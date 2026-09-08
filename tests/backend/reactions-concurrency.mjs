@@ -8,17 +8,16 @@ if (process.env.REACTIONS_ALLOW_SYNTHETIC !== "1") {
   throw new Error("Set REACTIONS_ALLOW_SYNTHETIC=1 to run the synthetic concurrency fixture");
 }
 
-function isLocalHost(value) {
-  const host = String(value || "").trim().toLowerCase().replace(/[\[\]]/g, "");
-  return host === "localhost" || host === "127.0.0.1" || host === "::1" || host.startsWith("/");
+function isUnixSocketDirectory(value) {
+  return String(value || "").trim().startsWith("/");
 }
 
 function connectionTarget() {
   const explicitHost = process.env.REACTIONS_DATABASE_HOST?.trim();
   if (explicitHost) {
-    if (!isLocalHost(explicitHost)) throw new Error("REACTIONS_DATABASE_HOST must be localhost, loopback, or a Unix socket path");
+    if (!isUnixSocketDirectory(explicitHost)) throw new Error("REACTIONS_DATABASE_HOST must be an absolute Unix socket directory");
     const port = process.env.REACTIONS_DATABASE_PORT ? Number(process.env.REACTIONS_DATABASE_PORT) : undefined;
-    if (port !== undefined && (!Number.isInteger(port) || port < 1 || port > 65535)) throw new Error("REACTIONS_DATABASE_PORT must be a valid local port");
+    if (port !== undefined && (!Number.isInteger(port) || port < 1 || port > 65535)) throw new Error("REACTIONS_DATABASE_PORT must be a valid Unix socket port");
     const database = process.env.REACTIONS_DATABASE_NAME?.trim();
     const user = process.env.REACTIONS_DATABASE_USER?.trim();
     if (!database || !user) throw new Error("REACTIONS_DATABASE_NAME and REACTIONS_DATABASE_USER are required with explicit host settings");
@@ -32,15 +31,8 @@ function connectionTarget() {
   }
 
   const databaseUrl = process.env.REACTIONS_DATABASE_URL?.trim();
-  if (!databaseUrl) throw new Error("Set REACTIONS_DATABASE_URL or the explicit local REACTIONS_DATABASE_HOST/PORT/USER/NAME settings");
-  let parsed;
-  try {
-    parsed = new URL(databaseUrl);
-  } catch {
-    throw new Error("REACTIONS_DATABASE_URL must be a valid PostgreSQL URL");
-  }
-  if (!isLocalHost(parsed.hostname)) throw new Error("REACTIONS_DATABASE_URL must point to localhost, loopback, or a Unix socket");
-  return databaseUrl;
+  if (databaseUrl) throw new Error("REACTIONS_DATABASE_URL is not supported; use explicit Unix socket settings");
+  throw new Error("Set REACTIONS_DATABASE_HOST to an absolute Unix socket directory with REACTIONS_DATABASE_PORT, REACTIONS_DATABASE_USER, and REACTIONS_DATABASE_NAME");
 }
 
 const target = connectionTarget();
@@ -59,7 +51,7 @@ const visitorA = "1".repeat(64);
 const visitorB = "2".repeat(64);
 
 function createClient() {
-  const client = typeof target === "string" ? postgres(target, options) : postgres({ ...target, ...options });
+  const client = postgres({ ...target, ...options });
   clients.push(client);
   return client;
 }
