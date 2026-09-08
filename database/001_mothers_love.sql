@@ -577,8 +577,6 @@ BEGIN
         new_contribution := mothers_love.ml_expression_vector(COALESCE((SELECT jsonb_agg(re.expression_id ORDER BY re.expression_id) FROM mothers_love.recognition_expressions re WHERE re.recognition_id = rec.id), '[]'::jsonb));
         UPDATE mothers_love.recognitions SET status = 'published', first_published_at = now_value, version = version + 1, reason_category = NULL WHERE id = rec.id;
         INSERT INTO mothers_love.contribution_state (recognition_id, period_start, contribution) VALUES (rec.id, period_start, new_contribution) ON CONFLICT (recognition_id) DO UPDATE SET period_start = EXCLUDED.period_start, contribution = EXCLUDED.contribution, updated_at = now_value;
-      ELSIF rec.status = 'hidden' THEN
-        UPDATE mothers_love.recognitions SET status = 'published', version = version + 1, reason_category = NULL WHERE id = rec.id;
       ELSIF rec.status <> 'published' THEN
         RETURN jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_STATE');
       ELSE
