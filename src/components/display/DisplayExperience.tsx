@@ -198,6 +198,13 @@ function primaryAccent(recognition: Recognition): string {
   return expression(recognition.expressionIds[0] ?? 1).color;
 }
 
+function newestFirst(left: Recognition, right: Recognition): number {
+  const leftPublished = Date.parse(left.firstPublishedAt ?? left.createdAt);
+  const rightPublished = Date.parse(right.firstPublishedAt ?? right.createdAt);
+  if (leftPublished !== rightPublished) return rightPublished - leftPublished;
+  return right.id.localeCompare(left.id);
+}
+
 function bubbleSize(recognition: Recognition, count: number): number {
   const messageWeight = recognition.message.length > 360 ? 18 : recognition.message.length > 180 ? 16.5 : 15.5;
   const densityAdjustment = count > 4 ? -1.5 : 0;
@@ -220,7 +227,7 @@ function GardenScreen({ state }: { state: PresentationState }) {
   const showConnections = state.settings.showConstellations && connections.length > 0;
   const showTrails = state.settings.showTrails && records.length > 0;
   return (
-    <section className={styles.screen} aria-labelledby="garden-title">
+    <section className={`${styles.screen} ${styles.gardenScreen}`} aria-labelledby="garden-title" data-motion-key="garden-drift">
       <div className={styles.screenHeading}>
         <p className={styles.eyebrow}>A GARDEN OF APPRECIATION</p>
         <h2 id="garden-title">Recognition Garden</h2>
@@ -282,7 +289,7 @@ function FeaturedScreen({ state }: { state: PresentationState }) {
   const expressionPage = isExpressionPage(recognition, pageIndex);
   const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
-    <section className={styles.screen} aria-labelledby="featured-title">
+    <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="featured-title" data-motion-key="featured-shimmer">
       <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}>
         <p className={styles.eyebrow}>AN EXPRESSION OF MOTHER&apos;S LOVE</p>
         <span className={styles.featureNumber}>{String(primary.id).padStart(2, '0')}</span>
@@ -319,7 +326,7 @@ function ClusterScreen({ state }: { state: PresentationState }) {
   const clusterExpression = state.clusterExpressionId ? expression(state.clusterExpressionId) : null;
   if (!clusterExpression || !matches.length) return <FallbackScreen />;
   return (
-    <section className={styles.screen} aria-labelledby="cluster-title">
+    <section className={`${styles.screen} ${styles.clusterScreen}`} aria-labelledby="cluster-title" data-motion-key="cluster-orbit">
       <div className={styles.clusterBoard}>
         <div className={styles.clusterCore} style={{ backgroundColor: clusterExpression.color }}>
           <p className={styles.eyebrow}>MOTHER&apos;S LOVE IN ACTION</p>
@@ -339,7 +346,7 @@ function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
   if (!snapshot) return <FallbackScreen />;
   const { aggregate } = snapshot;
   return (
-    <section className={styles.screen} aria-labelledby="impact-title">
+    <section className={`${styles.screen} ${styles.impactScreen}`} aria-labelledby="impact-title" data-motion-key="impact-spark">
       <div className={styles.impactMain}>
         <p className={styles.eyebrow}>THIS MONTH&apos;S SHARED MOMENT</p>
         <p className={styles.impactNumber}>{aggregate.expressionTotal}</p>
@@ -360,7 +367,7 @@ function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
 
 function ExpressionsScreen() {
   return (
-    <section className={styles.screen} aria-labelledby="expressions-title">
+    <section className={`${styles.screen} ${styles.expressionsScreen}`} aria-labelledby="expressions-title" data-motion-key="expressions-reveal">
       <div className={styles.screenHeading}>
         <p className={styles.eyebrow}>PRACTICE MOTHER&apos;S LOVE</p>
         <h2 id="expressions-title">The 9 Expressions</h2>
@@ -383,7 +390,7 @@ function ArrivalScreen({ state }: { state: PresentationState }) {
   if (!recognition) return <FallbackScreen />;
   if (isGroupedArrival(state)) {
     return (
-      <section className={styles.arrivalScreen} aria-live="polite" aria-labelledby="arrival-title">
+      <section className={`${styles.arrivalScreen} ${styles.arrivalGroupScreen}`} aria-live="polite" aria-labelledby="arrival-title" data-motion-key="arrival-gather">
         <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: '#a5c9ff' }} aria-hidden="true" />
         <p className={styles.eyebrow}>A FEW RECOGNITIONS HAVE ARRIVED</p>
         <h2 id="arrival-title">The garden has new gratitude.</h2>
@@ -399,12 +406,13 @@ function ArrivalScreen({ state }: { state: PresentationState }) {
   const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
     <section
-      className={styles.arrivalScreen}
+      className={`${styles.arrivalScreen} ${styles.arrivalPersonalScreen}`}
       aria-live="polite"
       aria-labelledby="arrival-title"
       data-testid="arrival-reading"
       data-page-index={pageIndex}
       data-page-count={pageCount}
+      data-motion-key="arrival-land"
     >
       <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: expression(recognition.expressionIds[0]).color }} aria-hidden="true" />
       <p className={styles.eyebrow}>{isGroupedArrival(state) ? 'A FEW RECOGNITIONS HAVE ARRIVED' : 'A NEW RECOGNITION HAS ARRIVED'}</p>
@@ -428,7 +436,7 @@ function ArrivalScreen({ state }: { state: PresentationState }) {
 
 function MilestoneScreen({ state }: { state: PresentationState }) {
   return (
-    <section className={styles.milestoneScreen} aria-live="polite" aria-labelledby="milestone-title">
+    <section className={styles.milestoneScreen} aria-live="polite" aria-labelledby="milestone-title" data-motion-key="milestone-glow">
       <p className={styles.eyebrow}>A SHARED MILESTONE</p>
       <p className={styles.milestoneNumber}>{state.pendingMilestone ?? ''}</p>
       <h2 id="milestone-title">Expressions of Mother&apos;s Love recognized together</h2>
@@ -439,7 +447,7 @@ function MilestoneScreen({ state }: { state: PresentationState }) {
 
 function QuietScreen({ neutral = false }: { neutral?: boolean }) {
   return (
-    <section className={styles.quietScreen} aria-labelledby="quiet-title">
+    <section className={styles.quietScreen} aria-labelledby="quiet-title" data-motion-key={neutral ? 'neutral-still' : 'quiet-breathe'}>
       <span className={styles.quietFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>{neutral ? 'DISPLAY SAFETY MODE' : 'A QUIET MOMENT'}</p>
       <h2 id="quiet-title">{neutral ? 'Messages are hidden on this display.' : 'Mother&apos;s Love is still here.'}</h2>
@@ -453,12 +461,36 @@ function QuietScreen({ neutral = false }: { neutral?: boolean }) {
 
 function FallbackScreen() {
   return (
-    <section className={styles.fallbackScreen} aria-labelledby="fallback-title">
+    <section className={styles.fallbackScreen} aria-labelledby="fallback-title" data-motion-key="fallback-warmth">
       <span className={styles.fallbackFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>THE RECOGNITION GARDEN</p>
       <h2 id="fallback-title">There is room for your expression of love.</h2>
       <p>Scan below to recognize someone who encouraged you.</p>
     </section>
+  );
+}
+
+function LiveRail({ items }: { items: Recognition[] }) {
+  if (!items.length) return null;
+  return (
+    <aside className={styles.liveRail} aria-label="Live recognitions" data-testid="live-rail" data-live-count={items.length}>
+      <div className={styles.liveRailHeader}>
+        <span className={styles.liveIndicator} aria-hidden="true" />
+        <strong>LIVE</strong>
+        <span className={styles.liveRailMeta}>Recent recognitions</span>
+      </div>
+      <div className={styles.liveRailViewport}>
+        {items.map((recognition, index) => {
+          const excerpt = shortExcerpt(recognition.message, 110);
+          return (
+            <article className={styles.liveRailItem} key={recognition.id} data-testid="live-recognition" data-live-index={index}>
+              <p className={styles.liveRailRecipient}>{recognition.recipient}</p>
+              <p className={styles.liveRailMessage}>{excerpt.text}</p>
+            </article>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 
@@ -582,7 +614,9 @@ export function DisplayExperience() {
   }, [state.paired, state.settings.version, state.snapshot, state.unauthorized]);
 
   const motion = effectiveMotion(state);
-  const eligibleCount = useMemo(() => selectEligible(state).length, [state]);
+  const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
+  const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
+  const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
   if (!state.paired && state.phase !== 'loading') {
     return <PairingPanel onPair={pairDisplay} pending={pairingPending} error={pairingError} />;
   }
@@ -591,7 +625,9 @@ export function DisplayExperience() {
       className={`${styles.displayApp} ${styles[`motion${motion}`]} ${state.lowActivity ? styles.lowActivity : ''} ${state.stale ? styles.stale : ''}`}
       data-testid="display-app"
       data-screen={state.screen}
+      data-motion={motion}
       data-eligible-count={eligibleCount}
+      data-rail-count={liveRailItems.length}
       data-cursor={state.cursor ?? ''}
     >
       <Atmosphere />
@@ -607,6 +643,7 @@ export function DisplayExperience() {
         </div>
       </header>
       <div className={styles.stage}><Screen state={state} /></div>
+      {personalContentVisible ? <LiveRail items={liveRailItems} /> : null}
       {state.snapshot?.submissionUrl ? <QrDock url={state.snapshot.submissionUrl} inviting={state.screen === 'fallback' || state.screen === 'quiet'} /> : null}
       <div className={styles.progressTrack} aria-hidden="true"><span style={{ width: state.nextTransitionAtMs ? `${Math.max(0, Math.min(100, ((state.nowMs - state.screenStartedAtMs) / Math.max(1, state.nextTransitionAtMs - state.screenStartedAtMs)) * 100))}%` : '0%' }} /></div>
     </main>

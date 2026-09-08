@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 type FixtureSize = 0 | 1 | 2 | 20 | 'long';
-type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean };
+type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; mode?: 'normal' | 'quiet' | 'neutral' };
 const LONG_RECIPIENT = 'R'.repeat(80);
 const LONG_MESSAGE = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
 const DENSE_LINE_MESSAGE = `${'A\n'.repeat(249)}A`;
@@ -45,7 +45,7 @@ function fixture(size: FixtureSize, options: FixtureOptions = {}) {
     },
     settings: {
       version: 1,
-      mode: 'normal' as const,
+      mode: options.mode ?? 'normal',
       motion: 'still' as const,
       pauseArrivals: false,
       pauseRotation: false,
@@ -221,6 +221,84 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(board).toHaveAttribute('data-trail-count', '0');
     await expect(board.locator('svg')).toHaveCount(0);
     await expect(board.locator('[class*="bubbleTrail"]')).toHaveCount(0);
+  });
+
+  test('keeps the paired live rail newest first, capped at 30, and outside the stage and QR dock', async ({ page }) => {
+    await pairAndRead(page, 20);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '20', { timeout: 10_000 });
+    await expect(page.getByTestId('live-rail')).toBeVisible();
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition')).toHaveCount(20);
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('Synthetic recipient 20');
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').last()).toContainText('Synthetic recipient 1');
+
+    const cardShape = await page.getByTestId('recognition-card').first().evaluate((card) => {
+      const style = getComputedStyle(card);
+      return { borderRadius: style.borderRadius, width: card.getBoundingClientRect().width, height: card.getBoundingClientRect().height };
+    });
+    expect(cardShape.borderRadius).not.toBe('50%');
+    expect(cardShape.width).toBeGreaterThan(cardShape.height * 0.7);
+
+    for (const viewport of [{ width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
+      await page.setViewportSize(viewport);
+      const bounds = await page.evaluate(() => {
+        const app = document.querySelector<HTMLElement>('[data-testid="display-app"]')?.getBoundingClientRect();
+        const rail = document.querySelector<HTMLElement>('[data-testid="live-rail"]')?.getBoundingClientRect();
+        const stage = document.querySelector<HTMLElement>('[class*="stage"]')?.getBoundingClientRect();
+        const qr = document.querySelector<HTMLElement>('[aria-label="Share a recognition"]')?.getBoundingClientRect();
+        if (!app || !rail || !stage || !qr) return null;
+        return {
+          appRight: app.right,
+          appBottom: app.bottom,
+          railLeft: rail.left,
+          railRight: rail.right,
+          railBottom: rail.bottom,
+          stageRight: stage.right,
+          qrRight: qr.right,
+          qrTop: qr.top,
+          railTop: rail.top,
+        };
+      });
+      expect(bounds).not.toBeNull();
+      expect(bounds!.railRight).toBeLessThanOrEqual(bounds!.appRight + 2);
+      expect(bounds!.railBottom).toBeLessThanOrEqual(bounds!.appBottom + 2);
+      expect(bounds!.stageRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
+      expect(bounds!.qrRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
+      expect(bounds!.qrTop).toBeGreaterThanOrEqual(bounds!.railTop - 2);
+    }
+  });
+
+  test('removes the live rail and personal counts in neutral mode', async ({ page }) => {
+    await pairAndRead(page, 2, { mode: 'neutral' });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '0');
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
+    await expect(page.getByTestId('live-rail')).toHaveCount(0);
+    await expect(page.getByText('Synthetic recipient 1')).toHaveCount(0);
+  });
+
+  test('gives each rotating screen its own motion composition', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairAndRead(page, 2, { continuous: true });
+    const seen = new Map<string, string>();
+    const capture = async (screen: string) => {
+      await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', screen, { timeout: 2_000 });
+      const key = await page.locator('[data-motion-key]').getAttribute('data-motion-key');
+      expect(key).toBeTruthy();
+      seen.set(screen, key!);
+    };
+    await capture('garden');
+    await page.clock.runFor(20_000);
+    await capture('featured');
+    await page.clock.runFor(12_000);
+    await capture('garden');
+    await page.clock.runFor(20_000);
+    await capture('impact');
+    await page.clock.runFor(15_000);
+    await capture('all-nine');
+    await page.clock.runFor(24_000);
+    await capture('cluster');
+    expect(new Set(seen.values()).size).toBe(6);
   });
 
   test('keeps garden bubbles inside the board and long excerpts readable at TV sizes', async ({ page }) => {
