@@ -49,7 +49,7 @@
   },
   {
     "path": "docs/HANDOFF.md",
-    "sha256": "96c4e44e26058f2383e57d247c07113c602e8aa263d093a5fa8be91e4dd6a5be"
+    "sha256": "aca2c2ac6d4b2a95d82dc73e9621ee041efc348d4da9448f86ba76b738895235"
   },
   {
     "path": "docs/HOSTING-DECISION.md",
@@ -69,7 +69,7 @@
   },
   {
     "path": "docs/UI-QUALITY-REPORT.md",
-    "sha256": "1502dd1950201480ece262166acf85a3c903f0165430bd9e506a72d493111549"
+    "sha256": "c7dc667230b8dd668beaacfd15389ddd1c22a9bf1740e2de3418eb86959d80fb"
   },
   {
     "path": "docs/USER-JOURNEYS.md",
@@ -298,6 +298,10 @@
   {
     "path": "docs/runs/2026-09-08-full-app/research/production-evidence/smoke.json",
     "sha256": "90957b443c5c8dda6f55d5c40ed8ff4c7e337fb68ccf4fb0ca1d19e978a22e94"
+  },
+  {
+    "path": "docs/runs/2026-09-08-full-app/research/release-publication.md",
+    "sha256": "c84e12e63a35a218ac4b23c5217eaf83a6ed8f9da1f2f08b372b078fd9af82c3"
   },
   {
     "path": "docs/runs/2026-09-08-full-app/research/release-storage.md",
