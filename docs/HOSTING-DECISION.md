@@ -1,7 +1,7 @@
 # Hosting decision
 User explicitly authorized full app and deployment, then use of the same database after the separate free database quota was refused. No paid upgrade is authorized or performed.
 
-Frontend/server: new mothers-love project under existing Vercel lvzion Hobby team. Provider hostname, no domain purchase. Database: existing Supabase cvuwdlmlukepwfffpgdu, separate mothers_love schema, dedicated restricted runtime credential and campaign functions. Existing church app data and authentication settings preserved. Supabase Auth credentials are limited to verified campaign membership; Owner MFA required, Moderator ordinary secured login. Root-only provisioning secrets never deployed or committed.
+Frontend/server: new mothers-love project under existing Vercel lvzion Hobby team. Provider hostname, no domain purchase. Database: existing Supabase cvuwdlmlukepwfffpgdu, separate mothers_love schema, dedicated restricted runtime credential and campaign functions. Existing church app data and authentication settings preserved. Supabase Auth credentials are limited to verified campaign membership; Both roles use individual verified email/password with no campaign authenticator requirement, per Anthony's latest correction. Root-only provisioning secrets never deployed or committed.
 
 No new service subscription. Existing free quotas still apply, including possible provider inactivity pausing and resource limits. Provider recovery behavior follows actual free-plan limitations, not a claimed permanent-free guarantee. Supabase official pricing and backups: https://supabase.com/pricing and https://supabase.com/docs/guides/platform/backups. Vercel commands verified against https://vercel.com/docs/cli/deploy. Runtime versions are exact lockfile pins.
 

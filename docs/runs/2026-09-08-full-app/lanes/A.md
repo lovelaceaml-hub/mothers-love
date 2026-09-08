@@ -31,7 +31,7 @@ This lane owns `src/app/admin/`, `src/components/admin/`, `tests/admin/`, this l
 
 ## Known integration notes
 
-- API calls use the foundation `api<T>` bearer-token path and the exact contract routes. Server route enforcement and AAL2 checks remain backend-owned.
+- API calls use the foundation `api<T>` bearer-token path and the exact contract routes. Server route enforcement, verified identity and role checks remain backend-owned.
 - Recovery and owner-issued moderator magic links use the root-authorized `https://mothers-love.vercel.app/admin/set-password` callback. The legacy login callback preserves the query or hash, including provider error markers, and hands off to setup. Setup captures only the non-secret callback type before Supabase can clear the hash, waits for a real provider session, confirms the provider user email before enabling save, updates the provider password and verifies campaign membership through `/api/admin/session`; callback markers alone never grant access. A callback error never falls back to a different stored session.
 - The detail editor sends only `EditableRecognitionFields`, never `requestKey`.
 - The display UI consumes `Device.appliedSnapshotRevision`; a settings version alone is not presented as full display acknowledgement.

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "form-phone",
+    "violations": [],
+    "domContentLoadedMs": 673,
+    "loadMs": 806,
+    "resourceBytes": 237367,
+    "overflow": false
+  },
+  {
+    "name": "form-desktop",
+    "violations": [],
+    "domContentLoadedMs": 36,
+    "loadMs": 49,
+    "resourceBytes": 1549,
+    "overflow": false
+  },
+  {
+    "name": "admin-login",
+    "violations": [],
+    "domContentLoadedMs": 96,
+    "loadMs": 96,
+    "resourceBytes": 13857,
+    "overflow": false
+  },
+  {
+    "name": "display-pair",
+    "violations": [],
+    "domContentLoadedMs": 263,
+    "loadMs": 265,
+    "resourceBytes": 29138,
+    "overflow": false
+  },
+  {
+    "name": "privacy",
+    "violations": [],
+    "domContentLoadedMs": 237,
+    "loadMs": 237,
+    "resourceBytes": 2312,
+    "overflow": false
+  },
+  {
+    "name": "expressions-phone",
+    "violations": [],
+    "domContentLoadedMs": 255,
+    "loadMs": 255,
+    "resourceBytes": 2312,
+    "overflow": false
+  },
+  {
+    "name": "expressions-desktop",
+    "violations": [],
+    "domContentLoadedMs": 56,
+    "loadMs": 64,
+    "resourceBytes": 600,
+    "overflow": false
+  },
+  {
+    "name": "password-setup",
+    "violations": [],
+    "domContentLoadedMs": 43,
+    "loadMs": 79,
+    "resourceBytes": 10763,
+    "overflow": false
+  },
+  {
+    "name": "password-link-request",
+    "violations": [],
+    "domContentLoadedMs": 48,
+    "loadMs": 49,
+    "resourceBytes": 600,
+    "overflow": false
+  }
+]
