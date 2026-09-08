@@ -403,13 +403,25 @@ function advanceProgram(state: PresentationState): PresentationState {
 }
 
 function completeArrival(state: PresentationState): PresentationState {
-  const activeId = state.activeArrival?.id;
-  if (!activeId) return state;
+  const activeArrival = state.activeArrival;
+  const activeId = activeArrival?.id;
+  if (!activeArrival || !activeId) return state;
+  const grouped = activeArrival.grouped;
   const item = state.queue[0];
-  const nextQueue = item?.id === activeId ? state.queue.slice(1) : state.queue.filter((queued) => queued.id !== activeId);
-  const nextIntroduced = item && !state.introducedPublicationKeys.includes(item.publicationKey)
-    ? [...state.introducedPublicationKeys, item.publicationKey]
-    : state.introducedPublicationKeys;
+  const introducedKeys = grouped
+    ? state.queue.map((queued) => queued.publicationKey)
+    : item?.id === activeId
+      ? [item.publicationKey]
+      : state.queue.filter((queued) => queued.id === activeId).map((queued) => queued.publicationKey);
+  const nextQueue = grouped
+    ? []
+    : item?.id === activeId
+      ? state.queue.slice(1)
+      : state.queue.filter((queued) => queued.id !== activeId);
+  const nextIntroduced = [...state.introducedPublicationKeys];
+  for (const key of introducedKeys) {
+    if (!nextIntroduced.includes(key)) nextIntroduced.push(key);
+  }
   return {
     ...state,
     screen: 'garden',
