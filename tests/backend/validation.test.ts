@@ -5,7 +5,7 @@ import { graphemeLength, startOfLosAngelesWeek } from "@/lib/server/time";
 import { validateEditablePatch, validateRecognitionInput } from "@/lib/server/validation";
 
 describe("backend input validation", () => {
-  const base = { submittedName: "A. Sender", recipient: "M. Friend", message: "Thank you for your kindness.", expressionIds: [2, 6, 8], requestKey: "request-1234" };
+  const base = { submittedName: "Sender A.", recipient: "Friend M.", message: "Thank you for your kindness.", expressionIds: [2, 6, 8], requestKey: "request-1234" };
 
   it("accepts the 500 grapheme boundary and rejects 501", () => {
     expect(validateRecognitionInput({ ...base, message: "🙂".repeat(500) }).issues).toHaveLength(0);
@@ -15,6 +15,26 @@ describe("backend input validation", () => {
   it("counts combining and emoji text by grapheme", () => {
     expect(graphemeLength("e\u0301")).toBe(1);
     expect(graphemeLength("👩‍👩‍👧‍👦")).toBe(1);
+  });
+
+  it("keeps the public name shape aligned with the browser for Unicode names", () => {
+    expect(validateRecognitionInput({ ...base, submittedName: "Mary Jane O.", recipient: "Jean-Luc E\u0301." }).issues).toEqual([]);
+    expect(validateRecognitionInput({ ...base, submittedName: "张 伟", recipient: "Friend M." }).issues).toEqual([]);
+    expect(validateRecognitionInput({ ...base, submittedName: "Maya Rodriguez" }).issues).toContainEqual({ field: "submittedName", code: "invalid_format" });
+    expect(validateRecognitionInput({ ...base, recipient: "hello" }).issues).toContainEqual({ field: "recipient", code: "invalid_format" });
+  });
+
+  it("keeps the 80-grapheme name boundary and rejects 81", () => {
+    const nameAtLimit = `${"a".repeat(78)} B`;
+    const nameOverLimit = `${"a".repeat(79)} B`;
+    expect(validateRecognitionInput({ ...base, submittedName: nameAtLimit }).issues).toEqual([]);
+    expect(validateRecognitionInput({ ...base, submittedName: nameOverLimit }).issues).toContainEqual({ field: "submittedName", code: "too_long" });
+  });
+
+  it("applies the same name shape to editable fields and preserves trimmed values", () => {
+    expect(validateEditablePatch({ submittedName: " Sender A. ", recipient: " Friend M. " }).value).toEqual({ submittedName: "Sender A.", recipient: "Friend M." });
+    expect(validateEditablePatch({ submittedName: "Sender Fullname" }).issues).toContainEqual({ field: "submittedName", code: "invalid_format" });
+    expect(validateEditablePatch({ recipient: "Friend Fullname" }).issues).toContainEqual({ field: "recipient", code: "invalid_format" });
   });
 
   it("keeps editable requestKey immutable while accepting partial fields", () => {

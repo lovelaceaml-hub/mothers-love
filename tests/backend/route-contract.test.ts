@@ -20,7 +20,8 @@ vi.mock("@/lib/server/response", async () => {
   return { ...actual, requireTrustedOrigin: () => null };
 });
 
-import * as recognitionRoute from "@/app/api/admin/recognitions/[id]/route";
+import * as adminRecognitionRoute from "@/app/api/admin/recognitions/[id]/route";
+import * as publicRecognitionRoute from "@/app/api/recognitions/route";
 import * as reportsRoute from "@/app/api/admin/reports/route";
 import * as settingsRoute from "@/app/api/admin/settings/route";
 import * as devicesRoute from "@/app/api/admin/devices/route";
@@ -41,7 +42,7 @@ const settings = {
   showConstellations: true,
 };
 const aggregate = { periodStart: "2026-09-01", periodEnd: "2026-09-30", recognitions: 2, expressionCounts: [1, 0, 1, 0, 0, 0, 0, 0, 0], expressionTotal: 2, revision: 4 };
-const recognition = { id: "00000000-0000-4000-8000-000000000010", recipient: "M. Friend", message: "Thank you.", expressionIds: [2], createdAt: "2026-09-07T00:00:00Z", firstPublishedAt: "2026-09-07T00:00:00Z", expiresAt: "2026-09-14T00:00:00Z", version: 1, status: "published", featured: false, submittedName: "A. Sender", reason: null };
+const recognition = { id: "00000000-0000-4000-8000-000000000010", recipient: "Friend M.", message: "Thank you.", expressionIds: [2], createdAt: "2026-09-07T00:00:00Z", firstPublishedAt: "2026-09-07T00:00:00Z", expiresAt: "2026-09-14T00:00:00Z", version: 1, status: "published", featured: false, submittedName: "Sender A.", reason: null };
 
 function request(path: string, init?: { method?: string; headers?: HeadersInit; body?: BodyInit | null }) {
   return new NextRequest(`https://mothers-love.example${path}`, init);
@@ -56,8 +57,29 @@ beforeEach(() => {
 describe("admin route DTOs", () => {
   it("returns a bare AdminRecognition for detail GET", async () => {
     databaseAction.mockResolvedValue({ data: { ok: true, recognition }, error: null });
-    const response = await recognitionRoute.GET(request("/api/admin/recognitions/00000000-0000-4000-8000-000000000010"), { params: Promise.resolve({ id: recognition.id }) });
+    const response = await adminRecognitionRoute.GET(request("/api/admin/recognitions/00000000-0000-4000-8000-000000000010"), { params: Promise.resolve({ id: recognition.id }) });
     expect(await response.json()).toEqual(recognition);
+  });
+
+  it("rejects malformed public names before the database call", async () => {
+    readJson.mockResolvedValue({ value: { submittedName: "Sender Fullname", recipient: "Friend M.", message: "Thank you.", expressionIds: [2], requestKey: "request-1234" } });
+    const response = await publicRecognitionRoute.POST(request("/api/recognitions", { method: "POST", headers: { origin: "https://mothers-love.example" } }));
+    expect(response.status).toBe(400);
+    expect(databaseAction).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed admin edit names before the database call", async () => {
+    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { submittedName: "Sender Fullname" }, reason: "correction" } });
+    const response = await adminRecognitionRoute.PATCH(request(`/api/admin/recognitions/${recognition.id}`, { method: "PATCH", headers: { origin: "https://mothers-love.example" } }), { params: Promise.resolve({ id: recognition.id }) });
+    expect(response.status).toBe(400);
+    expect(databaseAction).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed admin edit recipients before the database call", async () => {
+    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { recipient: "Friend Fullname" }, reason: "correction" } });
+    const response = await adminRecognitionRoute.PATCH(request(`/api/admin/recognitions/${recognition.id}`, { method: "PATCH", headers: { origin: "https://mothers-love.example" } }), { params: Promise.resolve({ id: recognition.id }) });
+    expect(response.status).toBe(400);
+    expect(databaseAction).not.toHaveBeenCalled();
   });
 
   it("returns bare DisplaySettings for GET and PATCH", async () => {

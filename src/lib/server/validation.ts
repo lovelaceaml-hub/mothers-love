@@ -1,3 +1,4 @@
+import { countGraphemes, isFirstNameLastInitial, MAX_NAME_GRAPHEMES } from "@/lib/name-validation";
 import { graphemeLength, isIsoDate, isMonthBoundary } from "./time";
 import type { EditableRecognitionFields, MutationAction, RecognitionInput } from "./types";
 
@@ -24,9 +25,11 @@ export function validateRecognitionInput(input: unknown): ValidationResult<Recog
   const expressionIds = Array.isArray(rawIds) && rawIds.every((id) => Number.isInteger(id)) ? [...new Set(rawIds as number[])].sort((a, b) => a - b) : null;
   const issues: ValidationIssue[] = [];
   if (!submittedName) issues.push({ field: "submittedName", code: "required" });
-  else if (graphemeLength(submittedName) > 80) issues.push({ field: "submittedName", code: "too_long" });
+  else if (countGraphemes(submittedName) > MAX_NAME_GRAPHEMES) issues.push({ field: "submittedName", code: "too_long" });
+  else if (!isFirstNameLastInitial(submittedName)) issues.push({ field: "submittedName", code: "invalid_format" });
   if (!recipient) issues.push({ field: "recipient", code: "required" });
-  else if (graphemeLength(recipient) > 80) issues.push({ field: "recipient", code: "too_long" });
+  else if (countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
+  else if (!isFirstNameLastInitial(recipient)) issues.push({ field: "recipient", code: "invalid_format" });
   if (!message) issues.push({ field: "message", code: "required" });
   else if (graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });
   if (!expressionIds || expressionIds.length < 1 || expressionIds.length > 9 || expressionIds.some((id) => id < 1 || id > 9)) issues.push({ field: "expressionIds", code: "invalid" });
@@ -75,9 +78,11 @@ export function validateEditablePatch(input: unknown): ValidationResult<Partial<
   const expressionIds = rawIds === undefined ? undefined : Array.isArray(rawIds) && rawIds.every((id) => Number.isInteger(id)) ? [...new Set(rawIds as number[])].sort((a, b) => a - b) : null;
   const issues: ValidationIssue[] = [];
   if (submittedName === null || submittedName === "") issues.push({ field: "submittedName", code: "required" });
-  else if (submittedName !== undefined && graphemeLength(submittedName) > 80) issues.push({ field: "submittedName", code: "too_long" });
+  else if (submittedName !== undefined && countGraphemes(submittedName) > MAX_NAME_GRAPHEMES) issues.push({ field: "submittedName", code: "too_long" });
+  else if (submittedName !== undefined && !isFirstNameLastInitial(submittedName)) issues.push({ field: "submittedName", code: "invalid_format" });
   if (recipient === null || recipient === "") issues.push({ field: "recipient", code: "required" });
-  else if (recipient !== undefined && graphemeLength(recipient) > 80) issues.push({ field: "recipient", code: "too_long" });
+  else if (recipient !== undefined && countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
+  else if (recipient !== undefined && !isFirstNameLastInitial(recipient)) issues.push({ field: "recipient", code: "invalid_format" });
   if (message === null || message === "") issues.push({ field: "message", code: "required" });
   else if (message !== undefined && graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });
   if (expressionIds !== undefined && (!expressionIds || expressionIds.length < 1 || expressionIds.length > 9 || expressionIds.some((id) => id < 1 || id > 9))) issues.push({ field: "expressionIds", code: "invalid" });
