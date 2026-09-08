@@ -184,17 +184,27 @@ test('does not resurrect a hidden item after a pending write returns', async ({ 
 });
 
 test('does not resurrect an expired item after a pending write returns', async ({ page }) => {
-  await page.clock.install();
+  const testStart = new Date('2030-01-01T11:59:50.000Z');
+  const beforeExpiry = new Date('2030-01-01T12:00:00.000Z');
+  await page.clock.install({ time: testStart });
+  await page.addInitScript(() => {
+    const nativeSetInterval = window.setInterval;
+    window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
+      nativeSetInterval(handler, timeout === 10_000 ? 60_000 : timeout, ...args)
+    )) as typeof window.setInterval;
+  });
   let releasePut: (() => void) | undefined;
+  let putStarted = false;
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
   await page.route('**/api/feed', async (route) => {
-    await route.fulfill({ json: { serverTime, items: [{ ...feedItem, expiresAt: '2030-01-01T12:00:01.000Z' }] } });
+    await route.fulfill({ json: { serverTime: testStart.toISOString(), items: [{ ...feedItem, expiresAt: '2030-01-01T12:00:01.000Z' }] } });
   });
   await page.route('**/api/reactions**', async (route) => {
     if (route.request().method() === 'GET') {
       await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
       return;
     }
+    putStarted = true;
     await pendingPut;
     await route.fulfill({ json: { id: feedItem.id, count: 8, liked: true } });
   });
@@ -202,8 +212,11 @@ test('does not resurrect an expired item after a pending write returns', async (
   await page.goto('/');
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
   await expect(heart).toBeEnabled();
+  await page.clock.pauseAt(beforeExpiry);
+  await expect(heart).toBeEnabled();
   await heart.click();
-  await page.clock.fastForward(1_200);
+  await expect.poll(() => putStarted).toBe(true);
+  await page.clock.runFor(1_200);
   await expect(page.getByText('Michelle R.')).toHaveCount(0);
   releasePut?.();
   await expect(page.getByText('Michelle R.')).toHaveCount(0);
