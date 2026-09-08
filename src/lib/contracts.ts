@@ -3,6 +3,7 @@ export interface Expression {
   phrase: string;
   principle: string;
   color: string;
+  example?: string;
 }
 
 export interface RecognitionInput {
