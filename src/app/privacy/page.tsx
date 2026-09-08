@@ -15,7 +15,7 @@ export default function PrivacyPage() {
     <main className={styles.page}>
       <div className={styles.decorativeCircle} aria-hidden="true" />
       <div className={styles.shell}>
-        <Link className={styles.backLink} href="/">Back to recognition sharing</Link>
+        <Link className={styles.backLink} href="/">Back to live recognitions</Link>
         <header className={styles.header}>
           <p className={styles.kicker}>A clear, short guide</p>
           <h1>{CAMPAIGN_TITLE}</h1>
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
 
         </article>
 
-        <p className={styles.footer}>Return to the <Link href="/">recognition form</Link> when you are ready.</p>
+        <p className={styles.footer}>Return to the <Link href="/recognize">recognition form</Link> when you are ready.</p>
       </div>
     </main>
   );
