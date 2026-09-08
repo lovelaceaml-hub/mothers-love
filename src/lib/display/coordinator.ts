@@ -161,12 +161,17 @@ function maxBubbles(settings: DisplaySettings): number {
 }
 
 function nextMilestone(total: number, celebrated: number[]): number | null {
+  const candidates = milestoneThresholds(total);
+  const crossed = candidates.filter((threshold) => threshold <= total && !celebrated.includes(threshold));
+  return crossed.length ? Math.max(...crossed) : null;
+}
+
+function milestoneThresholds(total: number): number[] {
   const candidates = [...MILESTONE_BASES];
   if (total >= 1_000) {
     for (let threshold = 1_500; threshold <= total + 500; threshold += 500) candidates.push(threshold);
   }
-  const crossed = candidates.filter((threshold) => threshold <= total && !celebrated.includes(threshold));
-  return crossed.length ? Math.max(...crossed) : null;
+  return candidates;
 }
 
 function durationFor(screen: DisplayScreen, selected?: Recognition): number {
@@ -256,9 +261,15 @@ function rebuildVisibleState(
   const items = eligible(snapshot, receivedAtMs, offset);
   const reset = snapshot.sync === 'reset' || !state.snapshot;
   const arrivals: SnapshotArrival[] = snapshot.arrivals ?? [];
+  const knownKeys = new Set(state.knownPublicationKeys);
   const newArrivals = reset
     ? []
-    : arrivals.filter((arrival) => !state.knownPublicationKeys.includes(arrivalKey(arrival)));
+    : arrivals.filter((arrival) => {
+      const key = arrivalKey(arrival);
+      if (knownKeys.has(key)) return false;
+      knownKeys.add(key);
+      return true;
+    });
   const queuedKeys = new Set(state.queue.map((item) => item.publicationKey));
   const nextQueue = state.queue
     .filter((item) => items.some((candidate) => candidate.id === item.id))
@@ -277,6 +288,7 @@ function rebuildVisibleState(
   const threshold = reset ? null : nextMilestone(snapshot.aggregate.expressionTotal, celebrated);
   const currentScreenIsValid =
     state.screen === 'featured' ? Boolean(byId(items, state.featuredId)) : state.screen !== 'arrival' || Boolean(state.activeArrival);
+  const activeArrivalIsValid = !state.activeArrival || items.some((item) => item.id === state.activeArrival?.id);
   const mode = settings.mode;
   const quiet = mode === 'quiet' || state.operatorModeOverride === 'quiet';
   const neutral = mode === 'neutral' || state.operatorModeOverride === 'neutral';
@@ -292,10 +304,10 @@ function rebuildVisibleState(
     ? 'neutral'
     : quiet
       ? 'quiet'
-      : reset || wakeForPublication || !currentScreenIsValid
+      : reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid
         ? fallbackScreen
         : state.screen;
-  const shouldStartClock = reset || wakeForPublication || !state.nextTransitionAtMs;
+  const shouldStartClock = reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid || !state.nextTransitionAtMs;
   return {
     ...state,
     paired: true,
@@ -313,6 +325,7 @@ function rebuildVisibleState(
     clusterIds: cluster.ids,
     clusterExpressionId: cluster.expressionId,
     queue: nextQueue,
+    activeArrival: activeArrivalIsValid ? state.activeArrival : null,
     knownPublicationKeys: reset
       ? arrivals.map(arrivalKey)
       : [...state.knownPublicationKeys, ...newArrivals.map(arrivalKey)],
@@ -476,7 +489,8 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       const month = periodKey(action.snapshot);
       const celebrated = next.celebratedMilestones[month] ?? [];
       if (!state.snapshot) {
-        const initialThresholds = MILESTONE_BASES.filter((threshold) => threshold <= action.snapshot.aggregate.expressionTotal);
+        const initialThresholds = milestoneThresholds(action.snapshot.aggregate.expressionTotal)
+          .filter((threshold) => threshold <= action.snapshot.aggregate.expressionTotal);
         return {
           ...next,
           celebratedMilestones: initialThresholds.length

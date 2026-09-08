@@ -119,6 +119,16 @@ describe('display presentation coordinator', () => {
     expect(second.knownPublicationKeys).toEqual(['event-one']);
   });
 
+  it('deduplicates repeated event ids within one delta response', () => {
+    const item = recognition('same-delta');
+    const base = received(createInitialState(), snapshot([item]), 0);
+    const arrival = { eventId: 'event-same-delta', recognitionId: item.id, publishedAt: item.firstPublishedAt! };
+    const next = received(base, delta(snapshot([item]), [item], [arrival, arrival, arrival], 1), 1);
+
+    expect(next.queue).toHaveLength(1);
+    expect(next.knownPublicationKeys).toEqual(['event-same-delta']);
+  });
+
   it('starts a restart from a quiet authoritative snapshot without replaying old records', () => {
     const records = [recognition('one'), recognition('two')];
     const restarted = received(createInitialState(), snapshot(records, { arrivals: [], sync: 'reset' }), 0);
@@ -126,6 +136,16 @@ describe('display presentation coordinator', () => {
     expect(restarted.screen).toBe('garden');
     expect(restarted.queue).toHaveLength(0);
     expect(restarted.activeArrival).toBeNull();
+  });
+
+  it('marks every already-crossed milestone as baseline on startup', () => {
+    const current = snapshot([recognition('baseline')], {
+      aggregate: { ...snapshot([]).aggregate, expressionTotal: 1_500 },
+    });
+    const state = received(createInitialState(), current, 0);
+
+    expect(state.pendingMilestone).toBeNull();
+    expect(state.celebratedMilestones['2026-09']).toContain(1_500);
   });
 
   it('removes an expired record immediately while rotation is paused', () => {
@@ -137,6 +157,19 @@ describe('display presentation coordinator', () => {
     expect(selectEligible(afterExpiry)).toHaveLength(0);
     expect(afterExpiry.gardenIds).toHaveLength(0);
     expect(afterExpiry.screen).toBe('fallback');
+  });
+
+  it('cancels an active arrival immediately when the authoritative snapshot removes it', () => {
+    const item = recognition('removed');
+    const base = received(createInitialState(), snapshot([item]), 0);
+    const arrival = { eventId: 'event-removed', recognitionId: item.id, publishedAt: item.firstPublishedAt! };
+    const queued = received(base, delta(snapshot([item]), [item], [arrival], 1), 1);
+    const active = displayReducer(queued, { type: 'TICK', nowMs: 20_001 });
+    const removed = received(active, delta(snapshot([]), [], [], 20_002), 20_002);
+
+    expect(removed.activeArrival).toBeNull();
+    expect(removed.queue).toHaveLength(0);
+    expect(removed.screen).toBe('fallback');
   });
 
   it('resets the cursor and holds Quiet after a disconnect until a reset snapshot arrives', () => {
