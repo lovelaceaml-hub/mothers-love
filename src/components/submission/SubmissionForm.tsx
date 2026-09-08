@@ -225,7 +225,6 @@ function Header() {
       <p className={styles.kicker}>A small word of encouragement</p>
       <h1>{CAMPAIGN_TITLE}</h1>
       <p className={styles.tagline}>{CAMPAIGN_TAGLINE}</p>
-      <p className={styles.intro}>Recognize someone who shared a little of Mother’s Love with you.</p>
     </header>
   );
 }
