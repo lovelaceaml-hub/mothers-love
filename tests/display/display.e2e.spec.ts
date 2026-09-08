@@ -71,8 +71,9 @@ function longAcceptanceFixture(
   sync: 'reset' | 'delta' = 'reset',
   arrivals: Array<{ eventId: string; recognitionId: string; publishedAt: string }> = [],
   message = LONG_MESSAGE,
+  options: Pick<FixtureOptions, 'motion'> = {},
 ) {
-  const base = fixture(1);
+  const base = fixture(1, options);
   return {
     ...base,
     revision,
@@ -144,7 +145,7 @@ async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOption
   await expect(page.getByTestId('display-app')).toBeVisible();
 }
 
-async function pairLongAcceptance(page: Page, withArrival: boolean, message = LONG_MESSAGE) {
+async function pairLongAcceptance(page: Page, withArrival: boolean, message = LONG_MESSAGE, options: Pick<FixtureOptions, 'motion'> = {}) {
   await routeReactionCounts(page);
   await page.route('**/api/display/pair', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
@@ -157,14 +158,14 @@ async function pairLongAcceptance(page: Page, withArrival: boolean, message = LO
       return;
     }
     if (snapshotCalls === 2) {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(longAcceptanceFixture(1, 'reset', [], message)) });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(longAcceptanceFixture(1, 'reset', [], message, options)) });
       return;
     }
     const arrival = { eventId: 'long-acceptance-event', recognitionId: 'synthetic-1', publishedAt: '2026-09-08T12:00:00.000Z' };
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify(longAcceptanceFixture(snapshotCalls, 'delta', withArrival ? [arrival] : [], message)),
+      body: JSON.stringify(longAcceptanceFixture(snapshotCalls, 'delta', withArrival ? [arrival] : [], message, options)),
     });
   });
   await page.route('**/api/display/ack', async (route) => {
@@ -423,7 +424,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairLongAcceptance(page, true);
+    await pairLongAcceptance(page, true, LONG_MESSAGE, { motion: 'standard' });
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
       await page.clock.runFor(500);
@@ -608,19 +609,23 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.skip(!DISPLAY_CAPTURE_ENABLED || !DISPLAY_CAPTURE_DIRECTORY, 'Set DISPLAY_SCREENSHOTS=1 and DISPLAY_SCREENSHOT_DIR to capture evidence.');
     const directory = DISPLAY_CAPTURE_DIRECTORY!;
 
-    await pairAndRead(page, 0);
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'fallback', { timeout: 10_000 });
-    await page.screenshot({ path: join(directory, 'fallback-empty.png'), fullPage: true });
+    const fallbackPage = await page.context().newPage();
+    await pairAndRead(fallbackPage, 0);
+    await expect(fallbackPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'fallback', { timeout: 10_000 });
+    await fallbackPage.screenshot({ path: join(directory, 'fallback-empty.png'), fullPage: true });
+    await fallbackPage.close();
 
-    await page.goto('/display');
-    await pairAndRead(page, 2, { mode: 'quiet' });
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'quiet', { timeout: 10_000 });
-    await page.screenshot({ path: join(directory, 'quiet-mode.png'), fullPage: true });
+    const quietPage = await page.context().newPage();
+    await pairAndRead(quietPage, 2, { mode: 'quiet' });
+    await expect(quietPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'quiet', { timeout: 10_000 });
+    await quietPage.screenshot({ path: join(directory, 'quiet-mode.png'), fullPage: true });
+    await quietPage.close();
 
-    await page.goto('/display');
-    await pairAndRead(page, 2, { mode: 'neutral' });
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
-    await page.screenshot({ path: join(directory, 'neutral-mode.png'), fullPage: true });
+    const neutralPage = await page.context().newPage();
+    await pairAndRead(neutralPage, 2, { mode: 'neutral' });
+    await expect(neutralPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
+    await neutralPage.screenshot({ path: join(directory, 'neutral-mode.png'), fullPage: true });
+    await neutralPage.close();
   });
 
   test('captures arrival and milestone screens from synthetic snapshots', async ({ page }) => {
