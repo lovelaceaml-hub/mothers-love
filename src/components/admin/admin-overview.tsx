@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Aggregate, Device, DisplaySettings } from '@/lib/contracts';
 import { adminApi, getAuthErrorMessage } from './admin-api';
 import { formatDateTime, formatExpiry, periodLabel } from './admin-utils';
@@ -17,26 +17,47 @@ type OverviewResponse = {
   settings: DisplaySettings;
 };
 
+const CLEANUP_HEALTH_WINDOW_MS = 120_000;
+
 export function AdminOverview() {
   const [data, setData] = useState<OverviewResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => Date.now());
+  const refreshInFlight = useRef(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async (background = false) => {
+    if (refreshInFlight.current) return;
+    refreshInFlight.current = true;
+    if (!background) {
+      setLoading(true);
+      setError(null);
+    }
+    setNow(Date.now());
     try {
-      setData(await adminApi<OverviewResponse>('/api/admin/overview'));
+      const refreshed = await adminApi<OverviewResponse>('/api/admin/overview');
+      setData(refreshed);
+      setError(null);
+      setNow(Date.now());
     } catch (cause) {
-      setError(getAuthErrorMessage(cause));
+      if (!background) setError(getAuthErrorMessage(cause));
     } finally {
-      setLoading(false);
+      refreshInFlight.current = false;
+      if (!background) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void load(); }, 0);
     return () => window.clearTimeout(timer);
+  }, [load]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+      void load(true);
+    }, 30_000);
+    return () => window.clearInterval(timer);
   }, [load]);
 
   if (loading) return <div className={styles.skeleton} aria-label="Loading overview" />;
@@ -46,6 +67,15 @@ export function AdminOverview() {
   const activeDevice = data.devices.find((device) => !device.revoked);
   const heartbeat = activeDevice?.lastSeenAt ? `Browser last connected ${formatDateTime(activeDevice.lastSeenAt)}` : 'No paired browser has connected yet';
   const modeLabel = data.settings.mode[0].toUpperCase() + data.settings.mode.slice(1);
+  const lastCleanupTime = data.lastCleanupAt ? new Date(data.lastCleanupAt).getTime() : Number.NaN;
+  const cleanupNeverRan = !data.lastCleanupAt;
+  const cleanupStale = cleanupNeverRan || !Number.isFinite(lastCleanupTime) || now - lastCleanupTime > CLEANUP_HEALTH_WINDOW_MS;
+  const retentionNeedsAttention = data.overduePurgeCount > 0 || cleanupStale;
+  const cleanupStatus = cleanupNeverRan
+    ? 'Cleanup has not run yet. Retention health will show Attention until the first cleanup completes.'
+    : cleanupStale
+      ? `Cleanup is stale. The latest run was more than ${CLEANUP_HEALTH_WINDOW_MS / 60_000} minutes ago.`
+      : `Last cleanup: ${formatDateTime(data.lastCleanupAt)}`;
 
   return (
     <>
@@ -65,9 +95,9 @@ export function AdminOverview() {
         </article>
 
         <article className={`${styles.card} ${styles.cardGreen} ${styles.col3}`}>
-          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Retention health</h2><p className={styles.cardDescription}>Personal data follows original expiry.</p></div><span className={data.overduePurgeCount ? styles.badgeInvalid : styles.badgePublished}>{data.overduePurgeCount ? 'Attention' : 'Healthy'}</span></div>
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Retention health</h2><p className={styles.cardDescription}>Personal data follows original expiry.</p></div><span className={retentionNeedsAttention ? styles.badgeInvalid : styles.badgePublished}>{retentionNeedsAttention ? 'Attention' : 'Healthy'}</span></div>
           <div className={styles.metric}><span className={styles.metricValue}>{data.overduePurgeCount}</span><span className={styles.metricLabel}>overdue purges</span></div>
-          <p className={styles.cardDescription}>Last cleanup: {formatDateTime(data.lastCleanupAt)}</p>
+          <p className={styles.cardDescription}>{cleanupStatus}{data.overduePurgeCount ? ` ${data.overduePurgeCount} overdue purge${data.overduePurgeCount === 1 ? '' : 's'} remain.` : ''}</p>
         </article>
 
         <article className={`${styles.card} ${styles.cardLavender} ${styles.col3}`}>
