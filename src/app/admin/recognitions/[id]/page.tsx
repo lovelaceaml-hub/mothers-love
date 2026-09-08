@@ -4,9 +4,8 @@ import { RecognitionDetailPage } from '@/components/admin/recognition-detail-pag
 export default async function RecognitionDetailRoute({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
-    <AdminShell eyebrow="Content workspace" title="Recognition detail" description="Review private admin fields separately from the public projection.">
+    <AdminShell eyebrow="Content workspace" title="Recognition detail" description="Review and update this recognition.">
       <RecognitionDetailPage id={id} />
     </AdminShell>
   );
 }
-

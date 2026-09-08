@@ -3,9 +3,8 @@ import { DisplayControls } from '@/components/admin/display-controls';
 
 export default function DisplayPage() {
   return (
-    <AdminShell eyebrow="Living Wall" title="Display controls" description="See what the paired browser last acknowledged and keep operational status truthful.">
+    <AdminShell eyebrow="Living Wall" title="Display controls" description="Check the paired browser and change display settings.">
       <DisplayControls />
     </AdminShell>
   );
 }
-

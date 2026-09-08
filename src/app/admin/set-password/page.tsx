@@ -129,7 +129,7 @@ export default function AdminSetPasswordPage() {
     }
     const auth = getAuthClient();
     if (!auth) {
-      setError('Admin authentication is not configured yet. Request a fresh setup link after the service is configured.');
+      setError('Admin authentication is unavailable. Request a fresh setup link later.');
       setStage('unavailable');
       setWorking(false);
       return;
@@ -160,7 +160,7 @@ export default function AdminSetPasswordPage() {
 
           {checking ? <div className={styles.skeleton} aria-label="Checking setup link" /> : null}
           {stage === 'unavailable' ? (
-            <div className={styles.error} role="alert">Admin authentication is not configured yet. The campaign stays closed until the authentication service is configured.</div>
+            <div className={styles.error} role="alert">Admin authentication is unavailable. The campaign stays closed until sign-in is available.</div>
           ) : null}
           {stage === 'missing' ? (
             <div className={styles.error} role="alert">{error ?? 'This setup link is missing, expired or already used. No password was changed.'}</div>

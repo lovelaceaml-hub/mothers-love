@@ -4,7 +4,6 @@ import {
   ackLabel,
   capabilitiesFor,
   displaySettingChanges,
-  formatExpiry,
   graphemeLength,
   isExpired,
   makeAggregateCsv,
@@ -43,17 +42,16 @@ const settings = (): DisplaySettings => ({
 });
 
 describe('admin editor safety helpers', () => {
-  it('clears eligibility at expiry and formats the expired state', () => {
+  it('clears eligibility at expiry', () => {
     const expiresAt = '2026-09-07T10:00:00.000Z';
     expect(isExpired(expiresAt, Date.parse('2026-09-07T10:00:01.000Z'))).toBe(true);
-    expect(formatExpiry(expiresAt, Date.parse('2026-09-07T10:00:01.000Z'))).toBe('Expired');
   });
 
   it('counts graphemes at the 500 boundary instead of UTF-16 code units', () => {
     const message = '🙂'.repeat(500);
     expect(graphemeLength(message)).toBe(500);
     expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message, expressionIds: [1] })).toEqual([]);
-    expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message: `${message}a`, expressionIds: [1] })).toContain('Messages must be 500 graphemes or fewer.');
+    expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message: `${message}a`, expressionIds: [1] })).toContain('Messages must be 500 characters or fewer.');
   });
 
   it('requires a deliberate reconcile decision when another admin advances the version', () => {
@@ -75,7 +73,7 @@ describe('admin role and display acknowledgement helpers', () => {
   it('distinguishes saved, pending and browser-applied acknowledgement', () => {
     expect(ackLabel('saved', false)).toBe('Unsaved changes');
     expect(ackLabel('pending', false)).toBe('Pending delivery');
-    expect(ackLabel('applied', false)).toBe('Saved in server');
+    expect(ackLabel('applied', false)).toBe('Saved');
     expect(ackLabel('applied', true)).toBe('Applied by browser');
   });
 
@@ -88,4 +86,3 @@ describe('admin role and display acknowledgement helpers', () => {
     expect(csv).not.toContain('Mina K.');
   });
 });
-

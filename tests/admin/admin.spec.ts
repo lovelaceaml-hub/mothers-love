@@ -240,7 +240,7 @@ test.describe('synthetic admin browser workflows', () => {
     await page.goto('/admin/settings');
     await expect(page.getByRole('heading', { name: 'Settings and access' })).toBeVisible();
     await expect(page.getByText('Read only', { exact: true })).toBeVisible();
-    await expect(page.getByText('Moderator account sign-in', { exact: true })).toBeVisible();
+    await expect(page.getByText('Display devices', { exact: true })).toBeVisible();
     await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
     await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toHaveCount(0);
@@ -252,13 +252,13 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Owner required', { exact: true })).toBeVisible();
   });
 
-  test('owner settings state email and password access without authenticator requirements', async ({ page }) => {
+  test('owner settings show member and device controls', async ({ page }) => {
     await mockCommon(page, { role: 'owner' });
     await signInAs(page);
     await page.goto('/admin/settings');
-    await expect(page.getByText('Owner account sign-in', { exact: true })).toBeVisible();
-    await expect(page.getByText('Moderator account sign-in', { exact: true })).toBeVisible();
-    await expect(page.getByText('Email and password', { exact: true })).toHaveCount(2);
+    await expect(page.getByText('Invited campaign members', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Invite moderator' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toBeVisible();
     await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
     await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
     await expect(page.getByText('authenticator', { exact: false })).toHaveCount(0);
@@ -319,7 +319,7 @@ test.describe('synthetic admin browser workflows', () => {
     expect(await page.evaluate(() => Object.entries(localStorage).filter(([key, value]) => key.includes('auth-token') || value.includes('synthetic-access-token')))).toEqual([]);
   });
 
-  test('retention health turns attention when cleanup becomes stale while open', async ({ page }) => {
+  test('cleanup status turns attention when cleanup becomes stale while open', async ({ page }) => {
     const cleanupAt = new Date().toISOString();
     await mockCommon(page, { overviewBody: overview({ lastCleanupAt: cleanupAt, overduePurgeCount: 0 }) });
     await page.clock.install({ time: cleanupAt });
@@ -328,10 +328,10 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Healthy', { exact: true })).toBeVisible();
     await page.clock.fastForward(121_000);
     await expect(page.getByText('Attention', { exact: true })).toBeVisible();
-    await expect(page.getByText('Cleanup is stale. The latest run was more than 2 minutes ago.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Cleanup needs attention. Keep collection closed until it is current.', { exact: true })).toBeVisible();
   });
 
-  test('retention health stays healthy when a background refresh advances cleanup', async ({ page }) => {
+  test('cleanup status stays healthy when a background refresh advances cleanup', async ({ page }) => {
     const cleanupAt = new Date().toISOString();
     const refreshedCleanupAt = new Date(Date.now() + 121_000).toISOString();
     let overviewRequests = 0;
@@ -351,15 +351,15 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Attention', { exact: true })).toHaveCount(0);
   });
 
-  test('retention health explains when cleanup has never run', async ({ page }) => {
+  test('cleanup status explains when cleanup has never run', async ({ page }) => {
     await mockCommon(page, { overviewBody: overview({ lastCleanupAt: null, overduePurgeCount: 0 }) });
     await signInAs(page);
     await page.goto('/admin');
     await expect(page.getByText('Attention', { exact: true })).toBeVisible();
-    await expect(page.getByText('Cleanup has not run yet. Retention health will show Attention until the first cleanup completes.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Cleanup has not run yet. Keep collection closed.', { exact: true })).toBeVisible();
   });
 
-  test('editor reconciles a 409 with the latest server version before saving', async ({ page }) => {
+  test('editor reconciles a 409 with the newer copy before saving', async ({ page }) => {
     let patchAttempts = 0;
     let submittedReason = '';
     const latest = recognition({ version: 4, message: 'Latest server copy.' });
@@ -383,16 +383,16 @@ test.describe('synthetic admin browser workflows', () => {
     await page.locator('#detail-message').fill('Local edited copy.');
     await page.getByRole('button', { name: 'Save edit' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByLabel('Why was this substantive edit made?')).toHaveValue('correction');
+    await expect(page.getByLabel('Why was this edit made?')).toHaveValue('correction');
     await page.getByRole('dialog').getByRole('button', { name: 'Save edit' }).click();
-    await expect(page.getByRole('heading', { name: 'Version conflict needs a decision' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Another update needs your choice' })).toBeVisible();
     await expect(page.getByText('Latest server copy.', { exact: true })).toBeVisible();
 
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
-    await page.getByRole('button', { name: 'Keep my draft and review' }).click();
+    await page.getByRole('button', { name: 'Keep my draft' }).click();
     await page.getByRole('button', { name: 'Save edit' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Save edit' }).click();
-    await expect(page.getByText('Edit saved. The server returned the new version.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Changes saved.', { exact: true })).toBeVisible();
     expect(patchAttempts).toBe(2);
     expect(submittedReason).toBe('correction');
   });
@@ -453,7 +453,7 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Late Conflict Recipient', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Late Conflict Sender', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Late conflict private message.', { exact: true })).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Version conflict needs a decision' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Another update needs your choice' })).toHaveCount(0);
   });
 
   test('expired PATCH response clears the editor before private fields render', async ({ page }) => {
@@ -500,13 +500,13 @@ test.describe('synthetic admin browser workflows', () => {
     });
     await signInAs(page);
     await page.goto('/admin/display');
-    await expect(page.getByText('Saved in server', { exact: true })).toBeVisible();
+    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Toggle pause new arrivals' }).click();
     await page.getByRole('button', { name: 'Save display settings' }).click();
     await expect(page.getByText('Pending delivery', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Refresh browser acknowledgement' }).click();
+    await page.getByRole('button', { name: 'Refresh TV status' }).click();
     await expect(page.getByText('Applied by browser', { exact: true })).toBeVisible();
-    await expect(page.getByText('Applied settings version 6; applied snapshot revision 4.', { exact: true })).toBeVisible();
+    await expect(page.getByText('TV status', { exact: true })).toBeVisible();
   });
 
   test('aggregate export downloads server CSV without personal fields', async ({ page }) => {
