@@ -3,11 +3,14 @@ import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 type FixtureSize = 0 | 1 | 2 | 20 | 'long';
-type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; mode?: 'normal' | 'quiet' | 'neutral' };
+type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still' };
 const LONG_RECIPIENT = 'R'.repeat(80);
 const LONG_MESSAGE = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
 const DENSE_LINE_MESSAGE = `${'A\n'.repeat(249)}A`;
 const LONG_EXPRESSIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const DISPLAY_CAPTURE_ENABLED = Boolean(process.env.DISPLAY_CAPTURE_SCREENS || process.env.DISPLAY_SCREENSHOTS);
+const DISPLAY_CAPTURE_DIRECTORY = process.env.DISPLAY_SCREENSHOT_DIR
+  ?? (process.env.DISPLAY_SCREENSHOTS && process.env.DISPLAY_SCREENSHOTS !== '1' ? process.env.DISPLAY_SCREENSHOTS : undefined);
 
 const fixtureRecognition = (id: number, long = false, expressionIds = [1, 2, 6]) => ({
   id: `synthetic-${id}`,
@@ -17,7 +20,7 @@ const fixtureRecognition = (id: number, long = false, expressionIds = [1, 2, 6])
     : `Synthetic appreciation message ${id}.`,
   expressionIds,
   createdAt: '2026-09-08T12:00:00.000Z',
-  firstPublishedAt: '2026-09-08T12:00:00.000Z',
+  firstPublishedAt: new Date(Date.parse('2026-09-08T12:00:00.000Z') + id * 1_000).toISOString(),
   expiresAt: '2026-09-15T12:00:00.000Z',
   version: 1,
   status: 'published' as const,
@@ -46,7 +49,7 @@ function fixture(size: FixtureSize, options: FixtureOptions = {}) {
     settings: {
       version: 1,
       mode: options.mode ?? 'normal',
-      motion: 'still' as const,
+      motion: options.motion ?? 'still',
       pauseArrivals: false,
       pauseRotation: false,
       collectionOpen: true,
@@ -103,7 +106,15 @@ async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOption
     }
     const response = fixture(size, options);
     const body = options.continuous && snapshotCalls > 2
-      ? { ...response, revision: snapshotCalls, cursor: `fixture-${size}-${snapshotCalls}`, sync: 'delta' as const }
+      ? {
+        ...response,
+        aggregate: options.milestone
+          ? { ...response.aggregate, expressionCounts: [6, 6, 6, 6, 6, 5, 5, 5, 5], expressionTotal: 50 }
+          : response.aggregate,
+        revision: snapshotCalls,
+        cursor: `fixture-${size}-${snapshotCalls}`,
+        sync: 'delta' as const,
+      }
       : response;
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   });
@@ -261,9 +272,84 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       expect(bounds).not.toBeNull();
       expect(bounds!.railRight).toBeLessThanOrEqual(bounds!.appRight + 2);
       expect(bounds!.railBottom).toBeLessThanOrEqual(bounds!.appBottom + 2);
-      expect(bounds!.stageRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
+      expect(bounds!.stageRight).toBeLessThanOrEqual(bounds!.railLeft - 20);
       expect(bounds!.qrRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
       expect(bounds!.qrTop).toBeGreaterThanOrEqual(bounds!.railTop - 2);
+    }
+  });
+
+  test('keeps cluster content clear of its expression panel at TV sizes', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await pairAndRead(page, 2, { continuous: true });
+    for (let step = 0; step < 30; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'cluster') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'cluster', { timeout: 2_000 });
+
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
+      await page.setViewportSize(viewport);
+      const metrics = await page.evaluate(() => {
+        const core = document.querySelector<HTMLElement>('[class*="clusterCore"]')?.getBoundingClientRect();
+        const cards = [...document.querySelectorAll<HTMLElement>('[class*="clusterCards"] [data-testid="recognition-card"]')].map((card) => {
+          const rect = card.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+            scrollWidth: card.scrollWidth,
+            clientWidth: card.clientWidth,
+            scrollHeight: card.scrollHeight,
+            clientHeight: card.clientHeight,
+          };
+        });
+        if (!core) return null;
+        return { core: { left: core.left, right: core.right, top: core.top, bottom: core.bottom }, cards };
+      });
+      expect(metrics).not.toBeNull();
+      expect(metrics!.cards.length).toBeGreaterThan(0);
+      for (const card of metrics!.cards) {
+        const overlaps = card.left < metrics!.core.right && card.right > metrics!.core.left && card.top < metrics!.core.bottom && card.bottom > metrics!.core.top;
+        expect(overlaps).toBe(false);
+        expect(card.scrollWidth).toBeLessThanOrEqual(card.clientWidth + 2);
+        expect(card.scrollHeight).toBeLessThanOrEqual(card.clientHeight + 2);
+      }
+    }
+  });
+
+  test('keeps all-nine expression cards clear of the QR dock at TV sizes', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await pairAndRead(page, 2, { continuous: true });
+    for (let step = 0; step < 30; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'all-nine') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'all-nine', { timeout: 2_000 });
+
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
+      await page.setViewportSize(viewport);
+      const metrics = await page.evaluate(() => {
+        const qr = document.querySelector<HTMLElement>('[aria-label="Share a recognition"]')?.getBoundingClientRect();
+        const cards = [...document.querySelectorAll<HTMLElement>('[class*="expressionGrid"] [class*="expressionCard"]')].map((card) => {
+          const rect = card.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, scrollWidth: card.scrollWidth, clientWidth: card.clientWidth, scrollHeight: card.scrollHeight, clientHeight: card.clientHeight };
+        });
+        if (!qr) return null;
+        return { qr: { left: qr.left, right: qr.right, top: qr.top, bottom: qr.bottom }, cards };
+      });
+      expect(metrics).not.toBeNull();
+      expect(metrics!.cards).toHaveLength(9);
+      for (const card of metrics!.cards) {
+        const overlaps = card.left < metrics!.qr.right && card.right > metrics!.qr.left && card.top < metrics!.qr.bottom && card.bottom > metrics!.qr.top;
+        expect(overlaps).toBe(false);
+        expect(card.scrollWidth).toBeLessThanOrEqual(card.clientWidth + 2);
+        expect(card.scrollHeight).toBeLessThanOrEqual(card.clientHeight + 2);
+      }
     }
   });
 
@@ -278,26 +364,25 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
   test('gives each rotating screen its own motion composition', async ({ page }) => {
     test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairAndRead(page, 2, { continuous: true });
+    await pairAndRead(page, 2, { continuous: true, motion: 'standard' });
     const seen = new Map<string, string>();
-    const capture = async (screen: string) => {
-      await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', screen, { timeout: 2_000 });
-      const key = await page.locator('[data-motion-key]').getAttribute('data-motion-key');
-      expect(key).toBeTruthy();
-      seen.set(screen, key!);
+    const capture = async () => {
+      const screen = await page.getByTestId('display-app').getAttribute('data-screen');
+      const motion = await page.locator('[data-motion-key]').evaluate((element) => {
+        const style = getComputedStyle(element);
+        return { key: element.getAttribute('data-motion-key'), animationName: style.animationName };
+      });
+      expect(screen).toBeTruthy();
+      expect(motion.key).toBeTruthy();
+      expect(motion.animationName).not.toBe('none');
+      seen.set(screen!, motion.key!);
     };
-    await capture('garden');
-    await page.clock.runFor(20_000);
-    await capture('featured');
-    await page.clock.runFor(12_000);
-    await capture('garden');
-    await page.clock.runFor(20_000);
-    await capture('impact');
-    await page.clock.runFor(15_000);
-    await capture('all-nine');
-    await page.clock.runFor(24_000);
-    await capture('cluster');
+    for (let step = 0; step < 30 && seen.size < 6; step += 1) {
+      await capture();
+      await page.clock.runFor(5_000);
+    }
     expect(new Set(seen.values()).size).toBe(6);
   });
 
@@ -436,10 +521,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
   });
 
   test('captures the current multi-record garden, featured, all-nine, and cluster screens', async ({ page }) => {
-    test.skip(!process.env.DISPLAY_CAPTURE_SCREENS, 'Set DISPLAY_CAPTURE_SCREENS and DISPLAY_SCREENSHOT_DIR to capture evidence.');
+    test.skip(!DISPLAY_CAPTURE_ENABLED || !DISPLAY_CAPTURE_DIRECTORY, 'Set DISPLAY_SCREENSHOTS=1 and DISPLAY_SCREENSHOT_DIR to capture evidence.');
     test.setTimeout(140_000);
     await pairAndRead(page, 2, { continuous: true });
-    const directory = process.env.DISPLAY_SCREENSHOT_DIR!;
+    const directory = DISPLAY_CAPTURE_DIRECTORY!;
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 15_000 });
     await page.screenshot({ path: join(directory, 'garden-multi-record.png'), fullPage: true });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 30_000 });
@@ -448,5 +533,45 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.screenshot({ path: join(directory, 'all-nine-multi-record.png'), fullPage: true });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'cluster', { timeout: 35_000 });
     await page.screenshot({ path: join(directory, 'cluster-multi-record.png'), fullPage: true });
+  });
+
+  test('captures fallback, quiet, and neutral safety screens', async ({ page }) => {
+    test.skip(!DISPLAY_CAPTURE_ENABLED || !DISPLAY_CAPTURE_DIRECTORY, 'Set DISPLAY_SCREENSHOTS=1 and DISPLAY_SCREENSHOT_DIR to capture evidence.');
+    const directory = DISPLAY_CAPTURE_DIRECTORY!;
+
+    await pairAndRead(page, 0);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'fallback', { timeout: 10_000 });
+    await page.screenshot({ path: join(directory, 'fallback-empty.png'), fullPage: true });
+
+    await page.goto('/display');
+    await pairAndRead(page, 2, { mode: 'quiet' });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'quiet', { timeout: 10_000 });
+    await page.screenshot({ path: join(directory, 'quiet-mode.png'), fullPage: true });
+
+    await page.goto('/display');
+    await pairAndRead(page, 2, { mode: 'neutral' });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
+    await page.screenshot({ path: join(directory, 'neutral-mode.png'), fullPage: true });
+  });
+
+  test('captures arrival and milestone screens from synthetic snapshots', async ({ page }) => {
+    test.skip(!DISPLAY_CAPTURE_ENABLED || !DISPLAY_CAPTURE_DIRECTORY, 'Set DISPLAY_SCREENSHOTS=1 and DISPLAY_SCREENSHOT_DIR to capture evidence.');
+    test.setTimeout(90_000);
+    const directory = DISPLAY_CAPTURE_DIRECTORY!;
+
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairLongAcceptance(page, true);
+    await page.clock.runFor(26_000);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
+    await page.screenshot({ path: join(directory, 'arrival-long.png'), fullPage: true });
+
+    await page.goto('/display');
+    await pairAndRead(page, 2, { continuous: true, milestone: true });
+    for (let step = 0; step < 10; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'milestone', { timeout: 2_000 });
+    await page.screenshot({ path: join(directory, 'milestone-50.png'), fullPage: true });
   });
 });
