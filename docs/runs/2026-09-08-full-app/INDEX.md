@@ -11,6 +11,10 @@ Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-01-full-app.md includ
 | D display | Luna xhigh | Complete readings and pause timing verified at 1080p and 4K | Complete |
 | X backup | Luna xhigh, Terra review | Passed, integrated and privately backed up | Complete |
 | I integration | root plus Luna xhigh repairs | Verified release, collection closed | Complete |
+| RP public readiness | Luna xhigh | Auditing current release | None |
+| RA admin and TV readiness | Luna xhigh | Auditing current release | None |
+| RD data activation readiness | Luna xhigh | Checking exact activation path | None |
+| RI activation and release | Root controller | Live preflight | RP, RA, RD |
 
 Live opening page: https://mothers-love.vercel.app. Full app deployed with collection closed; final integration review passed. Source and non-sensitive release evidence are backed up. Shared database target approved by user, isolated campaign schema. User explicitly approved campaign credential transfer; all required production environment variables are configured. Local disposable PostgreSQL verification is available.
 

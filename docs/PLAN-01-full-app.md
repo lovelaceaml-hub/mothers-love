@@ -100,3 +100,17 @@ Selected architecture Next.js App Router, Supabase Auth/PostgreSQL and server-on
 - Deployed ccf272e as dpl_BfhAJijY2zYiFiS3BFGAAhAMKb3W. All 48 synthetic browser journeys pass on production, including all 23 admin journeys. Nine real anonymous pages again show zero axe violations and no horizontal overflow. Real config is configured and closed; protected APIs remain denied with no-store. Full 64 focused tests, lint and build pass. Fresh complete review payload prepared after these facts and the updated records.
 
 - Final independent Terra review PASS verified all 140 sealed hashes after the accepted corrections. No material findings remain. Implementation ccf272e is the accepted runtime source. Release archive uploaded to the configured private Drive folder, metadata verified, and mounted copy SHA-256 matches d79d310b78cd607aa3467ca6b20fa80eeb0f5940ec6f7e74f0de30a679df88aa. Final source/status commit and private push include the retro and pending user-confirmation boundary. No physical TV, QR scan or post-repair real Owner sign-in is claimed.
+
+## Ready-to-use follow-up
+Anthony requests everything pushed, deployed and ready to use, with as many parallel Luna lanes as useful. Starting baseline: 19d31c4c2f3f1b9414f1f0e3a904a15be446a97d, clean worktree. This request authorizes completing campaign activation, including opening collection after immediate health and privacy checks. Existing apps, credentials, database schema and real recognition content remain protected. No real production test recognitions. Physical TV pairing still requires the actual TV browser.
+
+Execution choices: coordinator runner; implementation and audit agents gpt-5.6-luna xhigh in three separate worktrees; root owns live operations, shared documentation, integration, source push and deployment. Controller review handles a settings-only activation; any new auth/privacy implementation receives independent Terra high review.
+
+### Lane RP: Public readiness
+Read-only source and existing test audit of the public recognition and expression-guide journey. Own only the RP lane record in its worktree.
+### Lane RA: Admin and TV readiness
+Read-only audit of final email/password, settings, pairing and display journeys; distinguish software readiness from physical commissioning. Own only the RA lane record.
+### Lane RD: Data activation readiness
+Read-only audit of the exact existing settings operation and health preconditions; propose a minimal version-checked collection activation with no new schema. Own only the RD lane record.
+### Lane RI: Final activation and release
+Root verifies real provider state, current private backup, cleanup health and anonymous live pages while audits run. Integrate only material fixes through Luna, activate the authorized campaign, verify immediate results, update records, push and deploy.
