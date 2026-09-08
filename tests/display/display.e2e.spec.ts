@@ -558,7 +558,9 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
   test('bounds a legal dense line-break message while preserving every segment', async ({ page }) => {
     test.setTimeout(60_000);
-    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    const testStart = new Date('2026-09-08T12:00:00.000Z');
+    await page.clock.install({ time: testStart });
+    await page.clock.pauseAt(testStart);
     await page.setViewportSize({ width: 1920, height: 1080 });
     await pairLongAcceptance(page, false, DENSE_LINE_MESSAGE);
     for (let step = 0; step < 50; step += 1) {
