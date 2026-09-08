@@ -194,10 +194,12 @@ test.describe('synthetic admin browser workflows', () => {
     await page.goto('/admin/recognitions/synthetic-recognition');
     await expect(page.locator('#detail-message')).toHaveValue('Thank you for being there.');
     await expect(page.locator('#detail-submitted-name')).toHaveValue('Synthetic Sender');
-    await expect(page.getByText('Message cleared after expiry.', { exact: true })).toBeVisible({ timeout: 3_000 });
-    await expect(page.locator('#detail-message')).toHaveValue('');
-    await expect(page.locator('#detail-submitted-name')).toHaveValue('');
-    await expect(page.getByText('Cleared after expiry', { exact: true })).toBeVisible();
+    await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible({ timeout: 3_000 });
+    await expect(page.locator('#detail-message')).toHaveCount(0);
+    await expect(page.locator('#detail-submitted-name')).toHaveCount(0);
+    await expect(page.getByText('Mina K.', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Synthetic Sender', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible();
   });
 
   test('display settings show saved, pending and browser applied acknowledgement', async ({ page }) => {

@@ -33,6 +33,16 @@ export function RecognitionDetailPage({ id }: { id: string }) {
   const [action, setAction] = useState<ActionKind | null>(null);
   const [reason, setReason] = useState('');
 
+  const expireOpenRecognition = useCallback(() => {
+    setExpired(true);
+    setRecognition(null);
+    setDraft(null);
+    setLatest(null);
+    setAction(null);
+    setReason('');
+    setNotice('This recognition expired while it was open. Its personal fields were cleared and actions are disabled.');
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -55,21 +65,14 @@ export function RecognitionDetailPage({ id }: { id: string }) {
 
   useEffect(() => {
     if (!recognition || expired) return;
-    const clearPersonalFields = () => {
-      setExpired(true);
-      setDraft(null);
-      setRecognition((current) => current ? { ...current, submittedName: '', message: '', expressionIds: [] } : null);
-      setAction(null);
-      setNotice('This recognition expired while it was open. Personal fields were cleared and publish, restore and feature actions are disabled.');
-    };
     const remaining = Math.max(0, new Date(recognition.expiresAt).getTime() - Date.now());
-    const expiryTimer = window.setTimeout(clearPersonalFields, remaining);
+    const expiryTimer = window.setTimeout(expireOpenRecognition, remaining);
     const refreshTimer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => {
       window.clearTimeout(expiryTimer);
       window.clearInterval(refreshTimer);
     };
-  }, [expired, recognition]);
+  }, [expired, expireOpenRecognition, recognition]);
 
   const fieldsChanged = useMemo(() => {
     if (!recognition || !draft) return false;
@@ -131,11 +134,7 @@ export function RecognitionDetailPage({ id }: { id: string }) {
           setError(getAuthErrorMessage(refreshCause));
         }
       } else if (status === 410 || code === 'EXPIRED') {
-        setExpired(true);
-        setDraft(null);
-        setRecognition((current) => current ? { ...current, submittedName: '', message: '', expressionIds: [] } : null);
-        setAction(null);
-        setNotice('This recognition expired before the action completed. Personal fields were cleared.');
+        expireOpenRecognition();
       } else {
         setError(getAuthErrorMessage(cause));
       }
@@ -150,7 +149,12 @@ export function RecognitionDetailPage({ id }: { id: string }) {
 
   if (loading) return <div className={styles.skeleton} aria-label="Loading recognition detail" />;
   if (error && !recognition) return <div className={styles.error} role="alert">{error} <button type="button" className={styles.authLink} onClick={() => void load()}>Try again</button></div>;
-  if (!recognition) return <div className={styles.empty}>This recognition is no longer available.</div>;
+  if (!recognition) {
+    if (expired) {
+      return <><div className={styles.buttonRow} style={{ marginBottom: 16 }}><Link className={styles.buttonQuiet} href="/admin/recognitions">Back to recognitions</Link></div><div className={styles.error} role="alert"><strong>Expired.</strong> Personal recognition fields were cleared. Publish, restore, feature and edit actions are unavailable.</div></>;
+    }
+    return <div className={styles.empty}>This recognition is no longer available.</div>;
+  }
 
   const currentStatusClass = recognition.status === 'published' ? styles.badgePublished : recognition.status === 'held' ? styles.badgeHeld : recognition.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
 
