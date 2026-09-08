@@ -161,11 +161,12 @@ test('shows all nine expressions and everyday examples on phone and desktop', as
     expect(bounds.documentWidth).toBeLessThanOrEqual(bounds.viewportWidth);
   }
 
-  await expect(page.getByRole('link', { name: /Open heavenlymotherslove\.org\/about/ })).toHaveAttribute(
+  const officialExamplesLink = page.getByRole('link', { name: 'Read the official campaign examples' });
+  await expect(officialExamplesLink).toHaveAttribute(
     'href',
     'https://heavenlymotherslove.org/en/about',
   );
-  await expect(page.getByRole('link', { name: /Open heavenlymotherslove\.org\/about/ })).toHaveAttribute('target', '_blank');
+  await expect(officialExamplesLink).toHaveAttribute('target', '_blank');
   await expect(page.getByRole('link', { name: 'Back to recognition sharing' })).toHaveAttribute('href', '/');
 });
 
