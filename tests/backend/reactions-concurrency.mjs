@@ -59,7 +59,7 @@ const visitorA = "1".repeat(64);
 const visitorB = "2".repeat(64);
 
 function createClient() {
-  const client = postgres(target, options);
+  const client = typeof target === "string" ? postgres(target, options) : postgres({ ...target, ...options });
   clients.push(client);
   return client;
 }
@@ -85,44 +85,96 @@ function delay(milliseconds) {
 async function lockedSetter(targetId, visitor, lockSql, expectedCode) {
   const lockClient = await makeClient();
   const blockedClient = await makeClient();
-  let blockedPromise;
+  let blockedPromise = null;
   let released = false;
   await lockClient`begin`;
   try {
     await lockSql(lockClient);
-    blockedPromise = resultOf(blockedClient`select public.ml_reactions_set(${targetId}::uuid, ${visitor}, true, 'synthetic-lock-ip') as result`);
     let settled = false;
-    blockedPromise = blockedPromise.then((value) => {
+    blockedPromise = Promise.resolve()
+      .then(() => resultOf(blockedClient`select public.ml_reactions_set(${targetId}::uuid, ${visitor}, true, 'synthetic-lock-ip') as result`))
+      .then((value) => ({ ok: true, value }), (error) => ({ ok: false, error }));
+    const observedPromise = blockedPromise.then(() => {
       settled = true;
-      return value;
-    }, (error) => {
-      settled = true;
-      throw error;
     });
     await delay(lockProbeMs);
     if (settled) throw new Error(`setter was not blocked by the ${expectedCode} lock`);
     await lockClient`commit`;
     released = true;
-    const result = await blockedPromise;
+    await observedPromise;
+    const blockedOutcome = await blockedPromise;
+    if (!blockedOutcome.ok) throw blockedOutcome.error;
+    const result = blockedOutcome.value;
     if (result?.code !== expectedCode) throw new Error(`${expectedCode} contention returned ${JSON.stringify(result)}`);
     const reactionRows = await lockClient`select count(*)::integer as count from mothers_love.recognition_reactions where recognition_id = ${targetId}::uuid`;
     if (Number(reactionRows[0]?.count ?? 0) !== 0) throw new Error(`${expectedCode} contention left a reaction row`);
     return result;
   } finally {
-    if (!released) await lockClient`rollback`;
-    if (blockedPromise) await blockedPromise.catch(() => undefined);
+    if (!released) await lockClient`rollback`.catch(() => undefined);
+    if (blockedPromise) await blockedPromise;
   }
 }
 
-const root = await makeClient();
+const fixtureNamePrefix = "Synthetic Concurrency Sender ";
+
+async function cleanStaleFixture(root) {
+  const rows = await root`select id, submitted_name from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
+  if (rows.some((row) => typeof row.submitted_name !== "string" || !row.submitted_name.startsWith(fixtureNamePrefix))) {
+    throw new Error("synthetic concurrency IDs already exist with non-fixture content");
+  }
+  if (rows.length) {
+    await root`delete from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
+  }
+  await root`delete from mothers_love.rate_limits
+    where (scope = 'reaction_browser' and key_hash in (mothers_love.ml_hash(${visitorA}), mothers_love.ml_hash(${visitorB})))
+       or (scope = 'reaction_ip' and key_hash in (
+         mothers_love.ml_hash('synthetic-hidden-ip'),
+         mothers_love.ml_hash('synthetic-purge-ip'),
+         mothers_love.ml_hash('synthetic-lock-ip'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-0'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-1'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-2'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-3'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-4'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-5'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-6'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-7'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-8'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-9'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-10'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-11'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-12'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-13'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-14'),
+         mothers_love.ml_hash('synthetic-concurrency-ip-15'),
+         mothers_love.ml_hash('synthetic-opposing-ip-0'),
+         mothers_love.ml_hash('synthetic-opposing-ip-1'),
+         mothers_love.ml_hash('synthetic-opposing-ip-2'),
+         mothers_love.ml_hash('synthetic-opposing-ip-3'),
+         mothers_love.ml_hash('synthetic-opposing-ip-4'),
+         mothers_love.ml_hash('synthetic-opposing-ip-5'),
+         mothers_love.ml_hash('synthetic-opposing-ip-6'),
+         mothers_love.ml_hash('synthetic-opposing-ip-7'),
+         mothers_love.ml_hash('synthetic-opposing-ip-8'),
+         mothers_love.ml_hash('synthetic-opposing-ip-9'),
+         mothers_love.ml_hash('synthetic-opposing-ip-10'),
+         mothers_love.ml_hash('synthetic-opposing-ip-11'),
+         mothers_love.ml_hash('synthetic-opposing-ip-12'),
+         mothers_love.ml_hash('synthetic-opposing-ip-13'),
+         mothers_love.ml_hash('synthetic-opposing-ip-14'),
+         mothers_love.ml_hash('synthetic-opposing-ip-15')
+       ))`;
+}
+
+let root = null;
 let originalSettings;
 try {
+  root = await makeClient();
   const settingsRows = await root`select mode, last_cleanup_at, overdue_purge_count from mothers_love.settings where singleton_id = true`;
   originalSettings = settingsRows[0];
   if (!originalSettings) throw new Error("campaign settings row is missing");
 
-  const existing = await root`select id from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
-  if (existing.length) throw new Error("synthetic concurrency IDs already exist");
+  await cleanStaleFixture(root);
 
   await root`update mothers_love.settings set mode = 'normal', last_cleanup_at = clock_timestamp(), overdue_purge_count = 0 where singleton_id = true`;
   await root`insert into mothers_love.recognitions (id, submitted_name, recipient, message, status, created_at, first_published_at, expires_at)
@@ -174,8 +226,8 @@ try {
   console.log(JSON.stringify({ duplicateCount: duplicateItem.count, opposingCount: opposingItem.count, hiddenCode: hiddenRace.code, expiryCode: expiryRace.code, purgeRows: Number(purgedRows[0]?.count ?? 0) }));
 } finally {
   try {
-    await root`delete from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
-    if (originalSettings) {
+    if (root) await root`delete from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
+    if (root && originalSettings) {
       await root`update mothers_love.settings set mode = ${originalSettings.mode}, last_cleanup_at = ${originalSettings.last_cleanup_at}, overdue_purge_count = ${originalSettings.overdue_purge_count} where singleton_id = true`;
     }
   } finally {
