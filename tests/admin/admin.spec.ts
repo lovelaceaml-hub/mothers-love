@@ -133,6 +133,15 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByRole('heading', { name: 'Verify owner access' })).toBeVisible();
   });
 
+  test('invitation magic link keeps password setup after Supabase clears the callback hash', async ({ page }) => {
+    await mockCommon(page);
+    await page.goto(`/admin/login#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=magiclink`);
+    await expect(page.getByLabel('Set a new password')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Set password' })).toBeVisible();
+    await expect(page.locator('#admin-password')).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+  });
+
   test('moderator sees permission limits for invitations, pairing and collection control', async ({ page }) => {
     await mockCommon(page, { role: 'moderator' });
     await signInAs(page, 'moderator');
@@ -147,6 +156,46 @@ test.describe('synthetic admin browser workflows', () => {
     const collectionToggle = page.getByRole('button', { name: 'Toggle collection availability' });
     await expect(collectionToggle).toBeDisabled();
     await expect(page.getByText('Owner required', { exact: true })).toBeVisible();
+  });
+
+  test('retention health turns attention when cleanup becomes stale while open', async ({ page }) => {
+    const cleanupAt = new Date().toISOString();
+    await mockCommon(page, { overviewBody: overview({ lastCleanupAt: cleanupAt, overduePurgeCount: 0 }) });
+    await page.clock.install({ time: cleanupAt });
+    await signInAs(page);
+    await page.goto('/admin');
+    await expect(page.getByText('Healthy', { exact: true })).toBeVisible();
+    await page.clock.fastForward(121_000);
+    await expect(page.getByText('Attention', { exact: true })).toBeVisible();
+    await expect(page.getByText('Cleanup is stale. The latest run was more than 2 minutes ago.', { exact: true })).toBeVisible();
+  });
+
+  test('retention health stays healthy when a background refresh advances cleanup', async ({ page }) => {
+    const cleanupAt = new Date().toISOString();
+    const refreshedCleanupAt = new Date(Date.now() + 121_000).toISOString();
+    let overviewRequests = 0;
+    await mockCommon(page, { overviewBody: overview({ lastCleanupAt: cleanupAt, overduePurgeCount: 0 }) });
+    await page.unroute('**/api/admin/overview');
+    await page.route('**/api/admin/overview', (route) => {
+      overviewRequests += 1;
+      return fulfillJson(route, overview({ lastCleanupAt: overviewRequests === 1 ? cleanupAt : refreshedCleanupAt, overduePurgeCount: 0 }));
+    });
+    await page.clock.install({ time: cleanupAt });
+    await signInAs(page);
+    await page.goto('/admin');
+    await expect(page.getByText('Healthy', { exact: true })).toBeVisible();
+    await page.clock.fastForward(121_000);
+    await expect.poll(() => overviewRequests).toBeGreaterThan(1);
+    await expect(page.getByText('Healthy', { exact: true })).toBeVisible();
+    await expect(page.getByText('Attention', { exact: true })).toHaveCount(0);
+  });
+
+  test('retention health explains when cleanup has never run', async ({ page }) => {
+    await mockCommon(page, { overviewBody: overview({ lastCleanupAt: null, overduePurgeCount: 0 }) });
+    await signInAs(page);
+    await page.goto('/admin');
+    await expect(page.getByText('Attention', { exact: true })).toBeVisible();
+    await expect(page.getByText('Cleanup has not run yet. Retention health will show Attention until the first cleanup completes.', { exact: true })).toBeVisible();
   });
 
   test('editor reconciles a 409 with the latest server version before saving', async ({ page }) => {

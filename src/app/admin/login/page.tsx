@@ -2,11 +2,23 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { AdminSession } from '@/lib/contracts';
 import { getAuthClient } from '@/lib/auth-client';
 import { adminApi, getAuthErrorMessage } from '@/components/admin/admin-api';
 import styles from '@/components/admin/admin.module.css';
+
+const PASSWORD_SETUP_CALLBACK_TYPES = ['invite', 'recovery', 'magiclink', 'signup'] as const;
+type PasswordSetupCallbackType = typeof PASSWORD_SETUP_CALLBACK_TYPES[number];
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+const readPasswordSetupCallbackType = (): PasswordSetupCallbackType | null => {
+  if (typeof window === 'undefined') return null;
+  const hashType = new URLSearchParams(window.location.hash.replace(/^#/, '')).get('type');
+  const queryType = new URLSearchParams(window.location.search).get('type');
+  const type = hashType ?? queryType;
+  return PASSWORD_SETUP_CALLBACK_TYPES.includes(type as PasswordSetupCallbackType) ? type as PasswordSetupCallbackType : null;
+};
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -14,14 +26,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [resetMode, setResetMode] = useState(false);
-  const [passwordMode, setPasswordMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const type = new URLSearchParams(window.location.search).get('type');
-    return type === 'invite' || type === 'recovery';
-  });
+  const callbackTypeRef = useRef<PasswordSetupCallbackType | null>(null);
+  const [passwordMode, setPasswordMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useIsomorphicLayoutEffect(() => {
+    const callbackType = readPasswordSetupCallbackType();
+    callbackTypeRef.current = callbackType;
+    if (callbackType !== null) setPasswordMode(true);
+  }, []);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,8 +83,7 @@ export default function AdminLoginPage() {
     const auth = getAuthClient();
     if (!auth) return;
     const { data } = auth.auth.onAuthStateChange((event) => {
-      const hashType = new URLSearchParams(window.location.hash.replace(/^#/, '')).get('type');
-      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && hashType === 'invite')) {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && callbackTypeRef.current !== null)) {
         setPasswordMode(true);
       }
     });
