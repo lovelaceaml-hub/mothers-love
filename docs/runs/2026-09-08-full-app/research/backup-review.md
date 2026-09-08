@@ -1,0 +1,3 @@
+# Backup boundary review
+
+Independent reviewer: reviewer_terra, gpt-5.6-terra high, read-only. Verdict: passed, iteration1. Scoped scripts/supabase.mjs, test/campaign-retention.test.mjs, docs/HANDOFF.md against0e54b83765de8fa633a997b4809054190c3f4b1d. Unknown campaign tables skipped before row SELECT. Only daily_aggregates/settings row contents retained. Existing auth session exclusions and other namespaces unchanged. Metadata definitions intentionally preserved. All25 synthetic tests and diff check passed. No live provider, credential or personal data access. Integrated commit589c09815261f2a5e5c939c55265513841090d8d.
