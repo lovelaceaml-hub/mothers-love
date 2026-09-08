@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Words of Mother's Love — Living Wall V3</title>
+<style>
+:root{
+  --cream:#fff6dc; --paper:#fffdf6; --ink:#303342; --muted:#6b6f7b;
+  --blue:#8ed6f5; --yellow:#ffd86a; --orange:#ffaf70; --coral:#ff8e86;
+  --red:#ef747b; --lav:#cbb9f4; --lime:#cdeb76; --green:#9dd99f; --sky:#a5c9ff;
+  --shadow:0 20px 56px rgba(65,55,35,.13);
+  --atm-a:rgba(142,214,245,.23);
+  --atm-b:rgba(205,235,118,.18);
+  --atm-c:rgba(255,142,134,.14);
+  --atm-opacity:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--cream);color:var(--ink);
+  font-family:Inter,ui-rounded,"Avenir Next","Segoe UI",system-ui,sans-serif}
+body{user-select:none}
+#app{position:relative;width:100vw;height:100vh;overflow:hidden;
+  background:linear-gradient(135deg,#fff6dc,#fffdf4 49%,#fff2cc)}
+#atmosphere{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:var(--atm-opacity);
+  background:
+    radial-gradient(circle at 13% 13%,var(--atm-a) 0 11%,transparent 23%),
+    radial-gradient(circle at 91% 9%,var(--atm-b) 0 10%,transparent 22%),
+    radial-gradient(circle at 89% 88%,var(--atm-c) 0 10%,transparent 24%);
+  transition:background 1.6s ease,opacity 1.4s ease}
+.ambient{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.58);pointer-events:none;z-index:1;opacity:.38}
+.a1{width:8vw;height:8vw;background:var(--blue);left:-2vw;top:25vh;animation:ambientA 24s ease-in-out infinite}
+.a2{width:5vw;height:5vw;background:var(--lav);right:18vw;top:8vh;animation:ambientB 29s ease-in-out infinite}
+.a3{width:7vw;height:7vw;background:var(--orange);right:-2vw;top:42vh;animation:ambientA 31s ease-in-out infinite reverse}
+.a4{width:4vw;height:4vw;background:var(--green);left:20vw;top:-1vw;animation:ambientB 26s ease-in-out infinite}
+@keyframes ambientA{0%,100%{transform:translate(0,0)}50%{transform:translate(1.1vw,-1.2vh)}}
+@keyframes ambientB{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-.9vw,1vh) rotate(5deg)}}
+
+header{position:absolute;left:4vw;right:4vw;top:3.2vh;z-index:10;display:flex;justify-content:space-between;align-items:flex-start}
+.brand .mini{font-size:.67vw;letter-spacing:.19em;text-transform:uppercase;font-weight:900;color:#6e7280;margin-bottom:.5vh}
+.brand h1{margin:0;font-size:2.3vw;line-height:.94;letter-spacing:-.047em;font-weight:950}
+.brand .tag{font-family:Georgia,serif;font-style:italic;font-size:1vw;color:#626673;margin-top:.6vh}
+
+.milestone-build{width:12.8vw;background:rgba(255,253,246,.92);border:1px solid rgba(255,255,255,.8);
+  box-shadow:0 10px 28px rgba(65,55,35,.10);border-radius:1vw;padding:.68vw .8vw}
+.milestone-build .top{display:flex;justify-content:space-between;align-items:baseline;gap:.5vw}
+.milestone-build strong{font-size:.9vw}
+.milestone-build span{font-size:.64vw;color:#747885}
+.mini-track{height:.35vh;background:rgba(48,51,66,.09);border-radius:999px;overflow:hidden;margin-top:.55vh}
+.mini-track i{display:block;height:100%;background:#9dd99f;width:85.6%;border-radius:999px;transition:width .7s ease}
+.milestone-build .remain{font-size:.58vw;color:#747885;margin-top:.4vh;text-align:right}
+
+.stage{position:absolute;left:4vw;right:4vw;top:14.5vh;bottom:7.3vh;z-index:4}
+.screen{position:absolute;inset:0;opacity:0;transform:translateY(1.2vh) scale(.995);filter:blur(1px);
+  transition:opacity .65s ease,transform .65s ease,filter .65s ease;pointer-events:none}
+.screen.active{opacity:1;transform:none;filter:none;pointer-events:auto}
+.kicker{font-size:.73vw;letter-spacing:.2em;text-transform:uppercase;font-weight:950;color:#737783}
+.title{font-size:3.35vw;line-height:.95;letter-spacing:-.05em;font-weight:950;margin:.7vh 0 0}
+.screen-head{height:8vh}
+
+/* ===== Recognition Garden ===== */
+.garden-board{height:calc(100% - 8vh);position:relative;overflow:hidden;border-radius:2.4vw}
+#constellationCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.trail-layer{position:absolute;inset:0;z-index:2;pointer-events:none}
+.rec-bubble{position:absolute;left:0;top:0;z-index:4;width:var(--size,15vw);height:var(--size,15vw);will-change:transform}
+.bubble-inner{position:absolute;inset:0;border-radius:50%;background:rgba(255,253,247,.98);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9%;
+  border:.28vw solid color-mix(in srgb,var(--accent) 68%,white);
+  overflow:hidden;transform:scale(1);transition:box-shadow .5s ease,filter .5s ease}
+.bubble-inner:after{content:"";position:absolute;width:46%;height:46%;border-radius:50%;right:-12%;bottom:-15%;
+  background:color-mix(in srgb,var(--accent) 38%,white);opacity:.35}
+.rec-bubble h3{position:relative;z-index:2;font-size:calc(var(--size) * .105);line-height:1;letter-spacing:-.04em;margin:0 0 .6vh}
+.rec-bubble .tags{position:relative;z-index:2;font-size:calc(var(--size) * .037);font-weight:950;letter-spacing:.06em}
+.rec-bubble blockquote{position:relative;z-index:2;font-family:Georgia,serif;font-size:calc(var(--size) * .052);
+  line-height:1.38;margin:.7vh 0 0;max-width:84%}
+.fresh-tag{position:absolute;z-index:5;top:8%;left:50%;transform:translateX(-50%);background:#303342;color:white;
+  border-radius:999px;padding:.24vw .5vw;font-size:.52vw;font-weight:950;letter-spacing:.09em;text-transform:uppercase;opacity:0}
+.rec-bubble.fresh .fresh-tag{opacity:.95}
+.rec-bubble.fresh .bubble-inner{animation:freshHalo 4.6s cubic-bezier(.2,.8,.2,1) 1}
+@keyframes freshHalo{
+  0%{transform:scale(.84);box-shadow:0 0 0 0 rgba(157,217,159,0),var(--shadow)}
+  24%{transform:scale(1.07);box-shadow:0 0 0 .72vw color-mix(in srgb,var(--accent) 25%,transparent),0 28px 70px rgba(65,55,35,.18)}
+  70%{transform:scale(1.025)}
+  100%{transform:scale(1);box-shadow:var(--shadow)}
+}
+.trail-dot{position:absolute;border-radius:50%;opacity:.20;animation:trailFade 4s ease-out forwards}
+@keyframes trailFade{0%{opacity:.22;transform:scale(1)}60%{opacity:.09;transform:scale(.65)}100%{opacity:0;transform:scale(.2) translateY(-1vh)}}
+.garden-note{position:absolute;right:1.5vw;bottom:1.1vh;z-index:8;border-radius:999px;background:rgba(48,51,66,.88);color:white;
+  padding:.5vw .8vw;font-size:.64vw;font-weight:850;letter-spacing:.03em}
+
+/* ===== Featured ===== */
+.feature-screen{height:100%;position:relative}
+.feature-circle{position:absolute;left:2vw;top:3vh;width:32vw;height:32vw;border-radius:50%;background:var(--yellow);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;justify-content:center;padding:4vw;animation:bobSoft 10s ease-in-out infinite}
+.feature-circle .n{font-size:7vw;line-height:.75;font-weight:950;opacity:.28}
+.feature-circle h2{font-size:2.85vw;line-height:1;letter-spacing:-.045em;margin:1.5vh 0 1vh}
+.feature-circle p{font-family:Georgia,serif;font-size:1.2vw;line-height:1.4;max-width:78%}
+.feature-card{position:absolute;right:1.5vw;top:8vh;width:48vw;background:#fff;border-radius:2.2vw;padding:2.6vw 3vw;
+  box-shadow:var(--shadow);animation:bobSoftB 13s ease-in-out infinite}
+.feature-card .small{font-size:.72vw;letter-spacing:.2em;text-transform:uppercase;font-weight:950;color:#737783}
+.feature-card h3{font-size:4.1vw;line-height:.9;letter-spacing:-.055em;margin:1vh 0}
+.feature-card blockquote{font-family:Georgia,serif;font-size:1.5vw;line-height:1.5;margin:1.5vh 0}
+.pills{display:flex;gap:.4vw;flex-wrap:wrap}.pill{display:inline-block;border-radius:999px;padding:.36vw .6vw;font-size:.7vw;font-weight:900}
+@keyframes bobSoft{0%,100%{transform:translateY(0)}50%{transform:translateY(-.8vh)}}
+@keyframes bobSoftB{0%,100%{transform:translate(.1vw,0) rotate(-.7deg)}50%{transform:translate(-.3vw,.6vh) rotate(.6deg)}}
+
+/* ===== Stats ===== */
+.stats-wrap{height:100%;position:relative}
+.bigstat{position:absolute;left:1vw;top:4vh;width:28.5vw;height:28.5vw;border-radius:50%;background:var(--lav);box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;animation:bobSoft 11s ease-in-out infinite}
+.bigstat .num{font-size:8vw;line-height:.8;font-weight:950}.bigstat strong{font-size:1.55vw;line-height:1.06;max-width:72%}.bigstat span{font-size:.86vw;margin-top:1vh}
+.statfield{position:absolute;right:0;top:1vh;width:58vw;height:57vh}
+.sdot{position:absolute;border-radius:50%;width:10.6vw;height:10.6vw;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;
+  padding:1vw;box-shadow:0 10px 25px rgba(65,55,35,.10);animation:bobSoft 12s ease-in-out infinite}
+.sdot .count{font-size:2.1vw;font-weight:950;line-height:1}.sdot .txt{font-size:.69vw;line-height:1.15;font-weight:850;margin-top:.4vh}
+.s1{left:0;top:0}.s2{left:12vw;top:1vh}.s3{left:24vw;top:0}.s4{left:36vw;top:2vh}
+.s5{left:5vw;top:20vh}.s6{left:17vw;top:21vh}.s7{left:29vw;top:20vh}.s8{left:41vw;top:21vh}.s9{left:23vw;top:40vh}
+
+/* ===== Expressions ===== */
+.expr-wrap{height:calc(100% - 8vh);display:grid;grid-template-columns:repeat(3,1fr);gap:1vw}
+.expr{border-radius:1.8vw;padding:1.15vw;box-shadow:0 12px 30px rgba(65,55,35,.1);position:relative;overflow:hidden}
+.expr:after{content:"";position:absolute;width:7vw;height:7vw;border-radius:50%;right:-2vw;bottom:-3vw;background:rgba(255,255,255,.38)}
+.expr .n{font-size:2.25vw;font-weight:950}.expr p{font-size:.92vw;line-height:1.24;font-weight:850;margin:.6vh 0 0}
+
+/* ===== Smart recognition clusters ===== */
+.cluster-wrap{height:100%;position:relative}
+.cluster-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24.5vw;height:24.5vw;border-radius:50%;
+  background:var(--cluster-color,var(--green));box-shadow:0 28px 75px rgba(65,55,35,.16);padding:3.2vw;
+  display:flex;flex-direction:column;justify-content:center;text-align:center;z-index:4;animation:bobSoft 9s ease-in-out infinite}
+.cluster-center .cn{font-size:5.5vw;font-weight:950;line-height:.82;opacity:.3}.cluster-center h2{font-size:1.85vw;line-height:1.05;letter-spacing:-.035em;margin:.7vh 0}
+.cluster-center p{font-family:Georgia,serif;font-size:.86vw;line-height:1.35;margin:.4vh auto 0;max-width:82%}
+.cluster-bubble{position:absolute;width:14.6vw;height:14.6vw;border-radius:50%;background:#fff;box-shadow:0 18px 48px rgba(65,55,35,.13);
+  display:flex;flex-direction:column;justify-content:center;text-align:center;padding:1.55vw;border:.3vw solid color-mix(in srgb,var(--cluster-color,var(--green)) 55%,white)}
+.cluster-bubble h3{font-size:1.3vw;margin:0 0 .5vh}.cluster-bubble blockquote{font-family:Georgia,serif;font-size:.76vw;line-height:1.38;margin:0}
+.cb1{left:8vw;top:4vh;animation:bobSoft 11s ease-in-out infinite}.cb2{right:8vw;top:4vh;animation:bobSoftB 13s ease-in-out infinite}
+.cb3{left:11vw;bottom:2vh;animation:bobSoftB 12s ease-in-out infinite}.cb4{right:11vw;bottom:1vh;animation:bobSoft 14s ease-in-out infinite}
+
+/* ===== Bottom-left QR ===== */
+.qr-dock{position:absolute;z-index:20;left:3.6vw;bottom:2.4vh;display:flex;align-items:center;gap:.62vw;background:rgba(255,253,246,.97);
+  border:1px solid rgba(255,255,255,.82);border-radius:1.1vw;padding:.46vw .6vw;box-shadow:0 14px 34px rgba(65,55,35,.13);
+  transform-origin:left bottom;transition:transform .65s ease,padding .65s ease,box-shadow .65s ease}
+.qr-dock img{width:3.65vw;height:3.65vw;border-radius:.3vw}.qr-copy{max-width:11vw}.qr-copy strong{display:block;font-size:.76vw}.qr-copy span{display:block;font-size:.56vw;color:#737783;margin-top:.1vh}
+.qr-question{max-height:0;opacity:0;overflow:hidden;transform:translateY(.4vh);font-family:Georgia,serif;font-style:italic;font-size:.82vw;line-height:1.2;transition:.5s ease}
+.qr-dock.inviting{transform:scale(1.12);padding:.68vw .85vw;box-shadow:0 20px 48px rgba(65,55,35,.19),0 0 0 .55vw rgba(142,214,245,.14)}
+.qr-dock.inviting .qr-question{max-height:3vh;opacity:1;transform:none;margin-bottom:.24vh}
+
+/* ===== New recognition journey ===== */
+.journey-orb{position:fixed;left:0;top:0;z-index:55;width:4.2vw;height:4.2vw;border-radius:50%;background:var(--journey-color,var(--green));
+  box-shadow:0 16px 40px rgba(65,55,35,.18),0 0 0 .55vw color-mix(in srgb,var(--journey-color,var(--green)) 28%,transparent);
+  display:flex;align-items:center;justify-content:center;color:white;font-size:1.4vw;font-weight:950;pointer-events:none}
+.journey-label{position:fixed;z-index:56;background:#303342;color:white;border-radius:999px;padding:.38vw .62vw;font-size:.62vw;font-weight:900;pointer-events:none;white-space:nowrap}
+
+/* ===== Milestone celebration ===== */
+.milestone-overlay{position:absolute;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(255,248,222,.95);
+  backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .5s ease;overflow:hidden}
+.milestone-overlay.show{opacity:1;pointer-events:auto}
+.milestone-content{text-align:center;position:relative;z-index:3;width:72vw;animation:milestoneIn .85s cubic-bezier(.2,.8,.2,1) both}
+.milestone-content .mk{font-size:.95vw;letter-spacing:.22em;text-transform:uppercase;font-weight:950;color:#656a77}
+.milestone-number{font-size:12vw;line-height:.76;font-weight:950;letter-spacing:-.07em;margin:3vh 0 2vh}
+.milestone-content h2{font-size:3.1vw;line-height:1;letter-spacing:-.04em;margin:0}.milestone-content p{font-family:Georgia,serif;font-size:1.25vw;color:#5e6370;margin:1.5vh auto 0;max-width:50vw}
+@keyframes milestoneIn{from{opacity:0;transform:translateY(4vh) scale(.9)}to{opacity:1;transform:none}}
+.celebrate-bubble{position:absolute;border-radius:50%;opacity:.48;animation:celebrateDrift 5.5s ease-in-out infinite}
+@keyframes celebrateDrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(1vw,-1.3vh) scale(1.06)}}
+
+/* ===== Low-activity mode ===== */
+#app.low-activity{--atm-opacity:.62}
+#app.low-activity .ambient{opacity:.23;animation-duration:48s}
+#app.low-activity .garden-note:after{content:" · Low-activity mode"}
+#app.low-activity .qr-dock{opacity:.88}
+
+/* ===== Controls ===== */
+.progress{position:absolute;left:19vw;right:4vw;bottom:2vh;height:.38vh;background:rgba(48,51,66,.08);overflow:hidden;z-index:12;border-radius:999px}
+.progress span{display:block;height:100%;background:#303342;width:0}
+.controls{position:absolute;right:1vw;bottom:.9vh;z-index:80;display:flex;gap:.28vw;opacity:0;transition:.2s}
+#app:hover .controls{opacity:.8}
+.controls button{border:0;background:#303342;color:white;padding:.42vw .56vw;border-radius:.48vw;font-size:.58vw;cursor:pointer}
+
+/* Motion presets affect ambient decorative motion too. */
+#app.motion-calm .ambient{animation-duration:48s}
+#app.motion-lively .ambient{animation-duration:16s}
+#app.motion-calm .feature-circle,#app.motion-calm .feature-card,#app.motion-calm .cluster-center,#app.motion-calm .cluster-bubble{animation-duration:22s}
+#app.motion-lively .feature-circle,#app.motion-lively .feature-card,#app.motion-lively .cluster-center,#app.motion-lively .cluster-bubble{animation-duration:7s}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+
+/* ===== Gentle breathing size variation ===== */
+@keyframes recognitionBreath{
+  0%,100%{scale:1}
+  50%{scale:1.016}
+}
+.rec-bubble .bubble-inner{
+  animation:recognitionBreath var(--breath-duration,9.5s) ease-in-out infinite;
+  animation-delay:var(--breath-delay,0s);
+  transform-origin:center;
+}
+#app.motion-calm .rec-bubble .bubble-inner{animation-duration:15s}
+#app.motion-lively .rec-bubble .bubble-inner{animation-duration:6.8s}
+#app.low-activity .rec-bubble .bubble-inner{animation-duration:20s}
+.rec-bubble.fresh .bubble-inner{
+  animation:
+    recognitionBreath var(--breath-duration,9.5s) ease-in-out infinite,
+    freshHalo 4.6s cubic-bezier(.2,.8,.2,1) 1;
+}
+
+/* ===== Full-detail nine-expression page ===== */
+.expr-wrap{
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  gap:.72vw;
+}
+.expr{
+  padding:.92vw 1.05vw;
+  border-radius:1.55vw;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:0;
+}
+.expr-top{
+  display:grid;
+  grid-template-columns:2.35vw 1fr;
+  gap:.72vw;
+  align-items:start;
+}
+.expr .n{font-size:1.95vw;line-height:.92}
+.expr-detail{
+  font-size:.72vw;
+  line-height:1.18;
+  font-weight:720;
+  color:rgba(48,51,66,.78);
+  padding-top:.08vh;
+}
+.expr .expr-phrase{
+  font-size:.88vw;
+  line-height:1.18;
+  font-weight:920;
+  margin:.62vh 0 0 3.05vw;
+  max-width:88%;
+}
+
+/* ===== True live-arrival queue cue ===== */
+.arrival-status{
+  position:absolute;z-index:23;left:3.6vw;bottom:8.6vh;
+  display:flex;align-items:center;gap:.58vw;
+  min-width:12.5vw;max-width:18vw;
+  background:rgba(48,51,66,.94);color:white;
+  padding:.62vw .78vw;border-radius:1vw;
+  box-shadow:0 16px 42px rgba(48,51,66,.20);
+  opacity:0;transform:translateY(1.2vh) scale(.96);
+  pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;
+}
+.arrival-status.show{opacity:1;transform:translateY(0) scale(1)}
+.arrival-status strong{display:block;font-size:.72vw;line-height:1.12}
+.arrival-status span{
+  display:block;margin-top:.16vh;font-size:.56vw;
+  color:rgba(255,255,255,.76);line-height:1.25
+}
+.arrival-pulse{
+  width:.78vw;height:.78vw;border-radius:50%;
+  background:var(--green);flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(157,217,159,.55);
+  animation:arrivalPulse 1.65s ease-out infinite;
+}
+@keyframes arrivalPulse{
+  0%{box-shadow:0 0 0 0 rgba(157,217,159,.55);transform:scale(.9)}
+  70%{box-shadow:0 0 0 .58vw rgba(157,217,159,0);transform:scale(1.05)}
+  100%{box-shadow:0 0 0 0 rgba(157,217,159,0);transform:scale(.9)}
+}
+.arrival-status.waiting .arrival-pulse{background:var(--yellow)}
+.arrival-status.arriving .arrival-pulse{background:var(--blue)}
+
+</style>
+</head>
+<body>
+<div id="app" class="motion-standard">
+  <div id="atmosphere"></div>
+  <div class="ambient a1"></div><div class="ambient a2"></div><div class="ambient a3"></div><div class="ambient a4"></div>
+
+  <header>
+    <div class="brand">
+      <div class="mini">A Campaign of Appreciation</div>
+      <h1>THE WORDS OF MOTHER'S LOVE</h1>
+      <div class="tag">Where a mother's love resides, peace abides.</div>
+    </div>
+    <div class="milestone-build" id="milestoneBuild">
+      <div class="top"><strong><span id="currentTotal">214</span> / <span id="nextMilestone">250</span></strong><span>Next milestone</span></div>
+      <div class="mini-track"><i id="milestoneTrack"></i></div>
+      <div class="remain" id="milestoneRemain">36 expressions to 250</div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="screen active" id="garden" data-duration="18000">
+      <div class="screen-head"><div class="kicker">Mother's Love in Our Church</div><h2 class="title">Recognition Garden</h2></div>
+      <div class="garden-board" id="gardenBoard">
+        <canvas id="constellationCanvas"></canvas>
+        <div class="trail-layer" id="trailLayer"></div>
+        <div class="garden-note">Living wall · recognitions move organically</div>
+      </div>
+    </section>
+
+    <section class="screen" id="featured" data-duration="15000">
+      <div class="feature-screen">
+        <div class="feature-circle" id="featureCircle">
+          <div class="kicker">Featured Expression</div>
+          <div class="n" id="featureNum">08</div>
+          <h2 id="featureExpression">Can I give you a hand with anything?</h2>
+          <p>Small expressions of care can make someone feel seen, supported, and loved.</p>
+        </div>
+        <div class="feature-card">
+          <div class="small">Thank you</div>
+          <h3 id="featuredName">Michelle R.</h3>
+          <div class="pills" id="featuredPills"></div>
+          <blockquote id="featuredQuote"></blockquote>
+          <div style="font-size:.72vw;color:#7b7f8b">— Recognized Anonymously</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="stats" data-duration="13000">
+      <div class="stats-wrap">
+        <div class="bigstat"><div class="num" id="statsTotal">214</div><strong>Expressions of Mother's Love Recognized</strong><span><b id="recognitionTotal">57</b> recognitions shared this month</span></div>
+        <div class="statfield" id="statField"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="expressions" data-duration="21000">
+      <div class="screen-head"><div class="kicker">Practice Mother's Love</div><h2 class="title">The 9 Expressions</h2></div>
+      <div class="expr-wrap" id="exprWrap"></div>
+    </section>
+
+    <section class="screen" id="cluster" data-duration="14000">
+      <div class="cluster-wrap" id="clusterWrap">
+        <div class="cluster-center" id="clusterCenter">
+          <div class="kicker">Mother's Love in Action</div>
+          <div class="cn" id="clusterNum">08</div>
+          <h2 id="clusterExpression">“Can I give you a hand with anything?”</h2>
+          <p>Recent recognitions connected by one expression of Mother's Love.</p>
+        </div>
+        <div class="cluster-bubble cb1" id="cb1"></div>
+        <div class="cluster-bubble cb2" id="cb2"></div>
+        <div class="cluster-bubble cb3" id="cb3"></div>
+        <div class="cluster-bubble cb4" id="cb4"></div>
+      </div>
+    </section>
+  </main>
+
+
+  <div class="arrival-status" id="arrivalStatus" aria-live="polite">
+    <div class="arrival-pulse"></div>
+    <div>
+      <strong id="arrivalTitle">Recognition received</strong>
+      <span id="arrivalDetail">Preparing its journey to the wall</span>
+    </div>
+  </div>
+  <div class="qr-dock" id="qrDock">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAIAAAAslP2oAAAE30lEQVR4nO3dwY6TIRhAUWt8/1ceN25MLgsMBHDOWes/bZ0bkn4Cn6+vrx/A336efgFwI2FAEAYEYUAQBgRhQBAGBGFAEAYEYUAQBgRhQBAGBGFAEAaEX7N/4fP57Hgdy83uM5l9X6Pnr3rOyOj5r7zfU2Y/HysGBGFAEAYEYUAQBgRhQBAGhOk5xsip86l2f4++6n2dmnvMPmfV5/n674MVA4IwIAgDgjAgCAOCMCAIA8KyOcbIbd+Lz76eVfsfZp16v7vd9vswYsWAIAwIwoAgDAjCgCAMCMKAsH2O8Yrd+xN2z092//nvxooBQRgQhAFBGBCEAUEYEIQBwRzjj1Xf6++eG6yah8z++e8237BiQBAGBGFAEAYEYUAQBgRhQNg+x3jl++/d923fdg/3qXu7X/l9sGJAEAYEYUAQBgRhQBAGBGFAWDbHuO0ehlVuO9/plc/5ldc5YsWAIAwIwoAgDAjCgCAMCMKAMD3HeOX/08+67TylV+YA/+vvgxUDgjAgCAOCMCAIA4IwIAgDwmf3eUqnvo+/7RynU267r2OV3fMTKwYEYUAQBgRhQBAGBGFAEAaE6TnG8EGPfJ+96nXu/txuO4fq1PNnrZrPWDEgCAOCMCAIA4IwIAgDgjAgHLvn+9R+gFfOQTo1Hxj93P91H86IFQOCMCAIA4IwIAgDgjAgCAPC9jnGyKr5xuxzds9PZp/z3e7fOHU/+iwrBgRhQBAGBGFAEAYEYUAQBoRj92Pcdi7TKred03Xq32XWbftqrBgQhAFBGBCEAUEYEIQBQRgQtt+P8fp927fdC3FqP8nr8x/3Y8ACwoAgDAjCgCAMCMKAIAwIz9/zvdtt9z+scts94rPsx4ADhAFBGBCEAUEYEIQBQRgQrrvne/Y5r9v9+ayaM9x2r4j7MeAAYUAQBgRhQBAGBGFAEAaEY/d8j9x2X8dt93uses6p+zFemWtZMSAIA4IwIAgDgjAgCAOCMCAcu+d7ldvmDyO37Se57Vys2+ZOVgwIwoAgDAjCgCAMCMKAIAwIz+zHGH0/fWqusnsuYf7zb5wrBRsJA4IwIAgDgjAgCAOCMCAcm2Pcdr7Q7vnJyKm5yiv3c5+at1gxIAgDgjAgCAOCMCAIA4IwIDyzH2Pk1Dxh1ffru89TWuW2/SEjzpWCjYQBQRgQhAFBGBCEAUEYEKbvx3jd7nnFKqfOxXr9XKkRcwxYQBgQhAFBGBCEAUEYEIQBYXo/xm33Q4/M7n+4zSvzhN2vc2T3860YEIQBQRgQhAFBGBCEAUEYEJadK3VqPrDq3KFZp+73ODU3GNl9P8ks50rBRsKAIAwIwoAgDAjCgCAMCNvvxzh1j/Uqq+6lHjm1L2LVvea7rXpfs6wYEIQBQRgQhAFBGBCEAUEYEK675/sVp+Yzp/afjJy6p3z3vhcrBgRhQBAGBGFAEAYEYUAQBgRzjD9ev/d6936VVfs0Ts1VZlkxIAgDgjAgCAOCMCAIA4IwIGyfY9x2r/ap7/tXnYO0am5wah/FrFM/14oBQRgQhAFBGBCEAUEYEIQBYdkc49T9CbN2n0e0++funj+8Mq/YPY+yYkAQBgRhQBAGBGFAEAYEYUD43LZfAm5gxYAgDAjCgCAMCMKAIAwIwoAgDAjCgCAMCMKAIAwIwoAgDAjCgPAbarUqHD/J8eAAAAAASUVORK5CYII=" alt="Prototype QR code">
+    <div class="qr-copy">
+      <div class="qr-question">Who encouraged you today?</div>
+      <strong>Recognize Someone</strong>
+      <span>Scan to share Mother's Love</span>
+    </div>
+  </div>
+
+  <div class="milestone-overlay" id="milestoneOverlay">
+    <div class="celebrate-bubble" style="width:24vw;height:24vw;left:-8vw;top:-8vw;background:var(--blue)"></div>
+    <div class="celebrate-bubble" style="width:18vw;height:18vw;right:-4vw;top:4vh;background:var(--lime);animation-delay:-1s"></div>
+    <div class="celebrate-bubble" style="width:20vw;height:20vw;left:12vw;bottom:-10vw;background:var(--coral);animation-delay:-2s"></div>
+    <div class="celebrate-bubble" style="width:17vw;height:17vw;right:14vw;bottom:-7vw;background:var(--lav);animation-delay:-3s"></div>
+    <div class="milestone-content">
+      <div class="mk">Together, we're practicing Mother's Love</div>
+      <div class="milestone-number" id="celebrationNumber">250</div>
+      <h2>Expressions of Mother's Love Shared!</h2>
+      <p>Every expression helps make our church warmer, kinder, and more peaceful.</p>
+    </div>
+  </div>
+
+  <div class="progress"><span id="bar"></span></div>
+  <div class="controls">
+    <button id="prevBtn">◀</button>
+    <button id="pauseBtn">Pause</button>
+    <button id="motionBtn">Motion: Standard</button>
+    <button id="linesBtn">Lines: On</button>
+    <button id="lowBtn">Low Activity</button>
+    <button id="newBtn">Queue Arrival</button><button id="queue3Btn">Queue ×3</button>
+    <button id="clusterBtn">Cluster</button>
+    <button id="milestoneBtn">Milestone</button>
+    <button id="nextBtn">▶</button>
+  </div>
+</div>
+
+<script>
+const expressions=[
+ {n:1,text:"How Are You?",detail:"The first phrase to peace",color:"#8ED6F5",count:18},
+ {n:2,text:"Thank you. It's all thanks to you. You've worked hard.",detail:"Express gratitude even for small efforts and acts of kindness",color:"#FFD86A",count:37},
+ {n:3,text:"I'm sorry. It must have been hard on you.",detail:"A phrase that melts the heart by understanding the other's feelings first",color:"#FFAF70",count:14},
+ {n:4,text:"It's okay. I understand.",detail:"A phrase of forgiveness that embraces faults",color:"#FF8E86",count:21},
+ {n:5,text:"Please, after you.",detail:"When feeling impatient, take a breath and yield to others",color:"#EF747B",count:16},
+ {n:6,text:"I'd love to hear more about your thoughts.",detail:"When opinions differ, listen carefully to others",color:"#CBB9F4",count:30},
+ {n:7,text:"I'll pray (or root) for you. Everything will go well.",detail:"Offer sincere support and encouragement",color:"#CDEB76",count:25},
+ {n:8,text:"Can I give you a hand with anything?",detail:"Consideration begins with paying attention to those around you",color:"#9DD99F",count:31},
+ {n:9,text:"You're amazing. You're doing great!",detail:"Warm compliments bring happiness to both sides",color:"#A5C9FF",count:22}
+];
+
+const recognitionPool=[
+ {name:"Michelle R.",ex:[2,8],msg:"Thank you for noticing when help is needed and stepping in before anyone even has to ask. Your consideration encourages me."},
+ {name:"James K.",ex:[6],msg:"You always make people feel heard. Thank you for slowing down, listening carefully, and showing that their thoughts matter."},
+ {name:"Sarah M.",ex:[9,7],msg:"Your encouragement came at exactly the right time. Thank you for reminding me to keep going and for rooting for me."},
+ {name:"Daniel K.",ex:[1,4],msg:"You always check in sincerely and make it easy for people to be honest. Thank you for being so understanding."},
+ {name:"Ashley C.",ex:[3],msg:"Your apology was thoughtful and sincere. It made me feel understood instead of overlooked. Thank you."},
+ {name:"Marcus T.",ex:[5,2],msg:"You consistently put others first in small, thoughtful ways. Those moments make our church feel warm and welcoming."},
+ {name:"Naomi B.",ex:[1,6],msg:"Thank you for asking how I was doing and really listening to the answer. Your attention made me feel cared for."},
+ {name:"Joshua P.",ex:[8],msg:"You quietly helped without waiting to be asked. That simple kindness made a difficult task feel much lighter."},
+ {name:"Grace L.",ex:[4,7],msg:"Your calm words helped me feel at peace. Thank you for understanding and reminding me that everything would be okay."},
+ {name:"Elijah S.",ex:[2,9],msg:"Thank you for working so hard and still taking time to encourage others. Your positive words lifted everyone around you."},
+ {name:"Rebecca J.",ex:[3,4],msg:"Your humility and understanding meant a lot to me. Thank you for making reconciliation feel easy and sincere."},
+ {name:"Caleb W.",ex:[5,8],msg:"You kept putting others first and offering help throughout the day. Those small actions were noticed and appreciated."},
+ {name:"Rachel H.",ex:[7,9],msg:"Your words gave me courage when I needed it. Thank you for believing in me and reminding me that things can go well."},
+ {name:"Samuel D.",ex:[2,6],msg:"Thank you for listening carefully and making space for another person's perspective. Your patience was meaningful."}
+];
+
+const newSamples=[
+ {name:"Olivia N.",ex:[8,2],msg:"You noticed I needed help and immediately stepped in. Thank you for making me feel supported without making a big deal of it."},
+ {name:"Ethan C.",ex:[1],msg:"Thank you for checking on me with genuine concern. It meant more than you probably realized."},
+ {name:"Sophia J.",ex:[9,7],msg:"Your encouragement helped me keep going. Thank you for believing in me and reminding me that I could do it."}
+];
+
+const app=document.getElementById("app");
+const gardenBoard=document.getElementById("gardenBoard");
+const trailLayer=document.getElementById("trailLayer");
+const canvas=document.getElementById("constellationCanvas");
+const ctx=canvas.getContext("2d");
+
+function hexToRgba(hex,a){
+  const h=hex.replace("#","");
+  const n=parseInt(h,16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function pill(n){
+  const e=expressions[n-1];
+  return `<span class="pill" style="background:${e.color}">#${String(n).padStart(2,"0")} ${e.text}</span>`;
+}
+function sizeFor(r){
+  const len=r.msg.length;
+  const bonus=Math.max(0,(r.ex.length-1)*.7);
+  return Math.min(16.5,Math.max(12.7,12.7+len/78+bonus));
+}
+function desiredDensity(){
+  const count=recognitionPool.length;
+  if(innerWidth<1300) return Math.min(5,count);
+  if(count<=5) return count;
+  if(count<=9) return 6;
+  if(count<=15) return 7;
+  return 8;
+}
+function recognitionMarkup(r){
+  return `<div class="fresh-tag">New Recognition</div>
+    <div class="bubble-inner">
+      <h3>${r.name}</h3>
+      <div class="tags">${r.ex.map(n=>"#"+String(n).padStart(2,"0")).join(" · ")}</div>
+      <blockquote>“${r.msg}”</blockquote>
+    </div>`;
+}
+
+/* ===== Living wall density + physics ===== */
+let bodies=[];
+let poolCursor=0;
+let physicsRAF=null;
+let lastT=performance.now();
+let linesOn=true;
+let motionPreset="standard";
+let lowActivity=false;
+let lastRecognitionAt=Date.now();
+let lowActivityTimer=null;
+
+const presetConfig={
+  calm:{speed:.42,attraction:.55,trailMs:2200,lineAlpha:.065},
+  standard:{speed:1,attraction:1,trailMs:1100,lineAlpha:.11},
+  lively:{speed:1.62,attraction:1.35,trailMs:700,lineAlpha:.15}
+};
+
+function renderGarden(){
+  [...gardenBoard.querySelectorAll(".rec-bubble")].forEach(x=>x.remove());
+  bodies=[];
+  const count=desiredDensity();
+  const rect=gardenBoard.getBoundingClientRect();
+  const grid=[
+    [.03,.06],[.25,.47],[.42,.04],[.62,.48],[.81,.06],[.05,.53],[.78,.52],[.42,.52]
+  ];
+  for(let i=0;i<count;i++){
+    const r=recognitionPool[i%recognitionPool.length];
+    const el=document.createElement("div");
+    el.className="rec-bubble";
+    el.dataset.poolIndex=String(i);
+    el.dataset.expressions=r.ex.join(",");
+    el.dataset.color=expressions[r.ex[0]-1].color;
+    el.style.setProperty("--accent",el.dataset.color);
+    const sizeVW=sizeFor(r);
+    el.style.setProperty("--size",sizeVW+"vw");
+    el.style.setProperty("--breath-duration",(8.2+Math.random()*4.6).toFixed(2)+"s");
+    el.style.setProperty("--breath-delay",(-Math.random()*7).toFixed(2)+"s");
+    el.innerHTML=recognitionMarkup(r);
+    gardenBoard.appendChild(el);
+    const d=innerWidth*sizeVW/100;
+    const p=grid[i%grid.length];
+    const x=Math.min(Math.max(0,p[0]*rect.width),Math.max(0,rect.width-d));
+    const y=Math.min(Math.max(0,p[1]*rect.height),Math.max(0,rect.height-d));
+    bodies.push({
+      el,r,x,y,vx:(Math.random()-.5)*1.2,vy:(Math.random()-.5)*1.2,d,
+      tx:x,ty:y,wander:1200+Math.random()*2600,trail:Math.random()*800
+    });
+  }
+  poolCursor=count;
+  resizeCanvas();
+}
+
+function resizeCanvas(){
+  const r=gardenBoard.getBoundingClientRect();
+  const dpr=Math.max(1,Math.min(2,devicePixelRatio||1));
+  canvas.width=Math.round(r.width*dpr); canvas.height=Math.round(r.height*dpr);
+  canvas.style.width=r.width+"px";canvas.style.height=r.height+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function chooseTarget(b,rect){
+  const pad=8;
+  b.tx=pad+Math.random()*Math.max(1,rect.width-b.d-pad*2);
+  b.ty=pad+Math.random()*Math.max(1,rect.height-b.d-pad*2);
+  b.wander=5000+Math.random()*7500;
+}
+
+function spawnTrail(b){
+  const cfg=presetConfig[motionPreset];
+  if(lowActivity || motionPreset==="calm" && Math.random()<.45) return;
+  const dot=document.createElement("div");
+  dot.className="trail-dot";
+  const s=8+Math.random()*13;
+  dot.style.width=s+"px";dot.style.height=s+"px";
+  dot.style.background=b.el.dataset.color;
+  dot.style.left=(b.x+b.d*.5+(Math.random()-.5)*b.d*.18)+"px";
+  dot.style.top=(b.y+b.d*.5+(Math.random()-.5)*b.d*.16)+"px";
+  trailLayer.appendChild(dot);
+  setTimeout(()=>dot.remove(),4100);
+  const dots=trailLayer.querySelectorAll(".trail-dot");
+  if(dots.length>38)dots[0].remove();
+}
+
+function sharedExpression(a,b){
+  const aa=a.r.ex,bb=b.r.ex;
+  return aa.find(n=>bb.includes(n))||null;
+}
+
+function drawConstellations(){
+  const rect=gardenBoard.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width,rect.height);
+  if(!linesOn || !document.getElementById("garden").classList.contains("active")) return;
+  const alpha=(lowActivity?.055:presetConfig[motionPreset].lineAlpha);
+  for(let i=0;i<bodies.length;i++){
+    for(let j=i+1;j<bodies.length;j++){
+      const a=bodies[i],b=bodies[j];
+      const ex=sharedExpression(a,b);
+      if(!ex)continue;
+      const ax=a.x+a.d/2,ay=a.y+a.d/2,bx=b.x+b.d/2,by=b.y+b.d/2;
+      const dist=Math.hypot(bx-ax,by-ay);
+      if(dist>rect.width*.42)continue;
+      const color=expressions[ex-1].color;
+      ctx.beginPath();
+      ctx.moveTo(ax,ay);
+      const mx=(ax+bx)/2, my=(ay+by)/2-18;
+      ctx.quadraticCurveTo(mx,my,bx,by);
+      ctx.lineWidth=1.2;
+      ctx.strokeStyle=hexToRgba(color,alpha);
+      ctx.stroke();
+      ctx.beginPath();ctx.arc(mx,my,2.2,0,Math.PI*2);ctx.fillStyle=hexToRgba(color,alpha*1.6);ctx.fill();
+    }
+  }
+}
+
+function physics(now){
+  const dt=Math.min(.033,(now-lastT)/1000||.016);lastT=now;
+  const active=document.getElementById("garden").classList.contains("active");
+  if(active && bodies.length){
+    const rect=gardenBoard.getBoundingClientRect();
+    const cfg=presetConfig[motionPreset];
+    const activityFactor=lowActivity?.32:1;
+    const speedFactor=cfg.speed*activityFactor;
+    const attraction=cfg.attraction*activityFactor;
+
+    for(const b of bodies){
+      b.wander-=dt*1000;b.trail-=dt*1000;
+      if(b.wander<=0)chooseTarget(b,rect);
+      const dx=b.tx-b.x,dy=b.ty-b.y,dist=Math.max(1,Math.hypot(dx,dy));
+      b.vx+=(dx/dist)*attraction*dt*4.2;
+      b.vy+=(dy/dist)*attraction*dt*4.2;
+      b.vx+=(Math.random()-.5)*.11*dt;
+      b.vy+=(Math.random()-.5)*.11*dt;
+    }
+    /* pairwise collision avoidance */
+    for(let i=0;i<bodies.length;i++){
+      for(let j=i+1;j<bodies.length;j++){
+        const a=bodies[i],b=bodies[j];
+        const ax=a.x+a.d/2,ay=a.y+a.d/2,bx=b.x+b.d/2,by=b.y+b.d/2;
+        let dx=bx-ax,dy=by-ay,dist=Math.hypot(dx,dy)||1;
+        const min=(a.d+b.d)/2+innerWidth*.009;
+        if(dist<min){
+          const nx=dx/dist,ny=dy/dist;
+          const overlap=(min-dist)/min;
+          const push=overlap*10;
+          a.vx-=nx*push*dt;a.vy-=ny*push*dt;
+          b.vx+=nx*push*dt;b.vy+=ny*push*dt;
+          const corr=Math.min(1.7,(min-dist)*.035);
+          a.x-=nx*corr;a.y-=ny*corr;b.x+=nx*corr;b.y+=ny*corr;
+        }
+      }
+    }
+    for(const b of bodies){
+      b.vx*=.994;b.vy*=.994;
+      const s=Math.hypot(b.vx,b.vy),max=5.4*speedFactor+1;
+      if(s>max){b.vx=b.vx/s*max;b.vy=b.vy/s*max}
+      b.x+=b.vx*dt*16*speedFactor;
+      b.y+=b.vy*dt*16*speedFactor;
+      const maxX=Math.max(0,rect.width-b.d),maxY=Math.max(0,rect.height-b.d);
+      if(b.x<0){b.x=0;b.vx=Math.abs(b.vx)}if(b.x>maxX){b.x=maxX;b.vx=-Math.abs(b.vx)}
+      if(b.y<0){b.y=0;b.vy=Math.abs(b.vy)}if(b.y>maxY){b.y=maxY;b.vy=-Math.abs(b.vy)}
+      b.el.style.transform=`translate3d(${b.x}px,${b.y}px,0)`;
+      if(b.trail<=0){spawnTrail(b);b.trail=presetConfig[motionPreset].trailMs+Math.random()*650}
+    }
+  }
+  drawConstellations();
+  physicsRAF=requestAnimationFrame(physics);
+}
+
+/* ===== Featured content ===== */
+function setFeatured(r){
+  const main=r.ex[0],e=expressions[main-1];
+  document.getElementById("featureNum").textContent=String(main).padStart(2,"0");
+  document.getElementById("featureExpression").textContent=e.text;
+  document.getElementById("featureCircle").style.background=e.color;
+  document.getElementById("featuredName").textContent=r.name;
+  document.getElementById("featuredPills").innerHTML=r.ex.map(pill).join("");
+  document.getElementById("featuredQuote").textContent="“"+r.msg+"”";
+  setAtmosphere(main);
+}
+
+/* ===== Smart cluster rotation ===== */
+let clusterCursor=0;
+function eligibleClusterExpressions(){
+  return expressions.map(e=>{
+    const matches=recognitionPool.filter(r=>r.ex.includes(e.n));
+    return {e,matches};
+  }).filter(x=>x.matches.length>=2);
+}
+function renderNextCluster(){
+  const eligible=eligibleClusterExpressions();
+  if(!eligible.length)return;
+  const item=eligible[clusterCursor%eligible.length];clusterCursor++;
+  const {e,matches}=item;
+  document.getElementById("clusterWrap").style.setProperty("--cluster-color",e.color);
+  document.getElementById("clusterNum").textContent=String(e.n).padStart(2,"0");
+  document.getElementById("clusterExpression").textContent="“"+e.text+"”";
+  for(let i=0;i<4;i++){
+    const r=matches[i%matches.length],el=document.getElementById("cb"+(i+1));
+    el.innerHTML=`<h3>${r.name}</h3><blockquote>“${r.msg}”</blockquote>`;
+  }
+  setAtmosphere(e.n);
+}
+
+/* ===== Expression-colored atmosphere ===== */
+function setAtmosphere(n){
+  const main=expressions[(n-1+9)%9].color;
+  const next=expressions[(n+1)%9].color;
+  const third=expressions[(n+4)%9].color;
+  document.documentElement.style.setProperty("--atm-a",hexToRgba(main,.27));
+  document.documentElement.style.setProperty("--atm-b",hexToRgba(next,.19));
+  document.documentElement.style.setProperty("--atm-c",hexToRgba(third,.14));
+}
+function setGardenAtmosphere(){
+  const freq={};
+  bodies.forEach(b=>b.r.ex.forEach(n=>freq[n]=(freq[n]||0)+1));
+  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0]||8;
+  setAtmosphere(Number(top));
+}
+
+/* ===== Stats + expressions ===== */
+document.getElementById("statField").innerHTML=expressions.map((e,i)=>`
+  <div class="sdot s${i+1}" style="background:${e.color};animation-delay:${-i*.7}s">
+    <div class="count">${e.count}</div><div class="txt">${String(e.n).padStart(2,"0")} · ${e.text}</div>
+  </div>`).join("");
+document.getElementById("exprWrap").innerHTML=expressions.map(e=>`
+  <div class="expr" style="background:${e.color}">
+    <div class="expr-top">
+      <div class="n">${String(e.n).padStart(2,"0")}</div>
+      <div class="expr-detail">${e.detail}</div>
+    </div>
+    <p class="expr-phrase">“${e.text}”</p>
+  </div>`).join("");
+
+/* ===== Milestone buildup + celebration ===== */
+let currentTotal=214,recognitionCount=57;
+const thresholds=[50,100,250,500,1000,2500,5000];
+function nextThreshold(total){return thresholds.find(x=>x>total)||Math.ceil(total/5000+1)*5000}
+function updateMilestoneUI(){
+  const next=nextThreshold(currentTotal),prev=[0,...thresholds].filter(x=>x<=currentTotal).pop()||0;
+  const pct=Math.max(0,Math.min(100,(currentTotal-prev)/(next-prev)*100));
+  document.getElementById("currentTotal").textContent=currentTotal.toLocaleString();
+  document.getElementById("nextMilestone").textContent=next.toLocaleString();
+  document.getElementById("milestoneTrack").style.width=pct+"%";
+  document.getElementById("milestoneRemain").textContent=(next-currentTotal).toLocaleString()+" expressions to "+next.toLocaleString();
+  document.getElementById("statsTotal").textContent=currentTotal.toLocaleString();
+  document.getElementById("recognitionTotal").textContent=recognitionCount.toLocaleString();
+}
+function showMilestone(value){
+  document.getElementById("celebrationNumber").textContent=value.toLocaleString();
+  const ov=document.getElementById("milestoneOverlay");ov.classList.add("show");
+  setTimeout(()=>ov.classList.remove("show"),7200);
+}
+function addExpressionCount(r){
+  const oldNext=nextThreshold(currentTotal);
+  currentTotal+=r.ex.length;recognitionCount++;
+  r.ex.forEach(n=>expressions[n-1].count++);
+  updateMilestoneUI();
+  if(currentTotal>=oldNext)showMilestone(oldNext);
+}
+
+/* ===== QR invitation ===== */
+const qrDock=document.getElementById("qrDock");
+function inviteQR(){qrDock.classList.add("inviting");setTimeout(()=>qrDock.classList.remove("inviting"),6200)}
+let qrInterval=setInterval(inviteQR,44000);setTimeout(inviteQR,11000);
+
+/* ===== True live-arrival queue + journey from QR to living wall ===== */
+let sampleCursor=0;
+const arrivalQueue=[];
+let arrivalProcessing=false;
+let arrivalSequence=0;
+const ARRIVAL_SETTLE_MS=6500;
+
+const arrivalStatus=document.getElementById("arrivalStatus");
+const arrivalTitle=document.getElementById("arrivalTitle");
+const arrivalDetail=document.getElementById("arrivalDetail");
+
+function replaceBodyWithRecognition(body,r){
+  body.r=r;
+  body.el.dataset.expressions=r.ex.join(",");
+  body.el.dataset.color=expressions[r.ex[0]-1].color;
+  body.el.style.setProperty("--accent",body.el.dataset.color);
+
+  const sizeVW=sizeFor(r);
+  body.el.style.setProperty("--size",sizeVW+"vw");
+  body.el.style.setProperty("--breath-duration",(8.2+Math.random()*4.6).toFixed(2)+"s");
+  body.el.style.setProperty("--breath-delay",(-Math.random()*7).toFixed(2)+"s");
+  body.el.innerHTML=recognitionMarkup(r);
+  body.el.classList.add("fresh");
+
+  requestAnimationFrame(()=>{
+    body.d=body.el.getBoundingClientRect().width||body.d;
+    chooseTarget(body,gardenBoard.getBoundingClientRect());
+  });
+  setTimeout(()=>body.el.classList.remove("fresh"),4700);
+}
+
+function updateArrivalCue(mode="waiting"){
+  const waiting=arrivalQueue.length;
+  arrivalStatus.classList.remove("waiting","arriving");
+  arrivalStatus.classList.add(mode);
+
+  if(arrivalProcessing){
+    arrivalStatus.classList.add("show");
+    arrivalTitle.textContent="New recognition arriving";
+    arrivalDetail.textContent=waiting
+      ? `${waiting} more ${waiting===1?"recognition":"recognitions"} waiting`
+      : "Making its way to the Recognition Garden";
+  }else if(waiting){
+    arrivalStatus.classList.add("show");
+    arrivalTitle.textContent=`${waiting} new ${waiting===1?"recognition":"recognitions"} received`;
+    arrivalDetail.textContent="Queued to enter the wall one at a time";
+  }else{
+    arrivalTitle.textContent="Recognition received";
+    arrivalDetail.textContent="Preparing its journey to the wall";
+    setTimeout(()=>{
+      if(!arrivalProcessing && arrivalQueue.length===0){
+        arrivalStatus.classList.remove("show");
+      }
+    },1400);
+  }
+}
+
+function enqueueRecognition(r){
+  arrivalSequence++;
+  arrivalQueue.push({...r,_arrivalId:arrivalSequence});
+  lastRecognitionAt=Date.now();
+  setLowActivity(false);
+  updateArrivalCue("waiting");
+  processArrivalQueue();
+}
+
+async function processArrivalQueue(){
+  if(arrivalProcessing || arrivalQueue.length===0)return;
+  arrivalProcessing=true;
+
+  while(arrivalQueue.length){
+    const r=arrivalQueue.shift();
+    updateArrivalCue("arriving");
+    await performRecognitionJourney(r);
+
+    if(arrivalQueue.length){
+      updateArrivalCue("waiting");
+      await new Promise(resolve=>setTimeout(resolve,ARRIVAL_SETTLE_MS));
+    }
+  }
+
+  arrivalProcessing=false;
+  updateArrivalCue();
+}
+
+async function performRecognitionJourney(r){
+  if(!document.getElementById("garden").classList.contains("active")){
+    showById("garden");
+    await new Promise(resolve=>setTimeout(resolve,760));
+  }
+
+  recognitionPool.push(r);
+  const target=bodies[(poolCursor++)%bodies.length];
+
+  const qr=qrDock.getBoundingClientRect();
+  const br=gardenBoard.getBoundingClientRect();
+  const startX=qr.left+qr.width*.48;
+  const startY=qr.top+qr.height*.24;
+  const endX=br.left+target.x+target.d*.5;
+  const endY=br.top+target.y+target.d*.5;
+
+  const orb=document.createElement("div");
+  orb.className="journey-orb";
+  orb.style.setProperty("--journey-color",expressions[r.ex[0]-1].color);
+  orb.textContent="♥";
+  document.body.appendChild(orb);
+
+  const label=document.createElement("div");
+  label.className="journey-label";
+  label.textContent=`For ${r.name}`;
+  document.body.appendChild(label);
+
+  orb.style.left=(startX-28)+"px";
+  orb.style.top=(startY-28)+"px";
+  label.style.left=(startX+34)+"px";
+  label.style.top=(startY-10)+"px";
+
+  const dx=endX-startX,dy=endY-startY;
+
+  const anim=orb.animate([
+    {transform:"translate3d(0,0,0) scale(.54)",opacity:.12},
+    {transform:`translate3d(${dx*.22}px,${dy*.22-55}px,0) scale(.86)`,opacity:1,offset:.26},
+    {transform:`translate3d(${dx*.55}px,${dy*.55-125}px,0) scale(1.06)`,opacity:1,offset:.56},
+    {transform:`translate3d(${dx*.82}px,${dy*.82-55}px,0) scale(1.18)`,opacity:1,offset:.82},
+    {transform:`translate3d(${dx}px,${dy}px,0) scale(1.3)`,opacity:1}
+  ],{
+    duration:2600,
+    easing:"cubic-bezier(.2,.72,.2,1)",
+    fill:"forwards"
+  });
+
+  label.animate([
+    {opacity:0,transform:"translateY(8px)"},
+    {opacity:1,transform:"translateY(0)",offset:.18},
+    {opacity:1,offset:.62},
+    {opacity:0,transform:"translateY(-9px)"}
+  ],{duration:2100,fill:"forwards"});
+
+  await anim.finished;
+  orb.remove();
+  label.remove();
+
+  replaceBodyWithRecognition(target,r);
+  addExpressionCount(r);
+  setGardenAtmosphere();
+
+  arrivalTitle.textContent=`${r.name} is now on the wall`;
+  arrivalDetail.textContent=arrivalQueue.length
+    ? `${arrivalQueue.length} more ${arrivalQueue.length===1?"recognition":"recognitions"} waiting`
+    : "Their recognition has joined the garden";
+
+  await new Promise(resolve=>setTimeout(resolve,1200));
+}
+
+function queueSampleRecognition(){
+  const r=newSamples[sampleCursor++%newSamples.length];
+  enqueueRecognition({...r});
+}
+
+function queueThreeSamples(){
+  for(let i=0;i<3;i++){
+    const r=newSamples[sampleCursor++%newSamples.length];
+    enqueueRecognition({...r});
+  }
+}
+
+/* ===== End-of-day / low-activity mode ===== */
+const LOW_ACTIVITY_MS=20*60*1000;
+function setLowActivity(on){
+  lowActivity=on;app.classList.toggle("low-activity",on);
+  document.getElementById("lowBtn").textContent=on?"Resume Activity":"Low Activity";
+  if(on && !document.getElementById("garden").classList.contains("active"))showById("garden");
+}
+lowActivityTimer=setInterval(()=>{if(Date.now()-lastRecognitionAt>LOW_ACTIVITY_MS)setLowActivity(true)},30000);
+
+/* ===== Admin motion presets ===== */
+function applyMotionPreset(name){
+  motionPreset=name;
+  app.classList.remove("motion-calm","motion-standard","motion-lively");
+  app.classList.add("motion-"+name);
+  document.getElementById("motionBtn").textContent="Motion: "+name[0].toUpperCase()+name.slice(1);
+}
+function cycleMotion(){
+  const order=["calm","standard","lively"];
+  applyMotionPreset(order[(order.indexOf(motionPreset)+1)%order.length]);
+}
+
+/* ===== Rotation engine ===== */
+const screens=[...document.querySelectorAll(".screen")];
+let rotationIndex=0,rotationTimer=null,progressRAF=null,paused=false;
+function playlist(){return lowActivity?["garden","expressions","garden","stats"]:["garden","featured","stats","expressions","cluster"]}
+function progress(ms){
+  cancelAnimationFrame(progressRAF);
+  const bar=document.getElementById("bar");bar.style.width="0%";const st=performance.now();
+  function tick(now){const p=Math.min(100,(now-st)/ms*100);bar.style.width=p+"%";if(p<100&&!paused)progressRAF=requestAnimationFrame(tick)}
+  progressRAF=requestAnimationFrame(tick);
+}
+function showById(id){
+  clearTimeout(rotationTimer);cancelAnimationFrame(progressRAF);
+  screens.forEach(s=>s.classList.toggle("active",s.id===id));
+  if(id==="garden")setGardenAtmosphere();
+  if(id==="featured"){const r=recognitionPool[(poolCursor+2)%recognitionPool.length];setFeatured(r)}
+  if(id==="cluster")renderNextCluster();
+  if(id==="stats")setAtmosphere(6);
+  if(id==="expressions")setAtmosphere(2);
+  const s=document.getElementById(id),ms=Number(s.dataset.duration||14000)*(lowActivity?1.5:1);
+  progress(ms);
+  if(!paused)rotationTimer=setTimeout(nextScreen,ms);
+}
+function nextScreen(){
+  const list=playlist();rotationIndex=(rotationIndex+1)%list.length;showById(list[rotationIndex]);
+}
+function prevScreen(){
+  const list=playlist();rotationIndex=(rotationIndex-1+list.length)%list.length;showById(list[rotationIndex]);
+}
+function togglePause(){
+  paused=!paused;document.getElementById("pauseBtn").textContent=paused?"Resume":"Pause";
+  clearTimeout(rotationTimer);cancelAnimationFrame(progressRAF);if(!paused)showById(playlist()[rotationIndex]);
+}
+
+/* ===== Controls ===== */
+document.getElementById("nextBtn").onclick=nextScreen;
+document.getElementById("prevBtn").onclick=prevScreen;
+document.getElementById("pauseBtn").onclick=togglePause;
+document.getElementById("motionBtn").onclick=cycleMotion;
+document.getElementById("linesBtn").onclick=()=>{linesOn=!linesOn;document.getElementById("linesBtn").textContent=linesOn?"Lines: On":"Lines: Off"};
+document.getElementById("lowBtn").onclick=()=>setLowActivity(!lowActivity);
+document.getElementById("newBtn").onclick=queueSampleRecognition;
+document.getElementById("queue3Btn").onclick=queueThreeSamples;
+document.getElementById("clusterBtn").onclick=()=>showById("cluster");
+document.getElementById("milestoneBtn").onclick=()=>showMilestone(nextThreshold(currentTotal));
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight")nextScreen();
+  if(e.key==="ArrowLeft")prevScreen();
+  if(e.key.toLowerCase()==="n")queueSampleRecognition();
+  if(e.key.toLowerCase()==="c")showById("cluster");
+  if(e.key.toLowerCase()==="m")showMilestone(nextThreshold(currentTotal));
+  if(e.code==="Space"){e.preventDefault();togglePause()}
+  if(e.key.toLowerCase()==="f")document.documentElement.requestFullscreen?.();
+});
+
+window.addEventListener("resize",()=>{resizeCanvas();renderGarden()});
+
+/* Start */
+renderGarden();
+setFeatured(recognitionPool[0]);
+updateMilestoneUI();
+applyMotionPreset("standard");
+resizeCanvas();
+cancelAnimationFrame(physicsRAF);lastT=performance.now();physicsRAF=requestAnimationFrame(physics);
+showById("garden");
+</script>
+</body>
+</html>

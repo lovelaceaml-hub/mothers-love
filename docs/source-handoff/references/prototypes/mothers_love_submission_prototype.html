@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Words of Mother's Love</title>
+<style>
+  :root{
+    --cream:#FFF8DD;
+    --paper:#FFFDF5;
+    --ink:#2C3042;
+    --muted:#6E7282;
+    --blue:#89D4F4;
+    --yellow:#FFD968;
+    --orange:#FFAD67;
+    --coral:#FF8F86;
+    --red:#F26E73;
+    --lavender:#C9B5F5;
+    --lime:#CBEA73;
+    --green:#9CD89F;
+    --deep-green:#4D9A76;
+    --shadow:0 16px 40px rgba(70,65,50,.12);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--cream);color:var(--ink);font-family:Inter, ui-rounded, "SF Pro Rounded", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;}
+  body{min-height:100vh;overflow-x:hidden}
+
+  .page{
+    position:relative;
+    min-height:100vh;
+    padding:20px 16px 40px;
+    overflow:hidden;
+  }
+
+  .bubble{
+    position:absolute;
+    border-radius:50%;
+    opacity:.42;
+    pointer-events:none;
+    filter:saturate(.95);
+  }
+  .b1{width:170px;height:170px;background:var(--blue);top:-70px;right:-58px}
+  .b2{width:92px;height:92px;background:var(--lavender);top:150px;left:-42px}
+  .b3{width:120px;height:120px;background:var(--lime);bottom:55px;right:-60px}
+  .b4{width:76px;height:76px;background:var(--coral);bottom:260px;left:-34px}
+  .bubble:after{
+    content:"";
+    position:absolute;inset:13%;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.58);
+  }
+
+  .daisy{
+    position:absolute;width:58px;height:58px;pointer-events:none;
+  }
+  .daisy .p{
+    position:absolute;left:24px;top:4px;width:11px;height:24px;background:white;border-radius:11px 11px 7px 7px;
+    transform-origin:6px 25px;box-shadow:0 2px 4px rgba(0,0,0,.06);
+  }
+  .daisy .p:nth-child(2){transform:rotate(45deg)}
+  .daisy .p:nth-child(3){transform:rotate(90deg)}
+  .daisy .p:nth-child(4){transform:rotate(135deg)}
+  .daisy .p:nth-child(5){transform:rotate(180deg)}
+  .daisy .p:nth-child(6){transform:rotate(225deg)}
+  .daisy .p:nth-child(7){transform:rotate(270deg)}
+  .daisy .p:nth-child(8){transform:rotate(315deg)}
+  .daisy .c{
+    position:absolute;left:19px;top:19px;width:20px;height:20px;border-radius:50%;background:#F8C644;z-index:2;
+  }
+  .daisy.d1{right:20px;top:120px;transform:scale(.8) rotate(10deg)}
+  .daisy.d2{left:8px;bottom:170px;transform:scale(.65) rotate(-12deg)}
+
+  .shell{
+    position:relative;
+    z-index:2;
+    width:min(100%, 540px);
+    margin:0 auto;
+  }
+
+  .brand{
+    text-align:center;
+    padding:16px 10px 22px;
+  }
+  .eyebrow{
+    font-weight:900;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:#5C6173;
+    margin-bottom:9px;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(34px,9vw,52px);
+    line-height:.95;
+    letter-spacing:-.045em;
+    font-weight:900;
+  }
+  .tagline{
+    margin:12px auto 0;
+    max-width:390px;
+    font-family:Georgia, "Times New Roman", serif;
+    font-style:italic;
+    font-size:18px;
+    line-height:1.35;
+    color:#585B67;
+  }
+
+  .card{
+    background:rgba(255,253,245,.94);
+    border:1px solid rgba(255,255,255,.72);
+    border-radius:30px;
+    box-shadow:var(--shadow);
+    padding:22px 18px 20px;
+    backdrop-filter:blur(10px);
+  }
+
+  .section{
+    margin-bottom:22px;
+  }
+  label.block{
+    display:block;
+    font-weight:900;
+    font-size:16px;
+    margin:0 0 7px;
+  }
+  .helper{
+    color:var(--muted);
+    font-size:12.5px;
+    line-height:1.45;
+    margin:-1px 0 9px;
+  }
+
+  input, textarea{
+    width:100%;
+    border:2px solid #ECE8D9;
+    background:white;
+    color:var(--ink);
+    border-radius:17px;
+    padding:14px 15px;
+    outline:none;
+    font:inherit;
+    font-size:16px;
+    transition:.2s ease;
+  }
+  input:focus, textarea:focus{
+    border-color:#8FD1EA;
+    box-shadow:0 0 0 4px rgba(137,212,244,.18);
+  }
+  textarea{min-height:126px;resize:vertical;line-height:1.45}
+  .counter{text-align:right;color:var(--muted);font-size:12px;margin-top:6px}
+
+  .expression-title{
+    font-weight:900;
+    font-size:16px;
+    margin-bottom:5px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:12px;
+  }
+
+  .expr{
+    position:relative;
+    border:0;
+    width:100%;
+    text-align:left;
+    border-radius:19px;
+    padding:14px 48px 14px 14px;
+    color:#2f3341;
+    cursor:pointer;
+    min-height:74px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .expr:active{transform:scale(.99)}
+  .expr:hover{filter:brightness(1.02)}
+  .expr.selected{
+    box-shadow:inset 0 0 0 3px rgba(43,48,66,.73), 0 7px 18px rgba(60,60,70,.11);
+  }
+  .expr .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;height:28px;
+    border-radius:50%;
+    background:rgba(255,255,255,.75);
+    font-weight:950;
+    font-size:12px;
+    margin-right:8px;
+    vertical-align:top;
+  }
+  .expr .text{
+    display:inline;
+    font-weight:800;
+    font-size:14px;
+    line-height:1.32;
+  }
+  .check{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.65);
+    color:transparent;
+    font-weight:1000;
+  }
+  .expr.selected .check{background:#2F3341;color:white}
+
+  .e1{background:var(--blue)}
+  .e2{background:var(--yellow)}
+  .e3{background:var(--orange)}
+  .e4{background:var(--coral)}
+  .e5{background:var(--red);color:white}
+  .e5 .num,.e5 .check{color:#2f3341}
+  .e6{background:var(--lavender)}
+  .e7{background:var(--lime)}
+  .e8{background:var(--green)}
+  .e9{background:#9CC7FF}
+
+  .submit{
+    width:100%;
+    border:0;
+    border-radius:18px;
+    background:#2F3341;
+    color:white;
+    padding:16px 18px;
+    font-weight:950;
+    font-size:16px;
+    letter-spacing:.01em;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(47,51,65,.18);
+  }
+  .submit:hover{transform:translateY(-1px)}
+  .submit:active{transform:translateY(0)}
+  .error{
+    display:none;
+    margin:0 0 14px;
+    padding:11px 12px;
+    border-radius:13px;
+    background:#FFF0EF;
+    color:#9E3F42;
+    font-size:13px;
+    font-weight:700;
+  }
+  .error.show{display:block}
+
+  .privacy{
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+    margin-top:12px;
+    color:#777B86;
+    font-size:11.5px;
+    line-height:1.4;
+  }
+  .lock{
+    width:20px;height:20px;border-radius:50%;
+    background:#EDE9DC;
+    display:flex;align-items:center;justify-content:center;flex:0 0 20px;
+    font-size:11px;
+  }
+
+  .thankyou{
+    display:none;
+    min-height:72vh;
+    align-items:center;
+    justify-content:center;
+  }
+  .thankyou.active{display:flex}
+  .form-view.hidden{display:none}
+  .thank-card{
+    background:rgba(255,253,245,.95);
+    border-radius:34px;
+    padding:34px 24px;
+    text-align:center;
+    box-shadow:var(--shadow);
+    width:100%;
+    position:relative;
+    overflow:hidden;
+  }
+  .heart{
+    width:74px;height:74px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:36px;
+    background:#FFE1DE;
+  }
+  .thank-card h2{
+    margin:0;
+    font-size:34px;
+    line-height:1;
+    letter-spacing:-.035em;
+  }
+  .thank-card p{
+    color:#666B78;
+    line-height:1.55;
+    margin:16px auto 22px;
+    max-width:390px;
+  }
+  .outline-btn{
+    width:100%;
+    border:2px solid #2F3341;
+    background:transparent;
+    color:#2F3341;
+    border-radius:17px;
+    padding:14px 16px;
+    font-weight:900;
+    font-size:15px;
+    cursor:pointer;
+  }
+
+  .prototype-note{
+    margin:14px auto 0;
+    text-align:center;
+    font-size:10.5px;
+    color:#8B8C92;
+  }
+
+  @media (min-width:560px){
+    .page{padding-top:34px}
+    .card{padding:28px 26px 24px}
+    .grid{grid-template-columns:1fr 1fr}
+    .expr{min-height:96px}
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="bubble b1"></div>
+  <div class="bubble b2"></div>
+  <div class="bubble b3"></div>
+  <div class="bubble b4"></div>
+
+  <div class="daisy d1">
+    <i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i>
+    <i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="c"></i>
+  </div>
+  <div class="daisy d2">
+    <i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i>
+    <i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="c"></i>
+  </div>
+
+  <div class="shell">
+    <header class="brand">
+      <div class="eyebrow">Las Vegas Campaign</div>
+      <h1>THE WORDS OF<br>MOTHER'S LOVE</h1>
+      <div class="tagline">Where a mother's love resides, peace abides.</div>
+    </header>
+
+    <section class="form-view" id="formView">
+      <form class="card" id="recognitionForm">
+        <div class="section">
+          <label class="block" for="submitter">Your Name</label>
+          <div class="helper">Your identity is visible only to campaign administrators and will never appear on the public display.</div>
+          <input id="submitter" name="submitter" type="text" autocomplete="name" placeholder="First name + last initial" maxlength="60" />
+        </div>
+
+        <div class="section">
+          <label class="block" for="recipient">Who would you like to recognize?</label>
+          <div class="helper">Enter their first name and last initial.</div>
+          <input id="recipient" name="recipient" type="text" placeholder="e.g., Michelle R." maxlength="60" />
+        </div>
+
+        <div class="section">
+          <div class="expression-title">Which expression(s) did they practice?</div>
+          <div class="helper">Select one or more.</div>
+
+          <div class="grid" id="expressions">
+            <button type="button" class="expr e1" data-expression="1">
+              <span class="num">01</span><span class="text">“How Are You?”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e2" data-expression="2">
+              <span class="num">02</span><span class="text">“Thank you. It's all thanks to you. You've worked hard.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e3" data-expression="3">
+              <span class="num">03</span><span class="text">“I'm sorry. It must have been hard on you.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e4" data-expression="4">
+              <span class="num">04</span><span class="text">“It's okay. I understand.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e5" data-expression="5">
+              <span class="num">05</span><span class="text">“Please, after you.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e6" data-expression="6">
+              <span class="num">06</span><span class="text">“I'd love to hear more about your thoughts.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e7" data-expression="7">
+              <span class="num">07</span><span class="text">“I'll pray (or root) for you. Everything will go well.”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e8" data-expression="8">
+              <span class="num">08</span><span class="text">“Can I give you a hand with anything?”</span><span class="check">✓</span>
+            </button>
+            <button type="button" class="expr e9" data-expression="9">
+              <span class="num">09</span><span class="text">“You're amazing. You're doing great!”</span><span class="check">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="section">
+          <label class="block" for="message">Share your appreciation</label>
+          <div class="helper">Write a personal message of acknowledgement and thanks.</div>
+          <textarea id="message" name="message" maxlength="500" placeholder="What did they do, and how did it encourage you?"></textarea>
+          <div class="counter"><span id="count">0</span>/500</div>
+        </div>
+
+        <div class="error" id="errorBox">Please complete every field and select at least one expression.</div>
+
+        <button class="submit" type="submit">SEND RECOGNITION ♥</button>
+
+        <div class="privacy">
+          <div class="lock">🔒</div>
+          <div>Your name is kept private from the public display. Recipient, selected expression(s), and message may be shown on the campaign TV.</div>
+        </div>
+      </form>
+      <div class="prototype-note">Interactive design prototype — no data is saved yet.</div>
+    </section>
+
+    <section class="thankyou" id="thankYou">
+      <div class="thank-card">
+        <div class="heart">♥</div>
+        <h2>Thank you for sharing Mother's Love.</h2>
+        <p>Your recognition has been received and will help encourage our church family.<br><br><strong>Your message will appear on the Words of Mother's Love display.</strong></p>
+        <button class="outline-btn" id="againBtn" type="button">Recognize Someone Else</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  const exprButtons = [...document.querySelectorAll('.expr')];
+  const form = document.getElementById('recognitionForm');
+  const errorBox = document.getElementById('errorBox');
+  const formView = document.getElementById('formView');
+  const thankYou = document.getElementById('thankYou');
+  const message = document.getElementById('message');
+  const count = document.getElementById('count');
+  const againBtn = document.getElementById('againBtn');
+
+  exprButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('selected');
+      errorBox.classList.remove('show');
+    });
+  });
+
+  message.addEventListener('input', () => {
+    count.textContent = message.value.length;
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const submitter = document.getElementById('submitter').value.trim();
+    const recipient = document.getElementById('recipient').value.trim();
+    const selected = exprButtons.filter(b => b.classList.contains('selected'));
+    const body = message.value.trim();
+
+    if(!submitter || !recipient || selected.length === 0 || !body){
+      errorBox.classList.add('show');
+      return;
+    }
+
+    errorBox.classList.remove('show');
+    formView.classList.add('hidden');
+    thankYou.classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  againBtn.addEventListener('click', () => {
+    form.reset();
+    exprButtons.forEach(b => b.classList.remove('selected'));
+    count.textContent = '0';
+    thankYou.classList.remove('active');
+    formView.classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+</script>
+</body>
+</html>
