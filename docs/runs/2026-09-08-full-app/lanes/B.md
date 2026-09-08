@@ -21,7 +21,7 @@
 ## Verification
 
 - `npm run typecheck` passed.
-- `npm test` passed: 17 tests across 5 files.
+- `npm test` passed: 22 tests across 6 files, including mocked route DTO checks.
 - `npm run build` passed with all backend routes compiled as dynamic App Router handlers.
 - Live Supabase migration, pgTAP execution, restricted runtime login query, and deployed endpoint smoke tests were not run in this lane. Root owns provider access, migration application, credentials, and deployment.
 
@@ -32,3 +32,9 @@
 - The SQL artifact is `database/001_mothers_love.sql`. Root should review and apply it through the provider migration path, then run the isolated pgTAP fixture and direct deny checks using the restricted login.
 - Provider metadata confirmed pgcrypto is in `extensions`, and the artifact calls `extensions.digest` without changing extension placement.
 - Root should verify the optional `ml_purge` pg_cron schedule exists exactly once after migration. The migration conditionally schedules it only when the cron relation is available.
+
+## Post-review security fixture
+
+- Added `tests/backend/004_security_assertions.sql`, a rollback-only synthetic PostgreSQL fixture covering forced RLS and direct privilege denial for anon/authenticated, bridge-only restricted runtime grants, Owner AAL2 enforcement, moderator and membership boundaries, one-use pairing and revoked display sessions, and idempotent receipt preservation with hash conflict detection.
+- Root applied migration SHA-256 `790f72f06ececc14a408355c2912673de55a04a2bed4e103792e9015709f18c1` to a fresh disposable database and passed the hardened lifecycle fixture at `tests/backend/003_transaction_assertions.sql`. Subsequent review corrections are pending fresh database verification at migration SHA `f213b423a4e36ec45d1958b7a1c93a282debd1d84cd6d761d3dcaa95fd753a10`.
+- The latest candidate also gates effective collection availability on a cleanup timestamp within two minutes and zero rows overdue beyond the two-minute lag. Unhealthy collection enable returns `PURGE_UNHEALTHY`; config and submission remain closed until `ml_purge` recovers health.

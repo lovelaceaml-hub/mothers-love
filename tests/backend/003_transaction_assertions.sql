@@ -5,6 +5,7 @@ BEGIN;
 INSERT INTO mothers_love.admin_memberships (user_id, role, active)
 VALUES ('00000000-0000-4000-8000-000000000002', 'owner', true)
 ON CONFLICT (user_id) DO UPDATE SET role = 'owner', active = true;
+SELECT public.ml_purge();
 UPDATE mothers_love.settings SET collection_open = true;
 
 DO $fixture$
