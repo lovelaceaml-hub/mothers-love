@@ -1,0 +1,46 @@
+[
+  {
+    "path": "/",
+    "status": 200
+  },
+  {
+    "path": "/admin/login",
+    "status": 200
+  },
+  {
+    "path": "/admin/set-password",
+    "status": 200
+  },
+  {
+    "path": "/display",
+    "status": 200
+  },
+  {
+    "path": "/expressions",
+    "status": 200
+  },
+  {
+    "path": "/privacy",
+    "status": 200
+  },
+  {
+    "path": "/api/config",
+    "status": 200,
+    "configured": true,
+    "collectionOpen": true
+  },
+  {
+    "path": "/api/admin/session",
+    "status": 401,
+    "noStore": true
+  },
+  {
+    "path": "/api/display/snapshot",
+    "status": 401,
+    "noStore": true
+  },
+  {
+    "path": "/run-board/index.html",
+    "status": 200
+  }
+]
