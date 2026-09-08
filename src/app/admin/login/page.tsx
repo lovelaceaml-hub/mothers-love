@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
             <button type="button" className={styles.buttonQuiet} onClick={() => { setResetMode((value) => !value); setError(null); setMessage(null); }}>
               {resetMode ? 'Back to sign in' : 'Set up an invited account'}
             </button>
-            <Link className={styles.authLink} href="/">Return to public form</Link>
+            <Link className={styles.authLink} href="/">Back to live recognitions</Link>
           </div>
         </section>
       </div>
