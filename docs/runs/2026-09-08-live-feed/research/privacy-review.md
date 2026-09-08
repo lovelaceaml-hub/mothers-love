@@ -1,0 +1,3 @@
+# Independent privacy review
+
+Reviewer: reviewer_terra, gpt-5.6-terra high. Final verdict: PASS. Reviewed corrected isolated source payload with15matching SHA256 entries. The original fixture assertion depended on pg_get_functiondef formatting; Luna replaced it with catalog metadata checks and the isolatedPGfixture passed. Final review found no material privacy, ACL or public-contract defect. SQL selects six public fields, published and unexpired only, bounded50, neutral/cleanup gates, emptysearchpath SECURITY DEFINER and runtime-only permission. API explicitly projects and validates before no-store output.

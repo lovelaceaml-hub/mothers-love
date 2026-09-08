@@ -33,3 +33,6 @@ Final copy evidence is privately uploaded and mounted-copy verified at https://d
 
 ## Expression card follow-up
 Anthony requested cleaner submission cards with a number, quoted expression and explicit Select button. Full principles and everyday examples remain visible below in quieter text; disclosure controls are removed. This follow-up is deployed and verified. All 12 affected journeys and three phone/desktop accessibility checks passed on production; native controller review passed. See cards-publication.md and cards-review.md in the copy-cleanup research folder. Private evidence: https://drive.google.com/file/d/197OILCiEcRyN0klFgxnI14-39do7YJdN/view.
+
+## Active live feed follow-up
+Read PLAN-03-live-feed.md and runs/2026-09-08-live-feed/INDEX.md. Anthony requested a public published-recognition home list, a prominent submission action and discreet Admin access. Form moves to /recognize. Two Luna xhigh lanes implement the page and narrowly scoped public feed function; root validates and releases. Name-verification advice awaits clarification; no roster or participant accounts are introduced.

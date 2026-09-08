@@ -1,0 +1,11 @@
+# Feed verification
+
+Integrated Luna implementation passed lint, all 77 unit tests, and the production build. All 18 affected browser journeys passed: six feed and twelve submission tests. Five synthetic rendered states passed strict axe and horizontal bounds at 320px, 390px and 1440px. Desktop remains one vertical list. Keyboard navigation reaches Admin, Share a recognition and the /recognize form. Root inspected phone and desktop captures. Long messages and all nine expression labels render completely.
+
+Isolated PostgreSQL17.6 compiled the exact migration004 and passed the rollback-only fixture. Coverage includes filtering before the50limit, collection-closed behavior, exact sixfield projection, stable ordering,50limit, neutral, cleanup unavailable, runtime execution and denied commonroles. No real record was inserted in production.
+
+Independent Terra high review passed after the fixture metadata assertion correction, with all15sealed manifest hashes verified. No material publicdata, ACL or projection defect remained. Native Sol high controller review is running. Root corrected one stale admin navigation label during integration; authentication logic is unchanged.
+
+The approved function was applied to the existing shared Supabase project after preconditions validated existing migration hashes, absence of the new function and healthy cleanup. New004 SHA256: 78611aa702933206dc3b2ba2295dd6e9f0a07dc198515b9f094df6c463089510. Existing public/auth function source, owner and ACL aggregate fingerprint remains 06e31c44807a74873ba6908558fd7796 before and after. New function grants runtime execution and denies anon, authenticated and service_role. Cleanup remains healthy.
+
+Synthetic browser responses establish UI behavior, not a real submitted recognition or identity verification. Existing moderation is a keyword filter, not comprehensive inappropriate-content detection. Typed names remain unverified. Production publication and immediate checks are pending.

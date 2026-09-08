@@ -1,7 +1,10 @@
 # Using The Words of Mother's Love
 
+## Read recognitions
+Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Choose Share a recognition to open the form. The small Admin link opens sign-in.
+
 ## Share a recognition
-Open the [recognition form](https://mothers-love.vercel.app). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
+Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
 
 Keep contact information and private details out of your message. If sending fails, keep the tab open and try again. A message received for review will appear only after approval.
 
@@ -15,8 +18,8 @@ Open the [review inbox](https://mothers-love.vercel.app/admin/review) to check m
 
 | Action | What it does |
 |---|---|
-| Publish | Makes an approved message available to the TV |
-| Hide | Removes the message from the TV and keeps its contribution to totals |
+| Publish | Makes an approved message available on the home page and TV |
+| Hide | Removes the message from the home page and TV and keeps its contribution to totals |
 | Invalidate | Removes a spam, duplicate or test message and its contribution to totals |
 | Restore | Returns a message to review or display |
 | Feature | Gives a message more attention on the TV |
