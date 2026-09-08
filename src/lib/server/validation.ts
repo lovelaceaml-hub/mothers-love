@@ -95,6 +95,37 @@ export function validateReportQuery(period: string | null, from: string | null, 
   return { period, from, to };
 }
 
+export function validateAdminListQuery(status: string | null, expression: string | null, from: string | null, to: string | null): { status: string | null; expression: number | null; from: string | null; to: string | null } | null {
+  const normalizedStatus = status?.trim() || null;
+  if (normalizedStatus && !["held", "published", "hidden", "invalid"].includes(normalizedStatus)) return null;
+  const normalizedExpression = expression?.trim() || null;
+  const expressionNumber = normalizedExpression === null ? null : Number(normalizedExpression);
+  if (expressionNumber !== null && (!Number.isInteger(expressionNumber) || expressionNumber < 1 || expressionNumber > 9)) return null;
+  const normalizedFrom = from?.trim() || null;
+  const normalizedTo = to?.trim() || null;
+  if ((normalizedFrom && !isIsoDate(normalizedFrom)) || (normalizedTo && !isIsoDate(normalizedTo))) return null;
+  if (normalizedFrom && normalizedTo && normalizedFrom > normalizedTo) return null;
+  return { status: normalizedStatus, expression: expressionNumber, from: normalizedFrom, to: normalizedTo };
+}
+
+export function validateSettingsChanges(input: unknown): input is Record<string, unknown> {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return false;
+  const changes = input as Record<string, unknown>;
+  const keys = Object.keys(changes);
+  if (!keys.length) return false;
+  for (const key of keys) {
+    const value = changes[key];
+    if (key === "mode" && (value !== "normal" && value !== "quiet" && value !== "neutral")) return false;
+    if (key === "motion" && (value !== "calm" && value !== "standard" && value !== "lively" && value !== "still")) return false;
+    if (["pauseArrivals", "pauseRotation", "collectionOpen", "showTrails", "showConstellations"].includes(key) && typeof value !== "boolean") return false;
+    if (key === "lowActivityMinutes" && (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 180)) return false;
+    if (key === "readingSeconds" && (typeof value !== "number" || !Number.isInteger(value) || value < 8 || value > 60)) return false;
+    if (key === "maxBubbles" && (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 6)) return false;
+    if (!["mode", "motion", "pauseArrivals", "pauseRotation", "collectionOpen", "lowActivityMinutes", "readingSeconds", "maxBubbles", "showTrails", "showConstellations"].includes(key)) return false;
+  }
+  return true;
+}
+
 export function validReason(value: unknown): value is string {
   return typeof value === "string" && REASONS.has(value);
 }
