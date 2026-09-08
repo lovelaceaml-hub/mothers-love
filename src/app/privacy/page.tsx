@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <section>
             <h3>How long does personal content stay?</h3>
             <p>
-              Personal recognition content is kept for seven days, which is 168 hours from submission. The original lifetime does not extend when content is edited, featured, restored, or hidden. Expired personal content is removed through the campaign cleanup process. This page does not promise irreversible erasure from every provider backup because backup behavior depends on the authorized hosting provider.
+              Active recognition content, including submitted names and messages, expires after seven days, which is 168 hours from submission. The original lifetime does not extend when content is edited, featured, restored, or hidden. The application’s custom backup excludes personal recognition rows. Provider recovery copies may follow the provider’s retention policy, and they are not reused for campaign display before current purge checks. This page does not promise irreversible erasure from every provider recovery copy.
             </p>
           </section>
 
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
           <section>
             <h3>Display and backups</h3>
             <p>
-              A display browser may use an in-memory snapshot while it is connected. If it cannot verify a fresh snapshot for 60 seconds, it falls back to a neutral state. It does not keep a permanent personal cache. Campaign backups may follow the authorized provider’s operational policy. No extra campaign raw snapshots are intentionally shared as a separate archive, and expired personal content is not restored for display without current checks.
+              A display browser may use an in-memory snapshot while it is connected. If it cannot verify a fresh snapshot for 60 seconds, it falls back to a neutral state. It does not keep a permanent personal cache. The application’s custom backup excludes personal recognition rows. Provider recovery copies may follow the provider’s retention policy. They are not reused for campaign display before current purge checks, and expired personal content is not restored for display without current checks.
             </p>
           </section>
 

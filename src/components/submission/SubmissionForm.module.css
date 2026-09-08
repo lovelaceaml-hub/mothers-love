@@ -50,7 +50,7 @@
   max-width: 33rem;
   margin: 0 auto;
   color: var(--ink);
-  font-size: clamp(2.6rem, 9vw, 5.2rem);
+  font-size: clamp(2.2rem, 9vw, 3.25rem);
   font-weight: 900;
   letter-spacing: -0.065em;
   line-height: 0.94;
@@ -80,6 +80,7 @@
 .closedCard,
 .receiptCard,
 .previewPanel {
+  max-width: 34rem;
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 2rem;
   background: rgba(255, 253, 246, 0.95);
@@ -88,7 +89,6 @@
 }
 
 .formCard {
-  max-width: 52rem;
   margin: 0 auto;
   padding: clamp(1.1rem, 3vw, 2rem);
 }
@@ -599,7 +599,6 @@
 }
 
 .previewPanel {
-  max-width: 52rem;
   margin: 1rem auto 0;
   padding: clamp(1.1rem, 3vw, 1.6rem);
 }

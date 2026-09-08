@@ -41,3 +41,10 @@
 ## Review notes
 
 The axe run found and the lane corrected two contrast issues in the coral expression and privacy reminder. The final accessibility scan passed with no violations. Root integration should rerun the full application suite after backend routes and shared Playwright discovery are merged.
+
+## Follow-up evidence
+
+- Privacy wording now states the concrete 168-hour active lifetime, custom application backup exclusion for personal recognition rows, provider recovery-copy retention uncertainty, and the current purge check before campaign reuse.
+- Evidence report: `docs/runs/2026-09-08-full-app/research/submission-evidence/SUBMISSION-EVIDENCE.md`.
+- Synthetic captures cover 390x844 and 1440x1000 open forms, public preview, published receipt, and immutable prototype reference screens.
+- Visual comparison found and corrected the desktop card width and title scale mismatch. Remaining differences are intentional contract corrections: no location kicker, private-name callout, optional principle controls, preview, and truthful receipts.
