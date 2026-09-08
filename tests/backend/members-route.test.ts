@@ -54,7 +54,10 @@ describe("admin member invitation delivery", () => {
     expect(retryBody).toEqual({ invited: true });
     expect(retryBody).not.toHaveProperty("expiresAt");
     expect(signInWithOtp).toHaveBeenCalledTimes(2);
-    expect(signInWithOtp).toHaveBeenNthCalledWith(2, { email: invite.email, options: { shouldCreateUser: true } });
+    expect(signInWithOtp).toHaveBeenNthCalledWith(2, {
+      email: invite.email,
+      options: { shouldCreateUser: true, emailRedirectTo: "https://mothers-love.vercel.app/admin/set-password" },
+    });
   });
 
   it("does not send mail for an unrelated database conflict", async () => {

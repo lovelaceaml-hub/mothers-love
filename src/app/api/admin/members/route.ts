@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { verifyAdmin } from "@/lib/server/auth";
 import { actorPayload, databaseAction } from "@/lib/server/operations";
 import { authClient } from "@/lib/server/supabase";
-import { getServerConfig } from "@/lib/server/env";
 import { databaseResult, errorResult, requireTrustedOrigin } from "@/lib/server/response";
 import { readJson, requireConfigured } from "@/lib/server/http";
 
@@ -37,8 +36,7 @@ export async function POST(request: NextRequest) {
   }
   const client = authClient();
   if (!client) return errorResult(503, "UNAVAILABLE");
-  const config = getServerConfig();
-  const redirectTo = config?.appUrl ? `${config.appUrl.replace(/\/$/, "")}/admin/login` : undefined;
+  const redirectTo = "https://mothers-love.vercel.app/admin/set-password";
   const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true, ...(redirectTo ? { emailRedirectTo: redirectTo } : {}) } });
   if (error) return errorResult(503, "INVITATION_UNAVAILABLE");
   const response = existingInvitationRetry
