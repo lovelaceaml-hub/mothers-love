@@ -150,49 +150,38 @@ function FieldMessage({ id, children }: { id: string; children?: string }) {
 function ExpressionChoice({
   expression,
   selected,
-  expanded,
   onToggle,
-  onExpand,
   error,
 }: {
   expression: (typeof EXPRESSIONS)[number];
   selected: boolean;
-  expanded: boolean;
   onToggle: () => void;
-  onExpand: () => void;
   error?: string;
 }) {
   return (
     <article className={`${styles.expressionCard} ${styles[`expression${expression.id}`]} ${selected ? styles.expressionSelected : ''}`}>
-      <button
-        className={styles.expressionSelect}
-        type="button"
-        aria-pressed={selected}
-        aria-describedby={error ? `expressions-error` : undefined}
-        onClick={onToggle}
-      >
-        <span className={styles.expressionNumber}>{String(expression.id).padStart(2, '0')}</span>
-        <span className={styles.expressionPhrase}>“{expression.phrase}”</span>
-        <span className={styles.checkmark} aria-hidden="true" />
-        <span className={styles.srOnly}>{selected ? 'Selected' : 'Not selected'}</span>
-      </button>
-      <button
-        className={styles.principleButton}
-        type="button"
-        aria-expanded={expanded}
-        aria-controls={`principle-${expression.id}`}
-        onClick={onExpand}
-      >
-        {expanded ? 'Hide why' : 'Why this matters'}
-      </button>
-      {expanded && (
-        <div className={styles.principleDetails} id={`principle-${expression.id}`}>
-          <p className={styles.principle}>{expression.principle}</p>
-          {expression.example && (
-            <p className={styles.expressionExample}><strong>Everyday example.</strong> {expression.example}</p>
-          )}
+      <div className={styles.expressionHeader}>
+        <div className={styles.expressionHeading}>
+          <span className={styles.expressionNumber}>{String(expression.id).padStart(2, '0')}</span>
+          <span className={styles.expressionPhrase}>“{expression.phrase}”</span>
         </div>
-      )}
+        <button
+          className={styles.expressionSelect}
+          type="button"
+          aria-label={`${selected ? 'Selected' : 'Select'} expression ${String(expression.id).padStart(2, '0')}: “${expression.phrase}”`}
+          aria-pressed={selected}
+          aria-describedby={error ? 'expressions-error' : undefined}
+          onClick={onToggle}
+        >
+          {selected ? 'Selected' : 'Select'}
+        </button>
+      </div>
+      <div className={styles.principleDetails}>
+        <p className={styles.principle}>{expression.principle}</p>
+        {expression.example && (
+          <p className={styles.expressionExample}>{expression.example}</p>
+        )}
+      </div>
     </article>
   );
 }
@@ -285,7 +274,6 @@ export function SubmissionForm() {
   const [draft, setDraft] = useState<Draft>({ submitter: '', recipient: '', message: '', expressionIds: [] });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submissionError, setSubmissionError] = useState('');
-  const [expandedExpression, setExpandedExpression] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [requestKey, setRequestKey] = useState(makeRequestKey);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
@@ -403,7 +391,6 @@ export function SubmissionForm() {
     setReceiptStatus(null);
     setViewState('editing');
     setShowPreview(false);
-    setExpandedExpression(null);
     setRequestKey(makeRequestKey());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -500,9 +487,7 @@ export function SubmissionForm() {
                       key={expression.id}
                       expression={expression}
                       selected={draft.expressionIds.includes(expression.id)}
-                      expanded={expandedExpression === expression.id}
                       onToggle={() => toggleExpression(expression.id)}
-                      onExpand={() => setExpandedExpression((current) => current === expression.id ? null : expression.id)}
                       error={fieldErrors.expressions}
                     />
                   ))}
