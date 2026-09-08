@@ -159,7 +159,7 @@ async function cleanStaleFixture(root) {
     await root`delete from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
   }
   await root`delete from mothers_love.rate_limits
-    where (scope = 'reaction_browser' and key_hash in (mothers_love.ml_hash(${visitorA}), mothers_love.ml_hash(${visitorB})))
+    where (scope = 'reaction_browser' and key_hash in (${visitorA}, ${visitorB}))
        or (scope = 'reaction_ip' and key_hash in (
          mothers_love.ml_hash('synthetic-hidden-ip'),
          mothers_love.ml_hash('synthetic-purge-ip'),
