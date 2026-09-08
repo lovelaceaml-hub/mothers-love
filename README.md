@@ -2,8 +2,8 @@
 
 ## Quick links
 
-- **Website:** [Campaign](https://mothers-love.vercel.app), Full app live, collection closed until the Owner opens it.
-- **Status:** Verified release, password-only admin access, collection closed.
+- **Website:** [Campaign](https://mothers-love.vercel.app), Live and accepting recognitions.
+- **Status:** Ready to use, recognition sharing open, email/password admin access.
 - **Expression guide:** [Nine expressions and everyday examples](https://mothers-love.vercel.app/expressions), live.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login), Sign in with the existing password; no authenticator required.
 - **TV:** [Paired display](https://mothers-love.vercel.app/display), pair it with an Owner-issued code.

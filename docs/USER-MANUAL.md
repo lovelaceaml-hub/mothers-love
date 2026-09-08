@@ -1,7 +1,7 @@
 # Using The Words of Mother's Love
 
 ## Current release state
-The full app is live with collection closed until the Owner chooses to open it. The backend, certificate-verified restricted database connection and scheduled cleanup are active. Password setup is explicit and all administrators use email/password without an authenticator. Physical TV commissioning is separate.
+The full app is live and recognition sharing is open. The Owner can pause collection in display controls. The backend, certificate-verified restricted database connection and scheduled cleanup are active. Password setup is explicit and all administrators use email/password without an authenticator. Physical TV commissioning is separate.
 
 ## Explore the nine expressions
 The [expression guide](https://mothers-love.vercel.app/expressions) contains all nine phrases, their descriptions and everyday examples. It remains available while recognition sharing is paused. The form's Why this matters buttons show the same examples without changing your selections.

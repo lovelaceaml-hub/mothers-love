@@ -1,6 +1,6 @@
 # Clickable user journeys
 
-Status: full app deployed with collection closed. Password setup, no-authenticator access and the expression guide are live. Real public pages, accessibility and denied unauthenticated API access were checked. Exact automated counts and limitations are in UI-QUALITY-REPORT.md; final independent integration review passed.
+Status: full app deployed and accepting recognitions. Physical TV pairing remains an on-site task. Password setup, no-authenticator access and the expression guide are live. Real public pages, accessibility and denied unauthenticated API access were checked. Exact automated counts and limitations are in UI-QUALITY-REPORT.md; final independent integration review passed.
 
 | Journey | Start | Decisive action | Success and recovery |
 |---|---|---|---|

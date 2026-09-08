@@ -13,3 +13,6 @@ Keep real recognitions out of tests, artifacts and source backups. Reapply exact
 
 ## Feedback
 Anthony answered the workflow question: keep the parallel Luna workflow. Result satisfaction and process-change feedback are pending. The survey does not block technical release. No durable global rule or memory change was made from this project.
+
+## Readiness follow-up
+Anthony requested everything pushed, deployed and ready to use. Three Luna readiness lanes found one remaining validation inconsistency, corrected it through a shared browser/server predicate, and preserved the existing approved valid names. Root opened collection only after the updated release, direct invalid-request check, healthy cleanup and independent review passed. The site now accepts recognitions; physical TV pairing remains explicit. The parallel Luna workflow preference remains unchanged.
