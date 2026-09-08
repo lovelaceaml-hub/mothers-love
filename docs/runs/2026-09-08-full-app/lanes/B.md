@@ -38,3 +38,9 @@
 - Added `tests/backend/004_security_assertions.sql`, a rollback-only synthetic PostgreSQL fixture covering forced RLS and direct privilege denial for anon/authenticated, bridge-only restricted runtime grants, Owner AAL2 enforcement, moderator and membership boundaries, one-use pairing and revoked display sessions, and idempotent receipt preservation with hash conflict detection.
 - Root applied migration SHA-256 `790f72f06ececc14a408355c2912673de55a04a2bed4e103792e9015709f18c1` to a fresh disposable database and passed the hardened lifecycle fixture at `tests/backend/003_transaction_assertions.sql`. Subsequent review corrections are pending fresh database verification at migration SHA `f213b423a4e36ec45d1958b7a1c93a282debd1d84cd6d761d3dcaa95fd753a10`.
 - The latest candidate also gates effective collection availability on a cleanup timestamp within two minutes and zero rows overdue beyond the two-minute lag. Unhealthy collection enable returns `PURGE_UNHEALTHY`; config and submission remain closed until `ml_purge` recovers health.
+
+## Unicode edit parity artifact
+
+- Added `database/002_unicode_edit_parity.sql`, a fail-closed replacement of only the three frozen admin edit codepoint caps. The caps are now 16,384 codepoints so the HTTP layer remains authoritative for the 80 and 500 grapheme limits and the 16 KiB request body.
+- Added `tests/backend/005_unicode_edit_assertions.sql`, a rollback-only disposable PostgreSQL fixture that submits and edits a synthetic 500-family-emoji message under 16 KiB, verifies the stored edit and unchanged contribution counts, and preserves the existing HTTP 501-grapheme rejection coverage.
+- Frozen `database/001_mothers_love.sql` remains unchanged at SHA-256 `f213b423a4e36ec45d1958b7a1c93a282debd1d84cd6d761d3dcaa95fd753a10`. Root must apply 002 after 001 and run fixture 005 in a disposable database.
