@@ -1,28 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, expressionById } from '@/lib/catalog';
 
 import styles from './FeedHome.module.css';
-import {
-  activeFeedItems,
-  type PublicFeedItem,
-  type VerifiedFeedSnapshot,
-  verifyFeedSnapshot,
-} from './feed-types';
-
-type FeedStatus = 'loading' | 'ready' | 'empty' | 'error' | 'hidden';
-
-type FeedState = {
-  status: FeedStatus;
-  snapshot: VerifiedFeedSnapshot | null;
-};
-
-function monotonicNow() {
-  return typeof performance === 'undefined' ? 0 : performance.now();
-}
+import { ReactionButton, usePublicFeed, type PublicFeedStatus } from './PublicFeedProvider';
+import type { PublicFeedItem } from './feed-types';
 
 function FeedDecorations() {
   return (
@@ -44,6 +28,7 @@ function FeedDecorations() {
 }
 
 function FeedCard({ item }: { item: PublicFeedItem }) {
+  const { reactions, toggleReaction, retryReactions } = usePublicFeed();
   const expressions = item.expressionIds
     .map((expressionId) => expressionById(expressionId))
     .filter((expression): expression is NonNullable<typeof expression> => Boolean(expression));
@@ -61,6 +46,14 @@ function FeedCard({ item }: { item: PublicFeedItem }) {
           <li key={expression.id}>{expression.phrase}</li>
         ))}
       </ul>
+      <div className={styles.reactionRow}>
+        <ReactionButton
+          item={item}
+          reaction={reactions[item.id]}
+          onToggle={() => toggleReaction(item)}
+          onRetry={retryReactions}
+        />
+      </div>
     </article>
   );
 }
@@ -78,8 +71,8 @@ function Header() {
   );
 }
 
-function FeedStateCard({ status, onRetry }: { status: FeedStatus; onRetry: () => void }) {
-  if (status === 'loading') {
+function FeedStateCard({ status, onRetry }: { status: PublicFeedStatus; onRetry: () => void }) {
+  if (status === 'loading' || status === 'hidden') {
     return (
       <section className={styles.stateCard} aria-live="polite" aria-busy="true">
         <span className={styles.loadingDots} aria-hidden="true"><i /><i /><i /></span>
@@ -98,15 +91,6 @@ function FeedStateCard({ status, onRetry }: { status: FeedStatus; onRetry: () =>
     );
   }
 
-  if (status === 'hidden') {
-    return (
-      <section className={styles.stateCard} aria-live="polite">
-        <span className={styles.stateMark} aria-hidden="true">•</span>
-        <h2>Loading recognitions</h2>
-      </section>
-    );
-  }
-
   return (
     <section className={styles.stateCard} aria-live="polite">
       <span className={styles.stateMark} aria-hidden="true">♡</span>
@@ -118,128 +102,37 @@ function FeedStateCard({ status, onRetry }: { status: FeedStatus; onRetry: () =>
 }
 
 export function FeedHome() {
-  const [state, setState] = useState<FeedState>({ status: 'loading', snapshot: null });
-  const [motionPaused, setMotionPaused] = useState(false);
-  const requestSerialRef = useRef(0);
-  const controllerRef = useRef<AbortController | null>(null);
-  const expiryTimerRef = useRef<number | null>(null);
-  const applyVisibleItemsRef = useRef<(snapshot: VerifiedFeedSnapshot) => void>(() => undefined);
-
-  const clearExpiryTimer = useCallback(() => {
-    if (expiryTimerRef.current !== null) {
-      window.clearTimeout(expiryTimerRef.current);
-      expiryTimerRef.current = null;
-    }
-  }, []);
-
-  const applyVisibleItems = useCallback((snapshot: VerifiedFeedSnapshot) => {
-    const items = activeFeedItems(snapshot, monotonicNow());
-    setState({ status: items.length > 0 ? 'ready' : 'empty', snapshot });
-
-    clearExpiryTimer();
-    if (items.length === 0) return;
-
-    const remainingMs = Math.min(...items.map((item) => {
-      const elapsedMs = Math.max(0, monotonicNow() - snapshot.verifiedMonotonicMs);
-      return Date.parse(item.expiresAt) - (snapshot.verifiedServerTimeMs + elapsedMs);
-    }));
-    expiryTimerRef.current = window.setTimeout(() => {
-      applyVisibleItemsRef.current(snapshot);
-    }, Math.max(20, remainingMs + 5));
-  }, [clearExpiryTimer]);
-
-  useEffect(() => {
-    applyVisibleItemsRef.current = applyVisibleItems;
-  }, [applyVisibleItems]);
-
-  const fetchFeed = useCallback(async () => {
-    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
-
-    const serial = requestSerialRef.current + 1;
-    requestSerialRef.current = serial;
-    controllerRef.current?.abort();
-    const controller = new AbortController();
-    controllerRef.current = controller;
-    const requestStartedAt = monotonicNow();
-    let timedOut = false;
-    const deadline = window.setTimeout(() => {
-      timedOut = true;
-      controller.abort();
-    }, 8_000);
-
-    try {
-      const response = await fetch('/api/feed', {
-        cache: 'no-store',
-        credentials: 'include',
-        headers: { accept: 'application/json' },
-        signal: controller.signal,
-      });
-      if (!response.ok) throw new Error(`Feed request failed with status ${response.status}`);
-      const payload: unknown = await response.json();
-      const snapshot = verifyFeedSnapshot(payload, requestStartedAt);
-      if (!snapshot) throw new Error('Feed response was not valid.');
-      if (serial !== requestSerialRef.current || controller.signal.aborted) return;
-      applyVisibleItems(snapshot);
-    } catch {
-      if ((!timedOut && controller.signal.aborted) || serial !== requestSerialRef.current) return;
-      clearExpiryTimer();
-      setState({ status: 'error', snapshot: null });
-    } finally {
-      window.clearTimeout(deadline);
-    }
-  }, [applyVisibleItems, clearExpiryTimer]);
-
-  useEffect(() => {
-    const initialRequest = window.setTimeout(() => { void fetchFeed(); }, 0);
-    const interval = window.setInterval(() => { void fetchFeed(); }, 10_000);
-
-    function onVisibilityChange() {
-      if (document.visibilityState === 'hidden') {
-        requestSerialRef.current += 1;
-        controllerRef.current?.abort();
-        clearExpiryTimer();
-        setState({ status: 'hidden', snapshot: null });
-        return;
-      }
-
-      setState({ status: 'loading', snapshot: null });
-      void fetchFeed();
-    }
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () => {
-      window.clearTimeout(initialRequest);
-      window.clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      controllerRef.current?.abort();
-      clearExpiryTimer();
-    };
-  }, [clearExpiryTimer, fetchFeed]);
-
-  const items = state.snapshot ? activeFeedItems(state.snapshot, monotonicNow()) : [];
-  const status = state.status === 'ready' && items.length === 0 ? 'empty' : state.status;
+  const { items, status, retry } = usePublicFeed();
 
   return (
-    <main className={`${styles.page}${motionPaused ? ` ${styles.motionPaused}` : ''}`}>
+    <main className={styles.page}>
       <FeedDecorations />
       <div className={styles.shell}>
         <Header />
 
-        <section className={styles.feedSection} aria-labelledby="recent-recognitions-title">
+        <div className={styles.feedSection}>
           <div className={styles.sectionHeader}>
             <div>
+              <p className={styles.cardEyebrow}>Live, newest first</p>
               <h2 id="recent-recognitions-title">Recent recognitions</h2>
             </div>
           </div>
 
-          {status === 'ready' && items.length > 0 ? (
-            <div className={styles.feedList}>
-              {items.map((item) => <FeedCard key={item.id} item={item} />)}
-            </div>
-          ) : (
-            <FeedStateCard status={status} onRetry={() => { setState({ status: 'loading', snapshot: null }); void fetchFeed(); }} />
-          )}
-        </section>
+          <div
+            className={styles.feedViewport}
+            role="region"
+            tabIndex={0}
+            aria-labelledby="recent-recognitions-title"
+          >
+            {status === 'ready' && items.length > 0 ? (
+              <div className={styles.feedList}>
+                {items.map((item) => <FeedCard key={item.id} item={item} />)}
+              </div>
+            ) : (
+              <FeedStateCard status={status} onRetry={retry} />
+            )}
+          </div>
+        </div>
 
         <footer className={styles.footer}>
           <nav className={styles.footerLinks} aria-label="Campaign links">
@@ -250,13 +143,6 @@ export function FeedHome() {
               <Link href="/display">TV View</Link>
             </span>
           </nav>
-          <button
-            className={styles.motionToggle}
-            type="button"
-            onClick={() => setMotionPaused((paused) => !paused)}
-          >
-            {motionPaused ? 'Resume animation' : 'Pause animation'}
-          </button>
         </footer>
       </div>
     </main>
