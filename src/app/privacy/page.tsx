@@ -29,7 +29,7 @@ export default function PrivacyPage() {
             No account is needed. Enter your first name and last initial, the recipient’s first name and last initial, one or more expressions, and a message.
           </p>
           <p>
-            Your name is visible to campaign administrators and is not shown publicly. The recipient, selected expressions, and message may appear on the campaign display after basic checks.
+            Your name is visible to campaign administrators and is not shown publicly. The recipient, selected expressions, and message may appear on the home page and TV after basic checks.
           </p>
 
           <section>
