@@ -19,6 +19,63 @@ async function fillValidDraft(page: Page) {
   await page.getByLabel('Share your appreciation').fill('Your kindness made a hard day feel lighter.');
 }
 
+const expressionDetails = [
+  {
+    id: '01',
+    phrase: 'How Are You?',
+    principle: 'The first phrase to peace',
+    example: 'Start with a friendly hello to a neighbor, a classmate, or someone serving your community.',
+  },
+  {
+    id: '02',
+    phrase: "Thank you. It's all thanks to you. You've worked hard.",
+    principle: 'Express gratitude even for small efforts and acts of kindness',
+    example: 'Thank someone for an everyday kindness, such as preparing a meal or helping you travel safely.',
+  },
+  {
+    id: '03',
+    phrase: "I'm sorry. It must have been hard on you.",
+    principle: "A phrase that melts the heart by understanding the other's feelings first",
+    example: 'Consider how your words affected the other person. Acknowledge your mistake and take the first step toward reconciliation.',
+  },
+  {
+    id: '04',
+    phrase: "It's okay. I understand.",
+    principle: 'A phrase of forgiveness that embraces faults',
+    example: 'Respond gently when someone makes a mistake, and help them move forward without embarrassment.',
+  },
+  {
+    id: '05',
+    phrase: 'Please, after you.',
+    principle: 'When feeling impatient, take a breath and yield to others',
+    example: 'Make room for someone else when a queue or busy journey tests your patience.',
+  },
+  {
+    id: '06',
+    phrase: "I'd love to hear more about your thoughts.",
+    principle: 'When opinions differ, listen carefully to others',
+    example: 'Give a different opinion your full attention before replying. Listening helps people feel respected.',
+  },
+  {
+    id: '07',
+    phrase: "I'll pray (or root) for you. Everything will go well.",
+    principle: 'Offer sincere support and encouragement',
+    example: 'Encourage someone facing a difficult moment, and remind them that they have your support.',
+  },
+  {
+    id: '08',
+    phrase: 'Can I give you a hand with anything?',
+    principle: 'Consideration begins with paying attention to those around you',
+    example: 'Notice who could use practical help, then offer a manageable act of kindness.',
+  },
+  {
+    id: '09',
+    phrase: "You're amazing. You're doing great!",
+    principle: 'Warm compliments bring happiness to both sides',
+    example: "Recognize someone's effort or progress with a thoughtful compliment that brightens their day.",
+  },
+];
+
 test('publishes a normal recognition and resets all fields for a new recognition', async ({ page }) => {
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { collectionOpen: true, configured: true } });
@@ -104,13 +161,29 @@ test('public preview excludes the submitted name and is keyboard reachable', asy
   await expect(page.getByRole('button', { name: 'Close public preview' })).toBeFocused();
 });
 
-test('supports expression principle disclosure without changing selection', async ({ page }) => {
+test('shows every expression explanation and lets selection buttons toggle independently', async ({ page }) => {
   await openCollection(page);
-  const expression = page.getByRole('article').filter({ hasText: 'How Are You?' });
-  await expression.getByRole('button', { name: 'Why this matters' }).click();
-  await expect(expression).toContainText('The first phrase to peace');
-  await expression.getByRole('button', { name: /How Are You/ }).click();
-  await expect(expression.getByRole('button', { name: /How Are You/ })).toHaveAttribute('aria-pressed', 'true');
+  const cards = page.getByRole('article');
+  await expect(cards).toHaveCount(9);
+
+  for (const detail of expressionDetails) {
+    const card = cards.filter({ hasText: detail.phrase });
+    await expect(card).toContainText(detail.principle);
+    await expect(card).toContainText(detail.example);
+    await expect(card.getByRole('button', { name: `Select expression ${detail.id}: “${detail.phrase}”` })).toHaveAttribute('aria-pressed', 'false');
+  }
+
+  const first = cards.filter({ hasText: 'How Are You?' });
+  const second = cards.filter({ hasText: "Thank you. It's all thanks to you. You've worked hard." });
+  await first.getByRole('button', { name: /^Select expression 01:/ }).click();
+  await expect(first.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(second.getByRole('button', { name: /^Select expression 02:/ })).toHaveAttribute('aria-pressed', 'false');
+
+  await second.getByRole('button', { name: /^Select expression 02:/ }).click();
+  await expect(second.getByRole('button', { name: /^Selected expression 02:/ })).toHaveAttribute('aria-pressed', 'true');
+  await first.getByRole('button', { name: /^Selected expression 01:/ }).click();
+  await expect(first.getByRole('button', { name: /^Select expression 01:/ })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('button', { name: /Why this matters|Hide why/ })).toHaveCount(0);
 });
 
 test('has no automated accessibility violations on the open form', async ({ page }) => {
@@ -180,14 +253,14 @@ test('keeps the expressions guide reachable when collection sharing is closed', 
   await expect(guideLink).toHaveAttribute('href', '/expressions');
 });
 
-test('keeps open form disclosure selection behavior while showing the everyday example', async ({ page }) => {
+test('keeps open form selection behavior while showing the everyday example', async ({ page }) => {
   await openCollection(page);
   const expression = page.getByRole('article').filter({ hasText: 'How Are You?' });
-  await expression.getByRole('button', { name: 'Why this matters' }).click();
   await expect(expression).toContainText('The first phrase to peace');
   await expect(expression).toContainText('Start with a friendly hello to a neighbor, a classmate, or someone serving your community.');
-  await expression.getByRole('button', { name: /How Are You/ }).click();
-  await expect(expression.getByRole('button', { name: /How Are You/ })).toHaveAttribute('aria-pressed', 'true');
+  await expression.getByRole('button', { name: /^Select expression 01:/ }).click();
+  await expect(expression.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /Why this matters|Hide why/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Explore the nine expressions and everyday examples' })).toHaveAttribute('href', '/expressions');
 });
 

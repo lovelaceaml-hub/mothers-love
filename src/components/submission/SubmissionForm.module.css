@@ -195,7 +195,6 @@
 .textInput:focus,
 .messageInput:focus,
 .expressionSelect:focus-visible,
-.principleButton:focus-visible,
 .submitButton:focus-visible,
 .previewButton:focus-visible,
 .secondaryButton:focus-visible,
@@ -256,18 +255,35 @@
 .expression8 { background: var(--green); }
 .expression9 { background: var(--sky); }
 
-.expressionSelect {
+.expressionHeader {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 0.85rem 0;
+}
+
+.expressionHeading {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1 1 auto;
   gap: 0.55rem;
-  width: 100%;
-  min-height: 5.8rem;
-  padding: 1rem 2.9rem 0.35rem 0.9rem;
-  border: 0;
+}
+
+.expressionSelect {
+  flex: 0 0 auto;
+  min-width: 4.5rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgba(48, 51, 66, 0.28);
+  border-radius: 999px;
   color: var(--ink);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.52);
   font: inherit;
-  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -285,61 +301,28 @@
 }
 
 .expressionPhrase {
+  min-width: 0;
   padding-top: 0.1rem;
   font-size: 0.91rem;
   font-weight: 800;
   line-height: 1.35;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
-.checkmark {
-  position: absolute;
-  top: 1rem;
-  right: 0.85rem;
-  width: 1.7rem;
-  height: 1.7rem;
-  border: 2px solid rgba(48, 51, 66, 0.28);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.65);
-}
-
-.checkmark::after {
-  position: absolute;
-  top: 0.34rem;
-  left: 0.48rem;
-  width: 0.42rem;
-  height: 0.7rem;
-  border-right: 2px solid transparent;
-  border-bottom: 2px solid transparent;
-  content: '';
-  transform: rotate(42deg);
-}
-
-.expressionSelected .checkmark {
+.expressionSelected .expressionSelect {
   border-color: var(--ink);
+  color: #fff;
   background: var(--ink);
 }
 
-.expressionSelected .checkmark::after {
-  border-color: #fff;
-}
-
-.principleButton {
-  display: block;
-  min-height: 2.75rem;
-  margin: 0 0.85rem 0.65rem 3.45rem;
-  padding: 0.34rem 0.55rem;
-  border: 1px solid rgba(48, 51, 66, 0.28);
-  border-radius: 999px;
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.38);
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 800;
-  cursor: pointer;
+.expressionSelected .expressionSelect:focus-visible {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(142, 214, 245, 0.45);
 }
 
 .principleDetails {
-  margin: -0.05rem 0.9rem 0.85rem 3.45rem;
+  margin: 0.7rem 0.9rem 0.95rem 3.45rem;
 }
 
 .principle {
@@ -352,8 +335,8 @@
 .expressionExample {
   margin: 0.55rem 0 0;
   color: rgba(48, 51, 66, 0.78);
-  font-size: 0.76rem;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .selectionCount,
@@ -747,6 +730,12 @@
   .expressionGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .expressionCard { min-height: 9.6rem; }
   .actions { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: stretch; }
+}
+
+@media (max-width: 23rem) {
+  .expressionHeader { flex-wrap: wrap; }
+  .expressionHeading { flex-basis: 100%; }
+  .expressionSelect { margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
