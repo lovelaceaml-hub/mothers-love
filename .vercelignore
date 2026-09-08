@@ -1,0 +1,33 @@
+# Environment and local credential files
+.env*
+!.env.example
+.envrc
+credentials/
+credentials.*
+secrets/
+secrets.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Private project records and agent instructions
+docs/
+AGENTS.md
+CLAUDE.md
+tests/
+
+# Dependencies and generated build, test, and cache output
+node_modules/
+.next/
+test-results/
+playwright-report/
+coverage/
+.cache/
+cache/
+.vercel/
+*.log
+*.sqlite
+*.sqlite3
+*.db
