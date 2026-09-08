@@ -210,6 +210,16 @@
   opacity: 0.24;
 }
 
+.motioncalm .bubbleDrift { animation-duration: 22s; }
+.motioncalm .bubbleBreath { animation-duration: 15s; }
+.motioncalm .bubbleTrail { animation-duration: 15s; }
+.motionlively .bubbleDrift { animation-duration: 7s; }
+.motionlively .bubbleBreath { animation-duration: 6.8s; }
+.motionlively .bubbleTrail { animation-duration: 5.5s; }
+.lowActivity .bubbleDrift { animation-duration: 34s; }
+.lowActivity .bubbleBreath { animation-duration: 24s; }
+.lowActivity .bubbleTrail { animation-duration: 24s; }
+
 .stage {
   position: absolute;
   z-index: 2;
@@ -248,30 +258,59 @@
   border-radius: clamp(26px, 2.4vw, 56px);
 }
 
-.constellationLines {
+.constellationSvg {
   position: absolute;
-  inset: 9% 10% 6% 10%;
-  background:
-    linear-gradient(135deg, transparent 49.8%, rgba(157, 217, 159, 0.28) 50%, transparent 50.3%) 10% 18% / 42% 42% no-repeat,
-    linear-gradient(45deg, transparent 49.8%, rgba(142, 214, 245, 0.24) 50%, transparent 50.3%) 59% 16% / 35% 44% no-repeat,
-    linear-gradient(165deg, transparent 49.8%, rgba(203, 185, 244, 0.24) 50%, transparent 50.3%) 42% 58% / 42% 34% no-repeat;
-  opacity: 0.68;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.constellationSvg line {
+  stroke-width: 0.28;
+  stroke-opacity: 0.38;
+  stroke-dasharray: 1.2 1.8;
 }
 
 .gardenBubble {
   position: absolute;
   z-index: 2;
-  width: clamp(178px, 16vw, 370px);
+  width: clamp(170px, var(--bubble-size, 16vw), 540px);
   aspect-ratio: 1;
-  animation: bob 12s ease-in-out infinite;
 }
 
-.gardenBubble:nth-of-type(3n) {
-  animation-delay: -4s;
+.bubbleDrift,
+.bubbleBreath {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.gardenBubble:nth-of-type(4n) {
-  animation-delay: -8s;
+.bubbleDrift {
+  animation: driftBubble 11s ease-in-out infinite;
+  animation-delay: var(--bubble-delay, 0s);
+}
+
+.bubbleBreath {
+  z-index: 1;
+  animation: breatheBubble 9.5s ease-in-out infinite;
+  animation-delay: var(--bubble-delay, 0s);
+  transform-origin: center;
+}
+
+.bubbleTrail {
+  position: absolute;
+  z-index: 0;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--bubble-accent, #9dd99f) 65%, white) 0%, transparent 70%);
+  filter: blur(10px);
+  opacity: 0.3;
+  pointer-events: none;
+  animation: trailFloat 8s ease-in-out infinite;
+  animation-delay: var(--bubble-delay, 0s);
 }
 
 .gardenPositionOne { top: 1%; left: 3%; }
@@ -283,6 +322,7 @@
 
 .recognitionCard {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -315,9 +355,48 @@
   z-index: 1;
 }
 
-.recognitionCard :global(.expressionList) {
-  max-height: 16%;
+.compactExpressionList {
+  max-height: 15%;
   overflow: hidden;
+}
+
+.expressionChip {
+  display: inline-grid;
+  place-items: center;
+  min-width: clamp(20px, 1.1vw, 32px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(48, 51, 66, 0.12);
+  border-radius: 50%;
+  color: #303342;
+  font-size: clamp(10px, 0.62vw, 16px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.compactRecognitionCard {
+  padding: 10%;
+}
+
+.compactRecognitionCard h3 {
+  margin: 5px 0;
+  font-size: clamp(14px, 1.12vw, 28px);
+}
+
+.compactRecognitionCard .recognitionMessage {
+  margin-top: 6px;
+  font-size: clamp(11px, 0.78vw, 18px);
+  line-height: 1.22;
+  -webkit-line-clamp: 3;
+}
+
+.compactRecognitionCard .excerptNote {
+  display: -webkit-box;
+  max-width: 88%;
+  margin-top: 4px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: clamp(9px, 0.52vw, 13px);
 }
 
 .recipientLabel {
@@ -593,7 +672,7 @@
 }
 
 .clusterCards .recognitionCard {
-  width: clamp(180px, 14.6vw, 350px);
+  width: clamp(220px, 20vw, 360px);
   aspect-ratio: 1;
   justify-self: start;
 }
@@ -1062,7 +1141,7 @@
   }
 
   .gardenBubble {
-    width: clamp(150px, 28vw, 240px);
+    width: clamp(150px, var(--bubble-size, 28vw), 240px);
   }
 
   .featureExpression {
@@ -1111,7 +1190,7 @@
   }
 
   .gardenBubble {
-    width: 154px;
+    width: clamp(150px, var(--bubble-size, 42vw), 220px);
   }
 
   .gardenPositionOne { top: 1%; left: 2%; }
@@ -1212,6 +1291,21 @@
 @keyframes bob {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -0.8vh, 0); }
+}
+
+@keyframes driftBubble {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-0.5deg); }
+  50% { transform: translate3d(0.7vw, -0.9vh, 0) rotate(0.5deg); }
+}
+
+@keyframes breatheBubble {
+  0%, 100% { transform: scale(0.985); }
+  50% { transform: scale(1.018); }
+}
+
+@keyframes trailFloat {
+  0%, 100% { transform: scale(0.94) translate3d(-0.4vw, 0.3vh, 0); opacity: 0.18; }
+  50% { transform: scale(1.04) translate3d(0.5vw, -0.4vh, 0); opacity: 0.32; }
 }
 
 @keyframes bobSoft {

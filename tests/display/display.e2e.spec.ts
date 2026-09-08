@@ -1,14 +1,17 @@
+import { join } from 'node:path';
+
 import { expect, test, type Page } from '@playwright/test';
 
 type FixtureSize = 0 | 1 | 2 | 20 | 'long';
+type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean };
 
-const fixtureRecognition = (id: number, long = false) => ({
+const fixtureRecognition = (id: number, long = false, expressionIds = [1, 2, 6]) => ({
   id: `synthetic-${id}`,
   recipient: `Synthetic recipient ${id}`,
   message: long
     ? `Synthetic long appreciation ${id}. `.repeat(48).slice(0, 500)
     : `Synthetic appreciation message ${id}.`,
-  expressionIds: [1, 2, 6],
+  expressionIds,
   createdAt: '2026-09-08T12:00:00.000Z',
   firstPublishedAt: '2026-09-08T12:00:00.000Z',
   expiresAt: '2026-09-15T12:00:00.000Z',
@@ -17,9 +20,13 @@ const fixtureRecognition = (id: number, long = false) => ({
   featured: false,
 });
 
-function fixture(size: FixtureSize) {
+function fixture(size: FixtureSize, options: FixtureOptions = {}) {
   const count = size === 'long' ? 1 : size;
-  const recognitions = Array.from({ length: count }, (_, index) => fixtureRecognition(index + 1, size === 'long'));
+  const recognitions = Array.from({ length: count }, (_, index) => fixtureRecognition(
+    index + 1,
+    size === 'long',
+    options.nonSharedExpressions ? (index % 2 ? [2] : [1]) : [1, 2, 6],
+  ));
   return {
     serverTime: '2026-09-08T12:00:00.000Z',
     revision: 1,
@@ -42,8 +49,8 @@ function fixture(size: FixtureSize) {
       lowActivityMinutes: 20,
       readingSeconds: 20,
       maxBubbles: 4,
-      showTrails: true,
-      showConstellations: true,
+      showTrails: options.showTrails ?? true,
+      showConstellations: options.showConstellations ?? true,
     },
     submissionUrl: 'https://synthetic.invalid/recognize',
     cursor: `fixture-${size}`,
@@ -52,7 +59,7 @@ function fixture(size: FixtureSize) {
   };
 }
 
-async function pairAndRead(page: Page, size: FixtureSize) {
+async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOptions = {}) {
   await page.route('**/api/display/pair', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
   });
@@ -63,7 +70,11 @@ async function pairAndRead(page: Page, size: FixtureSize) {
       await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'pairing required', code: 'UNAUTHORIZED' }) });
       return;
     }
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(size)) });
+    const response = fixture(size, options);
+    const body = options.continuous && snapshotCalls > 2
+      ? { ...response, revision: snapshotCalls, cursor: `fixture-${size}-${snapshotCalls}`, sync: 'delta' as const }
+      : response;
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   });
   await page.route('**/api/display/ack', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
@@ -121,6 +132,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(2)) });
         return;
       }
+      if (snapshotCalls === 2) {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(2)) });
+        return;
+      }
       await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'revoked', code: 'UNAUTHORIZED' }) });
     });
     await page.route('**/api/display/ack', async (route) => {
@@ -133,5 +148,55 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 15_000 });
     await page.waitForTimeout(5_500);
     await expect(page.getByRole('heading', { name: 'Bring the living wall to life.' })).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('honors trail and constellation flags and only links shared expressions', async ({ page }) => {
+    await pairAndRead(page, 2, { showTrails: false, showConstellations: false, nonSharedExpressions: true });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 10_000 });
+    const board = page.getByTestId('garden-board');
+    await expect(board).toHaveAttribute('data-connection-count', '0');
+    await expect(board).toHaveAttribute('data-trail-count', '0');
+    await expect(board.locator('svg')).toHaveCount(0);
+    await expect(board.locator('[class*="bubbleTrail"]')).toHaveCount(0);
+  });
+
+  test('keeps garden bubbles inside the board and long excerpts readable at TV sizes', async ({ page }) => {
+    await pairAndRead(page, 'long');
+    for (const viewport of [{ width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
+      await page.setViewportSize(viewport);
+      const bounds = await page.getByTestId('garden-board').evaluate((board) => {
+        const boardRect = board.getBoundingClientRect();
+        return [...board.querySelectorAll<HTMLElement>('[data-testid="garden-bubble"]')].map((bubble) => {
+          const rect = bubble.getBoundingClientRect();
+          return {
+            left: rect.left - boardRect.left,
+            top: rect.top - boardRect.top,
+            right: boardRect.right - rect.right,
+            bottom: boardRect.bottom - rect.bottom,
+          };
+        });
+      });
+      expect(bounds.length).toBe(1);
+      expect(bounds[0].left).toBeGreaterThanOrEqual(-2);
+      expect(bounds[0].top).toBeGreaterThanOrEqual(-2);
+      expect(bounds[0].right).toBeGreaterThanOrEqual(-2);
+      expect(bounds[0].bottom).toBeGreaterThanOrEqual(-2);
+      await expect(page.getByText('Garden excerpt, full message follows in the reading view.')).toBeVisible();
+    }
+  });
+
+  test('captures the current multi-record garden, featured, all-nine, and cluster screens', async ({ page }) => {
+    test.skip(!process.env.DISPLAY_CAPTURE_SCREENS, 'Set DISPLAY_CAPTURE_SCREENS and DISPLAY_SCREENSHOT_DIR to capture evidence.');
+    test.setTimeout(140_000);
+    await pairAndRead(page, 2, { continuous: true });
+    const directory = process.env.DISPLAY_SCREENSHOT_DIR!;
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 15_000 });
+    await page.screenshot({ path: join(directory, 'garden-multi-record.png'), fullPage: true });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 30_000 });
+    await page.screenshot({ path: join(directory, 'featured-multi-record.png'), fullPage: true });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'all-nine', { timeout: 70_000 });
+    await page.screenshot({ path: join(directory, 'all-nine-multi-record.png'), fullPage: true });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'cluster', { timeout: 35_000 });
+    await page.screenshot({ path: join(directory, 'cluster-multi-record.png'), fullPage: true });
   });
 });

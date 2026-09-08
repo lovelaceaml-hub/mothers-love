@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import QRCode from 'qrcode';
 
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
@@ -105,15 +105,29 @@ function ExpressionPill({ id }: { id: number }) {
   return <span className={styles.expressionPill} style={{ backgroundColor: item.color }}>{item.phrase}</span>;
 }
 
-function RecognitionCard({ recognition, detailed = false, fresh = false }: { recognition: Recognition; detailed?: boolean; fresh?: boolean }) {
+function ExpressionChip({ id }: { id: number }) {
+  const item = expression(id);
+  return <span className={styles.expressionChip} style={{ backgroundColor: item.color }} title={item.phrase} aria-label={`Expression ${id}: ${item.phrase}`}>#{id}</span>;
+}
+
+type RecognitionCardProps = {
+  recognition: Recognition;
+  detailed?: boolean;
+  fresh?: boolean;
+  compactExpressions?: boolean;
+  style?: CSSProperties;
+  className?: string;
+};
+
+function RecognitionCard({ recognition, detailed = false, fresh = false, compactExpressions = false, style, className = '' }: RecognitionCardProps) {
   const excerpt = shortExcerpt(recognition.message, detailed ? 650 : 150);
   return (
-    <article className={`${styles.recognitionCard} ${detailed ? styles.recognitionCardDetailed : ''} ${fresh ? styles.recognitionFresh : ''}`}>
+    <article className={`${styles.recognitionCard} ${compactExpressions ? styles.compactRecognitionCard : ''} ${detailed ? styles.recognitionCardDetailed : ''} ${fresh ? styles.recognitionFresh : ''} ${className}`} style={style} data-testid="recognition-card">
       {fresh ? <span className={styles.freshLabel}>New recognition</span> : null}
       <p className={styles.recipientLabel}>THANK YOU,</p>
       <h3>{recognition.recipient}</h3>
-      <div className={styles.expressionList} aria-label="Expressions selected">
-        {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
+      <div className={`${styles.expressionList} ${compactExpressions ? styles.compactExpressionList : ''}`} aria-label="Expressions selected">
+        {recognition.expressionIds.map((id) => compactExpressions ? <ExpressionChip key={id} id={id} /> : <ExpressionPill key={id} id={id} />)}
       </div>
       <p className={styles.recognitionMessage}>{excerpt.text}</p>
       {excerpt.excerpt ? <p className={styles.excerptNote}>Garden excerpt, full message follows in the reading view.</p> : null}
@@ -160,20 +174,74 @@ function QrDock({ url, inviting }: { url: string; inviting: boolean }) {
   );
 }
 
-function GardenScreen({ state, inviting }: { state: PresentationState; inviting: boolean }) {
+const GARDEN_SLOTS = [
+  { className: 'gardenPositionOne', x: 14, y: 24 },
+  { className: 'gardenPositionTwo', x: 39, y: 31 },
+  { className: 'gardenPositionThree', x: 87, y: 20 },
+  { className: 'gardenPositionFour', x: 75, y: 79 },
+  { className: 'gardenPositionFive', x: 20, y: 78 },
+  { className: 'gardenPositionSix', x: 51, y: 73 },
+] as const;
+
+function primaryAccent(recognition: Recognition): string {
+  return expression(recognition.expressionIds[0] ?? 1).color;
+}
+
+function bubbleSize(recognition: Recognition, count: number): number {
+  const messageWeight = recognition.message.length > 360 ? 18 : recognition.message.length > 180 ? 16.5 : 15.5;
+  const densityAdjustment = count > 4 ? -1.5 : 0;
+  const expressionAdjustment = recognition.expressionIds.length > 4 ? 0.8 : 0;
+  return Math.max(12.8, Math.min(18.5, messageWeight + densityAdjustment + expressionAdjustment));
+}
+
+function sharedExpressionIds(left: Recognition, right: Recognition): number[] {
+  return left.expressionIds.filter((id) => right.expressionIds.includes(id));
+}
+
+function GardenScreen({ state }: { state: PresentationState }) {
   const records = selectGarden(state);
-  const positions = ['gardenPositionOne', 'gardenPositionTwo', 'gardenPositionThree', 'gardenPositionFour', 'gardenPositionFive', 'gardenPositionSix'];
+  const connections = records.flatMap((left, leftIndex) => records.slice(leftIndex + 1).flatMap((right, rightIndex) => {
+    const shared = sharedExpressionIds(left, right);
+    if (!shared.length) return [];
+    const rightIndexInRecords = leftIndex + 1 + rightIndex;
+    return [{ leftIndex, rightIndex: rightIndexInRecords, expressionId: shared[0] }];
+  }));
+  const showConnections = state.settings.showConstellations && connections.length > 0;
+  const showTrails = state.settings.showTrails && records.length > 0;
   return (
     <section className={styles.screen} aria-labelledby="garden-title">
       <div className={styles.screenHeading}>
         <p className={styles.eyebrow}>A GARDEN OF APPRECIATION</p>
         <h2 id="garden-title">Recognition Garden</h2>
       </div>
-      <div className={styles.gardenBoard}>
-        <div className={styles.constellationLines} aria-hidden="true" />
+      <div className={styles.gardenBoard} data-testid="garden-board" data-connection-count={showConnections ? connections.length : 0} data-trail-count={showTrails ? records.length : 0}>
+        {showConnections ? (
+          <svg className={styles.constellationSvg} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {connections.map((connection) => {
+              const from = GARDEN_SLOTS[connection.leftIndex];
+              const to = GARDEN_SLOTS[connection.rightIndex];
+              return <line key={`${connection.leftIndex}-${connection.rightIndex}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={expression(connection.expressionId).color} />;
+            })}
+          </svg>
+        ) : null}
         {records.map((recognition, index) => (
-          <div key={recognition.id} className={`${styles.gardenBubble} ${styles[positions[index % positions.length]]}`}>
-            <RecognitionCard recognition={recognition} fresh={state.queue.some((item) => item.id === recognition.id)} />
+          <div
+            key={recognition.id}
+            className={`${styles.gardenBubble} ${styles[GARDEN_SLOTS[index % GARDEN_SLOTS.length].className]}`}
+            data-testid="garden-bubble"
+            style={{ '--bubble-size': `${bubbleSize(recognition, records.length)}vw`, '--bubble-delay': `${-index * 1.8}s`, '--bubble-accent': primaryAccent(recognition) } as CSSProperties}
+          >
+            <div className={styles.bubbleDrift}>
+              {showTrails ? <span className={styles.bubbleTrail} aria-hidden="true" /> : null}
+              <div className={styles.bubbleBreath}>
+                <RecognitionCard
+                  recognition={recognition}
+                  compactExpressions
+                  fresh={state.queue.some((item) => item.id === recognition.id)}
+                  style={{ '--bubble-accent': primaryAccent(recognition) } as CSSProperties}
+                />
+              </div>
+            </div>
           </div>
         ))}
         {!records.length ? <EmptyGarden /> : null}
@@ -231,7 +299,7 @@ function ClusterScreen({ state }: { state: PresentationState }) {
           <p>{clusterExpression.principle}</p>
         </div>
         <div className={styles.clusterCards}>
-          {matches.map((recognition) => <RecognitionCard key={recognition.id} recognition={recognition} />)}
+          {matches.map((recognition) => <RecognitionCard key={recognition.id} recognition={recognition} compactExpressions />)}
         </div>
       </div>
     </section>
@@ -285,6 +353,17 @@ function ExpressionsScreen() {
 function ArrivalScreen({ state }: { state: PresentationState }) {
   const recognition = state.activeArrival ? selectEligible(state).find((item) => item.id === state.activeArrival?.id) : null;
   if (!recognition) return <FallbackScreen />;
+  if (isGroupedArrival(state)) {
+    return (
+      <section className={styles.arrivalScreen} aria-live="polite" aria-labelledby="arrival-title">
+        <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: '#a5c9ff' }} aria-hidden="true" />
+        <p className={styles.eyebrow}>A FEW RECOGNITIONS HAVE ARRIVED</p>
+        <h2 id="arrival-title">The garden has new gratitude.</h2>
+        <p className={styles.fullMessage}>Each recognition will make room in the garden in a fair rotation.</p>
+        <p className={styles.arrivalGroupNote}>The display is welcoming a small group of new recognitions.</p>
+      </section>
+    );
+  }
   return (
     <section className={styles.arrivalScreen} aria-live="polite" aria-labelledby="arrival-title">
       <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: expression(recognition.expressionIds[0]).color }} aria-hidden="true" />
@@ -337,7 +416,7 @@ function FallbackScreen() {
 
 function Screen({ state }: { state: PresentationState }) {
   switch (state.screen) {
-    case 'garden': return <GardenScreen state={state} inviting={false} />;
+    case 'garden': return <GardenScreen state={state} />;
     case 'featured': return <FeaturedScreen state={state} />;
     case 'cluster': return <ClusterScreen state={state} />;
     case 'impact': return <ImpactScreen snapshot={state.snapshot} />;
@@ -413,9 +492,11 @@ export function DisplayExperience() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ code }),
       });
+      snapshotRequestGeneration.current += 1;
+      snapshotRequestInFlight.current = false;
       dispatch({ type: 'PAIRING_SUCCEEDED' });
       setPairingPending(false);
-      window.setTimeout(() => void loadSnapshot(), 0);
+      window.setTimeout(() => void loadSnapshot(true), 0);
     } catch (error) {
       setPairingPending(false);
       setPairingError(isUnauthorized(error) ? 'That code is no longer valid. Ask the campaign owner for a new code.' : 'The display could not connect. Check the code and try again.');

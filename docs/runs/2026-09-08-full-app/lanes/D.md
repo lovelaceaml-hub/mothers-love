@@ -15,20 +15,20 @@
 - Added cursor-aware no-store snapshot polling every five seconds. Requests use credentials, include `?after=cursor`, accept authoritative `sync` and `arrivals`, and never infer introductions from the current recognition pool. In-flight requests are serialized, older revisions are ignored, and network failure resets the cursor and holds Quiet until a verified snapshot returns.
 - Added immediate 401 clearing, server-time offset plus monotonic freshness, local expiry removal, sixty-second offline neutral fallback, and verified resync release.
 - Added one reducer-driven presentation coordinator for garden, featured, cluster, impact, all nine expressions, arrival, milestone, fallback, Quiet, and neutral states. The tick loop is the sole presentation clock. Protected reading holds cannot be interrupted by ordinary rotation.
-- Added arrival identity deduplication by event ID, edit-safe version handling, ten-item burst coverage, grouped acknowledgements after ten items or two minutes, cancellation on disappearance or expiry, and fair least-recently-presented rotation.
+- Added arrival identity deduplication by event ID, including repeated IDs inside one delta, edit-safe version handling, ten-item burst coverage, anonymous grouped acknowledgements after ten items or two minutes, cancellation on disappearance or expiry, and fair least-recently-presented rotation.
 - Added content-aware featured and arrival reading time, full verbatim message treatment, clearly marked garden excerpts, exact associated expressions, no duplicate cluster fillers, shared-expression constellation atmosphere, responsive density capped at four by default and six maximum, and readable 1080p and 4K CSS sizing.
 - Added manual feature selection support in the reducer, automatic recency selection, Calm, Standard, Lively and Still motion classes, reduced-motion handling that stops all CSS movement, stationary bottom-left QR with the verified submission URL, low-activity mode, and static safety cues.
 - Added synchronized monthly impact totals, all nine canonical principles and phrases, one-time monthly milestones, and aggregate revision display.
-- Added synthetic coordinator and browser tests for the required arrival, duplicate, edit, restart, expiry, offline, motion, milestone, pairing, startup cookie, delayed response, revocation, 0, 1, 2, 20, and long-message cases.
+- Added synthetic coordinator and browser tests for the required arrival, duplicate, edit, restart, expiry, offline, motion, milestone, pairing, startup cookie, delayed response, revocation, 0, 1, 2, 20, long-message, settings flag, shared-expression connection, TV bounds, and cluster readability cases.
 
 ## Verification
 
 - `npm_config_cache=/tmp/npm-cache npm run typecheck`: passed.
 - `npm_config_cache=/tmp/npm-cache npm run lint`: passed with no warnings.
-- `npm_config_cache=/tmp/npm-cache npm test -- --run tests/display/coordinator.test.ts`: 11 tests passed.
+- `npm_config_cache=/tmp/npm-cache npx vitest run tests/display/coordinator.test.ts`: 14 tests passed.
 - `npm_config_cache=/tmp/npm-cache npm run build`: passed. `/display` compiled as a static App Router route.
-- Synthetic browser suite: 8 tests passed against an isolated local Next.js preview on `127.0.0.1:3137`, covering pairing, existing-cookie startup, delayed response, 401 revocation, and fixture sizes 0, 1, 2, 20, and long message. Screenshot capture passed for each fixture. The final browser route mock matches both initial and cursor query snapshot requests.
-- Rendered screenshot inspection: `/private/tmp/mothers-love-display-fixture.png` showed the approved warm cream, organic bubble, expressive color, readable text, atmosphere and stationary QR treatment. The file is outside the repository and contains only synthetic content.
+- Synthetic browser suite: 10 active tests passed against an isolated local Next.js preview on `127.0.0.1:3137`, covering pairing, existing-cookie startup, delayed response, 401 revocation, fixture sizes 0, 1, 2, 20, long message, settings flags, shared-expression connection truth, 1920 and 3840 bounds, and cluster card readability. One opt-in capture test also passed after a reset followed by delta responses.
+- Current synthetic screen captures are `/private/tmp/mothers-love-display-current/garden-multi-record.png`, `/private/tmp/mothers-love-display-current/featured-multi-record.png`, `/private/tmp/mothers-love-display-current/all-nine-multi-record.png`, and `/private/tmp/mothers-love-display-current/cluster-multi-record.png`. Visual inspection confirmed the warm cream board, organic bubbles, colored shared-expression links, compact readable garden and cluster cards, full featured reading, all nine expressions, local QR, and no clipped text in the captured 1280 by 720 viewport. The files are outside the repository and contain only synthetic content.
 
 ## Known limits
 
