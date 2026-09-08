@@ -7,7 +7,7 @@ import styles from './expressions.module.css';
 
 export const metadata: Metadata = {
   title: `Nine expressions | ${CAMPAIGN_TITLE}`,
-  description: 'Explore the nine expressions and everyday ways to practice them.',
+  description: 'Read the nine expressions and their everyday examples.',
 };
 
 function GardenDecorations() {
@@ -40,7 +40,7 @@ export default function ExpressionsPage() {
           <h1>{CAMPAIGN_TITLE}</h1>
           <p className={styles.tagline}>{CAMPAIGN_TAGLINE}</p>
           <p className={styles.intro}>
-            Explore all nine expressions, the principle behind each one, and a simple way to practice it today.
+            Read the nine expressions and their everyday examples.
           </p>
         </header>
 
@@ -49,7 +49,7 @@ export default function ExpressionsPage() {
             <p className={styles.cardEyebrow}>The nine expressions</p>
             <h2 id="expressions-title">Words that make room for peace</h2>
             <p className={styles.contentIntro}>
-              These examples offer simple ways to put the nine expressions into practice.
+              Read each expression&apos;s principle and example.
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export default function ExpressionsPage() {
           <p className={styles.cardEyebrow}>Learn more</p>
           <h2 id="source-title">Read the official campaign guidance</h2>
           <p>
-            Read more about the campaign and find the original examples. The everyday examples here are concise adaptations.
+            Find more campaign guidance and examples.
           </p>
           <a
             className={styles.sourceLink}

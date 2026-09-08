@@ -162,7 +162,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
   test('keeps the pairing gate before the first verified snapshot', async ({ page }) => {
     await page.goto('/display');
-    await expect(page.getByRole('heading', { name: 'Bring the living wall to life.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible();
     await expect(page.getByTestId('display-app')).toHaveCount(0);
   });
 
@@ -205,12 +205,12 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
     });
     await page.goto('/display');
-    await expect(page.getByRole('heading', { name: 'Bring the living wall to life.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible();
     await page.getByLabel('Display code').fill('A7C9F2H4');
     await page.getByRole('button', { name: 'Connect this display' }).click();
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 15_000 });
     await page.waitForTimeout(5_500);
-    await expect(page.getByRole('heading', { name: 'Bring the living wall to life.' })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible({ timeout: 5_000 });
   });
 
   test('honors trail and constellation flags and only links shared expressions', async ({ page }) => {
@@ -244,7 +244,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       expect(bounds[0].top).toBeGreaterThanOrEqual(-2);
       expect(bounds[0].right).toBeGreaterThanOrEqual(-2);
       expect(bounds[0].bottom).toBeGreaterThanOrEqual(-2);
-      await expect(page.getByText('Garden excerpt, full message follows in the reading view.')).toBeVisible();
+      await expect(page.getByText('Message preview. Full message follows.')).toBeVisible();
     }
   });
 

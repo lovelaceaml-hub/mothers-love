@@ -247,7 +247,7 @@ function Preview({ draft, onClose }: { draft: Draft; onClose: () => void }) {
         <ul className={styles.previewExpressions} aria-label="Selected expressions">
           {selected.map((expression) => <li key={expression.id}>{expression.phrase}</li>)}
         </ul>
-        <p className={styles.previewNote}>Your submitted name is kept for administrators and is not shown here.</p>
+        <p className={styles.previewNote}>Your name is not shown here.</p>
       </div>
     </section>
   );
@@ -441,7 +441,7 @@ export function SubmissionForm() {
             <form className={styles.formCard} onSubmit={submit} noValidate>
               <div className={styles.privateCallout}>
                 <span className={styles.privateIcon} aria-hidden="true"><span /></span>
-                <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The public display shows the recipient, selected expressions, and message.</p>
+                <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The public display shows the recipient, expressions, and message.</p>
               </div>
 
               {formError && (
@@ -456,7 +456,7 @@ export function SubmissionForm() {
 
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="submitter">Your name</label>
-                <p className={styles.helper} id="submitter-help">First name plus last initial. This is self-reported and is never shown publicly.</p>
+                <p className={styles.helper} id="submitter-help">First name and last initial.</p>
                 <input
                   ref={submitterRef}
                   className={styles.textInput}
@@ -475,7 +475,7 @@ export function SubmissionForm() {
 
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="recipient">Who would you like to recognize?</label>
-                <p className={styles.helper} id="recipient-help">Enter their first name and last initial. Children follow the same rules.</p>
+                <p className={styles.helper} id="recipient-help">Enter their first name and last initial.</p>
                 <input
                   ref={recipientRef}
                   className={styles.textInput}
@@ -513,7 +513,7 @@ export function SubmissionForm() {
 
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="message">Share your appreciation</label>
-                <p className={styles.helper} id="message-help">Write a personal message of acknowledgement and thanks. Keep it encouraging and appropriate for public display.</p>
+                <p className={styles.helper} id="message-help">Write a message of thanks. Leave out contact information and private details.</p>
                 <textarea
                   ref={messageRef}
                   className={styles.messageInput}
@@ -545,7 +545,6 @@ export function SubmissionForm() {
                 </button>
               </div>
 
-              <p className={styles.privacyReminder}>Please avoid health details, personal disagreements, contact information, or anything the recipient would prefer to keep private. A message can still reveal its writer through its wording or timing.</p>
             </form>
             <div className={styles.footerLinks}>
               <Link href="/expressions">Explore the nine expressions and everyday examples</Link>

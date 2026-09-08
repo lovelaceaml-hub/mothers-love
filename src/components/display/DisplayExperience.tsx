@@ -81,10 +81,10 @@ function PairingPanel({ onPair, pending, error }: { onPair: (code: string) => vo
       </div>
       <section className={styles.pairingCard}>
         <p className={styles.eyebrow}>THE WORDS OF MOTHER&apos;S LOVE</p>
-        <h1 id="pairing-title">Bring the living wall to life.</h1>
+        <h1 id="pairing-title">Connect this display.</h1>
         <p className={styles.tagline}>Where a mother&apos;s love resides, peace abides.</p>
         <p className={styles.pairingCopy}>
-          Enter the one-time display code created by the campaign owner. This screen stays private until the display is paired.
+          Enter the 8-character display code from the campaign owner.
         </p>
         <form className={styles.pairingForm} onSubmit={submit}>
           <label htmlFor="display-code">Display code</label>
@@ -100,7 +100,7 @@ function PairingPanel({ onPair, pending, error }: { onPair: (code: string) => vo
             aria-describedby={error ? 'pairing-error' : 'pairing-help'}
             disabled={pending}
           />
-          <span id="pairing-help" className={styles.fieldHint}>The code expires after a short time.</span>
+          <span id="pairing-help" className={styles.fieldHint}>Ask the campaign owner for a code if you need one.</span>
           {error ? <p id="pairing-error" className={styles.formError} role="alert">{error}</p> : null}
           <button type="submit" disabled={pending || code.trim().length !== 8}>
             {pending ? 'Connecting…' : 'Connect this display'}
@@ -141,7 +141,7 @@ function RecognitionCard({ recognition, detailed = false, fresh = false, compact
         {recognition.expressionIds.map((id) => compactExpressions ? <ExpressionChip key={id} id={id} /> : <ExpressionPill key={id} id={id} />)}
       </div>
       <p className={styles.recognitionMessage}>{excerpt.text}</p>
-      {excerpt.excerpt ? <p className={styles.excerptNote}>Garden excerpt, full message follows in the reading view.</p> : null}
+      {excerpt.excerpt ? <p className={styles.excerptNote}>Message preview. Full message follows.</p> : null}
     </article>
   );
 }
@@ -354,7 +354,6 @@ function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
           </div>
         ))}
       </div>
-      <p className={styles.revisionNote}>All totals share revision {aggregate.revision}.</p>
     </section>
   );
 }
@@ -443,8 +442,8 @@ function QuietScreen({ neutral = false }: { neutral?: boolean }) {
     <section className={styles.quietScreen} aria-labelledby="quiet-title">
       <span className={styles.quietFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>{neutral ? 'DISPLAY SAFETY MODE' : 'A QUIET MOMENT'}</p>
-      <h2 id="quiet-title">{neutral ? 'The living wall is resyncing.' : 'Mother&apos;s Love is still here.'}</h2>
-      <p>{neutral ? 'Only the nine campaign expressions remain visible until this display is verified again.' : 'The wall will return when the campaign owner releases Quiet mode.'}</p>
+      <h2 id="quiet-title">{neutral ? 'Recognitions are paused.' : 'Mother&apos;s Love is still here.'}</h2>
+      <p>{neutral ? 'The nine campaign expressions remain visible.' : 'The wall will return when Quiet mode ends.'}</p>
       <div className={styles.quietExpressions}>
         {EXPRESSIONS.map((item) => <span key={item.id} style={{ backgroundColor: item.color }}>{item.phrase}</span>)}
       </div>
