@@ -26,6 +26,10 @@ export interface ActiveArrival {
   phase: ArrivalPhase;
   grouped: boolean;
   journeyEndsAtMs: number;
+  readingPageIndex: number;
+  readingPageCount: number;
+  readingPageDurationMs: number;
+  nextPageEndsAtMs: number;
   readingEndsAtMs: number;
 }
 
@@ -41,6 +45,8 @@ export interface PresentationState {
   screen: DisplayScreen;
   screenStartedAtMs: number;
   nextTransitionAtMs: number | null;
+  readingPageIndex: number;
+  readingPageCount: number;
   playlistIndex: number;
   gardenIds: string[];
   featuredId: string | null;
@@ -89,6 +95,8 @@ const ORDINARY_GAP_MS = 8_000;
 const INTRO_GROUP_AGE_MS = 2 * 60_000;
 const PLAYLIST: DisplayScreen[] = ['garden', 'featured', 'garden', 'impact', 'all-nine', 'cluster'];
 const MILESTONE_BASES = [50, 100, 250, 500, 1_000];
+export const READING_MESSAGE_PAGE_GRAPHEMES = 180;
+export const READING_MESSAGE_PAGE_LINES = 7;
 
 export const DEFAULT_DISPLAY_SETTINGS: DisplaySettings = {
   version: 0,
@@ -181,10 +189,57 @@ function durationFor(screen: DisplayScreen, selected?: Recognition): number {
   if (screen === 'cluster') return 20_000;
   if (screen === 'fallback') return 20_000;
   if (screen === 'featured') {
-    const length = selected?.message.length ?? 0;
-    return Math.max(12_000, Math.min(60_000, 12_000 + length * 30));
+    return selected ? readingTotalDuration(selected) : 12_000;
   }
   return 20_000;
+}
+
+function graphemes(text: string): string[] {
+  const segmenter = (Intl as typeof Intl & {
+    Segmenter?: new (locales?: string | string[], options?: { granularity: 'grapheme' }) => { segment(input: string): Iterable<{ segment: string }> };
+  }).Segmenter;
+  if (segmenter) return [...new segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((part) => part.segment);
+  return Array.from(text);
+}
+
+export function splitVerbatimMessage(message: string): string[] {
+  const units = graphemes(message);
+  if (!units.length) return [''];
+  const pages: string[] = [];
+  let cursor = 0;
+  while (cursor < units.length) {
+    let end = cursor;
+    let newlineCount = 0;
+    while (end < units.length && end - cursor < READING_MESSAGE_PAGE_GRAPHEMES) {
+      const unit = units[end];
+      if (unit === '\n' && newlineCount >= READING_MESSAGE_PAGE_LINES) break;
+      end += 1;
+      if (unit === '\n') newlineCount += 1;
+      if (newlineCount >= READING_MESSAGE_PAGE_LINES) break;
+    }
+    if (end === cursor) end += 1;
+    if (end < units.length && newlineCount < READING_MESSAGE_PAGE_LINES) {
+      const whitespace = units.slice(cursor, end).reduce((last, unit, index) => /\s/u.test(unit) ? cursor + index : last, -1);
+      if (whitespace > cursor + Math.floor(READING_MESSAGE_PAGE_GRAPHEMES * 0.55)) end = whitespace + 1;
+    }
+    pages.push(units.slice(cursor, end).join(''));
+    cursor = end;
+  }
+  return pages;
+}
+
+export function recognitionReadingPageCount(recognition: Recognition): number {
+  const messagePages = splitVerbatimMessage(recognition.message).length;
+  return messagePages + (messagePages > 1 || recognition.expressionIds.length > 4 ? 1 : 0);
+}
+
+function readingTotalDuration(recognition: Recognition, minimumMs = 12_000): number {
+  const expressionWeight = recognition.expressionIds.length * 350;
+  return Math.max(minimumMs, Math.min(120_000, 12_000 + graphemes(recognition.message).length * 30 + expressionWeight));
+}
+
+function readingPageDuration(recognition: Recognition, minimumMs = 12_000): number {
+  return Math.ceil(readingTotalDuration(recognition, minimumMs) / recognitionReadingPageCount(recognition));
 }
 
 function recognitionForCluster(items: Recognition[], expressionId: number): Recognition[] {
@@ -242,6 +297,8 @@ function clearPersonal(state: PresentationState, unauthorized: boolean, offlineS
     paired: !unauthorized,
     screen: unauthorized ? 'quiet' : 'neutral',
     nextTransitionAtMs: null,
+    readingPageIndex: 0,
+    readingPageCount: 1,
     neutral: !unauthorized,
     quiet: false,
     offlineSafe,
@@ -320,6 +377,8 @@ function rebuildVisibleState(
     screen,
     screenStartedAtMs: shouldStartClock ? receivedAtMs : state.screenStartedAtMs,
     nextTransitionAtMs: shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, byId(items, featuredId)) : state.nextTransitionAtMs,
+    readingPageIndex: screen === 'featured' ? Math.min(state.readingPageIndex, Math.max(0, (byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1) - 1)) : 0,
+    readingPageCount: screen === 'featured' && byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1,
     gardenIds,
     featuredId,
     clusterIds: cluster.ids,
@@ -349,7 +408,9 @@ function startArrival(state: PresentationState): PresentationState {
   const grouped = state.queue.length > 10 || state.nowMs - first.enqueuedAtMs > INTRO_GROUP_AGE_MS;
   const readingSeconds = Math.max(12, state.settings.readingSeconds || 20);
   const item = state.snapshot?.recognitions.find((recognition) => recognition.id === first.id);
-  const readingMs = Math.max(readingSeconds * 1_000, Math.min(60_000, 12_000 + (item?.message.length ?? 0) * 30));
+  const readingPageCount = item ? recognitionReadingPageCount(item) : 1;
+  const readingPageDurationMs = item ? readingPageDuration(item, readingSeconds * 1_000) : readingSeconds * 1_000;
+  const readingMs = readingPageDurationMs * readingPageCount;
   return {
     ...state,
     screen: 'arrival',
@@ -361,9 +422,12 @@ function startArrival(state: PresentationState): PresentationState {
       phase: 'journey',
       grouped,
       journeyEndsAtMs: state.nowMs + JOURNEY_MS,
+      readingPageIndex: 0,
+      readingPageCount,
+      readingPageDurationMs,
+      nextPageEndsAtMs: state.nowMs + JOURNEY_MS + readingPageDurationMs,
       readingEndsAtMs: state.nowMs + JOURNEY_MS + readingMs,
     },
-    presentationHistory: markPresented(state, [first.id], state.nowMs),
   };
 }
 
@@ -378,6 +442,8 @@ function advanceProgram(state: PresentationState): PresentationState {
       featuredId: null,
       clusterIds: [],
       clusterExpressionId: null,
+      readingPageIndex: 0,
+      readingPageCount: 1,
     };
   }
   const nextIndex = (state.playlistIndex + 1) % PLAYLIST.length;
@@ -386,13 +452,17 @@ function advanceProgram(state: PresentationState): PresentationState {
   const garden = sorted.slice(0, maxBubbles(state.settings));
   const feature = byId(items, state.manualFeatureId) ?? byId(items, state.featuredId) ?? sorted[0];
   const cluster = chooseCluster(items, state.clusterExpressionId);
-  const selectedIds = nextScreen === 'garden' ? garden.map((item) => item.id) : feature ? [feature.id] : [];
+  const selectedIds = nextScreen === 'garden' ? garden.map((item) => item.id) : nextScreen === 'featured' || !feature ? [] : [feature.id];
+  const nextReadingPageCount = nextScreen === 'featured' && feature ? recognitionReadingPageCount(feature) : 1;
+  const nextPageDuration = nextScreen === 'featured' && feature ? readingPageDuration(feature) : 0;
   return {
     ...state,
     screen: nextScreen,
     playlistIndex: nextIndex,
     screenStartedAtMs: state.nowMs,
-    nextTransitionAtMs: state.nowMs + durationFor(nextScreen, feature),
+    nextTransitionAtMs: state.nowMs + (nextScreen === 'featured' && feature ? nextPageDuration : durationFor(nextScreen, feature)),
+    readingPageIndex: 0,
+    readingPageCount: nextReadingPageCount,
     gardenIds: garden.map((item) => item.id),
     featuredId: feature?.id ?? null,
     clusterIds: cluster.ids,
@@ -428,6 +498,9 @@ function completeArrival(state: PresentationState): PresentationState {
     activeArrival: null,
     queue: nextQueue,
     introducedPublicationKeys: nextIntroduced,
+    presentationHistory: grouped ? state.presentationHistory : markPresented(state, [activeId], state.nowMs),
+    readingPageIndex: 0,
+    readingPageCount: 1,
     screenStartedAtMs: state.nowMs,
     nextTransitionAtMs: state.nowMs + ORDINARY_GAP_MS,
   };
@@ -459,6 +532,8 @@ export function createInitialState(settings?: Partial<DisplaySettings>): Present
     screen: 'quiet',
     screenStartedAtMs: 0,
     nextTransitionAtMs: null,
+    readingPageIndex: 0,
+    readingPageCount: 1,
     playlistIndex: 0,
     gardenIds: [],
     featuredId: null,
@@ -548,6 +623,17 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         },
         items,
       );
+      if (next.screen === 'featured' && next.featuredId && !items.some((item) => item.id === next.featuredId)) {
+        next = {
+          ...next,
+          screen: items.length ? 'garden' : 'fallback',
+          featuredId: null,
+          readingPageIndex: 0,
+          readingPageCount: 1,
+          screenStartedAtMs: action.nowMs,
+          nextTransitionAtMs: action.nowMs + durationFor(items.length ? 'garden' : 'fallback'),
+        };
+      }
       if (next.neutral || next.quiet || next.offlineSafe || next.phase !== 'ready') return next;
       if (!items.length && !next.activeArrival) {
         return {
@@ -558,6 +644,8 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
           featuredId: null,
           clusterIds: [],
           clusterExpressionId: null,
+          readingPageIndex: 0,
+          readingPageCount: 1,
         };
       }
       if (next.lowActivity && next.queue.length) next = { ...next, lowActivity: false };
@@ -568,8 +656,42 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         if (next.activeArrival.phase === 'journey' && action.nowMs >= next.activeArrival.journeyEndsAtMs) {
           next = { ...next, activeArrival: { ...next.activeArrival, phase: 'reading' } };
         }
-        if (next.activeArrival && action.nowMs >= next.activeArrival.readingEndsAtMs) next = completeArrival(next);
+        if (
+          next.activeArrival
+          && action.nowMs >= next.activeArrival.readingEndsAtMs
+          && next.activeArrival.readingPageIndex >= next.activeArrival.readingPageCount - 1
+        ) {
+          next = completeArrival(next);
+        } else if (
+          next.activeArrival?.phase === 'reading'
+          && action.nowMs >= next.activeArrival.nextPageEndsAtMs
+          && next.activeArrival.readingPageIndex < next.activeArrival.readingPageCount - 1
+        ) {
+          next = {
+            ...next,
+            activeArrival: {
+              ...next.activeArrival,
+              readingPageIndex: next.activeArrival.readingPageIndex + 1,
+              nextPageEndsAtMs: next.activeArrival.nextPageEndsAtMs + next.activeArrival.readingPageDurationMs,
+            },
+          };
+        }
         return next;
+      }
+      const due = next.nextTransitionAtMs !== null && action.nowMs >= next.nextTransitionAtMs;
+      if (due && next.screen === 'featured') {
+        if (next.pauseRotation) return next;
+        if (next.readingPageIndex < next.readingPageCount - 1) {
+          const feature = byId(items, next.featuredId);
+          const nextPageDuration = feature ? readingPageDuration(feature) : 12_000;
+          return {
+            ...next,
+            readingPageIndex: next.readingPageIndex + 1,
+            screenStartedAtMs: action.nowMs,
+            nextTransitionAtMs: action.nowMs + nextPageDuration,
+          };
+        }
+        if (next.featuredId) next = { ...next, presentationHistory: markPresented(next, [next.featuredId], action.nowMs) };
       }
       if (next.screen === 'milestone' && next.nextTransitionAtMs !== null && action.nowMs >= next.nextTransitionAtMs) {
         const period = next.snapshot ? periodKey(next.snapshot) : '';
@@ -584,7 +706,6 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
             : next.celebratedMilestones,
         };
       }
-      const due = next.nextTransitionAtMs !== null && action.nowMs >= next.nextTransitionAtMs;
       if (due && next.pendingMilestone !== null) {
         return { ...next, screen: 'milestone', nextTransitionAtMs: action.nowMs + 8_000, screenStartedAtMs: action.nowMs };
       }
