@@ -15,6 +15,11 @@ describe('submission validation', () => {
     expect(isFirstNameLastInitial('Michelle')).toBe(false);
   });
 
+  it('uses the shared name validator for the same malformed cases rejected by the server', () => {
+    expect(isFirstNameLastInitial('Maya Rodriguez')).toBe(false);
+    expect(isFirstNameLastInitial('hello')).toBe(false);
+  });
+
   it('returns field level errors without shortening the draft', () => {
     const message = 'a'.repeat(500);
     const errors = getValidationErrors({
