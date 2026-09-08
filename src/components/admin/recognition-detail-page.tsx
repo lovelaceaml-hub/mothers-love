@@ -1,0 +1,195 @@
+'use client';
+
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { AdminRecognition, Expression } from '@/lib/contracts';
+import { EXPRESSIONS } from '@/lib/catalog';
+import { useAdminSession } from './admin-shell';
+import { ActionDialog } from './action-dialog';
+import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
+import { formatDateTime, formatExpiry, graphemeLength, isExpired, requiresReason, statusLabel, validateEditorDraft, type ActionKind } from './admin-utils';
+import styles from './admin.module.css';
+
+type EditableDraft = {
+  recipient: string;
+  submittedName: string;
+  message: string;
+  expressionIds: number[];
+};
+
+const expressionCatalog = EXPRESSIONS as Expression[];
+
+export function RecognitionDetailPage({ id }: { id: string }) {
+  const session = useAdminSession();
+  const [recognition, setRecognition] = useState<AdminRecognition | null>(null);
+  const [draft, setDraft] = useState<EditableDraft | null>(null);
+  const [latest, setLatest] = useState<AdminRecognition | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [expired, setExpired] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const [action, setAction] = useState<ActionKind | null>(null);
+  const [reason, setReason] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const current = await adminApi<AdminRecognition>(`/api/admin/recognitions/${encodeURIComponent(id)}`);
+      setRecognition(current);
+      setDraft(toDraft(current));
+      setExpired(isExpired(current.expiresAt));
+    } catch (cause) {
+      setError(getAuthErrorMessage(cause));
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  useEffect(() => {
+    if (!recognition || expired) return;
+    const clearPersonalFields = () => {
+      setExpired(true);
+      setDraft(null);
+      setRecognition((current) => current ? { ...current, submittedName: '', message: '', expressionIds: [] } : null);
+      setAction(null);
+      setNotice('This recognition expired while it was open. Personal fields were cleared and publish, restore and feature actions are disabled.');
+    };
+    const remaining = Math.max(0, new Date(recognition.expiresAt).getTime() - Date.now());
+    const expiryTimer = window.setTimeout(clearPersonalFields, remaining);
+    const refreshTimer = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => {
+      window.clearTimeout(expiryTimer);
+      window.clearInterval(refreshTimer);
+    };
+  }, [expired, recognition]);
+
+  const fieldsChanged = useMemo(() => {
+    if (!recognition || !draft) return false;
+    return recognition.recipient !== draft.recipient || recognition.submittedName !== draft.submittedName || recognition.message !== draft.message || recognition.expressionIds.join(',') !== draft.expressionIds.join(',');
+  }, [draft, recognition]);
+
+  const updateDraft = <K extends keyof EditableDraft>(key: K, value: EditableDraft[K]) => {
+    setDraft((current) => current ? { ...current, [key]: value } : current);
+  };
+
+  const saveEdit = async () => {
+    if (!recognition || !draft || expired) return;
+    const errors = validateEditorDraft(draft);
+    if (errors.length) {
+      setError(errors.join(' '));
+      return;
+    }
+    if (requiresReason('edit', fieldsChanged)) {
+      setAction('edit');
+      setReason('');
+      return;
+    }
+    await commitAction('edit', null);
+  };
+
+  const commitAction = async (kind: ActionKind, actionReason: string | null) => {
+    if (!recognition || expired) return;
+    setSaving(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const fields = kind === 'edit' && draft ? draft : undefined;
+      const response = await adminJson<{ recognition: AdminRecognition | null }>(`/api/admin/recognitions/${encodeURIComponent(recognition.id)}`, {
+        expectedVersion: recognition.version,
+        action: kind,
+        ...(fields ? { fields } : {}),
+        ...(actionReason ? { reason: actionReason } : {}),
+      });
+      if (response.recognition) {
+        setRecognition(response.recognition);
+        setDraft(toDraft(response.recognition));
+        setExpired(isExpired(response.recognition.expiresAt));
+      } else {
+        setRecognition(null);
+        setDraft(null);
+      }
+      setAction(null);
+      setReason('');
+      setNotice(`${kind === 'delete' ? 'Recognition permanently deleted.' : `${kind[0].toUpperCase()}${kind.slice(1)} saved.`} The server returned the new version.`);
+    } catch (cause) {
+      const status = (cause as { status?: number; code?: string }).status;
+      const code = (cause as { code?: string }).code;
+      if (status === 409 || code === 'VERSION_CONFLICT') {
+        try {
+          const current = await adminApi<AdminRecognition>(`/api/admin/recognitions/${encodeURIComponent(recognition.id)}`);
+          setLatest(current);
+          setNotice('Another admin saved a newer version. Choose which version to use before saving again.');
+        } catch (refreshCause) {
+          setError(getAuthErrorMessage(refreshCause));
+        }
+      } else if (status === 410 || code === 'EXPIRED') {
+        setExpired(true);
+        setDraft(null);
+        setRecognition((current) => current ? { ...current, submittedName: '', message: '', expressionIds: [] } : null);
+        setAction(null);
+        setNotice('This recognition expired before the action completed. Personal fields were cleared.');
+      } else {
+        setError(getAuthErrorMessage(cause));
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cancelAction = useCallback(() => {
+    if (!saving) setAction(null);
+  }, [saving]);
+
+  if (loading) return <div className={styles.skeleton} aria-label="Loading recognition detail" />;
+  if (error && !recognition) return <div className={styles.error} role="alert">{error} <button type="button" className={styles.authLink} onClick={() => void load()}>Try again</button></div>;
+  if (!recognition) return <div className={styles.empty}>This recognition is no longer available.</div>;
+
+  const currentStatusClass = recognition.status === 'published' ? styles.badgePublished : recognition.status === 'held' ? styles.badgeHeld : recognition.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
+
+  return (
+    <>
+      <div className={styles.buttonRow} style={{ marginBottom: 16 }}><Link className={styles.buttonQuiet} href="/admin/recognitions">Back to recognitions</Link><span className={`${styles.badge} ${currentStatusClass}`}>{statusLabel(recognition.status)}</span>{recognition.featured ? <span className={`${styles.badge} ${styles.badgePending}`}>Featured</span> : null}<span className={styles.badge}>Version {recognition.version}</span><span className={styles.badge}>{formatExpiry(recognition.expiresAt, now)}</span></div>
+      {notice ? <div className={styles.notice} role="status">{notice}</div> : null}
+      {error ? <div className={styles.error} role="alert">{error}</div> : null}
+      {expired ? <div className={styles.error} role="alert"><strong>Expired.</strong> Personal fields are cleared. Publish, restore and feature actions are unavailable.</div> : null}
+
+      <section className={styles.grid}>
+        <div className={`${styles.card} ${styles.col7}`}>
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Editable recognition fields</h2><p className={styles.cardDescription}>Save uses expected version protection. A substantive edit needs a moderation reason.</p></div><span className={styles.badge}>{formatExpiry(recognition.expiresAt, now)}</span></div>
+          <div className={styles.field}><label className={styles.label} htmlFor="detail-recipient">Recipient</label><input id="detail-recipient" className={styles.input} value={draft?.recipient ?? ''} onChange={(event) => updateDraft('recipient', event.target.value)} disabled={expired} /></div>
+          <div className={styles.field}><label className={styles.label} htmlFor="detail-submitted-name">Submitted name <span className={styles.privateLabel} style={{ display: 'inline', marginLeft: 6 }}>Admin only</span></label><input id="detail-submitted-name" className={styles.input} value={draft?.submittedName ?? ''} onChange={(event) => updateDraft('submittedName', event.target.value)} disabled={expired} /></div>
+          <div className={styles.field}><label className={styles.label} htmlFor="detail-message">Message</label><textarea id="detail-message" className={styles.textarea} value={draft?.message ?? ''} onChange={(event) => updateDraft('message', event.target.value)} disabled={expired} /><p className={styles.fieldHint}>{graphemeLength(draft?.message ?? '')}/500 graphemes</p></div>
+          <fieldset className={styles.field} disabled={expired} style={{ border: 0, padding: 0, margin: 0 }}><legend className={styles.label}>Expressions</legend><div className={styles.expressionGrid}>{expressionCatalog.map((expression) => <label key={expression.id} className={styles.expressionChoice}><input className={styles.checkbox} type="checkbox" checked={draft?.expressionIds.includes(expression.id) ?? false} onChange={(event) => { const ids = new Set(draft?.expressionIds ?? []); if (event.target.checked) ids.add(expression.id); else ids.delete(expression.id); updateDraft('expressionIds', [...ids].sort((a, b) => a - b)); }} />{expression.phrase}</label>)}</div></fieldset>
+          <div className={styles.buttonRow} style={{ marginTop: 18 }}><button className={styles.button} type="button" onClick={() => void saveEdit()} disabled={saving || expired || !fieldsChanged}>Save edit</button>{recognition.status === 'held' ? <button className={styles.buttonSecondary} type="button" onClick={() => { setAction('publish'); setReason(''); }} disabled={saving || expired}>Publish</button> : null}{recognition.status === 'hidden' ? <button className={styles.buttonSecondary} type="button" onClick={() => { setAction('restore'); setReason(''); }} disabled={saving || expired}>Restore</button> : null}<button className={styles.buttonQuiet} type="button" onClick={() => { setAction(recognition.featured ? 'unfeature' : 'feature'); setReason(''); }} disabled={saving || expired}>{recognition.featured ? 'Remove feature' : 'Feature'}</button></div>
+        </div>
+
+        <div className={`${styles.card} ${styles.col5}`}>
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Public preview</h2><p className={styles.cardDescription}>This projection never includes the submitted name or moderation reason.</p></div></div>
+          <div className={styles.preview}><p className={styles.previewKicker}>Recognized anonymously</p><h3 className={styles.previewTitle}>Thank you, {draft?.recipient || recognition.recipient}</h3><p className={styles.previewMessage}>{draft?.message || recognition.message || 'Message cleared after expiry.'}</p><div className={styles.listItemMeta}>{(draft?.expressionIds ?? recognition.expressionIds).map((expressionId) => <span key={expressionId} className={styles.badge}>{expressionCatalog.find((expression) => expression.id === expressionId)?.phrase ?? `Expression ${expressionId}`}</span>)}</div></div>
+          <div style={{ marginTop: 16 }}><div className={styles.statLine}><span>Created</span><span className={styles.statValue}>{formatDateTime(recognition.createdAt)}</span></div><div className={styles.statLine}><span>First published</span><span className={styles.statValue}>{formatDateTime(recognition.firstPublishedAt)}</span></div><div className={styles.statLine}><span>Expires</span><span className={styles.statValue}>{formatDateTime(recognition.expiresAt)}</span></div><div className={styles.statLine}><span>Count effect</span><span className={styles.statValue}>{recognition.status === 'published' || recognition.status === 'hidden' ? 'Retained' : 'None'}</span></div></div>
+          <div className={styles.privatePanel} style={{ marginTop: 16 }}><p className={styles.privateLabel}>Private admin field</p><p style={{ margin: 0 }}>{recognition.submittedName || 'Cleared after expiry'}</p>{recognition.reason ? <p className={styles.fieldHint}>Hold reason: {recognition.reason}</p> : null}</div>
+          <div className={styles.buttonRow} style={{ marginTop: 18 }}><button className={styles.buttonQuiet} type="button" onClick={() => { setAction('hide'); setReason(''); }} disabled={saving || expired || recognition.status === 'hidden' || recognition.status === 'invalid'}>Hide</button><button className={styles.buttonDanger} type="button" onClick={() => { setAction('invalidate'); setReason(''); }} disabled={saving || expired || recognition.status === 'invalid'}>Invalidate</button>{session?.role === 'owner' ? <button className={styles.buttonDanger} type="button" onClick={() => { setAction('delete'); setReason(''); }} disabled={saving || expired}>Permanent delete</button> : null}</div>
+        </div>
+      </section>
+
+      {latest ? <section className={styles.card} style={{ marginTop: 16 }}><div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Version conflict needs a decision</h2><p className={styles.cardDescription}>The server has version {latest.version}. Review the latest record before choosing what to keep.</p></div></div><div className={styles.grid}><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Your unsaved draft</h3><p className={styles.listItemText}>{draft?.message}</p></div><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Latest server version</h3><p className={styles.listItemText}>{latest.message}</p></div></div><div className={styles.buttonRow} style={{ marginTop: 16 }}><button className={styles.buttonSecondary} type="button" onClick={() => { setRecognition(latest); setDraft(toDraft(latest)); setLatest(null); setNotice('Loaded the latest server version. Review it, then save deliberately.'); }}>Use latest server version</button><button className={styles.button} type="button" onClick={() => { setRecognition((current) => current ? { ...current, version: latest.version } : current); setLatest(null); setNotice('Your draft is still visible. Save again only after reviewing the latest version number.'); }}>Keep my draft and review</button></div></section> : null}
+
+      {action ? <ActionDialog action={action} recognition={recognition} reason={reason} onReasonChange={setReason} onCancel={cancelAction} onConfirm={() => void commitAction(action, reason || null)} busy={saving} /> : null}
+    </>
+  );
+}
+
+const toDraft = (recognition: AdminRecognition): EditableDraft => ({
+  recipient: recognition.recipient,
+  submittedName: recognition.submittedName,
+  message: recognition.message,
+  expressionIds: [...recognition.expressionIds],
+});
