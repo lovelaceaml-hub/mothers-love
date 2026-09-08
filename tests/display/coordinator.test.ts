@@ -1,0 +1,231 @@
+import { describe, expect, it } from 'vitest';
+
+import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
+import {
+  createInitialState,
+  displayReducer,
+  effectiveMotion,
+  isGroupedArrival,
+  selectEligible,
+} from '@/lib/display/coordinator';
+
+const serverOrigin = Date.parse('2026-09-08T12:00:00.000Z');
+
+function recognition(id: string, overrides: Partial<Recognition> = {}): Recognition {
+  return {
+    id,
+    recipient: `Synthetic recipient ${id}`,
+    message: `Synthetic appreciation message for ${id}.`,
+    expressionIds: [1, 2],
+    createdAt: new Date(serverOrigin).toISOString(),
+    firstPublishedAt: new Date(serverOrigin).toISOString(),
+    expiresAt: new Date(serverOrigin + 168 * 60 * 60 * 1000).toISOString(),
+    version: 1,
+    status: 'published',
+    featured: false,
+    ...overrides,
+  };
+}
+
+function snapshot(
+  records: Recognition[],
+  options: Partial<DisplaySnapshot> = {},
+): DisplaySnapshot {
+  return {
+    serverTime: new Date(serverOrigin).toISOString(),
+    revision: 1,
+    recognitions: records,
+    aggregate: {
+      periodStart: '2026-09-01T07:00:00.000Z',
+      periodEnd: '2026-10-01T07:00:00.000Z',
+      recognitions: records.length,
+      expressionCounts: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      expressionTotal: 0,
+      revision: 1,
+    },
+    settings: {
+      version: 1,
+      mode: 'normal',
+      motion: 'standard',
+      pauseArrivals: false,
+      pauseRotation: false,
+      collectionOpen: true,
+      lowActivityMinutes: 20,
+      readingSeconds: 20,
+      maxBubbles: 4,
+      showTrails: true,
+      showConstellations: true,
+    },
+    submissionUrl: 'https://synthetic.invalid/recognize',
+    cursor: 'cursor-1',
+    sync: 'reset',
+    arrivals: [],
+    ...options,
+  };
+}
+
+function received(state: ReturnType<typeof createInitialState>, current: DisplaySnapshot, atMs = 0) {
+  return displayReducer(state, { type: 'SNAPSHOT_RECEIVED', snapshot: current, receivedAtMs: atMs });
+}
+
+function delta(
+  current: DisplaySnapshot,
+  records: Recognition[],
+  arrivals: DisplaySnapshot['arrivals'],
+  atMs: number,
+  aggregate?: Partial<DisplaySnapshot['aggregate']>,
+) {
+  return {
+    ...current,
+    revision: current.revision + 1,
+    cursor: `cursor-${current.revision + 1}`,
+    sync: 'delta' as const,
+    recognitions: records,
+    arrivals,
+    aggregate: { ...current.aggregate, ...aggregate, revision: current.aggregate.revision + 1 },
+    serverTime: new Date(serverOrigin + atMs).toISOString(),
+  };
+}
+
+describe('display presentation coordinator', () => {
+  it('queues ten arrivals without dropping any and presents one at a time', () => {
+    const records = Array.from({ length: 10 }, (_, index) => recognition(String(index + 1)));
+    const initial = received(createInitialState(), snapshot(records), 0);
+    const arrivals = records.map((item) => ({ eventId: `event-${item.id}`, recognitionId: item.id, publishedAt: item.firstPublishedAt! }));
+    const withBurst = received(initial, delta(snapshot(records), records, arrivals, 1), 1);
+
+    expect(withBurst.queue).toHaveLength(10);
+    const journey = displayReducer(withBurst, { type: 'TICK', nowMs: 20_001 });
+    expect(journey.screen).toBe('arrival');
+    expect(journey.activeArrival?.id).toBe('1');
+    expect(journey.queue).toHaveLength(10);
+
+    const finished = displayReducer(journey, { type: 'TICK', nowMs: journey.activeArrival!.readingEndsAtMs + 1 });
+    expect(finished.queue).toHaveLength(9);
+    expect(finished.introducedPublicationKeys).toContain('event-1');
+  });
+
+  it('deduplicates duplicate event delivery and treats edits as the same publication', () => {
+    const item = recognition('one');
+    const base = received(createInitialState(), snapshot([item]), 0);
+    const arrival = { eventId: 'event-one', recognitionId: 'one', publishedAt: item.firstPublishedAt! };
+    const first = received(base, delta(snapshot([item]), [item], [arrival], 1), 1);
+    const edited = recognition('one', { version: 2, message: 'Synthetic edited message.' });
+    const second = received(first, delta(snapshot([edited]), [edited], [arrival, arrival], 2), 2);
+
+    expect(first.queue).toHaveLength(1);
+    expect(second.queue).toHaveLength(1);
+    expect(second.queue[0].version).toBe(1);
+    expect(second.knownPublicationKeys).toEqual(['event-one']);
+  });
+
+  it('starts a restart from a quiet authoritative snapshot without replaying old records', () => {
+    const records = [recognition('one'), recognition('two')];
+    const restarted = received(createInitialState(), snapshot(records, { arrivals: [], sync: 'reset' }), 0);
+
+    expect(restarted.screen).toBe('garden');
+    expect(restarted.queue).toHaveLength(0);
+    expect(restarted.activeArrival).toBeNull();
+  });
+
+  it('removes an expired record immediately while rotation is paused', () => {
+    const item = recognition('expiring', { expiresAt: new Date(serverOrigin + 5_000).toISOString() });
+    const current = snapshot([item], { settings: { ...snapshot([]).settings, pauseRotation: true } });
+    const state = received(createInitialState(), current, 0);
+    const afterExpiry = displayReducer(state, { type: 'TICK', nowMs: 5_001 });
+
+    expect(selectEligible(afterExpiry)).toHaveLength(0);
+    expect(afterExpiry.gardenIds).toHaveLength(0);
+    expect(afterExpiry.screen).toBe('fallback');
+  });
+
+  it('resets the cursor and holds Quiet after a disconnect until a reset snapshot arrives', () => {
+    const item = recognition('disconnect');
+    const state = received(createInitialState(), snapshot([item]), 0);
+    const failed = displayReducer(state, { type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: 5_000 });
+
+    expect(failed.cursor).toBeNull();
+    expect(failed.screen).toBe('quiet');
+    expect(failed.queue).toHaveLength(0);
+
+    const reset = received(failed, snapshot([item], { revision: 2, cursor: 'cursor-reset', sync: 'reset' }), 6_000);
+    expect(reset.screen).toBe('garden');
+    expect(reset.cursor).toBe('cursor-reset');
+  });
+
+  it('ignores a delayed older revision and honors a configured one bubble density', () => {
+    const first = recognition('first');
+    const second = recognition('second');
+    const current = snapshot([first, second], { settings: { ...snapshot([]).settings, maxBubbles: 1 }, revision: 4, cursor: 'cursor-current' });
+    const state = received(createInitialState(), current, 0);
+    const older = snapshot([first], { revision: 3, cursor: 'cursor-old', sync: 'delta' });
+    const ignored = received(state, older, 1);
+
+    expect(ignored.snapshot?.revision).toBe(4);
+    expect(ignored.gardenIds).toHaveLength(1);
+  });
+
+  it('clears personal content after the sixty second offline grace period', () => {
+    const item = recognition('offline');
+    const state = received(createInitialState(), snapshot([item]), 0);
+    const offline = displayReducer(state, { type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: 60_000 });
+
+    expect(offline.offlineSafe).toBe(true);
+    expect(offline.snapshot).toBeNull();
+    expect(offline.queue).toHaveLength(0);
+    expect(offline.screen).toBe('neutral');
+
+    const resynced = received(offline, snapshot([item], { cursor: 'cursor-resync', sync: 'reset' }), 60_500);
+    expect(resynced.offlineSafe).toBe(false);
+    expect(resynced.neutral).toBe(false);
+    expect(selectEligible(resynced)).toHaveLength(1);
+  });
+
+  it('clears the display immediately on an unauthorized snapshot response', () => {
+    const state = received(createInitialState(), snapshot([recognition('revoked')]), 0);
+    const revoked = displayReducer(state, { type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: 2_000, unauthorized: true });
+
+    expect(revoked.paired).toBe(false);
+    expect(revoked.snapshot).toBeNull();
+    expect(revoked.screen).toBe('quiet');
+  });
+
+  it('keeps Quiet manual and Still or reduced motion from waking or animating', () => {
+    const state = received(createInitialState(), snapshot([recognition('quiet')]), 0);
+    const quiet = displayReducer(state, { type: 'SET_OPERATOR_MODE', mode: 'quiet' });
+    const still = displayReducer(quiet, { type: 'SET_MOTION', motion: 'still' });
+    const reduced = displayReducer(still, { type: 'SET_REDUCED_MOTION', reduced: true });
+    const afterTick = displayReducer(reduced, { type: 'TICK', nowMs: 500_000 });
+
+    expect(afterTick.screen).toBe('quiet');
+    expect(afterTick.quiet).toBe(true);
+    expect(effectiveMotion(afterTick)).toBe('still');
+    expect(afterTick.queue).toHaveLength(0);
+  });
+
+  it('celebrates only the highest new threshold in a month and records it once', () => {
+    const item = recognition('milestone');
+    const base = snapshot([item], { aggregate: { ...snapshot([]).aggregate, expressionTotal: 49 } });
+    const state = received(createInitialState(), base, 0);
+    const crossed = delta(base, [item], [], 1, { expressionTotal: 251 });
+    const withMilestone = received(state, crossed, 1);
+    const milestone = displayReducer(withMilestone, { type: 'TICK', nowMs: 20_001 });
+
+    expect(milestone.pendingMilestone).toBe(250);
+    expect(milestone.screen).toBe('milestone');
+    const returned = displayReducer(milestone, { type: 'TICK', nowMs: 28_002 });
+    expect(returned.pendingMilestone).toBeNull();
+    expect(returned.celebratedMilestones['2026-09']).toContain(250);
+  });
+
+  it('marks an old burst as grouped while preserving every queued record', () => {
+    const records = Array.from({ length: 11 }, (_, index) => recognition(String(index + 1)));
+    const base = received(createInitialState(), snapshot(records), 0);
+    const arrivals = records.map((item) => ({ eventId: `event-${item.id}`, recognitionId: item.id, publishedAt: item.firstPublishedAt! }));
+    const queued = received(base, delta(snapshot(records), records, arrivals, 1), 1);
+    const grouped = displayReducer(queued, { type: 'TICK', nowMs: 20_001 });
+
+    expect(grouped.queue).toHaveLength(11);
+    expect(isGroupedArrival(grouped)).toBe(true);
+  });
+});
