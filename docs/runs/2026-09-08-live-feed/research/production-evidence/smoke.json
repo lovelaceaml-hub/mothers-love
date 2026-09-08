@@ -1,0 +1,74 @@
+[
+  {
+    "name": "phone",
+    "violations": [],
+    "overflow": false,
+    "cards": [
+      {
+        "x": 37,
+        "y": 390.484375,
+        "w": 316,
+        "b": 702.640625
+      },
+      {
+        "x": 37,
+        "y": 716.234375,
+        "w": 316,
+        "b": 1639.234375
+      }
+    ]
+  },
+  {
+    "name": "desktop",
+    "violations": [],
+    "overflow": false,
+    "cards": [
+      {
+        "x": 304,
+        "y": 463.28125,
+        "w": 832,
+        "b": 689.328125
+      },
+      {
+        "x": 304,
+        "y": 702.921875,
+        "w": 832,
+        "b": 1197.40625
+      }
+    ]
+  },
+  {
+    "name": "small",
+    "violations": [],
+    "overflow": false,
+    "cards": [
+      {
+        "x": 37,
+        "y": 425.8125,
+        "w": 246,
+        "b": 779.1875
+      },
+      {
+        "x": 37,
+        "y": 792.78125,
+        "w": 246,
+        "b": 1928.375
+      }
+    ]
+  },
+  {
+    "name": "empty",
+    "violations": [],
+    "overflow": false,
+    "cards": []
+  },
+  {
+    "name": "error",
+    "violations": [],
+    "overflow": false,
+    "cards": []
+  },
+  {
+    "keyboardNavigation": true
+  }
+]
