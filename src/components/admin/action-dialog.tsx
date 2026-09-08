@@ -18,7 +18,7 @@ type ActionDialogProps = {
 export function ActionDialog({ action, recognition, reason, onReasonChange, onCancel, onConfirm, busy = false }: ActionDialogProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-  const reasonRequired = action === 'invalidate' || action === 'edit';
+  const reasonRequired = action === 'invalidate' || action === 'edit' || action === 'hide' || action === 'restore';
 
   useEffect(() => {
     returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -42,8 +42,7 @@ export function ActionDialog({ action, recognition, reason, onReasonChange, onCa
         </div>
         <p className={styles.sectionHint}>{actionExplanation(action, recognition)}</p>
         <div className={styles.notice}>{countImpact(recognition)}</div>
-        {action === 'invalidate' ? <div className={styles.field}><label className={styles.label} htmlFor="invalidate-reason">Reason category</label><select id="invalidate-reason" className={styles.select} value={reason} onChange={(event) => onReasonChange(event.target.value)}><option value="">Choose a reason</option><option value="spam">Spam or automated content</option><option value="duplicate">Duplicate recognition</option><option value="test">Test content</option><option value="privacy">Privacy concern</option><option value="other">Other approved moderation reason</option></select><p className={styles.fieldHint}>Use a category only. Do not put the personal message in an admin action reason.</p></div> : null}
-        {action === 'edit' ? <div className={styles.field}><label className={styles.label} htmlFor="edit-reason">Why was this substantive edit made?</label><textarea id="edit-reason" className={styles.textarea} value={reason} onChange={(event) => onReasonChange(event.target.value)} placeholder="Describe the moderation reason without copying personal content." /></div> : null}
+        {reasonRequired ? <div className={styles.field}><label className={styles.label} htmlFor={`${action}-reason`}>{action === 'edit' ? 'Why was this substantive edit made?' : 'Reason category'}</label><select id={`${action}-reason`} className={styles.select} value={reason} onChange={(event) => onReasonChange(event.target.value)}><option value="">Choose a reason category</option><option value="correction">Correction</option><option value="recipient_request">Recipient request</option><option value="privacy">Privacy concern</option><option value="safety">Safety concern</option><option value="spam">Spam or automated content</option><option value="duplicate">Duplicate recognition</option><option value="test">Test content</option><option value="other">Other approved moderation reason</option></select><p className={styles.fieldHint}>Choose a category only. Do not put the personal message in an admin action reason.</p></div> : null}
         {action === 'delete' ? <div className={styles.error}>Permanent deletion cannot be undone. It is separate from hiding and does not claim to erase provider backups.</div> : null}
         <div className={styles.buttonRow} style={{ justifyContent: 'flex-end', marginTop: 18 }}>
           <button type="button" className={styles.buttonQuiet} onClick={onCancel} disabled={busy}>Cancel</button>

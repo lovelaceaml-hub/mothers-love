@@ -40,6 +40,18 @@ export function ReviewInbox() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
+  useEffect(() => {
+    const timers = items.map((item) => window.setTimeout(() => {
+      if (isExpired(item.expiresAt)) {
+        setItems((current) => current.filter((candidate) => candidate.id !== item.id));
+        setSelected((current) => current?.id === item.id ? null : current);
+        setAction((current) => selected?.id === item.id ? null : current);
+        setNotice((current) => selected?.id === item.id ? 'This held recognition expired before a decision was saved. Its private content was removed from the review list.' : current);
+      }
+    }, Math.max(0, new Date(item.expiresAt).getTime() - Date.now())));
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [items, selected]);
+
   const commit = async () => {
     if (!selected || !action) return;
     setBusy(true);
