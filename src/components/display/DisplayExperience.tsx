@@ -12,9 +12,11 @@ import {
   displayReducer,
   effectiveMotion,
   isGroupedArrival,
+  recognitionReadingPageCount,
   selectCluster,
   selectEligible,
   selectFeatured,
+  splitVerbatimMessage,
   selectGarden,
   type PresentationState,
 } from '@/lib/display/coordinator';
@@ -43,6 +45,15 @@ function formatPeriod(periodStart?: string): string {
 function shortExcerpt(message: string, limit = 150): { text: string; excerpt: boolean } {
   if (message.length <= limit) return { text: message, excerpt: false };
   return { text: `${message.slice(0, limit).trimEnd()}…`, excerpt: true };
+}
+
+function isExpressionPage(recognition: Recognition, pageIndex: number): boolean {
+  const messagePages = splitVerbatimMessage(recognition.message);
+  return pageIndex >= messagePages.length && (messagePages.length > 1 || recognition.expressionIds.length > 4);
+}
+
+function readingPageLabel(pageIndex: number, pageCount: number): string | null {
+  return pageCount > 1 ? `Reading ${pageIndex + 1} of ${pageCount}` : null;
 }
 
 function isUnauthorized(error: unknown): boolean {
@@ -265,6 +276,11 @@ function FeaturedScreen({ state }: { state: PresentationState }) {
   const recognition = selectFeatured(state);
   if (!recognition) return <FallbackScreen />;
   const primary = expression(recognition.expressionIds[0]);
+  const messagePages = splitVerbatimMessage(recognition.message);
+  const pageCount = recognitionReadingPageCount(recognition);
+  const pageIndex = Math.min(state.readingPageIndex, pageCount - 1);
+  const expressionPage = isExpressionPage(recognition, pageIndex);
+  const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
     <section className={styles.screen} aria-labelledby="featured-title">
       <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}>
@@ -273,13 +289,26 @@ function FeaturedScreen({ state }: { state: PresentationState }) {
         <h2>{primary.phrase}</h2>
         <p>{primary.principle}</p>
       </div>
-      <div className={styles.featureReading}>
+      <div
+        className={`${styles.featureReading} ${expressionPage ? styles.continuationPage : ''}`}
+        data-testid="featured-reading"
+        data-page-index={pageIndex}
+        data-page-count={pageCount}
+      >
         <p className={styles.eyebrow}>FULL RECOGNITION</p>
         <h2 id="featured-title">Thank you, {recognition.recipient}.</h2>
-        <p className={styles.fullMessage}>{recognition.message}</p>
-        <div className={styles.expressionList} aria-label="All associated expressions">
-          {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
-        </div>
+        {expressionPage ? <p className={styles.continuationHeading}>Associated expressions</p> : <p className={styles.fullMessage} data-testid="featured-message-segment">{messagePages[pageIndex]}</p>}
+        {!expressionPage && pageCount === 1 ? (
+          <div className={styles.expressionList} aria-label="All associated expressions" data-testid="featured-expressions">
+            {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
+          </div>
+        ) : null}
+        {expressionPage ? (
+          <div className={styles.expressionList} aria-label="All associated expressions" data-testid="featured-expressions">
+            {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
+          </div>
+        ) : null}
+        {pageLabel ? <p className={styles.continuationLabel} aria-live="polite">{pageLabel}</p> : null}
       </div>
     </section>
   );
@@ -364,15 +393,35 @@ function ArrivalScreen({ state }: { state: PresentationState }) {
       </section>
     );
   }
+  const messagePages = splitVerbatimMessage(recognition.message);
+  const pageCount = recognitionReadingPageCount(recognition);
+  const pageIndex = Math.min(state.activeArrival?.readingPageIndex ?? 0, pageCount - 1);
+  const expressionPage = isExpressionPage(recognition, pageIndex);
+  const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
-    <section className={styles.arrivalScreen} aria-live="polite" aria-labelledby="arrival-title">
+    <section
+      className={styles.arrivalScreen}
+      aria-live="polite"
+      aria-labelledby="arrival-title"
+      data-testid="arrival-reading"
+      data-page-index={pageIndex}
+      data-page-count={pageCount}
+    >
       <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: expression(recognition.expressionIds[0]).color }} aria-hidden="true" />
       <p className={styles.eyebrow}>{isGroupedArrival(state) ? 'A FEW RECOGNITIONS HAVE ARRIVED' : 'A NEW RECOGNITION HAS ARRIVED'}</p>
       <h2 id="arrival-title">Thank you, {recognition.recipient}.</h2>
-      <p className={styles.fullMessage}>{recognition.message}</p>
-      <div className={styles.expressionList} aria-label="All associated expressions">
-        {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
-      </div>
+      {expressionPage ? <p className={styles.continuationHeading}>Associated expressions</p> : <p className={styles.fullMessage} data-testid="arrival-message-segment">{messagePages[pageIndex]}</p>}
+      {!expressionPage && pageCount === 1 ? (
+        <div className={styles.expressionList} aria-label="All associated expressions" data-testid="arrival-expressions">
+          {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
+        </div>
+      ) : null}
+      {expressionPage ? (
+        <div className={styles.expressionList} aria-label="All associated expressions" data-testid="arrival-expressions">
+          {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
+        </div>
+      ) : null}
+      {pageLabel ? <p className={styles.continuationLabel} aria-live="polite">{pageLabel}</p> : null}
       {isGroupedArrival(state) ? <p className={styles.arrivalGroupNote}>Each recognition remains in the garden for a fair rotation.</p> : null}
     </section>
   );

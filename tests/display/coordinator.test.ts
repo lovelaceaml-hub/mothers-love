@@ -6,7 +6,9 @@ import {
   displayReducer,
   effectiveMotion,
   isGroupedArrival,
+  recognitionReadingPageCount,
   selectEligible,
+  splitVerbatimMessage,
 } from '@/lib/display/coordinator';
 
 const serverOrigin = Date.parse('2026-09-08T12:00:00.000Z');
@@ -157,6 +159,53 @@ describe('display presentation coordinator', () => {
     expect(selectEligible(afterExpiry)).toHaveLength(0);
     expect(afterExpiry.gardenIds).toHaveLength(0);
     expect(afterExpiry.screen).toBe('fallback');
+  });
+
+  it('holds every full-message page before featured or arrival presentation is counted', () => {
+    const message = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
+    const item = recognition('long-reading', {
+      recipient: 'R'.repeat(80),
+      message,
+      expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    });
+    const messagePages = splitVerbatimMessage(message);
+    expect(messagePages.join('')).toBe(message);
+    expect(messagePages.length).toBeGreaterThan(1);
+    const denseLines = `${'A\n'.repeat(249)}A`;
+    const densePages = splitVerbatimMessage(denseLines);
+    expect(densePages.join('')).toBe(denseLines);
+    expect(Math.max(...densePages.map((page) => (page.match(/\n/g) ?? []).length))).toBeLessThanOrEqual(7);
+    const pageCount = recognitionReadingPageCount(item);
+    const base = received(createInitialState(), snapshot([item]), 0);
+
+    let featured = displayReducer(base, { type: 'ADVANCE' });
+    expect(featured.screen).toBe('featured');
+    expect(featured.readingPageCount).toBe(pageCount);
+    expect(featured.presentationHistory[item.id]).toBeUndefined();
+    for (let page = 1; page < pageCount; page += 1) {
+      featured = displayReducer(featured, { type: 'TICK', nowMs: featured.nextTransitionAtMs! + 1 });
+      expect(featured.screen).toBe('featured');
+      expect(featured.readingPageIndex).toBe(page);
+    }
+    const featuredFinished = displayReducer(featured, { type: 'TICK', nowMs: featured.nextTransitionAtMs! + 1 });
+    expect(featuredFinished.presentationHistory[item.id]).toBeDefined();
+
+    const arrivalEvent = { eventId: 'event-long-reading', recognitionId: item.id, publishedAt: item.firstPublishedAt! };
+    const queued = received(base, delta(base.snapshot!, [item], [arrivalEvent], 1), 1);
+    let arrival = displayReducer(queued, { type: 'TICK', nowMs: queued.nextTransitionAtMs! + 1 });
+    expect(arrival.activeArrival?.readingPageCount).toBe(pageCount);
+    expect(arrival.presentationHistory[item.id]).toBeUndefined();
+    arrival = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.journeyEndsAtMs + 1 });
+    const delayed = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.readingEndsAtMs + 1_000 });
+    expect(delayed.activeArrival).not.toBeNull();
+    expect(delayed.activeArrival?.readingPageIndex).toBe(1);
+    for (let page = 1; page < pageCount; page += 1) {
+      arrival = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.nextPageEndsAtMs + 1 });
+      expect(arrival.activeArrival?.readingPageIndex).toBe(page);
+    }
+    const arrivalFinished = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.readingEndsAtMs + 1 });
+    expect(arrivalFinished.activeArrival).toBeNull();
+    expect(arrivalFinished.presentationHistory[item.id]).toBeDefined();
   });
 
   it('cancels an active arrival immediately when the authoritative snapshot removes it', () => {

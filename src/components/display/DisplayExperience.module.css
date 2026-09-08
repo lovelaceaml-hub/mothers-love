@@ -607,6 +607,8 @@
   top: 8vh;
   right: 1.5vw;
   width: min(48vw, 920px);
+  max-height: 78vh;
+  overflow: hidden;
   padding: clamp(28px, 2.6vw, 64px) clamp(30px, 3vw, 72px);
   border-radius: clamp(24px, 2.2vw, 54px);
   background: #fff;
@@ -616,13 +618,36 @@
 
 .featureReading h2 {
   margin-top: 14px;
-  font-size: clamp(30px, 4.1vw, 95px);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(28px, 2.1vw, 58px);
 }
 
 .featureReading .fullMessage {
   margin: 22px 0;
+  max-height: 42vh;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-size: clamp(17px, 1.5vw, 34px);
   line-height: 1.5;
+}
+
+.continuationHeading {
+  margin: 18px 0 12px;
+  color: var(--muted);
+  font-size: clamp(14px, 0.95vw, 23px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.continuationLabel {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: clamp(11px, 0.7vw, 17px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .clusterBoard {
@@ -841,12 +866,18 @@
 .arrivalScreen h2 {
   max-width: 1000px;
   margin-top: 14px;
+  overflow-wrap: anywhere;
+  font-size: clamp(26px, 1.9vw, 48px);
 }
 
 .arrivalScreen .fullMessage {
   max-width: 1000px;
+  max-height: 34vh;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   margin: 22px auto;
-  font-size: clamp(18px, 1.6vw, 38px);
+  font-size: clamp(16px, 1.2vw, 30px);
+  line-height: 1.35;
 }
 
 .arrivalOrb {
