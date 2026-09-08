@@ -43,7 +43,7 @@ export function DisplayControls() {
   }, [load]);
 
   const activeDevice = devices.find((device) => !device.revoked);
-  const applied = activeDevice && settings ? activeDevice.appliedVersion >= settings.version && activeDevice.appliedSnapshotRevision >= settings.version : false;
+  const applied = activeDevice && settings ? activeDevice.appliedVersion >= settings.version : false;
   const changes = useMemo(() => settings ? displaySettingChanges(settings, draft) : {}, [draft, settings]);
 
   const setValue = <K extends keyof DisplaySettings>(key: K, value: DisplaySettings[K]) => {

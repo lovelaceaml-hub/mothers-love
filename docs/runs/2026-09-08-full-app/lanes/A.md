@@ -38,4 +38,5 @@ This lane owns `src/app/admin/`, `src/components/admin/`, `tests/admin/`, this l
 - The aggregate export reads authenticated `text/csv` directly and surfaces server errors without a client fallback that could mask them.
 - Hide, restore, invalidate and substantive edit actions require the approved reason categories. Invalid records can be restored only while unexpired, and current manager/review rows remove expired records and cancel pending review actions.
 - Expiry handling now removes the entire open recognition record from the editor DOM, including recipient, message, submitted name, expressions and conflict state. The browser test asserts recipient and private-name absence after expiry.
+- Display acknowledgement now compares only `Device.appliedVersion` with `DisplaySettings.version`; `appliedSnapshotRevision` remains separately displayed telemetry. The synthetic browser test covers an applied settings version with a differing snapshot revision.
 - Physical TV power and visibility are never claimed from browser heartbeat data.
