@@ -78,6 +78,12 @@ async function resultOf(query) {
   return rows[0]?.result ?? null;
 }
 
+function capture(operation) {
+  return Promise.resolve()
+    .then(operation)
+    .then((value) => ({ ok: true, value }), (error) => ({ ok: false, error }));
+}
+
 function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
@@ -91,9 +97,7 @@ async function lockedSetter(targetId, visitor, lockSql, expectedCode) {
   try {
     await lockSql(lockClient);
     let settled = false;
-    blockedPromise = Promise.resolve()
-      .then(() => resultOf(blockedClient`select public.ml_reactions_set(${targetId}::uuid, ${visitor}, true, 'synthetic-lock-ip') as result`))
-      .then((value) => ({ ok: true, value }), (error) => ({ ok: false, error }));
+    blockedPromise = capture(() => resultOf(blockedClient`select public.ml_reactions_set(${targetId}::uuid, ${visitor}, true, 'synthetic-lock-ip') as result`));
     const observedPromise = blockedPromise.then(() => {
       settled = true;
     });
@@ -112,6 +116,43 @@ async function lockedSetter(targetId, visitor, lockSql, expectedCode) {
   } finally {
     if (!released) await lockClient`rollback`.catch(() => undefined);
     if (blockedPromise) await blockedPromise;
+  }
+}
+
+async function purgeWithContendingSetter(targetId, visitor) {
+  const lockClient = await makeClient();
+  const purgeClient = await makeClient();
+  const setterClient = await makeClient();
+  let purgePromise = null;
+  let setterPromise = null;
+  let released = false;
+  await lockClient`begin`;
+  try {
+    await lockClient`select id from mothers_love.recognitions where id = ${targetId}::uuid for update`;
+    let purgeSettled = false;
+    let setterSettled = false;
+    purgePromise = capture(() => resultOf(purgeClient`select public.ml_purge() as result`)).then((outcome) => {
+      purgeSettled = true;
+      return outcome;
+    });
+    setterPromise = capture(() => resultOf(setterClient`select public.ml_reactions_set(${targetId}::uuid, ${visitor}, true, 'synthetic-purge-ip') as result`)).then((outcome) => {
+      setterSettled = true;
+      return outcome;
+    });
+    await delay(lockProbeMs);
+    if (purgeSettled || setterSettled) throw new Error("purge and setter did not both wait on the expired recognition lock");
+
+    await lockClient`commit`;
+    released = true;
+    const [purgeOutcome, setterOutcome] = await Promise.all([purgePromise, setterPromise]);
+    if (!purgeOutcome.ok) throw purgeOutcome.error;
+    if (!setterOutcome.ok) throw setterOutcome.error;
+    if (purgeOutcome.value?.ok !== true) throw new Error(`purge contention returned ${JSON.stringify(purgeOutcome.value)}`);
+    if (setterOutcome.value?.code !== "NOT_FOUND") throw new Error(`expired setter contention returned ${JSON.stringify(setterOutcome.value)}`);
+    return { purge: purgeOutcome.value, setter: setterOutcome.value };
+  } finally {
+    if (!released) await lockClient`rollback`.catch(() => undefined);
+    await Promise.all([purgePromise, setterPromise].filter(Boolean));
   }
 }
 
@@ -168,6 +209,8 @@ async function cleanStaleFixture(root) {
 
 let root = null;
 let originalSettings;
+let runError = null;
+let cleanupError = null;
 try {
   root = await makeClient();
   const settingsRows = await root`select mode, last_cleanup_at, overdue_purge_count from mothers_love.settings where singleton_id = true`;
@@ -182,13 +225,15 @@ try {
       (${id}::uuid, 'Synthetic Concurrency Sender A.', 'Synthetic Concurrency Recipient A.', 'Synthetic concurrency fixture A.', 'published', clock_timestamp(), clock_timestamp(), clock_timestamp() + interval '1 hour'),
       (${hiddenId}::uuid, 'Synthetic Concurrency Sender B.', 'Synthetic Concurrency Recipient B.', 'Synthetic concurrency fixture B.', 'published', clock_timestamp(), clock_timestamp(), clock_timestamp() + interval '1 hour'),
       (${expiryId}::uuid, 'Synthetic Concurrency Sender C.', 'Synthetic Concurrency Recipient C.', 'Synthetic concurrency fixture C.', 'published', clock_timestamp(), clock_timestamp(), clock_timestamp() + interval '1 hour'),
-      (${purgeId}::uuid, 'Synthetic Concurrency Sender D.', 'Synthetic Concurrency Recipient D.', 'Synthetic concurrency fixture D.', 'published', clock_timestamp(), clock_timestamp(), clock_timestamp() + interval '1 hour')`;
+      (${purgeId}::uuid, 'Synthetic Concurrency Sender D.', 'Synthetic Concurrency Recipient D.', 'Synthetic concurrency fixture D.', 'published', clock_timestamp() - interval '2 hours', clock_timestamp() - interval '2 hours', clock_timestamp() + interval '1 hour')`;
 
   const duplicateResults = await Promise.all(Array.from({ length: 16 }, async (_, index) => {
     const client = await makeClient();
     return resultOf(client`select public.ml_reactions_set(${id}::uuid, ${visitorA}, true, ${`synthetic-concurrency-ip-${index}`}) as result`);
   }));
-  if (duplicateResults.some((value) => value?.ok !== true)) throw new Error(`duplicate writes had a failure: ${JSON.stringify(duplicateResults)}`);
+  if (duplicateResults.some((value) => value?.ok !== true || value?.liked !== true || value?.count !== 1)) {
+    throw new Error(`duplicate writes were not consistently idempotent: ${JSON.stringify(duplicateResults)}`);
+  }
   const duplicateRead = await resultOf(root`select public.ml_reactions_get(jsonb_build_array(${id}::text), ${visitorA}) as result`);
   const duplicateItem = duplicateRead?.items?.[0];
   if (duplicateItem?.count !== 1 || duplicateItem?.liked !== true) throw new Error(`duplicate writes were not idempotent: ${JSON.stringify(duplicateRead)}`);
@@ -197,7 +242,9 @@ try {
     const client = await makeClient();
     return resultOf(client`select public.ml_reactions_set(${id}::uuid, ${visitorB}, ${index % 2 === 0}, ${`synthetic-opposing-ip-${index}`}) as result`);
   }));
-  if (opposingResults.some((value) => value?.ok !== true)) throw new Error(`opposing writes had a failure: ${JSON.stringify(opposingResults)}`);
+  if (opposingResults.some((value, index) => value?.ok !== true || value?.liked !== (index % 2 === 0) || !Number.isInteger(value?.count) || value.count < 1 || value.count > 2)) {
+    throw new Error(`opposing writes did not apply their requested state: ${JSON.stringify(opposingResults)}`);
+  }
   const opposingRead = await resultOf(root`select public.ml_reactions_get(jsonb_build_array(${id}::text), ${visitorB}) as result`);
   const opposingItem = opposingRead?.items?.[0];
   const expectedOpposingCount = 1 + (opposingItem?.liked ? 1 : 0);
@@ -214,23 +261,36 @@ try {
   }, "NOT_FOUND");
 
   await root`update mothers_love.recognitions set expires_at = clock_timestamp() - interval '1 second' where id = ${purgeId}::uuid`;
-  const purgeClient = await makeClient();
-  const purgeRaceClient = await makeClient();
-  await Promise.all([
-    purgeClient`select public.ml_purge() as result`,
-    purgeRaceClient`select public.ml_reactions_set(${purgeId}::uuid, ${visitorA}, true, 'synthetic-purge-ip') as result`,
-  ]);
-  const purgedRows = await root`select count(*)::integer as count from mothers_love.recognitions where id = ${purgeId}::uuid or id in (select recognition_id from mothers_love.recognition_reactions where recognition_id = ${purgeId}::uuid)`;
+  const purgeRace = await purgeWithContendingSetter(purgeId, visitorA);
+  const purgedRows = await root`select
+    (select count(*)::integer from mothers_love.recognitions where id = ${purgeId}::uuid)
+    + (select count(*)::integer from mothers_love.recognition_reactions where recognition_id = ${purgeId}::uuid) as count`;
   if (Number(purgedRows[0]?.count ?? 0) !== 0) throw new Error("purge contention left a target or reaction row");
 
-  console.log(JSON.stringify({ duplicateCount: duplicateItem.count, opposingCount: opposingItem.count, hiddenCode: hiddenRace.code, expiryCode: expiryRace.code, purgeRows: Number(purgedRows[0]?.count ?? 0) }));
+  console.log(JSON.stringify({ duplicateCount: duplicateItem.count, opposingCount: opposingItem.count, hiddenCode: hiddenRace.code, expiryCode: expiryRace.code, purgeCode: purgeRace.purge?.ok === true ? "PURGED" : null, purgeSetterCode: purgeRace.setter?.code ?? null, purgeRows: Number(purgedRows[0]?.count ?? 0) }));
+} catch (error) {
+  runError = error;
 } finally {
   try {
-    if (root) await root`delete from mothers_love.recognitions where id in (${id}::uuid, ${hiddenId}::uuid, ${expiryId}::uuid, ${purgeId}::uuid)`;
+    if (root) await cleanStaleFixture(root);
+  } catch (error) {
+    cleanupError = error;
+  }
+  try {
     if (root && originalSettings) {
       await root`update mothers_love.settings set mode = ${originalSettings.mode}, last_cleanup_at = ${originalSettings.last_cleanup_at}, overdue_purge_count = ${originalSettings.overdue_purge_count} where singleton_id = true`;
     }
+  } catch (error) {
+    cleanupError ??= error;
   } finally {
-    await Promise.all(clients.map((client) => client.end({ timeout: 5 })));
+    try {
+      await Promise.all(clients.map((client) => client.end({ timeout: 5 })));
+    } catch (error) {
+      cleanupError ??= error;
+    }
   }
 }
+
+if (runError && cleanupError) throw new AggregateError([runError, cleanupError], "reaction concurrency runner and cleanup both failed");
+if (cleanupError) throw cleanupError;
+if (runError) throw runError;
