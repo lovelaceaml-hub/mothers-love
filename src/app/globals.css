@@ -1,4 +1,6 @@
 :root {
+  --font-display: Georgia, "Times New Roman", serif;
+  --heading-ink: #693b53;
   --cream: #fff6dc;
   --paper: #fffdf6;
   --ink: #303342;
@@ -29,8 +31,23 @@ body {
     radial-gradient(circle at 84% 88%, rgba(157, 217, 159, 0.36) 0 14rem, transparent 14.1rem),
     var(--cream);
   color: var(--ink);
-  font-family: ui-rounded, "SF Pro Rounded", "Avenir Next", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--heading-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.18;
 }
 
 button,
@@ -105,7 +122,7 @@ a {
   margin: 0 0 1.1rem;
   color: #914c55;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -122,11 +139,16 @@ a {
 .campaign-title {
   max-width: 14ch;
   margin: 0;
-  color: var(--ink);
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(2.45rem, 7vw, 6.25rem);
-  font-weight: 900;
-  letter-spacing: -0.055em;
-  line-height: 0.94;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.04;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 142, 134, 0.62);
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.08em;
   text-wrap: balance;
 }
 
@@ -134,7 +156,7 @@ a {
   max-width: 32rem;
   margin: 1.35rem 0 0;
   color: #695b6e;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.1vw, 1.55rem);
   font-style: italic;
   line-height: 1.4;
@@ -151,9 +173,16 @@ a {
 .opening-copy h2 {
   max-width: 14ch;
   margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.7rem, 3vw, 2.7rem);
-  letter-spacing: -0.04em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.14;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 142, 134, 0.52);
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.1em;
 }
 
 .opening-copy p {
@@ -190,7 +219,7 @@ a {
   margin-bottom: 0.7rem;
   color: #5e4961;
   font-size: 0.76rem;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -199,7 +228,7 @@ a {
   max-width: 25rem;
   margin: 0;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.5;
 }
 
