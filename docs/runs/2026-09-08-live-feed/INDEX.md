@@ -8,7 +8,7 @@ Runner: current coordinator, two isolated Luna xhigh writers. Baseline a10adfa70
 | F feed and form | Luna xhigh | Complete | None |
 | B public feed boundary | Luna xhigh | Complete | None |
 | I integration and release | Controller | Complete, production verified | F and B |
-| M home motion and navigation | Luna xhigh | Locally verified, publishing | None |
+| M home motion and navigation | Luna xhigh | Complete, production verified | None |
 
 Only campaign source and synthetic fixtures enter records. Shared database objects outside the explicitly new feed function remain protected. Real personal content and credentials never enter tools, agent payloads or evidence.
 

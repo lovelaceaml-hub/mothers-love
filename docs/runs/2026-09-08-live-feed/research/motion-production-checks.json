@@ -1,0 +1,46 @@
+[
+  {
+    "name": "phone",
+    "runningAnimations": 7,
+    "violations": [],
+    "overflow": false,
+    "primaryVisible": true,
+    "footerLinks": true,
+    "pauseResume": true,
+    "reducedMotion": false,
+    "navigation": true
+  },
+  {
+    "name": "desktop",
+    "runningAnimations": 7,
+    "violations": [],
+    "overflow": false,
+    "primaryVisible": true,
+    "footerLinks": true,
+    "pauseResume": true,
+    "reducedMotion": false,
+    "navigation": true
+  },
+  {
+    "name": "small",
+    "runningAnimations": 7,
+    "violations": [],
+    "overflow": false,
+    "primaryVisible": true,
+    "footerLinks": true,
+    "pauseResume": true,
+    "reducedMotion": false,
+    "navigation": true
+  },
+  {
+    "name": "reduced",
+    "runningAnimations": 0,
+    "violations": [],
+    "overflow": false,
+    "primaryVisible": true,
+    "footerLinks": true,
+    "pauseResume": false,
+    "reducedMotion": true,
+    "navigation": true
+  }
+]

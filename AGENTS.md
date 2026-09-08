@@ -26,3 +26,5 @@ Use simple task-oriented instructions. No age-specific explanations or personal-
 
 ## Live feed request
 Anthony requested a public list-first home with a prominent form action and discreet visible Admin link. Published, unexpired recognition messages may appear in this new public feed; submitted names and moderation details remain private. The form moves to /recognize. Read PLAN-03-live-feed.md for the explicit feed allowlist, stale-state removal and campaign-only function boundary. No roster or new participant account requirement is approved.
+
+Home motion is approved and deployed: coral/gold primary action, gentle decorative animation with pause and reduced-motion support. Admin and TV View are grouped at the bottom, linking to existing login and paired display. Preserve feed data timing and server access rules. See docs/runs/2026-09-08-live-feed/research/motion-publication.md.

@@ -3,7 +3,7 @@
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).
-- **Status:** Ready to use, recognition sharing open, email/password admin access.
+- **Status:** Live animated home, bright sharing action, Admin and TV View links at the bottom.
 - **Expression guide:** [Nine expressions and everyday examples](https://mothers-love.vercel.app/expressions), live.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login), Sign in with the existing password; no authenticator required.
 - **TV:** [Paired display](https://mothers-love.vercel.app/display), pair it with an Owner-issued code.
