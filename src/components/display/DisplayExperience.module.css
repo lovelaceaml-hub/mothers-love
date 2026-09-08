@@ -1290,6 +1290,11 @@
     gap: 8px;
   }
 
+  .expressionsScreen .expressionGrid {
+    padding-left: 0;
+    padding-bottom: 8px;
+  }
+
   .expressionCard {
     padding: 10px;
   }
@@ -1425,7 +1430,7 @@
 }
 
 .stage {
-  inset: clamp(142px, 14vh, 246px) clamp(250px, 19vw, 370px) clamp(78px, 7.4vh, 120px) clamp(28px, 4vw, 76px);
+  inset: clamp(142px, 14vh, 246px) clamp(278px, 21vw, 430px) clamp(78px, 7.4vh, 120px) clamp(28px, 4vw, 76px);
 }
 
 .screen {
@@ -1663,13 +1668,16 @@
 
 .clusterCore {
   width: 34%;
-  height: 42%;
+  height: 34%;
   aspect-ratio: auto;
+  top: 0;
+  left: 50%;
   padding: clamp(22px, 2.1vw, 42px);
   border: 1px solid rgba(90, 41, 72, 0.15);
   border-radius: 30px;
   box-shadow: 0 24px 62px rgba(107, 65, 68, 0.15), 0 0 30px var(--gold-glow);
   animation: clusterCorePulse 8s ease-in-out infinite;
+  transform: translateX(-50%);
 }
 
 .clusterCore h2 {
@@ -1685,14 +1693,15 @@
 }
 
 .clusterCards {
+  inset: 39% 0 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(16px, 1.4vw, 30px);
-  padding: 1vh 2vw;
+  padding: 0 1vw;
 }
 
 .clusterCards .recognitionCard {
   width: min(100%, 360px);
-  height: clamp(170px, 24vh, 255px);
+  height: clamp(116px, 18vh, 240px);
   aspect-ratio: auto;
 }
 
@@ -1760,6 +1769,15 @@
 
 .expressionGrid {
   gap: clamp(11px, 0.82vw, 20px);
+}
+
+.expressionsScreen {
+  padding-bottom: clamp(54px, 7vh, 100px);
+}
+
+.expressionsScreen .expressionGrid {
+  padding-left: clamp(240px, 17.5vw, 430px);
+  padding-bottom: clamp(10px, 1.5vh, 22px);
 }
 
 .expressionCard {
@@ -2030,7 +2048,7 @@
 
 @media (max-width: 900px) {
   .stage {
-    right: 220px;
+    right: 240px;
   }
 
   .liveRail {
@@ -2297,4 +2315,26 @@
 @keyframes railItemIn {
   from { opacity: 0; transform: translateX(8px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+@media (min-width: 641px) and (max-width: 1400px) and (max-height: 800px) {
+  .expressionCard {
+    padding: 10px 12px;
+  }
+
+  .expressionNumber {
+    font-size: clamp(18px, 1.4vw, 28px);
+  }
+
+  .expressionCard p {
+    margin-top: 4px;
+    font-size: clamp(9px, 0.62vw, 13px);
+    line-height: 1.1;
+  }
+
+  .expressionCard strong {
+    margin-top: 4px;
+    font-size: clamp(10px, 0.7vw, 14px);
+    line-height: 1.1;
+  }
 }
