@@ -28,13 +28,21 @@ export async function POST(request: NextRequest) {
   if (!value || typeof value.email !== "string" || value.role !== "moderator") return errorResult(400, "INVALID_REQUEST");
   const email = value.email.trim().toLowerCase();
   const pending = await databaseAction("member_invite_pending", { actor: actorPayload(verified.actor), email });
-  if (pending.error || !pending.data || pending.data.ok !== true) return databaseResult(pending.data, pending.error);
+  const existingInvitationRetry = pending.error === null
+    && pending.data?.ok === false
+    && pending.data.status === 409
+    && pending.data.code === "INVITATION_EXISTS";
+  if (!existingInvitationRetry && (pending.error || !pending.data || pending.data.ok !== true)) {
+    return databaseResult(pending.data, pending.error);
+  }
   const client = authClient();
   if (!client) return errorResult(503, "UNAVAILABLE");
   const config = getServerConfig();
   const redirectTo = config?.appUrl ? `${config.appUrl.replace(/\/$/, "")}/admin/login` : undefined;
   const { error } = await client.auth.signInWithOtp({ email, options: { shouldCreateUser: true, ...(redirectTo ? { emailRedirectTo: redirectTo } : {}) } });
   if (error) return errorResult(503, "INVITATION_UNAVAILABLE");
-  return databaseResult({ ok: true, invited: true, expiresAt: pending.data.expiresAt }, null, 201);
+  const response = existingInvitationRetry
+    ? { ok: true, invited: true }
+    : { ok: true, invited: true, expiresAt: pending.data?.expiresAt };
+  return databaseResult(response, null, 201);
 }
-
