@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, expressionById } from '@/lib/catalog';
 
@@ -103,9 +104,10 @@ function FeedStateCard({ status, onRetry }: { status: PublicFeedStatus; onRetry:
 
 export function FeedHome() {
   const { items, status, retry } = usePublicFeed();
+  const [motionPaused, setMotionPaused] = useState(false);
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page}${motionPaused ? ` ${styles.motionPaused}` : ''}`}>
       <FeedDecorations />
       <div className={styles.shell}>
         <Header />
@@ -143,6 +145,13 @@ export function FeedHome() {
               <Link href="/display">TV View</Link>
             </span>
           </nav>
+          <button
+            className={styles.motionToggle}
+            type="button"
+            onClick={() => setMotionPaused((paused) => !paused)}
+          >
+            {motionPaused ? 'Resume animation' : 'Pause animation'}
+          </button>
         </footer>
       </div>
     </main>
