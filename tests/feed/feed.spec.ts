@@ -29,6 +29,20 @@ async function routeFeed(page: Page, response: unknown) {
   });
 }
 
+async function routeReactions(page: Page) {
+  await page.route('**/api/reactions**', async (route) => {
+    if (route.request().method() !== 'GET') {
+      await route.continue();
+      return;
+    }
+    const url = new URL(route.request().url());
+    const ids = url.searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
+    await route.fulfill({
+      json: { items: ids.map((id) => ({ id, count: 2, liked: false })) },
+    });
+  });
+}
+
 test('shows the campaign home with safe feed cards and public navigation', async ({ page }) => {
   await routeFeed(page, snapshot([
     item({
@@ -41,6 +55,7 @@ test('shows the campaign home with safe feed cards and public navigation', async
     }),
     item({ id: 'older', firstPublishedAt: '2030-01-01T11:58:30.000Z' }),
   ]));
+  await routeReactions(page);
 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: "THE WORDS OF MOTHER'S LOVE" })).toBeVisible();
@@ -66,6 +81,7 @@ test('replaces the feed on polling and removes old messages on an error', async 
     { malformed: true },
   ];
   let requestCount = 0;
+  await routeReactions(page);
   await page.route('**/api/feed', async (route) => {
     const response = responses[Math.min(requestCount, responses.length - 1)];
     requestCount += 1;
@@ -88,6 +104,7 @@ test('clears personal content while hidden and rechecks immediately on return', 
   await page.clock.install();
   let requestCount = 0;
   let returnFresh = false;
+  await routeReactions(page);
   await page.route('**/api/feed', async (route) => {
     requestCount += 1;
     await route.fulfill({ json: snapshot([item({ id: `recognition-${requestCount}`, recipient: returnFresh ? 'Returned R.' : 'Hidden R.' })]) });
@@ -113,6 +130,7 @@ test('clears personal content while hidden and rechecks immediately on return', 
 
 test('uses verified server time for initial suppression and monotonic expiry', async ({ page }) => {
   await page.clock.install();
+  await routeReactions(page);
   await routeFeed(page, snapshot([
     item({ id: 'expired', recipient: 'Expired R.', expiresAt: '2030-01-01T11:59:59.000Z' }),
     item({ id: 'short-lived', recipient: 'Short lived R.', expiresAt: '2030-01-01T12:00:01.000Z' }),
@@ -127,8 +145,27 @@ test('uses verified server time for initial suppression and monotonic expiry', a
   await expect(page.getByText('Long lived R.')).toBeVisible();
 });
 
+test('removes each item at its own expiry without waiting for polling', async ({ page }) => {
+  await page.clock.install();
+  await routeReactions(page);
+  await routeFeed(page, snapshot([
+    item({ id: 'expires-first', recipient: 'First expiry R.', expiresAt: '2030-01-01T12:00:01.000Z' }),
+    item({ id: 'expires-second', recipient: 'Second expiry R.', expiresAt: '2030-01-01T12:00:03.000Z' }),
+  ]));
+
+  await page.goto('/');
+  await expect(page.getByText('First expiry R.')).toBeVisible();
+  await expect(page.getByText('Second expiry R.')).toBeVisible();
+  await page.clock.fastForward(1_200);
+  await expect(page.getByText('First expiry R.')).toHaveCount(0);
+  await expect(page.getByText('Second expiry R.')).toBeVisible();
+  await page.clock.fastForward(2_000);
+  await expect(page.getByText('Second expiry R.')).toHaveCount(0);
+});
+
 test('clears the feed when a request exceeds the deadline', async ({ page }) => {
   await page.clock.install();
+  await routeReactions(page);
   await page.route('**/api/feed', async () => {
     await new Promise<void>(() => undefined);
   });
@@ -140,6 +177,7 @@ test('clears the feed when a request exceeds the deadline', async ({ page }) => 
 
 test('ignores a stale response after a visibility refresh', async ({ page }) => {
   await page.clock.install();
+  await routeReactions(page);
   let releaseFirst: (() => void) | undefined;
   const firstResponse = new Promise<void>((resolve) => { releaseFirst = resolve; });
   let requestCount = 0;
@@ -164,4 +202,41 @@ test('ignores a stale response after a visibility refresh', async ({ page }) => 
   await expect(page.getByText('Fresh R.')).toBeVisible();
   releaseFirst?.();
   await expect(page.getByText('Stale R.')).toHaveCount(0);
+});
+
+test('bounds home to 30 items and keeps the list keyboard-scrollable', async ({ page }) => {
+  const items = Array.from({ length: 35 }, (_, index) => item({
+    id: `recognition-${index}`,
+    recipient: `Recipient ${index} R.`,
+    firstPublishedAt: `2030-01-01T11:${String(59 - Math.floor(index / 60)).padStart(2, '0')}:${String(59 - (index % 60)).padStart(2, '0')}.000Z`,
+  }));
+  await routeFeed(page, snapshot(items));
+  await routeReactions(page);
+
+  await page.goto('/');
+  const viewport = page.getByRole('region', { name: 'Recent recognitions' });
+  await expect(viewport).toHaveAttribute('tabindex', '0');
+  await expect(page.getByRole('article')).toHaveCount(30);
+});
+
+test('shares the same public feed companion beside the recognition form', async ({ page }) => {
+  const companionItems = Array.from({ length: 35 }, (_, index) => item({
+    id: `companion-${index}`,
+    recipient: index === 0 ? 'Companion R.' : `Companion ${index} R.`,
+    firstPublishedAt: `2030-01-01T11:${String(59 - Math.floor(index / 60)).padStart(2, '0')}:${String(59 - (index % 60)).padStart(2, '0')}.000Z`,
+  }));
+  await routeFeed(page, snapshot(companionItems));
+  await routeReactions(page);
+  await page.route('**/api/config', async (route) => {
+    await route.fulfill({ json: { configured: true, collectionOpen: true } });
+  });
+
+  await page.goto('/recognize');
+  const companion = page.getByRole('region', { name: 'Recent recognitions' });
+  await expect(companion).toHaveAttribute('tabindex', '0');
+  await expect(companion).toContainText('Companion R.');
+  await companion.focus();
+  await companion.press('End');
+  await expect.poll(() => companion.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
 });

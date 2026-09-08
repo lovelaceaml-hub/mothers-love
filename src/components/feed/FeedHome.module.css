@@ -1,7 +1,6 @@
 .page {
   --cream: #fff6dc;
   --paper: #fffdf6;
-  --ink: #303342;
   --muted: #6b6f7b;
   --line: rgba(48, 51, 66, 0.13);
   --blue: #8ed6f5;
@@ -53,11 +52,12 @@
 .header h1 {
   max-width: 34rem;
   margin: 0 auto;
-  color: var(--ink);
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(2.35rem, 9vw, 4rem);
-  font-weight: 900;
-  letter-spacing: -0.07em;
-  line-height: 0.94;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.04;
   text-wrap: balance;
 }
 
@@ -154,14 +154,32 @@
 
 .sectionHeader h2 {
   margin: 0.38rem 0 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.55rem, 4vw, 2.15rem);
-  letter-spacing: -0.045em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.12;
 }
 
 .feedList {
   display: grid;
   gap: 0.85rem;
+}
+
+.feedViewport {
+  max-height: min(67vh, 43rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.16rem 0.32rem 0.28rem 0.08rem;
+  scrollbar-color: rgba(105, 59, 83, 0.4) rgba(105, 59, 83, 0.08);
+  scrollbar-width: thin;
+}
+
+.feedViewport:focus-visible,
+.publicFeedCompanion:focus-visible {
+  outline: 3px solid #215a82;
+  outline-offset: 4px;
 }
 
 .feedCard {
@@ -189,9 +207,12 @@
 
 .cardHeader h3 {
   margin: 0.25rem 0 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.15rem, 3vw, 1.4rem);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.25;
 }
 
 .message {
@@ -249,8 +270,11 @@
 
 .stateCard h2 {
   margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.35rem, 4vw, 1.8rem);
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  letter-spacing: normal;
   line-height: 1.08;
 }
 
@@ -272,6 +296,55 @@
 
 button.secondaryAction {
   cursor: pointer;
+}
+
+.reactionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-left: 0.65rem;
+}
+
+.reactionButton,
+.reactionRetry {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  padding: 0.38rem 0.72rem;
+  border: 1px solid rgba(105, 59, 83, 0.2);
+  border-radius: 999px;
+  color: #693b53;
+  background: rgba(255, 246, 220, 0.76);
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.reactionButton:not(:disabled),
+.reactionRetry {
+  cursor: pointer;
+}
+
+.reactionButton:not(:disabled):hover,
+.reactionRetry:hover {
+  background: #fff0dc;
+}
+
+.reactionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.reactionButton > span:first-child {
+  font-size: 1.08rem;
+  line-height: 1;
+}
+
+.reactionRetry {
+  color: #7b3f4f;
+  background: #fff2ef;
 }
 
 .loadingDots {
@@ -472,6 +545,182 @@ button.secondaryAction {
 .motionPaused .primaryAction::after,
 .motionPaused .loadingDots i {
   animation-play-state: paused;
+}
+
+.publicFeedFrame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 23rem);
+  gap: clamp(1rem, 3vw, 2.4rem);
+  align-items: start;
+  min-height: 100vh;
+  padding: clamp(0.75rem, 2.5vw, 1.4rem);
+  background: var(--cream);
+}
+
+.publicFeedContent {
+  min-width: 0;
+}
+
+.publicFeedCompanion {
+  position: sticky;
+  top: clamp(0.75rem, 2.5vw, 1.4rem);
+  min-width: 0;
+  max-height: calc(100vh - 2 * clamp(0.75rem, 2.5vw, 1.4rem));
+  overflow-y: auto;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 1.8rem;
+  background: rgba(255, 253, 246, 0.9);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.publicFeedCompanionHeading p {
+  margin: 0;
+  color: #914c55;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.publicFeedCompanionHeading h2 {
+  margin: 0.35rem 0 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.publicFeedCompanionViewport {
+  max-height: none;
+  margin-top: 1rem;
+  overflow: visible;
+  overscroll-behavior: contain;
+  padding-right: 0.24rem;
+  scrollbar-color: rgba(105, 59, 83, 0.4) rgba(105, 59, 83, 0.08);
+  scrollbar-width: thin;
+}
+
+.publicFeedCompanionList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.publicFeedCompanionCard {
+  padding: 0.9rem;
+  border: 1px solid rgba(48, 51, 66, 0.1);
+  border-radius: 1.1rem 1.1rem 1.1rem 0.45rem;
+  background: var(--paper);
+}
+
+.publicFeedCompanionRecipient {
+  margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  font-weight: 600;
+  line-height: 1.22;
+}
+
+.publicFeedCompanionMessage {
+  display: -webkit-box;
+  margin: 0.52rem 0 0;
+  overflow: hidden;
+  color: #373948;
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  line-height: 1.42;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.publicFeedCompanionCard .reactionButton,
+.publicFeedCompanionCard .reactionRetry {
+  min-height: 2.75rem;
+  margin-top: 0.72rem;
+}
+
+.publicFeedCompanionCard .reactionButton {
+  width: 100%;
+}
+
+.publicFeedCompanionCount {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.companionState {
+  padding: 1.15rem 0.4rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.companionState > span {
+  color: var(--heading-ink);
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+}
+
+.companionState h2 {
+  margin: 0.55rem 0 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.18;
+}
+
+.companionState p {
+  margin: 0.45rem 0 0;
+  font-size: 0.85rem;
+}
+
+.companionState a,
+.companionState button {
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(105, 59, 83, 0.24);
+  border-radius: 999px;
+  color: #693b53;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (max-width: 60rem) {
+  .publicFeedFrame {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 19rem);
+  }
+}
+
+@media (max-width: 47rem) {
+  .publicFeedFrame {
+    display: block;
+    padding: 0;
+  }
+
+  .publicFeedCompanion {
+    position: relative;
+    top: auto;
+    max-height: 31rem;
+    margin: 0 0.8rem 1rem;
+  }
+
+  .publicFeedCompanionViewport {
+    max-height: none;
+  }
 }
 
 @media (min-width: 42rem) {

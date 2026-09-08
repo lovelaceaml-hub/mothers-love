@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { PublicFeedFrame, PublicFeedProvider } from '@/components/feed/PublicFeedProvider';
 
 export const metadata: Metadata = {
   title: "The Words of Mother's Love",
@@ -15,7 +16,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <PublicFeedProvider>
+          <PublicFeedFrame>{children}</PublicFeedFrame>
+        </PublicFeedProvider>
+      </body>
     </html>
   );
 }
