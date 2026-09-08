@@ -1,13 +1,18 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { databaseClient, requireConfigured, randomSessionToken } = vi.hoisted(() => ({
+const { databaseClient, getServerConfig, requireConfigured, randomSessionToken } = vi.hoisted(() => ({
   databaseClient: vi.fn(),
+  getServerConfig: vi.fn((): { appUrl: string } | null => ({ appUrl: "https://mothers-love.example" })),
   requireConfigured: vi.fn(() => null),
   randomSessionToken: vi.fn(() => "A".repeat(43)),
 }));
 
 vi.mock("@/lib/server/supabase", () => ({ databaseClient }));
+vi.mock("@/lib/server/env", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/server/env")>("@/lib/server/env");
+  return { ...actual, getServerConfig };
+});
 vi.mock("@/lib/server/operations", () => ({
   randomSessionToken,
   sha256: (value: string) => `hash-${value}`,
@@ -37,6 +42,7 @@ function sqlResult(result: unknown) {
 
 beforeEach(() => {
   databaseClient.mockReset();
+  getServerConfig.mockReturnValue({ appUrl: "https://mothers-love.example" });
   requireConfigured.mockReturnValue(null);
   randomSessionToken.mockReturnValue("A".repeat(43));
 });
@@ -129,6 +135,18 @@ describe("PUT /api/reactions/[id]", () => {
 
     const extraField = await PUT(putRequest({ liked: true, extra: false }), { params: Promise.resolve({ id }) });
     expect(extraField.status).toBe(400);
+    expect(databaseClient).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when no canonical app URL is configured, even with forged host headers", async () => {
+    getServerConfig.mockReturnValue(null);
+    const response = await PUT(putRequest({ liked: true }, {
+      host: "mothers-love.example",
+      "x-forwarded-host": "mothers-love.example",
+      "x-forwarded-proto": "https",
+    }), { params: Promise.resolve({ id }) });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ ok: false, error: "CSRF_ORIGIN", code: "CSRF_ORIGIN" });
     expect(databaseClient).not.toHaveBeenCalled();
   });
 

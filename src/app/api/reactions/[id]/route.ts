@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJson, requireConfigured } from "@/lib/server/http";
-import { databaseResult, errorResult, requireTrustedOrigin, requestRateKeys } from "@/lib/server/response";
+import { databaseResult, errorResult, requestRateKeys } from "@/lib/server/response";
 import { getServerConfig } from "@/lib/server/env";
 import {
   isReactionCookie,
@@ -22,11 +22,7 @@ function hasTrustedReactionOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   if (!origin || request.headers.get("sec-fetch-site")?.toLowerCase() === "cross-site") return false;
   const configuredAppUrl = getServerConfig()?.appUrl?.replace(/\/$/, "");
-  if (configuredAppUrl) return origin === configuredAppUrl;
-  if (requireTrustedOrigin(request) === null) return true;
-  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || request.nextUrl.host;
-  const protocol = request.headers.get("x-forwarded-proto") || request.nextUrl.protocol.replace(/:$/, "");
-  return origin === `${protocol}://${host}`;
+  return Boolean(configuredAppUrl && origin === configuredAppUrl);
 }
 
 export async function PUT(request: NextRequest, context: Context) {
