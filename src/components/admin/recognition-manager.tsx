@@ -35,8 +35,10 @@ export function RecognitionManager() {
     if (to) query.set('to', to);
     try {
       const response = await adminApi<RecognitionResponse>(`/api/admin/recognitions?${query.toString()}`);
-      setItems(response.items);
-      setTotal(response.total);
+      const currentItems = response.items.filter((item) => !isExpired(item.expiresAt));
+      const expiredOnPage = response.items.length - currentItems.length;
+      setItems(currentItems);
+      setTotal(Math.max(0, response.total - expiredOnPage));
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {

@@ -202,6 +202,76 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible();
   });
 
+  test('already expired GET is cleared before private fields render', async ({ page }) => {
+    await mockCommon(page);
+    await page.route('**/api/admin/recognitions/synthetic-recognition', (route) => fulfillJson(route, recognition({
+      recipient: 'Expired Recipient',
+      submittedName: 'Expired Sender',
+      message: 'Expired private message.',
+      expiresAt: new Date(Date.now() - 1_000).toISOString(),
+    })));
+    await signInAs(page);
+    await page.goto('/admin/recognitions/synthetic-recognition');
+    await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Expired Recipient', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Expired Sender', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Expired private message.', { exact: true })).toHaveCount(0);
+  });
+
+  test('expired conflict response clears the open editor before adoption', async ({ page }) => {
+    let patchAttempts = 0;
+    await mockCommon(page);
+    await page.route('**/api/admin/recognitions/synthetic-recognition', async (route) => {
+      if (route.request().method() === 'GET') {
+        await fulfillJson(route, recognition({
+          recipient: 'Late Conflict Recipient',
+          submittedName: 'Late Conflict Sender',
+          message: 'Late conflict private message.',
+          expiresAt: patchAttempts ? new Date(Date.now() - 1_000).toISOString() : new Date(Date.now() + 15_000).toISOString(),
+        }));
+        return;
+      }
+      patchAttempts += 1;
+      await fulfillJson(route, { error: 'Version conflict', code: 'VERSION_CONFLICT' }, 409);
+    });
+    await signInAs(page);
+    await page.goto('/admin/recognitions/synthetic-recognition');
+    await page.locator('#detail-message').fill('Conflict draft.');
+    await page.getByRole('button', { name: 'Save edit' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Save edit' }).click();
+    await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Late Conflict Recipient', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Late Conflict Sender', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Late conflict private message.', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Version conflict needs a decision' })).toHaveCount(0);
+  });
+
+  test('expired PATCH response clears the editor before private fields render', async ({ page }) => {
+    await mockCommon(page);
+    await page.route('**/api/admin/recognitions/synthetic-recognition', async (route) => {
+      if (route.request().method() === 'GET') {
+        await fulfillJson(route, recognition());
+        return;
+      }
+      await fulfillJson(route, { recognition: recognition({
+        recipient: 'Late Patch Recipient',
+        submittedName: 'Late Patch Sender',
+        message: 'Late patch private message.',
+        expiresAt: new Date(Date.now() - 1_000).toISOString(),
+      }) });
+    });
+    await signInAs(page);
+    await page.goto('/admin/recognitions/synthetic-recognition');
+    await page.locator('#detail-message').fill('Patch draft.');
+    await page.getByRole('button', { name: 'Save edit' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Save edit' }).click();
+    await expect(page.getByText('Personal recognition fields were cleared.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Late Patch Recipient', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Late Patch Sender', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Late patch private message.', { exact: true })).toHaveCount(0);
+    await expect(page.locator('#detail-message')).toHaveCount(0);
+  });
+
   test('display settings show saved, pending and browser applied acknowledgement', async ({ page }) => {
     let saved = false;
     await mockCommon(page, { overviewBody: overview({ settings: settings({ version: 5 }), devices: [device({ appliedVersion: 4, appliedSnapshotRevision: 4 })] }) });

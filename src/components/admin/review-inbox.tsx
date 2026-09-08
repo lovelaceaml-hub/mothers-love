@@ -27,7 +27,7 @@ export function ReviewInbox() {
     setError(null);
     try {
       const response = await adminApi<RecognitionResponse>('/api/admin/recognitions?status=held&page=1');
-      setItems(response.items);
+      setItems(response.items.filter((item) => !isExpired(item.expiresAt)));
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {
