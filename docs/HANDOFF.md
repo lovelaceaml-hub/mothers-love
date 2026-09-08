@@ -41,3 +41,6 @@ Anthony requested cleaner submission cards with a number, quoted expression and 
 
 ## Completed live feed follow-up
 Read PLAN-03-live-feed.md and runs/2026-09-08-live-feed/INDEX.md. Anthony requested a public published-recognition home list, a prominent submission action and discreet Admin access. Form moves to /recognize. Two Luna xhigh lanes implement the page and narrowly scoped public feed function; root validates and releases. Name-verification advice awaits clarification; no roster or participant accounts are introduced.
+
+## Home motion and footer navigation follow-up
+User requested gentle animation and a brighter dominant Share a recognition button, then moved Admin and new TV View links to the bottom. Luna xhigh owns the two presentation files in an isolated worktree; root verifies and deploys. No API, expiry, polling, TV pairing or catalog behavior changes. See runs/2026-09-08-live-feed/lanes/M.md.

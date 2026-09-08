@@ -1,7 +1,7 @@
 # Using The Words of Mother's Love
 
 ## Read recognitions
-Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Choose Share a recognition to open the form. The small Admin link opens sign-in.
+Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the paired display. Use Pause animation to stop decorative movement.
 
 ## Share a recognition
 Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
