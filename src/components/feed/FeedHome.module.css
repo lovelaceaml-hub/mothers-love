@@ -566,7 +566,7 @@ button.secondaryAction {
   top: clamp(0.75rem, 2.5vw, 1.4rem);
   min-width: 0;
   max-height: calc(100vh - 2 * clamp(0.75rem, 2.5vw, 1.4rem));
-  overflow: hidden;
+  overflow-y: auto;
   padding: clamp(1rem, 2vw, 1.4rem);
   border: 1px solid rgba(255, 255, 255, 0.86);
   border-radius: 1.8rem;
@@ -595,9 +595,9 @@ button.secondaryAction {
 }
 
 .publicFeedCompanionViewport {
-  max-height: min(68vh, 38rem);
+  max-height: none;
   margin-top: 1rem;
-  overflow-y: auto;
+  overflow: visible;
   overscroll-behavior: contain;
   padding-right: 0.24rem;
   scrollbar-color: rgba(105, 59, 83, 0.4) rgba(105, 59, 83, 0.08);
@@ -639,7 +639,7 @@ button.secondaryAction {
 
 .publicFeedCompanionCard .reactionButton,
 .publicFeedCompanionCard .reactionRetry {
-  min-height: 2.55rem;
+  min-height: 2.75rem;
   margin-top: 0.72rem;
 }
 
@@ -714,12 +714,12 @@ button.secondaryAction {
   .publicFeedCompanion {
     position: relative;
     top: auto;
-    max-height: none;
+    max-height: 31rem;
     margin: 0 0.8rem 1rem;
   }
 
   .publicFeedCompanionViewport {
-    max-height: 25rem;
+    max-height: none;
   }
 }
 

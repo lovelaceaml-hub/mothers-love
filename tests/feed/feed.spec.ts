@@ -220,7 +220,12 @@ test('bounds home to 30 items and keeps the list keyboard-scrollable', async ({ 
 });
 
 test('shares the same public feed companion beside the recognition form', async ({ page }) => {
-  await routeFeed(page, snapshot([item({ recipient: 'Companion R.' })]));
+  const companionItems = Array.from({ length: 35 }, (_, index) => item({
+    id: `companion-${index}`,
+    recipient: index === 0 ? 'Companion R.' : `Companion ${index} R.`,
+    firstPublishedAt: `2030-01-01T11:${String(59 - Math.floor(index / 60)).padStart(2, '0')}:${String(59 - (index % 60)).padStart(2, '0')}.000Z`,
+  }));
+  await routeFeed(page, snapshot(companionItems));
   await routeReactions(page);
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { configured: true, collectionOpen: true } });
@@ -230,5 +235,8 @@ test('shares the same public feed companion beside the recognition form', async 
   const companion = page.getByRole('region', { name: 'Recent recognitions' });
   await expect(companion).toHaveAttribute('tabindex', '0');
   await expect(companion).toContainText('Companion R.');
+  await companion.focus();
+  await companion.press('End');
+  await expect.poll(() => companion.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
 });

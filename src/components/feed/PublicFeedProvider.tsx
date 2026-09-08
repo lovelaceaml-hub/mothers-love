@@ -118,6 +118,8 @@ export async function fetchReactionCounts(ids: readonly string[], signal?: Abort
   if (!response.ok) throw new Error(`Reaction request failed with status ${response.status}`);
   const payload = decodeReactionPayload(await response.json());
   if (!payload) throw new Error('Reaction response was not valid.');
+  const requestedIds = new Set(boundedIds);
+  if (payload.some((item) => !requestedIds.has(item.id))) throw new Error('Reaction response included an unrequested item.');
   return new Map(payload.map((item) => [item.id, item]));
 }
 
@@ -183,7 +185,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const reactionWriteVersionsRef = useRef(new Map<string, number>());
   const reactionInFlightRef = useRef(new Set<string>());
   const reactionMutationControllersRef = useRef(new Map<string, AbortController>());
-  const reactionTargetEpochRef = useRef(new Map<string, number>());
+  const reactionTargetTokensRef = useRef(new Map<string, object>());
   const feedGenerationRef = useRef(0);
   const snapshotRef = useRef<VerifiedFeedSnapshot | null>(null);
   const retryRef = useRef<() => void>(() => undefined);
@@ -227,16 +229,15 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     if (feedDeadlineRef.current !== null) window.clearTimeout(feedDeadlineRef.current);
     feedDeadlineRef.current = null;
     clearExpiryTimer();
-    currentItems(snapshotRef.current).forEach((item) => {
-      reactionTargetEpochRef.current.set(item.id, (reactionTargetEpochRef.current.get(item.id) ?? 0) + 1);
-    });
+    reactionTargetTokensRef.current.clear();
+    reactionWriteVersionsRef.current.clear();
     feedGenerationRef.current += 1;
     snapshotRef.current = null;
     setSnapshot(null);
     setStatus(nextStatus);
     setClockVersion((version) => version + 1);
     clearReactions();
-  }, [clearExpiryTimer, clearReactions, currentItems]);
+  }, [clearExpiryTimer, clearReactions]);
 
   const loadReactions = useCallback(async (items: PublicFeedItem[], generation: number) => {
     reactionControllerRef.current?.abort();
@@ -293,18 +294,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
 
   const applySnapshot = useCallback((nextSnapshot: VerifiedFeedSnapshot) => {
     const visibleItems = activeFeedItems(nextSnapshot, monotonicNow());
-    const previousIds = new Set(currentItems(snapshotRef.current).map((item) => item.id));
     const nextIds = new Set(visibleItems.map((item) => item.id));
-    for (const id of new Set([...previousIds, ...nextIds])) {
-      if (previousIds.has(id) !== nextIds.has(id)) {
-        reactionTargetEpochRef.current.set(id, (reactionTargetEpochRef.current.get(id) ?? 0) + 1);
-        if (previousIds.has(id) && !nextIds.has(id)) {
-          reactionMutationControllersRef.current.get(id)?.abort();
-          reactionMutationControllersRef.current.delete(id);
-          reactionInFlightRef.current.delete(id);
-        }
+    for (const id of reactionTargetTokensRef.current.keys()) {
+      if (!nextIds.has(id)) {
+        reactionMutationControllersRef.current.get(id)?.abort();
+        reactionMutationControllersRef.current.delete(id);
+        reactionInFlightRef.current.delete(id);
+        reactionTargetTokensRef.current.delete(id);
+        reactionWriteVersionsRef.current.delete(id);
       }
     }
+    visibleItems.forEach((item) => {
+      if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
+    });
     const generation = feedGenerationRef.current + 1;
     feedGenerationRef.current = generation;
     snapshotRef.current = nextSnapshot;
@@ -320,10 +322,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const freshIds = new Set(freshItems.map((item) => item.id));
       for (const item of current.items) {
         if (!freshIds.has(item.id)) {
-          reactionTargetEpochRef.current.set(item.id, (reactionTargetEpochRef.current.get(item.id) ?? 0) + 1);
           reactionMutationControllersRef.current.get(item.id)?.abort();
           reactionMutationControllersRef.current.delete(item.id);
           reactionInFlightRef.current.delete(item.id);
+          reactionTargetTokensRef.current.delete(item.id);
+          reactionWriteVersionsRef.current.delete(item.id);
         }
       }
       feedGenerationRef.current += 1;
@@ -351,7 +354,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     }
 
     void loadReactions(visibleItems, generation);
-  }, [clearExpiryTimer, commitReactions, currentItems, loadReactions]);
+  }, [clearExpiryTimer, commitReactions, loadReactions]);
 
   const fetchFeed = useCallback(async () => {
     if (!active || document.visibilityState === 'hidden') return;
@@ -426,7 +429,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const entry = reactions[item.id];
     if (!entry || entry.status !== 'ready' || !entry.item || entry.pending || reactionInFlightRef.current.has(item.id)) return;
     const desiredLiked = !entry.item.liked;
-    const targetEpoch = reactionTargetEpochRef.current.get(item.id) ?? 0;
+    const targetToken = reactionTargetTokensRef.current.get(item.id);
+    if (!targetToken) return;
     const writeVersion = (reactionWriteVersionsRef.current.get(item.id) ?? 0) + 1;
     reactionWriteVersionsRef.current.set(item.id, writeVersion);
     reactionInFlightRef.current.add(item.id);
@@ -453,10 +457,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         if (!updated || updated.id !== item.id) throw new Error('Reaction update was not valid.');
         const stillVisible = currentItems().some((candidate) => candidate.id === item.id);
         const stillCurrent = (reactionWriteVersionsRef.current.get(item.id) ?? 0) === writeVersion
-          && (reactionTargetEpochRef.current.get(item.id) ?? 0) === targetEpoch;
+          && reactionTargetTokensRef.current.get(item.id) === targetToken;
         if (!stillCurrent || !stillVisible) return;
         reactionInFlightRef.current.delete(item.id);
         reactionMutationControllersRef.current.delete(item.id);
+        reactionWriteVersionsRef.current.set(item.id, writeVersion + 1);
         commitReactions((current) => ({
           ...current,
           [item.id]: { item: updated, status: 'ready', pending: false },
@@ -464,10 +469,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       } catch {
         const stillVisible = currentItems().some((candidate) => candidate.id === item.id);
         const stillCurrent = (reactionWriteVersionsRef.current.get(item.id) ?? 0) === writeVersion
-          && (reactionTargetEpochRef.current.get(item.id) ?? 0) === targetEpoch;
+          && reactionTargetTokensRef.current.get(item.id) === targetToken;
         if (!stillCurrent || !stillVisible) return;
         reactionInFlightRef.current.delete(item.id);
         reactionMutationControllersRef.current.delete(item.id);
+        reactionWriteVersionsRef.current.set(item.id, writeVersion + 1);
         commitReactions((current) => ({
           ...current,
           [item.id]: { ...current[item.id], status: 'error', pending: false, error: 'Could not save heart.' },
