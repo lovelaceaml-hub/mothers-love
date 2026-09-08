@@ -31,6 +31,36 @@ VALUES
   ('00000000-0000-4000-8000-000000000012', 3),
   ('00000000-0000-4000-8000-000000000013', 4);
 
+DO $initial_feed_assertions$
+DECLARE
+  result jsonb;
+BEGIN
+  result := public.ml_public_feed();
+  IF result->>'ok' IS DISTINCT FROM 'true' OR jsonb_array_length(result->'items') IS DISTINCT FROM 1 THEN
+    RAISE EXCEPTION 'initial public feed did not return the one eligible item: %', result;
+  END IF;
+  IF (SELECT count(*) FROM jsonb_object_keys(result)) IS DISTINCT FROM 3
+     OR NOT (result ? 'items' AND result ? 'ok' AND result ? 'serverTime') THEN
+    RAISE EXCEPTION 'initial feed top-level keys changed: %', result;
+  END IF;
+  IF (SELECT count(*) FROM jsonb_object_keys(result->'items'->0)) IS DISTINCT FROM 6
+     OR NOT (result->'items'->0 ? 'expiresAt'
+             AND result->'items'->0 ? 'expressionIds'
+             AND result->'items'->0 ? 'firstPublishedAt'
+             AND result->'items'->0 ? 'id'
+             AND result->'items'->0 ? 'message'
+             AND result->'items'->0 ? 'recipient') THEN
+    RAISE EXCEPTION 'initial feed item keys changed: %', result;
+  END IF;
+  IF result->'items'->0->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000000010' THEN
+    RAISE EXCEPTION 'initial published item was not returned while collection was closed: %', result;
+  END IF;
+  IF result->'items'->0->'expressionIds' IS DISTINCT FROM '[2, 6]'::jsonb THEN
+    RAISE EXCEPTION 'initial expression ordering changed: %', result;
+  END IF;
+END
+$initial_feed_assertions$;
+
 DO $limit_fixture$
 DECLARE
   index_value integer;
@@ -53,7 +83,8 @@ DECLARE
   expected_id text;
   role_name text;
   index_value integer;
-  function_definition text;
+  function_security_definer boolean;
+  function_config text[];
 BEGIN
   result := public.ml_public_feed();
   IF result->>'ok' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'healthy feed failed: %', result; END IF;
@@ -78,10 +109,17 @@ BEGIN
   result := public.ml_public_feed();
   IF result->>'ok' IS DISTINCT FROM 'false' OR (result->>'status')::integer IS DISTINCT FROM 503 THEN RAISE EXCEPTION 'stale cleanup did not fail closed: %', result; END IF;
 
-  SELECT pg_catalog.pg_get_functiondef('public.ml_public_feed()'::regprocedure) INTO function_definition;
-  IF function_definition NOT LIKE '%SECURITY DEFINER%'
-     OR function_definition NOT LIKE '%' || 'SET search_path = ' || pg_catalog.quote_literal('') || '%' THEN
-    RAISE EXCEPTION 'feed function is not hardened: %', function_definition;
+  SELECT p.prosecdef, p.proconfig
+  INTO function_security_definer, function_config
+  FROM pg_catalog.pg_proc AS p
+  WHERE p.oid = 'public.ml_public_feed()'::regprocedure;
+  IF function_security_definer IS DISTINCT FROM true
+     OR NOT EXISTS (
+       SELECT 1
+       FROM pg_catalog.unnest(COALESCE(function_config, ARRAY[]::text[])) AS config(value)
+       WHERE replace(config.value, ' ', '') IN ('search_path=', $$search_path=""$$, $$search_path=''$$)
+     ) THEN
+    RAISE EXCEPTION 'feed function hardening metadata is incorrect';
   END IF;
   IF has_function_privilege('mothers_love_runtime', 'public.ml_public_feed()', 'EXECUTE') IS DISTINCT FROM true THEN RAISE EXCEPTION 'runtime role lacks feed execution'; END IF;
   FOREACH role_name IN ARRAY ARRAY['anon', 'authenticated', 'service_role'] LOOP
@@ -92,5 +130,40 @@ BEGIN
   END LOOP;
 END
 $public_feed_assertions$;
+
+UPDATE mothers_love.settings SET mode = 'normal', last_cleanup_at = clock_timestamp();
+
+DO $tie_break_fixture$
+DECLARE
+  tie_at timestamptz := clock_timestamp();
+  result jsonb;
+BEGIN
+  INSERT INTO mothers_love.recognitions (id, submitted_name, recipient, message, status, created_at, first_published_at, expires_at)
+  VALUES
+    ('00000000-0000-4000-8000-000000002001', 'Synthetic Sender Tie A.', 'Synthetic Recipient Tie A.', 'Synthetic tie fixture A.', 'published', tie_at, tie_at, tie_at + interval '1 hour'),
+    ('00000000-0000-4000-8000-000000002002', 'Synthetic Sender Tie B.', 'Synthetic Recipient Tie B.', 'Synthetic tie fixture B.', 'published', tie_at, tie_at, tie_at + interval '1 hour');
+  INSERT INTO mothers_love.recognition_expressions (recognition_id, expression_id)
+  VALUES ('00000000-0000-4000-8000-000000002001', 1), ('00000000-0000-4000-8000-000000002002', 1);
+
+  result := public.ml_public_feed();
+  IF result->'items'->0->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000002002'
+     OR result->'items'->1->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000002001' THEN
+    RAISE EXCEPTION 'same-timestamp feed tie-break is not id descending: %', result->'items'->0;
+  END IF;
+END
+$tie_break_fixture$;
+
+SET LOCAL ROLE mothers_love_runtime;
+DO $runtime_feed$
+DECLARE
+  runtime_result jsonb;
+BEGIN
+  runtime_result := public.ml_public_feed();
+  IF runtime_result->>'ok' IS DISTINCT FROM 'true' THEN
+    RAISE EXCEPTION 'restricted runtime could not execute the feed bridge';
+  END IF;
+END
+$runtime_feed$;
+RESET ROLE;
 
 ROLLBACK;
