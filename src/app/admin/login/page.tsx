@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useLayoutEffect, useState } from 'react';
 import type { AdminSession } from '@/lib/contracts';
 import { getAuthClient } from '@/lib/auth-client';
 import { adminApi, getAuthErrorMessage } from '@/components/admin/admin-api';
@@ -20,22 +20,30 @@ const readPasswordSetupCallbackType = (): PasswordSetupCallbackType | null => {
   return PASSWORD_SETUP_CALLBACK_TYPES.includes(type as PasswordSetupCallbackType) ? type as PasswordSetupCallbackType : null;
 };
 
+const hasPasswordSetupCallback = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const queryParams = new URLSearchParams(window.location.search);
+  return readPasswordSetupCallbackType() !== null
+    || queryParams.has('code')
+    || [hashParams, queryParams].some((params) => params.has('error') || params.has('error_code') || params.has('error_description'));
+};
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [resetMode, setResetMode] = useState(false);
-  const callbackTypeRef = useRef<PasswordSetupCallbackType | null>(null);
-  const [passwordMode, setPasswordMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useIsomorphicLayoutEffect(() => {
-    const callbackType = readPasswordSetupCallbackType();
-    callbackTypeRef.current = callbackType;
-    if (callbackType !== null) setPasswordMode(true);
+    if (hasPasswordSetupCallback()) {
+      window.location.replace(`/admin/set-password${window.location.search}${window.location.hash}`);
+      return;
+    }
+    if (new URLSearchParams(window.location.search).get('setup') === '1') setResetMode(true);
   }, []);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -50,28 +58,18 @@ export default function AdminLoginPage() {
       return;
     }
     try {
-      if (passwordMode) {
-        if (newPassword.length < 10) throw new Error('Use a password with at least 10 characters.');
-        const { error: updateError } = await auth.auth.updateUser({ password: newPassword });
-        if (updateError) throw updateError;
-        setPasswordMode(false);
-        window.history.replaceState({}, '', '/admin/login');
-        setMessage('Your password is ready. Sign in below.');
-        setPassword('');
-        return;
-      }
       if (resetMode) {
         if (!email.trim()) throw new Error('Enter the invited admin email address.');
-        const redirectTo = 'https://mothers-love.vercel.app/admin/login';
+        const redirectTo = 'https://mothers-love.vercel.app/admin/set-password';
         const { error: resetError } = await auth.auth.resetPasswordForEmail(email.trim(), { redirectTo });
         if (resetError) throw resetError;
-        setMessage('If this address is an active admin, a recovery link will arrive from the configured provider.');
+        setMessage('If this address belongs to an active campaign account, a password setup link will arrive.');
         return;
       }
       const { error: signInError } = await auth.auth.signInWithPassword({ email: email.trim(), password });
       if (signInError) throw signInError;
-      const session = await adminApi<AdminSession>('/api/admin/session');
-      router.replace(session.needsMfa && session.role === 'owner' ? '/admin/mfa' : '/admin');
+      await adminApi<AdminSession>('/api/admin/session');
+      router.replace('/admin');
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {
@@ -79,59 +77,40 @@ export default function AdminLoginPage() {
     }
   };
 
-  useEffect(() => {
-    const auth = getAuthClient();
-    if (!auth) return;
-    const { data } = auth.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && callbackTypeRef.current !== null)) {
-        setPasswordMode(true);
-      }
-    });
-    return () => data.subscription.unsubscribe();
-  }, []);
-
   return (
     <main className={styles.app}>
       <div className={styles.authLayout}>
         <section className={styles.authCard} aria-labelledby="login-title">
           <span className={styles.brandMark} aria-hidden="true">ML</span>
           <p className={styles.eyebrow}>Campaign workspace</p>
-          <h1 id="login-title" className={styles.authTitle}>Admin sign in</h1>
-          <p className={styles.authSubtitle}>Use an invited campaign account. Public recognition does not require an account, and open admin registration is disabled.</p>
+          <h1 id="login-title" className={styles.authTitle}>{resetMode ? 'Get a password setup link' : 'Admin sign in'}</h1>
+          <p className={styles.authSubtitle}>{resetMode ? 'Request a fresh link for your invited campaign account.' : 'Use an invited campaign account. Public recognition does not require an account, and open admin registration is disabled.'}</p>
 
           {message ? <div className={styles.success} role="status">{message}</div> : null}
           {error ? <div className={styles.error} role="alert">{error}</div> : null}
 
+          {resetMode ? <div className={styles.card} style={{ marginBottom: 18 }}><h2 className={styles.cardTitle}>Set up an invited account</h2><p className={styles.cardDescription}>Enter the invited email address to request a fresh password setup link.</p></div> : null}
+
           <form className={styles.authForm} onSubmit={submit}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="admin-email">Email address</label>
-              <input id="admin-email" className={styles.input} type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required disabled={loading || passwordMode} />
+              <input id="admin-email" className={styles.input} type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required disabled={loading} />
             </div>
 
-            {passwordMode ? (
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="new-password">Set a new password</label>
-                <input id="new-password" className={styles.input} type="password" autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} minLength={10} required disabled={loading} />
-                <p className={styles.fieldHint}>This link came from the configured invitation or recovery provider. No password is stored in the app UI.</p>
-              </div>
-            ) : resetMode ? null : (
+            {!resetMode ? (
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="admin-password">Password</label>
                 <input id="admin-password" className={styles.input} type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required disabled={loading} />
               </div>
-            )}
+            ) : null}
 
-            <button className={styles.button} type="submit" disabled={loading}>
-              {loading ? 'Working...' : passwordMode ? 'Set password' : resetMode ? 'Send recovery link' : 'Sign in'}
-            </button>
+            <button className={styles.button} type="submit" disabled={loading}>{loading ? 'Working...' : resetMode ? 'Send password setup link' : 'Sign in'}</button>
           </form>
 
           <div className={styles.buttonRow} style={{ marginTop: 18 }}>
-            {!passwordMode ? (
-              <button type="button" className={styles.buttonQuiet} onClick={() => { setResetMode((value) => !value); setError(null); setMessage(null); }}>
-                {resetMode ? 'Back to sign in' : 'Forgot password?'}
-              </button>
-            ) : null}
+            <button type="button" className={styles.buttonQuiet} onClick={() => { setResetMode((value) => !value); setError(null); setMessage(null); }}>
+              {resetMode ? 'Back to sign in' : 'Set up an invited account'}
+            </button>
             <Link className={styles.authLink} href="/">Return to public form</Link>
           </div>
         </section>

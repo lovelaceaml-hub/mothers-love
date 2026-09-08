@@ -54,10 +54,6 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
           return;
         }
         const current = await adminApi<AdminSession>('/api/admin/session');
-        if (current.needsMfa && current.role === 'owner') {
-          router.replace('/admin/mfa');
-          return;
-        }
         if (!cancelled) {
           setSession(current);
           setError(null);
