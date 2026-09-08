@@ -341,6 +341,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.runFor(1);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '30');
     await page.clock.runFor(5_000);
+    await page.clock.runFor(20_000);
     await page.clock.runFor(2_500);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
     await expect(page.getByTestId('arrival-reading').getByLabel('1 hearts')).toBeVisible({ timeout: 5_000 });
@@ -443,6 +444,12 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
     await expect(page.getByTestId('live-rail')).toHaveCount(0);
     await expect(page.getByText('Synthetic recipient 1')).toHaveCount(0);
+  });
+
+  test('renders the quiet message with a literal apostrophe', async ({ page }) => {
+    await pairAndRead(page, 2, { mode: 'quiet' });
+    await expect(page.getByRole('heading', { name: "Mother's Love is still here." })).toBeVisible();
+    await expect(page.getByText("Mother&apos;s Love is still here.")).toHaveCount(0);
   });
 
   test('gives each rotating screen its own motion composition', async ({ page }) => {
