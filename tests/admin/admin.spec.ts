@@ -115,8 +115,9 @@ async function signInAs(page: Page, role: 'owner' | 'moderator' = 'owner') {
 }
 
 test.describe('synthetic admin browser workflows', () => {
-  test('login is accessible and owner sign in redirects to MFA', async ({ page }) => {
+  test('mobile login is accessible and owner sign in enters admin without an authenticator step', async ({ page }) => {
     await mockCommon(page, { role: 'owner', needsMfa: true });
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/admin/login');
 
     const accessibility = await new AxeBuilder({ page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]['page'] }).analyze();
@@ -129,17 +130,107 @@ test.describe('synthetic admin browser workflows', () => {
     await page.getByLabel('Password').fill('synthetic-password');
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    await expect(page).toHaveURL(/\/admin\/mfa$/);
-    await expect(page.getByRole('heading', { name: 'Verify owner access' })).toBeVisible();
+    await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+    await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
+    await page.goto('/admin/mfa');
+    await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+    await expect(page.getByText('Show enrollment QR', { exact: true })).toHaveCount(0);
   });
 
   test('invitation magic link keeps password setup after Supabase clears the callback hash', async ({ page }) => {
     await mockCommon(page);
     await page.goto(`/admin/login#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=magiclink`);
-    await expect(page.getByLabel('Set a new password')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Set password' })).toBeVisible();
+    await expect(page).toHaveURL(/\/admin\/set-password#?$/);
+    await expect(page.getByRole('heading', { name: 'Set your password' })).toBeVisible();
+    await expect(page.getByLabel('New password', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save password' })).toBeVisible();
+    await expect(page.getByText('Verified email:', { exact: false })).toBeVisible();
     await expect(page.locator('#admin-password')).toHaveCount(0);
     await expect.poll(() => page.evaluate(() => window.location.hash)).toBe('');
+    await page.reload();
+    await expect(page.getByLabel('New password', { exact: true })).toBeVisible();
+  });
+
+  test('setup page waits for a provider session before enabling password save', async ({ page }) => {
+    await mockCommon(page);
+    await page.unroute('**/auth/v1/user*');
+    await page.route('**/auth/v1/user*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      await fulfillJson(route, authSession('owner').user);
+    });
+    await page.goto(`/admin/set-password#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=invite`);
+    await expect(page.getByLabel('Checking setup link')).toBeVisible();
+    await expect(page.getByLabel('New password', { exact: true })).toBeVisible({ timeout: 3_000 });
+  });
+
+  test('invalid setup link gives recovery guidance without a password form', async ({ page }) => {
+    await mockCommon(page);
+    await page.goto('/admin/set-password?type=invite');
+    await expect(page.getByRole('heading', { name: 'Set your password' })).toBeVisible();
+    await expect(page.getByText('missing, expired or already used', { exact: false })).toBeVisible();
+    await expect(page.getByLabel('New password', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Request a fresh setup link' })).toHaveAttribute('href', '/admin/login?setup=1');
+  });
+
+  test('error callback does not fall back to a different persisted account session', async ({ page }) => {
+    await mockCommon(page);
+    await page.goto(`/admin/set-password#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=magiclink`);
+    await expect(page.getByLabel('New password', { exact: true })).toBeVisible();
+
+    await page.goto('/admin/login#type=invite&error=access_denied&error_code=otp_expired&error_description=Setup%20link%20expired');
+    await expect(page).toHaveURL(/\/admin\/set-password#type=invite&error=access_denied&error_code=otp_expired/);
+    await expect(page.getByText('missing, expired or already used', { exact: false })).toBeVisible();
+    await expect(page.getByLabel('New password', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Request a fresh setup link' })).toBeVisible();
+  });
+
+  test('setup page keeps password save disabled when getUser rejects the session', async ({ page }) => {
+    await mockCommon(page);
+    await page.goto(`/admin/set-password#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=invite`);
+    await expect(page.getByLabel('New password', { exact: true })).toBeVisible();
+    await page.unroute('**/auth/v1/user*');
+    await page.route('**/auth/v1/user*', (route) => fulfillJson(route, {
+      error: 'invalid_token',
+      error_description: 'The setup session is no longer valid.',
+    }, 401));
+    await page.goto('/admin/set-password?type=invite');
+    await expect(page.getByText('could not verify the account', { exact: false })).toBeVisible();
+    await expect(page.getByLabel('New password', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Request a fresh setup link' })).toBeVisible();
+  });
+
+  test('password setup updates the provider and enters admin after campaign verification', async ({ page }) => {
+    await mockCommon(page);
+    await page.unroute('**/auth/v1/user*');
+    await page.route('**/auth/v1/user*', async (route) => {
+      if (route.request().method() === 'PUT') {
+        await fulfillJson(route, { user: authSession('owner').user, session: authSession('owner') });
+        return;
+      }
+      await fulfillJson(route, authSession('owner').user);
+    });
+    await page.goto(`/admin/set-password#access_token=${syntheticToken}&refresh_token=synthetic-refresh-token&expires_in=3600&expires_at=${Math.floor(Date.now() / 1000) + 3600}&token_type=bearer&type=magiclink`);
+    await page.getByLabel('New password', { exact: true }).fill('synthetic-password-new');
+    await page.getByLabel('Confirm new password').fill('synthetic-password-new');
+    await page.getByRole('button', { name: 'Save password' }).click();
+    await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+    await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
+  });
+
+  test('login makes invited account recovery explicit', async ({ page }) => {
+    await mockCommon(page);
+    let redirectTo = '';
+    await page.route('**/auth/v1/recover*', async (route) => {
+      redirectTo = new URL(route.request().url()).searchParams.get('redirect_to') ?? '';
+      await fulfillJson(route, {});
+    });
+    await page.goto('/admin/login');
+    await page.getByRole('button', { name: 'Set up an invited account' }).click();
+    await expect(page.getByRole('heading', { name: 'Set up an invited account' })).toBeVisible();
+    await page.getByLabel('Email address').fill('moderator@synthetic.test');
+    await page.getByRole('button', { name: 'Send password setup link' }).click();
+    await expect(page.getByText('password setup link will arrive', { exact: false })).toBeVisible();
+    expect(redirectTo).toBe('https://mothers-love.vercel.app/admin/set-password');
   });
 
   test('moderator sees permission limits for invitations, pairing and collection control', async ({ page }) => {
