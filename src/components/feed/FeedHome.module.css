@@ -32,14 +32,6 @@
   text-align: center;
 }
 
-.headerTopline {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin: 0 0 1.5rem;
-}
-
 .cardEyebrow {
   margin: 0;
   color: #5c6173;
@@ -50,21 +42,10 @@
   text-transform: uppercase;
 }
 
-.adminLink {
-  flex: 0 0 auto;
-  padding: 0.45rem 0;
-  color: #5d5f70;
-  font-size: 0.76rem;
-  font-weight: 750;
-  text-decoration: underline;
-  text-decoration-color: rgba(93, 95, 112, 0.45);
-  text-underline-offset: 0.22em;
-}
-
-.adminLink:focus-visible,
 .footerLinks a:focus-visible,
 .primaryAction:focus-visible,
-.secondaryAction:focus-visible {
+.secondaryAction:focus-visible,
+.motionToggle:focus-visible {
   outline: 3px solid #215a82;
   outline-offset: 4px;
 }
@@ -103,17 +84,54 @@
 }
 
 .primaryAction {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   gap: 0.7rem;
   min-width: min(100%, 17rem);
+  min-height: 3.5rem;
   margin-top: 1.5rem;
-  padding: 0.7rem 1.25rem;
-  color: #fff;
-  background: var(--ink);
-  box-shadow: 0 12px 25px rgba(48, 51, 66, 0.2);
+  padding: 0.75rem 1.4rem;
+  border: 2px solid rgba(111, 57, 49, 0.22);
+  color: #3e2c32;
+  background: linear-gradient(115deg, #ff8078 0%, #ffae65 52%, #ffd86a 100%);
+  box-shadow: 0 14px 26px rgba(168, 88, 66, 0.24), 0 0 0 0.35rem rgba(255, 161, 106, 0.16);
+  transform: translateZ(0);
+}
+
+.primaryAction::before,
+.primaryAction::after {
+  position: absolute;
+  pointer-events: none;
+  content: '';
+}
+
+.primaryAction::before {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 18% 15%, rgba(255, 255, 255, 0.64), transparent 38%);
+  opacity: 0.62;
+}
+
+.primaryAction::after {
+  top: -20%;
+  bottom: -20%;
+  left: -28%;
+  z-index: -1;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  opacity: 0.6;
+  transform: translateX(-180%) skewX(-20deg);
+  animation: shimmer 6.5s ease-in-out infinite;
+}
+
+.primaryAction > * {
+  position: relative;
+  z-index: 1;
 }
 
 .primaryAction span {
-  color: #ffb7b2;
+  color: #5d3940;
   font-size: 1.2rem;
 }
 
@@ -287,12 +305,43 @@ button.secondaryAction {
   line-height: 1.5;
 }
 
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.38rem;
+  margin: 1.1rem auto 0;
+}
+
 .footerLinks a {
   color: #584f81;
   font-weight: 800;
   text-decoration: underline;
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.15em;
+}
+
+.footerUtilityLinks {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 1.1rem;
+}
+
+.motionToggle {
+  appearance: none;
+  min-height: 2.75rem;
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  border-radius: 0.4rem;
+  color: #696575;
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: rgba(105, 101, 117, 0.45);
+  text-underline-offset: 0.2em;
+  cursor: pointer;
 }
 
 .decorations {
@@ -306,6 +355,7 @@ button.secondaryAction {
   display: block;
   border-radius: 50%;
   opacity: 0.43;
+  will-change: transform, opacity;
 }
 
 .bubble::after {
@@ -316,10 +366,41 @@ button.secondaryAction {
   content: '';
 }
 
-.bubbleBlue { top: -4rem; right: -3.2rem; width: 12rem; height: 12rem; background: var(--blue); }
-.bubbleLavender { top: 19rem; left: -3.3rem; width: 7rem; height: 7rem; background: var(--lavender); }
-.bubbleLime { right: -4rem; bottom: 5rem; width: 9rem; height: 9rem; background: var(--lime); }
-.bubbleCoral { bottom: 22rem; left: -2rem; width: 5.2rem; height: 5.2rem; background: var(--coral); }
+.bubbleBlue {
+  top: -4rem;
+  right: -3.2rem;
+  width: 12rem;
+  height: 12rem;
+  background: var(--blue);
+  animation: floatBlue 17s ease-in-out -4s infinite;
+}
+
+.bubbleLavender {
+  top: 19rem;
+  left: -3.3rem;
+  width: 7rem;
+  height: 7rem;
+  background: var(--lavender);
+  animation: floatLavender 20s ease-in-out -9s infinite;
+}
+
+.bubbleLime {
+  right: -4rem;
+  bottom: 5rem;
+  width: 9rem;
+  height: 9rem;
+  background: var(--lime);
+  animation: floatLime 18s ease-in-out -6s infinite;
+}
+
+.bubbleCoral {
+  bottom: 22rem;
+  left: -2rem;
+  width: 5.2rem;
+  height: 5.2rem;
+  background: var(--coral);
+  animation: floatCoral 15s ease-in-out -11s infinite;
+}
 
 .leafTop,
 .leafBottom {
@@ -328,14 +409,69 @@ button.secondaryAction {
   height: 5.2rem;
   color: #70bb89;
   opacity: 0.55;
+  will-change: transform, opacity;
 }
 
-.leafTop { top: 8rem; right: 1rem; transform: rotate(16deg); }
-.leafBottom { bottom: 13rem; left: 0.5rem; transform: rotate(-15deg); }
+.leafTop {
+  top: 8rem;
+  right: 1rem;
+  transform: rotate(16deg);
+  animation: leafTopDrift 21s ease-in-out -8s infinite;
+}
+
+.leafBottom {
+  bottom: 13rem;
+  left: 0.5rem;
+  transform: rotate(-15deg);
+  animation: leafBottomDrift 23s ease-in-out -13s infinite;
+}
 
 @keyframes breathe {
   from { opacity: 0.45; transform: scale(0.92); }
   to { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0%, 16%, 100% { transform: translateX(-180%) skewX(-20deg); }
+  48% { transform: translateX(580%) skewX(-20deg); }
+}
+
+@keyframes floatBlue {
+  0%, 100% { opacity: 0.38; transform: translate3d(0, 0, 0) scale(0.98); }
+  50% { opacity: 0.5; transform: translate3d(-0.45rem, 0.65rem, 0) scale(1.015); }
+}
+
+@keyframes floatLavender {
+  0%, 100% { opacity: 0.4; transform: translate3d(0, 0, 0) scale(0.98); }
+  50% { opacity: 0.52; transform: translate3d(0.5rem, -0.6rem, 0) scale(1.02); }
+}
+
+@keyframes floatLime {
+  0%, 100% { opacity: 0.38; transform: translate3d(0, 0, 0) scale(0.98); }
+  50% { opacity: 0.5; transform: translate3d(-0.55rem, -0.5rem, 0) scale(1.02); }
+}
+
+@keyframes floatCoral {
+  0%, 100% { opacity: 0.38; transform: translate3d(0, 0, 0) scale(0.97); }
+  50% { opacity: 0.5; transform: translate3d(0.45rem, 0.55rem, 0) scale(1.03); }
+}
+
+@keyframes leafTopDrift {
+  0%, 100% { opacity: 0.5; transform: translate3d(0, 0, 0) rotate(16deg); }
+  50% { opacity: 0.62; transform: translate3d(-0.25rem, 0.45rem, 0) rotate(20deg); }
+}
+
+@keyframes leafBottomDrift {
+  0%, 100% { opacity: 0.5; transform: translate3d(0, 0, 0) rotate(-15deg); }
+  50% { opacity: 0.62; transform: translate3d(0.25rem, -0.4rem, 0) rotate(-19deg); }
+}
+
+.motionPaused .bubble,
+.motionPaused .leafTop,
+.motionPaused .leafBottom,
+.motionPaused .primaryAction::after,
+.motionPaused .loadingDots i {
+  animation-play-state: paused;
 }
 
 @media (min-width: 42rem) {
@@ -344,7 +480,6 @@ button.secondaryAction {
 }
 
 @media (max-width: 34rem) {
-  .headerTopline { align-items: flex-start; }
   .sectionHeader { align-items: flex-start; }
 }
 
@@ -353,8 +488,11 @@ button.secondaryAction {
   .page *::before,
   .page *::after {
     scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .motionToggle {
+    display: none;
   }
 }

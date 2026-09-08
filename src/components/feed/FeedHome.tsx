@@ -27,15 +27,15 @@ function monotonicNow() {
 function FeedDecorations() {
   return (
     <div className={styles.decorations} aria-hidden="true">
-      <span className={`${styles.bubble} ${styles.bubbleBlue}`} />
-      <span className={`${styles.bubble} ${styles.bubbleLavender}`} />
-      <span className={`${styles.bubble} ${styles.bubbleLime}`} />
-      <span className={`${styles.bubble} ${styles.bubbleCoral}`} />
-      <svg className={styles.leafTop} viewBox="0 0 90 90" focusable="false">
+      <span className={`${styles.bubble} ${styles.bubbleBlue}`} data-motion-element="decorative" />
+      <span className={`${styles.bubble} ${styles.bubbleLavender}`} data-motion-element="decorative" />
+      <span className={`${styles.bubble} ${styles.bubbleLime}`} data-motion-element="decorative" />
+      <span className={`${styles.bubble} ${styles.bubbleCoral}`} data-motion-element="decorative" />
+      <svg className={styles.leafTop} data-motion-element="decorative" viewBox="0 0 90 90" focusable="false">
         <path d="M78 12C47 15 23 34 19 65c21-1 42-14 59-53Z" fill="currentColor" />
         <path d="M19 65c16-13 28-24 43-39" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
       </svg>
-      <svg className={styles.leafBottom} viewBox="0 0 90 90" focusable="false">
+      <svg className={styles.leafBottom} data-motion-element="decorative" viewBox="0 0 90 90" focusable="false">
         <path d="M12 78C15 46 34 23 65 19c-1 21-14 42-53 59Z" fill="currentColor" />
         <path d="M65 19C52 35 40 47 21 63" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
       </svg>
@@ -68,12 +68,9 @@ function FeedCard({ item }: { item: PublicFeedItem }) {
 function Header() {
   return (
     <header className={styles.header}>
-      <div className={styles.headerTopline}>
-        <Link className={styles.adminLink} href="/admin/login">Admin</Link>
-      </div>
       <h1>{CAMPAIGN_TITLE}</h1>
       <p className={styles.tagline}>{CAMPAIGN_TAGLINE}</p>
-      <Link className={styles.primaryAction} href="/recognize">
+      <Link className={styles.primaryAction} href="/recognize" data-motion-element="attention">
         Share a recognition
         <span aria-hidden="true">↗</span>
       </Link>
@@ -122,6 +119,7 @@ function FeedStateCard({ status, onRetry }: { status: FeedStatus; onRetry: () =>
 
 export function FeedHome() {
   const [state, setState] = useState<FeedState>({ status: 'loading', snapshot: null });
+  const [motionPaused, setMotionPaused] = useState(false);
   const requestSerialRef = useRef(0);
   const controllerRef = useRef<AbortController | null>(null);
   const expiryTimerRef = useRef<number | null>(null);
@@ -222,7 +220,7 @@ export function FeedHome() {
   const status = state.status === 'ready' && items.length === 0 ? 'empty' : state.status;
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page}${motionPaused ? ` ${styles.motionPaused}` : ''}`}>
       <FeedDecorations />
       <div className={styles.shell}>
         <Header />
@@ -243,10 +241,23 @@ export function FeedHome() {
           )}
         </section>
 
-        <nav className={styles.footerLinks} aria-label="Campaign links">
-          <Link href="/expressions">Explore the nine expressions</Link>
-          <Link href="/privacy">Sharing guide</Link>
-        </nav>
+        <footer className={styles.footer}>
+          <nav className={styles.footerLinks} aria-label="Campaign links">
+            <Link href="/expressions">Explore the nine expressions</Link>
+            <Link href="/privacy">Sharing guide</Link>
+            <span className={styles.footerUtilityLinks}>
+              <Link href="/admin/login">Admin</Link>
+              <Link href="/display">TV View</Link>
+            </span>
+          </nav>
+          <button
+            className={styles.motionToggle}
+            type="button"
+            onClick={() => setMotionPaused((paused) => !paused)}
+          >
+            {motionPaused ? 'Resume animation' : 'Pause animation'}
+          </button>
+        </footer>
       </div>
     </main>
   );
