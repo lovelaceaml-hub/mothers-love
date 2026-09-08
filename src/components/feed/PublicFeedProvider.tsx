@@ -124,7 +124,7 @@ export async function fetchReactionCounts(ids: readonly string[], signal?: Abort
 }
 
 export function ReactionCount({ count }: { count: number }) {
-  return <span className={styles.publicFeedCompanionCount}>{count} hearts</span>;
+  return <span className={styles.publicFeedCompanionCount}>{count} {count === 1 ? 'heart' : 'hearts'}</span>;
 }
 
 function FeedState({ compact = false }: { compact?: boolean }) {
@@ -537,7 +537,6 @@ function FeedCompanionList({ items }: { items: PublicFeedItem[] }) {
 function FeedCompanionCard({ item }: { item: PublicFeedItem }) {
   const { reactions, toggleReaction, retryReactions } = usePublicFeed();
   const reaction = reactions[item.id];
-  const reactionReady = reaction?.status === 'ready' && reaction.item;
   return (
     <article className={styles.publicFeedCompanionCard}>
       <p className={styles.publicFeedCompanionRecipient}>For {item.recipient}</p>
@@ -548,7 +547,6 @@ function FeedCompanionCard({ item }: { item: PublicFeedItem }) {
         onToggle={() => toggleReaction(item)}
         onRetry={retryReactions}
       />
-      {reactionReady && reaction.item ? <ReactionCount count={reaction.item.count} /> : null}
     </article>
   );
 }
