@@ -240,6 +240,9 @@ test.describe('synthetic admin browser workflows', () => {
     await page.goto('/admin/settings');
     await expect(page.getByRole('heading', { name: 'Settings and access' })).toBeVisible();
     await expect(page.getByText('Read only', { exact: true })).toBeVisible();
+    await expect(page.getByText('Moderator account sign-in', { exact: true })).toBeVisible();
+    await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toHaveCount(0);
     await expect(page.getByLabel('Moderator email')).toHaveCount(0);
 
@@ -247,6 +250,73 @@ test.describe('synthetic admin browser workflows', () => {
     const collectionToggle = page.getByRole('button', { name: 'Toggle collection availability' });
     await expect(collectionToggle).toBeDisabled();
     await expect(page.getByText('Owner required', { exact: true })).toBeVisible();
+  });
+
+  test('owner settings state email and password access without authenticator requirements', async ({ page }) => {
+    await mockCommon(page, { role: 'owner' });
+    await signInAs(page);
+    await page.goto('/admin/settings');
+    await expect(page.getByText('Owner account sign-in', { exact: true })).toBeVisible();
+    await expect(page.getByText('Moderator account sign-in', { exact: true })).toBeVisible();
+    await expect(page.getByText('Email and password', { exact: true })).toHaveCount(2);
+    await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('authenticator', { exact: false })).toHaveCount(0);
+  });
+
+  test('sidebar sign out clears the stored session and returns to login', async ({ page }) => {
+    let logoutCalls = 0;
+    let logoutScope = '';
+    await mockCommon(page);
+    await page.route('**/auth/v1/logout*', async (route) => {
+      logoutCalls += 1;
+      logoutScope = new URL(route.request().url()).searchParams.get('scope') ?? '';
+      await route.fulfill({ status: 204, body: '' });
+    });
+    await signInAs(page);
+    await page.getByRole('button', { name: 'Sign out' }).nth(0).click();
+    await expect(page).toHaveURL(/\/admin\/login/);
+    await expect(page.getByRole('heading', { name: 'Admin sign in' })).toBeVisible();
+    expect(logoutCalls).toBe(1);
+    expect(logoutScope).toBe('local');
+    expect(await page.evaluate(() => Object.entries(localStorage).filter(([key, value]) => key.includes('auth-token') || value.includes('synthetic-access-token')))).toEqual([]);
+    await page.goto('/admin');
+    await expect(page).toHaveURL(/\/admin\/login/);
+  });
+
+  test('topbar sign out clears the stored session and returns to login', async ({ page }) => {
+    let logoutCalls = 0;
+    let logoutScope = '';
+    await mockCommon(page);
+    await page.route('**/auth/v1/logout*', async (route) => {
+      logoutCalls += 1;
+      logoutScope = new URL(route.request().url()).searchParams.get('scope') ?? '';
+      await route.fulfill({ status: 204, body: '' });
+    });
+    await signInAs(page);
+    await page.getByRole('button', { name: 'Sign out' }).nth(1).click();
+    await expect(page).toHaveURL(/\/admin\/login/);
+    await expect(page.getByRole('heading', { name: 'Admin sign in' })).toBeVisible();
+    expect(logoutCalls).toBe(1);
+    expect(logoutScope).toBe('local');
+    expect(await page.evaluate(() => Object.entries(localStorage).filter(([key, value]) => key.includes('auth-token') || value.includes('synthetic-access-token')))).toEqual([]);
+    await page.goto('/admin');
+    await expect(page).toHaveURL(/\/admin\/login/);
+  });
+
+  test('sign out failure checks local session state before deciding the next view', async ({ page }) => {
+    await mockCommon(page);
+    await page.route('**/auth/v1/logout*', async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'server_error', error_description: 'Logout service unavailable.' }),
+      });
+    });
+    await signInAs(page);
+    await page.getByRole('button', { name: 'Sign out' }).nth(1).click();
+    await expect(page).toHaveURL(/\/admin\/login/);
+    expect(await page.evaluate(() => Object.entries(localStorage).filter(([key, value]) => key.includes('auth-token') || value.includes('synthetic-access-token')))).toEqual([]);
   });
 
   test('retention health turns attention when cleanup becomes stale while open', async ({ page }) => {
