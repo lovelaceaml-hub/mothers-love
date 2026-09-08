@@ -95,9 +95,10 @@ export const actionExplanation = (
     case 'hide':
       return 'Remove this message from the TV. Campaign totals stay the same.';
     case 'restore':
+      if (!recognition.firstPublishedAt) return 'Return this message to review.';
       return recognition.status === 'invalid'
-        ? 'Return this message to the TV and campaign totals.'
-        : 'Return this message to the TV.';
+        ? 'Return this message to the display and campaign totals.'
+        : 'Return this message to the display.';
     case 'invalidate':
       return 'Remove this message from the TV and campaign totals.';
     case 'delete':

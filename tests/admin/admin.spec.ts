@@ -504,9 +504,39 @@ test.describe('synthetic admin browser workflows', () => {
     await page.getByRole('button', { name: 'Toggle pause new arrivals' }).click();
     await page.getByRole('button', { name: 'Save display settings' }).click();
     await expect(page.getByText('Pending delivery', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Refresh TV status' }).click();
+    await page.getByRole('button', { name: 'Refresh display connection' }).click();
     await expect(page.getByText('Applied by browser', { exact: true })).toBeVisible();
-    await expect(page.getByText('TV status', { exact: true })).toBeVisible();
+    await expect(page.getByText('Display connection', { exact: true })).toBeVisible();
+    await expect(page.getByText('Current campaign totals', { exact: true })).toBeVisible();
+  });
+
+  test('owner can distinguish multiple moderators before revoking access', async ({ page }) => {
+    let revokeUrl = '';
+    let confirmation = '';
+    await mockCommon(page, { role: 'owner' });
+    await page.unroute('**/api/admin/members');
+    await page.route('**/api/admin/members', async (route) => {
+      await fulfillJson(route, { items: [
+        { id: 'synthetic-owner', role: 'owner', active: true },
+        { id: 'synthetic-moderator-111111', role: 'moderator', active: true },
+        { id: 'synthetic-moderator-222222', role: 'moderator', active: true },
+      ] });
+    });
+    await page.route('**/api/admin/members/*', async (route) => {
+      revokeUrl = route.request().url();
+      await fulfillJson(route, {});
+    });
+    page.on('dialog', async (dialog) => {
+      confirmation = dialog.message();
+      await dialog.accept();
+    });
+    await signInAs(page);
+    await page.goto('/admin/settings');
+    await expect(page.getByText('Account ID ending in 111111.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Account ID ending in 222222.', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Revoke' }).nth(1).click();
+    await expect.poll(() => revokeUrl).toContain('synthetic-moderator-222222');
+    expect(confirmation).toContain('account ending in 222222');
   });
 
   test('aggregate export downloads server CSV without personal fields', async ({ page }) => {

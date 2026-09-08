@@ -36,3 +36,10 @@ Admin copy cleanup for the settings, sign-in, display, review, recognition, over
 ## Readability repair
 
 Root browser verification found the generic `.badge` text at 4.13:1 contrast on its existing background. The generic foreground is now `#565b67`, which meets the 4.5:1 target. Backgrounds, layout, and specialized status badge colors are unchanged. Root will rebuild and rerun the rendered checks.
+
+## Native review corrections
+
+- Restored account ID suffixes in member rows and revoke confirmation targeting.
+- Restore guidance now distinguishes never-published review items from previously published hidden or invalid items.
+- Display status and campaign total copy now describe connection and data state without claiming physical TV visibility.
+- Added focused regressions for restore guidance and multiple-moderator targeting.
