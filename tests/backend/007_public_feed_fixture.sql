@@ -83,7 +83,8 @@ DECLARE
   expected_id text;
   role_name text;
   index_value integer;
-  function_definition text;
+  function_security_definer boolean;
+  function_config text[];
 BEGIN
   result := public.ml_public_feed();
   IF result->>'ok' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'healthy feed failed: %', result; END IF;
@@ -108,10 +109,17 @@ BEGIN
   result := public.ml_public_feed();
   IF result->>'ok' IS DISTINCT FROM 'false' OR (result->>'status')::integer IS DISTINCT FROM 503 THEN RAISE EXCEPTION 'stale cleanup did not fail closed: %', result; END IF;
 
-  SELECT pg_catalog.pg_get_functiondef('public.ml_public_feed()'::regprocedure) INTO function_definition;
-  IF function_definition NOT LIKE '%SECURITY DEFINER%'
-     OR function_definition NOT LIKE '%' || 'SET search_path = ' || pg_catalog.quote_literal('') || '%' THEN
-    RAISE EXCEPTION 'feed function is not hardened: %', function_definition;
+  SELECT p.prosecdef, p.proconfig
+  INTO function_security_definer, function_config
+  FROM pg_catalog.pg_proc AS p
+  WHERE p.oid = 'public.ml_public_feed()'::regprocedure;
+  IF function_security_definer IS DISTINCT FROM true
+     OR NOT EXISTS (
+       SELECT 1
+       FROM pg_catalog.unnest(COALESCE(function_config, ARRAY[]::text[])) AS config(value)
+       WHERE replace(config.value, ' ', '') IN ('search_path=', $$search_path=""$$, $$search_path=''$$)
+     ) THEN
+    RAISE EXCEPTION 'feed function hardening metadata is incorrect';
   END IF;
   IF has_function_privilege('mothers_love_runtime', 'public.ml_public_feed()', 'EXECUTE') IS DISTINCT FROM true THEN RAISE EXCEPTION 'runtime role lacks feed execution'; END IF;
   FOREACH role_name IN ARRAY ARRAY['anon', 'authenticated', 'service_role'] LOOP
