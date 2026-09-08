@@ -17,10 +17,16 @@
   },
   {
     "path": "/privacy",
-    "status": 200
+    "status": 200,
+    "simpleSharingGuide": true
   },
   {
     "path": "/admin/settings",
     "status": 200
+  },
+  {
+    "path": "/run-board/index.html",
+    "status": 200,
+    "matchesCommittedBoard": true
   }
 ]
