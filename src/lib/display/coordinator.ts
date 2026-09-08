@@ -45,6 +45,7 @@ export interface PresentationState {
   screen: DisplayScreen;
   screenStartedAtMs: number;
   nextTransitionAtMs: number | null;
+  pauseStartedAtMs: number | null;
   readingPageIndex: number;
   readingPageCount: number;
   playlistIndex: number;
@@ -297,6 +298,7 @@ function clearPersonal(state: PresentationState, unauthorized: boolean, offlineS
     paired: !unauthorized,
     screen: unauthorized ? 'quiet' : 'neutral',
     nextTransitionAtMs: null,
+    pauseStartedAtMs: null,
     readingPageIndex: 0,
     readingPageCount: 1,
     neutral: !unauthorized,
@@ -306,6 +308,23 @@ function clearPersonal(state: PresentationState, unauthorized: boolean, offlineS
     unauthorized,
     cursor: null,
     operatorModeOverride: unauthorized ? null : state.operatorModeOverride,
+  };
+}
+
+function shiftPresentationTimers(state: PresentationState, elapsedMs: number): PresentationState {
+  if (elapsedMs <= 0) return state;
+  return {
+    ...state,
+    screenStartedAtMs: state.screenStartedAtMs + elapsedMs,
+    nextTransitionAtMs: state.nextTransitionAtMs === null ? null : state.nextTransitionAtMs + elapsedMs,
+    activeArrival: state.activeArrival
+      ? {
+        ...state.activeArrival,
+        journeyEndsAtMs: state.activeArrival.journeyEndsAtMs + elapsedMs,
+        nextPageEndsAtMs: state.activeArrival.nextPageEndsAtMs + elapsedMs,
+        readingEndsAtMs: state.activeArrival.readingEndsAtMs + elapsedMs,
+      }
+      : null,
   };
 }
 
@@ -365,8 +384,21 @@ function rebuildVisibleState(
         ? fallbackScreen
         : state.screen;
   const shouldStartClock = reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid || !state.nextTransitionAtMs;
+  const baseScreenStartedAtMs = shouldStartClock ? receivedAtMs : state.screenStartedAtMs;
+  const baseNextTransitionAtMs = shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, byId(items, featuredId)) : state.nextTransitionAtMs;
+  const pauseResumed = !reset && !settings.pauseRotation && state.pauseRotation && state.pauseStartedAtMs !== null;
+  const pauseElapsedMs = pauseResumed ? Math.max(0, receivedAtMs - state.pauseStartedAtMs!) : 0;
+  const timedState = shiftPresentationTimers(
+    {
+      ...state,
+      screenStartedAtMs: baseScreenStartedAtMs,
+      nextTransitionAtMs: baseNextTransitionAtMs,
+      activeArrival: activeArrivalIsValid ? state.activeArrival : null,
+    },
+    pauseElapsedMs,
+  );
   return {
-    ...state,
+    ...timedState,
     paired: true,
     phase: 'ready',
     snapshot,
@@ -375,8 +407,8 @@ function rebuildVisibleState(
     lastSuccessfulVerificationMs: receivedAtMs,
     nowMs: receivedAtMs,
     screen,
-    screenStartedAtMs: shouldStartClock ? receivedAtMs : state.screenStartedAtMs,
-    nextTransitionAtMs: shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, byId(items, featuredId)) : state.nextTransitionAtMs,
+    screenStartedAtMs: timedState.screenStartedAtMs,
+    nextTransitionAtMs: timedState.nextTransitionAtMs,
     readingPageIndex: screen === 'featured' ? Math.min(state.readingPageIndex, Math.max(0, (byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1) - 1)) : 0,
     readingPageCount: screen === 'featured' && byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1,
     gardenIds,
@@ -384,7 +416,7 @@ function rebuildVisibleState(
     clusterIds: cluster.ids,
     clusterExpressionId: cluster.expressionId,
     queue: nextQueue,
-    activeArrival: activeArrivalIsValid ? state.activeArrival : null,
+    activeArrival: timedState.activeArrival,
     knownPublicationKeys: reset
       ? arrivals.map(arrivalKey)
       : [...state.knownPublicationKeys, ...newArrivals.map(arrivalKey)],
@@ -396,6 +428,9 @@ function rebuildVisibleState(
     stale: false,
     unauthorized: false,
     pauseRotation: settings.pauseRotation,
+    pauseStartedAtMs: settings.pauseRotation
+      ? (state.pauseRotation ? state.pauseStartedAtMs ?? receivedAtMs : receivedAtMs)
+      : null,
     pauseArrivals: settings.pauseArrivals,
     lastActivityAtMs: wakeForPublication ? receivedAtMs : state.lastActivityAtMs,
     cursor: snapshot.cursor,
@@ -532,6 +567,7 @@ export function createInitialState(settings?: Partial<DisplaySettings>): Present
     screen: 'quiet',
     screenStartedAtMs: 0,
     nextTransitionAtMs: null,
+    pauseStartedAtMs: null,
     readingPageIndex: 0,
     readingPageCount: 1,
     playlistIndex: 0,
@@ -653,6 +689,7 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         next = { ...next, lowActivity: true };
       }
       if (next.activeArrival) {
+        if (next.pauseRotation) return next;
         if (next.activeArrival.phase === 'journey' && action.nowMs >= next.activeArrival.journeyEndsAtMs) {
           next = { ...next, activeArrival: { ...next.activeArrival, phase: 'reading' } };
         }
@@ -678,6 +715,7 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         }
         return next;
       }
+      if (next.pauseRotation) return next;
       const due = next.nextTransitionAtMs !== null && action.nowMs >= next.nextTransitionAtMs;
       if (due && next.screen === 'featured') {
         if (next.pauseRotation) return next;
@@ -736,8 +774,12 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       return { ...state, settings: { ...state.settings, motion: action.motion } };
     case 'SET_REDUCED_MOTION':
       return { ...state, reducedMotion: action.reduced };
-    case 'SET_PAUSE_ROTATION':
-      return { ...state, pauseRotation: action.paused };
+    case 'SET_PAUSE_ROTATION': {
+      if (action.paused === state.pauseRotation) return state;
+      if (action.paused) return { ...state, pauseRotation: true, pauseStartedAtMs: state.nowMs };
+      const elapsedMs = state.pauseStartedAtMs === null ? 0 : Math.max(0, state.nowMs - state.pauseStartedAtMs);
+      return { ...shiftPresentationTimers(state, elapsedMs), pauseRotation: false, pauseStartedAtMs: null };
+    }
     case 'SET_PAUSE_ARRIVALS':
       return { ...state, pauseArrivals: action.paused };
     case 'SET_FEATURED':
