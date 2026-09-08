@@ -10,7 +10,7 @@
 - **Storage:** [Release evidence in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw). Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love).
 - [Handoff](docs/HANDOFF.md)
-- [Copy cleanup plan](docs/PLAN-02-copy-cleanup.md)
+- [Copy and expression card cleanup plan](docs/PLAN-02-copy-cleanup.md)
 - [User manual](docs/USER-MANUAL.md)
 - [Product brief](docs/PRODUCT-BRIEF.md)
 - [Clickable journeys](docs/USER-JOURNEYS.md)

@@ -1,7 +1,7 @@
 # Using The Words of Mother's Love
 
 ## Share a recognition
-Open the [recognition form](https://mothers-love.vercel.app). Enter your first name and last initial, then the recipient's. Choose the expressions that fit and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
+Open the [recognition form](https://mothers-love.vercel.app). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
 
 Keep contact information and private details out of your message. If sending fails, keep the tab open and try again. A message received for review will appear only after approval.
 

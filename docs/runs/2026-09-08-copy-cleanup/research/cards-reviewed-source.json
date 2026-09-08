@@ -1,0 +1,14 @@
+[
+  {
+    "path": "src/components/submission/SubmissionForm.tsx",
+    "sha256": "5901436ef8c5c20a92e0bebc4ee0faa6dc09282129922abdb5e6c2aab12c8ea6"
+  },
+  {
+    "path": "src/components/submission/SubmissionForm.module.css",
+    "sha256": "6796b037c1008824d3679fe994c8fa68dfa254a1aa12e9ee049ed1cf24523a59"
+  },
+  {
+    "path": "tests/submission/submission.spec.ts",
+    "sha256": "e9cdceda3979bd5d3b987e679d480570ef2ab594a428d4c0fe99da722be99a6b"
+  }
+]

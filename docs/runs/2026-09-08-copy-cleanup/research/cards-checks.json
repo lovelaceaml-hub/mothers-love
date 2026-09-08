@@ -1,0 +1,221 @@
+[
+  {
+    "width": 320,
+    "cards": 9,
+    "visibleExplanations": true,
+    "keyboardToggle": true,
+    "noHorizontalOverflow": true,
+    "axeViolations": 0,
+    "metrics": [
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 250.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "cards": 9,
+    "visibleExplanations": true,
+    "keyboardToggle": true,
+    "noHorizontalOverflow": true,
+    "axeViolations": 0,
+    "metrics": [
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 320.8125,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "cards": 9,
+    "visibleExplanations": true,
+    "keyboardToggle": true,
+    "noHorizontalOverflow": true,
+    "axeViolations": 0,
+    "metrics": [
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      },
+      {
+        "width": 233.40625,
+        "paragraphs": 2,
+        "buttonHeight": 44,
+        "buttonInside": true,
+        "textVisible": true
+      }
+    ]
+  }
+]

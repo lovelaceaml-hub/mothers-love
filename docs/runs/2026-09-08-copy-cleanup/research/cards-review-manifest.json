@@ -1,0 +1,46 @@
+[
+  {
+    "path": "package.json",
+    "sha256": "e01b3d9fd5ae3b0b83da2e04bd93a124c2f9f9ff2e7447c572b69724c0359e42"
+  },
+  {
+    "path": "REVIEW-SCOPE.md",
+    "sha256": "3e28173ff09c0af4b76a8a70a059457ae5df710c5c44293d4f41ead204690d65"
+  },
+  {
+    "path": "docs/USER-MANUAL.md",
+    "sha256": "2d37f64891c2596e2c021481f169ac65714220206515c8d9b377f1e0a77f8b80"
+  },
+  {
+    "path": "src/lib/contracts.ts",
+    "sha256": "ad0beed62d35d1cdafd46b9e605bf454aff68692da083e99049eb49aafd085a8"
+  },
+  {
+    "path": "src/lib/name-validation.ts",
+    "sha256": "635c635166405fe8d2a8f071863adf1ad78f4acbe6a6682bc7b4b048655be416"
+  },
+  {
+    "path": "src/lib/client-api.ts",
+    "sha256": "5192e61e6b9f77aea5927b73a38048f7d8b8421252914fafe826e247bfb4136e"
+  },
+  {
+    "path": "src/lib/catalog.ts",
+    "sha256": "10e5336600b0c70f00f2ab51dea2e3f8198411e456db2366bc99516c8da2ef2c"
+  },
+  {
+    "path": "src/components/submission/SubmissionForm.tsx",
+    "sha256": "5901436ef8c5c20a92e0bebc4ee0faa6dc09282129922abdb5e6c2aab12c8ea6"
+  },
+  {
+    "path": "src/components/submission/SubmissionForm.module.css",
+    "sha256": "6796b037c1008824d3679fe994c8fa68dfa254a1aa12e9ee049ed1cf24523a59"
+  },
+  {
+    "path": "docs/runs/2026-09-08-copy-cleanup/research/cards-verification.md",
+    "sha256": "47942a5dd082be2fed6de8ca5b12a42f31ec1a063c6b5515156b85e62065cc9a"
+  },
+  {
+    "path": "tests/submission/submission.spec.ts",
+    "sha256": "e9cdceda3979bd5d3b987e679d480570ef2ab594a428d4c0fe99da722be99a6b"
+  }
+]
