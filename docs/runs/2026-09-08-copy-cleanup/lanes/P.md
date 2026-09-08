@@ -9,6 +9,7 @@ Status: ready for integration
 - Replaced the long privacy page with a short sharing guide covering fields, private name visibility, public-message boundaries, and review handling. Removed all information-duration and provider-detail explanations.
 - Tightened expressions-page metadata and surrounding guidance while preserving every catalog phrase, principle, and everyday example.
 - Simplified display pairing instructions, excerpt labeling, and status language. Removed revision narration and kept campaign recognition content unchanged.
+- Clarified neutral display status to distinguish hidden messages on the display from collection availability.
 - Updated only selectors that depended on changed visible wording in the assigned submission and display tests.
 
 ## Verification

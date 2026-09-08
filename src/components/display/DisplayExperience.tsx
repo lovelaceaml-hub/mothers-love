@@ -442,7 +442,7 @@ function QuietScreen({ neutral = false }: { neutral?: boolean }) {
     <section className={styles.quietScreen} aria-labelledby="quiet-title">
       <span className={styles.quietFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>{neutral ? 'DISPLAY SAFETY MODE' : 'A QUIET MOMENT'}</p>
-      <h2 id="quiet-title">{neutral ? 'Recognitions are paused.' : 'Mother&apos;s Love is still here.'}</h2>
+      <h2 id="quiet-title">{neutral ? 'Messages are hidden on this display.' : 'Mother&apos;s Love is still here.'}</h2>
       <p>{neutral ? 'The nine campaign expressions remain visible.' : 'The wall will return when Quiet mode ends.'}</p>
       <div className={styles.quietExpressions}>
         {EXPRESSIONS.map((item) => <span key={item.id} style={{ backgroundColor: item.color }}>{item.phrase}</span>)}
