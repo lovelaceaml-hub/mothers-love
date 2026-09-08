@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
 import { adminApi, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, formatExpiry, statusLabel } from './admin-utils';
+import { formatDateTime, formatExpiry, isExpired, statusLabel } from './admin-utils';
 import styles from './admin.module.css';
 
 type RecognitionResponse = { items: AdminRecognition[]; total: number };
@@ -48,6 +48,13 @@ export function RecognitionManager() {
     const timer = window.setTimeout(() => { void load(); }, 0);
     return () => window.clearTimeout(timer);
   }, [load]);
+
+  useEffect(() => {
+    const timers = items.map((item) => window.setTimeout(() => {
+      if (isExpired(item.expiresAt)) setItems((current) => current.filter((candidate) => candidate.id !== item.id));
+    }, Math.max(0, new Date(item.expiresAt).getTime() - Date.now())));
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [items]);
 
   const totalPages = Math.max(1, Math.ceil(total / 50));
   const clearFilters = (event?: FormEvent) => {

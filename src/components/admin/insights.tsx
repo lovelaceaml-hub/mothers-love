@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Aggregate, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
-import { adminApi, getAuthErrorMessage } from './admin-api';
-import { makeAggregateCsv, periodLabel } from './admin-utils';
+import { adminApi, adminCsv, getAuthErrorMessage } from './admin-api';
+import { periodLabel } from './admin-utils';
 import styles from './admin.module.css';
 
 type Period = 'week' | 'month' | 'all' | 'custom';
@@ -45,14 +45,7 @@ export function Insights() {
     if (!aggregate) return;
     setNotice(null);
     try {
-      let csv = '';
-      try {
-        const response = await adminApi<{ csv?: string }>(`/api/admin/reports/export?period=${period}${from ? `&from=${encodeURIComponent(from)}` : ''}${to ? `&to=${encodeURIComponent(to)}` : ''}`);
-        csv = response.csv ?? '';
-      } catch {
-        csv = '';
-      }
-      if (!csv) csv = makeAggregateCsv(aggregate);
+      const csv = await adminCsv(`/api/admin/reports/export?period=${period}${from ? `&from=${encodeURIComponent(from)}` : ''}${to ? `&to=${encodeURIComponent(to)}` : ''}`);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
