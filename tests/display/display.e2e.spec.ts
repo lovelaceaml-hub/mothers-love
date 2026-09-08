@@ -93,7 +93,24 @@ function longAcceptanceFixture(
   };
 }
 
+async function routeReactionCounts(page: Page) {
+  await page.route(/\/api\/reactions\?ids=/, async (route) => {
+    const ids = new URL(route.request().url()).searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: ids.map((id) => {
+          const suffix = Number(id.split('-').pop());
+          return { id, count: Number.isSafeInteger(suffix) && suffix > 0 ? suffix : 1, liked: false };
+        }),
+      }),
+    });
+  });
+}
+
 async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOptions = {}) {
+  await routeReactionCounts(page);
   await page.route('**/api/display/pair', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
   });
@@ -128,6 +145,7 @@ async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOption
 }
 
 async function pairLongAcceptance(page: Page, withArrival: boolean, message = LONG_MESSAGE) {
+  await routeReactionCounts(page);
   await page.route('**/api/display/pair', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
   });
@@ -240,6 +258,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(page.getByTestId('live-rail')).toBeVisible();
     await expect(page.getByTestId('live-rail').getByTestId('live-recognition')).toHaveCount(20);
     await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('Synthetic recipient 20');
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('20 hearts', { timeout: 10_000 });
     await expect(page.getByTestId('live-rail').getByTestId('live-recognition').last()).toContainText('Synthetic recipient 1');
 
     const cardShape = await page.getByTestId('recognition-card').first().evaluate((card) => {
@@ -295,15 +314,16 @@ test.describe('Bubble Board display synthetic fixtures', () => {
         const core = document.querySelector<HTMLElement>('[class*="clusterCore"]')?.getBoundingClientRect();
         const cards = [...document.querySelectorAll<HTMLElement>('[class*="clusterCards"] [data-testid="recognition-card"]')].map((card) => {
           const rect = card.getBoundingClientRect();
+          const text = [...card.querySelectorAll<HTMLElement>('h3, p, span')].map((element) => {
+            const textRect = element.getBoundingClientRect();
+            return { left: textRect.left, right: textRect.right, top: textRect.top, bottom: textRect.bottom };
+          });
           return {
             left: rect.left,
             right: rect.right,
             top: rect.top,
             bottom: rect.bottom,
-            scrollWidth: card.scrollWidth,
-            clientWidth: card.clientWidth,
-            scrollHeight: card.scrollHeight,
-            clientHeight: card.clientHeight,
+            text,
           };
         });
         if (!core) return null;
@@ -314,8 +334,12 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       for (const card of metrics!.cards) {
         const overlaps = card.left < metrics!.core.right && card.right > metrics!.core.left && card.top < metrics!.core.bottom && card.bottom > metrics!.core.top;
         expect(overlaps).toBe(false);
-        expect(card.scrollWidth).toBeLessThanOrEqual(card.clientWidth + 2);
-        expect(card.scrollHeight).toBeLessThanOrEqual(card.clientHeight + 2);
+        for (const text of card.text) {
+          expect(text.left).toBeGreaterThanOrEqual(card.left - 1);
+          expect(text.right).toBeLessThanOrEqual(card.right + 1);
+          expect(text.top).toBeGreaterThanOrEqual(card.top - 1);
+          expect(text.bottom).toBeLessThanOrEqual(card.bottom + 1);
+        }
       }
     }
   });
@@ -337,7 +361,11 @@ test.describe('Bubble Board display synthetic fixtures', () => {
         const qr = document.querySelector<HTMLElement>('[aria-label="Share a recognition"]')?.getBoundingClientRect();
         const cards = [...document.querySelectorAll<HTMLElement>('[class*="expressionGrid"] [class*="expressionCard"]')].map((card) => {
           const rect = card.getBoundingClientRect();
-          return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, scrollWidth: card.scrollWidth, clientWidth: card.clientWidth, scrollHeight: card.scrollHeight, clientHeight: card.clientHeight };
+          const text = [...card.querySelectorAll<HTMLElement>('p, strong, span')].map((element) => {
+            const textRect = element.getBoundingClientRect();
+            return { left: textRect.left, right: textRect.right, top: textRect.top, bottom: textRect.bottom };
+          });
+          return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, text };
         });
         if (!qr) return null;
         return { qr: { left: qr.left, right: qr.right, top: qr.top, bottom: qr.bottom }, cards };
@@ -347,8 +375,12 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       for (const card of metrics!.cards) {
         const overlaps = card.left < metrics!.qr.right && card.right > metrics!.qr.left && card.top < metrics!.qr.bottom && card.bottom > metrics!.qr.top;
         expect(overlaps).toBe(false);
-        expect(card.scrollWidth).toBeLessThanOrEqual(card.clientWidth + 2);
-        expect(card.scrollHeight).toBeLessThanOrEqual(card.clientHeight + 2);
+        for (const text of card.text) {
+          expect(text.left).toBeGreaterThanOrEqual(card.left - 1);
+          expect(text.right).toBeLessThanOrEqual(card.right + 1);
+          expect(text.top).toBeGreaterThanOrEqual(card.top - 1);
+          expect(text.bottom).toBeLessThanOrEqual(card.bottom + 1);
+        }
       }
     }
   });
@@ -379,11 +411,42 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       expect(motion.animationName).not.toBe('none');
       seen.set(screen!, motion.key!);
     };
-    for (let step = 0; step < 30 && seen.size < 6; step += 1) {
+    for (let step = 0; step < 30 && seen.size < 5; step += 1) {
       await capture();
       await page.clock.runFor(5_000);
     }
-    expect(new Set(seen.values()).size).toBe(6);
+    expect(new Set(seen.keys())).toEqual(new Set(['garden', 'featured', 'impact', 'all-nine', 'cluster']));
+    expect(new Set(seen.values()).size).toBe(5);
+  });
+
+  test('uses a distinct computed motion for an arrival screen', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairLongAcceptance(page, true);
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
+      await page.clock.runFor(500);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
+    const motion = await page.locator('[data-motion-key]').evaluate((element) => ({ key: element.getAttribute('data-motion-key'), animationName: getComputedStyle(element).animationName }));
+    expect(motion.key).toBe('arrival-land');
+    expect(motion.animationName).not.toBe('none');
+  });
+
+  test('uses a distinct computed motion for a milestone screen', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairAndRead(page, 2, { continuous: true, milestone: true, motion: 'standard' });
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
+      await page.clock.runFor(500);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'milestone', { timeout: 2_000 });
+    const motion = await page.locator('[data-motion-key]').evaluate((element) => ({ key: element.getAttribute('data-motion-key'), animationName: getComputedStyle(element).animationName }));
+    expect(motion.key).toBe('milestone-glow');
+    expect(motion.animationName).not.toBe('none');
   });
 
   test('keeps garden bubbles inside the board and long excerpts readable at TV sizes', async ({ page }) => {
@@ -416,8 +479,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1920, height: 1080 });
     await pairLongAcceptance(page, false);
-    await page.clock.runFor(5_000);
-    await page.clock.runFor(16_000);
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
+      await page.clock.runFor(500);
+    }
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 2_000 });
     const reading = page.getByTestId('featured-reading');
     const pageCount = Number(await reading.getAttribute('data-page-count'));
@@ -454,8 +519,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1920, height: 1080 });
     await pairLongAcceptance(page, true);
-    await page.clock.runFor(5_000);
-    await page.clock.runFor(21_000);
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
+      await page.clock.runFor(500);
+    }
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
     await page.clock.runFor(3_000);
     const reading = page.getByTestId('arrival-reading');
@@ -493,8 +560,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1920, height: 1080 });
     await pairLongAcceptance(page, false, DENSE_LINE_MESSAGE);
-    await page.clock.runFor(5_000);
-    await page.clock.runFor(16_000);
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
+      await page.clock.runFor(500);
+    }
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 2_000 });
     const reading = page.getByTestId('featured-reading');
     const pageCount = Number(await reading.getAttribute('data-page-count'));
@@ -561,17 +630,22 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await pairLongAcceptance(page, true);
-    await page.clock.runFor(26_000);
+    for (let step = 0; step < 50; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
+      await page.clock.runFor(500);
+    }
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
     await page.screenshot({ path: join(directory, 'arrival-long.png'), fullPage: true });
 
-    await page.goto('/display');
-    await pairAndRead(page, 2, { continuous: true, milestone: true });
-    for (let step = 0; step < 10; step += 1) {
-      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
-      await page.clock.runFor(5_000);
+    const milestonePage = await page.context().newPage();
+    await milestonePage.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairAndRead(milestonePage, 2, { continuous: true, milestone: true });
+    for (let step = 0; step < 50; step += 1) {
+      if (await milestonePage.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
+      await milestonePage.clock.runFor(500);
     }
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'milestone', { timeout: 2_000 });
-    await page.screenshot({ path: join(directory, 'milestone-50.png'), fullPage: true });
+    await expect(milestonePage.getByTestId('display-app')).toHaveAttribute('data-screen', 'milestone', { timeout: 2_000 });
+    await milestonePage.screenshot({ path: join(directory, 'milestone-50.png'), fullPage: true });
+    await milestonePage.close();
   });
 });
