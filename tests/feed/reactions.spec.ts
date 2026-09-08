@@ -73,15 +73,17 @@ test('toggles off with the server-confirmed count', async ({ page }) => {
 
 test('does not let an older poll overwrite a confirmed PUT', async ({ page }) => {
   let readCount = 0;
+  let putCount = 0;
   let releaseRead: (() => void) | undefined;
   let releasePut: (() => void) | undefined;
   const delayedRead = new Promise<void>((resolve) => { releaseRead = resolve; });
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
 
+  await page.clock.install();
   await page.addInitScript(() => {
     const nativeSetInterval = window.setInterval;
     window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
-      nativeSetInterval(handler, timeout === 10_000 ? 100 : timeout, ...args)
+      nativeSetInterval(handler, timeout === 10_000 ? 7_000 : timeout, ...args)
     )) as typeof window.setInterval;
   });
 
@@ -91,10 +93,12 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   await page.route('**/api/reactions**', async (route) => {
     if (route.request().method() === 'GET') {
       readCount += 1;
-      if (readCount > 1) await delayedRead;
-      await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
+      if (readCount === 2) await delayedRead;
+      const liked = readCount > 2;
+      await route.fulfill({ json: { items: [{ id: feedItem.id, count: liked ? 8 : 7, liked }] } });
       return;
     }
+    putCount += 1;
     await pendingPut;
     await route.fulfill({ json: { id: feedItem.id, count: 8, liked: true } });
   });
@@ -103,14 +107,17 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
   await expect(heart).toBeEnabled();
   await heart.click();
-  await expect.poll(() => readCount, { timeout: 3_000 }).toBeGreaterThan(1);
+  await page.clock.fastForward(7_000);
+  await expect.poll(() => readCount).toBe(2);
   await expect(heart).toBeDisabled();
+  expect(putCount).toBe(1);
   releasePut?.();
   await expect(heart).toHaveAttribute('aria-pressed', 'true');
   await expect(heart).toContainText('8');
   releaseRead?.();
   await expect(heart).toHaveAttribute('aria-pressed', 'true');
   await expect(heart).toContainText('8');
+  expect(putCount).toBe(1);
 });
 
 test('recovers from unavailable reaction writes after retrying the read', async ({ page }) => {
