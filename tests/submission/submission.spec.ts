@@ -89,7 +89,7 @@ test('publishes a normal recognition and resets all fields for a new recognition
   await fillValidDraft(page);
   await page.getByRole('button', { name: 'Send recognition' }).click();
   await expect(page.getByRole('heading', { name: /Thank you for sharing Mother's Love/ })).toBeVisible();
-  await expect(page.getByText('ready for the campaign display')).toBeVisible();
+  await expect(page.getByText('ready to appear on the home page and TV')).toBeVisible();
   expect(body?.submittedName).toBe('Maya R.');
   expect(body?.expressionIds).toEqual([2, 6, 8]);
   expect(typeof body?.requestKey).toBe('string');
@@ -109,7 +109,7 @@ test('shows a held receipt without promising display publication', async ({ page
   await fillValidDraft(page);
   await page.getByRole('button', { name: 'Send recognition' }).click();
   await expect(page.getByText('Some messages are reviewed before appearing.')).toBeVisible();
-  await expect(page.getByText('ready for the campaign display')).toHaveCount(0);
+  await expect(page.getByText('ready to appear on the home page and TV')).toHaveCount(0);
 });
 
 test('keeps the same draft and retries with the same key after an unconfirmed response', async ({ page }) => {
@@ -130,7 +130,7 @@ test('keeps the same draft and retries with the same key after an unconfirmed re
   await expect(page.getByText('Your recognition is not confirmed yet.')).toBeVisible();
   await expect(page.getByLabel('Share your appreciation')).toHaveValue('Your kindness made a hard day feel lighter.');
   await page.getByRole('button', { name: 'Retry recognition' }).click();
-  await expect(page.getByText('ready for the campaign display')).toBeVisible();
+  await expect(page.getByText('ready to appear on the home page and TV')).toBeVisible();
   expect(attempts).toBe(2);
   expect(keys[0]).toBe(keys[1]);
 });
@@ -142,7 +142,7 @@ test('keeps collection unavailable without showing a fake success', async ({ pag
   await page.goto('/recognize');
   await expect(page.getByRole('heading', { name: 'Recognition sharing is paused' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Send recognition' })).toHaveCount(0);
-  await expect(page.getByText('ready for the campaign display')).toHaveCount(0);
+  await expect(page.getByText('ready to appear on the home page and TV')).toHaveCount(0);
 });
 
 test('public preview excludes the submitted name and is keyboard reachable', async ({ page }) => {
