@@ -32,3 +32,7 @@ Admin copy cleanup for the settings, sign-in, display, review, recognition, over
 
 - Expired-link, expired-recognition, unavailable-service, and collection-closed messages remain because they tell an operator what is unavailable or what to do next.
 - Submitted-name labels, moderation reason categories, count effects, action consequences, and email/password setup instructions remain because they affect an operator decision or task.
+
+## Readability repair
+
+Root browser verification found the generic `.badge` text at 4.13:1 contrast on its existing background. The generic foreground is now `#565b67`, which meets the 4.5:1 target. Backgrounds, layout, and specialized status badge colors are unchanged. Root will rebuild and rerun the rendered checks.
