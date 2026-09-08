@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest, context: Context) {
   const rates = requestRateKeys(request);
   const result = await setReaction(id, visitorHash(cookie), payload.liked, rates.ip);
   if (result.error) return withReactionVary(errorResult(503, "UNAVAILABLE"));
-  const projected = projectReactionMutation(result.data);
+  const projected = projectReactionMutation(result.data, id);
   if (!projected) {
     const data = result.data;
     const code = data && typeof data === "object" && !Array.isArray(data) ? (data as Record<string, unknown>).code : null;

@@ -64,25 +64,27 @@ function projectItem(value: unknown): ReactionItem | null {
   return { id: record.id, count: record.count as number, liked: record.liked };
 }
 
-export function projectReactionResult(value: unknown): ReactionResult | null {
+export function projectReactionResult(value: unknown, expectedIds?: readonly string[]): ReactionResult | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
   if (record.ok !== true || !Array.isArray(record.items)) return null;
   const items: ReactionItem[] = [];
   const ids = new Set<string>();
+  const allowedIds = expectedIds ? new Set(expectedIds.map((id) => id.toLowerCase())) : null;
   for (const rawItem of record.items) {
     const item = projectItem(rawItem);
-    if (!item || ids.has(item.id.toLowerCase())) return null;
+    if (!item || (allowedIds && !allowedIds.has(item.id.toLowerCase())) || ids.has(item.id.toLowerCase())) return null;
     ids.add(item.id.toLowerCase());
     items.push(item);
   }
   return { ok: true, items };
 }
 
-export function projectReactionMutation(value: unknown): ReactionMutationResult | null {
+export function projectReactionMutation(value: unknown, expectedId?: string): ReactionMutationResult | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
   if (record.ok !== true || typeof record.id !== "string" || !UUID_PATTERN.test(record.id)) return null;
+  if (expectedId && record.id.toLowerCase() !== expectedId.toLowerCase()) return null;
   if (!Number.isSafeInteger(record.count) || (record.count as number) < 0 || typeof record.liked !== "boolean") return null;
   return { ok: true, id: record.id, count: record.count as number, liked: record.liked };
 }
