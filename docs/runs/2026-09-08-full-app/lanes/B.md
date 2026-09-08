@@ -51,3 +51,12 @@
 - The restricted Postgres client always receives `{ ca, rejectUnauthorized: true }` separately from `DATABASE_URL`, so URL `sslmode=disable` and `sslmode=require` cannot weaken certificate verification. `.env.example` documents the server-only restricted login, CA, and `NEXT_PUBLIC_APP_URL`, with no service-role variable.
 - Admin invitation retries now resend provider delivery when the authenticated database bridge returns the exact existing pending invitation conflict. The existing invitation is not renewed and the retry response omits `expiresAt` because the bridge does not expose a new expiry. Other database conflicts, transport failures, and authorization denials send no email.
 - Focused checks passed: TLS and invitation tests 9/9, `npm run typecheck`, and `npm run lint`.
+
+## Password-only admin policy
+
+- Updated `src/lib/server/auth.ts` to retain cryptographically verified bearer claims, confirmed email, and fresh campaign membership checks while ignoring the legacy AAL2 call-site argument. No HTTP admin operation returns `MFA_REQUIRED` after the additive migration.
+- Updated the admin session DTO to return `needsMfa: false` for both roles. Owner invitation delivery now uses `https://mothers-love.vercel.app/admin/set-password` and preserves the existing pending-invitation retry behavior.
+- Added `database/003_password_only_admin.sql`, which fail-closed replaces only the AAL2 guard in `mothers_love.ml_authorize` and the `needsMfa` expression in `public.ml_api` admin sessions. It checks exact fragment matches and preserves each function owner and ACL.
+- Updated `tests/backend/004_security_assertions.sql` for AAL1 owner success and added rollback-only `tests/backend/006_password_only_admin_assertions.sql` for AAL1 owner reads, settings write, and permanent delete, Moderator Owner-only denials with row-preservation proof, nonmember, revoked membership, and malformed actor denials. Added `tests/backend/auth.test.ts` for confirmed email, token, membership, and DTO behavior.
+- Focused checks passed: auth, route, SQL, and invitation tests 18/18, `npm run typecheck`, and `npm run lint`. Root must apply 003 after 001 and 002, then run fixtures 004 and 006 in a disposable database.
+- Fixture 006 was corrected after disposable execution exposed stale preconditions in the permission probe. It now captures the settings version from the Owner write and uses the recognition's own version for the delete probes, so each assertion reaches its intended authorization branch.

@@ -9,7 +9,11 @@ export function bearerToken(request: NextRequest): string | null {
   return token || null;
 }
 
-export async function verifyAdmin(request: NextRequest, requireAal2 = false): Promise<{ actor: VerifiedActor | null; result?: { status: number; code: string } }> {
+/**
+ * The second argument remains for call-site compatibility. Campaign access
+ * requires a verified token, confirmed email, and fresh membership only.
+ */
+export async function verifyAdmin(request: NextRequest, _requireAal2 = false): Promise<{ actor: VerifiedActor | null; result?: { status: number; code: string } }> {
   const token = bearerToken(request);
   const client = authClient();
   if (!token || !client) return { actor: null, result: { status: client ? 401 : 503, code: client ? "UNAUTHENTICATED" : "UNAVAILABLE" } };
@@ -26,7 +30,6 @@ export async function verifyAdmin(request: NextRequest, requireAal2 = false): Pr
   if (result.ok !== true || typeof result.role !== "string") return { actor: null, result: { status: Number(result.status) || 403, code: String(result.code || "FORBIDDEN") } };
   const role = result.role === "owner" ? "owner" : result.role === "moderator" ? "moderator" : null;
   if (!role) return { actor: null, result: { status: 403, code: "FORBIDDEN" } };
-  if (requireAal2 && role === "owner" && !aal2) return { actor: null, result: { status: 403, code: "MFA_REQUIRED" } };
   return { actor: { userId: data.user.id, email: data.user.email ?? null, role, aal2 } };
 }
 

@@ -82,11 +82,11 @@ DECLARE
   recognition_id uuid;
 BEGIN
   result := public.ml_api('admin_session', jsonb_build_object('actor', owner_aal1));
-  IF result->>'ok' IS DISTINCT FROM 'true' OR result->>'needsMfa' IS DISTINCT FROM 'true' THEN
-    RAISE EXCEPTION 'Owner AAL1 session did not remain available with MFA hint: %', result;
+  IF result->>'ok' IS DISTINCT FROM 'true' OR result->>'needsMfa' IS DISTINCT FROM 'false' THEN
+    RAISE EXCEPTION 'Owner AAL1 session was not accepted without MFA: %', result;
   END IF;
 
-  FOREACH action_name IN ARRAY ARRAY['admin_overview', 'admin_list', 'admin_settings_get', 'admin_devices_list', 'admin_members_list', 'admin_report', 'admin_settings_patch', 'admin_device_create', 'admin_device_revoke', 'admin_member_patch', 'admin_mutate'] LOOP
+  FOREACH action_name IN ARRAY ARRAY['admin_overview', 'admin_list', 'admin_settings_get', 'admin_devices_list', 'admin_members_list', 'admin_report'] LOOP
     result := public.ml_api(action_name, jsonb_build_object(
       'actor', owner_aal1,
       'page', 0,
@@ -101,8 +101,8 @@ BEGIN
       'label', 'Security Fixture',
       'codeHash', mothers_love.ml_hash('security-code')
     ));
-    IF result->>'code' IS DISTINCT FROM 'MFA_REQUIRED' THEN
-      RAISE EXCEPTION 'Owner AAL1 action % was not denied: %', action_name, result;
+    IF result->>'ok' IS DISTINCT FROM 'true' OR result->>'code' IS NOT NULL THEN
+      RAISE EXCEPTION 'Owner AAL1 action % was not accepted: %', action_name, result;
     END IF;
   END LOOP;
 
