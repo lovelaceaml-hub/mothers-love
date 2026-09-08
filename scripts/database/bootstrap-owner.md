@@ -12,8 +12,7 @@ VALUES ('<AUTH_USER_UUID>', 'owner', true)
 ON CONFLICT (user_id) DO UPDATE SET role = 'owner', active = true, updated_at = now();
 ```
 
-4. Sign in through the provider's MFA flow and verify `GET /api/admin/session` returns `role: "owner"` with `needsMfa: false` only after aal2 is present.
+4. Sign in with the owner's verified individual email and password, then verify `GET /api/admin/session` returns `role: "owner"` and `needsMfa: false`. Each request still requires a provider-verified bearer token, confirmed email, fresh active campaign membership, and the applicable role check.
 5. Keep collection closed until root has run the privacy and purge preflight. Open collection through the Owner settings route only after the provider migration, cleanup job, and deployed smoke checks pass.
 
 The invite route creates bounded pending campaign invitations and asks the provider's public email OTP flow to authenticate an invited address. It does not use a project-wide service-role key and does not grant access based on Auth metadata alone.
-
