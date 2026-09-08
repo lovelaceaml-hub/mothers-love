@@ -1508,9 +1508,9 @@
 }
 
 .recognitionCard::after {
-  right: -12%;
-  bottom: -24%;
-  width: 45%;
+  bottom: 0;
+  right: 0;
+  width: 34%;
   border-radius: 50%;
   opacity: 0.22;
 }
@@ -1557,6 +1557,41 @@
   max-width: 100%;
   margin-top: auto;
   -webkit-line-clamp: 4;
+}
+
+.recognitionReaction,
+.featureReaction,
+.arrivalReaction,
+.liveRailReaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #984d67;
+  font-size: clamp(10px, 0.58vw, 14px);
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.recognitionReaction {
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+.recognitionReaction > span:first-child,
+.featureReaction > span:first-child,
+.arrivalReaction > span:first-child,
+.liveRailReaction > span:first-child {
+  color: #d55d6f;
+  font-size: 1.15em;
+}
+
+.featureReaction {
+  margin-top: 16px;
+}
+
+.arrivalReaction {
+  margin-top: 12px;
 }
 
 .expressionList {
@@ -1776,7 +1811,6 @@
 }
 
 .expressionsScreen .expressionGrid {
-  padding-left: clamp(240px, 17.5vw, 430px);
   padding-bottom: clamp(10px, 1.5vh, 22px);
 }
 
@@ -1975,6 +2009,10 @@
   line-height: 1.3;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.liveRailReaction {
+  margin-top: 7px;
 }
 
 .qrDock {
@@ -2328,13 +2366,20 @@
 
   .expressionCard p {
     margin-top: 4px;
-    font-size: clamp(9px, 0.62vw, 13px);
-    line-height: 1.1;
+    font-size: clamp(12px, 0.95vw, 18px);
+    line-height: 1.12;
   }
 
   .expressionCard strong {
     margin-top: 4px;
-    font-size: clamp(10px, 0.7vw, 14px);
-    line-height: 1.1;
+    font-size: clamp(13px, 1vw, 20px);
+    line-height: 1.12;
   }
+}
+
+.expressionCard::after {
+  right: 0;
+  bottom: 0;
+  width: 28%;
+  max-width: 72px;
 }

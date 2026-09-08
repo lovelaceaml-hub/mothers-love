@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
+import { fetchReactionCounts, ReactionCount, type ReactionItem } from '@/components/feed/PublicFeedProvider';
 
 import {
   createInitialState,
@@ -126,12 +127,14 @@ type RecognitionCardProps = {
   detailed?: boolean;
   fresh?: boolean;
   compactExpressions?: boolean;
+  reactionCounts?: ReadonlyMap<string, ReactionItem>;
   style?: CSSProperties;
   className?: string;
 };
 
-function RecognitionCard({ recognition, detailed = false, fresh = false, compactExpressions = false, style, className = '' }: RecognitionCardProps) {
+function RecognitionCard({ recognition, detailed = false, fresh = false, compactExpressions = false, reactionCounts, style, className = '' }: RecognitionCardProps) {
   const excerpt = shortExcerpt(recognition.message, detailed ? 650 : 150);
+  const reaction = reactionCounts?.get(recognition.id);
   return (
     <article className={`${styles.recognitionCard} ${compactExpressions ? styles.compactRecognitionCard : ''} ${detailed ? styles.recognitionCardDetailed : ''} ${fresh ? styles.recognitionFresh : ''} ${className}`} style={style} data-testid="recognition-card">
       {fresh ? <span className={styles.freshLabel}>New recognition</span> : null}
@@ -142,6 +145,7 @@ function RecognitionCard({ recognition, detailed = false, fresh = false, compact
       </div>
       <p className={styles.recognitionMessage}>{excerpt.text}</p>
       {excerpt.excerpt ? <p className={styles.excerptNote}>Message preview. Full message follows.</p> : null}
+      {reaction ? <span className={styles.recognitionReaction} aria-label={`${reaction.count} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reaction.count} /></span> : null}
     </article>
   );
 }
@@ -216,7 +220,9 @@ function sharedExpressionIds(left: Recognition, right: Recognition): number[] {
   return left.expressionIds.filter((id) => right.expressionIds.includes(id));
 }
 
-function GardenScreen({ state }: { state: PresentationState }) {
+type ScreenProps = { state: PresentationState; reactionCounts: ReadonlyMap<string, ReactionItem> };
+
+function GardenScreen({ state, reactionCounts }: ScreenProps) {
   const records = selectGarden(state);
   const connections = records.flatMap((left, leftIndex) => records.slice(leftIndex + 1).flatMap((right, rightIndex) => {
     const shared = sharedExpressionIds(left, right);
@@ -255,6 +261,7 @@ function GardenScreen({ state }: { state: PresentationState }) {
                 <RecognitionCard
                   recognition={recognition}
                   compactExpressions
+                  reactionCounts={reactionCounts}
                   fresh={state.queue.some((item) => item.id === recognition.id)}
                   style={{ '--bubble-accent': primaryAccent(recognition) } as CSSProperties}
                 />
@@ -279,7 +286,7 @@ function EmptyGarden() {
   );
 }
 
-function FeaturedScreen({ state }: { state: PresentationState }) {
+function FeaturedScreen({ state, reactionCounts }: ScreenProps) {
   const recognition = selectFeatured(state);
   if (!recognition) return <FallbackScreen />;
   const primary = expression(recognition.expressionIds[0]);
@@ -315,13 +322,14 @@ function FeaturedScreen({ state }: { state: PresentationState }) {
             {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
           </div>
         ) : null}
+        {reactionCounts.has(recognition.id) ? <div className={styles.featureReaction} aria-label={`${reactionCounts.get(recognition.id)?.count ?? 0} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reactionCounts.get(recognition.id)?.count ?? 0} /></div> : null}
         {pageLabel ? <p className={styles.continuationLabel} aria-live="polite">{pageLabel}</p> : null}
       </div>
     </section>
   );
 }
 
-function ClusterScreen({ state }: { state: PresentationState }) {
+function ClusterScreen({ state, reactionCounts }: ScreenProps) {
   const matches = selectCluster(state);
   const clusterExpression = state.clusterExpressionId ? expression(state.clusterExpressionId) : null;
   if (!clusterExpression || !matches.length) return <FallbackScreen />;
@@ -335,7 +343,7 @@ function ClusterScreen({ state }: { state: PresentationState }) {
           <p>{clusterExpression.principle}</p>
         </div>
         <div className={styles.clusterCards}>
-          {matches.map((recognition) => <RecognitionCard key={recognition.id} recognition={recognition} compactExpressions />)}
+          {matches.map((recognition) => <RecognitionCard key={recognition.id} recognition={recognition} compactExpressions reactionCounts={reactionCounts} />)}
         </div>
       </div>
     </section>
@@ -385,7 +393,7 @@ function ExpressionsScreen() {
   );
 }
 
-function ArrivalScreen({ state }: { state: PresentationState }) {
+function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
   const recognition = state.activeArrival ? selectEligible(state).find((item) => item.id === state.activeArrival?.id) : null;
   if (!recognition) return <FallbackScreen />;
   if (isGroupedArrival(state)) {
@@ -428,6 +436,7 @@ function ArrivalScreen({ state }: { state: PresentationState }) {
           {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
         </div>
       ) : null}
+      {reactionCounts.has(recognition.id) ? <div className={styles.arrivalReaction} aria-label={`${reactionCounts.get(recognition.id)?.count ?? 0} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reactionCounts.get(recognition.id)?.count ?? 0} /></div> : null}
       {pageLabel ? <p className={styles.continuationLabel} aria-live="polite">{pageLabel}</p> : null}
       {isGroupedArrival(state) ? <p className={styles.arrivalGroupNote}>Each recognition remains in the garden for a fair rotation.</p> : null}
     </section>
@@ -470,7 +479,7 @@ function FallbackScreen() {
   );
 }
 
-function LiveRail({ items }: { items: Recognition[] }) {
+function LiveRail({ items, reactionCounts }: { items: Recognition[]; reactionCounts: ReadonlyMap<string, ReactionItem> }) {
   if (!items.length) return null;
   return (
     <aside className={styles.liveRail} aria-label="Live recognitions" data-testid="live-rail" data-live-count={items.length}>
@@ -486,6 +495,7 @@ function LiveRail({ items }: { items: Recognition[] }) {
             <article className={styles.liveRailItem} key={recognition.id} data-testid="live-recognition" data-live-index={index}>
               <p className={styles.liveRailRecipient}>{recognition.recipient}</p>
               <p className={styles.liveRailMessage}>{excerpt.text}</p>
+              {reactionCounts.has(recognition.id) ? <span className={styles.liveRailReaction} aria-label={`${reactionCounts.get(recognition.id)?.count ?? 0} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reactionCounts.get(recognition.id)?.count ?? 0} /></span> : null}
             </article>
           );
         })}
@@ -494,14 +504,14 @@ function LiveRail({ items }: { items: Recognition[] }) {
   );
 }
 
-function Screen({ state }: { state: PresentationState }) {
+function Screen({ state, reactionCounts }: ScreenProps) {
   switch (state.screen) {
-    case 'garden': return <GardenScreen state={state} />;
-    case 'featured': return <FeaturedScreen state={state} />;
-    case 'cluster': return <ClusterScreen state={state} />;
+    case 'garden': return <GardenScreen state={state} reactionCounts={reactionCounts} />;
+    case 'featured': return <FeaturedScreen state={state} reactionCounts={reactionCounts} />;
+    case 'cluster': return <ClusterScreen state={state} reactionCounts={reactionCounts} />;
     case 'impact': return <ImpactScreen snapshot={state.snapshot} />;
     case 'all-nine': return <ExpressionsScreen />;
-    case 'arrival': return <ArrivalScreen state={state} />;
+    case 'arrival': return <ArrivalScreen state={state} reactionCounts={reactionCounts} />;
     case 'milestone': return <MilestoneScreen state={state} />;
     case 'quiet': return <QuietScreen />;
     case 'neutral': return <QuietScreen neutral />;
@@ -518,6 +528,8 @@ export function DisplayExperience() {
   const displayOpenedAt = useRef<number | null>(null);
   const snapshotRequestInFlight = useRef(false);
   const snapshotRequestGeneration = useRef(0);
+  const reactionControllerRef = useRef<AbortController | null>(null);
+  const reactionGenerationRef = useRef(0);
 
   useEffect(() => {
     stateRef.current = state;
@@ -617,6 +629,58 @@ export function DisplayExperience() {
   const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
   const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
   const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
+  const reactionEligibleKey = useMemo(
+    () => personalContentVisible ? selectEligible(state).map((recognition) => recognition.id).slice(0, 30).join('\u001f') : '',
+    [personalContentVisible, state.snapshot],
+  );
+  const [reactionCounts, setReactionCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
+  const visibleReactionCounts = useMemo(() => {
+    if (!personalContentVisible || !reactionEligibleKey) return new Map<string, ReactionItem>();
+    const eligible = new Set(reactionEligibleKey.split('\u001f'));
+    return new Map([...reactionCounts].filter(([id]) => eligible.has(id)));
+  }, [personalContentVisible, reactionEligibleKey, reactionCounts]);
+
+  useEffect(() => {
+    reactionControllerRef.current?.abort();
+    reactionControllerRef.current = null;
+    reactionGenerationRef.current += 1;
+    const generation = reactionGenerationRef.current;
+    const eligibleIds = reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [];
+    let active = true;
+
+    if (!personalContentVisible || eligibleIds.length === 0) {
+      setReactionCounts(new Map());
+      return () => {
+        active = false;
+      };
+    }
+
+    const load = async () => {
+      const controller = new AbortController();
+      reactionControllerRef.current = controller;
+      const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
+      try {
+        const next = await fetchReactionCounts(eligibleIds, controller.signal);
+        if (!active || generation !== reactionGenerationRef.current) return;
+        const eligible = new Set(eligibleIds);
+        setReactionCounts(new Map([...next].filter(([id]) => eligible.has(id))));
+      } catch {
+        if (active && generation === reactionGenerationRef.current) setReactionCounts(new Map());
+      } finally {
+        window.clearTimeout(timeoutId);
+        if (reactionControllerRef.current === controller) reactionControllerRef.current = null;
+      }
+    };
+
+    void load();
+    const pollTimer = window.setInterval(() => void load(), 10_000);
+    return () => {
+      active = false;
+      window.clearInterval(pollTimer);
+      reactionControllerRef.current?.abort();
+      reactionControllerRef.current = null;
+    };
+  }, [personalContentVisible, reactionEligibleKey]);
   if (!state.paired && state.phase !== 'loading') {
     return <PairingPanel onPair={pairDisplay} pending={pairingPending} error={pairingError} />;
   }
@@ -642,8 +706,8 @@ export function DisplayExperience() {
           {state.queue.length ? <span>{state.queue.length} waiting</span> : null}
         </div>
       </header>
-      <div className={styles.stage}><Screen state={state} /></div>
-      {personalContentVisible ? <LiveRail items={liveRailItems} /> : null}
+      <div className={styles.stage}><Screen state={state} reactionCounts={visibleReactionCounts} /></div>
+      {personalContentVisible ? <LiveRail items={liveRailItems} reactionCounts={visibleReactionCounts} /> : null}
       {state.snapshot?.submissionUrl ? <QrDock url={state.snapshot.submissionUrl} inviting={state.screen === 'fallback' || state.screen === 'quiet'} /> : null}
       <div className={styles.progressTrack} aria-hidden="true"><span style={{ width: state.nextTransitionAtMs ? `${Math.max(0, Math.min(100, ((state.nowMs - state.screenStartedAtMs) / Math.max(1, state.nextTransitionAtMs - state.screenStartedAtMs)) * 100))}%` : '0%' }} /></div>
     </main>
