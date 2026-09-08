@@ -6,7 +6,7 @@ async function openCollection(page: Page) {
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { collectionOpen: true, configured: true } });
   });
-  await page.goto('/');
+  await page.goto('/recognize');
   await expect(page.getByRole('heading', { name: "THE WORDS OF MOTHER'S LOVE" })).toBeVisible();
 }
 
@@ -85,7 +85,7 @@ test('publishes a normal recognition and resets all fields for a new recognition
     body = route.request().postDataJSON() as Record<string, unknown>;
     await route.fulfill({ status: 201, json: { id: 'synthetic-1', status: 'published', expiresAt: '2030-01-08T00:00:00.000Z' } });
   });
-  await page.goto('/');
+  await page.goto('/recognize');
   await fillValidDraft(page);
   await page.getByRole('button', { name: 'Send recognition' }).click();
   await expect(page.getByRole('heading', { name: /Thank you for sharing Mother's Love/ })).toBeVisible();
@@ -139,7 +139,7 @@ test('keeps collection unavailable without showing a fake success', async ({ pag
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { collectionOpen: false, configured: true } });
   });
-  await page.goto('/');
+  await page.goto('/recognize');
   await expect(page.getByRole('heading', { name: 'Recognition sharing is paused' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Send recognition' })).toHaveCount(0);
   await expect(page.getByText('ready for the campaign display')).toHaveCount(0);
@@ -240,14 +240,14 @@ test('shows all nine expressions and everyday examples on phone and desktop', as
     'https://heavenlymotherslove.org/en/about',
   );
   await expect(officialExamplesLink).toHaveAttribute('target', '_blank');
-  await expect(page.getByRole('link', { name: 'Back to recognition sharing' })).toHaveAttribute('href', '/');
+  await expect(page.getByRole('link', { name: 'Back to live recognitions' })).toHaveAttribute('href', '/');
 });
 
 test('keeps the expressions guide reachable when collection sharing is closed', async ({ page }) => {
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { collectionOpen: false, configured: true } });
   });
-  await page.goto('/');
+  await page.goto('/recognize');
   const guideLink = page.getByRole('link', { name: 'Explore the nine expressions and everyday examples' });
   await expect(guideLink).toBeVisible();
   await expect(guideLink).toHaveAttribute('href', '/expressions');

@@ -33,7 +33,7 @@ export default function ExpressionsPage() {
     <main className={styles.page}>
       <GardenDecorations />
       <div className={styles.shell}>
-        <Link className={styles.backLink} href="/">Back to recognition sharing</Link>
+        <Link className={styles.backLink} href="/">Back to live recognitions</Link>
 
         <header className={styles.header}>
           <p className={styles.kicker}>A small guide for everyday peace</p>
@@ -92,7 +92,7 @@ export default function ExpressionsPage() {
           </a>
         </section>
 
-        <p className={styles.footer}>Ready to recognize someone? <Link href="/">Return to the recognition form</Link>.</p>
+        <p className={styles.footer}>Ready to recognize someone? <Link href="/recognize">Return to the recognition form</Link>.</p>
       </div>
     </main>
   );

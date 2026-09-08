@@ -189,6 +189,7 @@ function ExpressionChoice({
 function Header() {
   return (
     <header className={styles.header}>
+      <Link className={styles.backLink} href="/">Back to live recognitions</Link>
       <p className={styles.kicker}>A small word of encouragement</p>
       <h1>{CAMPAIGN_TITLE}</h1>
       <p className={styles.tagline}>{CAMPAIGN_TAGLINE}</p>
