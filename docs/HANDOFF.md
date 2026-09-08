@@ -1,8 +1,13 @@
 # Handoff
 
-Status: ready to use at https://mothers-love.vercel.app. Recognition sharing is OPEN. Current application source 6dd7578 simplifies app instructions and preserves the shared Unicode-aware first-name/last-initial check on public submissions and supplied admin name edits. Current runtime deployment: dpl_7SYXK1sAN3gyw6npZ7g1wC6S2c3i. The following runtime and publication identifiers describe the previous full release. Fully exercised runtime deployment: dpl_EsYytA55LTx1yneGsH1iZApLoErp. Final publication: dpl_4YzqFf4spX6S6WGZxbUnFsPEKjeR, published source 9aa762d, immediate checks passed. See research/readiness-publication.md. Password-only Owner/Moderator sign-in, explicit password setup, local-scope Sign out, expression guide and the approved Bubble Board remain intact.
+Status: ready to use at https://mothers-love.vercel.app. The home page is a live chronological recognition list; the full form is https://mothers-love.vercel.app/recognize. Small Admin navigation opens email/password sign-in. Latest reviewed source0e4fe81, application deploymentdpl_5ALoK5bWih68YJoNY3Gww5M49GDG. Feed and form production checks passed. The final static publication receipt is in runs/2026-09-08-live-feed/research/publication.md.
 
-## Verification
+## Current feed verification
+Luna xhigh implementation, native Sol high controller review and independent Terra high privacy review passed. Lint,77unit tests, productionbuild,18affected browserjourneys and five local/production synthetic axe and bounds states passed. After final text correction, all12affected formjourneys passed again on production. Real feed200/no-store/noindex exposes only sixpublicfields. Configuration remains open, protectedadmin/display401/no-store. Migration004 added only a campaignfeed function and ledger row; existing public/auth source/owner/ACL fingerprint unchanged. Synthetic evidence is privately backed up in Drive with verifiedSHA256. Typed names remain unverified, and moderation still uses a basic keyword filter. No participant accounts or recipient roster were introduced.
+
+The following sections preserve historical full-release evidence. Current plan is PLAN-03-live-feed.md.
+
+## Earlier full-release verification
 Root: 71 focused tests, lint and production Turbopack build pass. All 48 synthetic browser journeys pass on the deployed assets, including 23 admin flows; one optional screenshot-only test is skipped. The live API rejected malformed names with 400 while collection was still closed. After activation, nine real anonymous page views passed with zero axe violations and no horizontal overflow. Evidence is in runs/2026-09-08-full-app/research/readiness-evidence. Positive browser paths use intercepted synthetic APIs, and no valid synthetic recognition was inserted into production.
 
 Independent Terra high readiness review PASS verified 92 sealed file hashes and the scoped activation query. The previous full-release review and all database/security receipts remain historical evidence in the same research folder. No material finding remains from the three Luna readiness lanes.
@@ -34,5 +39,5 @@ Final copy evidence is privately uploaded and mounted-copy verified at https://d
 ## Expression card follow-up
 Anthony requested cleaner submission cards with a number, quoted expression and explicit Select button. Full principles and everyday examples remain visible below in quieter text; disclosure controls are removed. This follow-up is deployed and verified. All 12 affected journeys and three phone/desktop accessibility checks passed on production; native controller review passed. See cards-publication.md and cards-review.md in the copy-cleanup research folder. Private evidence: https://drive.google.com/file/d/197OILCiEcRyN0klFgxnI14-39do7YJdN/view.
 
-## Active live feed follow-up
+## Completed live feed follow-up
 Read PLAN-03-live-feed.md and runs/2026-09-08-live-feed/INDEX.md. Anthony requested a public published-recognition home list, a prominent submission action and discreet Admin access. Form moves to /recognize. Two Luna xhigh lanes implement the page and narrowly scoped public feed function; root validates and releases. Name-verification advice awaits clarification; no roster or participant accounts are introduced.

@@ -2,7 +2,7 @@
 
 ## Quick links
 
-- **Website:** [Campaign](https://mothers-love.vercel.app), Live and accepting recognitions.
+- **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).
 - **Status:** Ready to use, recognition sharing open, email/password admin access.
 - **Expression guide:** [Nine expressions and everyday examples](https://mothers-love.vercel.app/expressions), live.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login), Sign in with the existing password; no authenticator required.
@@ -18,4 +18,4 @@
 - [Product contract](docs/CONTRACT.md)
 - [Approved visual references](docs/source-handoff/references/README.md)
 
-A public appreciation form, secured administrative workspace and paired TV Living Wall. Code and synthetic fixtures may be privately backed up; live personal recognitions never belong in this repository. Existing database resources outside the campaign namespace are protected.
+A live appreciation feed and submission form, secured administrative workspace and paired TV Living Wall. Code and synthetic fixtures may be privately backed up; live personal recognitions never belong in this repository. Existing database resources outside the campaign namespace are protected.
