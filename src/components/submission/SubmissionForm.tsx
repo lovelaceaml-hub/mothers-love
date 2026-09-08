@@ -260,7 +260,7 @@ function Receipt({ status, onReset }: { status: ReceiptStatus; onReset: () => vo
       <p>
         {held
           ? 'Your recognition has been received. Some messages are reviewed before appearing.'
-          : 'Your recognition has been received and is ready for the campaign display.'}
+          : 'Your recognition has been received and is ready to appear on the home page and TV.'}
       </p>
       <button className={styles.secondaryButton} type="button" onClick={onReset}>Recognize Someone Else</button>
     </section>
@@ -429,7 +429,7 @@ export function SubmissionForm() {
             <form className={styles.formCard} onSubmit={submit} noValidate>
               <div className={styles.privateCallout}>
                 <span className={styles.privateIcon} aria-hidden="true"><span /></span>
-                <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The public display shows the recipient, expressions, and message.</p>
+                <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The recipient, expressions, and message appear on the home page and TV.</p>
               </div>
 
               {formError && (
