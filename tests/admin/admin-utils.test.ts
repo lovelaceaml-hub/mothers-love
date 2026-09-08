@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { AdminRecognition, DisplaySettings } from '@/lib/contracts';
 import {
   ackLabel,
+  actionExplanation,
   capabilitiesFor,
   displaySettingChanges,
   graphemeLength,
@@ -61,6 +62,13 @@ describe('admin editor safety helpers', () => {
     expect(result.changed).toBe(true);
     expect(result.local.message).toBe('Local draft');
     expect(result.latest.message).toBe('Latest server draft');
+  });
+
+  it('explains restore based on prior publication', () => {
+    expect(actionExplanation('restore', recognition({ status: 'invalid', firstPublishedAt: null }))).toBe('Return this message to review.');
+    expect(actionExplanation('restore', recognition({ status: 'hidden', firstPublishedAt: null }))).toBe('Return this message to review.');
+    expect(actionExplanation('restore', recognition({ status: 'invalid' }))).toBe('Return this message to the display and campaign totals.');
+    expect(actionExplanation('restore', recognition({ status: 'hidden' }))).toBe('Return this message to the display.');
   });
 });
 
