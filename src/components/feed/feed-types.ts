@@ -20,6 +20,8 @@ export type VerifiedFeedSnapshot = PublicFeedSnapshot & {
   verifiedMonotonicMs: number;
 };
 
+export const MAX_PUBLIC_FEED_ITEMS = 30;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -99,7 +101,8 @@ export function verifyFeedSnapshot(value: unknown, monotonicNow: number): Verifi
       const publishedDifference = Date.parse(right.firstPublishedAt) - Date.parse(left.firstPublishedAt);
       if (publishedDifference !== 0) return publishedDifference;
       return right.id.localeCompare(left.id);
-    });
+    })
+    .slice(0, MAX_PUBLIC_FEED_ITEMS);
 
   return {
     ...decoded,
