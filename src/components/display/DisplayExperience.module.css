@@ -1874,6 +1874,38 @@
   background: linear-gradient(145deg, rgba(255, 229, 220, 0.92), rgba(255, 253, 246, 0.9));
 }
 
+@media (max-height: 800px) and (min-width: 901px) {
+  .arrivalPersonalScreen {
+    padding: clamp(14px, 2.4vh, 22px) 8%;
+  }
+
+  .arrivalPersonalScreen .arrivalOrb {
+    width: clamp(38px, 3.4vw, 48px);
+    margin-bottom: 8px;
+  }
+
+  .arrivalPersonalScreen h2 {
+    margin: 8px 0 0;
+    font-size: clamp(22px, 1.55vw, 30px);
+    line-height: 1.05;
+  }
+
+  .arrivalPersonalScreen .fullMessage {
+    max-height: none;
+    margin: 10px auto;
+    font-size: clamp(15px, 1vw, 18px);
+    line-height: 1.28;
+  }
+
+  .arrivalPersonalScreen .arrivalReaction {
+    margin-top: 4px;
+  }
+
+  .arrivalPersonalScreen .continuationLabel {
+    margin-top: 6px;
+  }
+}
+
 .arrivalOrb {
   box-shadow: 0 16px 40px rgba(107, 65, 68, 0.18), 0 0 0 12px rgba(255, 142, 134, 0.18), 0 0 36px rgba(255, 216, 106, 0.2);
 }

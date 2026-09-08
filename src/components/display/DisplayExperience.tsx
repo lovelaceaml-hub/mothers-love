@@ -209,6 +209,28 @@ function newestFirst(left: Recognition, right: Recognition): number {
   return right.id.localeCompare(left.id);
 }
 
+function activeStageRecognitions(state: PresentationState): Recognition[] {
+  switch (state.screen) {
+    case 'garden':
+      return selectGarden(state);
+    case 'featured': {
+      const recognition = selectFeatured(state);
+      return recognition ? [recognition] : [];
+    }
+    case 'cluster':
+      return selectCluster(state);
+    case 'arrival': {
+      if (isGroupedArrival(state)) return [];
+      const recognition = state.activeArrival
+        ? selectEligible(state).find((item) => item.id === state.activeArrival?.id)
+        : undefined;
+      return recognition ? [recognition] : [];
+    }
+    default:
+      return [];
+  }
+}
+
 function bubbleSize(recognition: Recognition, count: number): number {
   const messageWeight = recognition.message.length > 360 ? 18 : recognition.message.length > 180 ? 16.5 : 15.5;
   const densityAdjustment = count > 4 ? -1.5 : 0;
@@ -459,7 +481,7 @@ function QuietScreen({ neutral = false }: { neutral?: boolean }) {
     <section className={styles.quietScreen} aria-labelledby="quiet-title" data-motion-key={neutral ? 'neutral-still' : 'quiet-breathe'}>
       <span className={styles.quietFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>{neutral ? 'DISPLAY SAFETY MODE' : 'A QUIET MOMENT'}</p>
-      <h2 id="quiet-title">{neutral ? 'Messages are hidden on this display.' : 'Mother&apos;s Love is still here.'}</h2>
+      <h2 id="quiet-title">{neutral ? 'Messages are hidden on this display.' : "Mother's Love is still here."}</h2>
       <p>{neutral ? 'The nine campaign expressions remain visible.' : 'The wall will return when Quiet mode ends.'}</p>
       <div className={styles.quietExpressions}>
         {EXPRESSIONS.map((item) => <span key={item.id} style={{ backgroundColor: item.color }}>{item.phrase}</span>)}
@@ -528,7 +550,15 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
       controllerRef.current = controller;
       const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
       try {
-        const next = await fetchReactionCounts(eligibleIds, controller.signal);
+        const reactionChunks = Array.from(
+          { length: Math.ceil(eligibleIds.length / 30) },
+          (_, index) => eligibleIds.slice(index * 30, index * 30 + 30),
+        );
+        const responses = await Promise.all(reactionChunks.map((ids) => fetchReactionCounts(ids, controller.signal)));
+        const next = new Map<string, ReactionItem>();
+        for (const response of responses) {
+          for (const [id, reaction] of response) next.set(id, reaction);
+        }
         if (!active || controller.signal.aborted || requestSerial !== requestSerialRef.current) return;
         setReactionCounts(next);
       } catch {
@@ -689,10 +719,15 @@ export function DisplayExperience() {
   const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
   const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
   const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
-  const reactionEligibleKey = useMemo(
-    () => liveRailItems.map((recognition) => recognition.id).join('\u001f'),
-    [liveRailItems],
-  );
+  const reactionEligibleKey = useMemo(() => {
+    if (!personalContentVisible) return '';
+    const eligibleIds = new Set(selectEligible(state).map((recognition) => recognition.id));
+    const visibleIds = [
+      ...liveRailItems.map((recognition) => recognition.id),
+      ...activeStageRecognitions(state).map((recognition) => recognition.id),
+    ];
+    return [...new Set(visibleIds)].filter((id) => eligibleIds.has(id)).join('\u001f');
+  }, [liveRailItems, personalContentVisible, state]);
   const reactionEligibleIds = useMemo(
     () => reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [],
     [reactionEligibleKey],

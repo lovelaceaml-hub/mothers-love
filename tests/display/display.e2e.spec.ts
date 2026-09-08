@@ -2,7 +2,7 @@ import { join } from 'node:path';
 
 import { expect, test, type Page } from '@playwright/test';
 
-type FixtureSize = 0 | 1 | 2 | 20 | 'long';
+type FixtureSize = 0 | 1 | 2 | 20 | 31 | 'long';
 type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still' };
 const LONG_RECIPIENT = 'R'.repeat(80);
 const LONG_MESSAGE = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
@@ -298,6 +298,56 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     }
   });
 
+  test('reads hearts for an older active arrival outside the newest 30 rail records', async ({ page }) => {
+    test.setTimeout(60_000);
+    const testStart = new Date('2026-09-08T12:00:00.000Z');
+    await page.clock.install({ time: testStart });
+    await page.clock.pauseAt(testStart);
+    const reactionRequests: string[][] = [];
+    await page.route(/\/api\/reactions\?ids=/, async (route) => {
+      const ids = new URL(route.request().url()).searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
+      reactionRequests.push(ids);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: ids.map((id) => ({ id, count: Number(id.split('-').pop()), liked: false })) }),
+      });
+    });
+    await page.route('**/api/display/pair', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
+    });
+    let snapshotCalls = 0;
+    await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
+      snapshotCalls += 1;
+      if (snapshotCalls === 1) {
+        await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'pairing required', code: 'UNAUTHORIZED' }) });
+        return;
+      }
+      const response = fixture(31);
+      const arrival = { eventId: 'older-arrival', recognitionId: 'synthetic-1', publishedAt: '2026-09-08T12:00:00.000Z' };
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(snapshotCalls === 2 ? response : { ...response, revision: snapshotCalls, cursor: `fixture-31-${snapshotCalls}`, sync: 'delta', arrivals: [arrival] }),
+      });
+    });
+    await page.route('**/api/display/ack', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    });
+
+    await page.goto('/display');
+    await page.getByLabel('Display code').fill('A7C9F2H4');
+    await page.getByRole('button', { name: 'Connect this display' }).click();
+    await page.clock.runFor(1);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '30');
+    await page.clock.runFor(5_000);
+    await page.clock.runFor(2_500);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
+    await expect(page.getByTestId('arrival-reading').getByLabel('1 hearts')).toBeVisible({ timeout: 5_000 });
+    expect(reactionRequests.every((ids) => ids.length <= 30)).toBe(true);
+    expect(reactionRequests.some((ids) => ids.includes('synthetic-1'))).toBe(true);
+  });
+
   test('keeps cluster content clear of its expression panel at TV sizes', async ({ page }) => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
@@ -515,10 +565,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(reading.getByRole('heading', { name: `Thank you, ${LONG_RECIPIENT}.` })).toBeVisible();
   });
 
-  test('paginates the full long arrival recognition at 1920 and 3840 widths', async ({ page }) => {
+  test('paginates the full long arrival recognition at TV widths', async ({ page }) => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.setViewportSize({ width: 1280, height: 720 });
     await pairLongAcceptance(page, true);
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
@@ -534,6 +584,15 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       const segment = reading.getByTestId('arrival-message-segment');
       if (await segment.count()) messageSegments.push((await segment.textContent()) ?? '');
       if (pageIndex === 0) {
+        const compactSegmentMetrics = await segment.evaluate((element) => ({
+          clientWidth: element.clientWidth,
+          clientHeight: element.clientHeight,
+          scrollWidth: element.scrollWidth,
+          scrollHeight: element.scrollHeight,
+        }));
+        expect(compactSegmentMetrics.scrollWidth).toBeLessThanOrEqual(compactSegmentMetrics.clientWidth + 2);
+        expect(compactSegmentMetrics.scrollHeight).toBeLessThanOrEqual(compactSegmentMetrics.clientHeight + 2);
+        await page.setViewportSize({ width: 1920, height: 1080 });
         if (process.env.DISPLAY_SCREENSHOT_DIR) await page.screenshot({ path: join(process.env.DISPLAY_SCREENSHOT_DIR, 'arrival-long-1920.png'), fullPage: true });
         await page.setViewportSize({ width: 3840, height: 2160 });
         if (process.env.DISPLAY_SCREENSHOT_DIR) await page.screenshot({ path: join(process.env.DISPLAY_SCREENSHOT_DIR, 'arrival-long-3840.png'), fullPage: true });
