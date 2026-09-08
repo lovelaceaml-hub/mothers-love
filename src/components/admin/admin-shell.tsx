@@ -81,7 +81,17 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
   const signOut = async () => {
     const auth = getAuthClient();
     if (!auth) return;
-    await auth.auth.signOut();
+    const { error: signOutError } = await auth.auth.signOut({ scope: 'local' });
+    if (signOutError) {
+      const { data: remaining } = await auth.auth.getSession();
+      if (!remaining.session) {
+        setSignedOut(true);
+        router.replace('/admin/login');
+        return;
+      }
+      setError(getAuthErrorMessage(signOutError));
+      return;
+    }
     setSignedOut(true);
     router.replace('/admin/login');
   };
@@ -121,7 +131,7 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
           <div className={styles.sidebarFooter}>
             <span className={styles.rolePill}>{session?.role ?? 'Checking access'}</span>
             <p className={styles.footerText}>Personal recognition records expire after their original seven day lifetime.</p>
-            <button type="button" className={styles.buttonQuiet} onClick={() => void signOut}>Sign out</button>
+            <button type="button" className={styles.buttonQuiet} onClick={() => void signOut()}>Sign out</button>
           </div>
         </aside>
 
@@ -134,7 +144,7 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
             </div>
             <div className={styles.topbarActions}>
               {session ? <span className={styles.rolePill}>{session.role === 'owner' ? 'Owner access' : 'Moderator access'}</span> : null}
-              <button type="button" className={styles.buttonSecondary} onClick={() => void signOut}>Sign out</button>
+              <button type="button" className={styles.buttonSecondary} onClick={() => void signOut()}>Sign out</button>
             </div>
           </header>
 
