@@ -1,4 +1,6 @@
 .page {
+  --font-display: Georgia, 'Times New Roman', serif;
+  --heading-ink: #693b53;
   --cream: #fff6dc;
   --paper: #fffdf6;
   --ink: #303342;
@@ -31,7 +33,7 @@
 .footer a,
 .sourceLink {
   color: #584f81;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration: underline;
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.18em;
@@ -63,7 +65,7 @@
   margin: 0 0 0.65rem;
   color: #5c6173;
   font-size: 0.72rem;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: 0.17em;
   line-height: 1.3;
   text-transform: uppercase;
@@ -71,10 +73,16 @@
 
 .header h1 {
   margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(2.45rem, 8vw, 4.7rem);
-  font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 0.94;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.06;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 142, 134, 0.62);
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.08em;
   text-wrap: balance;
 }
 
@@ -82,7 +90,7 @@
   max-width: 33rem;
   margin: 1rem auto 0;
   color: #585b67;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 2vw, 1.35rem);
   font-style: italic;
   line-height: 1.35;
@@ -119,9 +127,12 @@
 .contentHeader h2,
 .sourceCard h2 {
   margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.65rem, 4vw, 2.5rem);
-  letter-spacing: -0.045em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.14;
 }
 
 .contentIntro {
@@ -170,30 +181,32 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.72);
   font-size: 0.76rem;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .cardLabel {
   color: var(--ink);
   font-size: 0.72rem;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .expressionCard h3 {
   margin: 0.9rem 0 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
   font-size: clamp(1.12rem, 2vw, 1.35rem);
-  font-weight: 900;
-  letter-spacing: -0.025em;
-  line-height: 1.22;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.24;
 }
 
 .principle {
   margin: 0.65rem 0 0;
   color: var(--ink);
   font-size: 0.88rem;
-  font-weight: 750;
+  font-weight: 400;
   line-height: 1.45;
 }
 
@@ -216,7 +229,7 @@
   margin-bottom: 0.25rem;
   color: var(--ink);
   font-size: 0.67rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
