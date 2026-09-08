@@ -50,7 +50,7 @@ export const adminCsv = async (path: string): Promise<string> => {
 
 export const getAuthErrorMessage = (error: unknown): string => {
   if (error instanceof Error && error.message) return error.message;
-  return 'The admin service is unavailable. Try again when the campaign service is configured.';
+  return 'The admin service is unavailable. Try again.';
 };
 
 export const isUnauthorized = (error: unknown): boolean => {

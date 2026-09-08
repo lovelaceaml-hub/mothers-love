@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
     setMessage(null);
     const auth = getAuthClient();
     if (!auth) {
-      setError('Admin sign-in is not configured yet. The campaign stays closed until the authentication service is configured.');
+      setError('Admin sign-in is unavailable. The campaign stays closed until sign-in is available.');
       setLoading(false);
       return;
     }
@@ -84,12 +84,12 @@ export default function AdminLoginPage() {
           <span className={styles.brandMark} aria-hidden="true">ML</span>
           <p className={styles.eyebrow}>Campaign workspace</p>
           <h1 id="login-title" className={styles.authTitle}>{resetMode ? 'Get a password setup link' : 'Admin sign in'}</h1>
-          <p className={styles.authSubtitle}>{resetMode ? 'Request a fresh link for your invited campaign account.' : 'Use an invited campaign account. Public recognition does not require an account, and open admin registration is disabled.'}</p>
+          <p className={styles.authSubtitle}>{resetMode ? 'Request a password setup link for your invited account.' : 'Use your invited campaign email and password.'}</p>
 
           {message ? <div className={styles.success} role="status">{message}</div> : null}
           {error ? <div className={styles.error} role="alert">{error}</div> : null}
 
-          {resetMode ? <div className={styles.card} style={{ marginBottom: 18 }}><h2 className={styles.cardTitle}>Set up an invited account</h2><p className={styles.cardDescription}>Enter the invited email address to request a fresh password setup link.</p></div> : null}
+          {resetMode ? <div className={styles.card} style={{ marginBottom: 18 }}><h2 className={styles.cardTitle}>Set up an invited account</h2><p className={styles.cardDescription}>Enter the invited email address below.</p></div> : null}
 
           <form className={styles.authForm} onSubmit={submit}>
             <div className={styles.field}>

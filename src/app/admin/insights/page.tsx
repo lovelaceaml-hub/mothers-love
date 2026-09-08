@@ -3,9 +3,8 @@ import { Insights } from '@/components/admin/insights';
 
 export default function InsightsPage() {
   return (
-    <AdminShell eyebrow="Aggregate view" title="Insights" description="Review campaign totals by reporting period. Historical aggregates remain after personal recognitions expire.">
+    <AdminShell eyebrow="Aggregate view" title="Insights" description="Review campaign totals by period.">
       <Insights />
     </AdminShell>
   );
 }
-

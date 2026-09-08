@@ -53,7 +53,7 @@ export function Insights() {
       link.download = `mothers-love-aggregate-${period}.csv`;
       link.click();
       URL.revokeObjectURL(url);
-      setNotice('Aggregate-only CSV downloaded. It contains no recipients, messages, submitted names or raw records.');
+      setNotice('Aggregate CSV downloaded.');
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     }
@@ -62,7 +62,7 @@ export function Insights() {
   return (
     <>
       <section className={styles.card}>
-        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Reporting period</h2><p className={styles.cardDescription}>Week means Sunday through Saturday in America/Los_Angeles. Counts come from durable aggregates.</p></div><button type="button" className={styles.buttonSecondary} onClick={() => void exportAggregate()} disabled={!aggregate}>Export aggregate CSV</button></div>
+        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Reporting period</h2><p className={styles.cardDescription}>Choose a period for campaign totals.</p></div><button type="button" className={styles.buttonSecondary} onClick={() => void exportAggregate()} disabled={!aggregate}>Export aggregate CSV</button></div>
         <div className={styles.tabs} role="tablist" aria-label="Reporting period">
           {(['week', 'month', 'all', 'custom'] as Period[]).map((option) => <button key={option} type="button" role="tab" aria-selected={period === option} className={`${styles.tab} ${period === option ? styles.tabActive : ''}`} onClick={() => { setPeriod(option); if (option !== 'custom') { setFrom(''); setTo(''); } }}>{periodLabel(option)}</button>)}
         </div>
@@ -72,11 +72,10 @@ export function Insights() {
         {loading ? <div className={styles.skeleton} aria-label="Loading report" /> : null}
         {!loading && aggregate ? <>
           <div className={styles.grid}>
-            <article className={`${styles.card} ${styles.cardWarm} ${styles.col4}`}><p className={styles.eyebrow}>Recognitions</p><div className={styles.metric}><span className={styles.metricValue}>{aggregate.recognitions}</span></div><p className={styles.cardDescription}>{aggregate.periodStart} to {aggregate.periodEnd}</p></article>
-            <article className={`${styles.card} ${styles.cardBlue} ${styles.col4}`}><p className={styles.eyebrow}>Selected expressions</p><div className={styles.metric}><span className={styles.metricValue}>{aggregate.expressionTotal}</span></div><p className={styles.cardDescription}>All nine expressions are retained in canonical order.</p></article>
-            <article className={`${styles.card} ${styles.cardGreen} ${styles.col4}`}><p className={styles.eyebrow}>Data as of</p><div className={styles.metric}><span className={styles.metricValue} style={{ fontSize: '1.25rem' }}>{aggregate.revision}</span><span className={styles.metricLabel}>aggregate revision</span></div><p className={styles.cardDescription}>Aggregate revision identifies the server snapshot used.</p></article>
+            <article className={`${styles.card} ${styles.cardWarm} ${styles.col6}`}><p className={styles.eyebrow}>Recognitions</p><div className={styles.metric}><span className={styles.metricValue}>{aggregate.recognitions}</span></div><p className={styles.cardDescription}>{aggregate.periodStart} to {aggregate.periodEnd}</p></article>
+            <article className={`${styles.card} ${styles.cardBlue} ${styles.col6}`}><p className={styles.eyebrow}>Selected expressions</p><div className={styles.metric}><span className={styles.metricValue}>{aggregate.expressionTotal}</span></div><p className={styles.cardDescription}>Across all nine expressions.</p></article>
           </div>
-          <div className={styles.sectionHeader}><div><h2 className={styles.sectionTitle}>Expression counts</h2><p className={styles.sectionHint}>These totals never imply unique people, rankings or sender activity.</p></div></div>
+          <div className={styles.sectionHeader}><div><h2 className={styles.sectionTitle}>Expression counts</h2><p className={styles.sectionHint}>Totals for the selected period.</p></div></div>
           <div className={styles.card}>
             {expressionCatalog.map((expression, index) => { const count = aggregate.expressionCounts[index] ?? 0; return <div className={styles.statLine} key={expression.id}><span style={{ minWidth: 180 }}>{expression.id}. {expression.phrase}</span><div style={{ flex: 1 }}><div className={styles.bar}><div className={styles.barFill} style={{ width: `${Math.round((count / maxCount) * 100)}%`, background: expression.color }} /></div></div><span className={styles.statValue}>{count}</span></div>; })}
           </div>

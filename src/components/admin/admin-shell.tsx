@@ -43,7 +43,7 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
       if (!auth) {
         if (!cancelled) {
           setLoading(false);
-          setError('Admin sign-in is not configured yet. Collection and administration stay closed until the service is configured.');
+          setError('Admin sign-in is unavailable. Collection and administration stay closed until sign-in is available.');
         }
         return;
       }
@@ -130,7 +130,6 @@ export function AdminShell({ children, eyebrow, title, description }: AdminShell
 
           <div className={styles.sidebarFooter}>
             <span className={styles.rolePill}>{session?.role ?? 'Checking access'}</span>
-            <p className={styles.footerText}>Personal recognition records expire after their original seven day lifetime.</p>
             <button type="button" className={styles.buttonQuiet} onClick={() => void signOut()}>Sign out</button>
           </div>
         </aside>

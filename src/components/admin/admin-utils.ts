@@ -41,17 +41,6 @@ export const formatDateTime = (value: string | null | undefined): string => {
   }).format(date);
 };
 
-export const formatExpiry = (expiresAt: string, now = Date.now()): string => {
-  const remaining = new Date(expiresAt).getTime() - now;
-  if (!Number.isFinite(remaining) || remaining <= 0) return 'Expired';
-  const hours = Math.floor(remaining / 3_600_000);
-  const days = Math.floor(hours / 24);
-  const displayHours = hours % 24;
-  if (days > 0) return `${days}d ${displayHours}h left`;
-  if (hours > 0) return `${hours}h left`;
-  return `${Math.max(1, Math.floor(remaining / 60_000))}m left`;
-};
-
 export const graphemeLength = (value: string): number => {
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
     const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
@@ -104,21 +93,23 @@ export const actionExplanation = (
 ): string => {
   switch (action) {
     case 'hide':
-      return 'This removes the recognition from every display context. It keeps the record until its original expiry and does not extend retention.';
+      return 'Remove this message from the TV. Campaign totals stay the same.';
     case 'restore':
-      return 'This restores the remaining display eligibility. It does not create another first-publication count.';
+      return recognition.status === 'invalid'
+        ? 'Return this message to the TV and campaign totals.'
+        : 'Return this message to the TV.';
     case 'invalidate':
-      return `This removes the recognition as invalid and reverses its current count contribution once. Current status: ${statusLabel(recognition.status)}.`;
+      return 'Remove this message from the TV and campaign totals.';
     case 'delete':
-      return 'This permanently deletes the personal recognition. The action cannot be undone and does not claim to erase provider backups.';
+      return 'Permanently delete this message. This cannot be undone.';
     case 'feature':
-      return 'Featuring changes presentation emphasis only. It never extends the original expiry.';
+      return 'Give this message more attention on the TV.';
     case 'publish':
-      return 'Publishing reruns validation and contributes to totals once if the recognition has never been published.';
+      return 'This publishes the recognition after review. It counts once if it has not been published.';
     case 'edit':
-      return 'Edits rerun validation. Substantive changes need a reason and the saved version must still match the version you opened.';
+      return 'Save your changes. Choose a reason when prompted.';
     case 'unfeature':
-      return 'This removes the presentation emphasis while keeping the recognition eligible under its current status.';
+      return 'Remove extra attention from the TV.';
     default:
       return 'Review the effect before continuing.';
   }
@@ -130,9 +121,9 @@ export const requiresReason = (action: ActionKind, fieldsChanged = false): boole
 export const countImpact = (recognition: AdminRecognition): string => {
   if (recognition.status === 'published' || recognition.status === 'hidden') {
     const expressions = recognition.expressionIds.length;
-    return `This currently contributes 1 recognition and ${expressions} expression${expressions === 1 ? '' : 's'} to the aggregate.`;
+    return `Current totals include 1 recognition and ${expressions} expression${expressions === 1 ? '' : 's'}.`;
   }
-  return 'This currently contributes 0 to public aggregates.';
+  return 'Current totals include 0 for this recognition.';
 };
 
 export const validateEditorDraft = (draft: {
@@ -145,7 +136,7 @@ export const validateEditorDraft = (draft: {
   if (!draft.recipient.trim()) errors.push('Add a recipient name.');
   if (!draft.submittedName.trim()) errors.push('Add the submitted name.');
   if (!draft.expressionIds.length) errors.push('Choose at least one expression.');
-  if (graphemeLength(draft.message) > 500) errors.push('Messages must be 500 graphemes or fewer.');
+  if (graphemeLength(draft.message) > 500) errors.push('Messages must be 500 characters or fewer.');
   if (draft.message.trim().length === 0) errors.push('Add a message.');
   return errors;
 };
@@ -175,7 +166,7 @@ export const displaySettingChanges = (
 export const periodLabel = (period: 'week' | 'month' | 'all' | 'custom'): string => {
   switch (period) {
     case 'week':
-      return 'This week, Sunday start';
+      return 'This week';
     case 'month':
       return 'This month';
     case 'all':
@@ -192,7 +183,7 @@ export type AckState = 'saved' | 'pending' | 'applied';
 export const ackLabel = (state: AckState, browserApplied: boolean): string => {
   if (state === 'pending') return 'Pending delivery';
   if (state === 'saved') return 'Unsaved changes';
-  return browserApplied ? 'Applied by browser' : 'Saved in server';
+  return browserApplied ? 'Applied by browser' : 'Saved';
 };
 
 export const makeAggregateCsv = (aggregate: {

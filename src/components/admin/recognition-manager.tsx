@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
 import { adminApi, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, formatExpiry, isExpired, statusLabel } from './admin-utils';
+import { formatDateTime, isExpired, statusLabel } from './admin-utils';
 import styles from './admin.module.css';
 
 type RecognitionResponse = { items: AdminRecognition[]; total: number };
@@ -75,7 +75,7 @@ export function RecognitionManager() {
     <>
       <section className={styles.card}>
         <div className={styles.cardHeader}>
-          <div><h2 className={styles.cardTitle}>Current personal records</h2><p className={styles.cardDescription}>Records older than their original lifetime are removed from this view while aggregate totals remain.</p></div>
+          <div><h2 className={styles.cardTitle}>Current recognitions</h2><p className={styles.cardDescription}>Search and update recognitions.</p></div>
           <span className={styles.badge}>{total} result{total === 1 ? '' : 's'}</span>
         </div>
         <form className={styles.filters} onSubmit={(event) => { event.preventDefault(); setPage(1); void load(); }}>
@@ -93,15 +93,14 @@ export function RecognitionManager() {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <caption className={styles.srOnly}>Current campaign recognition records</caption>
-              <thead><tr><th scope="col">Recipient</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Expires</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
+              <thead><tr><th scope="col">Recipient</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
               <tbody>{items.map((item) => {
                 const badgeClass = item.status === 'published' ? styles.badgePublished : item.status === 'held' ? styles.badgeHeld : item.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
                 return <tr key={item.id}>
                   <td><strong>{item.recipient}</strong><div className={styles.fieldHint}>Admin detail includes submitted name</div></td>
                   <td><div>{item.expressionIds.length} selected</div><div className={styles.fieldHint}>{item.expressionIds.map((id) => expressionText.get(id) ?? `Expression ${id}`).join(', ')}</div></td>
                   <td><span className={`${styles.badge} ${badgeClass}`}>{statusLabel(item.status)}</span></td>
-                  <td>{formatDateTime(item.createdAt)}<div className={styles.fieldHint}>Version {item.version}</div></td>
-                  <td>{formatExpiry(item.expiresAt)}</td>
+                  <td>{formatDateTime(item.createdAt)}</td>
                   <td>{item.featured ? <span className={`${styles.badge} ${styles.badgePending}`}>Featured</span> : <span className={styles.badge}>Standard</span>}</td>
                   <td><Link className={styles.tableRowButton} href={`/admin/recognitions/${encodeURIComponent(item.id)}`}>Open detail</Link></td>
                 </tr>;

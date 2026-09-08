@@ -6,7 +6,7 @@ import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
 import { ActionDialog } from './action-dialog';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, formatExpiry, isExpired, statusLabel, type ActionKind } from './admin-utils';
+import { formatDateTime, isExpired, statusLabel, type ActionKind } from './admin-utils';
 import styles from './admin.module.css';
 
 type RecognitionResponse = { items: AdminRecognition[]; total: number };
@@ -46,7 +46,7 @@ export function ReviewInbox() {
         setItems((current) => current.filter((candidate) => candidate.id !== item.id));
         setSelected((current) => current?.id === item.id ? null : current);
         setAction((current) => selected?.id === item.id ? null : current);
-        setNotice((current) => selected?.id === item.id ? 'This held recognition expired before a decision was saved. Its private content was removed from the review list.' : current);
+        setNotice((current) => selected?.id === item.id ? 'This held recognition expired before you could decide. It was removed from this list.' : current);
       }
     }, Math.max(0, new Date(item.expiresAt).getTime() - Date.now())));
     return () => timers.forEach((timer) => window.clearTimeout(timer));
@@ -66,10 +66,10 @@ export function ReviewInbox() {
       setSelected(null);
       setAction(null);
       setReason('');
-      setNotice(result.recognition ? `${statusLabel(result.recognition.status)} saved. The held queue has been refreshed.` : 'The recognition was removed from the held queue.');
+      setNotice(result.recognition ? `${statusLabel(result.recognition.status)} saved. Review queue updated.` : 'The recognition was removed from the review queue.');
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
-      if ((cause as { status?: number }).status === 409) setNotice('Another admin updated this held record. Refresh before making a new decision.');
+      if ((cause as { status?: number }).status === 409) setNotice('This message changed. Refresh before deciding again.');
     } finally {
       setBusy(false);
     }
@@ -90,9 +90,9 @@ export function ReviewInbox() {
       {notice ? <div className={styles.success} role="status">{notice}</div> : null}
       {error ? <div className={styles.error} role="alert">{error}</div> : null}
       <section className={styles.card}>
-        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Held submissions</h2><p className={styles.cardDescription}>A hold reason is an administrative category, not public copy. Publishing reruns validation and counts once.</p></div><span className={styles.badgeHeld}>{items.length} waiting</span></div>
+        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Held submissions</h2><p className={styles.cardDescription}>Review each message, then choose an action.</p></div><span className={styles.badgeHeld}>{items.length} waiting</span></div>
         {!items.length ? <div className={styles.empty}>No held submissions need a decision. New held content will appear here after the next refresh.</div> : <div className={styles.list}>{items.map((item) => <article className={styles.listItem} key={item.id}>
-          <div><p className={styles.listItemTitle}>{item.recipient}</p><p className={styles.listItemText}>{item.message}</p><div className={styles.listItemMeta}><span className={`${styles.badge} ${styles.badgeHeld}`}>{statusLabel(item.status)}</span><span>Submitted {formatDateTime(item.createdAt)}</span><span>{formatExpiry(item.expiresAt)}</span><span>Reason: {item.reason ?? 'Content check'}</span></div><p className={styles.fieldHint}>Private submitted name: {item.submittedName}</p><div className={styles.listItemMeta}>{item.expressionIds.map((expressionId) => <span key={expressionId} className={styles.badge}>{expressionCatalog.find((expression) => expression.id === expressionId)?.phrase ?? `Expression ${expressionId}`}</span>)}</div></div>
+          <div><p className={styles.listItemTitle}>{item.recipient}</p><p className={styles.listItemText}>{item.message}</p><div className={styles.listItemMeta}><span className={`${styles.badge} ${styles.badgeHeld}`}>{statusLabel(item.status)}</span><span>Submitted {formatDateTime(item.createdAt)}</span><span>Reason: {item.reason ?? 'Content check'}</span></div><p className={styles.fieldHint}>Private submitted name: {item.submittedName}</p><div className={styles.listItemMeta}>{item.expressionIds.map((expressionId) => <span key={expressionId} className={styles.badge}>{expressionCatalog.find((expression) => expression.id === expressionId)?.phrase ?? `Expression ${expressionId}`}</span>)}</div></div>
           <div className={styles.buttonRow} style={{ alignSelf: 'center', justifyContent: 'flex-end' }}><Link className={styles.buttonQuiet} href={`/admin/recognitions/${encodeURIComponent(item.id)}`}>Edit then publish</Link><button type="button" className={styles.button} onClick={() => { setSelected(item); setAction('publish'); setReason(''); }} disabled={isExpired(item.expiresAt)}>Publish</button><button type="button" className={styles.buttonQuiet} onClick={() => { setSelected(item); setAction('hide'); setReason(''); }}>Keep hidden</button><button type="button" className={styles.buttonDanger} onClick={() => { setSelected(item); setAction('invalidate'); setReason(''); }}>Remove as invalid</button></div>
         </article>)}</div>}
       </section>
