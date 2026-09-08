@@ -208,6 +208,48 @@ describe('display presentation coordinator', () => {
     expect(arrivalFinished.presentationHistory[item.id]).toBeDefined();
   });
 
+  it('freezes arrival timing while rotation is paused, shifts on resume, and still expires safely', () => {
+    const item = recognition('paused-arrival', {
+      message: 'A '.repeat(120),
+      expiresAt: new Date(serverOrigin + 100_000).toISOString(),
+    });
+    const base = received(createInitialState(), snapshot([item]), 0);
+    const arrivalEvent = { eventId: 'event-paused-arrival', recognitionId: item.id, publishedAt: item.firstPublishedAt! };
+    const queued = received(base, delta(base.snapshot!, [item], [arrivalEvent], 1), 1);
+    let active = displayReducer(queued, { type: 'TICK', nowMs: queued.nextTransitionAtMs! + 1 });
+    active = displayReducer(active, { type: 'TICK', nowMs: active.activeArrival!.journeyEndsAtMs + 1 });
+    expect(active.activeArrival?.phase).toBe('reading');
+    expect(active.activeArrival?.readingPageIndex).toBe(0);
+
+    const pauseAt = active.nowMs + 1;
+    const pausedSnapshot = {
+      ...delta(active.snapshot!, [item], [], pauseAt),
+      settings: { ...active.snapshot!.settings, pauseRotation: true },
+    };
+    const paused = received(active, pausedSnapshot, pauseAt);
+    const held = displayReducer(paused, { type: 'TICK', nowMs: paused.activeArrival!.readingEndsAtMs + 5_000 });
+
+    expect(held.pauseRotation).toBe(true);
+    expect(held.activeArrival?.phase).toBe('reading');
+    expect(held.activeArrival?.readingPageIndex).toBe(0);
+
+    const resumeAt = held.nowMs + 1;
+    const resumedSnapshot = {
+      ...delta(held.snapshot!, [item], [], resumeAt),
+      settings: { ...held.snapshot!.settings, pauseRotation: false },
+    };
+    const resumed = received(held, resumedSnapshot, resumeAt);
+    expect(resumed.pauseRotation).toBe(false);
+    expect(resumed.activeArrival?.readingPageIndex).toBe(0);
+    expect(resumed.activeArrival!.nextPageEndsAtMs).toBeGreaterThan(resumed.nowMs);
+    const afterResume = displayReducer(resumed, { type: 'TICK', nowMs: resumed.nowMs + 1_000 });
+    expect(afterResume.activeArrival?.readingPageIndex).toBe(0);
+
+    const expired = displayReducer(paused, { type: 'TICK', nowMs: 100_001 });
+    expect(expired.activeArrival).toBeNull();
+    expect(expired.screen).toBe('fallback');
+  });
+
   it('cancels an active arrival immediately when the authoritative snapshot removes it', () => {
     const item = recognition('removed');
     const base = received(createInitialState(), snapshot([item]), 0);
