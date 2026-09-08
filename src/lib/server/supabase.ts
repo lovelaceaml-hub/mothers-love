@@ -14,6 +14,7 @@ export function databaseClient(): Sql | null {
       prepare: false,
       idle_timeout: 20,
       connect_timeout: 10,
+      ssl: config.databaseSsl,
     });
   }
   return cachedDatabase;

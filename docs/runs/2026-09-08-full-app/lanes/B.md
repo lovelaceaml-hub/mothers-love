@@ -44,3 +44,10 @@
 - Added `database/002_unicode_edit_parity.sql`, a fail-closed replacement of only the three frozen admin edit codepoint caps. The caps are now 16,384 codepoints so the HTTP layer remains authoritative for the 80 and 500 grapheme limits and the 16 KiB request body.
 - Added `tests/backend/005_unicode_edit_assertions.sql`, a rollback-only disposable PostgreSQL fixture that submits and edits a synthetic 500-family-emoji message under 16 KiB, verifies the stored edit and unchanged contribution counts, and preserves the existing HTTP 501-grapheme rejection coverage.
 - Frozen `database/001_mothers_love.sql` remains unchanged at SHA-256 `f213b423a4e36ec45d1958b7a1c93a282debd1d84cd6d761d3dcaa95fd753a10`. Root must apply 002 after 001 and run fixture 005 in a disposable database.
+
+## TLS configuration and invitation retry repairs
+
+- Server configuration now requires a valid X509 CA certificate in `DATABASE_CA_CERT` whenever `DATABASE_URL` is configured. Literal and escaped newlines are normalized, malformed or non-CA PEM values fail closed, and `isConfigured()` remains false without a valid CA.
+- The restricted Postgres client always receives `{ ca, rejectUnauthorized: true }` separately from `DATABASE_URL`, so URL `sslmode=disable` and `sslmode=require` cannot weaken certificate verification. `.env.example` documents the server-only restricted login, CA, and `NEXT_PUBLIC_APP_URL`, with no service-role variable.
+- Admin invitation retries now resend provider delivery when the authenticated database bridge returns the exact existing pending invitation conflict. The existing invitation is not renewed and the retry response omits `expiresAt` because the bridge does not expose a new expiry. Other database conflicts, transport failures, and authorization denials send no email.
+- Focused checks passed: TLS and invitation tests 9/9, `npm run typecheck`, and `npm run lint`.
