@@ -23,10 +23,10 @@ This lane owns `src/app/admin/`, `src/components/admin/`, `tests/admin/`, this l
 
 - `npm run typecheck` passes in this worktree after the foundation sync.
 - `npm run lint` passes with no warnings or errors.
-- `npm test -- tests/admin/admin-utils.test.ts` passes with 6 tests. It covers editor expiry, 500 grapheme boundaries, version conflicts, Owner versus Moderator capabilities, display acknowledgement, changed settings and aggregate-only CSV.
+- `npm test` passes with 15 tests across foundation contracts, catalog, client API and admin utility coverage. The admin utility suite covers editor expiry, 500 grapheme boundaries, version conflicts, Owner versus Moderator capabilities, display acknowledgement, changed settings and aggregate-only CSV.
 - `npm run build` passes on Next.js 16.3.4 and emits all admin routes, including the dynamic recognition detail route.
 - Browser smoke: local `http://127.0.0.1:3040/admin/login` returned 200 and rendered the invite-only sign-in form with visible labels and public-form return link. The local server was stopped after the check.
-- `npm run test:e2e -- --config=.tmp-playwright.config.ts tests/admin/admin.spec.ts` passes with 6 synthetic browser tests using intercepted Supabase and API responses. Coverage includes login accessibility with axe, Owner MFA redirect, Moderator permission limits, editor 409 reconciliation, expiry clearing, display acknowledgement and authenticated aggregate CSV export. The temporary config and generated test output were removed after the run.
+- `npx playwright test tests/admin/admin.spec.ts --config=.tmp-playwright.config.ts` passes with 9 synthetic browser tests using intercepted Supabase and API responses. Coverage includes login accessibility with axe, Owner MFA redirect, Moderator permission limits, editor 409 reconciliation, already-expired GET clearing, expired conflict and PATCH response clearing, in-flight expiry clearing, display acknowledgement and authenticated aggregate CSV export. The temporary config and generated test output were removed after the run.
 - Root integration should run `npm run typecheck`, `npm test`, `npm run build` and `npm run test:e2e` after backend, submission and display lanes land. Real authorization and deployed smoke evidence remain integration-owned.
 
 ## Known integration notes
@@ -38,5 +38,6 @@ This lane owns `src/app/admin/`, `src/components/admin/`, `tests/admin/`, this l
 - The aggregate export reads authenticated `text/csv` directly and surfaces server errors without a client fallback that could mask them.
 - Hide, restore, invalidate and substantive edit actions require the approved reason categories. Invalid records can be restored only while unexpired, and current manager/review rows remove expired records and cancel pending review actions.
 - Expiry handling now removes the entire open recognition record from the editor DOM, including recipient, message, submitted name, expressions and conflict state. The browser test asserts recipient and private-name absence after expiry.
+- Every detail response ingress checks expiry before adoption, so an already-expired GET, conflict refresh or PATCH success renders the generic cleared shell without briefly storing private fields. Recognition manager and review inbox also filter expired API rows before storing them.
 - Display acknowledgement now compares only `Device.appliedVersion` with `DisplaySettings.version`; `appliedSnapshotRevision` remains separately displayed telemetry. The synthetic browser test covers an applied settings version with a differing snapshot revision.
 - Physical TV power and visibility are never claimed from browser heartbeat data.

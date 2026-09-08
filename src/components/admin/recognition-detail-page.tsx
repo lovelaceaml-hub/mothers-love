@@ -35,6 +35,7 @@ export function RecognitionDetailPage({ id }: { id: string }) {
 
   const expireOpenRecognition = useCallback(() => {
     setExpired(true);
+    setError(null);
     setRecognition(null);
     setDraft(null);
     setLatest(null);
@@ -43,20 +44,42 @@ export function RecognitionDetailPage({ id }: { id: string }) {
     setNotice('This recognition expired while it was open. Its personal fields were cleared and actions are disabled.');
   }, []);
 
+  const adoptRecognition = useCallback((candidate: AdminRecognition | null, target: 'current' | 'latest' = 'current') => {
+    if (!candidate) {
+      setExpired(false);
+      setRecognition(null);
+      setDraft(null);
+      setLatest(null);
+      return false;
+    }
+    if (isExpired(candidate.expiresAt)) {
+      expireOpenRecognition();
+      return false;
+    }
+    if (target === 'latest') {
+      setLatest(candidate);
+      return true;
+    }
+    setExpired(false);
+    setRecognition(candidate);
+    setDraft(toDraft(candidate));
+    setLatest(null);
+    return true;
+  }, [expireOpenRecognition]);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setNotice(null);
     try {
       const current = await adminApi<AdminRecognition>(`/api/admin/recognitions/${encodeURIComponent(id)}`);
-      setRecognition(current);
-      setDraft(toDraft(current));
-      setExpired(isExpired(current.expiresAt));
+      adoptRecognition(current);
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [adoptRecognition, id]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void load(); }, 0);
@@ -112,12 +135,9 @@ export function RecognitionDetailPage({ id }: { id: string }) {
         ...(actionReason ? { reason: actionReason } : {}),
       });
       if (response.recognition) {
-        setRecognition(response.recognition);
-        setDraft(toDraft(response.recognition));
-        setExpired(isExpired(response.recognition.expiresAt));
+        if (!adoptRecognition(response.recognition)) return;
       } else {
-        setRecognition(null);
-        setDraft(null);
+        adoptRecognition(null);
       }
       setAction(null);
       setReason('');
@@ -128,8 +148,9 @@ export function RecognitionDetailPage({ id }: { id: string }) {
       if (status === 409 || code === 'VERSION_CONFLICT') {
         try {
           const current = await adminApi<AdminRecognition>(`/api/admin/recognitions/${encodeURIComponent(recognition.id)}`);
-          setLatest(current);
-          setNotice('Another admin saved a newer version. Choose which version to use before saving again.');
+          if (adoptRecognition(current, 'latest')) {
+            setNotice('Another admin saved a newer version. Choose which version to use before saving again.');
+          }
         } catch (refreshCause) {
           setError(getAuthErrorMessage(refreshCause));
         }
@@ -184,7 +205,7 @@ export function RecognitionDetailPage({ id }: { id: string }) {
         </div>
       </section>
 
-      {latest ? <section className={styles.card} style={{ marginTop: 16 }}><div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Version conflict needs a decision</h2><p className={styles.cardDescription}>The server has version {latest.version}. Review the latest record before choosing what to keep.</p></div></div><div className={styles.grid}><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Your unsaved draft</h3><p className={styles.listItemText}>{draft?.message}</p></div><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Latest server version</h3><p className={styles.listItemText}>{latest.message}</p></div></div><div className={styles.buttonRow} style={{ marginTop: 16 }}><button className={styles.buttonSecondary} type="button" onClick={() => { setRecognition(latest); setDraft(toDraft(latest)); setLatest(null); setNotice('Loaded the latest server version. Review it, then save deliberately.'); }}>Use latest server version</button><button className={styles.button} type="button" onClick={() => { setRecognition((current) => current ? { ...current, version: latest.version } : current); setLatest(null); setNotice('Your draft is still visible. Save again only after reviewing the latest version number.'); }}>Keep my draft and review</button></div></section> : null}
+      {latest ? <section className={styles.card} style={{ marginTop: 16 }}><div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Version conflict needs a decision</h2><p className={styles.cardDescription}>The server has version {latest.version}. Review the latest record before choosing what to keep.</p></div></div><div className={styles.grid}><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Your unsaved draft</h3><p className={styles.listItemText}>{draft?.message}</p></div><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Latest server version</h3><p className={styles.listItemText}>{latest.message}</p></div></div><div className={styles.buttonRow} style={{ marginTop: 16 }}><button className={styles.buttonSecondary} type="button" onClick={() => { if (adoptRecognition(latest)) setNotice('Loaded the latest server version. Review it, then save deliberately.'); }}>Use latest server version</button><button className={styles.button} type="button" onClick={() => { setRecognition((current) => current ? { ...current, version: latest.version } : current); setLatest(null); setNotice('Your draft is still visible. Save again only after reviewing the latest version number.'); }}>Keep my draft and review</button></div></section> : null}
 
       {action ? <ActionDialog action={action} recognition={recognition} reason={reason} onReasonChange={setReason} onCancel={cancelAction} onConfirm={() => void commitAction(action, reason || null)} busy={saving} /> : null}
     </>
