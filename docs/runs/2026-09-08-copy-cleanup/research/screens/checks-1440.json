@@ -1,0 +1,32 @@
+[
+  {
+    "name": "settings",
+    "width": 1440,
+    "violations": [],
+    "overflow": false
+  },
+  {
+    "name": "controls",
+    "width": 1440,
+    "violations": [],
+    "overflow": false
+  },
+  {
+    "name": "overview",
+    "width": 1440,
+    "violations": [],
+    "overflow": false
+  },
+  {
+    "name": "form",
+    "width": 1440,
+    "violations": [],
+    "overflow": false
+  },
+  {
+    "name": "guide",
+    "width": 1440,
+    "violations": [],
+    "overflow": false
+  }
+]

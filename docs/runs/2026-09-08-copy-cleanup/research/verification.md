@@ -1,0 +1,9 @@
+# Copy cleanup verification
+
+Runtime source: 6bdab79. The two Luna xhigh lanes changed instructional copy across public sharing, the privacy guide, display setup, account setup and admin screens. Campaign title, tagline, expressions, principles and longer examples are byte-identical. Backend, database, authorization, retention and display coordination are unchanged. The only stylesheet change darkens generic admin badge text from the inherited muted color to #565b67; specialized status colors and layout are unchanged.
+
+Root verification: lint passed, 72 unit tests passed, and the production build passed. Public/display browser journeys passed 25 tests, with one optional screenshot-only test skipped. Admin browser journeys passed all 24 tests on the production build. Existing behavior checks retain password setup/session isolation, both sign-out controls, permissions, expiry clearing, conflicts, counting, retry, pairing and TV text bounds.
+
+Rendered checks covered settings, display controls, overview, form and sharing guide at 390px and 1440px. The initial scan found generic badge contrast at 4.13:1. After the one-color correction, all ten strict axe and overflow checks passed. The controller inspected phone and desktop settings captures. Admin evidence uses fully intercepted synthetic account and display responses; it is not a real Owner session or physical TV claim. No production recognition was submitted for testing.
+
+The initial native review used 94 source/test/config files and identified five copy regressions. Luna corrected these, and a focused seven-file native recheck covers the changed instructions and regressions. The separate one-color review found no regression. Root verifies the combined source hashes and record/doc diff. The current deployed check passed all ten axe/bounds views, the neutral-display sharing distinction, and focused moderator-targeting/display-acknowledgement journeys. No required review is waived.

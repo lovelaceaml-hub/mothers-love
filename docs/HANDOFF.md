@@ -1,6 +1,6 @@
 # Handoff
 
-Status: ready to use at https://mothers-love.vercel.app. Recognition sharing is OPEN. Current application source 58e9388 includes the shared Unicode-aware first-name/last-initial check on public submissions and supplied admin name edits. Fully exercised runtime deployment: dpl_EsYytA55LTx1yneGsH1iZApLoErp. Final publication: dpl_4YzqFf4spX6S6WGZxbUnFsPEKjeR, published source 9aa762d, immediate checks passed. See research/readiness-publication.md. Password-only Owner/Moderator sign-in, explicit password setup, local-scope Sign out, expression guide and the approved Bubble Board remain intact.
+Status: ready to use at https://mothers-love.vercel.app. Recognition sharing is OPEN. Current application source 6bdab79 simplifies app instructions and preserves the shared Unicode-aware first-name/last-initial check on public submissions and supplied admin name edits. Current runtime deployment: dpl_J2eeCVW2GQWWv4f4iMfzth5YUHBe. The following runtime and publication identifiers describe the previous full release. Fully exercised runtime deployment: dpl_EsYytA55LTx1yneGsH1iZApLoErp. Final publication: dpl_4YzqFf4spX6S6WGZxbUnFsPEKjeR, published source 9aa762d, immediate checks passed. See research/readiness-publication.md. Password-only Owner/Moderator sign-in, explicit password setup, local-scope Sign out, expression guide and the approved Bubble Board remain intact.
 
 ## Verification
 Root: 71 focused tests, lint and production Turbopack build pass. All 48 synthetic browser journeys pass on the deployed assets, including 23 admin flows; one optional screenshot-only test is skipped. The live API rejected malformed names with 400 while collection was still closed. After activation, nine real anonymous page views passed with zero axe violations and no horizontal overflow. Evidence is in runs/2026-09-08-full-app/research/readiness-evidence. Positive browser paths use intercepted synthetic APIs, and no valid synthetic recognition was inserted into production.
@@ -23,3 +23,10 @@ The prior release archive and its verified SHA-256 remain in research/release-st
 
 ## Physical commissioning
 No active TV session was paired during preflight. The Owner creates a code at https://mothers-love.vercel.app/admin/settings; the TV operator enters it at https://mothers-love.vercel.app/display. Actual TV visibility, distance readability, phone QR scan and post-fix human Owner sign-in have not been reported. Those physical/identity actions are not fabricated by the automated software checks. The public website is already accepting recognitions.
+
+## Current copy follow-up
+Read docs/PLAN-02-copy-cleanup.md and docs/runs/2026-09-08-copy-cleanup/INDEX.md. Runtime 6bdab79 simplifies app instructions and removes age-specific and personal-retention explanations as requested. Existing policy and exact campaign wording remain unchanged. Verification and final publication receipts live in that run's research folder. The shorter USER-MANUAL.md describes only the tasks users perform.
+
+The copy follow-up is complete: native corrective review passed, with 72 unit tests, 49 existing/current browser journeys, ten deployed axe/bounds views and the targeted production corrections verified. See the copy-cleanup research/review-final.md and publication.md receipts.
+
+Final copy evidence is privately uploaded and mounted-copy verified at https://drive.google.com/file/d/1KUehv7WyPtKkw49BlapzGNLsMuk76Zy7/view. Source and subsequent publication receipts remain in the existing private Git branch.

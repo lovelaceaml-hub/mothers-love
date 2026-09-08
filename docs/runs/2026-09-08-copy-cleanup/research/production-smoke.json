@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/api/config",
+    "status": 200,
+    "configured": true,
+    "collectionOpen": true
+  },
+  {
+    "path": "/api/admin/session",
+    "status": 401,
+    "noStore": true
+  },
+  {
+    "path": "/api/display/snapshot",
+    "status": 401,
+    "noStore": true
+  },
+  {
+    "path": "/privacy",
+    "status": 200
+  },
+  {
+    "path": "/admin/settings",
+    "status": 200
+  }
+]
