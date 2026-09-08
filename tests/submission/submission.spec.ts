@@ -131,3 +131,70 @@ test('keeps the privacy page within the 390px horizontal viewport', async ({ pag
 
   expect(bounds.documentWidth).toBeLessThanOrEqual(bounds.viewportWidth);
 });
+
+test('shows all nine expressions and everyday examples on phone and desktop', async ({ page }) => {
+  const examples = [
+    'Start with a friendly hello to a neighbor, a classmate, or someone serving your community.',
+    'Thank someone for an everyday kindness, such as preparing a meal or helping you travel safely.',
+    'Consider how your words affected the other person. Acknowledge your mistake and take the first step toward reconciliation.',
+    'Respond gently when someone makes a mistake, and help them move forward without embarrassment.',
+    'Make room for someone else when a queue or busy journey tests your patience.',
+    'Give a different opinion your full attention before replying. Listening helps people feel respected.',
+    'Encourage someone facing a difficult moment, and remind them that they have your support.',
+    'Notice who could use practical help, then offer a manageable act of kindness.',
+    "Recognize someone's effort or progress with a thoughtful compliment that brightens their day.",
+  ];
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/expressions');
+    await expect(page.getByRole('heading', { name: 'Words that make room for peace' })).toBeVisible();
+    await expect(page.getByRole('article')).toHaveCount(9);
+    for (const example of examples) {
+      await expect(page.getByText(example, { exact: true })).toBeVisible();
+    }
+
+    const bounds = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }));
+    expect(bounds.documentWidth).toBeLessThanOrEqual(bounds.viewportWidth);
+  }
+
+  await expect(page.getByRole('link', { name: /Open heavenlymotherslove\.org\/about/ })).toHaveAttribute(
+    'href',
+    'https://heavenlymotherslove.org/en/about',
+  );
+  await expect(page.getByRole('link', { name: /Open heavenlymotherslove\.org\/about/ })).toHaveAttribute('target', '_blank');
+  await expect(page.getByRole('link', { name: 'Back to recognition sharing' })).toHaveAttribute('href', '/');
+});
+
+test('keeps the expressions guide reachable when collection sharing is closed', async ({ page }) => {
+  await page.route('**/api/config', async (route) => {
+    await route.fulfill({ json: { collectionOpen: false, configured: true } });
+  });
+  await page.goto('/');
+  const guideLink = page.getByRole('link', { name: 'Explore the nine expressions and everyday examples' });
+  await expect(guideLink).toBeVisible();
+  await expect(guideLink).toHaveAttribute('href', '/expressions');
+});
+
+test('keeps open form disclosure selection behavior while showing the everyday example', async ({ page }) => {
+  await openCollection(page);
+  const expression = page.getByRole('article').filter({ hasText: 'How Are You?' });
+  await expression.getByRole('button', { name: 'Why this matters' }).click();
+  await expect(expression).toContainText('The first phrase to peace');
+  await expect(expression).toContainText('Start with a friendly hello to a neighbor, a classmate, or someone serving your community.');
+  await expression.getByRole('button', { name: /How Are You/ }).click();
+  await expect(expression.getByRole('button', { name: /How Are You/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('link', { name: 'Explore the nine expressions and everyday examples' })).toHaveAttribute('href', '/expressions');
+});
+
+test('has no automated accessibility violations on the expressions guide', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/expressions');
+    const results = await new AxeBuilder({ page: page as never }).analyze();
+    expect(results.violations).toEqual([]);
+  }
+});

@@ -202,6 +202,7 @@
 .closeButton:focus-visible,
 .textLink:focus-visible,
 .footerLink a:focus-visible,
+.footerLinks a:focus-visible,
 .errorSummary button:focus-visible {
   border-color: #62b4d7;
   box-shadow: 0 0 0 4px rgba(142, 214, 245, 0.32);
@@ -337,10 +338,21 @@
   cursor: pointer;
 }
 
-.principle {
+.principleDetails {
   margin: -0.05rem 0.9rem 0.85rem 3.45rem;
+}
+
+.principle {
+  margin: 0;
   color: rgba(48, 51, 66, 0.83);
   font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.expressionExample {
+  margin: 0.55rem 0 0;
+  color: rgba(48, 51, 66, 0.78);
+  font-size: 0.76rem;
   line-height: 1.4;
 }
 
@@ -484,6 +496,35 @@
 
 .footerLink a,
 .textLink {
+  color: #584f81;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.15em;
+}
+
+.guideLinks,
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.9rem;
+}
+
+.guideLinks {
+  margin-top: 1.25rem;
+}
+
+.footerLinks {
+  max-width: 52rem;
+  margin: 1rem auto 0;
+  color: #626674;
+  font-size: 0.73rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.footerLinks a {
   color: #584f81;
   font-weight: 800;
   text-decoration: underline;

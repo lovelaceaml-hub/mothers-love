@@ -214,7 +214,14 @@ function ExpressionChoice({
       >
         {expanded ? 'Hide why' : 'Why this matters'}
       </button>
-      {expanded && <p className={styles.principle} id={`principle-${expression.id}`}>{expression.principle}</p>}
+      {expanded && (
+        <div className={styles.principleDetails} id={`principle-${expression.id}`}>
+          <p className={styles.principle}>{expression.principle}</p>
+          {expression.example && (
+            <p className={styles.expressionExample}><strong>Everyday example.</strong> {expression.example}</p>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -243,7 +250,10 @@ function ClosedState({ configured }: { configured: boolean }) {
           ? 'The campaign is taking a quiet moment. Please check back soon to share your recognition.'
           : 'This campaign is not ready to receive recognitions yet. Please check back soon.'}
       </p>
-      <Link className={styles.textLink} href="/privacy">Read how recognition sharing works</Link>
+      <div className={styles.guideLinks}>
+        <Link className={styles.textLink} href="/expressions">Explore the nine expressions and everyday examples</Link>
+        <Link className={styles.textLink} href="/privacy">Read how recognition sharing works</Link>
+      </div>
     </section>
   );
 }
@@ -566,7 +576,10 @@ export function SubmissionForm() {
 
               <p className={styles.privacyReminder}>Please avoid health details, personal disagreements, contact information, or anything the recipient would prefer to keep private. A message can still reveal its writer through its wording or timing.</p>
             </form>
-            <p className={styles.footerLink}><Link href="/privacy">Read the privacy details</Link></p>
+            <div className={styles.footerLinks}>
+              <Link href="/expressions">Explore the nine expressions and everyday examples</Link>
+              <Link href="/privacy">Read the privacy details</Link>
+            </div>
           </>
         )}
 
