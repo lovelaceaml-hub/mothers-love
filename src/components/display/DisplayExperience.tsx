@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import QRCode from 'qrcode';
 
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
@@ -504,6 +504,68 @@ function LiveRail({ items, reactionCounts }: { items: Recognition[]; reactionCou
   );
 }
 
+const EMPTY_REACTION_COUNTS: ReadonlyMap<string, ReactionItem> = new Map();
+
+function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly string[]; children: (reactionCounts: ReadonlyMap<string, ReactionItem>) => ReactNode }) {
+  const [reactionCounts, setReactionCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
+  const controllerRef = useRef<AbortController | null>(null);
+  const requestSerialRef = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+
+    if (eligibleIds.length === 0) {
+      return () => {
+        active = false;
+      };
+    }
+
+    const load = async () => {
+      controllerRef.current?.abort();
+      const controller = new AbortController();
+      const requestSerial = requestSerialRef.current + 1;
+      requestSerialRef.current = requestSerial;
+      controllerRef.current = controller;
+      const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
+      try {
+        const next = await fetchReactionCounts(eligibleIds, controller.signal);
+        if (!active || controller.signal.aborted || requestSerial !== requestSerialRef.current) return;
+        setReactionCounts(next);
+      } catch {
+        if (active && !controller.signal.aborted && requestSerial === requestSerialRef.current) setReactionCounts(EMPTY_REACTION_COUNTS);
+      } finally {
+        window.clearTimeout(timeoutId);
+        if (controllerRef.current === controller) controllerRef.current = null;
+      }
+    };
+
+    void load();
+    const pollTimer = window.setInterval(() => void load(), 10_000);
+    return () => {
+      active = false;
+      window.clearInterval(pollTimer);
+      controllerRef.current?.abort();
+      controllerRef.current = null;
+    };
+  }, [eligibleIds]);
+
+  return children(reactionCounts);
+}
+
+function DisplayStage({ state, personalContentVisible, liveRailItems, reactionCounts }: {
+  state: PresentationState;
+  personalContentVisible: boolean;
+  liveRailItems: Recognition[];
+  reactionCounts: ReadonlyMap<string, ReactionItem>;
+}) {
+  return (
+    <>
+      <div className={styles.stage}><Screen state={state} reactionCounts={reactionCounts} /></div>
+      {personalContentVisible ? <LiveRail items={liveRailItems} reactionCounts={reactionCounts} /> : null}
+    </>
+  );
+}
+
 function Screen({ state, reactionCounts }: ScreenProps) {
   switch (state.screen) {
     case 'garden': return <GardenScreen state={state} reactionCounts={reactionCounts} />;
@@ -528,8 +590,6 @@ export function DisplayExperience() {
   const displayOpenedAt = useRef<number | null>(null);
   const snapshotRequestInFlight = useRef(false);
   const snapshotRequestGeneration = useRef(0);
-  const reactionControllerRef = useRef<AbortController | null>(null);
-  const reactionGenerationRef = useRef(0);
 
   useEffect(() => {
     stateRef.current = state;
@@ -630,57 +690,13 @@ export function DisplayExperience() {
   const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
   const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
   const reactionEligibleKey = useMemo(
-    () => personalContentVisible ? selectEligible(state).map((recognition) => recognition.id).slice(0, 30).join('\u001f') : '',
-    [personalContentVisible, state.snapshot],
+    () => liveRailItems.map((recognition) => recognition.id).join('\u001f'),
+    [liveRailItems],
   );
-  const [reactionCounts, setReactionCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
-  const visibleReactionCounts = useMemo(() => {
-    if (!personalContentVisible || !reactionEligibleKey) return new Map<string, ReactionItem>();
-    const eligible = new Set(reactionEligibleKey.split('\u001f'));
-    return new Map([...reactionCounts].filter(([id]) => eligible.has(id)));
-  }, [personalContentVisible, reactionEligibleKey, reactionCounts]);
-
-  useEffect(() => {
-    reactionControllerRef.current?.abort();
-    reactionControllerRef.current = null;
-    reactionGenerationRef.current += 1;
-    const generation = reactionGenerationRef.current;
-    const eligibleIds = reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [];
-    let active = true;
-
-    if (!personalContentVisible || eligibleIds.length === 0) {
-      setReactionCounts(new Map());
-      return () => {
-        active = false;
-      };
-    }
-
-    const load = async () => {
-      const controller = new AbortController();
-      reactionControllerRef.current = controller;
-      const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
-      try {
-        const next = await fetchReactionCounts(eligibleIds, controller.signal);
-        if (!active || generation !== reactionGenerationRef.current) return;
-        const eligible = new Set(eligibleIds);
-        setReactionCounts(new Map([...next].filter(([id]) => eligible.has(id))));
-      } catch {
-        if (active && generation === reactionGenerationRef.current) setReactionCounts(new Map());
-      } finally {
-        window.clearTimeout(timeoutId);
-        if (reactionControllerRef.current === controller) reactionControllerRef.current = null;
-      }
-    };
-
-    void load();
-    const pollTimer = window.setInterval(() => void load(), 10_000);
-    return () => {
-      active = false;
-      window.clearInterval(pollTimer);
-      reactionControllerRef.current?.abort();
-      reactionControllerRef.current = null;
-    };
-  }, [personalContentVisible, reactionEligibleKey]);
+  const reactionEligibleIds = useMemo(
+    () => reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [],
+    [reactionEligibleKey],
+  );
   if (!state.paired && state.phase !== 'loading') {
     return <PairingPanel onPair={pairDisplay} pending={pairingPending} error={pairingError} />;
   }
@@ -706,8 +722,11 @@ export function DisplayExperience() {
           {state.queue.length ? <span>{state.queue.length} waiting</span> : null}
         </div>
       </header>
-      <div className={styles.stage}><Screen state={state} reactionCounts={visibleReactionCounts} /></div>
-      {personalContentVisible ? <LiveRail items={liveRailItems} reactionCounts={visibleReactionCounts} /> : null}
+      {personalContentVisible ? (
+        <ReactionCounts key={reactionEligibleKey} eligibleIds={reactionEligibleIds}>
+          {(reactionCounts) => <DisplayStage state={state} personalContentVisible={personalContentVisible} liveRailItems={liveRailItems} reactionCounts={reactionCounts} />}
+        </ReactionCounts>
+      ) : <DisplayStage state={state} personalContentVisible={false} liveRailItems={[]} reactionCounts={EMPTY_REACTION_COUNTS} />}
       {state.snapshot?.submissionUrl ? <QrDock url={state.snapshot.submissionUrl} inviting={state.screen === 'fallback' || state.screen === 'quiet'} /> : null}
       <div className={styles.progressTrack} aria-hidden="true"><span style={{ width: state.nextTransitionAtMs ? `${Math.max(0, Math.min(100, ((state.nowMs - state.screenStartedAtMs) / Math.max(1, state.nextTransitionAtMs - state.screenStartedAtMs)) * 100))}%` : '0%' }} /></div>
     </main>
