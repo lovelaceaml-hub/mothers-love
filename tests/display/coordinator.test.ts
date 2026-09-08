@@ -260,5 +260,22 @@ describe('display presentation coordinator', () => {
 
     expect(grouped.queue).toHaveLength(11);
     expect(isGroupedArrival(grouped)).toBe(true);
+
+    const completed = displayReducer(grouped, { type: 'TICK', nowMs: grouped.activeArrival!.readingEndsAtMs + 1 });
+    expect(completed.queue).toHaveLength(0);
+    expect(completed.introducedPublicationKeys).toHaveLength(11);
+
+    const later = recognition('later');
+    const laterSnapshot = delta(
+      completed.snapshot!,
+      [...records, later],
+      [{ eventId: 'event-later', recognitionId: later.id, publishedAt: later.firstPublishedAt! }],
+      completed.nowMs + 1,
+    );
+    const withLater = received(completed, laterSnapshot, completed.nowMs + 1);
+    const laterArrival = displayReducer(withLater, { type: 'TICK', nowMs: withLater.nextTransitionAtMs! + 1 });
+
+    expect(laterArrival.activeArrival?.id).toBe('later');
+    expect(laterArrival.activeArrival?.grouped).toBe(false);
   });
 });
