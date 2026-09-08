@@ -206,7 +206,7 @@ test.describe('synthetic admin browser workflows', () => {
     let saved = false;
     await mockCommon(page, { overviewBody: overview({ settings: settings({ version: 5 }), devices: [device({ appliedVersion: 4, appliedSnapshotRevision: 4 })] }) });
     await page.unroute('**/api/admin/overview');
-    await page.route('**/api/admin/overview', (route) => fulfillJson(route, overview({ settings: settings({ version: saved ? 6 : 5 }), devices: [device({ appliedVersion: saved ? 6 : 4, appliedSnapshotRevision: saved ? 6 : 4 })] })));
+    await page.route('**/api/admin/overview', (route) => fulfillJson(route, overview({ settings: settings({ version: saved ? 6 : 5 }), devices: [device({ appliedVersion: saved ? 6 : 4, appliedSnapshotRevision: 4 })] })));
     await page.route('**/api/admin/settings', async (route) => {
       if (route.request().method() === 'PATCH') {
         const body = route.request().postDataJSON() as { expectedVersion: number; changes: Record<string, unknown> };
@@ -226,6 +226,7 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Pending delivery', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Refresh browser acknowledgement' }).click();
     await expect(page.getByText('Applied by browser', { exact: true })).toBeVisible();
+    await expect(page.getByText('Applied settings version 6; applied snapshot revision 4.', { exact: true })).toBeVisible();
   });
 
   test('aggregate export downloads server CSV without personal fields', async ({ page }) => {
