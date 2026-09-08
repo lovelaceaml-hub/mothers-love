@@ -55,7 +55,7 @@ describe("GET /api/reactions", () => {
     expect(setCookie.toLowerCase()).toContain("httponly");
     expect(setCookie.toLowerCase()).toContain("secure");
     expect(setCookie.toLowerCase()).toContain("samesite=lax");
-    expect(setCookie).toContain("Path=/");
+    expect(setCookie).toContain("Path=/api/reactions");
     expect(setCookie).toContain("Max-Age=2592000");
     expect(setCookie).not.toContain("hash-");
     expect(sql).toHaveBeenCalledTimes(1);
@@ -86,6 +86,10 @@ describe("GET /api/reactions", () => {
     sqlResult({ ok: true, items: [{ id, count: -1, liked: false }] });
     const malformed = await GET(request(`/api/reactions?ids=${id}`, { headers: { cookie: `ml_reaction=${cookie}` } }));
     expect(malformed.status).toBe(503);
+
+    sqlResult({ ok: true, items: [{ id: idTwo, count: 1, liked: false }] });
+    const wrongId = await GET(request(`/api/reactions?ids=${id}`, { headers: { cookie: `ml_reaction=${cookie}` } }));
+    expect(wrongId.status).toBe(503);
   });
 });
 
@@ -141,5 +145,9 @@ describe("PUT /api/reactions/[id]", () => {
     const throttled = await PUT(putRequest({ liked: true }), { params: Promise.resolve({ id }) });
     expect(throttled.status).toBe(429);
     expect(throttled.headers.get("retry-after")).toBe("60");
+
+    sqlResult({ ok: true, id: idTwo, count: 1, liked: true });
+    const wrongId = await PUT(putRequest({ liked: true }), { params: Promise.resolve({ id }) });
+    expect(wrongId.status).toBe(503);
   });
 });

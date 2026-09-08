@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const reactionCookie = isReactionCookie(existingCookie) ? existingCookie : createReactionCookie();
   const result = await queryReactions(ids, visitorHash(reactionCookie));
   if (result.error) return withReactionVary(errorResult(503, "UNAVAILABLE"));
-  const projected = projectReactionResult(result.data);
+  const projected = projectReactionResult(result.data, ids);
   if (!projected) return withReactionVary(errorResult(503, "UNAVAILABLE"));
 
   const response = withReactionVary(databaseResult(projected));
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      path: "/",
+      path: "/api/reactions",
       maxAge: REACTION_COOKIE_MAX_AGE,
     });
   }
