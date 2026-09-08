@@ -118,3 +118,16 @@ test('has no automated accessibility violations on the open form', async ({ page
   const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations).toEqual([]);
 });
+
+test('keeps the privacy page within the 390px horizontal viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/privacy');
+  await expect(page.getByRole('heading', { name: 'Privacy details' })).toBeVisible();
+
+  const bounds = await page.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }));
+
+  expect(bounds.documentWidth).toBeLessThanOrEqual(bounds.viewportWidth);
+});

@@ -27,7 +27,7 @@
 .card p + p { margin-top: 1rem; }
 .card section { padding-top: 0.15rem; }
 .footer { margin: 1.3rem auto 0; color: var(--muted); font-size: 0.82rem; text-align: center; }
-.decorativeCircle { position: absolute; top: -4rem; right: -3rem; width: 13rem; height: 13rem; border: 2px solid rgba(255,255,255,0.55); border-radius: 50%; background: var(--coral); opacity: 0.37; }
+.decorativeCircle { position: absolute; top: -4rem; right: 0; width: 13rem; height: 13rem; border: 2px solid rgba(255,255,255,0.55); border-radius: 50%; background: var(--coral); opacity: 0.37; }
 .decorativeCircle::after { position: absolute; inset: 14%; border: 2px solid rgba(255,255,255,0.55); border-radius: 50%; content: ''; }
 
 @media (min-width: 42rem) { .page { padding-top: 2.5rem; } }
