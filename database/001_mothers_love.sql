@@ -240,6 +240,20 @@ RETURNS jsonb LANGUAGE sql STABLE SET search_path = '' AS $$
   SELECT mothers_love.ml_public_recognition(rec) || jsonb_build_object('submittedName', rec.submitted_name, 'reason', rec.reason_category)
 $$;
 
+CREATE OR REPLACE FUNCTION mothers_love.ml_purge_healthy(check_at timestamptz)
+RETURNS boolean LANGUAGE sql STABLE SET search_path = '' AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM mothers_love.settings s
+    WHERE s.singleton_id = true
+      AND s.last_cleanup_at IS NOT NULL
+      AND s.last_cleanup_at >= check_at - interval '2 minutes'
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM mothers_love.recognitions r
+    WHERE r.expires_at <= check_at - interval '2 minutes'
+  )
+$$;
+
 CREATE OR REPLACE FUNCTION mothers_love.ml_settings_json()
 RETURNS jsonb LANGUAGE sql STABLE SET search_path = '' AS $$
   SELECT jsonb_build_object(
@@ -248,7 +262,7 @@ RETURNS jsonb LANGUAGE sql STABLE SET search_path = '' AS $$
     'motion', s.motion,
     'pauseArrivals', s.pause_arrivals,
     'pauseRotation', s.pause_rotation,
-    'collectionOpen', s.collection_open,
+    'collectionOpen', s.collection_open AND mothers_love.ml_purge_healthy(now()),
     'lowActivityMinutes', s.low_activity_minutes,
     'readingSeconds', s.reading_seconds,
     'maxBubbles', s.max_bubbles,
@@ -391,6 +405,7 @@ DECLARE
   rate_result jsonb;
   req_key text;
   existing_id uuid;
+  existing_hash text;
   new_id uuid;
   now_value timestamptz := clock_timestamp();
   expires_value timestamptz;
@@ -434,23 +449,24 @@ DECLARE
 BEGIN
   IF action = 'config' THEN
     SELECT * INTO settings_row FROM mothers_love.settings WHERE singleton_id = true;
-    RETURN jsonb_build_object('ok', true, 'collectionOpen', COALESCE(settings_row.collection_open, false));
+    RETURN jsonb_build_object('ok', true, 'collectionOpen', COALESCE(settings_row.collection_open, false) AND mothers_love.ml_purge_healthy(now_value));
   END IF;
 
   IF action = 'submit' THEN
     rate_result := mothers_love.ml_check_rate(payload);
     IF NOT (rate_result->>'ok')::boolean THEN RETURN rate_result; END IF;
     SELECT * INTO settings_row FROM mothers_love.settings WHERE singleton_id = true;
-    IF NOT COALESCE(settings_row.collection_open, false) THEN RETURN jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE'); END IF;
+    IF NOT COALESCE(settings_row.collection_open, false) OR NOT mothers_love.ml_purge_healthy(now_value) THEN RETURN jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE'); END IF;
     req_key := NULLIF(payload->>'requestKey', '');
     IF req_key IS NULL THEN RETURN jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST'); END IF;
+    PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(req_key, 3987123456::bigint));
     DELETE FROM mothers_love.idempotency_keys WHERE expires_at <= now_value;
-    SELECT ik.recognition_id, ik.accepted_status INTO existing_id, role_value FROM mothers_love.idempotency_keys ik WHERE ik.request_key = payload->>'requestKey' AND ik.expires_at > now_value;
+    SELECT ik.recognition_id, ik.accepted_status, ik.payload_hash INTO existing_id, role_value, existing_hash FROM mothers_love.idempotency_keys ik WHERE ik.request_key = req_key AND ik.expires_at > now_value;
     IF existing_id IS NOT NULL THEN
-      IF COALESCE((SELECT ik.payload_hash FROM mothers_love.idempotency_keys ik WHERE ik.request_key = payload->>'requestKey'), '') <> COALESCE(payload->>'payloadHash', '') THEN RETURN jsonb_build_object('ok', false, 'status', 409, 'code', 'IDEMPOTENCY_CONFLICT'); END IF;
+      IF existing_hash IS DISTINCT FROM COALESCE(payload->>'payloadHash', '') THEN RETURN jsonb_build_object('ok', false, 'status', 409, 'code', 'IDEMPOTENCY_CONFLICT'); END IF;
       SELECT * INTO rec FROM mothers_love.recognitions WHERE id = existing_id AND expires_at > now_value;
       IF FOUND THEN RETURN jsonb_build_object('ok', true, 'id', rec.id::text, 'status', role_value, 'expiresAt', rec.expires_at); END IF;
-      DELETE FROM mothers_love.idempotency_keys AS old_key WHERE old_key.request_key = payload->>'requestKey';
+      DELETE FROM mothers_love.idempotency_keys AS old_key WHERE old_key.request_key = req_key;
     END IF;
     hold := COALESCE((payload->>'hold')::boolean, false);
     filter_categories := COALESCE(payload->'filterCategories', '[]'::jsonb);
@@ -461,11 +477,12 @@ BEGIN
     RETURNING * INTO rec;
     new_id := rec.id;
     INSERT INTO mothers_love.idempotency_keys (request_key, recognition_id, payload_hash, accepted_status, expires_at)
-    VALUES (payload->>'requestKey', new_id, COALESCE(payload->>'payloadHash', ''), CASE WHEN hold THEN 'held' ELSE 'published' END, expires_value)
+    VALUES (req_key, new_id, COALESCE(payload->>'payloadHash', ''), CASE WHEN hold THEN 'held' ELSE 'published' END, expires_value)
     ON CONFLICT (request_key) DO NOTHING;
-    SELECT ik.recognition_id, ik.accepted_status INTO existing_id, role_value FROM mothers_love.idempotency_keys ik WHERE ik.request_key = payload->>'requestKey';
+    SELECT ik.recognition_id, ik.accepted_status, ik.payload_hash INTO existing_id, role_value, existing_hash FROM mothers_love.idempotency_keys ik WHERE ik.request_key = req_key;
     IF existing_id <> new_id THEN
       DELETE FROM mothers_love.recognitions WHERE id = new_id;
+      IF existing_hash IS DISTINCT FROM COALESCE(payload->>'payloadHash', '') THEN RETURN jsonb_build_object('ok', false, 'status', 409, 'code', 'IDEMPOTENCY_CONFLICT'); END IF;
       SELECT * INTO rec FROM mothers_love.recognitions WHERE id = existing_id AND expires_at > now_value;
       IF FOUND THEN RETURN jsonb_build_object('ok', true, 'id', rec.id::text, 'status', role_value, 'expiresAt', rec.expires_at); END IF;
       RETURN jsonb_build_object('ok', false, 'status', 409, 'code', 'CONFLICT');
@@ -674,7 +691,7 @@ BEGIN
     SELECT * INTO settings_row FROM mothers_love.settings WHERE singleton_id = true;
     SELECT COALESCE(jsonb_agg(mothers_love.ml_device_json(d) ORDER BY d.created_at DESC), '[]'::jsonb) INTO device_items FROM mothers_love.devices d;
     aggregate := mothers_love.ml_aggregate_json((now_value AT TIME ZONE 'America/Los_Angeles')::date - EXTRACT(day FROM (now_value AT TIME ZONE 'America/Los_Angeles'))::integer + 1, (now_value AT TIME ZONE 'America/Los_Angeles')::date);
-    RETURN jsonb_build_object('ok', true, 'heldCount', (SELECT count(*) FROM mothers_love.recognitions WHERE status = 'held' AND expires_at > now_value), 'nearestExpiry', (SELECT min(expires_at) FROM mothers_love.recognitions WHERE status = 'held' AND expires_at > now_value), 'lastCleanupAt', settings_row.last_cleanup_at, 'overduePurgeCount', settings_row.overdue_purge_count, 'devices', device_items, 'aggregate', aggregate, 'settings', mothers_love.ml_settings_json());
+    RETURN jsonb_build_object('ok', true, 'heldCount', (SELECT count(*) FROM mothers_love.recognitions WHERE status = 'held' AND expires_at > now_value), 'nearestExpiry', (SELECT min(expires_at) FROM mothers_love.recognitions WHERE status = 'held' AND expires_at > now_value), 'lastCleanupAt', settings_row.last_cleanup_at, 'overduePurgeCount', (SELECT count(*) FROM mothers_love.recognitions WHERE expires_at <= now_value - interval '2 minutes'), 'devices', device_items, 'aggregate', aggregate, 'settings', mothers_love.ml_settings_json());
   END IF;
 
   IF action = 'admin_report' THEN
@@ -700,6 +717,7 @@ BEGIN
     SELECT * INTO settings_row FROM mothers_love.settings WHERE singleton_id = true FOR UPDATE;
     IF settings_row.version <> expected_version THEN RETURN jsonb_build_object('ok', false, 'status', 409, 'code', 'STALE'); END IF;
     IF (setting_changes ? 'collectionOpen') AND auth_result->>'role' <> 'owner' THEN RETURN jsonb_build_object('ok', false, 'status', 403, 'code', 'OWNER_REQUIRED'); END IF;
+    IF setting_changes ? 'collectionOpen' AND COALESCE((setting_changes->>'collectionOpen')::boolean, false) AND NOT mothers_love.ml_purge_healthy(now_value) THEN RETURN jsonb_build_object('ok', false, 'status', 503, 'code', 'PURGE_UNHEALTHY'); END IF;
     IF setting_changes ? 'mode' AND setting_changes->>'mode' NOT IN ('normal','quiet','neutral') THEN RETURN jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST'); END IF;
     IF setting_changes ? 'motion' AND setting_changes->>'motion' NOT IN ('calm','standard','lively','still') THEN RETURN jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST'); END IF;
     IF setting_changes ? 'lowActivityMinutes' AND ((setting_changes->>'lowActivityMinutes')::integer < 1 OR (setting_changes->>'lowActivityMinutes')::integer > 180) THEN RETURN jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST'); END IF;
@@ -770,9 +788,14 @@ BEGIN
 
   IF action = 'display_snapshot' THEN
     token_hash := NULLIF(payload->>'tokenHash', '');
-    SELECT ds.* INTO session_row FROM mothers_love.display_sessions ds WHERE ds.token_hash = payload->>'tokenHash' AND ds.revoked_at IS NULL AND ds.expires_at > now_value;
-    IF FOUND THEN SELECT d.* INTO device_row FROM mothers_love.devices d WHERE d.id = session_row.device_id AND d.revoked_at IS NULL; END IF;
-    IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
+    SELECT d.* INTO device_row
+    FROM mothers_love.display_sessions ds
+    JOIN mothers_love.devices d ON d.id = ds.device_id
+    WHERE ds.token_hash = NULLIF(payload->>'tokenHash', '')
+    FOR UPDATE OF d;
+    IF NOT FOUND OR device_row.revoked_at IS NOT NULL THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
+    SELECT ds.* INTO session_row FROM mothers_love.display_sessions ds WHERE ds.token_hash = NULLIF(payload->>'tokenHash', '') FOR UPDATE;
+    IF NOT FOUND OR session_row.revoked_at IS NOT NULL OR session_row.expires_at <= now_value THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
     UPDATE mothers_love.display_sessions SET expires_at = LEAST(expires_at, now_value + interval '30 days') WHERE id = session_row.id;
     UPDATE mothers_love.devices SET last_seen_at = now_value WHERE id = device_row.id;
     SELECT COALESCE(max(event_id), 0) INTO latest_event FROM mothers_love.display_events WHERE created_at <= now_value;
@@ -795,8 +818,16 @@ BEGIN
 
   IF action = 'display_ack' THEN
     token_hash := NULLIF(payload->>'tokenHash', '');
-    UPDATE mothers_love.display_sessions ds SET expires_at = LEAST(ds.expires_at, now_value + interval '30 days') WHERE ds.token_hash = payload->>'tokenHash' AND ds.revoked_at IS NULL AND ds.expires_at > now_value RETURNING ds.device_id INTO device_id;
-    IF device_id IS NULL THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
+    SELECT d.* INTO device_row
+    FROM mothers_love.display_sessions ds
+    JOIN mothers_love.devices d ON d.id = ds.device_id
+    WHERE ds.token_hash = NULLIF(payload->>'tokenHash', '')
+    FOR UPDATE OF d;
+    IF NOT FOUND OR device_row.revoked_at IS NOT NULL THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
+    SELECT ds.* INTO session_row FROM mothers_love.display_sessions ds WHERE ds.token_hash = NULLIF(payload->>'tokenHash', '') FOR UPDATE;
+    IF NOT FOUND OR session_row.revoked_at IS NOT NULL OR session_row.expires_at <= now_value THEN RETURN jsonb_build_object('ok', false, 'status', 401, 'code', 'UNAUTHENTICATED'); END IF;
+    device_id := device_row.id;
+    UPDATE mothers_love.display_sessions SET expires_at = LEAST(expires_at, now_value + interval '30 days') WHERE id = session_row.id;
     UPDATE mothers_love.devices SET applied_settings_version = GREATEST(applied_settings_version, COALESCE((payload->>'settingsVersion')::bigint, 0)), applied_snapshot_revision = GREATEST(applied_snapshot_revision, COALESCE((payload->>'snapshotRevision')::bigint, 0)), last_seen_at = now_value WHERE id = device_id AND revoked_at IS NULL;
     RETURN jsonb_build_object('ok', true);
   END IF;
