@@ -313,7 +313,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const activeRecovery = (id: string) => {
       const recovery = reactionRecoveryRef.current.get(id);
       const targetToken = reactionTargetTokensRef.current.get(id);
-      if (!recovery || !targetToken || recovery.targetToken !== targetToken) {
+      const writeVersion = reactionWriteVersionsRef.current.get(id) ?? 0;
+      if (!recovery || !targetToken || recovery.targetToken !== targetToken || recovery.writeVersion !== writeVersion) {
         if (recovery) clearRecovery(id);
         return undefined;
       }
@@ -789,7 +790,7 @@ export function ReactionButton({
           onClick={onRetry}
         >
           <span aria-hidden="true">{confirmedItem?.liked ? '❤️' : '🤍'}</span>
-          <span>{reaction.item ? reaction.item.count : 'Retry hearts'}</span>
+          <span id={confirmedItem ? countId : undefined}>{reaction.item ? reaction.item.count : 'Retry hearts'}</span>
         </button>
         <span className={styles.reactionRecoveryMessage} id={recoveryId}>Enable cookies, then retry.</span>
       </div>
