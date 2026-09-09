@@ -32,9 +32,12 @@ function boundedPositiveInteger(value: number | undefined, fallback: number): nu
 }
 
 function clientKey(request: NextRequest, isVercel: boolean): string {
-  // Vercel sets this header at its edge. Outside Vercel, all callers share one
-  // bucket because ordinary forwarding headers are user controlled.
-  const forwardedIp = isVercel ? request.headers.get("x-vercel-forwarded-for")?.trim().slice(0, 128) : null;
+  // Vercel sets these headers at its edge. The final forwarded address resists
+  // a client-prepended value. Outside Vercel, all callers share one bucket.
+  const forwarded = isVercel
+    ? request.headers.get("x-vercel-forwarded-for") || request.headers.get("x-forwarded-for")
+    : null;
+  const forwardedIp = forwarded?.split(",").at(-1)?.trim().slice(0, 128);
   const source = forwardedIp || "shared";
   return createHash("sha256").update(source).digest("base64url");
 }

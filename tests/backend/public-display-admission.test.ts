@@ -80,4 +80,17 @@ describe("public display admission", () => {
     first?.release();
     expect(guard.admit(request("198.51.100.2"))).toBeNull();
   });
+
+  it("uses the final Vercel forwarded address instead of a client-prepended value", () => {
+    const guard = new PublicDisplayAdmissionGuard({ burstRequests: 1, maxInFlight: 10, isVercel: () => true });
+    const first = new NextRequest("https://mothers-love.example/api/display/snapshot", {
+      headers: { "x-forwarded-for": "203.0.113.99, 198.51.100.4" },
+    });
+    const second = new NextRequest("https://mothers-love.example/api/display/snapshot", {
+      headers: { "x-forwarded-for": "203.0.113.98, 198.51.100.4" },
+    });
+    const admission = guard.admit(first);
+    admission?.release();
+    expect(guard.admit(second)).toBeNull();
+  });
 });
