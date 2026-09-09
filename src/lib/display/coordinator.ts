@@ -903,6 +903,8 @@ export function isGroupedArrival(state: PresentationState): boolean {
 }
 
 export function effectiveMotion(state: PresentationState): DisplaySettings['motion'] {
-  if (state.reducedMotion) return 'still';
+  // A deliberate Lively setting is the owner-approved TV broadcast override.
+  // Other settings retain the browser's reduced-motion equivalent.
+  if (state.reducedMotion && state.settings.motion !== 'lively') return 'still';
   return state.settings.motion;
 }

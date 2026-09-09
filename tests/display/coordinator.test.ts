@@ -396,6 +396,14 @@ describe('display presentation coordinator', () => {
     expect(afterTick.queue).toHaveLength(0);
   });
 
+  it('keeps an owner-selected Lively broadcast moving when the TV browser prefers reduced motion', () => {
+    const source = snapshot([recognition('lively')]);
+    const state = received(createInitialState(), { ...source, settings: { ...source.settings, motion: 'lively' } }, 0);
+    const reduced = displayReducer(state, { type: 'SET_REDUCED_MOTION', reduced: true });
+
+    expect(effectiveMotion(reduced)).toBe('lively');
+  });
+
   it('celebrates only the highest new threshold in a month and records it once', () => {
     const item = recognition('milestone');
     const base = snapshot([item], { aggregate: { ...snapshot([]).aggregate, recognitions: 49 } });

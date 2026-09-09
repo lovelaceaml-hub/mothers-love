@@ -45,7 +45,7 @@ export async function callDisplaySettingsPatch(
   const client = databaseClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
   try {
-    const rows = await client`select mothers_love.ml_patch_display_settings(${client.json(payload as never)}::jsonb) as result`;
+    const rows = await client`select public.ml_display_settings_patch(${client.json(payload as never)}::jsonb) as result`;
     return { data: rows[0]?.result ?? null, error: null };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };

@@ -244,6 +244,11 @@ function GardenScreen({ state, quality }: ScreenProps) {
     background: state.settings.effects?.background ?? true,
   };
   const decoration = quality.level === 'full' ? 'full' : quality.level === 'smooth' ? 'soft' : 'minimal';
+  const gardenTempo = state.settings.tempo === 'calm' || state.settings.tempo === 'slow' || state.settings.tempo === 'gentle'
+    ? 'calm'
+    : state.settings.tempo === 'lively' || state.settings.tempo === 'fast'
+      ? 'lively'
+      : 'standard';
   return (
     <div className={`${styles.screen} ${styles.gardenScreen}`} data-motion-key="garden-drift">
       <GardenScene
@@ -252,6 +257,7 @@ function GardenScreen({ state, quality }: ScreenProps) {
         pool={{ activeIds: state.gardenIds, presentationHistory: state.presentationHistory, rotation: state.playlistIndex }}
         nowMs={state.nowMs + state.serverOffsetMs}
         decoration={decoration}
+        tempo={gardenTempo}
         requestedDecoration={requestedDecoration}
         reducedMotion={effectiveMotion(state) === 'still'}
       />

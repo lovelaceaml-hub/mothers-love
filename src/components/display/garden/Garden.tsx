@@ -65,11 +65,20 @@ function gardenCardSize(record: GardenRecognition, fresh: boolean): number {
   return base + (fresh ? 4.1 : 0);
 }
 
+type GardenTempo = 'calm' | 'standard' | 'lively';
+
+function tempoTiming(tempo: GardenTempo): { cardMultiplier: number; sparkleDuration: string; backgroundDuration: string; budDuration: string } {
+  if (tempo === 'calm') return { cardMultiplier: 1.55, sparkleDuration: '10s', backgroundDuration: '24s', budDuration: '8.5s' };
+  if (tempo === 'lively') return { cardMultiplier: 0.56, sparkleDuration: '3.8s', backgroundDuration: '9s', budDuration: '3.4s' };
+  return { cardMultiplier: 1, sparkleDuration: '6.5s', backgroundDuration: '16s', budDuration: '5.5s' };
+}
+
 function cardStyle(
   record: GardenRecognition,
   index: number,
   records: readonly GardenRecognition[],
   nowMs: number,
+  tempo: GardenTempo,
 ): CSSProperties {
   const layout = GARDEN_LAYOUTS[index % GARDEN_LAYOUTS.length];
   const fresh = isNewestGardenCard(record, records, nowMs);
@@ -78,7 +87,7 @@ function cardStyle(
     '--garden-top': `${layout.top}%`,
     '--garden-rotation': `${layout.rotation}deg`,
     '--garden-delay': `${layout.delay}s`,
-    '--garden-drift-duration': `${layout.duration}s`,
+    '--garden-drift-duration': `${layout.duration * tempoTiming(tempo).cardMultiplier}s`,
     '--garden-card-size': `${gardenCardSize(record, fresh)}vw`,
     '--garden-accent': primaryColor(record),
   } as CSSProperties;
@@ -98,6 +107,7 @@ export interface GardenCardProps {
   index?: number;
   nowMs?: number;
   treatment?: GardenEntryTreatment;
+  tempo?: GardenTempo;
   reducedMotion?: boolean;
   showTrail?: boolean;
 }
@@ -108,6 +118,7 @@ export function GardenCard({
   index = 0,
   nowMs = 0,
   treatment = entryTreatmentFor(index),
+  tempo = 'standard',
   reducedMotion = false,
   showTrail = true,
 }: GardenCardProps) {
@@ -117,7 +128,7 @@ export function GardenCard({
   return (
     <div
       className={`${styles.cardSlot} ${fresh ? styles.freshCard : ''}`}
-      style={cardStyle(record, index, records, nowMs)}
+      style={cardStyle(record, index, records, nowMs, tempo)}
       data-testid="garden-card-slot"
       data-fresh={fresh ? 'true' : 'false'}
       data-detail-tier={detail}
@@ -154,6 +165,7 @@ export interface GardenSceneProps {
   pool?: GardenPoolState;
   nowMs?: number;
   decoration?: GardenDecorationLevel;
+  tempo?: GardenTempo;
   requestedDecoration?: GardenDecoration;
   reducedMotion?: boolean;
   className?: string;
@@ -165,6 +177,7 @@ export function GardenScene({
   pool,
   nowMs = 0,
   decoration = 'full',
+  tempo = 'standard',
   requestedDecoration,
   reducedMotion = false,
   className,
@@ -180,6 +193,7 @@ export function GardenScene({
   }, [amount, pool, records]);
   const effects = adaptGardenDecoration(decoration, requestedDecoration);
   const newestId = newestGardenId(visibleRecords);
+  const timing = tempoTiming(tempo);
   const connections = visibleRecords.flatMap((left, leftIndex) => visibleRecords.slice(leftIndex + 1).flatMap((right, rightIndex) => {
     const expressionId = sharedExpression(left, right);
     if (expressionId === null) return [];
@@ -193,8 +207,14 @@ export function GardenScene({
       data-garden-count={visibleRecords.length}
       data-garden-cap={GARDEN_POOL_CAP}
       data-decoration={decoration}
+      data-tempo={tempo}
       data-newest-id={newestId ?? ''}
       data-motion={reducedMotion ? 'reduced' : 'standard'}
+      style={{
+        '--garden-sparkle-duration': timing.sparkleDuration,
+        '--garden-background-duration': timing.backgroundDuration,
+        '--garden-bud-duration': timing.budDuration,
+      } as CSSProperties}
     >
       <div className={styles.board} data-testid="garden-board" data-decoration={decoration}>
         {effects.background ? <div className={styles.backgroundWash} aria-hidden="true" /> : null}
@@ -225,6 +245,7 @@ export function GardenScene({
                 index={index}
                 nowMs={nowMs}
                 treatment={entryTreatmentFor(index, pool?.rotation ?? 0)}
+                tempo={tempo}
                 reducedMotion={reducedMotion}
                 showTrail={effects.trails}
               />
