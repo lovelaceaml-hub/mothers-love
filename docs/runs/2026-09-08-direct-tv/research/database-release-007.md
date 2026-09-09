@@ -1,0 +1,3 @@
+# Deletion-safe snapshot revision deployed
+
+The exact guarded007 transaction applied successfully to cvuwdlmlukepwfffpgdu after the independent security gate passed. Postflight ledger count7,007SHA2963a4fa0f19793d94196296358e4667482080160d410ec3c60871c33821ef4f, cleanup healthy, runtime execute allowed and anon/authenticated/service_role denied. Current bridge definition MD5 b2a114e7c0ef1727240fa0cd3917ca43. The unrelated public/auth function fingerprint remains ad8fb6516459dddda4c3221cf85fbe64.006 remains immutable. No production test records or deletion operations were performed. The frontend remains temporarily rolled back pending its query-timeout correction.

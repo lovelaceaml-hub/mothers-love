@@ -1,5 +1,8 @@
 # Handoff
 
+## Direct TV link release
+Anthony removes the TV code requirement. Plan 05 has deployed /display as public and read-only, preserves global controls and privacy clearing, and removes pairing and device-status controls from the interface. Admin authentication stays protected. Read [Plan 05](PLAN-05-direct-tv.md) and its [run index](runs/2026-09-08-direct-tv/INDEX.md). Earlier paired-only release sections below are historical and superseded for TV access. Live fresh-browser, anonymous API,80browser journeys and5visual checks passed. See [publication](runs/2026-09-08-direct-tv/research/publication.md) and [database release](runs/2026-09-08-direct-tv/research/database-release.md). Final native review found a deletion revision regression. Production is temporarily rolled back while the immutable007 follow-up is verified. Final review and backup remain in progress.
+
 ## Current presentation and hearts release
 
 Live at https://mothers-love.vercel.app. The form stacks one expression per row, highlights selected cards with gold shimmer and a check, and places a compact keyboard-scrollable latest-30 feed below its titles. Public hearts are smaller at the top right. The TV restores circular compositions, drift, bounce, trails, constellations and sparkle, with page titles in the top-right header. Recognition Garden has no duplicate rail. Other eligible TV screens retain their paired feed. Long-message reading panels preserve the complete message; privacy and reduced-motion controls remain authoritative.
@@ -37,7 +40,7 @@ Exact mounted folder: /Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.a
 The prior release archive and its verified SHA-256 remain in research/release-storage.md. The readiness supplement is privately uploaded and its mounted-copy SHA-256 verified; see research/readiness-storage.md for the exact artifact URL and hash.
 
 ## Physical commissioning
-No active TV session was paired during preflight. The Owner creates a code at https://mothers-love.vercel.app/admin/settings; the TV operator enters it at https://mothers-love.vercel.app/display. Actual TV visibility, distance readability, phone QR scan and post-fix human Owner sign-in have not been reported. Those physical/identity actions are not fabricated by the automated software checks. The public website is already accepting recognitions.
+TV View now uses the direct link https://mothers-love.vercel.app/display, without a code or sign-in. Historical pairing commissioning is superseded by PLAN-05. Actual TV visibility, distance readability, phone QR scan and post-fix human Owner sign-in have not been reported. Those physical/identity actions are not fabricated by the automated software checks. The public website is already accepting recognitions.
 
 ## Current copy follow-up
 Read docs/PLAN-02-copy-cleanup.md and docs/runs/2026-09-08-copy-cleanup/INDEX.md. Runtime 6bdab79 simplifies app instructions and removes age-specific and personal-retention explanations as requested. Existing policy and exact campaign wording remain unchanged. Verification and final publication receipts live in that run's research folder. The shorter USER-MANUAL.md describes only the tasks users perform.
@@ -54,3 +57,7 @@ Read PLAN-03-live-feed.md and runs/2026-09-08-live-feed/INDEX.md. Anthony reques
 
 ## Home motion and footer navigation follow-up
 User requested gentle animation and a brighter dominant Share a recognition button, then moved Admin and new TV View links to the bottom. Luna xhigh implemented the two presentation files; root verified, reviewed and deployed the change. Production phone/desktop/reduced-motion checks passed. No API, expiry, polling, TV pairing or catalog behavior changes. See runs/2026-09-08-live-feed/lanes/M.md.
+
+Direct TV runtime77d23b7 is restored at the canonical link after explicit Vercel promotion.101unit tests,80fresh deployed browser journeys and6supplemental checks passed. Anonymous direct access and protected admin denial were verified without capturing real content. Final evidence is privately backed up at https://drive.google.com/file/d/12yjHaJlikBuAMx3G87qxj7V32Hd006Of/view, with mounted SHA256 verified. Exact release and review records are in runs/2026-09-08-direct-tv/research/. Physical TV readability and a real phone QR scan remain unverified.
+
+PLAN-05integration review passed with native Sol high and independent Terra high. TV View requires only its link. Source and final publication closure receipts are in runs/2026-09-08-direct-tv/research/closure.md.

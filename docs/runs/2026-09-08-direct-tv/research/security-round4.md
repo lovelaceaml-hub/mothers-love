@@ -1,0 +1,3 @@
+# Public-data correction review
+
+Independent Terra high found no SQL007issue but identified P2: the new public read could create unbounded database work. B4 adds a bounded process-local admission guard before query:180requests/min/IP,24burst,12in-flight,512hashed IP entries,10-minute expiry. Only Vercel-provided IP is trusted in deployment; non-Vercel requests share a bucket. Refused work returns429withRetry-After5andno-store before database access, and every acquired slot releases in finally. This is per-instance pressure control, not a distributed global quota. No recognition cache, new service or database write.

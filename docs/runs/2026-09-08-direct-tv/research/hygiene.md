@@ -1,0 +1,5 @@
+# Integration hygiene
+
+Root checked cumulative diff from e15cb1e, explicit lane file ownership, preserved campaign catalog bytes, code whitespace, and local README/manual/plan/handoff links. No missing relative links or new em/en dash found in the direct-TV plan, run records, migration or server projector. Existing private repository owner and visibility are verified. Parent project index remains independently dirty and is not staged in this repository. No environment, generated build, personal recognition data or credentials enter the backup payload.
+
+Final root pass confirms active README/manual/journey/product/contract/plan/handoff links resolve. Historical pairing instructions in the active journey and brief are updated to the direct link; unused legacy APIs are labeled. Runtime128-file source manifest matches the sealed controller payload. Final publication receipts and status changes are documentation-only. No catalog changes, credentials, real screenshots, network bodies or unrelated parent edits are staged.
