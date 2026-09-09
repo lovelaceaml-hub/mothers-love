@@ -370,9 +370,23 @@ function rebuildVisibleState(
   const neutral = mode === 'neutral' || state.operatorModeOverride === 'neutral';
   const wakeForPublication = newArrivals.length > 0 && !quiet && !neutral;
   const sorted = fairSort(items, state.presentationHistory);
-  const gardenIds = currentScreenIsValid && state.gardenIds.length
-    ? state.gardenIds.filter((id) => items.some((item) => item.id === id))
-    : sorted.slice(0, maxBubbles(settings)).map((item) => item.id);
+  const gardenLimit = maxBubbles(settings);
+  const previousEligibleIds = state.snapshot
+    ? new Set(eligible(state.snapshot, state.nowMs, state.serverOffsetMs).map((item) => item.id))
+    : null;
+  const newlyEligible = previousEligibleIds
+    ? fairSort(items.filter((item) => !previousEligibleIds.has(item.id)), state.presentationHistory)
+    : [];
+  const newlyEligibleIds = new Set(newlyEligible.map((item) => item.id));
+  const retainedGardenIds = currentScreenIsValid
+    ? [...new Set(state.gardenIds.filter((id) => items.some((item) => item.id === id && !newlyEligibleIds.has(id))))].slice(0, gardenLimit)
+    : [];
+  const retainedSet = new Set(retainedGardenIds);
+  const gardenIds = newlyEligible
+    .concat(retainedGardenIds.map((id) => items.find((item) => item.id === id)).filter((item): item is Recognition => Boolean(item)))
+    .concat(sorted.filter((item) => !newlyEligibleIds.has(item.id) && !retainedSet.has(item.id)))
+    .slice(0, gardenLimit)
+    .map((item) => item.id);
   const featuredId = byId(items, state.manualFeatureId)?.id ?? byId(items, state.featuredId)?.id ?? sorted[0]?.id ?? null;
   const cluster = chooseCluster(items, state.clusterExpressionId);
   const fallbackScreen: DisplayScreen = items.length ? 'garden' : 'fallback';

@@ -2,7 +2,7 @@ import { join } from 'node:path';
 
 import { expect, test, type Page } from '@playwright/test';
 
-type FixtureSize = 0 | 1 | 2 | 20 | 31 | 'long';
+type FixtureSize = 0 | 1 | 2 | 4 | 5 | 20 | 31 | 'long';
 type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still'; message?: string };
 const LONG_RECIPIENT = 'R'.repeat(80);
 const LONG_MESSAGE = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
@@ -338,6 +338,44 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       expect(bounds!.qrRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
       expect(bounds!.qrTop).toBeGreaterThanOrEqual(bounds!.railTop - 2);
     }
+  });
+
+  test('adds a newly polled recognition to a paused Garden without advancing rotation', async ({ page }) => {
+    const testStart = new Date('2026-09-08T12:00:00.000Z');
+    await page.clock.install({ time: testStart });
+    await page.clock.pauseAt(testStart);
+    let snapshotCalls = 0;
+    let allowNewRecognition = false;
+    await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
+      snapshotCalls += 1;
+      const source = fixture(allowNewRecognition ? 5 : 4, { motion: 'still' });
+      const settings = { ...source.settings, maxBubbles: 4, pauseRotation: true };
+      const arrival = { eventId: 'garden-poll-event', recognitionId: 'synthetic-5', publishedAt: '2026-09-08T12:00:05.000Z' };
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ...source,
+          revision: snapshotCalls,
+          cursor: `garden-poll-${snapshotCalls}`,
+          sync: allowNewRecognition ? 'delta' : 'reset',
+          settings,
+          arrivals: allowNewRecognition ? [arrival] : [],
+        }),
+      });
+    });
+
+    await page.goto('/display');
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 10_000 });
+    await expect(page.getByTestId('garden-bubble')).toHaveCount(4);
+
+    allowNewRecognition = true;
+    await page.clock.runFor(5_001);
+
+    await expect.poll(() => snapshotCalls).toBeGreaterThanOrEqual(2);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden');
+    await expect(page.getByTestId('garden-bubble')).toHaveCount(4);
+    await expect(page.getByTestId('garden-board')).toContainText('Synthetic recipient 5');
   });
 
   test('keeps live rail excerpts on grapheme boundaries', async ({ page }) => {

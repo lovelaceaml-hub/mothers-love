@@ -289,6 +289,71 @@ describe('display presentation coordinator', () => {
     expect(ignored.gardenIds).toHaveLength(1);
   });
 
+  it('fills open Garden slots while rotation is paused and keeps arrival delivery deduplicated', () => {
+    const first = recognition('first');
+    const second = recognition('second', { firstPublishedAt: new Date(serverOrigin + 1_000).toISOString() });
+    const third = recognition('third', { firstPublishedAt: new Date(serverOrigin + 2_000).toISOString() });
+    const baseSnapshot = snapshot([first, second], { settings: { ...snapshot([]).settings, maxBubbles: 4, pauseRotation: true } });
+    const base = received(createInitialState(), baseSnapshot, 0);
+    const arrival = { eventId: 'event-third', recognitionId: third.id, publishedAt: third.firstPublishedAt! };
+    const nextSnapshot = delta(baseSnapshot, [first, second, third], [arrival], 1);
+
+    const refreshed = received(base, nextSnapshot, 1);
+    const duplicate = received(refreshed, delta(nextSnapshot, [first, second, third], [arrival], 2), 2);
+
+    expect(refreshed.screen).toBe('garden');
+    expect(refreshed.pauseRotation).toBe(true);
+    expect(refreshed.gardenIds).toEqual(['third', 'second', 'first']);
+    expect(refreshed.queue).toHaveLength(1);
+    expect(duplicate.gardenIds).toEqual(refreshed.gardenIds);
+    expect(duplicate.queue).toHaveLength(1);
+  });
+
+  it('replaces removed Garden records from a reset snapshot while preserving valid pinned order', () => {
+    const first = recognition('first');
+    const second = recognition('second', { firstPublishedAt: new Date(serverOrigin + 1_000).toISOString() });
+    const third = recognition('third', { firstPublishedAt: new Date(serverOrigin + 2_000).toISOString() });
+    const replacement = recognition('replacement', { firstPublishedAt: new Date(serverOrigin + 3_000).toISOString() });
+    const additional = recognition('additional', { firstPublishedAt: new Date(serverOrigin + 4_000).toISOString() });
+    const baseSnapshot = snapshot([first, second, third], { settings: { ...snapshot([]).settings, maxBubbles: 3 } });
+    const base = received(createInitialState(), baseSnapshot, 0);
+    const resetSnapshot = snapshot([
+      { ...first, status: 'hidden' },
+      second,
+      { ...third, expiresAt: new Date(serverOrigin - 1_000).toISOString() },
+      replacement,
+      additional,
+    ], {
+      revision: 2,
+      cursor: 'cursor-reset',
+      sync: 'reset',
+      serverTime: new Date(serverOrigin + 1_000).toISOString(),
+      settings: baseSnapshot.settings,
+    });
+
+    const refreshed = received(base, resetSnapshot, 1_000);
+
+    expect(refreshed.gardenIds).toEqual(['additional', 'replacement', 'second']);
+    expect(selectEligible(refreshed).map((item) => item.id)).toEqual(['second', 'replacement', 'additional']);
+  });
+
+  it('replaces a bounded Garden slot for a new eligible record and stays stable on unchanged polls', () => {
+    const first = recognition('first');
+    const second = recognition('second', { firstPublishedAt: new Date(serverOrigin + 1_000).toISOString() });
+    const third = recognition('third', { firstPublishedAt: new Date(serverOrigin + 2_000).toISOString() });
+    const baseSnapshot = snapshot([first, second], { settings: { ...snapshot([]).settings, maxBubbles: 2 } });
+    const base = received(createInitialState(), baseSnapshot, 0);
+    const arrival = { eventId: 'event-third-full', recognitionId: third.id, publishedAt: third.firstPublishedAt! };
+    const refreshedSnapshot = delta(baseSnapshot, [first, second, third], [arrival], 1);
+    const refreshed = received(base, refreshedSnapshot, 1);
+    const unchanged = received(refreshed, delta(refreshedSnapshot, [first, second, third], [arrival], 2), 2);
+
+    expect(refreshed.gardenIds).toEqual(['third', 'second']);
+    expect(refreshed.queue).toHaveLength(1);
+    expect(unchanged.gardenIds).toEqual(refreshed.gardenIds);
+    expect(unchanged.queue).toHaveLength(1);
+  });
+
   it('clears personal content after the sixty second offline grace period', () => {
     const item = recognition('offline');
     const state = received(createInitialState(), snapshot([item]), 0);
