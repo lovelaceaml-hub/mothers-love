@@ -1060,3 +1060,18 @@
 .spotlightCopy h2 { font-size: clamp(34px, 3vw, 72px); }
 .spotlightPhrase { font-size: clamp(32px, 2.8vw, 70px); }
 .spotlightBadge { top: 2rem; left: 2rem; right: auto; bottom: auto; width: clamp(80px, 7vw, 160px); }
+
+/* A dimensional kinetic flower, with the reading plane held steady. */
+.spotlightScreen { perspective: 1400px; }
+.spotlightWheel { transform-style: preserve-3d; animation: sculptureSway 12s ease-in-out infinite; background: radial-gradient(ellipse at 32% 26%,#fffefacc,#fff6dc50 50%,transparent 70%); box-shadow: inset 0 6px 20px #fff, inset 0 -12px 30px #ab78902b, 0 40px 45px #6e466725; }
+.spotlightWheel::before,.spotlightWheel::after { content: ''; position: absolute; inset: -6%; border: 2px solid #c693b38c; border-radius: 50%; pointer-events: none; transform-style: preserve-3d; animation: sculptureRing 17s linear infinite; }
+.spotlightWheel::after { inset: -13%; border-color: #d8b86788; animation-delay: -7s; animation-direction: reverse; }
+.wheelCore { box-shadow: inset -8px -10px 14px #b98b2738,inset 5px 6px 10px #fff,0 16px 20px #7b4b7730; }
+.wheelPetal { box-shadow: inset 2px 3px 6px #ffffffc4,inset -4px -7px 10px #52395b25, 0 16px 22px #67406824; }
+.spotlightCopy { position: relative; padding: 1.4rem 1.8rem; border-left: 2px solid #d9b47b55; background: linear-gradient(90deg,#ffffff66,transparent); border-radius: 0 28px 28px 0; }
+@keyframes sculptureSway { 0%,100% { rotate: y -9deg; translate: 0 0; } 50% { rotate: y 11deg; translate: 0 -12px; } }
+@keyframes sculptureRing { from { transform: rotateZ(0) rotateX(64deg) rotateY(22deg); } to { transform: rotateZ(360deg) rotateX(64deg) rotateY(22deg); } }
+.motionStill .spotlightWheel,.motionStill .spotlightWheel::before,.motionStill .spotlightWheel::after { animation: none; }
+@media(prefers-reduced-motion: reduce) { .spotlightWheel,.spotlightWheel::before,.spotlightWheel::after { animation: none; } }
+
+.spotlightCopy { rotate: y var(--view-tilt, 0deg); transition: rotate 400ms ease-out; }

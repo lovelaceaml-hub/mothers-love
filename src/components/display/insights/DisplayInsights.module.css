@@ -1619,3 +1619,28 @@
 .expressionCards .flowerPhrase { margin-top: 8px; }
 .heartReveal { border-radius: 32px; }
 .heartRibbonStage { width: min(100%, 26vh); }
+
+/* The circles retain their geometry while the copy sits in a stable inner plane. */
+.sharedScreen .connectedLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); align-items: center; gap: 3vw; }
+.sharedScreen .connectedList { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; padding: 10px; }
+.sharedScreen .connectedItem { width: min(22vw, 330px); flex: 0 0 auto; }
+.sharedScreen .connectedBubble { position: relative; isolation: isolate; box-sizing: border-box; width: 100%; height: auto; min-height: 0; aspect-ratio: 1; padding: 17%; border-radius: 50%; display: grid; place-items: center; text-align: center; background: radial-gradient(circle at 28% 19%, #fff 8%, color-mix(in srgb,var(--connected-color) 12%,white) 62%,color-mix(in srgb,var(--connected-color) 34%,white)); box-shadow: inset 0 5px 8px #fff, inset 0 -12px 20px #69466616,0 18px 28px #6e486c20; }
+.sharedScreen .connectedBubble::before,.sharedScreen .connectedBubble::after { display: none; }
+.connectedBubbleContent { position: relative; z-index: 2; width: 100%; min-width: 0; }
+.sharedScreen .connectedRecipient { margin: 0 0 12px; font-size: clamp(15px,1.2vw,23px); overflow-wrap: anywhere; line-height: 1.1; }
+.sharedScreen .connectedMessage { margin: 0; font-size: var(--message-size,19px); line-height: 1.25; overflow-wrap: anywhere; }
+.connectedBubbleHalo { position: absolute; inset: -9px; border: 1px solid color-mix(in srgb,var(--connected-color) 70%,white); border-radius: 50%; pointer-events: none; animation: circleBreathe 9s ease-in-out infinite; }
+.connectedBubbleSweep { position: absolute; inset: 4%; border-radius: 50%; border-top: 2px solid #fff; border-right: 2px solid transparent; animation: circleGlint 14s linear infinite; pointer-events: none; }
+.sharedScreen .heartReveal { min-width: 0; }
+.expressionCards { perspective: 1300px; gap: clamp(18px,1.5vw,30px); padding: 16px 20px 25px; }
+.expressionCards .flowerCard { position: relative; isolation: isolate; overflow: hidden; transform-style: preserve-3d; border: 2px solid #ffffffb0; border-radius: 18px 32px 18px 32px; background: linear-gradient(145deg,#ffffff65,transparent 58%),var(--flower-color); box-shadow: 3px 5px 0 color-mix(in srgb,var(--flower-color) 70%,#755171), 0 16px 22px #67416b24; animation: cardDepthFloat 8s ease-in-out infinite; animation-delay: calc(var(--wave-index) * -.8s); }
+.flowerCardAura { position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 80% 5%,#fff9,transparent 60%); pointer-events: none; }
+.flowerCardSweep { position: absolute; inset: -30%; background: linear-gradient(115deg,transparent 35%,#ffffff4d 49%,transparent 62%); translate: -110% 0; animation: cardLightSweep 12s ease-in-out infinite; animation-delay: calc(var(--wave-index) * -.9s); pointer-events: none; }
+.flowerCardEdge { position: absolute; inset: 5px; border: 1px solid #ffffff55; border-radius: inherit; pointer-events: none; }
+.expressionCards .flowerNumber { background: #fffef5e8; box-shadow: 0 3px 0 #71516e22; }
+@keyframes cardDepthFloat { 0%,100% { transform: translateY(0) rotateX(0) rotateY(0); } 50% { transform: translateY(-5px) rotateX(2deg) rotateY(var(--card-tilt)); } }
+@keyframes cardLightSweep { 0%,40% { translate: -110% 0; } 75%,100% { translate: 110% 0; } }
+@keyframes circleBreathe { 50% { scale: 1.035; opacity: .45; } }
+@keyframes circleGlint { to { rotate: 360deg; } }
+.motionStill .flowerCard,.motionStill .flowerCardSweep,.motionStill .connectedBubbleHalo,.motionStill .connectedBubbleSweep { animation: none; }
+@media(prefers-reduced-motion: reduce) { .expressionCards .flowerCard,.flowerCardSweep,.connectedBubbleHalo,.connectedBubbleSweep { animation: none; } }

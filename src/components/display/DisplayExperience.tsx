@@ -39,9 +39,12 @@ import {
   splitVerbatimMessage,
   selectGarden,
   type PresentationState,
+  type DisplayScreen,
 } from '@/lib/display/coordinator';
 
 import styles from './DisplayExperience.module.css';
+import { ExpressiveMotion } from './expressive/ExpressiveMotion';
+import expressive from './expressive/ExpressiveMotion.module.css';
 
 const expressionMap = new Map(EXPRESSIONS.map((expression) => [expression.id, expression]));
 
@@ -314,7 +317,7 @@ export function FeaturedRecognitionView({ recognition, readingPageIndex = 0, rea
   const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
     <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="featured-title" data-motion-key="featured-shimmer">
-      <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}>
+      <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}><div className={styles.featureOrbits} aria-hidden="true"><i /><i /><i /><span>♥</span></div>
         <p className={styles.eyebrow}>AN EXPRESSION OF MOTHER&apos;S LOVE</p>
         <span className={styles.featureNumber}>{String(primary.id).padStart(2, '0')}</span>
         <h2>{primary.phrase}</h2>
@@ -614,7 +617,7 @@ function Screen({ state, reactionCounts, quality }: ScreenProps) {
   }
 }
 
-export function DisplayExperience() {
+export function DisplayExperience({ previewSnapshot, onNewRecognition }: { previewSnapshot?: DisplaySnapshot; onNewRecognition?: () => void }) {
   const [state, dispatch] = useReducer(displayReducer, undefined, createInitialState);
   const [quality, setQuality] = useState<AdaptiveQualityState>(() => createAdaptiveQualityState());
   const chimes = useDisplayChimes(state.settings.sound,
@@ -660,7 +663,7 @@ export function DisplayExperience() {
     snapshotControllerRef.current = controller;
     snapshotTimeoutRef.current = window.setTimeout(() => controller.abort(), DISPLAY_SNAPSHOT_TIMEOUT_MS);
     try {
-      const snapshot = await api<DisplaySnapshot>(snapshotRequestPath(requestCursor), {
+      const snapshot: DisplaySnapshot = previewSnapshot ? { ...previewSnapshot, settings: currentState?.snapshot ? { ...currentState.settings, pauseRotation: currentState.pauseRotation } : previewSnapshot.settings, serverTime: new Date().toISOString(), sync: currentState?.snapshot ? 'delta' : 'reset' } : await api<DisplaySnapshot>(snapshotRequestPath(requestCursor), {
         method: 'GET',
         auth: false,
         cache: 'no-store',
@@ -688,7 +691,7 @@ export function DisplayExperience() {
         }
       }
     }
-  }, [monotonicNow]);
+  }, [monotonicNow, previewSnapshot]);
 
   useEffect(() => {
     dispatch({ type: 'PAIRING_SUCCEEDED' });
@@ -785,10 +788,37 @@ export function DisplayExperience() {
     background: state.settings.effects?.background ?? true,
   };
   const visualQuality = resolveDisplayVisualQuality(requestedEffects);
+  const advance = () => dispatch({ type: 'MANUAL_SCREEN' });
+  useEffect(() => {
+    if (!previewSnapshot) return;
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.target as HTMLElement).closest('button, a, input, select, textarea')) return;
+      if (event.code === 'ArrowRight' || event.code === 'Space') {
+        event.preventDefault();
+        dispatch({ type: 'MANUAL_SCREEN' });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [previewSnapshot]);
+  useEffect(() => {
+    if (previewSnapshot && state.queue.length && !state.activeArrival && !state.pauseRotation) dispatch({ type: 'PREVIEW_SHOW_ARRIVAL' });
+  }, [previewSnapshot, state.queue.length, state.activeArrival, state.pauseRotation]);
   const showSubmissionDock = state.screen !== 'daily-practice' && state.screen !== 'peace-promise';
   return (
     <main
-      className={`${styles.displayApp} ${styles[`motion${motion}`]} ${state.lowActivity ? styles.lowActivity : ''} ${state.stale ? styles.stale : ''}`}
+      className={`${previewSnapshot ? expressive.expressiveSurface : ''} ${styles.displayApp} ${styles[`motion${motion}`]} ${state.lowActivity ? styles.lowActivity : ''} ${state.stale ? styles.stale : ''}`}
+      onClick={(event) => {
+        if (!previewSnapshot || (event.target as HTMLElement).closest('button, a, input, select, textarea')) return;
+        if (window.getSelection()?.toString()) return;
+        advance();
+      }}
+      onPointerMove={(event) => {
+        if (!previewSnapshot || motion === 'still' || state.pauseRotation) return;
+        const box = event.currentTarget.getBoundingClientRect();
+        event.currentTarget.style.setProperty('--view-tilt', `${((event.clientX - box.left) / box.width - .5) * 5}deg`);
+      }}
+      onPointerLeave={(event) => event.currentTarget.style.setProperty('--view-tilt', '0deg')}
       data-testid="display-app"
       data-screen={state.screen}
       data-motion={motion}
@@ -798,7 +828,20 @@ export function DisplayExperience() {
       data-rail-count={railVisible ? liveRailItems.length : 0}
       data-cursor={state.cursor ?? ''}
     >
-      <Atmosphere background={visualQuality.effects.background} sparkles={visualQuality.effects.sparkles} />
+      {previewSnapshot ? <nav aria-label="Design preview controls" className={styles.previewControls}>
+        <span>Local preview · Sample content</span>
+        <select aria-label="Choose display" value={state.screen} onChange={(event) => dispatch({ type: 'MANUAL_SCREEN', screen: event.target.value as DisplayScreen })}>
+          {state.screen === 'arrival' ? <option value="arrival">New Recognition</option> : null}
+          {['garden', 'featured', 'cluster', 'impact', 'all-nine', 'spotlight', 'daily-practice', 'one-kind-word', 'everyday-peace', 'peace-promise'].map((screen) => <option key={screen} value={screen}>{SCREEN_HEADINGS[screen as DisplayScreen].title}</option>)}
+        </select>
+        <button onClick={() => dispatch({ type: 'SET_PAUSE_ROTATION', paused: !state.pauseRotation })}>{state.pauseRotation ? 'Play' : 'Pause'}</button>
+        <button className={styles.previewArrivalButton} disabled={Boolean(state.activeArrival) || state.phase !== 'ready'} onClick={() => { dispatch({ type: 'SET_PAUSE_ROTATION', paused: false }); onNewRecognition?.(); }}>{state.activeArrival ? 'Arrival playing...' : '✦ Preview new arrival'}</button>
+        <button onClick={advance}>Next display →</button>
+        <button onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void document.documentElement.requestFullscreen(); }}>Full screen</button>
+        <small>Click anywhere or press →</small>
+      </nav> : null}
+      {previewSnapshot ? <ExpressiveMotion motion={motion} screen={state.screen} eventKey={`${state.screen}:${state.screenStartedAtMs}`} /> : null}
+      <Atmosphere background={visualQuality.effects.background} sparkles={!previewSnapshot && visualQuality.effects.sparkles} />
       <header className={styles.displayHeader}>
         <div>
           <h1>{TITLE}</h1>
@@ -816,7 +859,7 @@ export function DisplayExperience() {
         </div>
       </header>
       {state.phase !== 'ready' || (!state.snapshot && !state.offlineSafe) ? <StartupScreen unavailable={state.stale || state.unauthorized} /> : personalContentVisible ? (
-        <ReactionCounts key={reactionEligibleKey} eligibleIds={reactionEligibleIds}>
+        <ReactionCounts key={reactionEligibleKey} eligibleIds={previewSnapshot ? [] : reactionEligibleIds}>
           {(reactionCounts) => <DisplayStage state={state} personalContentVisible={personalContentVisible} liveRailItems={liveRailItems} reactionCounts={reactionCounts} quality={quality} />}
         </ReactionCounts>
       ) : <DisplayStage state={state} personalContentVisible={false} liveRailItems={[]} reactionCounts={EMPTY_REACTION_COUNTS} quality={quality} />}

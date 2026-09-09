@@ -1,5 +1,10 @@
 # Handoff
 
+## Held local design checkpoint, September 9, 2026
+
+Read the [detailed local design handoff](handoffs/2026-09-09-local-design/00-START-HERE.md) before continuing. The experimental branch is saved locally and is not deployed. Preview: http://127.0.0.1:3210/design-preview. Earlier live-release notes below describe the baseline, not this design.
+
+
 ## Interview completion update
 
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](PLAN-09-interview-completion.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.

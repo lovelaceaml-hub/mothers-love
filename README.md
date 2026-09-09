@@ -1,5 +1,10 @@
 # The Words of Mother's Love
 
+## Held local design checkpoint, September 9, 2026
+
+Read the [detailed local design handoff](docs/handoffs/2026-09-09-local-design/00-START-HERE.md) before continuing. The experimental branch is saved locally and is not deployed. Preview: http://127.0.0.1:3210/design-preview. Earlier live-release notes below describe the baseline, not this design.
+
+
 ## Interview completion update
 
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](docs/PLAN-09-interview-completion.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
@@ -29,3 +34,7 @@ The missing interview sequences, whole-card selection, true screen previews, and
 - [Approved visual references](docs/source-handoff/references/README.md)
 
 A live appreciation feed and submission form, secured administrative workspace and public TV Living Wall. Code and synthetic fixtures may be privately backed up; live personal recognitions never belong in this repository. Existing database resources outside the campaign namespace are protected.
+
+## Handoff storage
+
+[Managed Drive root](https://drive.google.com/drive/folders/1rwJkIJ6hn8zNxh5DsYloB4DNFfuHGTz1). Exact mounted archive folder: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/Mothers Love TV/2026-09-09 Local Design Handoff`. The archive copy was verified locally by SHA-256. Cloud synchronization and other people's access were not verified.

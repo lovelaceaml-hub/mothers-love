@@ -102,6 +102,8 @@ export type CoordinatorAction =
   | { type: 'SNAPSHOT_UNAVAILABLE'; receivedAtMs: number; unauthorized?: boolean }
   | { type: 'TICK'; nowMs: number }
   | { type: 'ADVANCE' }
+  | { type: 'PREVIEW_SHOW_ARRIVAL' }
+  | { type: 'MANUAL_SCREEN'; screen?: DisplayScreen }
   | { type: 'SET_OPERATOR_MODE'; mode: 'normal' | 'quiet' | 'neutral' }
   | { type: 'SET_MOTION'; motion: DisplaySettings['motion'] }
   | { type: 'SET_REDUCED_MOTION'; reduced: boolean }
@@ -864,6 +866,15 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       if (due && next.queue.length && !next.pauseArrivals) return startArrival(next);
       if (due && !next.pauseRotation) return advanceProgram(next);
       return next;
+    }
+    case 'PREVIEW_SHOW_ARRIVAL':
+      return state.activeArrival || state.pauseRotation ? state : startArrival(state);
+    case 'MANUAL_SCREEN': {
+      if (state.quiet || state.neutral || state.offlineSafe || !state.snapshot) return state;
+      const playlist = scheduledPlaylist(state.settings);
+      const target = action.screen ? playlist.indexOf(action.screen as typeof playlist[number]) : -1;
+      const next = advanceProgram({ ...(state.activeArrival ? completeArrival(state) : state), activeArrival: null, playlistIndex: target >= 0 ? (target - 1 + playlist.length) % playlist.length : state.playlistIndex });
+      return { ...next, pauseStartedAtMs: state.pauseRotation ? state.nowMs : null };
     }
     case 'ADVANCE': {
       if (state.activeArrival || state.quiet || state.neutral || state.pauseRotation) return state;
