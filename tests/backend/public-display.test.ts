@@ -3,13 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type ConfiguredResult = ReturnType<typeof import("@/lib/server/http")["requireConfigured"]>;
 
-const { databaseClient, requireConfigured } = vi.hoisted(() => ({
+const { databaseClient, requireConfigured, admitPublicDisplayRequest } = vi.hoisted(() => ({
   databaseClient: vi.fn(),
   requireConfigured: vi.fn<() => ConfiguredResult>(() => null),
+  admitPublicDisplayRequest: vi.fn(),
 }));
 
 vi.mock("@/lib/server/supabase", () => ({ databaseClient }));
 vi.mock("@/lib/server/http", () => ({ requireConfigured }));
+vi.mock("@/lib/server/public-display-admission", () => ({ admitPublicDisplayRequest }));
 
 import { GET } from "@/app/api/display/snapshot/route";
 import { projectPublicDisplaySnapshot } from "@/lib/server/public-display";
@@ -70,6 +72,7 @@ function request(path = "/api/display/snapshot") {
 beforeEach(() => {
   databaseClient.mockReset();
   requireConfigured.mockReturnValue(null);
+  admitPublicDisplayRequest.mockReturnValue({ release: vi.fn() });
 });
 
 describe("public display projection", () => {
@@ -209,5 +212,23 @@ describe("GET /api/display/snapshot", () => {
     const response = await GET(request());
     expect(response.status).toBe(503);
     expect(databaseClient).not.toHaveBeenCalled();
+  });
+
+  it("refuses an unadmitted request before the database and marks it uncached", async () => {
+    admitPublicDisplayRequest.mockReturnValue(null);
+    const response = await GET(request());
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("5");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(databaseClient).not.toHaveBeenCalled();
+  });
+
+  it("releases the admission slot when the database query fails", async () => {
+    const release = vi.fn();
+    admitPublicDisplayRequest.mockReturnValue({ release });
+    databaseClient.mockReturnValue(vi.fn().mockRejectedValue(new Error("synthetic transport failure")));
+    const response = await GET(request());
+    expect(response.status).toBe(503);
+    expect(release).toHaveBeenCalledTimes(1);
   });
 });
