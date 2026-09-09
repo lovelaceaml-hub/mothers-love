@@ -45,6 +45,6 @@ describe('display decorative layering', () => {
     expect(displayCss).toMatch(/\.displayApp\.motionstill[\s\S]*?animation:\s*none\s*!important;/);
     expect(displayCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.displayApp:not\(\.motionlively\) \*[\s\S]*?animation:\s*none\s*!important;/);
     expect(gardenCss).toMatch(/\.reducedMotion \.backgroundWash[\s\S]*?animation:\s*none;/);
-    expect(gardenCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.scene:not\(\[data-tempo="lively"\]\) \.backgroundWash[\s\S]*?animation:\s*none;/);
+    expect(gardenCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.scene:not\(\[data-motion="lively"\]\) \.backgroundWash[\s\S]*?animation:\s*none;/);
   });
 });

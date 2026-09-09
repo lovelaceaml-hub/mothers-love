@@ -549,17 +549,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scene:not([data-tempo="lively"]) .cardMotion,
-  .scene:not([data-tempo="lively"]) .bud,
-  .scene:not([data-tempo="lively"]) .milestoneFlower,
-  .scene:not([data-tempo="lively"]) .backgroundWash,
-  .scene:not([data-tempo="lively"]) .sparkle {
+  .scene:not([data-motion="lively"]) .cardMotion,
+  .scene:not([data-motion="lively"]) .bud,
+  .scene:not([data-motion="lively"]) .milestoneFlower,
+  .scene:not([data-motion="lively"]) .backgroundWash,
+  .scene:not([data-motion="lively"]) .sparkle {
     animation: none;
   }
 
-  .scene:not([data-tempo="lively"]) .arrivalCard,
-  .scene:not([data-tempo="lively"]) .groupedArrival,
-  .scene:not([data-tempo="lively"]) .readerMessage {
+  .scene:not([data-motion="lively"]) .arrivalCard,
+  .scene:not([data-motion="lively"]) .groupedArrival,
+  .scene:not([data-motion="lively"]) .readerMessage {
     animation-duration: 520ms;
   }
 }

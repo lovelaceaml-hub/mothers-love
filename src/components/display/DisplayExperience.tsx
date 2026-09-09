@@ -249,6 +249,7 @@ function GardenScreen({ state, quality }: ScreenProps) {
     : state.settings.tempo === 'lively' || state.settings.tempo === 'fast'
       ? 'lively'
       : 'standard';
+  const gardenMotion = effectiveMotion(state);
   return (
     <div className={`${styles.screen} ${styles.gardenScreen}`} data-motion-key="garden-drift">
       <GardenScene
@@ -258,8 +259,9 @@ function GardenScreen({ state, quality }: ScreenProps) {
         nowMs={state.nowMs + state.serverOffsetMs}
         decoration={decoration}
         tempo={gardenTempo}
+        motion={gardenMotion}
         requestedDecoration={requestedDecoration}
-        reducedMotion={effectiveMotion(state) === 'still'}
+        reducedMotion={gardenMotion === 'still'}
       />
       {state.stale ? <GardenReconnectNotice memory={{ status: 'reconnecting', records, lastSuccessfulAtMs: state.lastSuccessfulVerificationMs }} /> : null}
     </div>

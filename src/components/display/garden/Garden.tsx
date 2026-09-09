@@ -66,6 +66,7 @@ function gardenCardSize(record: GardenRecognition, fresh: boolean): number {
 }
 
 type GardenTempo = 'calm' | 'standard' | 'lively';
+type GardenMotion = 'still' | 'calm' | 'standard' | 'lively';
 
 function tempoTiming(tempo: GardenTempo): { cardMultiplier: number; sparkleDuration: string; backgroundDuration: string; budDuration: string } {
   if (tempo === 'calm') return { cardMultiplier: 1.55, sparkleDuration: '10s', backgroundDuration: '24s', budDuration: '8.5s' };
@@ -166,6 +167,7 @@ export interface GardenSceneProps {
   nowMs?: number;
   decoration?: GardenDecorationLevel;
   tempo?: GardenTempo;
+  motion?: GardenMotion;
   requestedDecoration?: GardenDecoration;
   reducedMotion?: boolean;
   className?: string;
@@ -178,6 +180,7 @@ export function GardenScene({
   nowMs = 0,
   decoration = 'full',
   tempo = 'standard',
+  motion = 'standard',
   requestedDecoration,
   reducedMotion = false,
   className,
@@ -209,7 +212,7 @@ export function GardenScene({
       data-decoration={decoration}
       data-tempo={tempo}
       data-newest-id={newestId ?? ''}
-      data-motion={reducedMotion ? 'reduced' : 'standard'}
+      data-motion={motion}
       style={{
         '--garden-sparkle-duration': timing.sparkleDuration,
         '--garden-background-duration': timing.backgroundDuration,

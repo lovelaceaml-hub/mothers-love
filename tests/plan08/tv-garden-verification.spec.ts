@@ -186,9 +186,10 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
 
   test('keeps owner-selected Lively TV motion and effects active when the browser requests reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await openSyntheticDisplay(page, syntheticSnapshot({ count: 2, settings: { motion: 'lively', tempo: 'lively' } }));
+    await openSyntheticDisplay(page, syntheticSnapshot({ count: 2, settings: { motion: 'lively', tempo: 'standard' } }));
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-motion', 'lively');
-    await expect(page.getByTestId('recognition-garden')).toHaveAttribute('data-tempo', 'lively');
+    await expect(page.getByTestId('recognition-garden')).toHaveAttribute('data-tempo', 'standard');
+    await expect(page.getByTestId('recognition-garden')).toHaveAttribute('data-motion', 'lively');
     const animation = await page.getByTestId('garden-card-slot').first().locator('> div').evaluate((element) => ({
       name: getComputedStyle(element).animationName,
       duration: getComputedStyle(element).animationDuration,
