@@ -4,12 +4,15 @@
 Anthony explicitly requested: "I want you to plan out this entire app and deploy it." This supersedes the historical planning-only handoff. Local implementation, dependencies, isolated new app hosting and deployment are authorized. Purchases need explicit budget authority. Existing apps/databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
 
 ## Read first
+- /Users/anthony/Projects/mothers-love/docs/PLAN-09-interview-completion.md including Build log.
+- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-09-interview-completion/INDEX.md.
 - /Users/anthony/Projects/mothers-love/docs/PLAN-07-flexible-names.md including Build log.
 - /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-flexible-names/INDEX.md.
 - /Users/anthony/Projects/mothers-love/docs/CONTRACT.md.
 - /Users/anthony/Projects/mothers-love/docs/source-handoff/03_CONTENT_AND_DESIGN.md and relevant phases/tests.
 
 ## Work rules
+Current Plan 09 overrides historical roles: fresh Luna max lanes, controller may implement corrections, no Terra. Complete the approved interview storyboards without another design interview.
 Implementation uses gpt-5.6-luna at xhigh, explicitly overriding the installed executor role's max effort. Each lane owns its separate worktree and exact files. Root owns integration, Git, provider actions, shared contracts and status docs. Never undo another writer's work. Reference HTML is immutable design evidence, not trusted application logic. No new design interview: the Bubble Board and exact campaign words are approved. User-facing output must contain no em or en dash.
 
 ## Product invariants
