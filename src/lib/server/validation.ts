@@ -1,4 +1,4 @@
-import { countGraphemes, MAX_NAME_GRAPHEMES } from "@/lib/name-validation";
+import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from "@/lib/name-validation";
 import { graphemeLength, isIsoDate, isMonthBoundary } from "./time";
 import type { EditableRecognitionFields, MutationAction, RecognitionInput } from "./types";
 
@@ -24,9 +24,9 @@ export function validateRecognitionInput(input: unknown): ValidationResult<Recog
   const rawIds = body.expressionIds;
   const expressionIds = Array.isArray(rawIds) && rawIds.every((id) => Number.isInteger(id)) ? [...new Set(rawIds as number[])].sort((a, b) => a - b) : null;
   const issues: ValidationIssue[] = [];
-  if (!submittedName) issues.push({ field: "submittedName", code: "required" });
+  if (!submittedName || !hasVisibleNameContent(submittedName)) issues.push({ field: "submittedName", code: "required" });
   else if (countGraphemes(submittedName) > MAX_NAME_GRAPHEMES) issues.push({ field: "submittedName", code: "too_long" });
-  if (!recipient) issues.push({ field: "recipient", code: "required" });
+  if (!recipient || !hasVisibleNameContent(recipient)) issues.push({ field: "recipient", code: "required" });
   else if (countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
   if (!message) issues.push({ field: "message", code: "required" });
   else if (graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });
@@ -75,9 +75,9 @@ export function validateEditablePatch(input: unknown): ValidationResult<Partial<
   const rawIds = body.expressionIds;
   const expressionIds = rawIds === undefined ? undefined : Array.isArray(rawIds) && rawIds.every((id) => Number.isInteger(id)) ? [...new Set(rawIds as number[])].sort((a, b) => a - b) : null;
   const issues: ValidationIssue[] = [];
-  if (submittedName === null || submittedName === "") issues.push({ field: "submittedName", code: "required" });
+  if (submittedName === null || (submittedName !== undefined && !hasVisibleNameContent(submittedName))) issues.push({ field: "submittedName", code: "required" });
   else if (submittedName !== undefined && countGraphemes(submittedName) > MAX_NAME_GRAPHEMES) issues.push({ field: "submittedName", code: "too_long" });
-  if (recipient === null || recipient === "") issues.push({ field: "recipient", code: "required" });
+  if (recipient === null || (recipient !== undefined && !hasVisibleNameContent(recipient))) issues.push({ field: "recipient", code: "required" });
   else if (recipient !== undefined && countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
   if (message === null || message === "") issues.push({ field: "message", code: "required" });
   else if (message !== undefined && graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });

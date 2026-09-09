@@ -22,6 +22,7 @@ describe("backend input validation", () => {
       ["Cher", "Mary Jane"],
       ["  Maya Rodriguez  ", "  张 伟  "],
       ["M.", "Jean-Luc E\u0301"],
+      ["A\u0301", "👩‍👩‍👧‍👦"],
     ] as const;
 
     for (const [submittedName, recipient] of cases) {
@@ -36,6 +37,14 @@ describe("backend input validation", () => {
     expect(validateRecognitionInput({ ...base, recipient: "\t\n" }).issues).toContainEqual({ field: "recipient", code: "required" });
   });
 
+  it("rejects zero-width, joiner, variation-selector, and control-only names as required", () => {
+    for (const value of ["\u200B", "\u200D", "\uFE0F", "\u0000"]) {
+      const result = validateRecognitionInput({ ...base, submittedName: value, recipient: value });
+      expect(result.issues).toContainEqual({ field: "submittedName", code: "required" });
+      expect(result.issues).toContainEqual({ field: "recipient", code: "required" });
+    }
+  });
+
   it("keeps the 80-grapheme name boundary and rejects 81", () => {
     const nameAtLimit = `${"a".repeat(78)} B`;
     const nameOverLimit = `${"a".repeat(79)} B`;
@@ -47,6 +56,8 @@ describe("backend input validation", () => {
   it("accepts flexible editable names and preserves trimmed values", () => {
     expect(validateEditablePatch({ submittedName: " Sender Fullname ", recipient: " Friend Fullname " }).value).toEqual({ submittedName: "Sender Fullname", recipient: "Friend Fullname" });
     expect(validateEditablePatch({ submittedName: "   " }).issues).toContainEqual({ field: "submittedName", code: "required" });
+    expect(validateEditablePatch({ submittedName: "\u200D" }).issues).toContainEqual({ field: "submittedName", code: "required" });
+    expect(validateEditablePatch({ recipient: "\uFE0F" }).issues).toContainEqual({ field: "recipient", code: "required" });
     expect(validateEditablePatch({ recipient: "🙂".repeat(81) }).issues).toContainEqual({ field: "recipient", code: "too_long" });
   });
 
