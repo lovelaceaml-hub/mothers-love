@@ -256,8 +256,9 @@
 
 .expressionCard {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  min-height: 8rem;
+  min-height: 8.4rem;
   container-type: inline-size;
   border-radius: 1.2rem;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.64);
@@ -289,6 +290,11 @@
   z-index: 1;
 }
 
+.expressionCard > .expressionScene {
+  position: absolute;
+  z-index: 0;
+}
+
 .expression1 { background: var(--blue); }
 .expression2 { background: var(--yellow); }
 .expression3 { background: var(--orange); }
@@ -300,7 +306,396 @@
 .expression9 { background: var(--sky); }
 
 .expressionCard.expressionSelected {
-  background: linear-gradient(135deg, #ffe9a3 0%, #f8d875 56%, #efc861 100%);
+  border-color: rgba(111, 57, 49, 0.24);
+  background: linear-gradient(115deg, #ff8078 0%, #ffae65 52%, #ffd86a 100%);
+  box-shadow: inset 0 0 0 3px rgba(111, 57, 49, 0.34), 0 10px 24px rgba(168, 88, 66, 0.2), 0 0 0 0.25rem rgba(255, 161, 106, 0.2);
+}
+
+.expressionScene {
+  right: 0.7rem;
+  bottom: 0.45rem;
+  width: 6.3rem;
+  height: 4rem;
+  opacity: 0.78;
+  pointer-events: none;
+  transform: rotate(-3deg);
+}
+
+.expressionScene > span {
+  position: absolute;
+  display: block;
+}
+
+.sceneGround {
+  right: 0.1rem;
+  bottom: 0.05rem;
+  width: 5.7rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.48);
+  transform: rotate(-4deg);
+}
+
+.scenePrimary,
+.sceneSecondary,
+.sceneAccent,
+.sceneSpark {
+  transform-origin: center;
+}
+
+.scene1 .scenePrimary {
+  top: 0.6rem;
+  left: 0.55rem;
+  width: 3.25rem;
+  height: 2.1rem;
+  border: 2px solid rgba(70, 65, 70, 0.45);
+  border-radius: 1rem 1rem 1rem 0.35rem;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.scene1 .scenePrimary::after {
+  position: absolute;
+  bottom: -0.42rem;
+  left: 0.45rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-bottom: 2px solid rgba(70, 65, 70, 0.45);
+  border-left: 2px solid rgba(70, 65, 70, 0.45);
+  background: inherit;
+  content: '';
+  transform: skewY(-34deg);
+}
+
+.scene1 .sceneSecondary {
+  top: 1.35rem;
+  right: 0.6rem;
+  width: 1.65rem;
+  height: 1.35rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.66);
+  transform: rotate(12deg);
+}
+
+.scene1 .sceneAccent,
+.scene1 .sceneSpark {
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: #fffdf6;
+}
+
+.scene1 .sceneAccent { top: 1.38rem; left: 1.2rem; box-shadow: 0.65rem 0 0 #fffdf6, 1.3rem 0 0 #fffdf6; }
+.scene1 .sceneSpark { top: 0.1rem; right: 0.45rem; box-shadow: -0.55rem 0.35rem 0 rgba(255, 255, 255, 0.8); }
+
+.scene2 .scenePrimary {
+  right: 0.95rem;
+  bottom: 0.6rem;
+  width: 2.65rem;
+  height: 2rem;
+  border: 2px solid rgba(113, 79, 25, 0.48);
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.scene2 .sceneSecondary {
+  right: 2.02rem;
+  bottom: 0.6rem;
+  width: 0.5rem;
+  height: 2rem;
+  border-right: 2px solid rgba(113, 79, 25, 0.48);
+  border-left: 2px solid rgba(113, 79, 25, 0.48);
+}
+
+.scene2 .sceneAccent {
+  top: 0.62rem;
+  right: 1.38rem;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(113, 79, 25, 0.48);
+  border-radius: 0.7rem 0.7rem 0.25rem 0.7rem;
+  transform: rotate(45deg);
+}
+
+.scene2 .sceneSpark {
+  top: 0.35rem;
+  left: 0.92rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0.7rem -0.25rem 0 rgba(255, 255, 255, 0.55), 0.95rem 0.55rem 0 rgba(255, 255, 255, 0.55);
+}
+
+.scene3 .scenePrimary {
+  top: 0.82rem;
+  left: 0.88rem;
+  width: 3.25rem;
+  height: 1.8rem;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0.75rem 0.25rem 0 -0.2rem rgba(255, 255, 255, 0.58), 1.25rem 0.5rem 0 -0.4rem rgba(255, 255, 255, 0.58);
+}
+
+.scene3 .sceneSecondary {
+  left: 1.4rem;
+  bottom: 0.38rem;
+  width: 2.7rem;
+  height: 1.2rem;
+  border-bottom: 2px solid rgba(113, 79, 25, 0.36);
+  border-radius: 0 0 50% 50%;
+  transform: rotate(-9deg);
+}
+
+.scene3 .sceneAccent,
+.scene3 .sceneSpark {
+  width: 0.3rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: rgba(91, 136, 178, 0.66);
+  transform: rotate(18deg);
+}
+
+.scene3 .sceneAccent { top: 2.55rem; left: 2.15rem; }
+.scene3 .sceneSpark { top: 2.25rem; left: 3.2rem; height: 0.55rem; }
+
+.scene4 .scenePrimary {
+  right: 0.78rem;
+  bottom: 0.48rem;
+  width: 4.15rem;
+  height: 2.45rem;
+  border: 0.42rem solid rgba(255, 255, 255, 0.62);
+  border-bottom: 0;
+  border-radius: 3rem 3rem 0 0;
+  transform: rotate(-4deg);
+}
+
+.scene4 .sceneSecondary {
+  right: 0.35rem;
+  bottom: 0.35rem;
+  width: 0.4rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: rgba(83, 72, 107, 0.5);
+  box-shadow: 3.6rem 0 0 rgba(83, 72, 107, 0.5);
+}
+
+.scene4 .sceneAccent {
+  top: 0.3rem;
+  left: 1rem;
+  width: 2.55rem;
+  height: 0.3rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  transform: rotate(15deg);
+}
+
+.scene4 .sceneSpark {
+  top: 1rem;
+  right: 0.38rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.scene5 .scenePrimary {
+  right: 0.7rem;
+  bottom: 1rem;
+  width: 4.65rem;
+  height: 1.15rem;
+  border-top: 0.22rem dashed rgba(81, 53, 62, 0.48);
+  transform: rotate(-11deg);
+}
+
+.scene5 .sceneSecondary {
+  right: 0.75rem;
+  bottom: 0.8rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-top: 0.2rem solid rgba(81, 53, 62, 0.48);
+  border-right: 0.2rem solid rgba(81, 53, 62, 0.48);
+  transform: rotate(44deg);
+}
+
+.scene5 .sceneAccent {
+  left: 0.8rem;
+  bottom: 0.55rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 1.25rem -0.55rem 0 rgba(255, 255, 255, 0.58), 2.45rem -0.9rem 0 rgba(255, 255, 255, 0.45);
+}
+
+.scene5 .sceneSpark {
+  top: 0.2rem;
+  right: 1.25rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+}
+
+.scene6 .scenePrimary {
+  top: 0.35rem;
+  right: 1.42rem;
+  width: 2.15rem;
+  height: 3rem;
+  border: 0.36rem solid rgba(83, 72, 107, 0.44);
+  border-left-color: transparent;
+  border-radius: 50%;
+  transform: rotate(19deg);
+}
+
+.scene6 .sceneSecondary {
+  top: 0.85rem;
+  right: 0.28rem;
+  width: 1.1rem;
+  height: 1.7rem;
+  border-top: 0.18rem solid rgba(255, 255, 255, 0.8);
+  border-bottom: 0.18rem solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  transform: rotate(20deg);
+}
+
+.scene6 .sceneAccent {
+  right: 0.12rem;
+  top: 0.28rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #fffdf6;
+  box-shadow: 0.48rem 0.25rem 0 #fffdf6, 0.95rem 0.58rem 0 #fffdf6;
+}
+
+.scene6 .sceneSpark {
+  bottom: 0.7rem;
+  left: 0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.scene7 .scenePrimary {
+  top: 0.28rem;
+  right: 1.08rem;
+  width: 2.55rem;
+  height: 2.55rem;
+  background: rgba(255, 255, 255, 0.72);
+  clip-path: polygon(50% 0, 62% 36%, 100% 36%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 36%, 38% 36%);
+  transform: rotate(10deg);
+}
+
+.scene7 .sceneSecondary {
+  right: 0.38rem;
+  bottom: 0.65rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: rgba(113, 79, 25, 0.42);
+}
+
+.scene7 .sceneAccent {
+  top: 0.42rem;
+  left: 0.95rem;
+  width: 0.26rem;
+  height: 2.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  transform: rotate(46deg);
+  box-shadow: 0.6rem 1.1rem 0 rgba(255, 255, 255, 0.45);
+}
+
+.scene7 .sceneSpark {
+  top: 0.05rem;
+  right: 0.25rem;
+  width: 0.46rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: #fffdf6;
+}
+
+.scene8 .scenePrimary {
+  right: 1.4rem;
+  bottom: 0.58rem;
+  width: 2.75rem;
+  height: 2.1rem;
+  border-radius: 1.25rem 1.25rem 0.85rem 0.85rem;
+  background: rgba(255, 255, 255, 0.62);
+  transform: rotate(-9deg);
+}
+
+.scene8 .sceneSecondary {
+  right: 0.55rem;
+  bottom: 1.55rem;
+  width: 3.65rem;
+  height: 0.52rem;
+  border-radius: 999px;
+  background: rgba(71, 113, 87, 0.45);
+  transform: rotate(-9deg);
+  box-shadow: 0 0.68rem 0 rgba(71, 113, 87, 0.45), 0 1.36rem 0 rgba(71, 113, 87, 0.45);
+}
+
+.scene8 .sceneAccent {
+  right: 0.95rem;
+  bottom: 0.3rem;
+  width: 0.32rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: rgba(71, 113, 87, 0.58);
+  transform: rotate(8deg);
+}
+
+.scene8 .sceneSpark {
+  right: 0.42rem;
+  bottom: 1.58rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-top: 0.15rem solid rgba(71, 113, 87, 0.58);
+  border-left: 0.15rem solid rgba(71, 113, 87, 0.58);
+  border-radius: 50% 0;
+  transform: rotate(20deg);
+}
+
+.scene9 .scenePrimary {
+  top: 0.32rem;
+  left: 0.9rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  background: rgba(255, 255, 255, 0.7);
+  clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%);
+  transform: rotate(7deg);
+}
+
+.scene9 .sceneSecondary {
+  right: 0.45rem;
+  bottom: 0.65rem;
+  width: 1.45rem;
+  height: 1.45rem;
+  background: rgba(255, 255, 255, 0.56);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  transform: rotate(-12deg);
+}
+
+.scene9 .sceneAccent {
+  top: 0.22rem;
+  right: 0.1rem;
+  width: 0.4rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  transform: rotate(38deg);
+}
+
+.scene9 .sceneSpark {
+  bottom: 1rem;
+  left: 0.38rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0.58rem -0.55rem 0 rgba(255, 255, 255, 0.6);
 }
 
 .expressionHeader {
@@ -376,7 +771,13 @@
 .expressionSelected .expressionSelect {
   border-color: #a87316;
   color: #5c3a08;
-  background: #ffd86a;
+  background: rgba(255, 249, 215, 0.74);
+}
+
+.expressionSelected .expressionCheck {
+  border-color: #5c3a08;
+  color: #fff;
+  background: #5c3a08;
 }
 
 .expressionSelected .expressionSelect:focus-visible {
@@ -409,6 +810,126 @@
   font-size: 0.75rem;
   line-height: 1.3;
   text-align: right;
+}
+
+.bouquetWrap {
+  margin-top: 0.45rem;
+}
+
+.bouquet {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 4.25rem;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  background: linear-gradient(180deg, rgba(255, 253, 246, 0.08), rgba(255, 253, 246, 0.56));
+}
+
+.bouquetGround {
+  position: absolute;
+  right: 20%;
+  bottom: 0.28rem;
+  left: 20%;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: rgba(97, 75, 73, 0.28);
+}
+
+.bouquetStem {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 1.45rem;
+  height: 3.25rem;
+  margin: 0 -0.18rem;
+  transform-origin: bottom center;
+  animation: bouquetGrow 520ms cubic-bezier(0.22, 1.15, 0.36, 1) both;
+}
+
+.bouquetStem::after {
+  position: absolute;
+  bottom: 0.22rem;
+  left: calc(50% - 0.08rem);
+  width: 0.16rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  background: #6c9d6b;
+  content: '';
+}
+
+.bouquetStem::before {
+  position: absolute;
+  bottom: 1rem;
+  left: calc(50% - 0.48rem);
+  width: 0.78rem;
+  height: 0.38rem;
+  border-radius: 100% 0;
+  background: rgba(91, 145, 91, 0.72);
+  content: '';
+  transform: rotate(-27deg);
+}
+
+.bouquetStem1 { transform: rotate(-22deg); animation-delay: 10ms; }
+.bouquetStem2 { transform: rotate(-16deg); animation-delay: 45ms; }
+.bouquetStem3 { transform: rotate(-10deg); animation-delay: 80ms; }
+.bouquetStem4 { transform: rotate(-4deg); animation-delay: 115ms; }
+.bouquetStem5 { transform: rotate(3deg); animation-delay: 150ms; }
+.bouquetStem6 { transform: rotate(9deg); animation-delay: 185ms; }
+.bouquetStem7 { transform: rotate(15deg); animation-delay: 220ms; }
+.bouquetStem8 { transform: rotate(21deg); animation-delay: 255ms; }
+.bouquetStem9 { transform: rotate(27deg); animation-delay: 290ms; }
+
+.bouquetBloom {
+  position: absolute;
+  top: 0.18rem;
+  left: calc(50% - 0.47rem);
+  z-index: 2;
+  display: block;
+  width: 0.94rem;
+  height: 0.94rem;
+  border-radius: 50%;
+  background: #ff8078;
+  box-shadow: 0 -0.33rem 0 -0.08rem currentColor, 0 0.33rem 0 -0.08rem currentColor, -0.33rem 0 0 -0.08rem currentColor, 0.33rem 0 0 -0.08rem currentColor;
+  color: #ffb8a6;
+}
+
+.bouquetBloom i {
+  position: absolute;
+  top: 0.32rem;
+  left: 0.32rem;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: #ffd86a;
+}
+
+.bouquetBloom1 { color: #9edcf2; }
+.bouquetBloom2 { color: #ffe694; }
+.bouquetBloom3 { color: #ffc08f; }
+.bouquetBloom4 { color: #ffaaa4; }
+.bouquetBloom5 { color: #f58e98; }
+.bouquetBloom6 { color: #d6c7f4; }
+.bouquetBloom7 { color: #d9ee91; }
+.bouquetBloom8 { color: #a9dfa9; }
+.bouquetBloom9 { color: #b5d3ff; }
+
+.bouquetStatus {
+  margin-left: 0.55rem;
+  color: #8d6341;
+  font-weight: 600;
+}
+
+.bouquetStatus::before {
+  display: inline-block;
+  width: 0.28rem;
+  height: 0.28rem;
+  margin: 0 0.32rem 0.08rem 0;
+  border-radius: 50%;
+  background: #e68f73;
+  content: '';
 }
 
 .counter span {
@@ -650,33 +1171,121 @@
   line-height: 1.55;
 }
 
-.receiptFlower {
+.seedJourney {
   position: relative;
-  width: 4.6rem;
-  height: 4.6rem;
-  margin: 0 auto 1.2rem;
-  border-radius: 50%;
-  background: #ffe1de;
+  width: min(100%, 19rem);
+  height: 5.25rem;
+  margin: 0 auto 1.1rem;
+  border-radius: 1.55rem;
+  background: linear-gradient(120deg, rgba(255, 226, 218, 0.86), rgba(255, 246, 210, 0.82));
+  overflow: hidden;
 }
 
-.receiptFlower span {
+.seedOrbit,
+.seedTrail,
+.seedGarden {
   position: absolute;
-  top: 0.75rem;
-  left: 1.85rem;
-  width: 0.92rem;
-  height: 1.75rem;
-  border-radius: 999px;
-  background: #fff;
-  transform-origin: 0.46rem 1.55rem;
+  display: block;
 }
 
-.receiptFlower span:nth-child(2) { transform: rotate(90deg); }
-.receiptFlower span:nth-child(3) { transform: rotate(180deg); }
-.receiptFlower span:nth-child(4) { transform: rotate(270deg); }
-.receiptFlower b { position: absolute; top: 1.67rem; left: 1.67rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: #f8c644; }
+.seedOrbit {
+  top: 1rem;
+  left: 20%;
+  width: 2.1rem;
+  height: 2.1rem;
+  animation: seedFloat 4.8s ease-in-out infinite;
+}
 
-.receiptHeld .receiptFlower { background: #f4efff; }
-.receiptHeld .receiptFlower b { background: #9b85d3; }
+.seed {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.75rem;
+  width: 0.62rem;
+  height: 1rem;
+  border-radius: 85% 15% 70% 30%;
+  background: #96643a;
+  transform: rotate(34deg);
+}
+
+.seedLeaf {
+  position: absolute;
+  top: 0.15rem;
+  left: 1.05rem;
+  width: 0.8rem;
+  height: 0.5rem;
+  border-radius: 100% 0;
+  background: #82b673;
+  transform: rotate(-20deg);
+}
+
+.seedTrail {
+  top: 2.2rem;
+  left: 23%;
+  width: 45%;
+  height: 1.4rem;
+  border-top: 2px dashed rgba(150, 100, 58, 0.35);
+  border-radius: 50%;
+  transform: rotate(7deg);
+}
+
+.seedGarden {
+  right: 15%;
+  bottom: 0.8rem;
+  width: 2.7rem;
+  height: 2.35rem;
+  border-bottom: 0.35rem solid rgba(91, 145, 91, 0.62);
+  border-radius: 50%;
+}
+
+.seedGarden::before,
+.seedGarden::after {
+  position: absolute;
+  bottom: 0.25rem;
+  width: 0.2rem;
+  height: 1.45rem;
+  border-radius: 999px;
+  background: rgba(91, 145, 91, 0.62);
+  content: '';
+  transform-origin: bottom center;
+}
+
+.seedGarden::before { left: 0.75rem; transform: rotate(-18deg); }
+.seedGarden::after { right: 0.72rem; transform: rotate(18deg); }
+
+.seedGarden i,
+.seedGarden b {
+  position: absolute;
+  top: 0.12rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50% 50% 50% 0;
+  background: #ff8e86;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.seedGarden i { left: 0.42rem; }
+.seedGarden b { right: 0.38rem; background: #ffd86a; }
+
+.receiptJourneyNote {
+  margin: -0.45rem auto 1.4rem !important;
+  color: #8d6341 !important;
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.receiptHeld .seedJourney {
+  background: linear-gradient(120deg, rgba(244, 239, 255, 0.9), rgba(255, 246, 210, 0.68));
+}
+
+.receiptHeld .seed {
+  background: #7b699d;
+}
+
+.receiptHeld .seedGarden i,
+.receiptHeld .seedGarden b {
+  background: #b7abd7;
+}
 
 .secondaryButton {
   width: 100%;
@@ -793,6 +1402,17 @@
 @keyframes selectedShimmer {
   0%, 20%, 100% { transform: translateX(-130%); }
   58% { transform: translateX(130%); }
+}
+
+@keyframes bouquetGrow {
+  from { opacity: 0; transform: translateY(1.4rem) rotate(0deg) scale(0.6); }
+  to { opacity: 1; }
+}
+
+@keyframes seedFloat {
+  0%, 100% { transform: translate(0, 0) rotate(-10deg); }
+  48% { transform: translate(4.2rem, -0.22rem) rotate(16deg); }
+  72% { transform: translate(8.1rem, 0.55rem) rotate(28deg); }
 }
 
 @media (min-width: 42rem) {
