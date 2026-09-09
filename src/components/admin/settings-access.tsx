@@ -87,7 +87,7 @@ export function SettingsAccess() {
         <article className={`${styles.card} ${styles.cardBlue} ${session?.role === 'owner' ? styles.col5 : styles.col7}`}>
           <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>TV View</h2><p className={styles.cardDescription}>Open the public campaign display directly with its link.</p></div><span className={styles.badge}>Public link</span></div>
           <Link className={styles.button} href="/display">Open TV View</Link>
-          <p className={styles.fieldHint} style={{ marginTop: 12 }}>Settings apply to open TV View screens when they refresh. An offline screen keeps its last successful state.</p>
+          <p className={styles.fieldHint} style={{ marginTop: 12 }}>Settings apply to open TV View screens when they refresh. Blank an offline screen to hide messages immediately.</p>
         </article>
       </section>
     </>
