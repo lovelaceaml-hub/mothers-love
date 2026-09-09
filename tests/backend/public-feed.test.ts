@@ -52,7 +52,7 @@ describe("public feed projection", () => {
   });
 
   it("accepts single, full, and Unicode recipient names without truncating them", () => {
-    for (const recipient of ["Cher", "Mary Jane", "张伟"]) {
+    for (const recipient of ["Cher", "Mary Jane", "张伟", "A\u0301", "👩‍👩‍👧‍👦", "👩🏽‍💻"]) {
       const projected = projectPublicFeed({ ...snapshot, items: [{ ...item, recipient }] });
       expect(projected?.items[0]?.recipient).toBe(recipient);
     }
@@ -64,6 +64,9 @@ describe("public feed projection", () => {
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, firstPublishedAt: "2026-09-08T10:02:00.000Z" }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, expiresAt: snapshot.serverTime }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "   " }] })).toBeNull();
+    for (const recipient of ["\u200B", "\u200D", "\uFE0F", "\u0000"]) {
+      expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient }] })).toBeNull();
+    }
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "🙂".repeat(81) }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: Array.from({ length: 51 }, () => item) })).toBeNull();
     expect(projectPublicFeed({

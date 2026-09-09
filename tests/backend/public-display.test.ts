@@ -125,7 +125,7 @@ describe("public display projection", () => {
   });
 
   it("accepts single, full, and Unicode recipient names without truncating them", () => {
-    for (const recipient of ["Cher", "Mary Jane", "张伟"]) {
+    for (const recipient of ["Cher", "Mary Jane", "张伟", "A\u0301", "👩‍👩‍👧‍👦", "👩🏽‍💻"]) {
       const projected = projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient }] });
       expect(projected?.recognitions[0]?.recipient).toBe(recipient);
     }
@@ -136,6 +136,9 @@ describe("public display projection", () => {
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, message: "" }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, status: "held" }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient: "   " }] })).toBeNull();
+    for (const recipient of ["\u200B", "\u200D", "\uFE0F", "\u0000"]) {
+      expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient }] })).toBeNull();
+    }
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient: "🙂".repeat(81) }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, arrivals: [{ ...snapshot.arrivals[0], recognitionId: "00000000-0000-4000-8000-000000000099" }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, settings: { ...settings, mode: "quiet" }, recognitions: [recognition] })).toBeNull();

@@ -1,4 +1,5 @@
 import type { Aggregate, DisplaySettings, DisplaySnapshot, Recognition } from "@/lib/contracts";
+import { hasVisibleNameContent } from "@/lib/name-validation";
 import { isIsoDate, graphemeLength } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 
@@ -87,7 +88,7 @@ function projectRecognition(value: unknown, serverTime: number): Recognition | n
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const recognition = value as Record<string, unknown>;
   if (typeof recognition.id !== "string" || !UUID_PATTERN.test(recognition.id)) return null;
-  if (typeof recognition.recipient !== "string" || recognition.recipient.trim().length === 0 || graphemeLength(recognition.recipient) > 80) return null;
+  if (typeof recognition.recipient !== "string" || !hasVisibleNameContent(recognition.recipient) || graphemeLength(recognition.recipient) > 80) return null;
   if (typeof recognition.message !== "string" || recognition.message.length === 0 || graphemeLength(recognition.message) > 500) return null;
   if (!Array.isArray(recognition.expressionIds) || recognition.expressionIds.length < 1 || recognition.expressionIds.length > 9) return null;
   if (!recognition.expressionIds.every((id): id is number => isSafeInteger(id, 1) && id <= 9)) return null;

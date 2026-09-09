@@ -1,4 +1,5 @@
 import type { PublicFeedItem, PublicFeedSnapshot } from "@/lib/feed-contract";
+import { hasVisibleNameContent } from "@/lib/name-validation";
 import { graphemeLength } from "./time";
 import { databaseClient } from "./supabase";
 
@@ -20,7 +21,7 @@ function isPublicFeedItem(value: unknown, serverTime: number): value is PublicFe
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const item = value as Record<string, unknown>;
   if (typeof item.id !== "string" || !UUID_PATTERN.test(item.id)) return false;
-  if (typeof item.recipient !== "string" || item.recipient.trim().length === 0 || graphemeLength(item.recipient) > 80) return false;
+  if (typeof item.recipient !== "string" || !hasVisibleNameContent(item.recipient) || graphemeLength(item.recipient) > 80) return false;
   if (typeof item.message !== "string" || item.message.length === 0 || graphemeLength(item.message) > 500) return false;
   if (!Array.isArray(item.expressionIds) || item.expressionIds.length < 1 || item.expressionIds.length > 9) return false;
   if (!item.expressionIds.every((id): id is number => Number.isInteger(id) && id >= 1 && id <= 9)) return false;

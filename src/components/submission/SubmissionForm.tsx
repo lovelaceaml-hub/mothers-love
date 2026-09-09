@@ -6,12 +6,12 @@ import Link from 'next/link';
 
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
-import { countGraphemes, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
+import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
 import { CompactPublicFeed } from '@/components/feed/PublicFeedProvider';
 
 import styles from './SubmissionForm.module.css';
 
-export { countGraphemes };
+export { countGraphemes, hasVisibleNameContent };
 
 type ConfigResponse = { collectionOpen: boolean; configured: boolean };
 type ReceiptStatus = 'published' | 'held';
@@ -54,13 +54,13 @@ export function getValidationErrors(draft: Draft): FieldErrors {
   const recipient = draft.recipient.trim();
   const message = draft.message.trim();
 
-  if (!submitter) {
+  if (!hasVisibleNameContent(submitter)) {
     errors.submitter = 'Enter your name.';
   } else if (countGraphemes(submitter) > MAX_NAME_GRAPHEMES) {
     errors.submitter = `Your name must be ${MAX_NAME_GRAPHEMES} characters or fewer.`;
   }
 
-  if (!recipient) {
+  if (!hasVisibleNameContent(recipient)) {
     errors.recipient = 'Enter the recipient name.';
   } else if (countGraphemes(recipient) > MAX_NAME_GRAPHEMES) {
     errors.recipient = `The recipient name must be ${MAX_NAME_GRAPHEMES} characters or fewer.`;
