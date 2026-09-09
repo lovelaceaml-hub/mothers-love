@@ -266,7 +266,8 @@
 .arrivalScreen h2,
 .milestoneScreen h2,
 .fallbackScreen h2,
-.quietScreen h2 {
+.quietScreen h2,
+.startupCard h2 {
   margin: 10px 0 0;
   color: var(--ink);
   font-size: clamp(30px, 3.35vw, 82px);
@@ -1450,6 +1451,7 @@
 .milestoneScreen h2,
 .fallbackScreen h2,
 .quietScreen h2,
+.startupCard h2,
 .emptyGarden h3,
 .pairingCard h1 {
   color: var(--heading-ink);
@@ -1492,6 +1494,67 @@
 .headerTagline,
 .tagline {
   color: #77435d;
+}
+
+.startupScreen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 44px);
+  text-align: center;
+}
+
+.startupCard {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 760px);
+  min-height: min(48vh, 420px);
+  padding: clamp(36px, 7vw, 94px) clamp(28px, 6vw, 84px);
+  overflow: hidden;
+  border: 1px solid var(--panel-edge);
+  border-radius: clamp(28px, 3vw, 58px);
+  background: var(--panel);
+  box-shadow: 0 24px 70px rgba(65, 55, 35, 0.12);
+}
+
+.startupCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+.startupCard::after {
+  position: absolute;
+  right: -10%;
+  bottom: -28%;
+  width: 44%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 216, 106, 0.27);
+  content: '';
+}
+
+.startupCard h2 {
+  max-width: 14ch;
+  margin: 18px 0 0;
+  font-size: clamp(34px, 4.4vw, 76px);
+}
+
+.startupCard p:last-child {
+  margin: 24px 0 0;
+  color: #626673;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.5vw, 25px);
+  font-style: italic;
+}
+
+.startupFlower {
+  width: clamp(54px, 7vw, 104px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd86a 0 16%, transparent 18%), conic-gradient(from 0deg, #ffaf70 0 12%, transparent 12% 25%, #ffaf70 25% 37%, transparent 37% 50%, #ffaf70 50% 62%, transparent 62% 75%, #ffaf70 75% 87%, transparent 87%);
+  filter: drop-shadow(0 10px 18px rgba(255, 175, 112, 0.22));
 }
 
 .eyebrow {
