@@ -172,6 +172,21 @@
   transform: rotate(12deg);
 }
 
+.atmosphereSparkle {
+  position: absolute;
+  width: clamp(20px, 1.8vw, 38px);
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  background: var(--yellow);
+  filter: drop-shadow(0 0 10px rgba(255, 216, 106, 0.56));
+  opacity: 0.7;
+  animation: sparkleTwinkle 8s ease-in-out infinite;
+}
+
+.atmosphereSparkleOne { top: 20%; left: 43%; }
+.atmosphereSparkleTwo { top: 34%; right: 23%; animation-delay: -2.4s; }
+.atmosphereSparkleThree { bottom: 20%; left: 42%; animation-delay: -5s; }
+
 .motioncalm .atmosphereOrbOne,
 .motioncalm .atmosphereOrbTwo,
 .motioncalm .atmosphereOrbThree {
@@ -190,10 +205,14 @@
   animation: drift 16s ease-in-out infinite;
 }
 
+.motioncalm .atmosphereSparkle { animation-duration: 14s; }
+.motionlively .atmosphereSparkle { animation-duration: 6s; }
+
 .motionstill .atmosphereOrbOne,
 .motionstill .atmosphereOrbTwo,
 .motionstill .atmosphereOrbThree,
 .motionstill .atmosphereDaisy,
+.motionstill .atmosphereSparkle,
 .motionstill .atmosphere::before,
 .motionstill .atmosphere::after {
   animation: none;
@@ -208,6 +227,11 @@
 .lowActivity .atmosphereOrbThree {
   animation-duration: 60s;
   opacity: 0.24;
+}
+
+.lowActivity .atmosphereSparkle {
+  animation-duration: 20s;
+  opacity: 0.36;
 }
 
 .motioncalm .bubbleDrift { animation-duration: 22s; }
@@ -313,10 +337,10 @@
   animation-delay: var(--bubble-delay, 0s);
 }
 
-.gardenPositionOne { top: 1%; left: 3%; }
+.gardenPositionOne { top: clamp(12px, 1.8%, 26px); left: 3%; }
 .gardenPositionTwo { top: 9%; left: 28%; }
-.gardenPositionThree { top: 0%; right: 4%; }
-.gardenPositionFour { right: 20%; bottom: 0%; }
+.gardenPositionThree { top: clamp(14px, 3.2%, 34px); right: 4%; }
+.gardenPositionFour { right: 20%; bottom: clamp(14px, 3%, 34px); }
 .gardenPositionFive { bottom: 5%; left: 7%; }
 .gardenPositionSix { right: 43%; bottom: 13%; }
 
@@ -1354,6 +1378,21 @@
   50% { transform: translate3d(-0.3vw, 0.6vh, 0) rotate(0.6deg); }
 }
 
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(0.72) rotate(45deg);
+  }
+  48% {
+    opacity: 0.78;
+    transform: translate3d(0, -0.6vh, 0) scale(1) rotate(45deg);
+  }
+  62% {
+    opacity: 0.58;
+    transform: translate3d(0, 0.2vh, 0) scale(0.9) rotate(45deg);
+  }
+}
+
 @keyframes freshHalo {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(157, 217, 159, 0), 0 20px 56px rgba(65, 55, 35, 0.13); }
   24% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(157, 217, 159, 0.2), 0 28px 70px rgba(65, 55, 35, 0.18); }
@@ -1509,10 +1548,10 @@
   aspect-ratio: 1;
 }
 
-.gardenPositionOne { top: 1%; left: 3%; }
+.gardenPositionOne { top: clamp(12px, 1.8%, 26px); left: 3%; }
 .gardenPositionTwo { top: 9%; left: 28%; }
-.gardenPositionThree { top: 0%; right: 4%; }
-.gardenPositionFour { right: 20%; bottom: 0%; }
+.gardenPositionThree { top: clamp(14px, 3.2%, 34px); right: 4%; }
+.gardenPositionFour { right: 20%; bottom: clamp(14px, 3%, 34px); }
 .gardenPositionFive { bottom: 5%; left: 7%; }
 .gardenPositionSix { right: 43%; bottom: 13%; }
 
@@ -1703,9 +1742,14 @@
 
 .featureNumber,
 .clusterNumber {
-  color: rgba(90, 41, 72, 0.26);
+  color: #5a2948;
   font-family: var(--font-display);
   font-weight: 700;
+}
+
+.featureExpression .eyebrow,
+.clusterCore .eyebrow {
+  color: #482236;
 }
 
 .featureReading {
@@ -1984,6 +2028,14 @@
   color: var(--heading-ink);
   font-family: var(--font-display);
   font-weight: 700;
+}
+
+.milestoneScreen p.milestoneNumber {
+  margin: 3vh 0 2vh;
+  color: #b16b36;
+  font-size: clamp(100px, 12vw, 280px);
+  line-height: 0.76;
+  text-shadow: 0 8px 24px rgba(177, 107, 54, 0.16);
 }
 
 .fallbackScreen,
@@ -2377,6 +2429,10 @@
   .displayApp .liveRailItem,
   .displayApp .impactBubble,
   .displayApp .expressionCard {
+    animation: none !important;
+  }
+
+  .displayApp .atmosphereSparkle {
     animation: none !important;
   }
 }
