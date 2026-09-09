@@ -202,7 +202,7 @@ function PlaylistEditor({
 
   return (
     <div className={styles.playlistEditor}>
-      <div className={styles.playlistHeader}><div><p className={styles.eyebrow}>Fixed playlist</p><h2 className={styles.sectionTitle}>What the display can show</h2><p className={styles.sectionHint}>Choose the screens, their order, and any safe reading-time adjustments. One screen must stay enabled.</p></div><span className={styles.countPill}>{activeCount} active</span></div>
+      <div className={styles.playlistHeader}><div><p className={styles.eyebrow}>Fixed playlist</p><h2 className={styles.sectionTitle}>What the display can show</h2><p className={styles.sectionHint}>Choose the screens, their order, and any safe reading-time adjustments. The Garden returns between enabled screens to keep the TV View garden-led. One screen must stay enabled.</p></div><span className={styles.countPill}>{activeCount} active</span></div>
       {playlistError ? <div className={styles.inlineError} role="alert">{playlistError}</div> : null}
       <ol className={styles.playlistList} aria-label="Display playlist">
         {playlist.map((entry, index) => {

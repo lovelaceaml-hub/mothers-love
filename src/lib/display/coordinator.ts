@@ -1,4 +1,15 @@
-import type { DisplaySettings, DisplaySnapshot, Recognition } from '@/lib/contracts';
+import {
+  DEFAULT_DISPLAY_EFFECTS,
+  DEFAULT_DISPLAY_GARDEN_AMOUNT,
+  DEFAULT_DISPLAY_PLAYLIST,
+  DEFAULT_DISPLAY_SOUND,
+  DEFAULT_DISPLAY_TEMPO,
+  type DisplayScreenId,
+  type DisplaySettings,
+  type DisplaySnapshot,
+  type Recognition,
+} from '@/lib/contracts';
+import { planGardenRender } from '@/lib/display-performance';
 
 export type DisplayScreen =
   | 'garden'
@@ -6,6 +17,11 @@ export type DisplayScreen =
   | 'cluster'
   | 'impact'
   | 'all-nine'
+  | 'spotlight'
+  | 'daily-practice'
+  | 'one-kind-word'
+  | 'everyday-peace'
+  | 'peace-promise'
   | 'arrival'
   | 'milestone'
   | 'fallback'
@@ -92,10 +108,10 @@ export type CoordinatorAction =
 
 const GRACE_MS = 60_000;
 const JOURNEY_MS = 2_500;
-const ORDINARY_GAP_MS = 8_000;
+const ORDINARY_GAP_MS = 10_000;
 const INTRO_GROUP_AGE_MS = 2 * 60_000;
-const PLAYLIST: DisplayScreen[] = ['garden', 'featured', 'garden', 'impact', 'all-nine', 'cluster'];
-const MILESTONE_BASES = [50, 100, 250, 500, 1_000];
+const LEGACY_PLAYLIST: DisplayScreen[] = ['garden', 'featured', 'garden', 'impact', 'all-nine', 'cluster'];
+const MILESTONE_INTERVAL = 25;
 export const READING_MESSAGE_PAGE_GRAPHEMES = 180;
 export const READING_MESSAGE_PAGE_LINES = 7;
 
@@ -165,8 +181,9 @@ function fairSort(items: Recognition[], history: Record<string, number>): Recogn
   });
 }
 
-function maxBubbles(settings: DisplaySettings): number {
-  return Math.max(1, Math.min(6, Number.isFinite(settings.maxBubbles) ? settings.maxBubbles : 4));
+function gardenNodeCount(settings: DisplaySettings, availableCount: number): number {
+  const gardenAmount = settings.gardenAmount ?? settings.maxBubbles ?? DEFAULT_DISPLAY_GARDEN_AMOUNT;
+  return planGardenRender({ availableCount, gardenAmount }).renderedCount;
 }
 
 function nextMilestone(total: number, celebrated: number[]): number | null {
@@ -176,23 +193,62 @@ function nextMilestone(total: number, celebrated: number[]): number | null {
 }
 
 function milestoneThresholds(total: number): number[] {
-  const candidates = [...MILESTONE_BASES];
-  if (total >= 1_000) {
-    for (let threshold = 1_500; threshold <= total + 500; threshold += 500) candidates.push(threshold);
-  }
-  return candidates;
+  const safeTotal = Math.max(0, Math.floor(total));
+  return Array.from({ length: Math.floor(safeTotal / MILESTONE_INTERVAL) }, (_, index) => (index + 1) * MILESTONE_INTERVAL);
 }
 
-function durationFor(screen: DisplayScreen, selected?: Recognition): number {
-  if (screen === 'garden') return 20_000;
-  if (screen === 'impact') return 15_000;
-  if (screen === 'all-nine') return 24_000;
-  if (screen === 'cluster') return 20_000;
-  if (screen === 'fallback') return 20_000;
+function playlistScreen(id: DisplayScreenId): DisplayScreen {
+  if (id === 'expressions') return 'all-nine';
+  if (id === 'shared-expression') return 'cluster';
+  return id;
+}
+
+function tempoMultiplier(tempo: DisplaySettings['tempo']): number {
+  if (tempo === 'calm' || tempo === 'slow' || tempo === 'gentle') return 1.25;
+  if (tempo === 'lively' || tempo === 'fast') return 0.85;
+  return 1;
+}
+
+function hasModernPlaylist(settings: DisplaySettings): boolean {
+  return Array.isArray(settings.playlist) && settings.playlist.length > 0;
+}
+
+function scheduledPlaylist(settings: DisplaySettings): DisplayScreen[] {
+  if (!hasModernPlaylist(settings)) return LEGACY_PLAYLIST;
+  const enabled = (settings.playlist ?? DEFAULT_DISPLAY_PLAYLIST).filter((entry) => entry.enabled);
+  const garden = enabled.find((entry) => entry.id === 'garden');
+  const otherScreens = enabled.filter((entry) => entry.id !== 'garden').map((entry) => playlistScreen(entry.id));
+  if (!garden) return otherScreens.length ? otherScreens : ['garden'];
+  if (!otherScreens.length) return ['garden'];
+  return otherScreens.flatMap((screen) => ['garden', screen]);
+}
+
+function availableProgramScreen(settings: DisplaySettings, hasRecognitions: boolean): DisplayScreen {
+  const choices = scheduledPlaylist(settings);
+  return choices.find((screen) => hasRecognitions || screen !== 'featured') ?? 'fallback';
+}
+
+function playlistEntry(settings: DisplaySettings, screen: DisplayScreen) {
+  const id: DisplayScreenId | null = screen === 'all-nine'
+    ? 'expressions'
+    : screen === 'cluster'
+      ? 'shared-expression'
+      : screen === 'garden' || screen === 'featured' || screen === 'impact' || screen === 'spotlight' || screen === 'daily-practice' || screen === 'one-kind-word' || screen === 'everyday-peace' || screen === 'peace-promise'
+        ? screen
+        : null;
+  return id ? settings.playlist?.find((entry) => entry.id === id) : undefined;
+}
+
+function durationFor(screen: DisplayScreen, settings: DisplaySettings, selected?: Recognition): number {
+  const baseSeconds = screen === 'garden' ? (hasModernPlaylist(settings) ? 24 : 20) : screen === 'fallback' ? 20 : screen === 'milestone' ? 8 : 12;
+  const entry = playlistEntry(settings, screen);
+  const overrideSeconds = entry?.durationSeconds
+    ?? (screen === 'all-nine' ? settings.durationOverrides?.expressions : screen === 'cluster' ? settings.durationOverrides?.['shared-expression'] : settings.durationOverrides?.[screen as DisplayScreenId]);
+  const baseMs = Math.max(12_000, (overrideSeconds ?? baseSeconds) * 1_000) * tempoMultiplier(settings.tempo ?? DEFAULT_DISPLAY_TEMPO);
   if (screen === 'featured') {
-    return selected ? readingTotalDuration(selected) : 12_000;
+    return selected ? Math.max(baseMs, readingTotalDuration(selected)) : baseMs;
   }
-  return 20_000;
+  return Math.round(baseMs);
 }
 
 function graphemes(text: string): string[] {
@@ -361,7 +417,7 @@ function rebuildVisibleState(
     );
   const settings = settingsWithDefaults(snapshot.settings);
   const celebrated = state.celebratedMilestones[periodKey(snapshot)] ?? [];
-  const threshold = reset ? null : nextMilestone(snapshot.aggregate.expressionTotal, celebrated);
+  const threshold = reset ? null : nextMilestone(snapshot.aggregate.recognitions, celebrated);
   const currentScreenIsValid =
     state.screen === 'featured' ? Boolean(byId(items, state.featuredId)) : state.screen !== 'arrival' || Boolean(state.activeArrival);
   const activeArrivalIsValid = !state.activeArrival || items.some((item) => item.id === state.activeArrival?.id);
@@ -370,7 +426,7 @@ function rebuildVisibleState(
   const neutral = mode === 'neutral' || state.operatorModeOverride === 'neutral';
   const wakeForPublication = newArrivals.length > 0 && !quiet && !neutral;
   const sorted = fairSort(items, state.presentationHistory);
-  const gardenLimit = maxBubbles(settings);
+  const gardenLimit = gardenNodeCount(settings, items.length);
   const previousEligibleIds = state.snapshot
     ? new Set(eligible(state.snapshot, state.nowMs, state.serverOffsetMs).map((item) => item.id))
     : null;
@@ -389,7 +445,8 @@ function rebuildVisibleState(
     .map((item) => item.id);
   const featuredId = byId(items, state.manualFeatureId)?.id ?? byId(items, state.featuredId)?.id ?? sorted[0]?.id ?? null;
   const cluster = chooseCluster(items, state.clusterExpressionId);
-  const fallbackScreen: DisplayScreen = items.length ? 'garden' : 'fallback';
+  const fallbackScreen = availableProgramScreen(settings, items.length > 0);
+  const startsGardenPresentation = (reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid) && fallbackScreen === 'garden';
   const screen = neutral
     ? 'neutral'
     : quiet
@@ -399,7 +456,7 @@ function rebuildVisibleState(
         : state.screen;
   const shouldStartClock = reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid || !state.nextTransitionAtMs;
   const baseScreenStartedAtMs = shouldStartClock ? receivedAtMs : state.screenStartedAtMs;
-  const baseNextTransitionAtMs = shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, byId(items, featuredId)) : state.nextTransitionAtMs;
+  const baseNextTransitionAtMs = shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, settings, byId(items, featuredId)) : state.nextTransitionAtMs;
   const pauseResumed = !reset && !settings.pauseRotation && state.pauseRotation && state.pauseStartedAtMs !== null;
   const pauseElapsedMs = pauseResumed ? Math.max(0, receivedAtMs - state.pauseStartedAtMs!) : 0;
   const timedState = shiftPresentationTimers(
@@ -426,6 +483,7 @@ function rebuildVisibleState(
     readingPageIndex: screen === 'featured' ? Math.min(state.readingPageIndex, Math.max(0, (byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1) - 1)) : 0,
     readingPageCount: screen === 'featured' && byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1,
     gardenIds,
+    presentationHistory: startsGardenPresentation ? markPresented(state, gardenIds, receivedAtMs) : state.presentationHistory,
     featuredId,
     clusterIds: cluster.ids,
     clusterExpressionId: cluster.expressionId,
@@ -454,7 +512,7 @@ function rebuildVisibleState(
 function startArrival(state: PresentationState): PresentationState {
   if (!state.queue.length || state.pauseArrivals || state.quiet || state.neutral || state.offlineSafe) return state;
   const first = state.queue[0];
-  const grouped = state.queue.length > 10 || state.nowMs - first.enqueuedAtMs > INTRO_GROUP_AGE_MS;
+  const grouped = state.queue.length >= 10 || state.nowMs - first.enqueuedAtMs > INTRO_GROUP_AGE_MS;
   const readingSeconds = Math.max(12, state.settings.readingSeconds || 20);
   const item = state.snapshot?.recognitions.find((recognition) => recognition.id === first.id);
   const readingPageCount = item ? recognitionReadingPageCount(item) : 1;
@@ -483,10 +541,15 @@ function startArrival(state: PresentationState): PresentationState {
 function advanceProgram(state: PresentationState): PresentationState {
   const items = eligible(state.snapshot, state.nowMs, state.serverOffsetMs);
   if (!items.length) {
+    const playlist = scheduledPlaylist(state.settings);
+    const nextIndex = (state.playlistIndex + 1) % playlist.length;
+    const nextScreen = playlist[nextIndex] === 'featured' ? availableProgramScreen(state.settings, false) : playlist[nextIndex];
     return {
       ...state,
-      screen: state.neutral ? 'neutral' : state.quiet ? 'quiet' : 'fallback',
-      nextTransitionAtMs: state.nowMs + durationFor('fallback'),
+      screen: state.neutral ? 'neutral' : state.quiet ? 'quiet' : nextScreen,
+      playlistIndex: nextIndex,
+      screenStartedAtMs: state.nowMs,
+      nextTransitionAtMs: state.nowMs + durationFor(nextScreen, state.settings),
       gardenIds: [],
       featuredId: null,
       clusterIds: [],
@@ -495,10 +558,11 @@ function advanceProgram(state: PresentationState): PresentationState {
       readingPageCount: 1,
     };
   }
-  const nextIndex = (state.playlistIndex + 1) % PLAYLIST.length;
-  const nextScreen = PLAYLIST[nextIndex];
+  const playlist = scheduledPlaylist(state.settings);
+  const nextIndex = (state.playlistIndex + 1) % playlist.length;
+  const nextScreen = playlist[nextIndex];
   const sorted = fairSort(items, state.presentationHistory);
-  const garden = sorted.slice(0, maxBubbles(state.settings));
+  const garden = sorted.slice(0, gardenNodeCount(state.settings, items.length));
   const feature = byId(items, state.manualFeatureId) ?? byId(items, state.featuredId) ?? sorted[0];
   const cluster = chooseCluster(items, state.clusterExpressionId);
   const selectedIds = nextScreen === 'garden' ? garden.map((item) => item.id) : nextScreen === 'featured' || !feature ? [] : [feature.id];
@@ -509,7 +573,7 @@ function advanceProgram(state: PresentationState): PresentationState {
     screen: nextScreen,
     playlistIndex: nextIndex,
     screenStartedAtMs: state.nowMs,
-    nextTransitionAtMs: state.nowMs + (nextScreen === 'featured' && feature ? nextPageDuration : durationFor(nextScreen, feature)),
+    nextTransitionAtMs: state.nowMs + (nextScreen === 'featured' && feature ? Math.max(nextPageDuration, durationFor(nextScreen, state.settings, feature) / nextReadingPageCount) : durationFor(nextScreen, state.settings, feature)),
     readingPageIndex: 0,
     readingPageCount: nextReadingPageCount,
     gardenIds: garden.map((item) => item.id),
@@ -562,8 +626,8 @@ function removeUnavailableActive(state: PresentationState, items: Recognition[])
     ...state,
     activeArrival: null,
     queue: state.queue.filter((item) => item.id !== activeId),
-    screen: items.length ? 'garden' : 'fallback',
-    nextTransitionAtMs: state.nowMs + durationFor(items.length ? 'garden' : 'fallback'),
+    screen: availableProgramScreen(state.settings, items.length > 0),
+    nextTransitionAtMs: state.nowMs + durationFor(availableProgramScreen(state.settings, items.length > 0), state.settings),
   };
 }
 
@@ -616,7 +680,7 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
     case 'PAIRING_STARTED':
       return { ...state, phase: 'loading' };
     case 'PAIRING_SUCCEEDED':
-      return { ...state, paired: true, phase: 'loading', unauthorized: false, operatorModeOverride: null };
+      return { ...state, paired: true, phase: state.phase === 'ready' ? 'ready' : 'loading', unauthorized: false, operatorModeOverride: null };
     case 'PAIRING_REQUIRED':
       return clearPersonal(state, true, false);
     case 'SNAPSHOT_RECEIVED': {
@@ -626,8 +690,8 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       const month = periodKey(action.snapshot);
       const celebrated = next.celebratedMilestones[month] ?? [];
       if (!state.snapshot) {
-        const initialThresholds = milestoneThresholds(action.snapshot.aggregate.expressionTotal)
-          .filter((threshold) => threshold <= action.snapshot.aggregate.expressionTotal);
+        const initialThresholds = milestoneThresholds(action.snapshot.aggregate.recognitions)
+          .filter((threshold) => threshold <= action.snapshot.aggregate.recognitions);
         return {
           ...next,
           celebratedMilestones: initialThresholds.length
@@ -643,8 +707,19 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       if (action.unauthorized) return clearPersonal(state, true, false);
       const lastVerified = state.lastSuccessfulVerificationMs;
       if (lastVerified !== null && action.receivedAtMs - lastVerified >= GRACE_MS) return clearPersonal(state, false, true);
+      if (state.snapshot) {
+        return {
+          ...state,
+          nowMs: action.receivedAtMs,
+          stale: true,
+          offlineSafe: false,
+          unauthorized: false,
+        };
+      }
       return {
         ...state,
+        paired: true,
+        phase: 'ready',
         nowMs: action.receivedAtMs,
         cursor: null,
         stale: true,
@@ -659,8 +734,7 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       let next = { ...state, nowMs: action.nowMs };
       if (
         next.lastSuccessfulVerificationMs !== null &&
-        action.nowMs - next.lastSuccessfulVerificationMs >= GRACE_MS &&
-        !next.snapshot
+        next.stale && action.nowMs - next.lastSuccessfulVerificationMs >= GRACE_MS
       ) {
         next = clearPersonal(next, false, true);
       }
@@ -676,20 +750,21 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
       if (next.screen === 'featured' && next.featuredId && !items.some((item) => item.id === next.featuredId)) {
         next = {
           ...next,
-          screen: items.length ? 'garden' : 'fallback',
+          screen: availableProgramScreen(next.settings, items.length > 0),
           featuredId: null,
           readingPageIndex: 0,
           readingPageCount: 1,
           screenStartedAtMs: action.nowMs,
-          nextTransitionAtMs: action.nowMs + durationFor(items.length ? 'garden' : 'fallback'),
+          nextTransitionAtMs: action.nowMs + durationFor(availableProgramScreen(next.settings, items.length > 0), next.settings),
         };
       }
       if (next.neutral || next.quiet || next.offlineSafe || next.phase !== 'ready') return next;
       if (!items.length && !next.activeArrival) {
+        const programScreen = availableProgramScreen(next.settings, false);
         return {
           ...next,
-          screen: 'fallback',
-          nextTransitionAtMs: action.nowMs + durationFor('fallback'),
+          screen: programScreen,
+          nextTransitionAtMs: action.nowMs + durationFor(programScreen, next.settings),
           gardenIds: [],
           featuredId: null,
           clusterIds: [],
@@ -750,8 +825,8 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         const threshold = next.pendingMilestone;
         return {
           ...next,
-          screen: items.length ? 'garden' : 'fallback',
-          nextTransitionAtMs: action.nowMs + durationFor(items.length ? 'garden' : 'fallback'),
+          screen: availableProgramScreen(next.settings, items.length > 0),
+          nextTransitionAtMs: action.nowMs + durationFor(availableProgramScreen(next.settings, items.length > 0), next.settings),
           pendingMilestone: null,
           celebratedMilestones: threshold && period
             ? { ...next.celebratedMilestones, [period]: [...(next.celebratedMilestones[period] ?? []), threshold] }
@@ -779,9 +854,9 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         quiet: false,
         neutral: false,
         offlineSafe: false,
-        screen: items.length ? 'garden' : 'fallback',
+        screen: availableProgramScreen(state.settings, items.length > 0),
         screenStartedAtMs: state.nowMs,
-        nextTransitionAtMs: state.nowMs + durationFor(items.length ? 'garden' : 'fallback'),
+        nextTransitionAtMs: state.nowMs + durationFor(availableProgramScreen(state.settings, items.length > 0), state.settings),
       };
     }
     case 'SET_MOTION':

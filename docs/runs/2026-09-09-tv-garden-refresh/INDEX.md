@@ -17,13 +17,13 @@ Coordinator: Terra high, non-editing
 | Lane | Title | State | Model | Worktree | Review | Depends on |
 |---|---|---|---|---|---|---|
 | LF | Foundation and safe skeleton | integrated | Luna xhigh | tv-garden-foundation | Sol passed | none |
-| LG | Garden engine | active | Luna xhigh | tv-garden-garden | Sol after landing | LF |
-| LI | Impact and expressions | active | Luna xhigh | tv-garden-insights | Sol after landing | LF |
-| LT | Teaching and invitation screens | active | Luna xhigh | tv-garden-teaching | Sol after landing | LF |
-| LC | Display studio | active | Luna xhigh | tv-garden-controls | Sol after landing | LF |
-| LS | Submission experience | active | Luna xhigh | tv-garden-submission | Sol after landing | LF |
-| LP | Performance and resilience evidence | active | Luna xhigh | tv-garden-performance | Sol after landing | LF |
-| LV | Browser and accessibility coverage | active | Luna xhigh | tv-garden-verification | Sol after landing | LF |
+| LG | Garden engine | integrated | Luna xhigh | tv-garden-garden | Sol passed | LF |
+| LI | Impact and expressions | integrated | Luna xhigh | tv-garden-insights | Sol passed | LF |
+| LT | Teaching and invitation screens | integrated | Luna xhigh | tv-garden-teaching | Sol passed | LF |
+| LC | Display studio | integrated | Luna xhigh | tv-garden-controls | Sol passed | LF |
+| LS | Submission experience | integrated | Luna xhigh | tv-garden-submission | Sol passed | LF |
+| LP | Performance and resilience evidence | integrated | Luna xhigh | tv-garden-performance | Sol passed | LF |
+| LV | Browser and accessibility coverage | integrated | Luna xhigh | tv-garden-verification | Sol passed | LF |
 | LR | Integration and release | active | Sol | main integration worktree | final Terra review | all feature lanes |
 
 ## Folders
@@ -36,15 +36,15 @@ Coordinator: Terra high, non-editing
 
 ## Artifacts
 
-- Rule diagram: pending
-- Lane board: pending
+- Rule diagram: board/index.html
+- Lane board: board/index.html
 
 <!-- lane: LF state: integrated model: Luna-xhigh worktree: tv-garden-foundation review: Sol-passed updated: 2026-09-09T07:52Z -->
-<!-- lane: LG state: active model: Luna-xhigh worktree: tv-garden-garden review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LI state: active model: Luna-xhigh worktree: tv-garden-insights review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LT state: active model: Luna-xhigh worktree: tv-garden-teaching review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LC state: active model: Luna-xhigh worktree: tv-garden-controls review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LS state: active model: Luna-xhigh worktree: tv-garden-submission review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LP state: active model: Luna-xhigh worktree: tv-garden-performance review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LV state: active model: Luna-xhigh worktree: tv-garden-verification review: Sol-after-landing updated: 2026-09-09T07:52Z -->
-<!-- lane: LR state: active model: Sol worktree: main-integration review: final-Terra updated: 2026-09-09T07:35Z -->
+<!-- lane: LG state: integrated model: Luna-xhigh worktree: tv-garden-garden review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LI state: integrated model: Luna-xhigh worktree: tv-garden-insights review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LT state: integrated model: Luna-xhigh worktree: tv-garden-teaching review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LC state: integrated model: Luna-xhigh worktree: tv-garden-controls review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LS state: integrated model: Luna-xhigh worktree: tv-garden-submission review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LP state: integrated model: Luna-xhigh worktree: tv-garden-performance review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LV state: integrated model: Luna-xhigh worktree: tv-garden-verification review: Sol-passed updated: 2026-09-09T08:51Z -->
+<!-- lane: LR state: active model: Sol worktree: main-integration review: final-Terra pending updated: 2026-09-09T08:51Z -->

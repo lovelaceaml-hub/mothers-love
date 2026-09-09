@@ -90,7 +90,7 @@ function delta(
 }
 
 describe('display presentation coordinator', () => {
-  it('queues ten arrivals without dropping any and presents one at a time', () => {
+  it('groups ten arrivals without dropping their fair rotation eligibility', () => {
     const records = Array.from({ length: 10 }, (_, index) => recognition(String(index + 1)));
     const initial = received(createInitialState(), snapshot(records), 0);
     const arrivals = records.map((item) => ({ eventId: `event-${item.id}`, recognitionId: item.id, publishedAt: item.firstPublishedAt! }));
@@ -100,11 +100,12 @@ describe('display presentation coordinator', () => {
     const journey = displayReducer(withBurst, { type: 'TICK', nowMs: 20_001 });
     expect(journey.screen).toBe('arrival');
     expect(journey.activeArrival?.id).toBe('1');
+    expect(journey.activeArrival?.grouped).toBe(true);
     expect(journey.queue).toHaveLength(10);
 
     const finished = displayReducer(journey, { type: 'TICK', nowMs: journey.activeArrival!.readingEndsAtMs + 1 });
-    expect(finished.queue).toHaveLength(9);
-    expect(finished.introducedPublicationKeys).toContain('event-1');
+    expect(finished.queue).toHaveLength(0);
+    expect(finished.introducedPublicationKeys).toHaveLength(10);
   });
 
   it('deduplicates duplicate event delivery and treats edits as the same publication', () => {
@@ -142,7 +143,7 @@ describe('display presentation coordinator', () => {
 
   it('marks every already-crossed milestone as baseline on startup', () => {
     const current = snapshot([recognition('baseline')], {
-      aggregate: { ...snapshot([]).aggregate, expressionTotal: 1_500 },
+      aggregate: { ...snapshot([]).aggregate, recognitions: 1_500 },
     });
     const state = received(createInitialState(), current, 0);
 
@@ -158,7 +159,7 @@ describe('display presentation coordinator', () => {
 
     expect(selectEligible(afterExpiry)).toHaveLength(0);
     expect(afterExpiry.gardenIds).toHaveLength(0);
-    expect(afterExpiry.screen).toBe('fallback');
+    expect(afterExpiry.screen).toBe('garden');
   });
 
   it('holds every full-message page before featured or arrival presentation is counted', () => {
@@ -181,7 +182,7 @@ describe('display presentation coordinator', () => {
     let featured = displayReducer(base, { type: 'ADVANCE' });
     expect(featured.screen).toBe('featured');
     expect(featured.readingPageCount).toBe(pageCount);
-    expect(featured.presentationHistory[item.id]).toBeUndefined();
+    expect(featured.presentationHistory[item.id]).toBe(0);
     for (let page = 1; page < pageCount; page += 1) {
       featured = displayReducer(featured, { type: 'TICK', nowMs: featured.nextTransitionAtMs! + 1 });
       expect(featured.screen).toBe('featured');
@@ -194,11 +195,12 @@ describe('display presentation coordinator', () => {
     const queued = received(base, delta(base.snapshot!, [item], [arrivalEvent], 1), 1);
     let arrival = displayReducer(queued, { type: 'TICK', nowMs: queued.nextTransitionAtMs! + 1 });
     expect(arrival.activeArrival?.readingPageCount).toBe(pageCount);
-    expect(arrival.presentationHistory[item.id]).toBeUndefined();
+    const presentationBeforeArrivalReading = arrival.presentationHistory[item.id];
     arrival = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.journeyEndsAtMs + 1 });
     const delayed = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.readingEndsAtMs + 1_000 });
     expect(delayed.activeArrival).not.toBeNull();
     expect(delayed.activeArrival?.readingPageIndex).toBe(1);
+    expect(delayed.presentationHistory[item.id]).toBe(presentationBeforeArrivalReading);
     for (let page = 1; page < pageCount; page += 1) {
       arrival = displayReducer(arrival, { type: 'TICK', nowMs: arrival.activeArrival!.nextPageEndsAtMs + 1 });
       expect(arrival.activeArrival?.readingPageIndex).toBe(page);
@@ -247,7 +249,7 @@ describe('display presentation coordinator', () => {
 
     const expired = displayReducer(paused, { type: 'TICK', nowMs: 100_001 });
     expect(expired.activeArrival).toBeNull();
-    expect(expired.screen).toBe('fallback');
+    expect(expired.screen).toBe('garden');
   });
 
   it('cancels an active arrival immediately when the authoritative snapshot removes it', () => {
@@ -260,17 +262,19 @@ describe('display presentation coordinator', () => {
 
     expect(removed.activeArrival).toBeNull();
     expect(removed.queue).toHaveLength(0);
-    expect(removed.screen).toBe('fallback');
+    expect(removed.screen).toBe('garden');
   });
 
-  it('resets the cursor and holds Quiet after a disconnect until a reset snapshot arrives', () => {
+  it('keeps the last approved public view in memory during a short reconnect', () => {
     const item = recognition('disconnect');
     const state = received(createInitialState(), snapshot([item]), 0);
     const failed = displayReducer(state, { type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: 5_000 });
 
-    expect(failed.cursor).toBeNull();
-    expect(failed.screen).toBe('quiet');
+    expect(failed.cursor).toBe('cursor-1');
+    expect(failed.screen).toBe('garden');
     expect(failed.queue).toHaveLength(0);
+    expect(failed.snapshot?.recognitions).toHaveLength(1);
+    expect(failed.stale).toBe(true);
 
     const reset = received(failed, snapshot([item], { revision: 2, cursor: 'cursor-reset', sync: 'reset' }), 6_000);
     expect(reset.screen).toBe('garden');
@@ -394,9 +398,9 @@ describe('display presentation coordinator', () => {
 
   it('celebrates only the highest new threshold in a month and records it once', () => {
     const item = recognition('milestone');
-    const base = snapshot([item], { aggregate: { ...snapshot([]).aggregate, expressionTotal: 49 } });
+    const base = snapshot([item], { aggregate: { ...snapshot([]).aggregate, recognitions: 49 } });
     const state = received(createInitialState(), base, 0);
-    const crossed = delta(base, [item], [], 1, { expressionTotal: 251 });
+    const crossed = delta(base, [item], [], 1, { recognitions: 251 });
     const withMilestone = received(state, crossed, 1);
     const milestone = displayReducer(withMilestone, { type: 'TICK', nowMs: 20_001 });
 
@@ -433,5 +437,41 @@ describe('display presentation coordinator', () => {
 
     expect(laterArrival.activeArrival?.id).toBe('later');
     expect(laterArrival.activeArrival?.grouped).toBe(false);
+  });
+
+  it('uses the enabled modern registry while keeping the Garden-led rhythm readable', () => {
+    const item = recognition('modern-playlist');
+    const modernSettings = {
+      ...snapshot([]).settings,
+      gardenAmount: 'all-active' as const,
+      playlist: [
+        { id: 'garden' as const, enabled: true },
+        { id: 'daily-practice' as const, enabled: true, durationSeconds: 12 },
+        { id: 'peace-promise' as const, enabled: true, durationSeconds: 12 },
+      ],
+      tempo: 'standard' as const,
+      durationOverrides: {},
+      effects: { trails: true, constellations: true, sparkles: true, background: true },
+      sound: { enabled: true, volume: 0.2, arrivalChime: true, milestoneChime: true },
+    };
+    const initial = received(createInitialState(), snapshot([item], { settings: modernSettings }), 0);
+    const daily = displayReducer(initial, { type: 'TICK', nowMs: initial.nextTransitionAtMs! + 1 });
+    const garden = displayReducer(daily, { type: 'TICK', nowMs: daily.nextTransitionAtMs! + 1 });
+
+    expect(daily.screen).toBe('daily-practice');
+    expect(garden.screen).toBe('garden');
+  });
+
+  it('honors an unlimited owner amount as a fair pool while capping rendered Garden nodes', () => {
+    const records = Array.from({ length: 40 }, (_, index) => recognition(`pool-${index + 1}`, {
+      firstPublishedAt: new Date(serverOrigin + index * 1_000).toISOString(),
+    }));
+    const state = received(createInitialState(), snapshot(records, {
+      settings: { ...snapshot([]).settings, gardenAmount: 9_999 },
+    }), 0);
+
+    expect(state.settings.gardenAmount).toBe(9_999);
+    expect(state.gardenIds).toHaveLength(12);
+    expect(new Set(state.gardenIds).size).toBe(12);
   });
 });

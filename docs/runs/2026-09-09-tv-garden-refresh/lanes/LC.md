@@ -1,25 +1,25 @@
 ---
 lane: LC
 title: Display studio
-state: planned
-model: pending
-runner: pending
-worktree: pending
-review: pending
-depends_on: pending
-updated: 2026-09-09T07:33Z
+state: integrated
+model: gpt-5.6-luna xhigh
+runner: Sol-dispatched Luna lane, Terra coordinated
+worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-garden-controls
+review: Sol passed after integration checks
+depends_on: LF
+updated: 2026-09-09T08:51Z
 ---
 
 # LC: Display studio
 
 ## Work order
 
-(helper appends the work order it received)
+Build the owner display studio UI only, with a fixed playlist, safe previews, tempo, timing, Garden amount, effects, and sound.
 
 ## Result
 
-(helper appends its result summary, changed files, verification evidence, limitations)
+Luna commit `08bd393` was integrated by Sol as `5514d3b`. It supplies add, remove, restore and reorder controls for fixed screens, sample versus approved previews, tempo, per-screen reading time, unlimited positive Garden amount, effects and gentle audio controls.
 
 ## Review
 
-(coordinator appends)
+Sol confirmed there is no scheduler, force-next command, arbitrary custom screen builder, or arbitrary QR editor. The Garden-led playlist behavior is disclosed in the studio.

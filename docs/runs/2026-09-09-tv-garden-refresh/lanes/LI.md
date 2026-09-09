@@ -1,25 +1,25 @@
 ---
 lane: LI
 title: Impact and expressions
-state: planned
-model: pending
-runner: pending
-worktree: pending
-review: pending
-depends_on: pending
-updated: 2026-09-09T07:33Z
+state: integrated
+model: gpt-5.6-luna xhigh
+runner: Sol-dispatched Luna lane, Terra coordinated
+worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-garden-insights
+review: Sol passed after integration checks
+depends_on: LF
+updated: 2026-09-09T08:51Z
 ---
 
 # LI: Impact and expressions
 
 ## Work order
 
-(helper appends the work order it received)
+Build isolated display components for Monthly Impact, Nine Expressions, and Shared Expression.
 
 ## Result
 
-(helper appends its result summary, changed files, verification evidence, limitations)
+Luna commit `b791f7e` was integrated by Sol as `9bdca1a`. It adds total-first rainbow ribbons, a stable expression color wave and flower wheel, and the connected shared-expression ribbon-heart reveal.
 
 ## Review
 
-(coordinator appends)
+Sol verified the components consume aggregate and expression data only, retain the stable nine-expression color map, and are covered by focused insights unit tests.

@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const projectRoot = resolve(scriptPath, "..", "..");
-const runRoot = join(projectRoot, "docs", "runs", "2026-09-08-full-app");
+const runId = process.env.RUN_ID ?? "2026-09-09-tv-garden-refresh";
+const runRoot = join(projectRoot, "docs", "runs", runId);
 const indexPath = join(runRoot, "INDEX.md");
 const boardRoot = join(runRoot, "board");
 const boardPath = join(boardRoot, "index.html");
@@ -130,7 +131,7 @@ const internalHtml = `<!doctype html>
   <main>
     <header>
       <h1>The Words of Mother's Love</h1>
-      <p>Facts-only implementation board for the 2026-09-08 full app run. Generated ${escapeHtml(generatedAt)}.</p>
+      <p>Facts-only implementation board for ${escapeHtml(runId)}. Generated ${escapeHtml(generatedAt)}.</p>
     </header>
     <section><h2>Current lanes</h2>${laneTable(lanes, true)}</section>
     ${sectionMarkup}

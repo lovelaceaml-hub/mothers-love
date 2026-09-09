@@ -1,12 +1,13 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { verifyAdmin, databaseAction, readJson } = vi.hoisted(() => ({ verifyAdmin: vi.fn(), databaseAction: vi.fn(), readJson: vi.fn() }));
+const { verifyAdmin, databaseAction, displaySettingsPatch, readJson } = vi.hoisted(() => ({ verifyAdmin: vi.fn(), databaseAction: vi.fn(), displaySettingsPatch: vi.fn(), readJson: vi.fn() }));
 
 vi.mock("@/lib/server/auth", () => ({ verifyAdmin }));
 vi.mock("@/lib/server/operations", () => ({
   actorPayload: (actor: unknown) => actor,
   databaseAction,
+  displaySettingsPatch,
   randomPairCode: (length = 10) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".slice(0, length),
   randomSessionToken: () => "session-token",
   sha256: (value: string) => `hash:${value}`,
@@ -51,6 +52,7 @@ function request(path: string, init?: { method?: string; headers?: HeadersInit; 
 beforeEach(() => {
   verifyAdmin.mockResolvedValue({ actor });
   databaseAction.mockReset();
+  displaySettingsPatch.mockReset();
   readJson.mockReset();
 });
 
@@ -86,7 +88,8 @@ describe("admin route DTOs", () => {
   });
 
   it("returns bare DisplaySettings for GET and PATCH", async () => {
-    databaseAction.mockResolvedValueOnce({ data: { ok: true, settings }, error: null }).mockResolvedValueOnce({ data: { ok: true, settings }, error: null });
+    databaseAction.mockResolvedValueOnce({ data: { ok: true, settings }, error: null });
+    displaySettingsPatch.mockResolvedValue({ data: { ok: true, settings }, error: null });
     const getResponse = await settingsRoute.GET(request("/api/admin/settings"));
     expect(await getResponse.json()).toEqual(settings);
     readJson.mockResolvedValue({ value: { expectedVersion: 3, changes: { mode: "quiet" } } });

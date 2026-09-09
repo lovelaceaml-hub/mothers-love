@@ -49,6 +49,10 @@ const BUDS = [
   { rotation: 4, delay: '-3.1s' },
   { rotation: 12, delay: '-2.4s' },
   { rotation: 20, delay: '-4.2s' },
+  { rotation: -23, delay: '-3.7s' },
+  { rotation: 27, delay: '-1.2s' },
+  { rotation: -2, delay: '-4.8s' },
+  { rotation: 8, delay: '-2.9s' },
 ] as const;
 
 function primaryColor(record: GardenRecognition): string {

@@ -109,10 +109,11 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
     expect(result.pairingRequests).toEqual([]);
   });
 
-  test('renders the empty garden safety state without personal content', async ({ page }) => {
+  test('renders nine waiting buds in the empty Garden without personal content', async ({ page }) => {
     await openSyntheticDisplay(page, syntheticSnapshot({ count: 0 }));
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'fallback');
-    await expect(page.getByRole('heading', { name: 'There is room for your expression of love.' })).toBeVisible();
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden');
+    await expect(page.getByTestId('waiting-buds')).toBeVisible();
+    await expect(page.getByTestId('waiting-buds').locator('div').first().locator('span')).toHaveCount(9);
     await expect(page.getByText('Synthetic recipient 1')).toHaveCount(0);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '0');
     await expectNoAccessibilityViolations(page);
@@ -142,7 +143,7 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
     expect(result.pairingRequests).toEqual([]);
   });
 
-  test('hides personal content and labels the temporary reconnect after a prior success', async ({ page }) => {
+  test('keeps approved Garden content moving and labels the temporary reconnect after a prior success', async ({ page }) => {
     const result: SnapshotRouteResult = { snapshotRequests: [], reactionRequests: [], pairingRequests: [] };
     page.on('request', (request) => {
       if (/\/api\/display\/(pair|ack)/.test(request.url())) result.pairingRequests.push(request.url());
@@ -168,10 +169,9 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
     await expect(page.getByText('Synthetic recipient 1')).toBeVisible();
     await expect.poll(() => calls, { timeout: 15_000 }).toBeGreaterThanOrEqual(3);
     await expect(page.getByText('Reconnecting', { exact: true })).toBeVisible();
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'quiet');
-    await expect(page.getByText('Synthetic recipient 1')).toHaveCount(0);
-    // The legacy quiet palette has one known contrast defect outside this lane.
-    await expectNoAccessibilityViolations(page, ['[class*="quietExpressions"]']);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden');
+    await expect(page.getByText('Synthetic recipient 1')).toBeVisible();
+    await expectNoAccessibilityViolations(page);
     expect(result.pairingRequests).toEqual([]);
   });
 
@@ -189,7 +189,7 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
     const result = await openSyntheticDisplay(page, snapshot);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '96');
     await expect.poll(() => result.reactionRequests.length).toBeGreaterThan(0);
-    await expect(page.getByTestId('garden-bubble').count()).resolves.toBeLessThanOrEqual(6);
+    await expect(page.getByTestId('garden-card').count()).resolves.toBeLessThanOrEqual(12);
     expect(result.reactionRequests.every((ids) => ids.length <= 30)).toBe(true);
     expect(result.snapshotRequests[0]).toMatch(/\/api\/display\/snapshot$/);
     expect(result.pairingRequests).toEqual([]);
@@ -204,12 +204,13 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
 
     for (const viewport of [{ width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
       await page.setViewportSize(viewport);
-      await page.goto('/display');
+      await page.goto('/display', { waitUntil: 'commit' });
+      await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', snapshot.cursor, { timeout: 15_000 });
       await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden');
       const metrics = await page.evaluate(() => {
         const app = document.querySelector<HTMLElement>('[data-testid="display-app"]')?.getBoundingClientRect();
         const board = document.querySelector<HTMLElement>('[data-testid="garden-board"]')?.getBoundingClientRect();
-        const bubbles = [...document.querySelectorAll<HTMLElement>('[data-testid="garden-bubble"]')].map((element) => {
+        const bubbles = [...document.querySelectorAll<HTMLElement>('[data-testid="garden-card-slot"]')].map((element) => {
           const rect = element.getBoundingClientRect();
           return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
         });
@@ -263,28 +264,27 @@ test.describe('Plan 08 TV Garden synthetic browser coverage', () => {
   });
 });
 
-test.describe.skip('Plan 08 future integration assertions, deferred until the central integration lands', () => {
-  test('renders all ten fixed playlist screens in the saved order', async ({ page }) => {
-    const snapshot = syntheticSnapshot();
-    await openSyntheticDisplay(page, snapshot);
-    for (const entry of snapshot.settings.playlist ?? []) {
-      await expect(page.getByTestId(`display-screen-${entry.id}`)).toBeVisible();
+test.describe('Plan 08 central screen composition', () => {
+  test('maps a saved fixed Spotlight screen to its composed teaching view', async ({ page }) => {
+    await openSyntheticDisplay(page, syntheticSnapshot({ settings: { playlist: [{ id: 'spotlight', enabled: true }] } }));
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'spotlight');
+    await expect(page.getByTestId('expression-spotlight')).toBeVisible();
+  });
+
+  test('labels the only two invitation destinations as official external forms', async ({ page }) => {
+    for (const [id, url, invitation] of [
+      ['daily-practice', DISPLAY_EXTERNAL_URLS.dailyPractice, 'daily-form-invitation'],
+      ['peace-promise', DISPLAY_EXTERNAL_URLS.peacePromise, 'peace-form-invitation'],
+    ] as const) {
+      await page.goto('about:blank');
+      await page.unrouteAll({ behavior: 'ignoreErrors' });
+      await openSyntheticDisplay(page, syntheticSnapshot({ settings: { playlist: [{ id, enabled: true }] } }));
+      const form = page.getByTestId(invitation);
+      await expect(form).toBeVisible();
+      await expect(form).toHaveAttribute('data-form-url', url);
+      await expect(form.getByText('External official form')).toBeVisible();
+      await expect(form.getByRole('link')).toHaveAttribute('href', url);
+      await expect(form.getByRole('link')).not.toHaveAttribute('href', /[?&](recipient|message|name)=/);
     }
-  });
-
-  test('labels Daily Practice and Peace Promise QR destinations as official external forms', async ({ page }) => {
-    const snapshot = syntheticSnapshot();
-    await openSyntheticDisplay(page, snapshot);
-    await expect(page.getByTestId('daily-practice-qr')).toHaveAttribute('data-destination', DISPLAY_EXTERNAL_URLS.dailyPractice);
-    await expect(page.getByTestId('peace-promise-qr')).toHaveAttribute('data-destination', DISPLAY_EXTERNAL_URLS.peacePromise);
-    await expect(page.getByText('External official form')).toHaveCount(2);
-  });
-
-  test('exposes only fixed playlist controls and does not expose schedule, Force Next, or QR editing', async ({ page }) => {
-    await page.goto('/admin/display');
-    await expect(page.getByRole('region', { name: 'Display playlist' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Force Next' })).toHaveCount(0);
-    await expect(page.getByText('Schedule')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Edit QR|Change QR/ })).toHaveCount(0);
   });
 });

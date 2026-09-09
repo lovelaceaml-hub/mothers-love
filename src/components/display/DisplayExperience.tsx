@@ -7,6 +7,24 @@ import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
 import { fetchReactionCounts, ReactionCount, type ReactionItem } from '@/components/feed/PublicFeedProvider';
+import {
+  GardenArrivalScene,
+  GardenMilestoneScene,
+  GardenReconnectNotice,
+  GardenScene,
+  projectGardenAggregate,
+} from '@/components/display/garden';
+import { MonthlyImpact, NineExpressions, SharedExpression } from '@/components/display/insights';
+import { DailyPractice, EverydayPeace, ExpressionSpotlight, OneKindWord, PeacePromise } from '@/components/display/teaching/TeachingScreens';
+import { SmoothModeIndicator } from '@/components/display/performance/SmoothModeIndicator';
+import {
+  createAdaptiveQualityState,
+  createRequestInFlightGuard,
+  createVolatileReconnectCache,
+  observeFrame,
+  planDisplayRefresh,
+  type AdaptiveQualityState,
+} from '@/lib/display-performance';
 
 import {
   createInitialState,
@@ -78,6 +96,11 @@ function snapshotRequestPath(cursor: string | null): string {
 
 const DISPLAY_SNAPSHOT_TIMEOUT_MS = 10_000;
 
+function displayVisibility(): 'visible' | 'hidden' {
+  if (typeof document === 'undefined') return 'visible';
+  return document.visibilityState === 'hidden' ? 'hidden' : 'visible';
+}
+
 function ExpressionPill({ id }: { id: number }) {
   const item = expression(id);
   return <span className={styles.expressionPill} style={{ backgroundColor: item.color }}>{item.phrase}</span>;
@@ -116,16 +139,11 @@ function RecognitionCard({ recognition, detailed = false, fresh = false, compact
   );
 }
 
-function Atmosphere() {
+function Atmosphere({ background = true, sparkles = true }: { background?: boolean; sparkles?: boolean }) {
   return (
     <div className={styles.atmosphere} aria-hidden="true">
-      <span className={styles.atmosphereOrbOne} />
-      <span className={styles.atmosphereOrbTwo} />
-      <span className={styles.atmosphereOrbThree} />
-      <span className={styles.atmosphereDaisy} />
-      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleOne}`} />
-      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleTwo}`} />
-      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleThree}`} />
+      {background ? <><span className={styles.atmosphereOrbOne} /><span className={styles.atmosphereOrbTwo} /><span className={styles.atmosphereOrbThree} /><span className={styles.atmosphereDaisy} /></> : null}
+      {sparkles ? <><span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleOne}`} /><span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleTwo}`} /><span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleThree}`} /></> : null}
     </div>
   );
 }
@@ -211,55 +229,34 @@ function sharedExpressionIds(left: Recognition, right: Recognition): number[] {
   return left.expressionIds.filter((id) => right.expressionIds.includes(id));
 }
 
-type ScreenProps = { state: PresentationState; reactionCounts: ReadonlyMap<string, ReactionItem> };
+type ScreenProps = {
+  state: PresentationState;
+  reactionCounts: ReadonlyMap<string, ReactionItem>;
+  quality: AdaptiveQualityState;
+};
 
-function GardenScreen({ state, reactionCounts }: ScreenProps) {
+function GardenScreen({ state, quality }: ScreenProps) {
   const records = selectGarden(state);
-  const connections = records.flatMap((left, leftIndex) => records.slice(leftIndex + 1).flatMap((right, rightIndex) => {
-    const shared = sharedExpressionIds(left, right);
-    if (!shared.length) return [];
-    const rightIndexInRecords = leftIndex + 1 + rightIndex;
-    return [{ leftIndex, rightIndex: rightIndexInRecords, expressionId: shared[0] }];
-  }));
-  const showConnections = state.settings.showConstellations && connections.length > 0;
-  const showTrails = state.settings.showTrails && records.length > 0;
+  const requestedDecoration = {
+    trails: state.settings.effects?.trails ?? state.settings.showTrails,
+    constellations: state.settings.effects?.constellations ?? state.settings.showConstellations,
+    sparkles: state.settings.effects?.sparkles ?? true,
+    background: state.settings.effects?.background ?? true,
+  };
+  const decoration = quality.level === 'full' ? 'full' : quality.level === 'smooth' ? 'soft' : 'minimal';
   return (
-    <section className={`${styles.screen} ${styles.gardenScreen}`} aria-labelledby="display-screen-heading" data-motion-key="garden-drift">
-      <div className={styles.gardenBoard} data-testid="garden-board" data-connection-count={showConnections ? connections.length : 0} data-trail-count={showTrails ? records.length : 0}>
-        {showConnections ? (
-          <svg className={styles.constellationSvg} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            {connections.map((connection) => {
-              const from = GARDEN_SLOTS[connection.leftIndex];
-              const to = GARDEN_SLOTS[connection.rightIndex];
-              return <line key={`${connection.leftIndex}-${connection.rightIndex}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={expression(connection.expressionId).color} />;
-            })}
-          </svg>
-        ) : null}
-        {records.map((recognition, index) => (
-          <div
-            key={recognition.id}
-            className={`${styles.gardenBubble} ${styles[GARDEN_SLOTS[index % GARDEN_SLOTS.length].className]}`}
-            data-testid="garden-bubble"
-            style={{ '--bubble-size': `${bubbleSize(recognition, records.length)}vw`, '--bubble-delay': `${-index * 1.8}s`, '--bubble-accent': primaryAccent(recognition) } as CSSProperties}
-          >
-            <div className={styles.bubbleDrift}>
-              {showTrails ? <span className={styles.bubbleTrail} aria-hidden="true" /> : null}
-              <div className={styles.bubbleBreath}>
-                <RecognitionCard
-                  recognition={recognition}
-                  compactExpressions
-                  reactionCounts={reactionCounts}
-                  fresh={state.queue.some((item) => item.id === recognition.id)}
-                  style={{ '--bubble-accent': primaryAccent(recognition) } as CSSProperties}
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-        {!records.length ? <EmptyGarden /> : null}
-        <p className={styles.gardenNote}>Every expression makes room for peace.</p>
-      </div>
-    </section>
+    <div className={`${styles.screen} ${styles.gardenScreen}`} data-motion-key="garden-drift">
+      <GardenScene
+        records={records}
+        amount={state.settings.gardenAmount ?? state.settings.maxBubbles}
+        pool={{ activeIds: state.gardenIds, presentationHistory: state.presentationHistory, rotation: state.playlistIndex }}
+        nowMs={state.nowMs + state.serverOffsetMs}
+        decoration={decoration}
+        requestedDecoration={requestedDecoration}
+        reducedMotion={effectiveMotion(state) === 'still'}
+      />
+      {state.stale ? <GardenReconnectNotice memory={{ status: 'reconnecting', records, lastSuccessfulAtMs: state.lastSuccessfulVerificationMs }} /> : null}
+    </div>
   );
 }
 
@@ -298,7 +295,9 @@ function FeaturedScreen({ state, reactionCounts }: ScreenProps) {
       >
         <p className={styles.eyebrow}>FULL RECOGNITION</p>
         <h2 id="featured-title">Thank you, {recognition.recipient}.</h2>
-        {expressionPage ? <p className={styles.continuationHeading}>Associated expressions</p> : <p className={styles.fullMessage} data-testid="featured-message-segment">{messagePages[pageIndex]}</p>}
+        {expressionPage ? <p className={styles.continuationHeading}>Associated expressions</p> : (
+          <p className={styles.fullMessage} data-testid="featured-message-segment">{messagePages[pageIndex]}</p>
+        )}
         {!expressionPage && pageCount === 1 ? (
           <div className={styles.expressionList} aria-label="All associated expressions" data-testid="featured-expressions">
             {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
@@ -338,42 +337,15 @@ function ClusterScreen({ state, reactionCounts }: ScreenProps) {
 }
 
 function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
-  if (!snapshot) return <FallbackScreen />;
-  const { aggregate } = snapshot;
-  return (
-    <section className={`${styles.screen} ${styles.impactScreen}`} aria-labelledby="display-screen-heading" data-motion-key="impact-spark">
-      <div className={styles.impactMain}>
-        <p className={styles.eyebrow}>THIS MONTH&apos;S SHARED MOMENT</p>
-        <p className={styles.impactNumber}>{aggregate.expressionTotal}</p>
-        <h2 id="impact-title">Expressions of Mother&apos;s Love Recognized</h2>
-        <p className={styles.impactSubline}>{aggregate.recognitions} recognitions shared in {formatPeriod(aggregate.periodStart)}</p>
-      </div>
-      <div className={styles.impactGrid} aria-label="Expression totals">
-        {EXPRESSIONS.map((item, index) => (
-          <div className={styles.impactBubble} style={{ backgroundColor: item.color }} key={item.id}>
-            <span className={styles.impactCount}>{aggregate.expressionCounts[index] ?? 0}</span>
-            <span className={styles.impactPhrase}>{item.phrase}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+  return <MonthlyImpact aggregate={snapshot?.aggregate} />;
 }
 
 function ExpressionsScreen() {
-  return (
-    <section className={`${styles.screen} ${styles.expressionsScreen}`} aria-labelledby="display-screen-heading" data-motion-key="expressions-reveal">
-      <div className={styles.expressionGrid}>
-        {EXPRESSIONS.map((item) => (
-          <article className={styles.expressionCard} style={{ backgroundColor: item.color }} key={item.id}>
-            <span className={styles.expressionNumber}>{String(item.id).padStart(2, '0')}</span>
-            <p>{item.principle}</p>
-            <strong>{item.phrase}</strong>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
+  return <NineExpressions />;
+}
+
+function SharedExpressionScreen({ state }: { state: PresentationState }) {
+  return <SharedExpression recognitions={selectEligible(state)} expressionId={state.clusterExpressionId} />;
 }
 
 function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
@@ -506,6 +478,11 @@ const SCREEN_HEADINGS: Record<PresentationState['screen'], { eyebrow: string; ti
   cluster: { eyebrow: 'MOTHER\'S LOVE IN ACTION', title: 'Shared Expression' },
   impact: { eyebrow: 'THIS MONTH\'S SHARED MOMENT', title: 'Monthly Impact' },
   'all-nine': { eyebrow: 'PRACTICE MOTHER\'S LOVE', title: 'The 9 Expressions' },
+  spotlight: { eyebrow: 'PRACTICE MOTHER\'S LOVE', title: 'Expression Spotlight' },
+  'daily-practice': { eyebrow: 'A DAILY PRACTICE', title: 'Practice Mother\'s Love Today' },
+  'one-kind-word': { eyebrow: 'ONE KIND WORD', title: 'Heartfelt Change' },
+  'everyday-peace': { eyebrow: 'EVERYDAY PEACE', title: 'Small Moments of Peace' },
+  'peace-promise': { eyebrow: 'A PEACE PROMISE', title: 'Add Your Promise' },
   arrival: { eyebrow: 'A NEW MOMENT HAS ARRIVED', title: 'New Recognition' },
   milestone: { eyebrow: 'A SHARED MILESTONE', title: 'Milestone' },
   quiet: { eyebrow: 'A QUIET MOMENT', title: 'Quiet Moment' },
@@ -519,6 +496,7 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
   const [reactionCounts, setReactionCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
   const controllerRef = useRef<AbortController | null>(null);
   const requestSerialRef = useRef(0);
+  const requestInFlightRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -530,7 +508,8 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
     }
 
     const load = async () => {
-      controllerRef.current?.abort();
+      if (requestInFlightRef.current) return;
+      requestInFlightRef.current = true;
       const controller = new AbortController();
       const requestSerial = requestSerialRef.current + 1;
       requestSerialRef.current = requestSerial;
@@ -553,6 +532,7 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
       } finally {
         window.clearTimeout(timeoutId);
         if (controllerRef.current === controller) controllerRef.current = null;
+        requestInFlightRef.current = false;
       }
     };
 
@@ -563,35 +543,42 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
       window.clearInterval(pollTimer);
       controllerRef.current?.abort();
       controllerRef.current = null;
+      requestInFlightRef.current = false;
     };
   }, [eligibleIds]);
 
   return children(reactionCounts);
 }
 
-function DisplayStage({ state, personalContentVisible, liveRailItems, reactionCounts }: {
+function DisplayStage({ state, personalContentVisible, liveRailItems, reactionCounts, quality }: {
   state: PresentationState;
   personalContentVisible: boolean;
   liveRailItems: Recognition[];
   reactionCounts: ReadonlyMap<string, ReactionItem>;
+  quality: AdaptiveQualityState;
 }) {
   return (
     <>
-      <div className={`${styles.stage} ${state.screen === 'garden' ? styles.gardenStage : ''}`}><Screen state={state} reactionCounts={reactionCounts} /></div>
+      <div className={`${styles.stage} ${state.screen === 'garden' ? styles.gardenStage : ''}`}><Screen state={state} reactionCounts={reactionCounts} quality={quality} /></div>
       {personalContentVisible && state.screen !== 'garden' ? <LiveRail items={liveRailItems} reactionCounts={reactionCounts} /> : null}
     </>
   );
 }
 
-function Screen({ state, reactionCounts }: ScreenProps) {
+function Screen({ state, reactionCounts, quality }: ScreenProps) {
   switch (state.screen) {
-    case 'garden': return <GardenScreen state={state} reactionCounts={reactionCounts} />;
-    case 'featured': return <FeaturedScreen state={state} reactionCounts={reactionCounts} />;
-    case 'cluster': return <ClusterScreen state={state} reactionCounts={reactionCounts} />;
+    case 'garden': return <GardenScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
+    case 'featured': return <FeaturedScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
+    case 'cluster': return <SharedExpressionScreen state={state} />;
     case 'impact': return <ImpactScreen snapshot={state.snapshot} />;
     case 'all-nine': return <ExpressionsScreen />;
-    case 'arrival': return <ArrivalScreen state={state} reactionCounts={reactionCounts} />;
-    case 'milestone': return <MilestoneScreen state={state} />;
+    case 'spotlight': return <ExpressionSpotlight expressionIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
+    case 'daily-practice': return <DailyPractice expressionIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
+    case 'one-kind-word': return <OneKindWord wordIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
+    case 'everyday-peace': return <EverydayPeace motion={effectiveMotion(state)} />;
+    case 'peace-promise': return <PeacePromise motion={effectiveMotion(state)} />;
+    case 'arrival': return <ArrivalScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
+    case 'milestone': return state.snapshot ? <GardenMilestoneScene aggregate={projectGardenAggregate(state.snapshot.aggregate)} approvalTotal={state.snapshot.aggregate.recognitions} celebrated={state.celebratedMilestones[state.snapshot.aggregate.periodStart.slice(0, 7)] ?? []} reducedMotion={effectiveMotion(state) === 'still'} /> : <MilestoneScreen state={state} />;
     case 'quiet': return <QuietScreen />;
     case 'neutral': return <QuietScreen neutral />;
     case 'fallback': return <FallbackScreen />;
@@ -601,16 +588,28 @@ function Screen({ state, reactionCounts }: ScreenProps) {
 
 export function DisplayExperience() {
   const [state, dispatch] = useReducer(displayReducer, undefined, createInitialState);
+  const [quality, setQuality] = useState<AdaptiveQualityState>(() => createAdaptiveQualityState());
+  const soundEnabled = state.settings.sound?.enabled ?? false;
+  const soundVolume = state.settings.sound?.volume ?? 0;
+  const arrivalChimeEnabled = state.settings.sound?.arrivalChime ?? false;
+  const milestoneChimeEnabled = state.settings.sound?.milestoneChime ?? false;
   const stateRef = useRef<PresentationState | null>(null);
+  const qualityRef = useRef<AdaptiveQualityState>(quality);
   const displayOpenedAt = useRef<number | null>(null);
-  const snapshotRequestInFlight = useRef(false);
+  const snapshotRequestGuard = useRef(createRequestInFlightGuard());
   const snapshotRequestGeneration = useRef(0);
   const snapshotControllerRef = useRef<AbortController | null>(null);
   const snapshotTimeoutRef = useRef<number | null>(null);
+  const lastSnapshotAttemptAtRef = useRef<number | null>(null);
+  const reconnectCache = useRef(createVolatileReconnectCache<DisplaySnapshot>());
 
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    qualityRef.current = quality;
+  }, [quality]);
 
   useEffect(() => {
     displayOpenedAt.current = typeof performance === 'undefined' ? Date.now() : performance.now();
@@ -623,8 +622,10 @@ export function DisplayExperience() {
 
   const loadSnapshot = useCallback(async (probe = false) => {
     const currentState = stateRef.current;
-    if (snapshotRequestInFlight.current) return;
-    snapshotRequestInFlight.current = true;
+    const lease = snapshotRequestGuard.current.begin();
+    if (!lease) return;
+    const requestedAtMs = monotonicNow();
+    lastSnapshotAttemptAtRef.current = requestedAtMs;
     const requestGeneration = snapshotRequestGeneration.current + 1;
     snapshotRequestGeneration.current = requestGeneration;
     const requestCursor = probe ? null : currentState?.cursor ?? null;
@@ -638,13 +639,20 @@ export function DisplayExperience() {
         cache: 'no-store',
         signal: controller.signal,
       });
-      if (requestGeneration !== snapshotRequestGeneration.current) return;
-      dispatch({ type: 'SNAPSHOT_RECEIVED', snapshot, receivedAtMs: monotonicNow() });
+      if (requestGeneration !== snapshotRequestGeneration.current || !snapshotRequestGuard.current.isCurrent(lease)) return;
+      const receivedAtMs = monotonicNow();
+      reconnectCache.current.set(snapshot, receivedAtMs);
+      dispatch({ type: 'SNAPSHOT_RECEIVED', snapshot, receivedAtMs });
     } catch (error) {
-      if (requestGeneration !== snapshotRequestGeneration.current) return;
-      dispatch({ type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: monotonicNow(), unauthorized: isUnauthorized(error) });
+      if (requestGeneration !== snapshotRequestGeneration.current || !snapshotRequestGuard.current.isCurrent(lease)) return;
+      const receivedAtMs = monotonicNow();
+      const cached = reconnectCache.current.get(receivedAtMs);
+      if (cached && !currentState?.snapshot && !isUnauthorized(error)) {
+        dispatch({ type: 'SNAPSHOT_RECEIVED', snapshot: cached, receivedAtMs });
+      }
+      dispatch({ type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs, unauthorized: isUnauthorized(error) });
     } finally {
-      if (requestGeneration === snapshotRequestGeneration.current) snapshotRequestInFlight.current = false;
+      snapshotRequestGuard.current.finish(lease);
       if (snapshotControllerRef.current === controller) {
         snapshotControllerRef.current = null;
         if (snapshotTimeoutRef.current !== null) {
@@ -661,13 +669,50 @@ export function DisplayExperience() {
   }, [loadSnapshot]);
 
   useEffect(() => {
+    const startupGuard = window.setTimeout(() => {
+      const current = stateRef.current;
+      if (!current?.snapshot) dispatch({ type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: monotonicNow() });
+    }, 2_000);
+    return () => window.clearTimeout(startupGuard);
+  }, [monotonicNow]);
+
+  useEffect(() => {
     const tickTimer = window.setInterval(() => dispatch({ type: 'TICK', nowMs: monotonicNow() }), 500);
-    const pollTimer = window.setInterval(() => void loadSnapshot(), 5_000);
+    const refresh = () => {
+      const refreshPlan = planDisplayRefresh({
+        nowMs: monotonicNow(),
+        visibility: displayVisibility(),
+        lastAttemptAtMs: lastSnapshotAttemptAtRef.current,
+        inFlight: snapshotRequestGuard.current.inFlight,
+        pauseWhenHidden: true,
+      });
+      if (refreshPlan.shouldRefresh) void loadSnapshot();
+    };
+    const pollTimer = window.setInterval(refresh, 1_000);
+    const onVisibilityChange = () => refresh();
+    document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       window.clearInterval(tickTimer);
       window.clearInterval(pollTimer);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [loadSnapshot, monotonicNow]);
+
+  useEffect(() => {
+    let animationFrame = 0;
+    let previousFrameMs: number | null = null;
+    const measure = (frameMs: number) => {
+      if (previousFrameMs !== null) {
+        const nextQuality = observeFrame(qualityRef.current, frameMs - previousFrameMs, frameMs);
+        qualityRef.current = nextQuality;
+        if (nextQuality.level !== quality.level) setQuality(nextQuality);
+      }
+      previousFrameMs = frameMs;
+      animationFrame = window.requestAnimationFrame(measure);
+    };
+    animationFrame = window.requestAnimationFrame(measure);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [quality.level]);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -677,9 +722,40 @@ export function DisplayExperience() {
     return () => media.removeEventListener?.('change', update);
   }, []);
 
+  useEffect(() => {
+    const isArrival = state.screen === 'arrival' && state.activeArrival?.phase === 'journey';
+    const isMilestone = state.screen === 'milestone';
+    if (!soundEnabled || (!isArrival && !isMilestone) || (isArrival && !arrivalChimeEnabled) || (isMilestone && !milestoneChimeEnabled)) return;
+    const Context = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Context) return;
+    const context = new Context();
+    const play = () => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(isMilestone ? 660 : 523.25, context.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(isMilestone ? 880 : 659.25, context.currentTime + 0.22);
+      gain.gain.setValueAtTime(0.0001, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, Math.min(0.08, soundVolume * 0.2)), context.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.42);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.45);
+    };
+    void context.resume().then(play).catch(() => undefined);
+    return () => void context.close();
+  }, [
+    state.activeArrival?.phase,
+    state.screen,
+    arrivalChimeEnabled,
+    milestoneChimeEnabled,
+    soundEnabled,
+    soundVolume,
+  ]);
+
   useEffect(() => () => {
     snapshotRequestGeneration.current += 1;
-    snapshotRequestInFlight.current = false;
+    snapshotRequestGuard.current.invalidate();
     snapshotControllerRef.current?.abort();
     snapshotControllerRef.current = null;
     if (snapshotTimeoutRef.current !== null) {
@@ -689,7 +765,7 @@ export function DisplayExperience() {
   }, []);
 
   const motion = effectiveMotion(state);
-  const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
+  const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.unauthorized;
   const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
   const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
   const railVisible = personalContentVisible && state.screen !== 'garden';
@@ -706,17 +782,25 @@ export function DisplayExperience() {
     () => reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [],
     [reactionEligibleKey],
   );
+  const requestedEffects = state.settings.effects ?? {
+    trails: state.settings.showTrails,
+    constellations: state.settings.showConstellations,
+    sparkles: true,
+    background: true,
+  };
+  const showSubmissionDock = state.screen !== 'daily-practice' && state.screen !== 'peace-promise';
   return (
     <main
       className={`${styles.displayApp} ${styles[`motion${motion}`]} ${state.lowActivity ? styles.lowActivity : ''} ${state.stale ? styles.stale : ''}`}
       data-testid="display-app"
       data-screen={state.screen}
       data-motion={motion}
+      data-quality={quality.level}
       data-eligible-count={eligibleCount}
       data-rail-count={railVisible ? liveRailItems.length : 0}
       data-cursor={state.cursor ?? ''}
     >
-      <Atmosphere />
+      <Atmosphere background={requestedEffects.background && quality.effects.background} sparkles={requestedEffects.sparkles && quality.effects.sparkles} />
       <header className={styles.displayHeader}>
         <div>
           <h1>{TITLE}</h1>
@@ -729,15 +813,16 @@ export function DisplayExperience() {
         <div className={styles.statusCluster} aria-live="polite">
           {state.stale ? <span className={styles.staleStatus}>Reconnecting</span> : null}
           {state.lowActivity ? <span className={styles.lowActivityStatus}>Low activity</span> : null}
+          <SmoothModeIndicator quality={quality.level} className={styles.lowActivityStatus} />
           {state.queue.length ? <span>{state.queue.length} waiting</span> : null}
         </div>
       </header>
       {state.phase !== 'ready' || (!state.snapshot && !state.offlineSafe) ? <StartupScreen unavailable={state.stale || state.unauthorized} /> : personalContentVisible ? (
         <ReactionCounts key={reactionEligibleKey} eligibleIds={reactionEligibleIds}>
-          {(reactionCounts) => <DisplayStage state={state} personalContentVisible={personalContentVisible} liveRailItems={liveRailItems} reactionCounts={reactionCounts} />}
+          {(reactionCounts) => <DisplayStage state={state} personalContentVisible={personalContentVisible} liveRailItems={liveRailItems} reactionCounts={reactionCounts} quality={quality} />}
         </ReactionCounts>
-      ) : <DisplayStage state={state} personalContentVisible={false} liveRailItems={[]} reactionCounts={EMPTY_REACTION_COUNTS} />}
-      {state.snapshot?.submissionUrl ? <QrDock url={state.snapshot.submissionUrl} inviting={state.screen === 'fallback' || state.screen === 'quiet'} /> : null}
+      ) : <DisplayStage state={state} personalContentVisible={false} liveRailItems={[]} reactionCounts={EMPTY_REACTION_COUNTS} quality={quality} />}
+      {state.snapshot?.submissionUrl && showSubmissionDock ? <QrDock url={state.snapshot.submissionUrl} inviting={state.screen === 'fallback' || state.screen === 'quiet'} /> : null}
       <div className={styles.progressTrack} aria-hidden="true"><span style={{ width: state.nextTransitionAtMs ? `${Math.max(0, Math.min(100, ((state.nowMs - state.screenStartedAtMs) / Math.max(1, state.nextTransitionAtMs - state.screenStartedAtMs)) * 100))}%` : '0%' }} /></div>
     </main>
   );

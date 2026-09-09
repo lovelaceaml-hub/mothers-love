@@ -34,6 +34,24 @@ export async function callDatabase(
   }
 }
 
+/**
+ * The TV studio has a dedicated, allowlisted settings writer. It is kept
+ * separate from the legacy action bridge so modern fields cannot be silently
+ * accepted and then discarded by the original settings patch branch.
+ */
+export async function callDisplaySettingsPatch(
+  payload: Record<string, unknown>,
+): Promise<{ data: unknown; error: Error | null }> {
+  const client = databaseClient();
+  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  try {
+    const rows = await client`select mothers_love.ml_patch_display_settings(${client.json(payload as never)}::jsonb) as result`;
+    return { data: rows[0]?.result ?? null, error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+  }
+}
+
 export function authClient(): SupabaseClient | null {
   const config = getServerConfig();
   if (!config) return null;
