@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 type FixtureSize = 0 | 1 | 2 | 20 | 31 | 'long';
-type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still' };
+type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still'; message?: string };
 const LONG_RECIPIENT = 'R'.repeat(80);
 const LONG_MESSAGE = Array.from({ length: 24 }, (_, index) => `Line ${index + 1}: preserve this exact appreciation.\n`).join('').slice(0, 500);
 const DENSE_LINE_MESSAGE = `${'A\n'.repeat(249)}A`;
@@ -33,7 +33,7 @@ function fixture(size: FixtureSize, options: FixtureOptions = {}) {
     index + 1,
     size === 'long',
     options.nonSharedExpressions ? (index % 2 ? [2] : [1]) : [1, 2, 6],
-  ));
+  )).map((recognition) => options.message === undefined ? recognition : { ...recognition, message: options.message });
   return {
     serverTime: '2026-09-08T12:00:00.000Z',
     revision: 1,
@@ -253,21 +253,31 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(board.locator('[class*="bubbleTrail"]')).toHaveCount(0);
   });
 
-  test('keeps the paired live rail newest first, capped at 30, and outside the stage and QR dock', async ({ page }) => {
-    await pairAndRead(page, 20);
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '20', { timeout: 10_000 });
-    await expect(page.getByTestId('live-rail')).toBeVisible();
-    await expect(page.getByTestId('live-rail').getByTestId('live-recognition')).toHaveCount(20);
-    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('Synthetic recipient 20');
-    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('20 hearts', { timeout: 10_000 });
-    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').last()).toContainText('Synthetic recipient 1');
-
+  test('keeps garden bubbles circular and shows the paired live rail on other screens', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await pairAndRead(page, 2, { continuous: true });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 10_000 });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
+    await expect(page.getByTestId('live-rail')).toHaveCount(0);
     const cardShape = await page.getByTestId('recognition-card').first().evaluate((card) => {
       const style = getComputedStyle(card);
       return { borderRadius: style.borderRadius, width: card.getBoundingClientRect().width, height: card.getBoundingClientRect().height };
     });
-    expect(cardShape.borderRadius).not.toBe('50%');
-    expect(cardShape.width).toBeGreaterThan(cardShape.height * 0.7);
+    expect(cardShape.borderRadius).toBe('50%');
+    expect(Math.abs(cardShape.width - cardShape.height)).toBeLessThanOrEqual(3);
+
+    for (let step = 0; step < 6; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 2_000 });
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '2', { timeout: 10_000 });
+    await expect(page.getByTestId('live-rail')).toBeVisible();
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition')).toHaveCount(2);
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('Synthetic recipient 2');
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').first()).toContainText('2 hearts', { timeout: 10_000 });
+    await expect(page.getByTestId('live-rail').getByTestId('live-recognition').last()).toContainText('Synthetic recipient 1');
 
     for (const viewport of [{ width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
       await page.setViewportSize(viewport);
@@ -296,6 +306,22 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       expect(bounds!.qrRight).toBeLessThanOrEqual(bounds!.railLeft + 2);
       expect(bounds!.qrTop).toBeGreaterThanOrEqual(bounds!.railTop - 2);
     }
+  });
+
+  test('keeps live rail excerpts on grapheme boundaries', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    const message = `${'A'.repeat(108)}e\u0301👩‍👩‍👧‍👦Z`;
+    const expected = `${'A'.repeat(108)}e\u0301👩‍👩‍👧‍👦…`;
+    await pairAndRead(page, 1, { continuous: true, message });
+    for (let step = 0; step < 6; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'featured', { timeout: 2_000 });
+    const excerpt = page.getByTestId('live-recognition').first().locator('[class*="liveRailMessage"]');
+    await expect(excerpt).toHaveText(expected);
+    expect(await excerpt.textContent()).not.toContain('�');
   });
 
   test('reads hearts for an older active arrival outside the newest 30 rail records', async ({ page }) => {
@@ -339,10 +365,14 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.getByLabel('Display code').fill('A7C9F2H4');
     await page.getByRole('button', { name: 'Connect this display' }).click();
     await page.clock.runFor(1);
-    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '30');
-    await page.clock.runFor(5_000);
-    await page.clock.runFor(20_000);
-    await page.clock.runFor(2_500);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
+    let railSeen = false;
+    for (let step = 0; step < 60; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-rail-count') === '30') railSeen = true;
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
+      await page.clock.runFor(1_000);
+    }
+    expect(railSeen).toBe(true);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'arrival', { timeout: 2_000 });
     await expect(page.getByTestId('arrival-reading').getByLabel('1 hearts')).toBeVisible({ timeout: 5_000 });
     expect(reactionRequests.every((ids) => ids.length <= 30)).toBe(true);

@@ -43,9 +43,18 @@ function formatPeriod(periodStart?: string): string {
   return new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' }).format(date);
 }
 
+function graphemeUnits(text: string): string[] {
+  const Segmenter = (Intl as typeof Intl & {
+    Segmenter?: new (locales?: string | string[], options?: { granularity: 'grapheme' }) => { segment(input: string): Iterable<{ segment: string }> };
+  }).Segmenter;
+  if (Segmenter) return Array.from(new Segmenter(undefined, { granularity: 'grapheme' }).segment(text), (part) => part.segment);
+  return Array.from(text);
+}
+
 function shortExcerpt(message: string, limit = 150): { text: string; excerpt: boolean } {
-  if (message.length <= limit) return { text: message, excerpt: false };
-  return { text: `${message.slice(0, limit).trimEnd()}…`, excerpt: true };
+  const units = graphemeUnits(message);
+  if (units.length <= limit) return { text: message, excerpt: false };
+  return { text: `${units.slice(0, limit).join('').trimEnd()}…`, excerpt: true };
 }
 
 function isExpressionPage(recognition: Recognition, pageIndex: number): boolean {
@@ -255,11 +264,7 @@ function GardenScreen({ state, reactionCounts }: ScreenProps) {
   const showConnections = state.settings.showConstellations && connections.length > 0;
   const showTrails = state.settings.showTrails && records.length > 0;
   return (
-    <section className={`${styles.screen} ${styles.gardenScreen}`} aria-labelledby="garden-title" data-motion-key="garden-drift">
-      <div className={styles.screenHeading}>
-        <p className={styles.eyebrow}>A GARDEN OF APPRECIATION</p>
-        <h2 id="garden-title">Recognition Garden</h2>
-      </div>
+    <section className={`${styles.screen} ${styles.gardenScreen}`} aria-labelledby="display-screen-heading" data-motion-key="garden-drift">
       <div className={styles.gardenBoard} data-testid="garden-board" data-connection-count={showConnections ? connections.length : 0} data-trail-count={showTrails ? records.length : 0}>
         {showConnections ? (
           <svg className={styles.constellationSvg} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -318,7 +323,7 @@ function FeaturedScreen({ state, reactionCounts }: ScreenProps) {
   const expressionPage = isExpressionPage(recognition, pageIndex);
   const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
-    <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="featured-title" data-motion-key="featured-shimmer">
+    <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="display-screen-heading" data-motion-key="featured-shimmer">
       <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}>
         <p className={styles.eyebrow}>AN EXPRESSION OF MOTHER&apos;S LOVE</p>
         <span className={styles.featureNumber}>{String(primary.id).padStart(2, '0')}</span>
@@ -356,7 +361,7 @@ function ClusterScreen({ state, reactionCounts }: ScreenProps) {
   const clusterExpression = state.clusterExpressionId ? expression(state.clusterExpressionId) : null;
   if (!clusterExpression || !matches.length) return <FallbackScreen />;
   return (
-    <section className={`${styles.screen} ${styles.clusterScreen}`} aria-labelledby="cluster-title" data-motion-key="cluster-orbit">
+    <section className={`${styles.screen} ${styles.clusterScreen}`} aria-labelledby="display-screen-heading" data-motion-key="cluster-orbit">
       <div className={styles.clusterBoard}>
         <div className={styles.clusterCore} style={{ backgroundColor: clusterExpression.color }}>
           <p className={styles.eyebrow}>MOTHER&apos;S LOVE IN ACTION</p>
@@ -376,7 +381,7 @@ function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
   if (!snapshot) return <FallbackScreen />;
   const { aggregate } = snapshot;
   return (
-    <section className={`${styles.screen} ${styles.impactScreen}`} aria-labelledby="impact-title" data-motion-key="impact-spark">
+    <section className={`${styles.screen} ${styles.impactScreen}`} aria-labelledby="display-screen-heading" data-motion-key="impact-spark">
       <div className={styles.impactMain}>
         <p className={styles.eyebrow}>THIS MONTH&apos;S SHARED MOMENT</p>
         <p className={styles.impactNumber}>{aggregate.expressionTotal}</p>
@@ -397,11 +402,7 @@ function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
 
 function ExpressionsScreen() {
   return (
-    <section className={`${styles.screen} ${styles.expressionsScreen}`} aria-labelledby="expressions-title" data-motion-key="expressions-reveal">
-      <div className={styles.screenHeading}>
-        <p className={styles.eyebrow}>PRACTICE MOTHER&apos;S LOVE</p>
-        <h2 id="expressions-title">The 9 Expressions</h2>
-      </div>
+    <section className={`${styles.screen} ${styles.expressionsScreen}`} aria-labelledby="display-screen-heading" data-motion-key="expressions-reveal">
       <div className={styles.expressionGrid}>
         {EXPRESSIONS.map((item) => (
           <article className={styles.expressionCard} style={{ backgroundColor: item.color }} key={item.id}>
@@ -420,7 +421,7 @@ function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
   if (!recognition) return <FallbackScreen />;
   if (isGroupedArrival(state)) {
     return (
-      <section className={`${styles.arrivalScreen} ${styles.arrivalGroupScreen}`} aria-live="polite" aria-labelledby="arrival-title" data-motion-key="arrival-gather">
+      <section className={`${styles.arrivalScreen} ${styles.arrivalGroupScreen}`} aria-live="polite" aria-labelledby="display-screen-heading" data-motion-key="arrival-gather">
         <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: '#a5c9ff' }} aria-hidden="true" />
         <p className={styles.eyebrow}>A FEW RECOGNITIONS HAVE ARRIVED</p>
         <h2 id="arrival-title">The garden has new gratitude.</h2>
@@ -438,7 +439,7 @@ function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
     <section
       className={`${styles.arrivalScreen} ${styles.arrivalPersonalScreen}`}
       aria-live="polite"
-      aria-labelledby="arrival-title"
+      aria-labelledby="display-screen-heading"
       data-testid="arrival-reading"
       data-page-index={pageIndex}
       data-page-count={pageCount}
@@ -467,7 +468,7 @@ function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
 
 function MilestoneScreen({ state }: { state: PresentationState }) {
   return (
-    <section className={styles.milestoneScreen} aria-live="polite" aria-labelledby="milestone-title" data-motion-key="milestone-glow">
+    <section className={styles.milestoneScreen} aria-live="polite" aria-labelledby="display-screen-heading" data-motion-key="milestone-glow">
       <p className={styles.eyebrow}>A SHARED MILESTONE</p>
       <p className={styles.milestoneNumber}>{state.pendingMilestone ?? ''}</p>
       <h2 id="milestone-title">Expressions of Mother&apos;s Love recognized together</h2>
@@ -478,7 +479,7 @@ function MilestoneScreen({ state }: { state: PresentationState }) {
 
 function QuietScreen({ neutral = false }: { neutral?: boolean }) {
   return (
-    <section className={styles.quietScreen} aria-labelledby="quiet-title" data-motion-key={neutral ? 'neutral-still' : 'quiet-breathe'}>
+    <section className={styles.quietScreen} aria-labelledby="display-screen-heading" data-motion-key={neutral ? 'neutral-still' : 'quiet-breathe'}>
       <span className={styles.quietFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>{neutral ? 'DISPLAY SAFETY MODE' : 'A QUIET MOMENT'}</p>
       <h2 id="quiet-title">{neutral ? 'Messages are hidden on this display.' : "Mother's Love is still here."}</h2>
@@ -492,7 +493,7 @@ function QuietScreen({ neutral = false }: { neutral?: boolean }) {
 
 function FallbackScreen() {
   return (
-    <section className={styles.fallbackScreen} aria-labelledby="fallback-title" data-motion-key="fallback-warmth">
+    <section className={styles.fallbackScreen} aria-labelledby="display-screen-heading" data-motion-key="fallback-warmth">
       <span className={styles.fallbackFlower} aria-hidden="true" />
       <p className={styles.eyebrow}>THE RECOGNITION GARDEN</p>
       <h2 id="fallback-title">There is room for your expression of love.</h2>
@@ -525,6 +526,19 @@ function LiveRail({ items, reactionCounts }: { items: Recognition[]; reactionCou
     </aside>
   );
 }
+
+const SCREEN_HEADINGS: Record<PresentationState['screen'], { eyebrow: string; title: string }> = {
+  garden: { eyebrow: 'A GARDEN OF APPRECIATION', title: 'Recognition Garden' },
+  featured: { eyebrow: 'A MOMENT OF GRATITUDE', title: 'Featured Recognition' },
+  cluster: { eyebrow: 'MOTHER\'S LOVE IN ACTION', title: 'Shared Expression' },
+  impact: { eyebrow: 'THIS MONTH\'S SHARED MOMENT', title: 'Monthly Impact' },
+  'all-nine': { eyebrow: 'PRACTICE MOTHER\'S LOVE', title: 'The 9 Expressions' },
+  arrival: { eyebrow: 'A NEW MOMENT HAS ARRIVED', title: 'New Recognition' },
+  milestone: { eyebrow: 'A SHARED MILESTONE', title: 'Milestone' },
+  quiet: { eyebrow: 'A QUIET MOMENT', title: 'Quiet Moment' },
+  neutral: { eyebrow: 'DISPLAY SAFETY MODE', title: 'Messages Hidden' },
+  fallback: { eyebrow: 'THE RECOGNITION GARDEN', title: 'Make Room for Love' },
+};
 
 const EMPTY_REACTION_COUNTS: ReadonlyMap<string, ReactionItem> = new Map();
 
@@ -590,8 +604,8 @@ function DisplayStage({ state, personalContentVisible, liveRailItems, reactionCo
 }) {
   return (
     <>
-      <div className={styles.stage}><Screen state={state} reactionCounts={reactionCounts} /></div>
-      {personalContentVisible ? <LiveRail items={liveRailItems} reactionCounts={reactionCounts} /> : null}
+      <div className={`${styles.stage} ${state.screen === 'garden' ? styles.gardenStage : ''}`}><Screen state={state} reactionCounts={reactionCounts} /></div>
+      {personalContentVisible && state.screen !== 'garden' ? <LiveRail items={liveRailItems} reactionCounts={reactionCounts} /> : null}
     </>
   );
 }
@@ -719,6 +733,7 @@ export function DisplayExperience() {
   const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
   const eligibleCount = useMemo(() => personalContentVisible ? selectEligible(state).length : 0, [personalContentVisible, state]);
   const liveRailItems = useMemo(() => personalContentVisible ? selectEligible(state).sort(newestFirst).slice(0, 30) : [], [personalContentVisible, state]);
+  const railVisible = personalContentVisible && state.screen !== 'garden';
   const reactionEligibleKey = useMemo(() => {
     if (!personalContentVisible) return '';
     const eligibleIds = new Set(selectEligible(state).map((recognition) => recognition.id));
@@ -742,7 +757,7 @@ export function DisplayExperience() {
       data-screen={state.screen}
       data-motion={motion}
       data-eligible-count={eligibleCount}
-      data-rail-count={liveRailItems.length}
+      data-rail-count={railVisible ? liveRailItems.length : 0}
       data-cursor={state.cursor ?? ''}
     >
       <Atmosphere />
@@ -750,6 +765,10 @@ export function DisplayExperience() {
         <div>
           <h1>{TITLE}</h1>
           <p className={styles.headerTagline}>{TAGLINE}</p>
+        </div>
+        <div className={styles.displayScreenHeading} data-testid="display-screen-heading" aria-live="polite">
+          <p className={styles.eyebrow}>{SCREEN_HEADINGS[state.screen].eyebrow}</p>
+          <h2 id="display-screen-heading">{SCREEN_HEADINGS[state.screen].title}</h2>
         </div>
         <div className={styles.statusCluster} aria-live="polite">
           {state.stale ? <span className={styles.staleStatus}>Reconnecting</span> : null}
