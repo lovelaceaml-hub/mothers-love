@@ -117,7 +117,10 @@ function isOrdered(previous: Recognition, current: Recognition): boolean {
   const previousTime = Date.parse(previous.firstPublishedAt ?? previous.createdAt);
   const currentTime = Date.parse(current.firstPublishedAt ?? current.createdAt);
   if (previousTime !== currentTime) return previousTime > currentTime;
-  return previous.id.toLowerCase() > current.id.toLowerCase();
+  // PostgreSQL orders timestamp values at microsecond precision. JavaScript
+  // Date.parse only retains milliseconds, so equal parsed times cannot safely
+  // impose a UUID order that could reject the database's valid exact order.
+  return true;
 }
 
 function projectArrival(value: unknown, eligibleIds: Set<string>, serverTime: number): DisplaySnapshot["arrivals"][number] | null {
