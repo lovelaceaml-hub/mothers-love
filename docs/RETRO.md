@@ -53,3 +53,10 @@ Direct TV completion reviews passed with all accepted findings corrected. Restor
 A live user report exposed two gaps despite prior startup tests: Garden retained its original slots on successful polls, and the server-side SQL timeout did not bound pool acquisition or protocol progress. The correction adds full/paused Garden polling regressions and a separate bounded TV-read connection lifecycle. A read-only metadata check confirmed healthy database state, and recycling the affected app restored service before the permanent correction. The approved Luna parallel workflow remains; result feedback is pending and nonblocking. No global instruction change is added.
 
 Garden correction completed its native Sol review with no actionable finding. The full deployed regression suite and safe actual service checks passed; private evidence checksum is verified. Existing workflow preference remains approved and no result feedback is required to close.
+
+## Flexible names
+The user supersedes the former name-format rule. The correction must remove the restriction from both writing and reading paths, otherwise an accepted full name could break public feed/TV projection. Two Luna lanes own UI and server parity. Existing workflow preference remains approved; feedback is pending and nonblocking. No global instruction change.
+
+The first flexible-name review caught invisible-only names passing trim-based required checks. A shared content predicate closes that blank-input case without reintroducing initials or changing meaningful Unicode names. This is a task correction, not a new global policy.
+
+Flexible-names correction completed with the existing approved parallel Luna workflow. Accepted review finding was corrected and the native Sol retry passed. No new preference or memory update is required.

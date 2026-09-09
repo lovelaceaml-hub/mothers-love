@@ -70,3 +70,8 @@ Plan05 removes TV pairing at Anthony's request. The canonical production runtime
 
 ## Garden live refresh
 PLAN-06adds a synthetic browser regression for new recognitions entering a full Garden while rotation is paused. Unchanged polls remain stable, hidden/expired slots refill and capacity remains bounded. No visual CSS changes. Integrated109unit tests and production build pass, including an actual silent TCP test proving the TV read deadline closes its connection. Final deployed browser verification is recorded in the Garden run.
+
+## Flexible names
+PLAN-07removes first-name/last-initial blocking and associated instructions from the form, server and public projections. U13synthetic browser checks accept full/single/nickname/Unicode input and preserve keyboard/accessibility flows. Integrated113unit tests, typecheck, lint and production build pass. No CSS/layout redesign or campaign wording changes. Deployed verification is recorded in the flexible-names run.
+
+PLAN-07 is complete: flexible names are accepted across form, API, admin, feed and TV. 117 unit tests, typecheck, lint, build and 82 deployed browser journeys pass, with 3 optional capture skips. Native Sol high final review passed. Production and private backup receipts are in docs/runs/2026-09-08-flexible-names/research/. No physical TV or real phone commissioning claim is added.

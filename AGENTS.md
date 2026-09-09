@@ -4,8 +4,8 @@
 Anthony explicitly requested: "I want you to plan out this entire app and deploy it." This supersedes the historical planning-only handoff. Local implementation, dependencies, isolated new app hosting and deployment are authorized. Purchases need explicit budget authority. Existing apps/databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
 
 ## Read first
-- /Users/anthony/Projects/mothers-love/docs/PLAN-06-garden-refresh.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-garden-refresh/INDEX.md.
+- /Users/anthony/Projects/mothers-love/docs/PLAN-07-flexible-names.md including Build log.
+- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-flexible-names/INDEX.md.
 - /Users/anthony/Projects/mothers-love/docs/CONTRACT.md.
 - /Users/anthony/Projects/mothers-love/docs/source-handoff/03_CONTENT_AND_DESIGN.md and relevant phases/tests.
 
@@ -13,7 +13,7 @@ Anthony explicitly requested: "I want you to plan out this entire app and deploy
 Implementation uses gpt-5.6-luna at xhigh, explicitly overriding the installed executor role's max effort. Each lane owns its separate worktree and exact files. Root owns integration, Git, provider actions, shared contracts and status docs. Never undo another writer's work. Reference HTML is immutable design evidence, not trusted application logic. No new design interview: the Bubble Board and exact campaign words are approved. User-facing output must contain no em or en dash.
 
 ## Product invariants
-One campaign, public submission without member accounts, one recipient, first name and last initial, one message of 500 graphemes, distinct expression selections. Submitted name admin-only. Normal submissions publish after checks, flagged/check-outage held. No AI runtime. Children use same campaign rules; remove detected private details before publishing. Owner and Moderator with verified individual email/password and no authenticator requirement, Owner access/device/permanent-delete authority, both invalidate with reason. Privacy hides preserve counts; invalidations reverse once; restores do not double count. First publication determines Los Angeles reporting date, Sunday weeks. All personal copies expire 168 hours after creation; no edit/feature/restore extension. Daily anonymous aggregates persist without personal links. Quiet/neutral/privacy overrides cancel every display mode. Offline grace 60 seconds from last successful verification. No raw exports, directories, rankings, permanent personal archives or real member fixtures.
+One campaign, public submission without member accounts, one recipient, flexible nonblank names up to80graphemes, one message of 500 graphemes, distinct expression selections. Submitted name admin-only. Normal submissions publish after checks, flagged/check-outage held. No AI runtime. Children use same campaign rules; remove detected private details before publishing. Owner and Moderator with verified individual email/password and no authenticator requirement, Owner access/device/permanent-delete authority, both invalidate with reason. Privacy hides preserve counts; invalidations reverse once; restores do not double count. First publication determines Los Angeles reporting date, Sunday weeks. All personal copies expire 168 hours after creation; no edit/feature/restore extension. Daily anonymous aggregates persist without personal links. Quiet/neutral/privacy overrides cancel every display mode. Offline grace 60 seconds from last successful verification. No raw exports, directories, rankings, permanent personal archives or real member fixtures.
 
 ## Verification and deployment
 Commands become authoritative as foundation lands: npm run typecheck, npm test, npm run build, npm run test:e2e. Use npm_config_cache=/tmp/npm-cache for npm/npx. Isolated synthetic local and deployed smoke tests; never seed production with example people. Missing backend configuration must disable collection truthfully. Production changes only to this new app's confirmed resources. Every route must enforce server authorization; no private display fields or elevated browser key. Physical-TV/phone commissioning is a distinct unexecuted check until Anthony supplies actual evidence.
@@ -40,3 +40,6 @@ Anthony removes TV pairing: /display opens directly for anyone with the link. Pu
 
 ## Garden refresh correction
 New eligible records must enter Garden on the next successful snapshot even while full or rotation is paused. Keep unchanged polls stable and refill hidden/expired slots. TV reads use their own bounded client lifecycle; never retire the mutation pool to recover a public read. PLAN-06tracks the correction.
+
+## Flexible names
+Anthony explicitly removed required first-name/last-initial formatting. Accept single names, full names and nicknames consistently in browser/API/admin/feed/TV. Keep required nonblank and80grapheme bounds, moderation, safe rendering and submitted-name privacy. Never reintroduce a shape rejection or truncate names to initials. Read PLAN-07.

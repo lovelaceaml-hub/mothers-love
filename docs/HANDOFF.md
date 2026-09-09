@@ -66,3 +66,8 @@ PLAN-05integration review passed with native Sol high and independent Terra high
 PLAN-06and runs/2026-09-08-garden-refresh record the user-reported live update defect. G updates the Garden selection on accepted snapshots; R isolates and bounds TV reads so they cannot reserve the mutation pool indefinitely. Initial process recycle restored service. Final integration and publication verification follow in the run records. Approved visuals and database objects remain unchanged.
 
 PLAN-06integration is complete: new recognitions join Garden automatically, including full/paused screens; TV reads use isolated eight-second recovery.109unit tests and81deployed browser checks passed, native Sol review passed. Private evidence: https://drive.google.com/file/d/1f-3pJyqR-BuWCT9iWkoNdxdw3wvPXV3Z/view. Final source/deployment receipts: runs/2026-09-08-garden-refresh/research/closure.md. An already-open TV browser needs one refresh to load the corrected code.
+
+## Flexible name input
+Anthony removes the required first-name/last-initial format for all name fields. PLAN-07tracks browser/API/admin and feed/TV parity. Nonblank/80grapheme bounds, moderation and submitted-name privacy remain. No schema or hosting change is needed. Final verification/publication records live in runs/2026-09-08-flexible-names/.
+
+PLAN-07 is complete: flexible names are accepted across form, API, admin, feed and TV. 117 unit tests, typecheck, lint, build and 82 deployed browser journeys pass, with 3 optional capture skips. Native Sol high final review passed. Production and private backup receipts are in docs/runs/2026-09-08-flexible-names/research/. No physical TV or real phone commissioning claim is added.

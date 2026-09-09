@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mother's Love run board</title>
+  <style>
+    :root { color-scheme: light; --ink: #303342; --muted: #626674; --cream: #fff6dc; --paper: #fffdf6; --line: rgba(48,51,66,.14); }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 2rem; color: var(--ink); background: var(--cream); font-family: system-ui, -apple-system, sans-serif; }
+    main { width: min(100%, 76rem); margin: 0 auto; }
+    header { margin-bottom: 2rem; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); letter-spacing: -.04em; }
+    header p { color: var(--muted); }
+    section { margin: 1.5rem 0; }
+    h2 { margin: 0 0 .75rem; font-size: 1rem; letter-spacing: .12em; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: var(--paper); }
+    th, td { padding: .8rem 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .records { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .85rem; }
+    .record { padding: 1rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--paper); }
+    .record h3 { margin: 0; font-size: 1rem; }
+    .record p { margin: .65rem 0; color: var(--muted); line-height: 1.45; }
+    .record small { color: var(--muted); overflow-wrap: anywhere; }
+    .empty { color: var(--muted); }
+    @media (max-width: 700px) { body { padding: 1rem; } th, td { padding: .65rem .5rem; font-size: .86rem; } }
+</style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>The Words of Mother's Love</h1>
+      <p>Facts-only implementation board for the 2026-09-08 flexible names run. Generated 2026-09-09T06:09:39.752Z.</p>
+    </header>
+    <section><h2>Current lanes</h2><table><thead><tr><th scope="col">Lane</th><th scope="col">Owner/model</th><th scope="col">State</th><th scope="col">Dependency</th></tr></thead><tbody><tr><td>U browser input</td><td>Luna xhigh</td><td>Integrated, focused checks passed</td><td>None</td></tr>
+<tr><td>S server parity</td><td>Luna xhigh</td><td>Integrated, focused checks passed</td><td>None</td></tr>
+<tr><td>V visibly nonblank</td><td>Luna xhigh</td><td>Integrated, 41 focused checks passed</td><td>U,S</td></tr>
+<tr><td>I integration</td><td>Root</td><td>Complete, verification and native Sol review passed</td><td>U,S</td></tr></tbody></table></section>
+    <section><h2>Research</h2><div class="records"><article class="record"><h3>Release closure</h3><p>Release closure</p><small>docs/runs/2026-09-08-flexible-names/research/closure.md</small></article>
+<article class="record"><h3>Scope and parity</h3><p>Scope and parity</p><small>docs/runs/2026-09-08-flexible-names/research/contract.md</small></article>
+<article class="record"><h3>Root hygiene</h3><p>Root hygiene</p><small>docs/runs/2026-09-08-flexible-names/research/hygiene.md</small></article>
+<article class="record"><h3>Production verification</h3><p>Production verification</p><small>docs/runs/2026-09-08-flexible-names/research/publication.md</small></article>
+<article class="record"><h3>Final controller review</h3><p>Final controller review</p><small>docs/runs/2026-09-08-flexible-names/research/review-final.md</small></article>
+<article class="record"><h3>Controller correction</h3><p>Controller correction</p><small>docs/runs/2026-09-08-flexible-names/research/review-round1.md</small></article>
+<article class="record"><h3>Private evidence backup</h3><p>Private evidence backup</p><small>docs/runs/2026-09-08-flexible-names/research/storage.md</small></article>
+<article class="record"><h3>Verification</h3><p>Verification</p><small>docs/runs/2026-09-08-flexible-names/research/verification.md</small></article></div></section>
+<section><h2>Decisions</h2><div class="records"><article class="record"><h3>Approved name format correction</h3><p>Approved name format correction</p><small>docs/runs/2026-09-08-flexible-names/decisions/user-format.md</small></article></div></section>
+<section><h2>Logs</h2><div class="records"><article class="record"><h3>Integration event</h3><p>Integration event</p><small>docs/runs/2026-09-08-flexible-names/logs/20260909-integration.md</small></article></div></section>
+  </main>
+</body>
+</html>
