@@ -3,7 +3,7 @@ import { SettingsAccess } from '@/components/admin/settings-access';
 
 export default function SettingsPage() {
   return (
-    <AdminShell eyebrow="Owner operations" title="Settings and access" description="Invite moderators and pair display browsers.">
+    <AdminShell eyebrow="Owner operations" title="Settings and access" description="Invite moderators and open TV View.">
       <SettingsAccess />
     </AdminShell>
   );

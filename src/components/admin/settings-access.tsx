@@ -1,10 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import type { Device } from '@/lib/contracts';
 import { useAdminSession } from './admin-shell';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
-import { formatDateTime } from './admin-utils';
 import styles from './admin.module.css';
 
 type Member = { id: string; role: string; active: boolean };
@@ -12,20 +11,16 @@ type Member = { id: string; role: string; active: boolean };
 export function SettingsAccess() {
   const session = useAdminSession();
   const [members, setMembers] = useState<Member[]>([]);
-  const [devices, setDevices] = useState<Device[]>([]);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [pairingCode, setPairingCode] = useState<{ code: string; expiresAt: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const deviceResponse = await adminApi<{ items: Device[] }>('/api/admin/devices');
-      setDevices(deviceResponse.items);
       if (session?.role === 'owner') {
         const memberResponse = await adminApi<{ items: Member[] }>('/api/admin/members');
         setMembers(memberResponse.items);
@@ -75,37 +70,6 @@ export function SettingsAccess() {
     }
   };
 
-  const pair = async () => {
-    if (session?.role !== 'owner') return;
-    setWorking(true);
-    setError(null);
-    setNotice(null);
-    try {
-      setPairingCode(await adminJson<{ code: string; expiresAt: string }>('/api/admin/devices', {}, 'POST'));
-      setNotice('Pairing code created. Enter it on the TV display page before it expires.');
-      await load();
-    } catch (cause) {
-      setError(getAuthErrorMessage(cause));
-    } finally {
-      setWorking(false);
-    }
-  };
-
-  const revokeDevice = async (device: Device) => {
-    if (session?.role !== 'owner') return;
-    if (!window.confirm(`Revoke the paired browser “${device.label}”? It will lose display access on its next verification.`)) return;
-    setWorking(true);
-    try {
-      await adminApi(`/api/admin/devices/${encodeURIComponent(device.id)}`, { method: 'DELETE' });
-      setNotice('Device revoked. The browser must pair again before receiving display data.');
-      await load();
-    } catch (cause) {
-      setError(getAuthErrorMessage(cause));
-    } finally {
-      setWorking(false);
-    }
-  };
-
   if (loading) return <div className={styles.skeleton} aria-label="Loading settings and access" />;
 
   return (
@@ -121,10 +85,9 @@ export function SettingsAccess() {
         </article> : null}
 
         <article className={`${styles.card} ${styles.cardBlue} ${session?.role === 'owner' ? styles.col5 : styles.col7}`}>
-          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Display devices</h2><p className={styles.cardDescription}>Pair a browser to show the campaign.</p></div><span className={styles.badge}>{session?.role === 'owner' ? 'Owner pairing' : 'Read only'}</span></div>
-          {session?.role === 'owner' ? <button type="button" className={styles.button} onClick={() => void pair()} disabled={working}>Create one time pairing code</button> : <p className={styles.notice}>Moderators can inspect device health. Pairing and revocation remain Owner actions.</p>}
-          {pairingCode ? <div className={styles.notice} style={{ marginTop: 16 }}><p style={{ margin: '0 0 8px' }}>Enter this code on the TV display page.</p><span className={styles.code}>{pairingCode.code}</span></div> : null}
-          {!devices.length ? <div className={styles.empty} style={{ marginTop: 16 }}>No display devices are paired.</div> : <div className={styles.list} style={{ marginTop: 16 }}>{devices.map((device) => <div className={styles.listItem} key={device.id}><div><p className={styles.listItemTitle}>{device.label}</p><p className={styles.listItemText}>Browser last connected: {formatDateTime(device.lastSeenAt)}</p><div className={styles.listItemMeta}><span className={device.revoked ? `${styles.badge} ${styles.badgeInvalid}` : `${styles.badge} ${styles.badgePublished}`}>{device.revoked ? 'Revoked' : 'Active'}</span></div></div>{session?.role === 'owner' && !device.revoked ? <button type="button" className={styles.buttonQuiet} onClick={() => void revokeDevice(device)} disabled={working}>Revoke</button> : null}</div>)}</div>}
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>TV View</h2><p className={styles.cardDescription}>Open the public campaign display directly with its link.</p></div><span className={styles.badge}>Public link</span></div>
+          <Link className={styles.button} href="/display">Open TV View</Link>
+          <p className={styles.fieldHint} style={{ marginTop: 12 }}>Settings apply to open TV View screens when they refresh. An offline screen keeps its last successful state.</p>
         </article>
       </section>
     </>

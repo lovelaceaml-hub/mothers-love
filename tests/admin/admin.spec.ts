@@ -19,22 +19,11 @@ const settings = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-const device = (overrides: Record<string, unknown> = {}) => ({
-  id: 'synthetic-device',
-  label: 'Synthetic display browser',
-  lastSeenAt: '2026-09-08T08:00:00.000Z',
-  appliedVersion: 5,
-  appliedSnapshotRevision: 5,
-  revoked: false,
-  ...overrides,
-});
-
 const overview = (overrides: Record<string, unknown> = {}) => ({
   heldCount: 0,
   nearestExpiry: null,
   lastCleanupAt: '2026-09-08T07:55:00.000Z',
   overduePurgeCount: 0,
-  devices: [device()],
   aggregate: {
     periodStart: '2026-09-01T07:00:00.000Z',
     periodEnd: '2026-10-01T06:59:59.999Z',
@@ -102,7 +91,6 @@ async function mockCommon(page: Page, options: CommonOptions = {}) {
     needsMfa: options.needsMfa ?? false,
   }));
   await page.route('**/api/admin/overview', (route) => fulfillJson(route, options.overviewBody ?? overview()));
-  await page.route('**/api/admin/devices', (route) => fulfillJson(route, { items: [device()] }));
   await page.route('**/api/admin/members', (route) => fulfillJson(route, { items: [] }));
 }
 
@@ -233,18 +221,19 @@ test.describe('synthetic admin browser workflows', () => {
     expect(redirectTo).toBe('https://mothers-love.vercel.app/admin/set-password');
   });
 
-  test('moderator sees permission limits for invitations, pairing and collection control', async ({ page }) => {
+  test('moderator sees permission limits for invitations and collection control', async ({ page }) => {
     await mockCommon(page, { role: 'moderator' });
     await signInAs(page, 'moderator');
 
     await page.goto('/admin/settings');
     await expect(page.getByRole('heading', { name: 'Settings and access' })).toBeVisible();
-    await expect(page.getByText('Read only', { exact: true })).toBeVisible();
-    await expect(page.getByText('Display devices', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'TV View', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Open TV View' })).toHaveAttribute('href', '/display');
     await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
     await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toHaveCount(0);
     await expect(page.getByLabel('Moderator email')).toHaveCount(0);
+    await expect(page.getByText('Display devices', { exact: true })).toHaveCount(0);
 
     await page.goto('/admin/display');
     const collectionToggle = page.getByRole('button', { name: 'Toggle collection availability' });
@@ -252,16 +241,39 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Owner required', { exact: true })).toBeVisible();
   });
 
-  test('owner settings show member and device controls', async ({ page }) => {
+  test('owner settings show member controls and the direct TV View link', async ({ page }) => {
+    let deviceRequests = 0;
     await mockCommon(page, { role: 'owner' });
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.startsWith('/api/admin/devices')) deviceRequests += 1;
+    });
     await signInAs(page);
     await page.goto('/admin/settings');
     await expect(page.getByText('Invited campaign members', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Invite moderator' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'TV View', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Open TV View' })).toHaveAttribute('href', '/display');
+    await expect(page.getByRole('button', { name: 'Create one time pairing code' })).toHaveCount(0);
+    await expect(page.getByText('Display devices', { exact: true })).toHaveCount(0);
     await expect(page.getByText('MFA', { exact: false })).toHaveCount(0);
     await expect(page.getByText('AAL1', { exact: false })).toHaveCount(0);
     await expect(page.getByText('authenticator', { exact: false })).toHaveCount(0);
+    expect(deviceRequests).toBe(0);
+  });
+
+  test('overview shows global TV View settings without device tracking', async ({ page }) => {
+    let deviceRequests = 0;
+    await mockCommon(page, { role: 'owner' });
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.startsWith('/api/admin/devices')) deviceRequests += 1;
+    });
+    await signInAs(page);
+    await page.goto('/admin');
+    await expect(page.getByRole('heading', { name: 'Global display mode', exact: true })).toBeVisible();
+    await expect(page.getByText('Current setting for open TV View screens.', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Access and TV View', exact: true })).toBeVisible();
+    await expect(page.getByText('paired browser', { exact: false })).toHaveCount(0);
+    expect(deviceRequests).toBe(0);
   });
 
   test('sidebar sign out clears the stored session and returns to login', async ({ page }) => {
@@ -482,11 +494,15 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.locator('#detail-message')).toHaveCount(0);
   });
 
-  test('display settings show saved, pending and browser applied acknowledgement', async ({ page }) => {
+  test('display settings show current global settings without device acknowledgement', async ({ page }) => {
+    let deviceRequests = 0;
     let saved = false;
-    await mockCommon(page, { overviewBody: overview({ settings: settings({ version: 5 }), devices: [device({ appliedVersion: 4, appliedSnapshotRevision: 4 })] }) });
+    await mockCommon(page, { overviewBody: overview({ settings: settings({ version: 5 }) }) });
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.startsWith('/api/admin/devices')) deviceRequests += 1;
+    });
     await page.unroute('**/api/admin/overview');
-    await page.route('**/api/admin/overview', (route) => fulfillJson(route, overview({ settings: settings({ version: saved ? 6 : 5 }), devices: [device({ appliedVersion: saved ? 6 : 4, appliedSnapshotRevision: 4 })] })));
+    await page.route('**/api/admin/overview', (route) => fulfillJson(route, overview({ settings: settings({ version: saved ? 6 : 5 }) })));
     await page.route('**/api/admin/settings', async (route) => {
       if (route.request().method() === 'PATCH') {
         const body = route.request().postDataJSON() as { expectedVersion: number; changes: Record<string, unknown> };
@@ -500,14 +516,18 @@ test.describe('synthetic admin browser workflows', () => {
     });
     await signInAs(page);
     await page.goto('/admin/display');
-    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Current display state', exact: true })).toBeVisible();
+    await expect(page.getByText('These are the current global settings for open TV View screens.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Pending delivery', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Applied by browser', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Unsaved changes', { exact: true })).toHaveCount(0);
     await page.getByRole('button', { name: 'Toggle pause new arrivals' }).click();
     await page.getByRole('button', { name: 'Save display settings' }).click();
-    await expect(page.getByText('Pending delivery', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Refresh display connection' }).click();
-    await expect(page.getByText('Applied by browser', { exact: true })).toBeVisible();
-    await expect(page.getByText('Display connection', { exact: true })).toBeVisible();
+    await expect(page.getByText('Settings saved. Open TV View screens apply them when they refresh.', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Refresh global settings' }).click();
+    await expect(page.getByText('Screen updates', { exact: true })).toBeVisible();
     await expect(page.getByText('Current campaign totals', { exact: true })).toBeVisible();
+    expect(deviceRequests).toBe(0);
   });
 
   test('owner can distinguish multiple moderators before revoking access', async ({ page }) => {

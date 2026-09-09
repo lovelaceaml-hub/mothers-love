@@ -1,20 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Device, DisplaySettings } from '@/lib/contracts';
+import type { DisplaySettings } from '@/lib/contracts';
 import { useAdminSession } from './admin-shell';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
-import { ackLabel, displaySettingChanges, formatDateTime, type AckState } from './admin-utils';
+import { displaySettingChanges } from './admin-utils';
 import styles from './admin.module.css';
 
-type Overview = { settings: DisplaySettings; devices: Device[]; aggregate: { recognitions: number; expressionTotal: number } };
+type Overview = { settings: DisplaySettings; aggregate: { recognitions: number; expressionTotal: number } };
 export function DisplayControls() {
   const session = useAdminSession();
   const [settings, setSettings] = useState<DisplaySettings | null>(null);
-  const [devices, setDevices] = useState<Device[]>([]);
   const [aggregate, setAggregate] = useState<Overview['aggregate'] | null>(null);
   const [draft, setDraft] = useState<Partial<DisplaySettings>>({});
-  const [ack, setAck] = useState<AckState>('applied');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,10 +24,8 @@ export function DisplayControls() {
     try {
       const response = await adminApi<Overview>('/api/admin/overview');
       setSettings(response.settings);
-      setDevices(response.devices);
       setAggregate(response.aggregate);
       setDraft({});
-      setAck('applied');
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {
@@ -42,13 +38,10 @@ export function DisplayControls() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
-  const activeDevice = devices.find((device) => !device.revoked);
-  const applied = activeDevice && settings ? activeDevice.appliedVersion >= settings.version : false;
   const changes = useMemo(() => settings ? displaySettingChanges(settings, draft) : {}, [draft, settings]);
 
   const setValue = <K extends keyof DisplaySettings>(key: K, value: DisplaySettings[K]) => {
     setDraft((current) => ({ ...current, [key]: value }));
-    setAck('saved');
   };
 
   const save = async () => {
@@ -60,8 +53,7 @@ export function DisplayControls() {
       const updated = await adminJson<DisplaySettings>('/api/admin/settings', { expectedVersion: settings.version, changes });
       setSettings(updated);
       setDraft({});
-      setAck('pending');
-      setNotice('Settings saved. The paired browser will apply them when it next connects.');
+      setNotice('Settings saved. Open TV View screens apply them when they refresh.');
     } catch (cause) {
       setError(getAuthErrorMessage(cause));
     } finally {
@@ -75,22 +67,19 @@ export function DisplayControls() {
   if (error && !settings) return <div className={styles.error} role="alert">{error} <button type="button" className={styles.authLink} onClick={() => void load()}>Try again</button></div>;
   if (!settings) return null;
 
-  const statusCopy = ackLabel(ack, applied);
-  const statusClass = ack === 'pending' || ack === 'saved' ? styles.badgePending : applied ? styles.badgePublished : styles.badgeHeld;
-
   return (
     <>
       {notice ? <div className={styles.success} role="status">{notice}</div> : null}
       {error ? <div className={styles.error} role="alert">{error}</div> : null}
       <section className={styles.grid}>
         <article className={`${styles.card} ${styles.cardBlue} ${styles.col7}`}>
-          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Display status</h2><p className={styles.cardDescription}>Check the paired browser before changing settings.</p></div><span className={`${styles.badge} ${statusClass}`}>{statusCopy}</span></div>
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Current display state</h2><p className={styles.cardDescription}>These are the current global settings for open TV View screens.</p></div><span className={styles.badge}>{settings.mode[0].toUpperCase() + settings.mode.slice(1)}</span></div>
           <div className={styles.grid}>
             <div className={styles.col6}><p className={styles.eyebrow}>Current mode</p><div className={styles.metric}><span className={styles.metricValue}>{settings.mode[0].toUpperCase() + settings.mode.slice(1)}</span></div><p className={styles.cardDescription}>{settings.pauseArrivals || settings.pauseRotation ? 'Some display updates are paused.' : 'Display arrivals and rotation are enabled.'}</p></div>
-            <div className={styles.col6}><p className={styles.eyebrow}>Display connection</p><p className={styles.cardTitle}>{activeDevice?.lastSeenAt ? `Last connected ${formatDateTime(activeDevice.lastSeenAt)}` : 'No paired browser connected'}</p></div>
+            <div className={styles.col6}><p className={styles.eyebrow}>Screen updates</p><p className={styles.cardTitle}>Open TV View screens refresh these settings.</p><p className={styles.cardDescription}>An offline screen keeps its last successful state.</p></div>
           </div>
           <div className={styles.preview} style={{ marginTop: 18 }}><p className={styles.previewKicker}>Campaign totals</p><h3 className={styles.previewTitle}>Mother&apos;s Love Living Wall</h3><p className={styles.previewMessage}>Current campaign totals</p><div className={styles.listItemMeta}><span className={styles.badge}>{aggregate?.recognitions ?? 0} recognitions</span><span className={styles.badge}>{aggregate?.expressionTotal ?? 0} expressions</span></div></div>
-          <div className={styles.buttonRow} style={{ marginTop: 16 }}><button type="button" className={styles.buttonQuiet} onClick={() => void load()} disabled={loading}>Refresh display connection</button></div>
+          <div className={styles.buttonRow} style={{ marginTop: 16 }}><button type="button" className={styles.buttonQuiet} onClick={() => void load()} disabled={loading}>Refresh global settings</button></div>
         </article>
 
         <article className={`${styles.card} ${styles.col5}`}>
@@ -104,7 +93,7 @@ export function DisplayControls() {
           <div className={styles.toggleRow}><div className={styles.toggleText}><p className={styles.toggleTitle}>Show constellations</p><p className={styles.toggleHint}>Links correspond to shared expressions.</p></div><button type="button" className={`${styles.switch} ${((draft.showConstellations ?? settings.showConstellations) ? styles.switchOn : '')}`} aria-label="Toggle show constellations" aria-pressed={draft.showConstellations ?? settings.showConstellations} onClick={() => setValue('showConstellations', !(draft.showConstellations ?? settings.showConstellations))} /></div>
           <div className={styles.field} style={{ marginTop: 16 }}><label className={styles.label} htmlFor="display-motion">Motion preset</label><select id="display-motion" className={styles.select} value={draft.motion ?? settings.motion} onChange={(event) => setValue('motion', event.target.value as DisplaySettings['motion'])}><option value="calm">Calm</option><option value="standard">Standard</option><option value="lively">Lively</option><option value="still">Still</option></select></div>
           <div className={styles.grid}><div className={styles.col6}><label className={styles.label} htmlFor="display-reading">Reading seconds</label><input id="display-reading" className={styles.input} type="number" min={12} max={60} value={draft.readingSeconds ?? settings.readingSeconds} onChange={(event) => setValue('readingSeconds', Number(event.target.value))} /></div><div className={styles.col6}><label className={styles.label} htmlFor="display-bubbles">Max bubbles</label><input id="display-bubbles" className={styles.input} type="number" min={4} max={6} value={draft.maxBubbles ?? settings.maxBubbles} onChange={(event) => setValue('maxBubbles', Number(event.target.value))} /></div></div>
-          <div className={styles.buttonRow} style={{ marginTop: 18 }}><button type="button" className={styles.button} onClick={() => void save()} disabled={saving || !Object.keys(changes).length}>{saving ? 'Saving...' : 'Save display settings'}</button><button type="button" className={styles.buttonQuiet} onClick={() => { setDraft({}); setAck('applied'); }}>Cancel</button></div>
+          <div className={styles.buttonRow} style={{ marginTop: 18 }}><button type="button" className={styles.button} onClick={() => void save()} disabled={saving || !Object.keys(changes).length}>{saving ? 'Saving...' : 'Save display settings'}</button><button type="button" className={styles.buttonQuiet} onClick={() => setDraft({})}>Cancel</button></div>
         </article>
 
         <article className={`${styles.card} ${styles.cardWarm} ${styles.col6}`}>
