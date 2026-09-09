@@ -13,3 +13,9 @@ Postflight returned only structural assertions, never recognition rows or identi
 - The default sound setting is enabled at its gentle configured level.
 
 No shared schema, public bridge, campaign recognition row, Owner account, secret, or outside application was changed.
+
+## Live Studio save repair
+
+Migration 009 was applied after a live regression report showed that Display Studio could not save. The original private writer remained intentionally unavailable by schema name to the runtime role. Migration 009 adds only `public.ml_display_settings_patch(jsonb)`: a narrowly scoped security-definer bridge with stored `search_path=""`, revoked public, anonymous, authenticated, and service-role access, and execute granted only to `mothers_love_runtime`.
+
+The runtime connection was verified with an invalid actor payload. It reached the bridge and returned the expected unauthenticated result without reading or changing a recognition, settings value, or Owner session. The private `mothers_love` schema remains closed to the runtime role.
