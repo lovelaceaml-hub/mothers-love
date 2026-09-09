@@ -125,8 +125,7 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   expect(putCount).toBe(1);
 });
 
-test('recovers from unavailable reaction writes after retrying the read', async ({ page }) => {
-  const writeStatuses = [404, 428, 429, 200];
+test('recovers from an unavailable reaction write after retrying the read', async ({ page }) => {
   let writeCount = 0;
   await page.route('**/api/feed', async (route) => {
     await route.fulfill({ json: { serverTime, items: [feedItem] } });
@@ -136,7 +135,7 @@ test('recovers from unavailable reaction writes after retrying the read', async 
       await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
       return;
     }
-    const status = writeStatuses[writeCount] ?? 200;
+    const status = writeCount === 0 ? 404 : 200;
     writeCount += 1;
     if (status !== 200) {
       await route.fulfill({ status, json: { error: 'synthetic reaction failure' } });
@@ -147,17 +146,87 @@ test('recovers from unavailable reaction writes after retrying the read', async 
 
   await page.goto('/');
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
-  for (const expectedStatus of writeStatuses.slice(0, 3)) {
-    await expect(heart).toBeEnabled();
-    await heart.click();
-    await expect(page.getByRole('button', { name: 'Try loading hearts again' })).toBeVisible();
-    expect(expectedStatus).toBeGreaterThanOrEqual(400);
-    await page.getByRole('button', { name: 'Try loading hearts again' }).click();
-    await expect(heart).toBeEnabled();
-  }
+  await expect(heart).toBeEnabled();
+  await heart.click();
+  await expect(page.getByRole('button', { name: 'Try loading hearts again' })).toBeVisible();
+  await page.getByRole('button', { name: 'Try loading hearts again' }).click();
+  await expect(heart).toBeEnabled();
   await heart.click();
   await expect(heart).toHaveAttribute('aria-pressed', 'true');
   await expect(heart).toContainText('8');
+});
+
+test('keeps a throttled heart disabled through the Retry-After window', async ({ page }) => {
+  await page.clock.install({ time: new Date(serverTime) });
+  let writeCount = 0;
+  await page.route('**/api/feed', async (route) => {
+    await route.fulfill({ json: { serverTime, items: [feedItem] } });
+  });
+  await page.route('**/api/reactions**', async (route) => {
+    if (route.request().method() === 'GET') {
+      await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
+      return;
+    }
+    writeCount += 1;
+    if (writeCount === 1) {
+      await route.fulfill({ status: 429, headers: { 'Retry-After': '2' }, json: { error: 'synthetic throttling' } });
+      return;
+    }
+    await route.fulfill({ json: { id: feedItem.id, count: 8, liked: true } });
+  });
+
+  await page.goto('/');
+  const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
+  await expect(heart).toBeEnabled();
+  await heart.click();
+  const paused = page.getByRole('button', { name: /Hearts paused for Michelle R/ });
+  await expect(paused).toBeDisabled();
+  await expect(paused).toContainText('7');
+  await expect(page.getByText('Try again in 2 sec.')).toBeVisible();
+  await page.clock.fastForward(1_500);
+  await expect(page.getByRole('button', { name: /Hearts paused for Michelle R/ })).toBeDisabled();
+  await page.clock.fastForward(700);
+  await expect(page.getByRole('button', { name: 'Try loading hearts again' })).toBeVisible();
+  await page.getByRole('button', { name: 'Try loading hearts again' }).click();
+  await expect(heart).toBeEnabled();
+  await heart.click();
+  await expect(heart).toHaveAttribute('aria-pressed', 'true');
+  expect(writeCount).toBe(2);
+});
+
+test('keeps cookie guidance until an explicit read retry succeeds', async ({ page }) => {
+  await page.clock.install({ time: new Date(serverTime) });
+  let writeCount = 0;
+  await page.route('**/api/feed', async (route) => {
+    await route.fulfill({ json: { serverTime, items: [feedItem] } });
+  });
+  await page.route('**/api/reactions**', async (route) => {
+    if (route.request().method() === 'GET') {
+      await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
+      return;
+    }
+    writeCount += 1;
+    if (writeCount === 1) {
+      await route.fulfill({ status: 428, json: { error: 'synthetic cookie requirement' } });
+      return;
+    }
+    await route.fulfill({ json: { id: feedItem.id, count: 8, liked: true } });
+  });
+
+  await page.goto('/');
+  const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
+  await expect(heart).toBeEnabled();
+  await heart.click();
+  const cookieRetry = page.getByRole('button', { name: 'Enable cookies, then retry hearts for Michelle R.' });
+  await expect(cookieRetry).toBeVisible();
+  await expect(page.getByText('Enable cookies, then retry.')).toBeVisible();
+  await page.clock.fastForward(10_000);
+  await expect(cookieRetry).toBeVisible();
+  await cookieRetry.click();
+  await expect(heart).toBeEnabled();
+  await heart.click();
+  await expect(heart).toHaveAttribute('aria-pressed', 'true');
+  expect(writeCount).toBe(2);
 });
 
 test('does not resurrect a hidden item after a pending write returns', async ({ page }) => {

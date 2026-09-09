@@ -234,11 +234,12 @@ test('shares the same public feed companion beside the recognition form', async 
   await page.goto('/recognize');
   const companion = page.getByTestId('submission-live-feed');
   await expect(companion).toHaveAttribute('aria-label', 'Live campaign');
-  await expect(companion).toHaveAttribute('tabindex', '0');
+  const viewport = companion.getByRole('region', { name: 'Latest recognitions' });
+  await expect(viewport).toHaveAttribute('tabindex', '0');
   await expect(companion).toContainText('Companion R.');
   await expect(page.getByRole('region', { name: 'Recent recognitions' })).toHaveCount(0);
-  await companion.focus();
-  await companion.press('End');
-  await expect.poll(() => companion.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await viewport.focus();
+  await viewport.press('End');
+  await expect.poll(() => viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
 });
