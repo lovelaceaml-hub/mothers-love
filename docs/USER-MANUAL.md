@@ -1,12 +1,14 @@
 # Using The Words of Mother's Love
 
 ## Read recognitions
-Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the paired display. Use Pause animation to stop decorative movement.
+Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Scroll the recent recognitions box to read the latest 30. Tap a heart to like a recognition, or tap it again to remove your like. No sign-in is needed. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the paired display. Use Pause animation to stop decorative movement.
 
 ## Share a recognition
 Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
 
 Keep contact information and private details out of your message. If sending fails, keep the tab open and try again. A message received for review will appear only after approval.
+
+A compact live feed also appears beside the form and other public pages.
 
 The [expression guide](https://mothers-love.vercel.app/expressions) explains all nine expressions with everyday examples.
 
@@ -36,3 +38,5 @@ Use [Display controls](https://mothers-love.vercel.app/admin/display) to change 
 
 ## Manage access
 The Owner uses [Settings and access](https://mothers-love.vercel.app/admin/settings) to invite moderators or remove account and TV access. Moderators can manage recognitions and everyday display controls. Keep your password private.
+
+Heart controls appear at the top right of recognition cards. Tap the heart to like a recognition, or tap it again to remove your like. The number shows the confirmed count.

@@ -1,11 +1,25 @@
 # Handoff
 
+## Current correction in progress
+
+Anthony requested restoration of the approved animated circles, top-right TV headings, no duplicate Garden rail, stacked expression rows, gold shimmering selected expressions, and a compact feed above the form. Two isolated Luna xhigh lanes implement these changes. The smaller top-right hearts remain live. Completion review and private source backup will include the corrected release.
+
+## Current presentation and hearts release
+
+Live at https://mothers-love.vercel.app. The update adds warm plum headings, distinct TV animations with fitting rounded panels, browser heart toggles and visible counts, a scrollable list of the latest 30 recognitions, and live feeds on public pages. TV content remains paired and privacy-controlled. Admin pages stay focused.
+
+Latest runtime ac43554 is deployed as dpl_Ci5ecMuBhRWbBRtv9pLyrFh9Rknu, adding the requested smaller top-right heart controls. The prior runtime a33f604 contains the complete TV and reaction update. All 84 unit tests, lint, production build, 74 deployed synthetic journeys, eight public accessibility views, and three TV impact sizes passed. Migration 005 is applied with healthy cleanup and unchanged existing shared-database function metadata. No real recognition or Owner session was used for verification.
+
+Read [Plan 04](PLAN-04-polish-and-hearts.md), the [run index](runs/2026-09-08-polish-hearts/INDEX.md), [publication receipt](runs/2026-09-08-polish-hearts/research/publication.md), and [private evidence backup](runs/2026-09-08-polish-hearts/research/storage.md). The local test timing correction passed 16 stress cases and the full 74-test suite. The smaller top-right hearts additionally passed16 deployed journeys and12 measured/accessibility views. Both evidence archives are privately backed up with matching mounted checksums. Final controller review and source push are closing. Physical TV pairing, viewing-distance readability and a phone camera QR scan remain unverified.
+
+## Earlier deployed release
+
 Status: ready to use at https://mothers-love.vercel.app. The home page is a live chronological recognition list; the full form is https://mothers-love.vercel.app/recognize. Small Admin navigation opens email/password sign-in. Latest presentation sourcec128f83, application deploymentdpl_DfPNeBPD6UQSF2yUT5Wg2LF7uWdn. Feed and form production checks passed. The final static publication receipt is in runs/2026-09-08-live-feed/research/publication.md.
 
 ## Current feed verification
 Luna xhigh implementation, native Sol high controller review and independent Terra high privacy review passed. Lint,77unit tests, productionbuild,18affected browserjourneys and five local/production synthetic axe and bounds states passed. After final text correction, all12affected formjourneys passed again on production. Real feed200/no-store/noindex exposes only sixpublicfields. Configuration remains open, protectedadmin/display401/no-store. Migration004 added only a campaignfeed function and ledger row; existing public/auth source/owner/ACL fingerprint unchanged. Synthetic evidence is privately backed up in Drive with verifiedSHA256. Typed names remain unverified, and moderation still uses a basic keyword filter. No participant accounts or recipient roster were introduced.
 
-The following sections preserve historical full-release evidence. Current plan is PLAN-03-live-feed.md.
+The following sections preserve historical full-release evidence. Current plan is PLAN-04-polish-and-hearts.md.
 
 ## Earlier full-release verification
 Root: 71 focused tests, lint and production Turbopack build pass. All 48 synthetic browser journeys pass on the deployed assets, including 23 admin flows; one optional screenshot-only test is skipped. The live API rejected malformed names with 400 while collection was still closed. After activation, nine real anonymous page views passed with zero axe violations and no horizontal overflow. Evidence is in runs/2026-09-08-full-app/research/readiness-evidence. Positive browser paths use intercepted synthetic APIs, and no valid synthetic recognition was inserted into production.

@@ -70,3 +70,16 @@ Anthony explicitly requested a live home-page list of published submissions, a p
 Normal submissions already auto-publish; explicit unsafe categories and unavailable checks hold for admin review. Current word-based checks are limited and cannot prove a typed name. No account or roster implementation is inferred from the user's request for advice about invented names.
 
 Home navigation and motion: the latest request moves Admin (/admin/login) and TV View (/display) together to the bottom. TV pairing remains required. The bright primary action opens /recognize. Decorative motion is optional and reduced-motion aware; feed polling and expiry remain unchanged.
+
+
+## Presentation and heart revision, September 8, 2026
+Anthony approved warmer plum serif headings, coral/gold glow and shimmer, distinct motion for rotating TV screens, and rounded panels that fit their full content. Existing campaign words remain unchanged. Still and reduced-motion preferences stop decorative motion.
+
+The visible public feed is now bounded to the latest 30 recognitions in a scrollable list. The existing database feed projection and maximum 50 response remain unchanged; the client selects 30. A shared feed appears on home, recognition form, expressions and privacy pages. Admin and sign-in pages have no companion feed. Every eligible TV presentation has a live rail sourced only from its verified paired snapshot. Quiet, neutral, unpaired, revoked, stale and expired states do not display personal content.
+
+One toggleable heart per browser requires no sign-in. A server-generated random browser cookie is HttpOnly, Secure, SameSite=Lax, path /api/reactions, with 30-day age. Only its hash enters campaign reaction rows. Clearing cookies or using another browser can create another anonymous identity; likes do not verify a person. Hearts have visible confirmed counts but never affect campaign totals, order, priority or lifetime. Reaction rows cascade when their recognition is purged or permanently deleted, and the existing backup allowlist excludes their rows.
+
+GET /api/reactions accepts 1 to 30 unique UUIDs and returns only eligible id, count and liked fields. PUT /api/reactions/:id accepts exactly {liked:boolean}, requires a trusted explicit Origin and existing valid cookie, and uses idempotent desired-state writes. Hidden, held, invalid and expired targets are unavailable. Neutral and unhealthy cleanup fail closed. Independent atomic limits are 120 writes per IP and 30 per browser per minute. No-store and Cookie-vary responses prevent shared caching. The implementation contract is in runs/2026-09-08-polish-hearts/decisions/reaction-contract.md.
+
+## Confirmed visual correction
+The approved Bubble Board retains circular forms and visible drift, sparkle and bounce. Long reading content uses fitting panels with full text. TV headings use the available top-right header space. Recognition Garden itself is the live feed, so it excludes the duplicate rail; other eligible rotating screens retain it. The submission page places a compact scrollable feed below its titles, stacks expression cards at all widths, and shows selected cards in gold with shimmer and a check indicator. The existing submit button remains. Motion presets, reduced-motion support, pairing, privacy overrides and data rules remain authoritative.

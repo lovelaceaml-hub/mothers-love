@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mother's Love run board</title>
+  <style>
+    :root { color-scheme: light; --ink: #303342; --muted: #626674; --cream: #fff6dc; --paper: #fffdf6; --line: rgba(48,51,66,.14); }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 2rem; color: var(--ink); background: var(--cream); font-family: system-ui, -apple-system, sans-serif; }
+    main { width: min(100%, 76rem); margin: 0 auto; }
+    header { margin-bottom: 2rem; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); letter-spacing: -.04em; }
+    header p { color: var(--muted); }
+    section { margin: 1.5rem 0; }
+    h2 { margin: 0 0 .75rem; font-size: 1rem; letter-spacing: .12em; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: var(--paper); }
+    th, td { padding: .8rem 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    .records { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: .85rem; }
+    .record { padding: 1rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--paper); }
+    .record h3 { margin: 0; font-size: 1rem; }
+    .record p { margin: .65rem 0; color: var(--muted); line-height: 1.45; }
+    .record small { color: var(--muted); overflow-wrap: anywhere; }
+    .empty { color: var(--muted); }
+    @media (max-width: 700px) { body { padding: 1rem; } th, td { padding: .65rem .5rem; font-size: .86rem; } }
+</style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>The Words of Mother's Love</h1>
+      <p>Facts-only implementation board for the 2026-09-08 presentation and hearts run. Generated 2026-09-09T00:44:01.640Z.</p>
+    </header>
+    <section><h2>Current lanes</h2><table><thead><tr><th scope="col">Lane</th><th scope="col">Owner/model</th><th scope="col">State</th><th scope="col">Dependency</th></tr></thead><tbody><tr><td>T typography</td><td>Luna xhigh</td><td>Deployed and verified</td><td>None</td></tr>
+<tr><td>D TV layouts and rail</td><td>Luna xhigh, Terra high corrections</td><td>Deployed and verified</td><td>None</td></tr>
+<tr><td>B reactions backend</td><td>Luna xhigh, Terra high runner correction</td><td>Deployed and verified</td><td>Contract frozen</td></tr>
+<tr><td>F shared feed and hearts</td><td>Luna xhigh, Terra then Sol test correction</td><td>Deployed and verified</td><td>Reaction contract</td></tr>
+<tr><td>H smaller top-right hearts</td><td>Luna xhigh</td><td>Deployed and verified</td><td>Public cards</td></tr>
+<tr><td>F2 compact submission form</td><td>Luna xhigh</td><td>Implementing</td><td>Current public feed</td></tr>
+<tr><td>D2 restore animated Bubble Board</td><td>Luna xhigh</td><td>Implementing</td><td>Approved TV prototype</td></tr>
+<tr><td>I integration and release</td><td>Root controller</td><td>Integrating user corrections</td><td>F2,D2</td></tr></tbody></table></section>
+    <section><h2>Research</h2><div class="records"><article class="record"><h3>Additive database release</h3><p>Additive database release</p><small>docs/runs/2026-09-08-polish-hearts/research/database-release.md</small></article>
+<article class="record"><h3>Smaller top-right hearts</h3><p>Smaller top-right hearts</p><small>docs/runs/2026-09-08-polish-hearts/research/heart-placement.md</small></article>
+<article class="record"><h3>Provider preflight</h3><p>Provider preflight</p><small>docs/runs/2026-09-08-polish-hearts/research/provider-preflight.md</small></article>
+<article class="record"><h3>Presentation and hearts publication</h3><p>Presentation and hearts publication</p><small>docs/runs/2026-09-08-polish-hearts/research/publication.md</small></article>
+<article class="record"><h3>Private evidence backup</h3><p>Private evidence backup</p><small>docs/runs/2026-09-08-polish-hearts/research/storage.md</small></article>
+<article class="record"><h3>Verification evidence</h3><p>Verification evidence</p><small>docs/runs/2026-09-08-polish-hearts/research/verification.md</small></article></div></section>
+<section><h2>Decisions</h2><div class="records"><article class="record"><h3>Live feed scope</h3><p>Live feed scope</p><small>docs/runs/2026-09-08-polish-hearts/decisions/feed-scope.md</small></article>
+<article class="record"><h3>Browser likes</h3><p>Browser likes</p><small>docs/runs/2026-09-08-polish-hearts/decisions/likes.md</small></article>
+<article class="record"><h3>Approved implementation fallback</h3><p>Approved implementation fallback</p><small>docs/runs/2026-09-08-polish-hearts/decisions/model-fallback.md</small></article>
+<article class="record"><h3>Reaction contract for implementation</h3><p>Reaction contract for implementation</p><small>docs/runs/2026-09-08-polish-hearts/decisions/reaction-contract.md</small></article>
+<article class="record"><h3>Restore approved movement and compact form</h3><p>Restore approved movement and compact form</p><small>docs/runs/2026-09-08-polish-hearts/decisions/restore-bubbles-and-compact-form.md</small></article></div></section>
+<section><h2>Logs</h2><div class="records"><article class="record"><h3>Final integration corrections</h3><p>Final integration corrections</p><small>docs/runs/2026-09-08-polish-hearts/logs/2026-09-08T2345-integration.md</small></article>
+<article class="record"><h3>Cumulative controller review, correction round1</h3><p>Cumulative controller review, correction round1</p><small>docs/runs/2026-09-08-polish-hearts/logs/2026-09-08T2346-controller-review.md</small></article>
+<article class="record"><h3>Review transport correction</h3><p>Review transport correction</p><small>docs/runs/2026-09-08-polish-hearts/logs/2026-09-09T0015-review-transport.md</small></article>
+<article class="record"><h3>Cumulative review corrective findings</h3><p>Cumulative review corrective findings</p><small>docs/runs/2026-09-08-polish-hearts/logs/2026-09-09T0040-controller-findings.md</small></article></div></section>
+  </main>
+</body>
+</html>

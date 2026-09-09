@@ -1,0 +1,5 @@
+# LH: Smaller top-right hearts
+
+Anthony directly requested a smaller heart at the top right of recognition cards while viewing the home page. Luna xhigh owns only FeedHome.module.css, FeedHome.tsx and PublicFeedProvider.tsx in an isolated heart-position worktree. Move the interactive heart/count into the card header on the home and public companion cards, reduce the visible emoji size, preserve44px tap area and all reaction/data behavior. TV count placement is outside this bounded follow-up. Root owns build, visual verification, release and records.
+
+Implemented by Luna xhigh as5d19fd1, integratedac43554. Header grids place14px heart glyphs and counts at top-right with at least44px tap areas. Typecheck, lint, build and16 affected browser journeys pass. Twelve local views at320,390 and1440 widths pass strict axe, page bounds and measured heart placement without name overlap. Root inspected phone and companion captures. Production deployment and16 affected journeys passed. All12 deployed measured/accessibility views passed. Private evidence provider metadata and mounted SHA match.

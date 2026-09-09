@@ -44,3 +44,16 @@ User requested a chronological list home page with a prominent Share a recogniti
 
 ## Home motion and footer navigation
 User-authorized coral/gold primary action, soft shimmer and floating Bubble Board decorations. Readable text and the feed remain stationary; Admin and TV View sit together at the bottom. Local production build passed four synthetic phone/desktop/reduced-motion checks with zero axe violations and no overflow. Pause/resume and zero reduced-motion animations verified, primary action above fold,44px targets, keyboard journey and TVpairing destination passed. All six existing feed regressions passed. No dependency, data, API or polling changes. Root inspected actualphone anddesktop captures; the same four modes passed on production, nativecontrollerreview passed, and private evidence backup was verified. Receipt: runs/2026-09-08-live-feed/research/motion-publication.md.
+
+
+## Presentation and hearts revision
+Anthony explicitly revised the approved visual direction toward plum serif headings, coral/gold glow, distinct TV motion and rounded content panels. Full campaign wording and display pagination remain intact. New home feed is bounded to30 with keyboard scrolling; public companions provide live recognitions without adding them to admin. Heart buttons are at least44px and expose confirmed counts and toggle state. TV reads counts only for paired eligible IDs and clears the count component on safety transitions.
+
+Root inspected phone home, desktop form companion, TV garden, full-long featured reading, all-nine and cluster captures. Corrected contrast, center-panel overlap and QR collision were verified with actual rendered screenshots. Eight public phone/desktop states passed axe and horizontal bounds.47 public/admin browser journeys passed on the integrated production build; expanded race/TV checks and final production smoke remain in progress. API and SQL passed84unit tests and actual isolated duplicate/hide/expiry/purge contention. No physical TV or real user session is inferred from synthetic verification.
+
+Final runtime a33f604 is deployed.84unit tests, lint and build pass. All74 deployed synthetic journeys passed with3 optional capture skips. Eight deployed public views passed axe/width checks; corrected impact grid passed strict axe at720p,1080p and4K. Root inspected updated long-arrival and Quiet captures. Long messages visibly fit720p, preserving every segment through pagination; stage heart counts include older records outside the rail. A remaining local fake-clock race is being corrected under the explicit Sol fallback. Private Drive evidence is verified in the run storage receipt.
+
+The final Sol fixture correction passed16 stress cases and all74 normal browser journeys. This closes the local clock issue without changing runtimea33f604.
+
+## Smaller top-right hearts
+User requested smaller hearts at the top right of public recognition cards. Runtimeac43554 moves the unchanged controls into header grids on home and companion cards. Heart glyphs are14px with44px minimum targets. Typecheck, lint, build and16 affected journeys pass. Twelve local views at320/390/1440 passed axe, horizontal bounds and measured top-right placement without name overlap. Exact wording and data behavior are unchanged.
