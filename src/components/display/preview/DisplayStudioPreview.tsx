@@ -290,7 +290,7 @@ export function DisplayStudioPreview({ settings, source, sessionKey, onSourceCha
   const setScreen = (screen: DisplayScreenId) => {
     setSelectedScreen(screen);
     elapsedRef.current = 0;
-    setTimeline((current) => ({ key: `${screen}:${source}:${sessionKey ?? ''}`, elapsedMs: 0, playing: false, replayKey: current.replayKey + 1 }));
+    setTimeline((current) => ({ key: `${screen}:${source}:${sessionKey ?? ''}`, elapsedMs: 0, playing: true, replayKey: current.replayKey + 1 }));
   };
 
   const replay = () => {
