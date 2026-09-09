@@ -61,6 +61,54 @@
   max-width: min(78%, 980px);
 }
 
+.impactScreen .screenHeader,
+.expressionsScreen .screenHeader,
+.sharedScreen .screenHeader {
+  isolation: isolate;
+}
+
+.impactScreen .screenHeader::before,
+.expressionsScreen .screenHeader::before,
+.sharedScreen .screenHeader::before,
+.impactScreen .screenHeader::after,
+.expressionsScreen .screenHeader::after,
+.sharedScreen .screenHeader::after {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+}
+
+.impactScreen .screenHeader::before,
+.expressionsScreen .screenHeader::before,
+.sharedScreen .screenHeader::before {
+  top: -42%;
+  left: -4%;
+  width: clamp(180px, 22vw, 460px);
+  height: clamp(82px, 8vw, 180px);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--insight-title-glow) 0%, transparent 70%);
+  opacity: 0.34;
+  transform: translate3d(0, 0, 0) scale(0.92);
+  animation: insightTitleGlow 8s ease-in-out infinite;
+}
+
+.impactScreen .screenHeader::after,
+.expressionsScreen .screenHeader::after,
+.sharedScreen .screenHeader::after {
+  top: -20%;
+  right: 12%;
+  width: clamp(118px, 16vw, 320px);
+  height: clamp(72px, 8vw, 160px);
+  background:
+    radial-gradient(circle at 15% 42%, var(--insight-title-sparkle) 0 1.5px, transparent 2.6px),
+    radial-gradient(circle at 56% 20%, var(--insight-title-sparkle) 0 1px, transparent 2.2px),
+    radial-gradient(circle at 78% 70%, var(--insight-title-sparkle) 0 1.5px, transparent 2.6px);
+  opacity: 0.3;
+  transform: translate3d(0, 0, 0) rotate(-4deg) scale(0.96);
+  animation: insightTitleSparkle 9s ease-in-out infinite;
+}
+
 .eyebrow {
   margin: 0;
   color: #5c6173;
@@ -93,6 +141,8 @@
 
 .impactScreen {
   --impact-accent: #ff8e86;
+  --insight-title-glow: rgba(255, 142, 134, 0.62);
+  --insight-title-sparkle: rgba(255, 255, 255, 0.86);
 }
 
 .impactTotal {
@@ -150,6 +200,23 @@
   box-shadow: 0 10px 24px rgba(65, 55, 35, 0.09);
   animation: ribbonIn 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--wave-index) * 70ms);
+}
+
+.impactScreen .ribbon::before {
+  position: absolute;
+  z-index: 0;
+  inset: -58% -4%;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 50%, var(--insight-title-glow) 0%, transparent 66%),
+    radial-gradient(circle at 20% 38%, var(--insight-title-sparkle) 0 1.5px, transparent 2.8px),
+    radial-gradient(circle at 66% 68%, rgba(255, 255, 255, 0.52) 0 1px, transparent 2.5px),
+    linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.26) 50%, transparent 78%);
+  content: '';
+  opacity: 0.3;
+  pointer-events: none;
+  transform: translate3d(-3%, 0, 0) scale(0.96);
+  animation: insightPanelSparkle 7.5s ease-in-out infinite;
 }
 
 .ribbon::after {
@@ -233,6 +300,8 @@
 }
 
 .expressionsScreen {
+  --insight-title-glow: rgba(255, 216, 106, 0.58);
+  --insight-title-sparkle: rgba(255, 255, 255, 0.9);
   background:
     radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.88), transparent 48%),
     linear-gradient(145deg, rgba(255, 246, 220, 0.96), rgba(255, 253, 246, 0.94));
@@ -369,16 +438,27 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.27);
   content: '';
+  pointer-events: none;
 }
 
 .flowerCard::before {
   top: -27%;
   right: -11%;
+  opacity: 0.3;
+  transform: translate3d(0, 0, 0) scale(0.95);
+  animation: insightPanelGlow 8.5s ease-in-out infinite;
 }
 
 .flowerCard::after {
   bottom: -34%;
   left: -16%;
+  background:
+    radial-gradient(circle at 36% 38%, var(--insight-title-sparkle) 0 1.5px, transparent 2.7px),
+    radial-gradient(circle at 66% 22%, rgba(255, 255, 255, 0.58) 0 1px, transparent 2.3px),
+    rgba(255, 255, 255, 0.27);
+  opacity: 0.34;
+  transform: translate3d(0, 0, 0) scale(1.02);
+  animation: insightPanelSparkle 9.5s 700ms ease-in-out infinite;
 }
 
 .flowerCard > * {
@@ -416,6 +496,8 @@
 }
 
 .sharedScreen {
+  --insight-title-glow: rgba(165, 201, 255, 0.62);
+  --insight-title-sparkle: rgba(255, 255, 255, 0.9);
   background:
     radial-gradient(circle at 20% 18%, rgba(165, 201, 255, 0.24), transparent 30%),
     radial-gradient(circle at 80% 74%, rgba(255, 142, 134, 0.19), transparent 33%),
@@ -461,6 +543,23 @@
   box-shadow: 0 14px 30px rgba(65, 55, 35, 0.1);
   animation: bubbleArrive 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--wave-index) * 100ms);
+}
+
+.sharedScreen .connectedBubble::before {
+  position: absolute;
+  z-index: 0;
+  inset: -24% -9%;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 50%, var(--insight-title-glow) 0%, transparent 68%),
+    radial-gradient(circle at 18% 34%, var(--insight-title-sparkle) 0 1.5px, transparent 2.8px),
+    radial-gradient(circle at 74% 24%, rgba(255, 255, 255, 0.56) 0 1px, transparent 2.4px),
+    linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.18) 52%, transparent 74%);
+  content: '';
+  opacity: 0.27;
+  pointer-events: none;
+  transform: translate3d(2%, 0, 0) scale(0.96);
+  animation: insightPanelSparkle 8.5s ease-in-out infinite;
 }
 
 .connectedItem:nth-child(2n) .connectedBubble {
@@ -541,6 +640,17 @@
   border-color: rgba(142, 214, 245, 0.35);
 }
 
+.sharedScreen .heartReveal::before,
+.sharedScreen .heartReveal::after {
+  opacity: 0.76;
+  transform: translate3d(0, 0, 0) scale(0.96);
+  animation: insightPanelGlow 10s ease-in-out infinite;
+}
+
+.sharedScreen .heartReveal::after {
+  animation-delay: -3s;
+}
+
 .heartBubble {
   position: relative;
   z-index: 1;
@@ -599,6 +709,68 @@
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+@keyframes insightTitleGlow {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translate3d(0, 0, 0) scale(0.92);
+  }
+
+  50% {
+    opacity: 0.46;
+    transform: translate3d(2%, -2%, 0) scale(1.04);
+  }
+}
+
+@keyframes insightTitleSparkle {
+  0%,
+  100% {
+    opacity: 0.14;
+    transform: translate3d(-1%, 0, 0) rotate(-4deg) scale(0.96);
+  }
+
+  35% {
+    opacity: 0.42;
+    transform: translate3d(2%, -3%, 0) rotate(2deg) scale(1.04);
+  }
+
+  70% {
+    opacity: 0.22;
+    transform: translate3d(-3%, 1%, 0) rotate(-1deg) scale(0.98);
+  }
+}
+
+@keyframes insightPanelGlow {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0) scale(0.94);
+  }
+
+  50% {
+    opacity: 0.42;
+    transform: translate3d(2%, -2%, 0) scale(1.04);
+  }
+}
+
+@keyframes insightPanelSparkle {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: translate3d(-3%, 0, 0) scale(0.95);
+  }
+
+  40% {
+    opacity: 0.38;
+    transform: translate3d(3%, -2%, 0) scale(1.03);
+  }
+
+  75% {
+    opacity: 0.2;
+    transform: translate3d(-1%, 2%, 0) scale(0.98);
+  }
 }
 
 @keyframes ribbonIn {
@@ -704,6 +876,22 @@
   .connectedBubble,
   .heartBubble,
   .heartRibbon {
+    animation: none;
+    transform: none;
+  }
+
+  .impactScreen .screenHeader::before,
+  .expressionsScreen .screenHeader::before,
+  .sharedScreen .screenHeader::before,
+  .impactScreen .screenHeader::after,
+  .expressionsScreen .screenHeader::after,
+  .sharedScreen .screenHeader::after,
+  .impactScreen .ribbon::before,
+  .expressionsScreen .flowerCard::before,
+  .expressionsScreen .flowerCard::after,
+  .sharedScreen .connectedBubble::before,
+  .sharedScreen .heartReveal::before,
+  .sharedScreen .heartReveal::after {
     animation: none;
     transform: none;
   }

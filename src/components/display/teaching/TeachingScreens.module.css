@@ -707,3 +707,77 @@
     transition: none !important;
   }
 }
+
+/* A common living-light signature across every teaching and invitation screen. */
+.teachingScreen {
+  isolation: isolate;
+}
+
+.teachingScreen h2,
+.teachingScreen h3 {
+  animation: teachingTitleGlow 9s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(255, 216, 106, 0.3);
+  will-change: transform, opacity;
+}
+
+.teachingScreen::after {
+  opacity: 0.52;
+  animation: teachingSparkle 6.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.teachingScreen::before {
+  opacity: 0.32;
+  animation: teachingHalo 12s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.spotlightCopy::after,
+.practiceExpression::after,
+.oneKindWordCopy::after,
+.peaceSceneGrid::after,
+.promiseVisual::after {
+  position: absolute;
+  top: 8%;
+  right: 7%;
+  width: clamp(13px, 1.1vw, 26px);
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  background: #ffd86a;
+  box-shadow: 0 0 14px rgba(255, 216, 106, 0.7);
+  content: '';
+  opacity: 0.58;
+  pointer-events: none;
+  animation: teachingSparkle 6.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes teachingTitleGlow {
+  0%, 100% { opacity: 0.94; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: 1; transform: translate3d(0, -0.22vh, 0) scale(1.01); }
+}
+
+@keyframes teachingSparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.72) rotate(0deg); }
+  50% { opacity: 0.9; transform: scale(1.08) rotate(45deg); }
+}
+
+@keyframes teachingHalo {
+  0%, 100% { opacity: 0.18; transform: translate3d(-2%, 1%, 0) scale(0.92); }
+  50% { opacity: 0.44; transform: translate3d(2%, -2%, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teachingScreen h2,
+  .teachingScreen h3,
+  .teachingScreen::before,
+  .teachingScreen::after,
+  .spotlightCopy::after,
+  .practiceExpression::after,
+  .oneKindWordCopy::after,
+  .peaceSceneGrid::after,
+  .promiseVisual::after {
+    animation: none !important;
+    transform: none !important;
+  }
+}

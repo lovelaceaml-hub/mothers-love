@@ -101,6 +101,26 @@ function displayVisibility(): 'visible' | 'hidden' {
   return document.visibilityState === 'hidden' ? 'hidden' : 'visible';
 }
 
+type RequestedDisplayEffects = {
+  background: boolean;
+  sparkles: boolean;
+  trails: boolean;
+  constellations: boolean;
+};
+
+type DisplayVisualQuality = {
+  decoration: 'full';
+  effects: RequestedDisplayEffects;
+};
+
+// Frame quality remains a status signal. It never overrides owner-selected effects.
+export function resolveDisplayVisualQuality(requestedEffects: RequestedDisplayEffects): DisplayVisualQuality {
+  return {
+    decoration: 'full',
+    effects: { ...requestedEffects },
+  };
+}
+
 function ExpressionPill({ id }: { id: number }) {
   const item = expression(id);
   return <span className={styles.expressionPill} style={{ backgroundColor: item.color }}>{item.phrase}</span>;
@@ -235,15 +255,14 @@ type ScreenProps = {
   quality: AdaptiveQualityState;
 };
 
-function GardenScreen({ state, quality }: ScreenProps) {
+function GardenScreen({ state }: ScreenProps) {
   const records = selectGarden(state);
-  const requestedDecoration = {
+  const visualQuality = resolveDisplayVisualQuality({
     trails: state.settings.effects?.trails ?? state.settings.showTrails,
     constellations: state.settings.effects?.constellations ?? state.settings.showConstellations,
     sparkles: state.settings.effects?.sparkles ?? true,
     background: state.settings.effects?.background ?? true,
-  };
-  const decoration = quality.level === 'full' ? 'full' : quality.level === 'smooth' ? 'soft' : 'minimal';
+  });
   const gardenTempo = state.settings.tempo === 'calm' || state.settings.tempo === 'slow' || state.settings.tempo === 'gentle'
     ? 'calm'
     : state.settings.tempo === 'lively' || state.settings.tempo === 'fast'
@@ -257,10 +276,10 @@ function GardenScreen({ state, quality }: ScreenProps) {
         amount={state.settings.gardenAmount ?? state.settings.maxBubbles}
         pool={{ activeIds: state.gardenIds, presentationHistory: state.presentationHistory, rotation: state.playlistIndex }}
         nowMs={state.nowMs + state.serverOffsetMs}
-        decoration={decoration}
+        decoration={visualQuality.decoration}
         tempo={gardenTempo}
         motion={gardenMotion}
-        requestedDecoration={requestedDecoration}
+        requestedDecoration={visualQuality.effects}
         reducedMotion={gardenMotion === 'still'}
       />
       {state.stale ? <GardenReconnectNotice memory={{ status: 'reconnecting', records, lastSuccessfulAtMs: state.lastSuccessfulVerificationMs }} /> : null}
@@ -790,12 +809,13 @@ export function DisplayExperience() {
     () => reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [],
     [reactionEligibleKey],
   );
-  const requestedEffects = state.settings.effects ?? {
-    trails: state.settings.showTrails,
-    constellations: state.settings.showConstellations,
-    sparkles: true,
-    background: true,
+  const requestedEffects = {
+    trails: state.settings.effects?.trails ?? state.settings.showTrails,
+    constellations: state.settings.effects?.constellations ?? state.settings.showConstellations,
+    sparkles: state.settings.effects?.sparkles ?? true,
+    background: state.settings.effects?.background ?? true,
   };
+  const visualQuality = resolveDisplayVisualQuality(requestedEffects);
   const showSubmissionDock = state.screen !== 'daily-practice' && state.screen !== 'peace-promise';
   return (
     <main
@@ -808,7 +828,7 @@ export function DisplayExperience() {
       data-rail-count={railVisible ? liveRailItems.length : 0}
       data-cursor={state.cursor ?? ''}
     >
-      <Atmosphere background={requestedEffects.background && quality.effects.background} sparkles={requestedEffects.sparkles && quality.effects.sparkles} />
+      <Atmosphere background={visualQuality.effects.background} sparkles={visualQuality.effects.sparkles} />
       <header className={styles.displayHeader}>
         <div>
           <h1>{TITLE}</h1>

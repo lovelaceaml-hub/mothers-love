@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -8,6 +10,7 @@ import {
   detailTierFor,
   entryTreatmentFor,
   fairGardenOrder,
+  GardenCard,
   gardenReconnectUnavailable,
   gardenReconnectSucceeded,
   isNewestGardenCard,
@@ -108,6 +111,13 @@ describe('Garden model', () => {
     expect(pages.length).toBeGreaterThan(1);
     expect(pages.join('')).toBe(message);
     expect(pages.join('').includes('🙂')).toBe(true);
+  });
+
+  it('renders the complete recognition message in a bounded Garden card', () => {
+    const message = `🙂 ${'word '.repeat(90)}A final sentence that must remain complete.`;
+    const markup = renderToStaticMarkup(createElement(GardenCard, { record: record('full-message', message) }));
+    expect(markup).toContain(message);
+    expect(markup).toContain('data-message-complete="true"');
   });
 
   it('keeps reconnect content in RAM during grace and clears it after grace', () => {

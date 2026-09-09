@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { resolveDisplayVisualQuality } from "@/components/display/DisplayExperience";
 import {
   createAdaptiveQualityState,
   effectsForQuality,
@@ -8,7 +9,7 @@ import {
 } from "@/lib/display-performance/adaptive-quality";
 
 describe("adaptive display quality", () => {
-  it("removes decoration in order while keeping content and core transitions enabled", () => {
+  it("reports decoration fallback levels while keeping content and core transitions enabled", () => {
     const options = { frameBudgetMs: 16, degradeAfterFrames: 2, recoverAfterFrames: 2 };
     let state = createAdaptiveQualityState(options);
 
@@ -48,5 +49,16 @@ describe("adaptive display quality", () => {
     expect(state.smoothMode).toBe(true);
     expect(state.contentEnabled).toBe(true);
     expect(state.effects.trails).toBe(false);
+  });
+
+  it("keeps owner-requested visual effects enabled when adaptive status drops", () => {
+    const ownerEffects = effectsForQuality("full");
+    const quality = setAdaptiveQuality(createAdaptiveQualityState(), "minimal");
+    const visualQuality = resolveDisplayVisualQuality(ownerEffects);
+
+    expect(quality.level).toBe("minimal");
+    expect(quality.effects).toEqual(effectsForQuality("minimal"));
+    expect(visualQuality.decoration).toBe("full");
+    expect(visualQuality.effects).toEqual(ownerEffects);
   });
 });

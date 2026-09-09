@@ -2,6 +2,10 @@
 
 ## Plan 08 TV Garden and submission release
 
+## Dynamic TV presentation correction
+
+The TV presentation now keeps owner-enabled effects active, restores exact circular Recognition Garden cards, shows every public recognition message inside its circle with safe bounded scrolling, and gives Garden, impact, expression, teaching, invitation, and status panels continuous glow, sparkle, and gentle title motion. Reduced-motion and privacy states remain authoritative. See the correction receipt at [dynamic TV presentation](runs/2026-09-09-tv-garden-refresh/logs/2026-09-09T0613Z-dynamic-tv-presentation.md).
+
 Live at https://mothers-love.vercel.app/display. The TV View is now a Garden-led playlist with naturally drifting recognition cards, bounded visual rendering, fair rotation, nine waiting buds, ribbons for Monthly Impact and Shared Expression, a flower wheel for Nine Expressions, and friendly teaching and invitation screens. Display Studio at https://mothers-love.vercel.app/admin/display now offers the fixed screen library, add, remove, restore and reorder controls, Safe Sample or approved-content preview, tempo, timing, Garden amount without a user-facing cap, effects and gentle chime controls. The recognition form at https://mothers-love.vercel.app/recognize now gives all nine expression choices matching mini-scenes and the coral-orange-gold Share Recognition selection treatment.
 
 Runtime source 98f06cc is live as Vercel deployment dpl_GHX7pC61f94emNrjfkM2wqihKq3g, READY with the production alias confirmed. The live repair restores visible Garden effects and makes the owner-selected Lively mode take priority over a browser reduced-motion preference, regardless of tempo. Database migration 008 remains private inside the `mothers_love` schema. Migration 009 adds a narrow public security-definer bridge for Display Studio saves, with an empty search path and execute granted only to `mothers_love_runtime`.

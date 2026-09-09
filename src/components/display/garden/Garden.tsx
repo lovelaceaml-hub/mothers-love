@@ -10,7 +10,6 @@ import {
   detailTierFor,
   entryTreatmentFor,
   GARDEN_POOL_CAP,
-  gardenMessagePreview,
   isNewestGardenCard,
   nextCollectiveMilestone,
   newestGardenId,
@@ -102,6 +101,16 @@ function safeClassName(className: string | undefined): string {
   return className ? ` ${className}` : '';
 }
 
+const FULL_MESSAGE_STYLE: CSSProperties = {
+  display: 'block',
+  minHeight: 0,
+  flexShrink: 1,
+  overflowY: 'auto',
+  overflowWrap: 'anywhere',
+  whiteSpace: 'pre-wrap',
+  WebkitLineClamp: 'unset',
+};
+
 export interface GardenCardProps {
   record: GardenRecognition;
   records?: readonly GardenRecognition[];
@@ -125,7 +134,6 @@ export function GardenCard({
 }: GardenCardProps) {
   const detail = detailTierFor(record);
   const fresh = isNewestGardenCard(record, records, nowMs);
-  const message = gardenMessagePreview(record, detail);
   return (
     <div
       className={`${styles.cardSlot} ${fresh ? styles.freshCard : ''}`}
@@ -153,7 +161,7 @@ export function GardenCard({
               </span>
             ))}
           </div>
-          <p className={styles.message}>{message}</p>
+          <p className={styles.message} style={FULL_MESSAGE_STYLE} data-message-complete="true">{record.message}</p>
         </article>
       </div>
     </div>

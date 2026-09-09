@@ -35,10 +35,21 @@ describe('display decorative layering', () => {
     expect(constellation).toBeLessThan(cards);
     expect(cards).toBeLessThan(waitingBuds);
     expect(gardenCss).toMatch(/\.card\s*\{[\s\S]*?background:\s*rgba\(255, 253, 247, 0\.98\);/);
+    expect(declaration(gardenCss, '.card', 'border-radius')).toBe('50%');
+    expect(declaration(gardenCss, '.card', 'text-align')).toBe('center');
+    expect(declaration(gardenCss, '.cardTrail', 'animation')).toBe('gardenTrail var(--garden-trail-duration, 9.5s) ease-in-out infinite');
+    expect(gardenCss).toMatch(/\.card h3\s*\{[\s\S]*?display:\s*-webkit-box;[\s\S]*?white-space:\s*normal;/);
+    expect(gardenCss).toMatch(/\.entrySeed \.card\s*\{[\s\S]*?border-radius:\s*50%;/);
+    expect(gardenCss).toMatch(/\.entryRibbon \.card\s*\{[\s\S]*?border-radius:\s*50%;/);
+    expect(gardenCss).toMatch(/\.entryBloom \.card\s*\{[\s\S]*?border-radius:\s*50%;/);
     expect(gardenCss).toContain('animation: backgroundBreathe var(--garden-background-duration, 16s) ease-in-out infinite;');
     expect(gardenCss).toContain('animation: sparkleTwinkle var(--garden-sparkle-duration, 6.5s) ease-in-out infinite;');
     expect(gardenCss).toContain('animation: budBreathe var(--garden-bud-duration, 5.5s) ease-in-out infinite;');
     expect(gardenCss).toContain('animation: gardenDrift var(--garden-drift-duration, 14s) ease-in-out infinite;');
+    expect(gardenCss).toContain('@keyframes gardenTrail');
+    expect(displayCss).toContain('animation: panelGlow var(--display-panel-glow-duration, 13s) ease-in-out infinite;');
+    expect(displayCss).toContain('animation: panelSparkle var(--display-panel-sparkle-duration, 8.5s) ease-in-out infinite;');
+    expect(displayCss).toContain('animation: panelTitleDrift var(--display-title-duration, 10s) ease-in-out infinite;');
   });
 
   it('retains reduced-motion animation overrides while preserving an explicit Lively TV override', () => {

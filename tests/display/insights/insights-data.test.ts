@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import { EXPRESSIONS } from '@/lib/catalog';
@@ -9,6 +11,11 @@ import {
   safeAggregateNumber,
   sharedExpressionId,
 } from '@/components/display/insights/insights-data';
+
+const insightsStyles = readFileSync(
+  new URL('../../../src/components/display/insights/DisplayInsights.module.css', import.meta.url),
+  'utf8',
+);
 
 function recognition(id: string, expressionIds: number[]): Recognition {
   return {
@@ -59,5 +66,23 @@ describe('display insights selectors', () => {
     expect(formatImpactPeriod('2026-09-01T07:00:00.000Z')).toBe('September 2026');
     expect(safeAggregateNumber(Number.NaN)).toBe(0);
     expect(safeAggregateNumber(4.9)).toBe(4);
+  });
+
+  it('keeps persistent insight effects scoped and reduced-motion safe', () => {
+    expect(insightsStyles).toContain('.impactScreen .ribbon::before');
+    expect(insightsStyles).toContain('.expressionsScreen .flowerCard::after');
+    expect(insightsStyles).toContain('.sharedScreen .connectedBubble::before');
+    expect(insightsStyles).toContain('@keyframes insightTitleGlow');
+    expect(insightsStyles).toContain('@keyframes insightTitleSparkle');
+    expect(insightsStyles).toContain('@keyframes insightPanelSparkle');
+    expect(insightsStyles).toContain('@media (prefers-reduced-motion: reduce)');
+
+    const reducedMotionBlock = insightsStyles.match(
+      /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*)\}\s*$/,
+    )?.[1] ?? '';
+
+    expect(reducedMotionBlock).toContain('.impactScreen .screenHeader::before');
+    expect(reducedMotionBlock).toContain('.expressionsScreen .flowerCard::after');
+    expect(reducedMotionBlock).toContain('.sharedScreen .heartReveal::after');
   });
 });

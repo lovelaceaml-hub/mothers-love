@@ -2652,3 +2652,156 @@
   width: 28%;
   max-width: 72px;
 }
+
+/* Shared display motion keeps titles and panels alive without competing with their words. */
+.displayApp {
+  --display-panel-glow-duration: 13s;
+  --display-panel-sparkle-duration: 8.5s;
+  --display-title-duration: 10s;
+}
+
+.displayApp.motioncalm {
+  --display-panel-glow-duration: 18s;
+  --display-panel-sparkle-duration: 14s;
+  --display-title-duration: 18s;
+}
+
+.displayApp.motionlively {
+  --display-panel-glow-duration: 8s;
+  --display-panel-sparkle-duration: 5.5s;
+  --display-title-duration: 7s;
+}
+
+.displayScreenHeading,
+.gardenBoard,
+.featureExpression,
+.featureReading,
+.clusterBoard,
+.clusterCore,
+.impactMain,
+.impactGrid,
+.expressionGrid,
+.emptyGarden,
+.arrivalScreen,
+.milestoneScreen,
+.fallbackScreen,
+.quietScreen,
+.liveRail {
+  isolation: isolate;
+}
+
+.displayScreenHeading,
+.expressionGrid,
+.fallbackScreen,
+.quietScreen {
+  position: relative;
+}
+
+.displayScreenHeading > *,
+.gardenBoard > *,
+.featureExpression > *,
+.featureReading > *,
+.clusterBoard > *,
+.clusterCore > *,
+.impactMain > *,
+.impactGrid > *,
+.expressionGrid > *,
+.emptyGarden > *,
+.arrivalScreen > *,
+.milestoneScreen > *,
+.fallbackScreen > *,
+.quietScreen > *,
+.liveRail > * {
+  position: relative;
+  z-index: 1;
+}
+
+.displayScreenHeading h2,
+.screenHeading h2,
+.featureExpression h2,
+.featureReading h2,
+.clusterCore h2,
+.impactMain h2,
+.arrivalScreen h2,
+.milestoneScreen h2,
+.fallbackScreen h2,
+.quietScreen h2 {
+  animation: panelTitleDrift var(--display-title-duration, 10s) ease-in-out infinite;
+  text-shadow: 0 0 22px rgba(255, 216, 106, 0.24);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.displayScreenHeading::after,
+.gardenBoard::after,
+.featureExpression::after,
+.featureReading::after,
+.clusterBoard::after,
+.clusterCore::after,
+.impactMain::after,
+.impactGrid::after,
+.expressionGrid::after,
+.emptyGarden::after,
+.arrivalScreen::after,
+.fallbackScreen::after,
+.quietScreen::after,
+.liveRail::after {
+  position: absolute;
+  top: clamp(14px, 7%, 64px);
+  right: clamp(18px, 8%, 86px);
+  z-index: 0;
+  width: clamp(14px, 1.2vw, 28px);
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  background: var(--yellow);
+  filter: drop-shadow(0 0 12px rgba(255, 216, 106, 0.68));
+  opacity: 0.28;
+  content: '';
+  pointer-events: none;
+  animation: panelSparkle var(--display-panel-sparkle-duration, 8.5s) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.gardenBoard::before,
+.featureExpression::before,
+.featureReading::before,
+.clusterBoard::before,
+.clusterCore::before,
+.impactMain::before,
+.impactGrid::before,
+.expressionGrid::before,
+.emptyGarden::before,
+.arrivalScreen::before,
+.fallbackScreen::before,
+.quietScreen::before,
+.liveRail::before {
+  position: absolute;
+  top: 5%;
+  right: 4%;
+  z-index: 0;
+  width: clamp(96px, 14vw, 280px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 42%, rgba(255, 216, 106, 0.58), rgba(255, 142, 134, 0.18) 46%, transparent 72%);
+  filter: blur(18px);
+  opacity: 0.2;
+  content: '';
+  pointer-events: none;
+  animation: panelGlow var(--display-panel-glow-duration, 13s) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes panelGlow {
+  0%, 100% { opacity: 0.14; transform: translate3d(-1.2%, 0.8%, 0) scale(0.92); }
+  50% { opacity: 0.3; transform: translate3d(1.4%, -1%, 0) scale(1.08); }
+}
+
+@keyframes panelSparkle {
+  0%, 100% { opacity: 0.2; transform: translate3d(-0.2vw, 0.2vh, 0) scale(0.72) rotate(0deg); }
+  50% { opacity: 0.76; transform: translate3d(0.2vw, -0.4vh, 0) scale(1) rotate(45deg); }
+}
+
+@keyframes panelTitleDrift {
+  0%, 100% { opacity: 0.94; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: 1; transform: translate3d(0, -0.18vh, 0) scale(1.006); }
+}
