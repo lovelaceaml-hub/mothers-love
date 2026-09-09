@@ -210,6 +210,41 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     expect(forbiddenRequests).toEqual([]);
   });
 
+  test('aborts a hung initial snapshot and opens after the next poll without pair or acknowledgement', async ({ page }) => {
+    const forbiddenRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
+    });
+    let snapshotCalls = 0;
+    let releaseHungRequest: (() => void) | null = null;
+    await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
+      snapshotCalls += 1;
+      if (snapshotCalls === 1) {
+        await new Promise<void>((resolve) => {
+          releaseHungRequest = resolve;
+        });
+        try {
+          await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(1)) });
+        } catch {
+          // The browser has already aborted the timed out request.
+        }
+        return;
+      }
+      releaseHungRequest?.();
+      releaseHungRequest = null;
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(1)) });
+    });
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await page.goto('/display');
+    await expect(page.getByRole('heading', { name: 'The display is connecting.' })).toBeVisible();
+    await page.clock.runFor(10_001);
+    await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible();
+    await page.clock.runFor(5_000);
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 5_000 });
+    expect(snapshotCalls).toBeGreaterThanOrEqual(2);
+    expect(forbiddenRequests).toEqual([]);
+  });
+
   test('shows a concise startup state, then clears content after an unauthorized resync', async ({ page }) => {
     const forbiddenRequests: string[] = [];
     page.on('request', (request) => {

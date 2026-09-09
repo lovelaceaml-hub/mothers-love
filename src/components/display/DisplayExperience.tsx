@@ -76,6 +76,8 @@ function snapshotRequestPath(cursor: string | null): string {
   return cursor ? `/api/display/snapshot?after=${encodeURIComponent(cursor)}` : '/api/display/snapshot';
 }
 
+const DISPLAY_SNAPSHOT_TIMEOUT_MS = 10_000;
+
 function ExpressionPill({ id }: { id: number }) {
   const item = expression(id);
   return <span className={styles.expressionPill} style={{ backgroundColor: item.color }}>{item.phrase}</span>;
@@ -603,6 +605,8 @@ export function DisplayExperience() {
   const displayOpenedAt = useRef<number | null>(null);
   const snapshotRequestInFlight = useRef(false);
   const snapshotRequestGeneration = useRef(0);
+  const snapshotControllerRef = useRef<AbortController | null>(null);
+  const snapshotTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     stateRef.current = state;
@@ -624,11 +628,15 @@ export function DisplayExperience() {
     const requestGeneration = snapshotRequestGeneration.current + 1;
     snapshotRequestGeneration.current = requestGeneration;
     const requestCursor = probe ? null : currentState?.cursor ?? null;
+    const controller = new AbortController();
+    snapshotControllerRef.current = controller;
+    snapshotTimeoutRef.current = window.setTimeout(() => controller.abort(), DISPLAY_SNAPSHOT_TIMEOUT_MS);
     try {
       const snapshot = await api<DisplaySnapshot>(snapshotRequestPath(requestCursor), {
         method: 'GET',
         auth: false,
         cache: 'no-store',
+        signal: controller.signal,
       });
       if (requestGeneration !== snapshotRequestGeneration.current) return;
       dispatch({ type: 'SNAPSHOT_RECEIVED', snapshot, receivedAtMs: monotonicNow() });
@@ -637,6 +645,13 @@ export function DisplayExperience() {
       dispatch({ type: 'SNAPSHOT_UNAVAILABLE', receivedAtMs: monotonicNow(), unauthorized: isUnauthorized(error) });
     } finally {
       if (requestGeneration === snapshotRequestGeneration.current) snapshotRequestInFlight.current = false;
+      if (snapshotControllerRef.current === controller) {
+        snapshotControllerRef.current = null;
+        if (snapshotTimeoutRef.current !== null) {
+          window.clearTimeout(snapshotTimeoutRef.current);
+          snapshotTimeoutRef.current = null;
+        }
+      }
     }
   }, [monotonicNow]);
 
@@ -660,6 +675,17 @@ export function DisplayExperience() {
     update();
     media.addEventListener?.('change', update);
     return () => media.removeEventListener?.('change', update);
+  }, []);
+
+  useEffect(() => () => {
+    snapshotRequestGeneration.current += 1;
+    snapshotRequestInFlight.current = false;
+    snapshotControllerRef.current?.abort();
+    snapshotControllerRef.current = null;
+    if (snapshotTimeoutRef.current !== null) {
+      window.clearTimeout(snapshotTimeoutRef.current);
+      snapshotTimeoutRef.current = null;
+    }
   }, []);
 
   const motion = effectiveMotion(state);
