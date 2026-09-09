@@ -1831,10 +1831,19 @@
   align-self: end;
 }
 
+.impactScreen {
+  display: grid;
+  grid-template-columns: minmax(360px, clamp(360px, 30vw, 680px)) minmax(0, 1fr);
+  align-items: center;
+  column-gap: clamp(18px, 2.3vw, 44px);
+}
+
 .impactMain {
-  top: 4vh;
-  left: 1vw;
+  position: relative;
+  top: auto;
+  left: auto;
   width: clamp(300px, 28.5vw, 670px);
+  max-width: 100%;
   height: auto;
   aspect-ratio: 1;
   padding: 7%;
@@ -1843,6 +1852,7 @@
   background: linear-gradient(145deg, #d7c9f4, #c6b3ea);
   box-shadow: 0 24px 62px rgba(107, 65, 68, 0.13), 0 0 34px var(--gold-glow);
   animation-name: impactLift;
+  justify-self: center;
 }
 
 .impactNumber {
@@ -1859,15 +1869,23 @@
 }
 
 .impactGrid {
-  top: 1vh;
-  right: 0;
-  width: min(58vw, 1100px);
-  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  position: relative;
+  top: auto;
+  right: auto;
+  width: min(100%, 64vh);
+  aspect-ratio: 1;
+  justify-self: end;
+  align-self: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: clamp(10px, 0.7vw, 22px);
 }
 
 .impactBubble {
+  width: 100%;
+  height: auto;
   min-height: clamp(100px, 10.6vw, 240px);
+  aspect-ratio: 1;
   border: 1px solid rgba(90, 41, 72, 0.12);
   border-radius: 50%;
   box-shadow: 0 12px 28px rgba(107, 65, 68, 0.1);
@@ -1890,6 +1908,8 @@
 
 .impactPhrase {
   color: #482236;
+  max-width: 92%;
+  font-size: clamp(10px, 0.75vw, 18px);
 }
 
 .impactCount {
@@ -2236,6 +2256,10 @@
 }
 
 @media (max-width: 900px) {
+  .impactScreen {
+    display: block;
+  }
+
   .stage {
     right: 240px;
   }

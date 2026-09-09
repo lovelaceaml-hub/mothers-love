@@ -507,6 +507,72 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     expect(new Set(seen.values()).size).toBe(5);
   });
 
+  test('keeps the monthly impact total separate from a readable 3x3 counter board', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await pairAndRead(page, 2, { continuous: true, motion: 'still' });
+    for (let step = 0; step < 30; step += 1) {
+      if (await page.getByTestId('display-app').getAttribute('data-screen') === 'impact') break;
+      await page.clock.runFor(5_000);
+    }
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'impact', { timeout: 2_000 });
+
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
+      await page.setViewportSize(viewport);
+      const metrics = await page.evaluate(() => {
+        const stage = document.querySelector<HTMLElement>('[class*="stage"]')?.getBoundingClientRect();
+        const main = document.querySelector<HTMLElement>('[class*="impactMain"]')?.getBoundingClientRect();
+        const grid = document.querySelector<HTMLElement>('[class*="impactGrid"]')?.getBoundingClientRect();
+        const qr = document.querySelector<HTMLElement>('[aria-label="Share a recognition"]')?.getBoundingClientRect();
+        const bubbles = [...document.querySelectorAll<HTMLElement>('[class*="impactBubble"]')].map((bubble) => {
+          const rect = bubble.getBoundingClientRect();
+          const text = [...bubble.querySelectorAll<HTMLElement>('span')].map((element) => {
+            const textRect = element.getBoundingClientRect();
+            return { left: textRect.left, right: textRect.right, top: textRect.top, bottom: textRect.bottom };
+          });
+          return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height, text };
+        });
+        if (!stage || !main || !grid || !qr) return null;
+        return {
+          stage: { left: stage.left, right: stage.right, top: stage.top, bottom: stage.bottom },
+          main: { left: main.left, right: main.right, top: main.top, bottom: main.bottom, width: main.width, height: main.height },
+          grid: { left: grid.left, right: grid.right, top: grid.top, bottom: grid.bottom },
+          qr: { left: qr.left, right: qr.right, top: qr.top, bottom: qr.bottom },
+          bubbles,
+        };
+      });
+      expect(metrics).not.toBeNull();
+      expect(metrics!.bubbles).toHaveLength(9);
+      expect(Math.abs(metrics!.main.width - metrics!.main.height)).toBeLessThanOrEqual(2);
+      for (const bubble of metrics!.bubbles) {
+        expect(Math.abs(bubble.width - bubble.height)).toBeLessThanOrEqual(2);
+        expect(bubble.left).toBeGreaterThanOrEqual(metrics!.stage.left - 1);
+        expect(bubble.right).toBeLessThanOrEqual(metrics!.stage.right + 1);
+        expect(bubble.top).toBeGreaterThanOrEqual(metrics!.stage.top - 1);
+        expect(bubble.bottom).toBeLessThanOrEqual(metrics!.stage.bottom + 1);
+        const overlapsMain = bubble.left < metrics!.main.right && bubble.right > metrics!.main.left && bubble.top < metrics!.main.bottom && bubble.bottom > metrics!.main.top;
+        expect(overlapsMain).toBe(false);
+        const overlapsQr = bubble.left < metrics!.qr.right && bubble.right > metrics!.qr.left && bubble.top < metrics!.qr.bottom && bubble.bottom > metrics!.qr.top;
+        expect(overlapsQr).toBe(false);
+        for (const text of bubble.text) {
+          expect(text.left).toBeGreaterThanOrEqual(bubble.left - 1);
+          expect(text.right).toBeLessThanOrEqual(bubble.right + 1);
+          expect(text.top).toBeGreaterThanOrEqual(bubble.top - 1);
+          expect(text.bottom).toBeLessThanOrEqual(bubble.bottom + 1);
+        }
+      }
+      for (let index = 0; index < metrics!.bubbles.length; index += 1) {
+        for (let otherIndex = index + 1; otherIndex < metrics!.bubbles.length; otherIndex += 1) {
+          const bubble = metrics!.bubbles[index];
+          const other = metrics!.bubbles[otherIndex];
+          const overlaps = bubble.left < other.right && bubble.right > other.left && bubble.top < other.bottom && bubble.bottom > other.top;
+          expect(overlaps).toBe(false);
+        }
+      }
+    }
+  });
+
   test('uses a distinct computed motion for an arrival screen', async ({ page }) => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
