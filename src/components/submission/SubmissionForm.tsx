@@ -139,6 +139,44 @@ function DecorativeGarden() {
   );
 }
 
+function ExpressionScene({ id }: { id: number }) {
+  return (
+    <span className={`${styles.expressionScene} ${styles[`scene${id}`]}`} data-testid="expression-scene" aria-hidden="true">
+      <span className={styles.sceneGround} />
+      <span className={styles.scenePrimary} />
+      <span className={styles.sceneSecondary} />
+      <span className={styles.sceneAccent} />
+      <span className={styles.sceneSpark} />
+    </span>
+  );
+}
+
+function GrowingBouquet({ selected }: { selected: (typeof EXPRESSIONS)[number][] }) {
+  return (
+    <div className={styles.bouquetWrap} data-selected-count={selected.length}>
+      <div className={styles.bouquet} data-testid="growing-bouquet" data-selected-count={selected.length} aria-hidden="true">
+        <span className={styles.bouquetGround} />
+        {selected.map((expression, index) => (
+          <span
+            className={`${styles.bouquetStem} ${styles[`bouquetStem${index + 1}`]}`}
+            key={expression.id}
+          >
+            <span className={`${styles.bouquetBloom} ${styles[`bouquetBloom${expression.id}`]}`}>
+              <i />
+            </span>
+          </span>
+        ))}
+      </div>
+      <p className={styles.selectionCount} aria-live="polite">
+        <span>{selected.length} selected</span>
+        <span className={styles.bouquetStatus}>
+          {selected.length > 0 ? 'Bouquet growing' : 'Your bouquet will grow here'}
+        </span>
+      </p>
+    </div>
+  );
+}
+
 function FieldMessage({ id, children }: { id: string; children?: string }) {
   if (!children) return null;
   return <p className={styles.fieldError} id={id} role="alert">{children}</p>;
@@ -157,6 +195,7 @@ function ExpressionChoice({
 }) {
   return (
     <article className={`${styles.expressionCard} ${styles[`expression${expression.id}`]} ${selected ? styles.expressionSelected : ''}`}>
+      <ExpressionScene id={expression.id} />
       <div className={styles.expressionHeader}>
         <div className={styles.expressionHeading}>
           <span className={styles.expressionNumber}>{String(expression.id).padStart(2, '0')}</span>
@@ -244,20 +283,29 @@ function Receipt({ status, onReset }: { status: ReceiptStatus; onReset: () => vo
   const held = status === 'held';
 
   return (
-    <section className={`${styles.receiptCard} ${held ? styles.receiptHeld : styles.receiptPublished}`} aria-labelledby="receipt-title">
-      <div className={styles.receiptFlower} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-        <b />
+    <section className={`${styles.receiptCard} ${held ? styles.receiptHeld : styles.receiptPublished}`} aria-labelledby="receipt-title" data-testid="submission-receipt">
+      <div className={styles.seedJourney} aria-hidden="true">
+        <span className={styles.seedOrbit}>
+          <span className={styles.seed} />
+          <span className={styles.seedLeaf} />
+        </span>
+        <span className={styles.seedTrail} />
+        <span className={styles.seedGarden}>
+          <i />
+          <b />
+        </span>
       </div>
       <p className={styles.cardEyebrow}>{held ? 'Received for review' : 'Recognition received'}</p>
       <h2 id="receipt-title">Thank you for sharing Mother&apos;s Love.</h2>
       <p>
         {held
-          ? 'Your recognition has been received. Some messages are reviewed before appearing.'
+          ? 'Your recognition has been received. Some messages are reviewed before appearing. It is not on the home page or TV yet.'
           : 'Your recognition has been received and is ready to appear on the home page and TV.'}
+      </p>
+      <p className={styles.receiptJourneyNote}>
+        {held
+          ? 'Your thank-you seed is resting safely while it is reviewed.'
+          : 'Your thank-you seed is floating toward the recognition garden.'}
       </p>
       <button className={styles.secondaryButton} type="button" onClick={onReset}>Recognize Someone Else</button>
     </section>
@@ -490,7 +538,7 @@ export function SubmissionForm() {
                   ))}
                 </div>
                 <FieldMessage id="expressions-error">{fieldErrors.expressions}</FieldMessage>
-                <p className={styles.selectionCount} aria-live="polite">{selectedExpressions.length} selected</p>
+                <GrowingBouquet selected={selectedExpressions} />
               </fieldset>
 
               <div className={styles.formSection}>
