@@ -212,8 +212,12 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
   test('aborts a hung initial snapshot and opens after the next poll without pair or acknowledgement', async ({ page }) => {
     const forbiddenRequests: string[] = [];
+    const failedSnapshotRequests: string[] = [];
     page.on('request', (request) => {
       if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
+    });
+    page.on('requestfailed', (request) => {
+      if (/\/api\/display\/snapshot(?:\?.*)?$/.test(request.url())) failedSnapshotRequests.push(request.failure()?.errorText ?? 'request failed');
     });
     let snapshotCalls = 0;
     let releaseHungRequest: (() => void) | null = null;
@@ -238,7 +242,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.goto('/display');
     await expect(page.getByRole('heading', { name: 'The display is connecting.' })).toBeVisible();
     await page.clock.runFor(10_001);
-    await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible();
+    await expect.poll(() => failedSnapshotRequests.length).toBeGreaterThan(0);
     await page.clock.runFor(5_000);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 5_000 });
     expect(snapshotCalls).toBeGreaterThanOrEqual(2);
