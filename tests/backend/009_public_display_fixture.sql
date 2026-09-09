@@ -62,7 +62,7 @@ BEGIN
      OR jsonb_array_length(result->'arrivals') IS DISTINCT FROM 0 THEN
     RAISE EXCEPTION 'initial public display snapshot failed: %', result;
   END IF;
-  IF pg_catalog.jsonb_object_length(result) IS DISTINCT FROM 10
+  IF (SELECT pg_catalog.count(*) FROM pg_catalog.jsonb_object_keys(result)) IS DISTINCT FROM 10
      OR NOT (result ? 'ok' AND result ? 'serverTime' AND result ? 'revision'
              AND result ? 'recognitions' AND result ? 'aggregate' AND result ? 'settings'
              AND result ? 'submissionUrl' AND result ? 'cursor' AND result ? 'sync' AND result ? 'arrivals') THEN
@@ -72,7 +72,7 @@ BEGIN
      OR result->'recognitions'->1->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000000011' THEN
     RAISE EXCEPTION 'featured-first display ordering failed: %', result;
   END IF;
-  IF pg_catalog.jsonb_object_length(result->'recognitions'->0) IS DISTINCT FROM 10
+  IF (SELECT pg_catalog.count(*) FROM pg_catalog.jsonb_object_keys(result->'recognitions'->0)) IS DISTINCT FROM 10
      OR result::text ~ 'submittedName|submitted_name|reason_category|private' THEN
     RAISE EXCEPTION 'private recognition fields leaked: %', result;
   END IF;
