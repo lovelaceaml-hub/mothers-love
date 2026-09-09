@@ -1,0 +1,205 @@
+-- Add the bounded public TV snapshot bridge. This migration is additive and
+-- does not remove or alter the existing paired display bridges.
+DO $public_display_migration$
+BEGIN
+  IF pg_catalog.to_regprocedure('public.ml_public_display_snapshot(text)') IS NOT NULL THEN
+    RAISE EXCEPTION 'public.ml_public_display_snapshot(text) already exists';
+  END IF;
+
+  EXECUTE $function_definition$
+    CREATE FUNCTION public.ml_public_display_snapshot(after_cursor text)
+    RETURNS jsonb
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    STABLE
+    SET search_path = ''
+    AS $function$
+    DECLARE
+      now_value timestamptz := pg_catalog.clock_timestamp();
+      settings_row mothers_love.settings%ROWTYPE;
+      latest_event bigint;
+      snapshot_revision bigint;
+      after_value numeric;
+      after_epoch numeric;
+      cursor_value bigint;
+      cursor_epoch bigint;
+      sync_value text := 'reset';
+      items jsonb := '[]'::jsonb;
+      arrivals jsonb := '[]'::jsonb;
+      aggregate_value jsonb;
+      settings_value jsonb;
+    BEGIN
+      SELECT *
+      INTO settings_row
+      FROM mothers_love.settings AS s
+      WHERE s.singleton_id = true;
+
+      IF NOT FOUND OR NOT mothers_love.ml_purge_healthy(now_value) THEN
+        RETURN jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');
+      END IF;
+
+      SELECT COALESCE(pg_catalog.max(de.event_id), 0)::bigint
+      INTO latest_event
+      FROM mothers_love.display_events AS de
+      WHERE de.created_at <= now_value;
+      snapshot_revision := GREATEST(latest_event, settings_row.version);
+
+      -- Parse only a short, unsigned decimal pair. Numeric is used for the
+      -- initial comparison so hostile input can never overflow a bigint cast.
+      IF after_cursor IS NOT NULL
+         AND after_cursor <> ''
+         AND pg_catalog.char_length(after_cursor) <= 64
+         AND after_cursor ~ '^[0-9]+\.[0-9]+$' THEN
+        after_value := pg_catalog.split_part(after_cursor, '.', 1)::numeric;
+        after_epoch := pg_catalog.split_part(after_cursor, '.', 2)::numeric;
+        IF after_value >= 0
+           AND after_value <= 9223372036854775807::numeric
+           AND after_epoch >= pg_catalog.floor(EXTRACT(epoch FROM now_value - interval '7 days'))
+           AND after_epoch <= pg_catalog.floor(EXTRACT(epoch FROM now_value))
+           AND after_epoch <= 9223372036854775807::numeric
+           AND after_value <= latest_event THEN
+          cursor_value := after_value::bigint;
+          cursor_epoch := after_epoch::bigint;
+          sync_value := 'delta';
+        END IF;
+      END IF;
+
+      settings_value := mothers_love.ml_settings_json();
+      aggregate_value := mothers_love.ml_aggregate_json(
+        (now_value AT TIME ZONE 'America/Los_Angeles')::date
+          - EXTRACT(day FROM (now_value AT TIME ZONE 'America/Los_Angeles'))::integer + 1,
+        (now_value AT TIME ZONE 'America/Los_Angeles')::date
+      );
+
+      -- Quiet and neutral modes clear personal display content and restart
+      -- arrival history when the display returns to normal mode.
+      IF settings_row.mode = 'normal' THEN
+        WITH selected AS (
+          SELECT
+            r.id,
+            r.recipient,
+            r.message,
+            r.created_at,
+            r.first_published_at,
+            r.expires_at,
+            r.version,
+            (r.featured AND (r.feature_until IS NULL OR r.feature_until > now_value)) AS featured,
+            COALESCE(
+              (
+                SELECT pg_catalog.jsonb_agg(re.expression_id ORDER BY re.expression_id)
+                FROM mothers_love.recognition_expressions AS re
+                WHERE re.recognition_id = r.id
+              ),
+              '[]'::jsonb
+            ) AS expression_ids
+          FROM mothers_love.recognitions AS r
+          WHERE r.status = 'published'
+            AND r.first_published_at IS NOT NULL
+            AND r.expires_at > now_value
+          ORDER BY
+            (r.featured AND (r.feature_until IS NULL OR r.feature_until > now_value)) DESC,
+            r.first_published_at DESC,
+            r.id DESC
+          LIMIT 1000
+        )
+        SELECT COALESCE(
+          pg_catalog.jsonb_agg(
+            pg_catalog.jsonb_build_object(
+              'id', selected.id::text,
+              'recipient', selected.recipient,
+              'message', selected.message,
+              'expressionIds', selected.expression_ids,
+              'createdAt', selected.created_at,
+              'firstPublishedAt', selected.first_published_at,
+              'expiresAt', selected.expires_at,
+              'version', selected.version,
+              'status', 'published',
+              'featured', selected.featured
+            )
+            ORDER BY selected.featured DESC, selected.first_published_at DESC, selected.id DESC
+          ),
+          '[]'::jsonb
+        )
+        INTO items
+        FROM selected;
+
+        IF sync_value = 'delta' THEN
+          WITH selected AS (
+            SELECT
+              r.id,
+              r.first_published_at,
+              r.expires_at
+            FROM mothers_love.recognitions AS r
+            WHERE r.status = 'published'
+              AND r.first_published_at IS NOT NULL
+              AND r.expires_at > now_value
+            ORDER BY
+              (r.featured AND (r.feature_until IS NULL OR r.feature_until > now_value)) DESC,
+              r.first_published_at DESC,
+              r.id DESC
+            LIMIT 1000
+          )
+          SELECT COALESCE(
+            pg_catalog.jsonb_agg(
+              pg_catalog.jsonb_build_object(
+                'eventId', bounded.event_id::text,
+                'recognitionId', bounded.recognition_id::text,
+                'publishedAt', bounded.created_at
+              )
+              ORDER BY bounded.event_id
+            ),
+            '[]'::jsonb
+          )
+          INTO arrivals
+          FROM (
+            SELECT de.event_id, de.recognition_id, de.created_at
+            FROM mothers_love.display_events AS de
+            JOIN selected ON selected.id = de.recognition_id
+            JOIN mothers_love.recognitions AS current_rec ON current_rec.id = de.recognition_id
+            WHERE de.event_id > cursor_value
+              AND de.event_id <= latest_event
+              AND de.created_at > now_value - interval '7 days'
+              AND de.event_kind = 'published'
+              AND de.expires_at > now_value
+              AND current_rec.status = 'published'
+              AND current_rec.first_published_at IS NOT NULL
+              AND current_rec.expires_at > now_value
+            ORDER BY de.event_id
+            LIMIT 1000
+          ) AS bounded;
+        END IF;
+      ELSE
+        sync_value := 'reset';
+      END IF;
+
+      RETURN pg_catalog.jsonb_build_object(
+        'ok', true,
+        'serverTime', now_value,
+        'revision', snapshot_revision,
+        'recognitions', items,
+        'aggregate', aggregate_value,
+        'settings', settings_value,
+        'submissionUrl', settings_row.submission_url,
+        'cursor', pg_catalog.format('%s.%s', latest_event, pg_catalog.floor(EXTRACT(epoch FROM now_value))::bigint),
+        'sync', sync_value,
+        'arrivals', arrivals
+      );
+    END
+    $function$;
+  $function_definition$;
+END
+$public_display_migration$;
+
+REVOKE ALL ON FUNCTION public.ml_public_display_snapshot(text) FROM PUBLIC;
+DO $public_display_acl$
+DECLARE
+  role_name text;
+BEGIN
+  FOREACH role_name IN ARRAY ARRAY['anon', 'authenticated', 'service_role'] LOOP
+    IF EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = role_name) THEN
+      EXECUTE pg_catalog.format('REVOKE ALL ON FUNCTION public.ml_public_display_snapshot(text) FROM %I', role_name);
+    END IF;
+  END LOOP;
+END
+$public_display_acl$;
+GRANT EXECUTE ON FUNCTION public.ml_public_display_snapshot(text) TO mothers_love_runtime;

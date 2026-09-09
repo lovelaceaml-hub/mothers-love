@@ -1,16 +1,15 @@
 import { NextRequest } from "next/server";
-import { databaseAction } from "@/lib/server/operations";
-import { databaseResult, errorResult, requireTrustedOrigin } from "@/lib/server/response";
+import { errorResult, jsonResult } from "@/lib/server/response";
 import { requireConfigured } from "@/lib/server/http";
-import { sha256 } from "@/lib/server/operations";
+import { projectPublicDisplaySnapshot, queryPublicDisplaySnapshot } from "@/lib/server/public-display";
+import type { ApiResult } from "@/lib/server/types";
 
 export async function GET(request: NextRequest) {
   const unavailable = requireConfigured();
   if (unavailable) return unavailable;
-  const token = request.cookies.get("ml_display_session")?.value || null;
-  const result = await databaseAction("display_snapshot", { tokenHash: token ? sha256(token) : null, after: request.nextUrl.searchParams.get("after") || null });
-  const response = databaseResult(result.data, result.error);
-  if (result.data?.code === "UNAUTHENTICATED" || result.error) response.cookies.set("ml_display_session", "", { httpOnly: true, secure: true, sameSite: "strict", maxAge: 0, path: "/" });
-  return response;
+  const result = await queryPublicDisplaySnapshot(request.nextUrl.searchParams.get("after"));
+  if (result.error) return errorResult(503, "UNAVAILABLE");
+  const snapshot = projectPublicDisplaySnapshot(result.data);
+  if (!snapshot) return errorResult(503, "UNAVAILABLE");
+  return jsonResult(snapshot as unknown as ApiResult, { headers: { "X-Robots-Tag": "noindex, nofollow" } });
 }
-
