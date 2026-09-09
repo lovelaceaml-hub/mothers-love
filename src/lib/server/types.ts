@@ -52,6 +52,17 @@ export type DisplaySettings = {
   lowActivityMinutes: number;
   readingSeconds: number;
   maxBubbles: number;
+  gardenAmount?: "all-active" | number;
+  playlist?: Array<{
+    id: "garden" | "featured" | "impact" | "expressions" | "shared-expression" | "spotlight" | "daily-practice" | "one-kind-word" | "everyday-peace" | "peace-promise";
+    enabled: boolean;
+    durationSeconds?: number;
+  }>;
+  tempo?: "slow" | "standard" | "fast" | "calm" | "gentle" | "lively";
+  durationOverrides?: Partial<Record<"garden" | "featured" | "impact" | "expressions" | "shared-expression" | "spotlight" | "daily-practice" | "one-kind-word" | "everyday-peace" | "peace-promise", number>>;
+  effects?: { trails: boolean; constellations: boolean; sparkles?: boolean; background?: boolean };
+  sound?: { enabled: boolean; volume: number; arrivalChime: boolean; milestoneChime: boolean };
+  externalUrls?: { dailyPractice: string; peacePromise: string };
   showTrails: boolean;
   showConstellations: boolean;
 };

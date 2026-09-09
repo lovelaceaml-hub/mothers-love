@@ -1,10 +1,49 @@
 import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from "@/lib/name-validation";
 import { graphemeLength, isIsoDate, isMonthBoundary } from "./time";
+import {
+  DISPLAY_EXTERNAL_URLS,
+  DISPLAY_SCREEN_IDS,
+  type DisplayEffects,
+  type DisplayGardenAmount,
+  type DisplayPlaylistEntry,
+  type DisplaySound,
+} from "@/lib/contracts";
 import type { EditableRecognitionFields, MutationAction, RecognitionInput } from "./types";
 
 const REQUEST_KEY_RE = /^[A-Za-z0-9._:-]{8,128}$/;
 const REASONS = new Set(["privacy", "recipient_request", "spam", "duplicate", "test", "safety", "correction", "other"]);
 const ACTIONS = new Set<MutationAction>(["edit", "publish", "hide", "restore", "invalidate", "feature", "unfeature", "delete"]);
+const DISPLAY_SCREEN_ID_SET = new Set<string>(DISPLAY_SCREEN_IDS);
+const DISPLAY_TEMPOS = new Set(["slow", "standard", "fast", "calm", "gentle", "lively"]);
+const DISPLAY_SETTINGS_KEYS = new Set([
+  "mode",
+  "motion",
+  "pauseArrivals",
+  "pauseRotation",
+  "collectionOpen",
+  "lowActivityMinutes",
+  "readingSeconds",
+  "maxBubbles",
+  "gardenAmount",
+  "playlist",
+  "tempo",
+  "durationOverrides",
+  "effects",
+  "sound",
+  "showTrails",
+  "showConstellations",
+  "soundEnabled",
+  "soundVolume",
+  "arrivalChime",
+  "milestoneChime",
+  "externalUrls",
+]);
+const DISPLAY_EFFECT_KEYS = new Set(["trails", "constellations", "sparkles", "background"]);
+const DISPLAY_SOUND_KEYS = new Set(["enabled", "volume", "arrivalChime", "milestoneChime", "arrivalChimes", "milestoneChimes", "arrivalChimeEnabled", "milestoneChimeEnabled"]);
+const DISPLAY_PLAYLIST_KEYS = new Set(["id", "screenId", "screen", "enabled", "durationSeconds"]);
+const MAX_DURATION_SECONDS = 120;
+const MIN_DURATION_SECONDS = 12;
+const MAX_SOUND_VOLUME = 0.4;
 
 export type ValidationIssue = { field: string; code: string };
 
@@ -109,22 +148,151 @@ export function validateAdminListQuery(status: string | null, expression: string
   return { status: normalizedStatus, expression: expressionNumber, from: normalizedFrom, to: normalizedTo };
 }
 
-export function validateSettingsChanges(input: unknown): input is Record<string, unknown> {
-  if (!input || typeof input !== "object" || Array.isArray(input)) return false;
-  const changes = input as Record<string, unknown>;
-  const keys = Object.keys(changes);
-  if (!keys.length) return false;
-  for (const key of keys) {
-    const value = changes[key];
-    if (key === "mode" && (value !== "normal" && value !== "quiet" && value !== "neutral")) return false;
-    if (key === "motion" && (value !== "calm" && value !== "standard" && value !== "lively" && value !== "still")) return false;
-    if (["pauseArrivals", "pauseRotation", "collectionOpen", "showTrails", "showConstellations"].includes(key) && typeof value !== "boolean") return false;
-    if (key === "lowActivityMinutes" && (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 180)) return false;
-    if (key === "readingSeconds" && (typeof value !== "number" || !Number.isInteger(value) || value < 8 || value > 60)) return false;
-    if (key === "maxBubbles" && (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 6)) return false;
-    if (!["mode", "motion", "pauseArrivals", "pauseRotation", "collectionOpen", "lowActivityMinutes", "readingSeconds", "maxBubbles", "showTrails", "showConstellations"].includes(key)) return false;
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function validDuration(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= MIN_DURATION_SECONDS && value <= MAX_DURATION_SECONDS;
+}
+
+function validGardenAmount(value: unknown): value is DisplayGardenAmount {
+  return value === "all-active" || (typeof value === "number" && Number.isSafeInteger(value) && value > 0);
+}
+
+function validOfficialUrls(value: unknown): boolean {
+  if (!isPlainRecord(value)) return false;
+  const keys = Object.keys(value);
+  return keys.length === 2
+    && keys.every((key) => key === "dailyPractice" || key === "peacePromise")
+    && value.dailyPractice === DISPLAY_EXTERNAL_URLS.dailyPractice
+    && value.peacePromise === DISPLAY_EXTERNAL_URLS.peacePromise;
+}
+
+function normalizePlaylistEntry(value: unknown): DisplayPlaylistEntry | null {
+  if (typeof value === "string") {
+    return DISPLAY_SCREEN_ID_SET.has(value) ? { id: value as DisplayPlaylistEntry["id"], enabled: true } : null;
   }
-  return true;
+  if (!isPlainRecord(value)) return null;
+  const keys = Object.keys(value);
+  if (keys.some((key) => !DISPLAY_PLAYLIST_KEYS.has(key))) return null;
+  const rawId = value.id ?? value.screenId ?? value.screen;
+  if (typeof rawId !== "string" || !DISPLAY_SCREEN_ID_SET.has(rawId)) return null;
+  if (typeof value.enabled !== "boolean") return null;
+  if (value.durationSeconds !== undefined && value.durationSeconds !== null && !validDuration(value.durationSeconds)) return null;
+  return {
+    id: rawId as DisplayPlaylistEntry["id"],
+    enabled: value.enabled,
+    ...(value.durationSeconds === undefined || value.durationSeconds === null ? {} : { durationSeconds: value.durationSeconds }),
+  };
+}
+
+function normalizePlaylist(value: unknown): DisplayPlaylistEntry[] | null {
+  if (!Array.isArray(value) || value.length < 1 || value.length > DISPLAY_SCREEN_IDS.length) return null;
+  const result: DisplayPlaylistEntry[] = [];
+  const seen = new Set<string>();
+  for (const item of value) {
+    const entry = normalizePlaylistEntry(item);
+    if (!entry || seen.has(entry.id)) return null;
+    seen.add(entry.id);
+    result.push(entry);
+  }
+  if (!result.some((entry) => entry.enabled)) return null;
+  return result;
+}
+
+function normalizeDurationOverrides(value: unknown): Partial<Record<DisplayPlaylistEntry["id"], number>> | null {
+  if (!isPlainRecord(value)) return null;
+  const result: Partial<Record<DisplayPlaylistEntry["id"], number>> = {};
+  for (const key of Object.keys(value)) {
+    if (!DISPLAY_SCREEN_ID_SET.has(key)) return null;
+    const duration = value[key];
+    if (duration === null) continue;
+    if (!validDuration(duration)) return null;
+    result[key as DisplayPlaylistEntry["id"]] = duration;
+  }
+  return result;
+}
+
+function normalizeEffects(value: unknown): DisplayEffects | null {
+  if (!isPlainRecord(value)) return null;
+  if (Object.keys(value).some((key) => !DISPLAY_EFFECT_KEYS.has(key))) return null;
+  const result: Partial<DisplayEffects> = {};
+  for (const key of DISPLAY_EFFECT_KEYS) {
+    if (value[key] !== undefined && typeof value[key] !== "boolean") return null;
+    if (value[key] !== undefined) result[key as keyof DisplayEffects] = value[key] as never;
+  }
+  if (Object.keys(result).length === 0) return null;
+  return result as DisplayEffects;
+}
+
+function normalizeSound(value: unknown): DisplaySound | null {
+  if (!isPlainRecord(value)) return null;
+  if (Object.keys(value).some((key) => !DISPLAY_SOUND_KEYS.has(key))) return null;
+  const enabled = value.enabled;
+  const volume = value.volume;
+  const arrivalChime = value.arrivalChime ?? value.arrivalChimes ?? value.arrivalChimeEnabled;
+  const milestoneChime = value.milestoneChime ?? value.milestoneChimes ?? value.milestoneChimeEnabled;
+  if (typeof enabled !== "boolean" || typeof volume !== "number" || !Number.isFinite(volume) || volume < 0 || volume > MAX_SOUND_VOLUME) return null;
+  if (typeof arrivalChime !== "boolean" || typeof milestoneChime !== "boolean") return null;
+  return { enabled, volume, arrivalChime, milestoneChime };
+}
+
+/**
+ * Validates and copies display settings changes into a prototype-safe shape.
+ * The copy prevents a JSON object with a special prototype key from reaching
+ * a database bridge or a later object merge.
+ */
+export function normalizeSettingsChanges(input: unknown): Record<string, unknown> | null {
+  if (!isPlainRecord(input)) return null;
+  const keys = Object.keys(input);
+  if (!keys.length || keys.some((key) => !DISPLAY_SETTINGS_KEYS.has(key))) return null;
+  const result: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
+  for (const key of keys) {
+    const value = input[key];
+    if (key === "mode" && (value !== "normal" && value !== "quiet" && value !== "neutral")) return null;
+    if (key === "motion" && (value !== "calm" && value !== "standard" && value !== "lively" && value !== "still")) return null;
+    if (["pauseArrivals", "pauseRotation", "collectionOpen", "showTrails", "showConstellations", "soundEnabled", "arrivalChime", "milestoneChime"].includes(key) && typeof value !== "boolean") return null;
+    if (key === "lowActivityMinutes" && (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1 || value > 180)) return null;
+    if (key === "readingSeconds" && (typeof value !== "number" || !Number.isSafeInteger(value) || value < 8 || value > 60)) return null;
+    if (key === "maxBubbles" && (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1 || value > 6)) return null;
+    if (key === "gardenAmount" && !validGardenAmount(value)) return null;
+    if (key === "tempo" && (typeof value !== "string" || !DISPLAY_TEMPOS.has(value))) return null;
+    if (key === "playlist") {
+      const playlist = normalizePlaylist(value);
+      if (!playlist) return null;
+      result.playlist = playlist;
+      continue;
+    }
+    if (key === "durationOverrides") {
+      const overrides = normalizeDurationOverrides(value);
+      if (!overrides) return null;
+      result.durationOverrides = overrides;
+      continue;
+    }
+    if (key === "effects") {
+      const effects = normalizeEffects(value);
+      if (!effects) return null;
+      result.effects = effects;
+      continue;
+    }
+    if (key === "sound") {
+      const sound = normalizeSound(value);
+      if (!sound) return null;
+      result.sound = sound;
+      continue;
+    }
+    if (key === "soundVolume" && (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > MAX_SOUND_VOLUME)) return null;
+    if (key === "externalUrls" && !validOfficialUrls(value)) return null;
+    result[key] = value;
+  }
+  return result;
+}
+
+export function validateSettingsChanges(input: unknown): input is Record<string, unknown> {
+  return normalizeSettingsChanges(input) !== null;
 }
 
 export function validReason(value: unknown): value is string {

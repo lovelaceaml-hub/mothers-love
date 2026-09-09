@@ -1,4 +1,14 @@
-import type { Aggregate, DisplaySettings, DisplaySnapshot, Recognition } from "@/lib/contracts";
+import {
+  DISPLAY_EXTERNAL_URLS,
+  DISPLAY_SCREEN_IDS,
+  type Aggregate,
+  type DisplayEffects,
+  type DisplayPlaylistEntry,
+  type DisplaySettings,
+  type DisplaySnapshot,
+  type DisplaySound,
+  type Recognition,
+} from "@/lib/contracts";
 import { hasVisibleNameContent } from "@/lib/name-validation";
 import { isIsoDate, graphemeLength } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
@@ -14,6 +24,13 @@ const MAX_CURSOR_LENGTH = 64;
 const MAX_RECOGNITIONS = 1000;
 const MAX_BIGINT = BigInt("9223372036854775807");
 const PUBLIC_DISPLAY_OPERATION_DEADLINE_MS = 8_000;
+const DISPLAY_SCREEN_ID_SET = new Set<string>(DISPLAY_SCREEN_IDS);
+const DISPLAY_TEMPOS = new Set(["slow", "standard", "fast", "calm", "gentle", "lively"]);
+const DISPLAY_EFFECT_KEYS = new Set(["trails", "constellations", "sparkles", "background"]);
+const DISPLAY_SOUND_KEYS = new Set(["enabled", "volume", "arrivalChime", "milestoneChime"]);
+const MIN_DURATION_SECONDS = 12;
+const MAX_DURATION_SECONDS = 120;
+const MAX_SOUND_VOLUME = 0.4;
 
 function parseTimestamp(value: unknown): number | null {
   if (typeof value !== "string" || value.length === 0 || value.length > MAX_TIMESTAMP_LENGTH) return null;
@@ -37,9 +54,87 @@ function projectCursor(value: unknown): string | null {
   return value;
 }
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function projectGardenAmount(value: unknown): "all-active" | number | null {
+  if (value === "all-active") return value;
+  return isSafeInteger(value, 1) ? value : null;
+}
+
+function projectPlaylist(value: unknown): DisplayPlaylistEntry[] | null {
+  if (!Array.isArray(value) || value.length < 1 || value.length > DISPLAY_SCREEN_IDS.length) return null;
+  const entries: DisplayPlaylistEntry[] = [];
+  const seen = new Set<string>();
+  for (const item of value) {
+    if (!isPlainRecord(item)) return null;
+    const keys = Object.keys(item);
+    if (keys.some((key) => !["id", "screenId", "screen", "enabled", "durationSeconds"].includes(key))) return null;
+    const rawId = item.id ?? item.screenId ?? item.screen;
+    if (typeof rawId !== "string" || !DISPLAY_SCREEN_ID_SET.has(rawId) || seen.has(rawId)) return null;
+    if (typeof item.enabled !== "boolean") return null;
+    if (item.durationSeconds !== undefined && item.durationSeconds !== null && (!isSafeInteger(item.durationSeconds, MIN_DURATION_SECONDS) || item.durationSeconds > MAX_DURATION_SECONDS)) return null;
+    seen.add(rawId);
+    entries.push({
+      id: rawId as DisplayPlaylistEntry["id"],
+      enabled: item.enabled,
+      ...(item.durationSeconds === undefined || item.durationSeconds === null ? {} : { durationSeconds: item.durationSeconds }),
+    });
+  }
+  return entries.some((entry) => entry.enabled) ? entries : null;
+}
+
+function projectDurationOverrides(value: unknown): Partial<Record<DisplayPlaylistEntry["id"], number>> | null {
+  if (!isPlainRecord(value)) return null;
+  const result: Partial<Record<DisplayPlaylistEntry["id"], number>> = {};
+  for (const key of Object.keys(value)) {
+    if (!DISPLAY_SCREEN_ID_SET.has(key)) return null;
+    const duration = value[key];
+    if (duration === null) continue;
+    if (!isSafeInteger(duration, MIN_DURATION_SECONDS) || duration > MAX_DURATION_SECONDS) return null;
+    result[key as DisplayPlaylistEntry["id"]] = duration;
+  }
+  return result;
+}
+
+function projectEffects(value: unknown): DisplayEffects | null {
+  if (!isPlainRecord(value)) return null;
+  if (Object.keys(value).some((key) => !DISPLAY_EFFECT_KEYS.has(key))) return null;
+  const result: Partial<DisplayEffects> = {};
+  for (const key of DISPLAY_EFFECT_KEYS) {
+    if (value[key] !== undefined && typeof value[key] !== "boolean") return null;
+    if (value[key] !== undefined) result[key as keyof DisplayEffects] = value[key] as never;
+  }
+  return Object.keys(result).length ? result as DisplayEffects : null;
+}
+
+function projectSound(value: unknown): DisplaySound | null {
+  if (!isPlainRecord(value) || Object.keys(value).some((key) => !DISPLAY_SOUND_KEYS.has(key))) return null;
+  if (typeof value.enabled !== "boolean" || typeof value.volume !== "number" || !Number.isFinite(value.volume) || value.volume < 0 || value.volume > MAX_SOUND_VOLUME) return null;
+  if (typeof value.arrivalChime !== "boolean" || typeof value.milestoneChime !== "boolean") return null;
+  return {
+    enabled: value.enabled,
+    volume: value.volume,
+    arrivalChime: value.arrivalChime,
+    milestoneChime: value.milestoneChime,
+  };
+}
+
+function projectOfficialUrls(value: unknown): typeof DISPLAY_EXTERNAL_URLS | null {
+  if (!isPlainRecord(value)) return null;
+  const keys = Object.keys(value);
+  if (keys.length !== 2 || !keys.every((key) => key === "dailyPractice" || key === "peacePromise")) return null;
+  return value.dailyPractice === DISPLAY_EXTERNAL_URLS.dailyPractice && value.peacePromise === DISPLAY_EXTERNAL_URLS.peacePromise
+    ? DISPLAY_EXTERNAL_URLS
+    : null;
+}
+
 function projectSettings(value: unknown): DisplaySettings | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const settings = value as Record<string, unknown>;
+  if (!isPlainRecord(value)) return null;
+  const settings = value;
   if (!isSafeInteger(settings.version, 1)) return null;
   if (settings.mode !== "normal" && settings.mode !== "quiet" && settings.mode !== "neutral") return null;
   if (settings.motion !== "calm" && settings.motion !== "standard" && settings.motion !== "lively" && settings.motion !== "still") return null;
@@ -47,9 +142,57 @@ function projectSettings(value: unknown): DisplaySettings | null {
   if (typeof settings.collectionOpen !== "boolean") return null;
   if (!isSafeInteger(settings.lowActivityMinutes, 1) || settings.lowActivityMinutes > 180) return null;
   if (!isSafeInteger(settings.readingSeconds, 8) || settings.readingSeconds > 60) return null;
-  if (!isSafeInteger(settings.maxBubbles, 1) || settings.maxBubbles > 6) return null;
   if (typeof settings.showTrails !== "boolean" || typeof settings.showConstellations !== "boolean") return null;
-  return {
+
+  const hasNewContract = ["gardenAmount", "playlist", "tempo", "durationOverrides", "effects", "sound", "externalUrls"].some((key) => Object.prototype.hasOwnProperty.call(settings, key));
+  if (!hasNewContract) {
+    if (!isSafeInteger(settings.maxBubbles, 1) || settings.maxBubbles > 6) return null;
+    return {
+      version: settings.version,
+      mode: settings.mode,
+      motion: settings.motion,
+      pauseArrivals: settings.pauseArrivals,
+      pauseRotation: settings.pauseRotation,
+      collectionOpen: settings.collectionOpen,
+      lowActivityMinutes: settings.lowActivityMinutes,
+      readingSeconds: settings.readingSeconds,
+      maxBubbles: settings.maxBubbles,
+      showTrails: settings.showTrails,
+      showConstellations: settings.showConstellations,
+    };
+  }
+
+  const gardenAmount = projectGardenAmount(settings.gardenAmount);
+  const playlist = projectPlaylist(settings.playlist);
+  if (gardenAmount === null || !playlist) return null;
+  if (typeof settings.tempo !== "string" || !DISPLAY_TEMPOS.has(settings.tempo)) return null;
+  let durationOverrides: DisplaySettings["durationOverrides"];
+  if (settings.durationOverrides !== undefined) {
+    const projectedOverrides = projectDurationOverrides(settings.durationOverrides);
+    if (projectedOverrides === null) return null;
+    durationOverrides = projectedOverrides;
+  }
+  let effects: DisplayEffects | undefined;
+  if (settings.effects !== undefined) {
+    const projectedEffects = projectEffects(settings.effects);
+    if (projectedEffects === null) return null;
+    effects = projectedEffects;
+  }
+  let sound: DisplaySound | undefined;
+  if (settings.sound !== undefined) {
+    const projectedSound = projectSound(settings.sound);
+    if (projectedSound === null) return null;
+    sound = projectedSound;
+  }
+  let externalUrls: typeof DISPLAY_EXTERNAL_URLS | undefined;
+  if (settings.externalUrls !== undefined) {
+    const projectedUrls = projectOfficialUrls(settings.externalUrls);
+    if (projectedUrls === null) return null;
+    externalUrls = projectedUrls;
+  }
+  if (settings.maxBubbles !== undefined && (!isSafeInteger(settings.maxBubbles, 1) || settings.maxBubbles > 6)) return null;
+  const compatibilityGardenAmount = gardenAmount === "all-active" ? 4 : Math.min(6, gardenAmount);
+  const projected: DisplaySettings = {
     version: settings.version,
     mode: settings.mode,
     motion: settings.motion,
@@ -58,10 +201,18 @@ function projectSettings(value: unknown): DisplaySettings | null {
     collectionOpen: settings.collectionOpen,
     lowActivityMinutes: settings.lowActivityMinutes,
     readingSeconds: settings.readingSeconds,
-    maxBubbles: settings.maxBubbles,
     showTrails: settings.showTrails,
     showConstellations: settings.showConstellations,
+    maxBubbles: settings.maxBubbles === undefined ? compatibilityGardenAmount : settings.maxBubbles,
+    gardenAmount,
+    playlist,
+    tempo: settings.tempo as DisplaySettings["tempo"],
+    ...(durationOverrides === undefined ? {} : { durationOverrides }),
+    ...(effects === undefined ? {} : { effects }),
+    ...(sound === undefined ? {} : { sound }),
+    ...(externalUrls === undefined ? {} : { externalUrls }),
   };
+  return projected;
 }
 
 function projectAggregate(value: unknown): Aggregate | null {
