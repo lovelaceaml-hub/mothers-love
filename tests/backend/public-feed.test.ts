@@ -51,12 +51,20 @@ describe("public feed projection", () => {
     expect(projected?.items[0]).not.toHaveProperty("reason");
   });
 
+  it("accepts single, full, and Unicode recipient names without truncating them", () => {
+    for (const recipient of ["Cher", "Mary Jane", "张伟"]) {
+      const projected = projectPublicFeed({ ...snapshot, items: [{ ...item, recipient }] });
+      expect(projected?.items[0]?.recipient).toBe(recipient);
+    }
+  });
+
   it("rejects malformed snapshots and unsorted items", () => {
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, expressionIds: [6, 2] }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, message: "" }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, firstPublishedAt: "2026-09-08T10:02:00.000Z" }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, expiresAt: snapshot.serverTime }] })).toBeNull();
-    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "Full Recipient Name" }] })).toBeNull();
+    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "   " }] })).toBeNull();
+    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "🙂".repeat(81) }] })).toBeNull();
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: Array.from({ length: 51 }, () => item) })).toBeNull();
     expect(projectPublicFeed({
       serverTime: snapshot.serverTime,

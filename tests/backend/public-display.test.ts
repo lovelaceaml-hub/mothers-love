@@ -124,11 +124,19 @@ describe("public display projection", () => {
     expect(projected?.recognitions[0]).not.toHaveProperty("reason");
   });
 
+  it("accepts single, full, and Unicode recipient names without truncating them", () => {
+    for (const recipient of ["Cher", "Mary Jane", "张伟"]) {
+      const projected = projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient }] });
+      expect(projected?.recognitions[0]?.recipient).toBe(recipient);
+    }
+  });
+
   it("fails closed for malformed, unsafe, unsorted, or mismatched data", () => {
     expect(projectPublicDisplaySnapshot({ ...snapshot, cursor: "999999999999999999999999.1" })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, message: "" }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, status: "held" }] })).toBeNull();
-    expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient: "Full Recipient Name" }] })).toBeNull();
+    expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient: "   " }] })).toBeNull();
+    expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: [{ ...recognition, recipient: "🙂".repeat(81) }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, arrivals: [{ ...snapshot.arrivals[0], recognitionId: "00000000-0000-4000-8000-000000000099" }] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, settings: { ...settings, mode: "quiet" }, recognitions: [recognition] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: Array.from({ length: 1001 }, (_, index) => ({ ...recognition, id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}` })) })).toBeNull();
