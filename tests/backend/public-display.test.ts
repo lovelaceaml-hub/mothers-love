@@ -65,8 +65,19 @@ const snapshot = {
   arrivals: [{ eventId: "12", recognitionId: recognition.id, publishedAt: recognition.firstPublishedAt }],
 };
 
-function request(path = "/api/display/snapshot") {
-  return new NextRequest(`https://mothers-love.example${path}`);
+function request(path = "/api/display/snapshot", signal?: AbortSignal) {
+  return new NextRequest(`https://mothers-love.example${path}`, { signal });
+}
+
+function mockTransactionalDatabase(select: () => Promise<unknown>) {
+  const transaction = vi.fn((strings: TemplateStringsArray, ..._values: unknown[]) => {
+    const statement = strings.join("?");
+    if (statement.includes("set local statement_timeout")) return Promise.resolve([]);
+    return select();
+  });
+  const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => callback(transaction));
+  databaseClient.mockReturnValue({ begin });
+  return { begin, transaction };
 }
 
 beforeEach(() => {
@@ -180,8 +191,7 @@ describe("public display projection", () => {
 
 describe("GET /api/display/snapshot", () => {
   it("uses the public bridge, returns the safe snapshot, and never sets a cookie", async () => {
-    const rpc = vi.fn().mockResolvedValue([{ result: { ...snapshot, privateAudit: "remove" } }]);
-    databaseClient.mockReturnValue(rpc);
+    const database = mockTransactionalDatabase(async () => [{ result: { ...snapshot, privateAudit: "remove" } }]);
 
     const response = await GET(request("/api/display/snapshot?after=11.1788861600"));
 
@@ -191,17 +201,22 @@ describe("GET /api/display/snapshot", () => {
     expect(response.headers.get("set-cookie")).toBeNull();
     const { ok: _ok, ...expectedSnapshot } = snapshot;
     expect(await response.json()).toEqual(expectedSnapshot);
-    expect(rpc).toHaveBeenCalledTimes(1);
-    expect(String(rpc.mock.calls[0]?.[0]?.[0])).toContain("public.ml_public_display_snapshot");
+    expect(database.begin).toHaveBeenCalledWith("read only", expect.any(Function));
+    expect(database.transaction).toHaveBeenCalledTimes(2);
+    expect(String(database.transaction.mock.calls[0]?.[0]?.[0])).toContain("set local statement_timeout = '5000ms'");
+    expect(String(database.transaction.mock.calls[1]?.[0]?.[0])).toContain("public.ml_public_display_snapshot");
+    expect(database.transaction.mock.calls[1]?.[1]).toBe("11.1788861600");
   });
 
   it("maps transport and malformed bridge failures to a safe unavailable response", async () => {
-    databaseClient.mockReturnValue(vi.fn().mockRejectedValue(new Error("private database detail")));
+    mockTransactionalDatabase(async () => {
+      throw new Error("private database detail");
+    });
     const transportResponse = await GET(request());
     expect(transportResponse.status).toBe(503);
     expect(await transportResponse.json()).toEqual({ ok: false, error: "UNAVAILABLE", code: "UNAVAILABLE" });
 
-    databaseClient.mockReturnValue(vi.fn().mockResolvedValue([{ result: { ...snapshot, recognitions: [{ ...recognition, status: "held" }] } }]));
+    mockTransactionalDatabase(async () => [{ result: { ...snapshot, recognitions: [{ ...recognition, status: "held" }] } }]);
     const malformedResponse = await GET(request());
     expect(malformedResponse.status).toBe(503);
     expect(await malformedResponse.json()).toEqual({ ok: false, error: "UNAVAILABLE", code: "UNAVAILABLE" });
@@ -226,9 +241,91 @@ describe("GET /api/display/snapshot", () => {
   it("releases the admission slot when the database query fails", async () => {
     const release = vi.fn();
     admitPublicDisplayRequest.mockReturnValue({ release });
-    databaseClient.mockReturnValue(vi.fn().mockRejectedValue(new Error("synthetic transport failure")));
+    mockTransactionalDatabase(async () => {
+      throw new Error("synthetic transport failure");
+    });
     const response = await GET(request());
     expect(response.status).toBe(503);
     expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not admit or enqueue a request that was already aborted", async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    const response = await GET(request("/api/display/snapshot", controller.signal));
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(admitPublicDisplayRequest).not.toHaveBeenCalled();
+    expect(databaseClient).not.toHaveBeenCalled();
+  });
+
+  it("skips every transaction statement when a queued request aborts before execution", async () => {
+    const controller = new AbortController();
+    const release = vi.fn();
+    admitPublicDisplayRequest.mockReturnValue({ release });
+    let releaseQueue: (() => void) | undefined;
+    const transaction = vi.fn();
+    const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => {
+      await new Promise<void>((resolve) => {
+        releaseQueue = resolve;
+      });
+      return callback(transaction);
+    });
+    databaseClient.mockReturnValue({ begin });
+
+    const pendingResponse = GET(request("/api/display/snapshot", controller.signal));
+    await vi.waitFor(() => expect(releaseQueue).toBeDefined());
+    controller.abort();
+    releaseQueue?.();
+    const response = await pendingResponse;
+
+    expect(response.status).toBe(503);
+    expect(transaction).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops after configuring the deadline when the request aborts before the display query", async () => {
+    const controller = new AbortController();
+    const release = vi.fn();
+    admitPublicDisplayRequest.mockReturnValue({ release });
+    let finishTimeoutSetup: (() => void) | undefined;
+    const transaction = vi.fn((strings: TemplateStringsArray) => {
+      if (!strings.join("?").includes("set local statement_timeout")) return Promise.resolve([{ result: snapshot }]);
+      return new Promise<unknown[]>((resolve) => {
+        finishTimeoutSetup = () => resolve([]);
+      });
+    });
+    const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => callback(transaction));
+    databaseClient.mockReturnValue({ begin });
+
+    const pendingResponse = GET(request("/api/display/snapshot", controller.signal));
+    await vi.waitFor(() => expect(finishTimeoutSetup).toBeDefined());
+    controller.abort();
+    finishTimeoutSetup?.();
+    const response = await pendingResponse;
+
+    expect(response.status).toBe(503);
+    expect(transaction).toHaveBeenCalledTimes(1);
+    expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it("recovers after a statement timeout and reapplies the transaction-scoped deadline", async () => {
+    let attempts = 0;
+    const database = mockTransactionalDatabase(async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("canceling statement due to statement timeout");
+      return [{ result: snapshot }];
+    });
+
+    const timeoutResponse = await GET(request());
+    const recoveryResponse = await GET(request());
+
+    expect(timeoutResponse.status).toBe(503);
+    expect(recoveryResponse.status).toBe(200);
+    expect(database.begin).toHaveBeenCalledTimes(2);
+    const timeoutStatements = database.transaction.mock.calls.filter((call) => String(call[0]?.[0]).includes("set local statement_timeout"));
+    expect(timeoutStatements).toHaveLength(2);
   });
 });
