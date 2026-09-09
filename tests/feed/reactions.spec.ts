@@ -79,7 +79,8 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   const delayedRead = new Promise<void>((resolve) => { releaseRead = resolve; });
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
 
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2029-12-31T12:00:00.000Z') });
+  await page.clock.pauseAt(new Date(serverTime));
   await page.addInitScript(() => {
     const nativeSetInterval = window.setInterval;
     window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
@@ -105,8 +106,12 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
 
   await page.goto('/');
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
-  await expect(heart).toBeEnabled();
+  await expect.poll(async () => {
+    await page.clock.runFor(1);
+    return heart.isEnabled().catch(() => false);
+  }).toBe(true);
   await heart.click();
+  await expect.poll(() => putCount).toBe(1);
   await page.clock.fastForward(7_000);
   await expect.poll(() => readCount).toBe(2);
   await expect(heart).toBeDisabled();
@@ -184,7 +189,8 @@ test('does not resurrect a hidden item after a pending write returns', async ({ 
 });
 
 test('does not resurrect an expired item after a pending write returns', async ({ page }) => {
-  await page.clock.install({ time: new Date('2030-01-01T12:00:00.000Z') });
+  await page.clock.install({ time: new Date('2029-12-31T12:00:00.000Z') });
+  await page.clock.pauseAt(new Date(serverTime));
   await page.addInitScript(() => {
     const nativeSetInterval = window.setInterval;
     window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
@@ -195,9 +201,8 @@ test('does not resurrect an expired item after a pending write returns', async (
   let putStarted = false;
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
   await page.route('**/api/feed', async (route) => {
-    const acceptedServerTime = await page.evaluate(() => new Date().toISOString());
-    const expiresAt = new Date(Date.parse(acceptedServerTime) + 1_000).toISOString();
-    await route.fulfill({ json: { serverTime: acceptedServerTime, items: [{ ...feedItem, expiresAt }] } });
+    const expiresAt = new Date(Date.parse(serverTime) + 1_000).toISOString();
+    await route.fulfill({ json: { serverTime, items: [{ ...feedItem, expiresAt }] } });
   });
   await page.route('**/api/reactions**', async (route) => {
     if (route.request().method() === 'GET') {
@@ -211,9 +216,10 @@ test('does not resurrect an expired item after a pending write returns', async (
 
   await page.goto('/');
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
-  await expect(heart).toBeEnabled();
-  await page.clock.pauseAt(await page.evaluate(() => Date.now()));
-  await expect(heart).toBeEnabled();
+  await expect.poll(async () => {
+    await page.clock.runFor(1);
+    return heart.isEnabled().catch(() => false);
+  }).toBe(true);
   await heart.click();
   await expect.poll(() => putStarted).toBe(true);
   await page.clock.runFor(1_200);
