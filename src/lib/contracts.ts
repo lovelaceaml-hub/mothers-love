@@ -53,6 +53,72 @@ export interface Aggregate {
 export type DisplayMode = "normal" | "quiet" | "neutral";
 export type DisplayMotion = "calm" | "standard" | "lively" | "still";
 
+export const DISPLAY_SCREEN_IDS = [
+  "garden",
+  "featured",
+  "impact",
+  "expressions",
+  "shared-expression",
+  "spotlight",
+  "daily-practice",
+  "one-kind-word",
+  "everyday-peace",
+  "peace-promise",
+] as const;
+
+export type DisplayScreenId = (typeof DISPLAY_SCREEN_IDS)[number];
+
+export type DisplayGardenAmount = "all-active" | number;
+
+// Tempo is intentionally an allowlist rather than an arbitrary multiplier.
+// The calm and lively aliases keep older settings clients readable while the
+// standard three values are used by the new display studio.
+export type DisplayTempo = "slow" | "standard" | "fast" | "calm" | "gentle" | "lively";
+
+export type DisplayPlaylistEntry = {
+  id: DisplayScreenId;
+  enabled: boolean;
+  durationSeconds?: number;
+};
+
+export type DisplayEffects = {
+  trails: boolean;
+  constellations: boolean;
+  sparkles?: boolean;
+  background?: boolean;
+};
+
+export type DisplaySound = {
+  enabled: boolean;
+  volume: number;
+  arrivalChime: boolean;
+  milestoneChime: boolean;
+};
+
+export const DISPLAY_EXTERNAL_URLS = {
+  dailyPractice: "https://heavenlymotherslove.org/en/checklist",
+  peacePromise: "https://heavenlymotherslove.org/en/signature",
+} as const;
+
+// This alias gives callers a name that emphasizes the trust boundary.
+export const TRUSTED_DISPLAY_URLS = DISPLAY_EXTERNAL_URLS;
+
+export const DEFAULT_DISPLAY_GARDEN_AMOUNT: DisplayGardenAmount = "all-active";
+export const DEFAULT_DISPLAY_TEMPO: DisplayTempo = "standard";
+export const DEFAULT_DISPLAY_PLAYLIST: readonly DisplayPlaylistEntry[] = DISPLAY_SCREEN_IDS.map((id) => ({ id, enabled: true }));
+export const DEFAULT_DISPLAY_EFFECTS: DisplayEffects = {
+  trails: true,
+  constellations: true,
+  sparkles: true,
+  background: true,
+};
+export const DEFAULT_DISPLAY_SOUND: DisplaySound = {
+  enabled: true,
+  volume: 0.2,
+  arrivalChime: true,
+  milestoneChime: true,
+};
+
 export interface DisplaySettings {
   version: number;
   mode: DisplayMode;
@@ -62,7 +128,15 @@ export interface DisplaySettings {
   collectionOpen: boolean;
   lowActivityMinutes: number;
   readingSeconds: number;
+  /** @deprecated Use gardenAmount. Kept while old display clients roll forward. */
   maxBubbles: number;
+  gardenAmount?: DisplayGardenAmount;
+  playlist?: DisplayPlaylistEntry[];
+  tempo?: DisplayTempo;
+  durationOverrides?: Partial<Record<DisplayScreenId, number>>;
+  effects?: DisplayEffects;
+  sound?: DisplaySound;
+  externalUrls?: typeof DISPLAY_EXTERNAL_URLS;
   showTrails: boolean;
   showConstellations: boolean;
 }
