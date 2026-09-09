@@ -2,29 +2,29 @@
 
 Plan ID: 2026-09-09-tv-garden-refresh
 Plan file: /Users/anthony/Projects/mothers-love/docs/PLAN-08-tv-garden-and-submission.md
-Runner: pending
+Runner: Sol integration chat with Terra lane coordinator
 Started: 2026-09-09T07:33Z
-Coordinator: pending
+Coordinator: Terra high, non-editing
 
 ## Baselines
 
 | Repo | Path | Branch | Baseline HEAD |
 |---|---|---|---|
-| pending | pending | pending | pending |
+| mothers-love | /Users/anthony/Projects/mothers-love | codex/mothers-love | 64590968dd5523134835216a1e5a5c2b8305160f |
 
 ## Lanes
 
 | Lane | Title | State | Model | Worktree | Review | Depends on |
 |---|---|---|---|---|---|---|
-| LF | Foundation and safe skeleton | planned | pending | pending | pending | pending |
-| LG | Garden engine | planned | pending | pending | pending | pending |
-| LI | Impact and expressions | planned | pending | pending | pending | pending |
-| LT | Teaching and invitation screens | planned | pending | pending | pending | pending |
-| LC | Display studio | planned | pending | pending | pending | pending |
-| LS | Submission experience | planned | pending | pending | pending | pending |
-| LP | Performance and resilience evidence | planned | pending | pending | pending | pending |
-| LV | Browser and accessibility coverage | planned | pending | pending | pending | pending |
-| LR | Integration and release | planned | pending | pending | pending | pending |
+| LF | Foundation and safe skeleton | integrated | Luna xhigh | tv-garden-foundation | Sol passed | none |
+| LG | Garden engine | active | Luna xhigh | tv-garden-garden | Sol after landing | LF |
+| LI | Impact and expressions | active | Luna xhigh | tv-garden-insights | Sol after landing | LF |
+| LT | Teaching and invitation screens | active | Luna xhigh | tv-garden-teaching | Sol after landing | LF |
+| LC | Display studio | active | Luna xhigh | tv-garden-controls | Sol after landing | LF |
+| LS | Submission experience | active | Luna xhigh | tv-garden-submission | Sol after landing | LF |
+| LP | Performance and resilience evidence | active | Luna xhigh | tv-garden-performance | Sol after landing | LF |
+| LV | Browser and accessibility coverage | active | Luna xhigh | tv-garden-verification | Sol after landing | LF |
+| LR | Integration and release | active | Sol | main integration worktree | final Terra review | all feature lanes |
 
 ## Folders
 
@@ -39,12 +39,12 @@ Coordinator: pending
 - Rule diagram: pending
 - Lane board: pending
 
-<!-- lane: LF state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LG state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LI state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LT state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LC state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LS state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LP state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LV state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
-<!-- lane: LR state: planned model: pending worktree: pending review: pending updated: 2026-09-09T07:33Z -->
+<!-- lane: LF state: integrated model: Luna-xhigh worktree: tv-garden-foundation review: Sol-passed updated: 2026-09-09T07:52Z -->
+<!-- lane: LG state: active model: Luna-xhigh worktree: tv-garden-garden review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LI state: active model: Luna-xhigh worktree: tv-garden-insights review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LT state: active model: Luna-xhigh worktree: tv-garden-teaching review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LC state: active model: Luna-xhigh worktree: tv-garden-controls review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LS state: active model: Luna-xhigh worktree: tv-garden-submission review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LP state: active model: Luna-xhigh worktree: tv-garden-performance review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LV state: active model: Luna-xhigh worktree: tv-garden-verification review: Sol-after-landing updated: 2026-09-09T07:52Z -->
+<!-- lane: LR state: active model: Sol worktree: main-integration review: final-Terra updated: 2026-09-09T07:35Z -->
