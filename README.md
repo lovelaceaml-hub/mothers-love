@@ -1,5 +1,9 @@
 # The Words of Mother's Love
 
+## Interview completion update
+
+The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](docs/PLAN-09-interview-completion.md). Release verification is in progress. Latest instructions use Luna max lanes plus controller corrections, no Terra.
+
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).

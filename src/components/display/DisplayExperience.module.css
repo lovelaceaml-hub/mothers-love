@@ -2805,3 +2805,18 @@
   0%, 100% { opacity: 0.94; transform: translate3d(0, 0, 0) scale(1); }
   50% { opacity: 1; transform: translate3d(0, -0.18vh, 0) scale(1.006); }
 }
+
+.chimeEnable {
+  border: 1px solid #966b55; border-radius: 999px; background: #fff6dc;
+  color: #503429; padding: .45rem .8rem; font: inherit; cursor: pointer;
+}
+.chimeEnable:focus-visible { outline: 3px solid #754a85; outline-offset: 3px; }
+.arrivalPersonalScreen[data-entry-treatment='seed'] .arrivalOrb { animation: arrivalSeedFlight 2.5s ease-out both; }
+.arrivalPersonalScreen[data-entry-treatment='ribbon'] .arrivalOrb { animation: arrivalRibbonFlight 2.5s ease-out both; }
+.arrivalPersonalScreen[data-entry-treatment='bloom'] .arrivalOrb { animation: arrivalBloomFlight 2.5s ease-out both; }
+@keyframes arrivalSeedFlight { from { transform: translate(-36vw, 26vh) scale(.12); opacity: 0; } to { transform: translate(0, 0) scale(1); opacity: 1; } }
+@keyframes arrivalRibbonFlight { from { transform: translate(35vw, -15vh) rotate(-120deg) scale(.35); opacity: 0; } to { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; } }
+@keyframes arrivalBloomFlight { 0% { transform: scale(.1); opacity: 0; } 75% { transform: scale(1.14); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.motionstill .arrivalOrb { animation: none !important; }
+
+.displayApp[data-paused="true"] *, .displayApp[data-paused="true"] *::before, .displayApp[data-paused="true"] *::after { animation-play-state: paused !important; }

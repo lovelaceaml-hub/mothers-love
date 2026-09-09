@@ -17,7 +17,7 @@ import {
 } from '@/lib/contracts';
 import { useAdminSession } from './admin-shell';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
-import { displaySettingChanges } from './admin-utils';
+import { DisplayStudioPreview } from '@/components/display/preview';
 import styles from './display-controls/display-controls.module.css';
 
 type Overview = { settings: DisplaySettings; aggregate: { recognitions: number; expressionTotal: number } };
@@ -67,6 +67,33 @@ export const soundWithDefaults = (settings: DisplaySettings): DisplaySound => ({
 export const gardenAmountWithDefaults = (settings: DisplaySettings): DisplayGardenAmount => settings.gardenAmount ?? 'all-active';
 const displayName = (id: DisplayScreenId): string => SCREEN_INFO[id].title;
 
+function sameSettingValue(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) return true;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false;
+    return left.every((value, index) => sameSettingValue(value, right[index]));
+  }
+  if (left && right && typeof left === 'object' && typeof right === 'object') {
+    const leftRecord = left as Record<string, unknown>;
+    const rightRecord = right as Record<string, unknown>;
+    const leftKeys = Object.keys(leftRecord);
+    const rightKeys = Object.keys(rightRecord);
+    if (leftKeys.length !== rightKeys.length || leftKeys.some((key) => !Object.prototype.hasOwnProperty.call(rightRecord, key))) return false;
+    return leftKeys.every((key) => sameSettingValue(leftRecord[key], rightRecord[key]));
+  }
+  return false;
+}
+
+export const displayChanges = (current: DisplaySettings, next: Partial<DisplaySettings>): Partial<DisplaySettings> => {
+  const changes: Partial<DisplaySettings> = {};
+  for (const [key, value] of Object.entries(next)) {
+    if (!sameSettingValue(current[key as keyof DisplaySettings], value)) {
+      (changes as Record<string, unknown>)[key] = value;
+    }
+  }
+  return changes;
+};
+
 function Toggle({
   label,
   hint,
@@ -96,47 +123,6 @@ function Toggle({
       >
         <span className={styles.switchKnob} aria-hidden="true" />
       </button>
-    </div>
-  );
-}
-
-function Preview({
-  mode,
-  aggregate,
-  settings,
-  preview,
-  onPreviewChange,
-}: {
-  mode: DisplaySettings['mode'];
-  aggregate: Overview['aggregate'] | null;
-  settings: DisplaySettings;
-  preview: 'sample' | 'approved';
-  onPreviewChange: (preview: 'sample' | 'approved') => void;
-}) {
-  const approved = mode === 'neutral' || mode === 'quiet' ? 'Display content is currently held back.' : 'Approved content is ready for the next display refresh.';
-  const previewLabel = preview === 'sample' ? 'Safe sample' : 'Current approved live state';
-  const gardenAmount = gardenAmountWithDefaults(settings);
-  const gardenLabel = gardenAmount === 'all-active' ? 'All active' : `${gardenAmount} active`;
-
-  return (
-    <div className={styles.previewShell} aria-label="Display preview">
-      <div className={styles.previewTopline}>
-        <div><p className={styles.previewKicker}>Studio preview</p><h3 className={styles.previewTitle}>{previewLabel}</h3></div>
-        <span className={styles.previewLiveBadge}>{preview === 'sample' ? 'Private sample' : 'Approved state'}</span>
-      </div>
-      <div className={styles.previewSwitch} role="group" aria-label="Preview source">
-        <button type="button" className={preview === 'sample' ? styles.previewSwitchActive : styles.previewSwitchButton} aria-pressed={preview === 'sample'} onClick={() => onPreviewChange('sample')}>Safe sample</button>
-        <button type="button" className={preview === 'approved' ? styles.previewSwitchActive : styles.previewSwitchButton} aria-pressed={preview === 'approved'} onClick={() => onPreviewChange('approved')}>Current approved</button>
-      </div>
-      <div className={`${styles.previewStage} ${preview === 'approved' ? styles.previewStageApproved : styles.previewStageSample}`}>
-        <div className={styles.previewOrb} aria-hidden="true"><span /><span /><span /></div>
-        <div className={styles.previewCopy}>
-          <p className={styles.previewOverline}>{preview === 'sample' ? 'Synthetic preview only' : `Live mode: ${mode}`}</p>
-          <p className={styles.previewMessage}>{preview === 'sample' ? 'A caring word makes room for peace.' : approved}</p>
-          <p className={styles.previewMeta}>{preview === 'sample' ? 'Recipient: Sample only' : `${aggregate?.recognitions ?? 0} approved recognitions · ${aggregate?.expressionTotal ?? 0} expressions`}</p>
-        </div>
-      </div>
-      <div className={styles.previewFacts}><span><strong>{gardenLabel}</strong> garden</span><span><strong>{legacyTempo(settings)}</strong> tempo</span><span><strong>{settings.pauseRotation ? 'Paused' : 'Moving'}</strong> rotation</span></div>
     </div>
   );
 }
@@ -281,7 +267,7 @@ export function DisplayControls() {
     };
   }, [draft, settings]);
 
-  const changes = useMemo(() => settings ? displaySettingChanges(settings, draft) : {}, [draft, settings]);
+  const changes = useMemo(() => settings ? displayChanges(settings, draft) : {}, [draft, settings]);
   const setValue = <K extends keyof DisplaySettings>(key: K, value: DisplaySettings[K]) => setDraft((current) => ({ ...current, [key]: value }));
 
   const save = async () => {
@@ -352,12 +338,12 @@ export function DisplayControls() {
       <section className={styles.heroGrid} aria-label="Display studio overview">
         <article className={styles.heroCard}>
           <div className={styles.heroHeader}><div><p className={styles.eyebrow}>Owner display studio</p><h2 className={styles.heroTitle}>Shape the living wall</h2><p className={styles.heroDescription}>Tune a fixed set of campaign screens for open TV View displays. Your changes stay within the approved campaign experience.</p></div><span className={styles.modeBadge}>{modeLabel}</span></div>
-          <Preview mode={effective.mode} aggregate={aggregate} settings={previewSettings} preview={preview} onPreviewChange={setPreview} />
+          <DisplayStudioPreview aggregate={aggregate} settings={previewSettings} source={preview} sessionKey={session?.id ?? null} onSourceChange={setPreview} />
         </article>
         <article className={styles.statusCard}>
           <div className={styles.cardHeader}><div><p className={styles.eyebrow}>Approved settings</p><h2 className={styles.sectionTitle}>Current display state</h2><p className={styles.sectionHint}>These are the current global settings for open TV View screens.</p></div><span className={styles.approvedPill}>{modeLabel}</span></div>
           <div className={styles.statusList}><div><span>Screen updates</span><strong>{effective.pauseRotation ? 'Paused' : 'Enabled'}</strong></div><div><span>New arrivals</span><strong>{effective.pauseArrivals ? 'Paused' : 'Enabled'}</strong></div><div><span>Current campaign totals</span><strong>{aggregate?.recognitions ?? 0} recognitions · {aggregate?.expressionTotal ?? 0} expressions</strong></div></div>
-          <p className={styles.statusNote}>The current approved preview is a read-only state summary. It never edits or exposes personal recognition fields.</p>
+          <p className={styles.statusNote}>The preview shows the selected TV screen. Current approved content is read-only and never changes the live display.</p>
           <button type="button" className={styles.quietButton} onClick={() => void load()} disabled={loading}>Refresh global settings</button>
         </article>
       </section>
@@ -382,12 +368,12 @@ export function DisplayControls() {
         <article className={`${styles.controlCard} ${styles.controlCardWide}`}><PlaylistEditor playlist={effective.playlist} durationOverrides={effective.durationOverrides} setPlaylist={setPlaylist} setDurationOverrides={setDurationOverrides} /></article>
 
         <article className={styles.controlCard}>
-          <div className={styles.cardHeader}><div><p className={styles.eyebrow}>Atmosphere</p><h2 className={styles.sectionTitle}>Visual effects</h2><p className={styles.sectionHint}>Keep decoration supportive of readable messages.</p></div><span className={styles.smoothBadge}>{effects.background && effects.sparkles ? 'Full detail' : 'Smooth mode'}</span></div>
+          <div className={styles.cardHeader}><div><p className={styles.eyebrow}>Atmosphere</p><h2 className={styles.sectionTitle}>Visual effects</h2><p className={styles.sectionHint}>Keep decoration supportive of readable messages.</p></div></div>
           <Toggle label="Show trails" hint="Decorative trails remain behind readable text." pressed={effects.trails} onChange={() => setEffects('trails')} />
           <Toggle label="Show constellations" hint="Links correspond to shared expressions." pressed={effects.constellations} onChange={() => setEffects('constellations')} />
           <Toggle label="Show sparkles" hint="Adds a restrained shimmer to the garden." pressed={Boolean(effects.sparkles)} onChange={() => setEffects('sparkles')} />
           <Toggle label="Background decoration" hint="Adds the soft color field behind each screen." pressed={Boolean(effects.background)} onChange={() => setEffects('background')} />
-          <div className={styles.smoothNote} role="status"><span className={styles.statusDot} aria-hidden="true" />Smooth mode status: {effects.background && effects.sparkles ? 'ready when the frame needs less decoration' : 'active, with decoration reduced'}</div>
+          <div className={styles.effectsNote} role="status"><span className={styles.statusDot} aria-hidden="true" />Owner effects: {effects.background && effects.sparkles && effects.trails && effects.constellations ? 'all selected effects are enabled.' : 'the selected effect set is applied exactly as configured.'}</div>
         </article>
 
         <article className={styles.controlCard}>

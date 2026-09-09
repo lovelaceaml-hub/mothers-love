@@ -1,7 +1,7 @@
 # Plan 09: Complete the approved interview experience
 
 ## Authority and execution
-Anthony requested completion of every missing interview requirement. Latest instruction: fresh Luna max agents in lanes, controller may implement and correct directly, no Terra. This supersedes Plan 08 roles/effort. Runner: this controller with four disjoint Luna max worktrees. Controller owns integration, Git, verification, corrections, release, and per-lane/cumulative review. Independent Claude completion review where available; no Terra. No new interview or direction round: fulfill approved storyboards.
+Anthony requested completion of every missing interview requirement. Latest instruction: fresh Luna max agents in lanes, controller may implement and correct directly, no Terra. This supersedes Plan 08 roles/effort. Runner: this controller with four disjoint Luna max worktrees. Controller owns integration, Git, verification, corrections, release, and per-lane/cumulative review. Controller integration review; no Terra. Later user direction to build quickly supersedes optional external reviews, surveys, and exhaustive repeated checks. No new interview or direction round: fulfill approved storyboards.
 
 ## Baseline and boundary
 Starting HEAD: 195c05970b967e27addc5e113a858abaa1f4cec6, clean tracked worktree. Preserve released circles, full messages, rich effects, and no automatic visual downgrade. Source/synthetic evidence are private-Git safe. No real recognition data, credentials, private snapshots, or live sessions in agents, tests, screenshots, or Git. Do not modify database schema or unrelated services. Hosting stays https://mothers-love.vercel.app; rollback is baseline source/deployment.
@@ -29,3 +29,5 @@ Map all interview choices in research/completion-matrix.md. Verify animation pha
 
 ## Build log
 - 2026-09-09: Clean baseline recorded after other task completed. Luna max and no Terra honored. Four disjoint lanes start together; root corrects shared implementation. In progress.
+
+- 2026-09-09: User requested immediate completion with less overhead. All four lanes integrated. Root fixed timeline double advancement, readable card layout, true single-scene everyday journey, stable preview lessons, isolated scaled preview canvas, stale preview clearing, and shared readable Featured view. Final focused checks and release in progress.

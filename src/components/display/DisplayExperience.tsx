@@ -16,7 +16,7 @@ import {
 } from '@/components/display/garden';
 import { MonthlyImpact, NineExpressions, SharedExpression } from '@/components/display/insights';
 import { DailyPractice, EverydayPeace, ExpressionSpotlight, OneKindWord, PeacePromise } from '@/components/display/teaching/TeachingScreens';
-import { SmoothModeIndicator } from '@/components/display/performance/SmoothModeIndicator';
+import { useDisplayChimes } from './use-display-chimes';
 import {
   createAdaptiveQualityState,
   createRequestInFlightGuard,
@@ -28,6 +28,7 @@ import {
 
 import {
   createInitialState,
+  storyIndexFor,
   displayReducer,
   effectiveMotion,
   isGroupedArrival,
@@ -276,6 +277,7 @@ function GardenScreen({ state }: ScreenProps) {
         amount={state.settings.gardenAmount ?? state.settings.maxBubbles}
         pool={{ activeIds: state.gardenIds, presentationHistory: state.presentationHistory, rotation: state.playlistIndex }}
         nowMs={state.nowMs + state.serverOffsetMs}
+        introducedAt={state.gardenIntroducedAt}
         decoration={visualQuality.decoration}
         tempo={gardenTempo}
         motion={gardenMotion}
@@ -300,14 +302,18 @@ function EmptyGarden() {
 function FeaturedScreen({ state, reactionCounts }: ScreenProps) {
   const recognition = selectFeatured(state);
   if (!recognition) return <FallbackScreen />;
+  return <FeaturedRecognitionView recognition={recognition} readingPageIndex={state.readingPageIndex} reactionCount={reactionCounts.get(recognition.id)?.count} />;
+}
+
+export function FeaturedRecognitionView({ recognition, readingPageIndex = 0, reactionCount }: { recognition: Recognition; readingPageIndex?: number; reactionCount?: number }) {
   const primary = expression(recognition.expressionIds[0]);
   const messagePages = splitVerbatimMessage(recognition.message);
   const pageCount = recognitionReadingPageCount(recognition);
-  const pageIndex = Math.min(state.readingPageIndex, pageCount - 1);
+  const pageIndex = Math.min(readingPageIndex, pageCount - 1);
   const expressionPage = isExpressionPage(recognition, pageIndex);
   const pageLabel = readingPageLabel(pageIndex, pageCount);
   return (
-    <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="display-screen-heading" data-motion-key="featured-shimmer">
+    <section className={`${styles.screen} ${styles.featuredScreen}`} aria-labelledby="featured-title" data-motion-key="featured-shimmer">
       <div className={styles.featureExpression} style={{ backgroundColor: primary.color }}>
         <p className={styles.eyebrow}>AN EXPRESSION OF MOTHER&apos;S LOVE</p>
         <span className={styles.featureNumber}>{String(primary.id).padStart(2, '0')}</span>
@@ -335,7 +341,7 @@ function FeaturedScreen({ state, reactionCounts }: ScreenProps) {
             {recognition.expressionIds.map((id) => <ExpressionPill key={id} id={id} />)}
           </div>
         ) : null}
-        {reactionCounts.has(recognition.id) ? <div className={styles.featureReaction} aria-label={`${reactionCounts.get(recognition.id)?.count ?? 0} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reactionCounts.get(recognition.id)?.count ?? 0} /></div> : null}
+        {reactionCount !== undefined ? <div className={styles.featureReaction} aria-label={`${reactionCount ?? 0} hearts`}><span aria-hidden="true">♥</span> <ReactionCount count={reactionCount ?? 0} /></div> : null}
         {pageLabel ? <p className={styles.continuationLabel} aria-live="polite">{pageLabel}</p> : null}
       </div>
     </section>
@@ -363,31 +369,23 @@ function ClusterScreen({ state, reactionCounts }: ScreenProps) {
   );
 }
 
-function ImpactScreen({ snapshot }: { snapshot: DisplaySnapshot | null }) {
-  return <MonthlyImpact aggregate={snapshot?.aggregate} />;
+function ImpactScreen({ state }: { state: PresentationState }) {
+  return <MonthlyImpact aggregate={state.snapshot?.aggregate} motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
 }
 
-function ExpressionsScreen() {
-  return <NineExpressions />;
+function ExpressionsScreen({ state }: { state: PresentationState }) {
+  return <NineExpressions motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
 }
 
 function SharedExpressionScreen({ state }: { state: PresentationState }) {
-  return <SharedExpression recognitions={selectEligible(state)} expressionId={state.clusterExpressionId} />;
+  return <SharedExpression recognitions={selectEligible(state)} expressionId={state.clusterExpressionId} motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
 }
 
 function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
   const recognition = state.activeArrival ? selectEligible(state).find((item) => item.id === state.activeArrival?.id) : null;
   if (!recognition) return <FallbackScreen />;
   if (isGroupedArrival(state)) {
-    return (
-      <section className={`${styles.arrivalScreen} ${styles.arrivalGroupScreen}`} aria-live="polite" aria-labelledby="display-screen-heading" data-motion-key="arrival-gather">
-        <div className={`${styles.arrivalOrb} ${state.activeArrival?.phase === 'reading' ? styles.arrivalOrbLanded : ''}`} style={{ backgroundColor: '#a5c9ff' }} aria-hidden="true" />
-        <p className={styles.eyebrow}>A FEW RECOGNITIONS HAVE ARRIVED</p>
-        <h2 id="arrival-title">The garden has new gratitude.</h2>
-        <p className={styles.fullMessage}>Each recognition will make room in the garden in a fair rotation.</p>
-        <p className={styles.arrivalGroupNote}>The display is welcoming a small group of new recognitions.</p>
-      </section>
-    );
+    return <GardenArrivalScene arrivals={selectEligible(state).filter(item => state.queue.some(queued => queued.id === item.id))} rotation={state.introducedPublicationKeys.length} reducedMotion={effectiveMotion(state) === 'still'} />;
   }
   const messagePages = splitVerbatimMessage(recognition.message);
   const pageCount = recognitionReadingPageCount(recognition);
@@ -400,6 +398,7 @@ function ArrivalScreen({ state, reactionCounts }: ScreenProps) {
       aria-live="polite"
       aria-labelledby="display-screen-heading"
       data-testid="arrival-reading"
+      data-entry-treatment={['seed', 'ribbon', 'bloom'][state.introducedPublicationKeys.length % 3]}
       data-page-index={pageIndex}
       data-page-count={pageCount}
       data-motion-key="arrival-land"
@@ -592,18 +591,20 @@ function DisplayStage({ state, personalContentVisible, liveRailItems, reactionCo
   );
 }
 
+function storyElapsed(state: PresentationState) { return Math.max(0, (state.pauseStartedAtMs ?? state.nowMs) - state.screenStartedAtMs); }
+
 function Screen({ state, reactionCounts, quality }: ScreenProps) {
   switch (state.screen) {
     case 'garden': return <GardenScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
     case 'featured': return <FeaturedScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
     case 'cluster': return <SharedExpressionScreen state={state} />;
-    case 'impact': return <ImpactScreen snapshot={state.snapshot} />;
-    case 'all-nine': return <ExpressionsScreen />;
-    case 'spotlight': return <ExpressionSpotlight expressionIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
-    case 'daily-practice': return <DailyPractice expressionIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
-    case 'one-kind-word': return <OneKindWord wordIndex={state.playlistIndex} motion={effectiveMotion(state)} />;
-    case 'everyday-peace': return <EverydayPeace motion={effectiveMotion(state)} />;
-    case 'peace-promise': return <PeacePromise motion={effectiveMotion(state)} />;
+    case 'impact': return <ImpactScreen state={state} />;
+    case 'all-nine': return <ExpressionsScreen state={state} />;
+    case 'spotlight': return <ExpressionSpotlight expressionIndex={storyIndexFor(state, state.screen)} motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
+    case 'daily-practice': return <DailyPractice expressionIndex={storyIndexFor(state, state.screen)} motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
+    case 'one-kind-word': return <OneKindWord wordIndex={storyIndexFor(state, state.screen)} motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
+    case 'everyday-peace': return <EverydayPeace motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
+    case 'peace-promise': return <PeacePromise motion={effectiveMotion(state)} elapsedMs={storyElapsed(state)} />;
     case 'arrival': return <ArrivalScreen state={state} reactionCounts={reactionCounts} quality={quality} />;
     case 'milestone': return state.snapshot ? <GardenMilestoneScene aggregate={projectGardenAggregate(state.snapshot.aggregate)} approvalTotal={state.snapshot.aggregate.recognitions} celebrated={state.celebratedMilestones[state.snapshot.aggregate.periodStart.slice(0, 7)] ?? []} reducedMotion={effectiveMotion(state) === 'still'} /> : <MilestoneScreen state={state} />;
     case 'quiet': return <QuietScreen />;
@@ -616,10 +617,9 @@ function Screen({ state, reactionCounts, quality }: ScreenProps) {
 export function DisplayExperience() {
   const [state, dispatch] = useReducer(displayReducer, undefined, createInitialState);
   const [quality, setQuality] = useState<AdaptiveQualityState>(() => createAdaptiveQualityState());
-  const soundEnabled = state.settings.sound?.enabled ?? false;
-  const soundVolume = state.settings.sound?.volume ?? 0;
-  const arrivalChimeEnabled = state.settings.sound?.arrivalChime ?? false;
-  const milestoneChimeEnabled = state.settings.sound?.milestoneChime ?? false;
+  const chimes = useDisplayChimes(state.settings.sound,
+    state.screen === 'milestone' ? { key: `milestone:${state.snapshot?.aggregate.periodStart}:${state.pendingMilestone}`, kind: 'milestone' }
+      : state.screen === 'arrival' && state.activeArrival?.phase === 'journey' ? { key: `arrival:${state.activeArrival.id}`, kind: 'arrival' } : null);
   const stateRef = useRef<PresentationState | null>(null);
   const qualityRef = useRef<AdaptiveQualityState>(quality);
   const displayOpenedAt = useRef<number | null>(null);
@@ -749,37 +749,6 @@ export function DisplayExperience() {
     return () => media.removeEventListener?.('change', update);
   }, []);
 
-  useEffect(() => {
-    const isArrival = state.screen === 'arrival' && state.activeArrival?.phase === 'journey';
-    const isMilestone = state.screen === 'milestone';
-    if (!soundEnabled || (!isArrival && !isMilestone) || (isArrival && !arrivalChimeEnabled) || (isMilestone && !milestoneChimeEnabled)) return;
-    const Context = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Context) return;
-    const context = new Context();
-    const play = () => {
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(isMilestone ? 660 : 523.25, context.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(isMilestone ? 880 : 659.25, context.currentTime + 0.22);
-      gain.gain.setValueAtTime(0.0001, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, Math.min(0.08, soundVolume * 0.2)), context.currentTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.42);
-      oscillator.connect(gain).connect(context.destination);
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.45);
-    };
-    void context.resume().then(play).catch(() => undefined);
-    return () => void context.close();
-  }, [
-    state.activeArrival?.phase,
-    state.screen,
-    arrivalChimeEnabled,
-    milestoneChimeEnabled,
-    soundEnabled,
-    soundVolume,
-  ]);
-
   useEffect(() => () => {
     snapshotRequestGeneration.current += 1;
     snapshotRequestGuard.current.invalidate();
@@ -823,6 +792,7 @@ export function DisplayExperience() {
       data-testid="display-app"
       data-screen={state.screen}
       data-motion={motion}
+      data-paused={state.pauseRotation}
       data-quality={quality.level}
       data-eligible-count={eligibleCount}
       data-rail-count={railVisible ? liveRailItems.length : 0}
@@ -839,9 +809,9 @@ export function DisplayExperience() {
           <h2 id="display-screen-heading">{SCREEN_HEADINGS[state.screen].title}</h2>
         </div>
         <div className={styles.statusCluster} aria-live="polite">
+          {state.settings.sound?.enabled && !chimes.ready && !chimes.unsupported ? <button type="button" className={styles.chimeEnable} onClick={chimes.enable}>Enable chimes on this screen</button> : null}
           {state.stale ? <span className={styles.staleStatus}>Reconnecting</span> : null}
           {state.lowActivity ? <span className={styles.lowActivityStatus}>Low activity</span> : null}
-          <SmoothModeIndicator quality={quality.level} className={styles.lowActivityStatus} />
           {state.queue.length ? <span>{state.queue.length} waiting</span> : null}
         </div>
       </header>

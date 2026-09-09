@@ -517,8 +517,8 @@
 
 @keyframes gardenDrift {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(-1deg); }
-  33% { transform: translate3d(1.1%, -1.4%, 0) rotate(1deg); }
-  66% { transform: translate3d(-1.4%, 1.1%, 0) rotate(-2deg); }
+  33% { transform: translate3d(7%, -8%, 0) rotate(1deg); }
+  66% { transform: translate3d(-8%, 7%, 0) rotate(-2deg); }
 }
 
 @keyframes gardenTrail {
@@ -581,3 +581,27 @@
     animation-duration: 520ms;
   }
 }
+
+/* Full words move through the circular reading window without a remote or mouse. */
+.messageContent { display: block; white-space: pre-wrap; }
+.message[data-scrolling='true'] { overflow: hidden !important; }
+.message[data-scrolling='true'] .messageContent {
+  animation: gardenMessageRead var(--message-read-duration, 24s) linear infinite;
+}
+@keyframes gardenMessageRead {
+  0%, 16% { transform: translateY(0); }
+  78%, 94% { transform: translateY(calc(-1 * var(--message-travel, 0px))); }
+  100% { transform: translateY(0); }
+}
+
+.cardSlot { transition: width 1.6s ease, top 2s ease, left 2s ease; }
+.cardSlot[data-fresh='true'] { z-index: 10; }
+.entrySeed .card { animation: seedEntrance 1.8s cubic-bezier(.2,.7,.2,1) both; }
+.entryRibbon .card { animation: ribbonEntrance 1.8s cubic-bezier(.2,.7,.2,1) both; }
+.entryBloom .card { animation: bloomEntrance 1.8s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes seedEntrance { from { transform: translate(-35%, 40%) scale(.2); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ribbonEntrance { from { transform: translate(35%, -25%) rotate(-55deg) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes bloomEntrance { 0% { transform: scale(.15); opacity: 0; } 75% { transform: scale(1.07); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.reducedMotion .card { animation: none; }
+
+.cardMotion, .cardTrail, .backgroundWash { will-change: transform, opacity; }

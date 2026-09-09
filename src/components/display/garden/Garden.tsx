@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, useRef, useEffect, type CSSProperties } from 'react';
 
 import { EXPRESSIONS, expressionById } from '@/lib/catalog';
 
@@ -79,9 +79,10 @@ function cardStyle(
   records: readonly GardenRecognition[],
   nowMs: number,
   tempo: GardenTempo,
+  introducedAtMs?: number,
 ): CSSProperties {
   const layout = GARDEN_LAYOUTS[index % GARDEN_LAYOUTS.length];
-  const fresh = isNewestGardenCard(record, records, nowMs);
+  const fresh = isNewestGardenCard(record, records, nowMs, introducedAtMs);
   return {
     '--garden-left': `${layout.left}%`,
     '--garden-top': `${layout.top}%`,
@@ -111,11 +112,34 @@ const FULL_MESSAGE_STYLE: CSSProperties = {
   WebkitLineClamp: 'unset',
 };
 
+function CompleteGardenMessage({ message, still }: { message: string; still: boolean }) {
+  const viewport = useRef<HTMLParagraphElement>(null);
+  const content = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const node = viewport.current;
+    const text = content.current;
+    if (!node || !text) return;
+    const measure = () => {
+      const overflow = Math.max(0, text.scrollHeight - node.clientHeight);
+      node.style.setProperty('--message-travel', `${overflow}px`);
+      node.style.setProperty('--message-read-duration', `${Math.max(18, message.length / 18)}s`);
+      node.dataset.scrolling = overflow > 2 && !still ? 'true' : 'false';
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    observer.observe(text);
+    measure();
+    return () => observer.disconnect();
+  }, [message, still]);
+  return <p ref={viewport} className={styles.message} style={FULL_MESSAGE_STYLE} data-message-complete="true"><span ref={content} className={styles.messageContent}>{message}</span></p>;
+}
+
 export interface GardenCardProps {
   record: GardenRecognition;
   records?: readonly GardenRecognition[];
   index?: number;
   nowMs?: number;
+  introducedAtMs?: number;
   treatment?: GardenEntryTreatment;
   tempo?: GardenTempo;
   reducedMotion?: boolean;
@@ -127,17 +151,18 @@ export function GardenCard({
   records = [record],
   index = 0,
   nowMs = 0,
+  introducedAtMs,
   treatment = entryTreatmentFor(index),
   tempo = 'standard',
   reducedMotion = false,
   showTrail = true,
 }: GardenCardProps) {
   const detail = detailTierFor(record);
-  const fresh = isNewestGardenCard(record, records, nowMs);
+  const fresh = isNewestGardenCard(record, records, nowMs, introducedAtMs);
   return (
     <div
       className={`${styles.cardSlot} ${fresh ? styles.freshCard : ''}`}
-      style={cardStyle(record, index, records, nowMs, tempo)}
+      style={cardStyle(record, index, records, nowMs, tempo, introducedAtMs)}
       data-testid="garden-card-slot"
       data-fresh={fresh ? 'true' : 'false'}
       data-detail-tier={detail}
@@ -161,7 +186,7 @@ export function GardenCard({
               </span>
             ))}
           </div>
-          <p className={styles.message} style={FULL_MESSAGE_STYLE} data-message-complete="true">{record.message}</p>
+          <CompleteGardenMessage message={record.message} still={reducedMotion} />
         </article>
       </div>
     </div>
@@ -173,6 +198,7 @@ export interface GardenSceneProps {
   amount?: 'all-active' | number;
   pool?: GardenPoolState;
   nowMs?: number;
+  introducedAt?: Record<string, number>;
   decoration?: GardenDecorationLevel;
   tempo?: GardenTempo;
   motion?: GardenMotion;
@@ -186,6 +212,7 @@ export function GardenScene({
   amount = 'all-active',
   pool,
   nowMs = 0,
+  introducedAt,
   decoration = 'full',
   tempo = 'standard',
   motion = 'standard',
@@ -255,6 +282,7 @@ export function GardenScene({
                 records={visibleRecords}
                 index={index}
                 nowMs={nowMs}
+                introducedAtMs={introducedAt?.[record.id]}
                 treatment={entryTreatmentFor(index, pool?.rotation ?? 0)}
                 tempo={tempo}
                 reducedMotion={reducedMotion}

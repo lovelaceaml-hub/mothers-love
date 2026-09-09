@@ -1,0 +1,401 @@
+.shell {
+  --preview-ink: #303342;
+  --preview-muted: #6b6f7b;
+  --preview-line: rgba(48, 51, 66, 0.14);
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(48, 51, 66, 0.12);
+  border-radius: 20px 16px 22px 16px;
+  background: rgba(255, 253, 246, 0.72);
+  color: var(--preview-ink);
+}
+
+.header,
+.controlHeader,
+.canvasHeader,
+.canvasMeta,
+.playbackControls,
+.stageDetails {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kicker,
+.canvasKicker {
+  margin: 0 0 5px;
+  color: #a83f42;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: #693b53;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.hint,
+.stageHint,
+.emptyText,
+.screenMeta,
+.timeText {
+  color: var(--preview-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.hint {
+  max-width: 68ch;
+  margin: 6px 0 0;
+}
+
+.sourceBadge,
+.includedBadge,
+.removedBadge,
+.validationBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sourceBadge {
+  background: #fff0c7;
+  color: #7a5a16;
+}
+
+.validationBadge {
+  background: #e6f6d4;
+  color: #366b3a;
+}
+
+.controlGroup {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid var(--preview-line);
+  border-radius: 13px;
+  background: rgba(255, 253, 246, 0.74);
+}
+
+.controlLabel {
+  margin: 0;
+  color: var(--preview-muted);
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sourceButtons,
+.playbackControls,
+.screenTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.sourceButton,
+.sourceButtonActive,
+.controlButton,
+.screenTab,
+.screenTabActive {
+  min-height: 36px;
+  padding: 8px 11px;
+  border: 1px solid rgba(48, 51, 66, 0.16);
+  border-radius: 9px;
+  background: rgba(255, 253, 246, 0.8);
+  color: var(--preview-ink);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.sourceButtonActive,
+.screenTabActive {
+  border-color: #a83f42;
+  background: #fff0ee;
+  box-shadow: inset 0 0 0 2px rgba(168, 63, 66, 0.1);
+}
+
+.controlButton {
+  background: #303342;
+  color: #fffdf6;
+}
+
+.controlButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.screenTab {
+  display: grid;
+  min-width: min(146px, 100%);
+  gap: 2px;
+  text-align: left;
+}
+
+.screenTab small {
+  color: var(--preview-muted);
+  font-size: 0.61rem;
+  font-weight: 650;
+}
+
+.screenTabActive small {
+  color: #7f272a;
+}
+
+.includedBadge,
+.removedBadge {
+  min-height: 18px;
+  padding: 2px 6px;
+  font-size: 0.57rem;
+}
+
+.includedBadge {
+  background: #e6f6d4;
+  color: #366b3a;
+}
+
+.removedBadge {
+  background: #e8edf2;
+  color: #4c5c6a;
+}
+
+.canvasHeader {
+  align-items: center;
+  margin-top: 2px;
+}
+
+.canvasKicker {
+  margin-bottom: 0;
+}
+
+.stageDetails {
+  align-items: center;
+  margin-top: 8px;
+}
+
+.stageHint,
+.screenMeta,
+.timeText {
+  margin: 0;
+}
+
+.canvasFrame {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(48, 51, 66, 0.15);
+  border-radius: 17px;
+  background: #fffdf6;
+  box-shadow: 0 16px 38px rgba(65, 55, 35, 0.12);
+}
+
+.canvasViewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #fffdf6;
+}
+
+.canvasContent {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.canvasContent > * {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.canvasContent a {
+  pointer-events: none;
+}
+
+.canvasContent :global(.motionStill) *,
+.canvasContent :global(.motionStill) *::before,
+.canvasContent :global(.motionStill) *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.featureScreen {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(22px, 4vw, 64px);
+  border-radius: clamp(22px, 3vw, 48px);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255, 216, 106, 0.35), transparent 26%),
+    linear-gradient(140deg, #fff6dc, #fffdf6 58%, #f7efff);
+  color: #303342;
+}
+
+.featureScreen::before,
+.featureScreen::after {
+  position: absolute;
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.featureScreen::before {
+  top: -18%;
+  right: -5%;
+  width: 34%;
+  aspect-ratio: 1;
+  background: rgba(255, 142, 134, 0.2);
+}
+
+.featureScreen::after {
+  bottom: -20%;
+  left: 16%;
+  width: 28%;
+  aspect-ratio: 1;
+  background: rgba(157, 217, 159, 0.2);
+}
+
+.featureHeader {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.featureHeader p,
+.featureHeader h2 {
+  margin: 0;
+}
+
+.featureHeader p {
+  color: #a83f42;
+  font-size: clamp(9px, 0.72vw, 16px);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.featureHeader h2 {
+  margin-top: 7px;
+  color: #693b53;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(25px, 3vw, 62px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.featureHeader span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 253, 246, 0.76);
+  color: #6b6f7b;
+  font-size: clamp(9px, 0.68vw, 14px);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.featureCard {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 0;
+  place-items: center;
+  padding: clamp(6px, 1.5vw, 22px);
+}
+
+.featureCard > * {
+  width: min(76%, 760px);
+  height: min(78%, 470px);
+}
+
+.emptyStage {
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 24% 22%, rgba(142, 214, 245, 0.34), transparent 28%),
+    radial-gradient(circle at 78% 72%, rgba(255, 216, 106, 0.3), transparent 26%),
+    #fffdf6;
+  text-align: center;
+}
+
+.emptyStage h3 {
+  margin: 0;
+  color: #693b53;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 2.8vw, 3rem);
+  font-weight: 600;
+}
+
+.emptyText {
+  max-width: 48ch;
+  margin: 0 auto;
+}
+
+.focusRing:focus-visible,
+.sourceButton:focus-visible,
+.sourceButtonActive:focus-visible,
+.controlButton:focus-visible,
+.screenTab:focus-visible,
+.screenTabActive:focus-visible {
+  outline: 3px solid #4d90fe;
+  outline-offset: 3px;
+}
+
+@media (max-width: 620px) {
+  .shell {
+    padding: 12px;
+  }
+
+  .header,
+  .controlHeader,
+  .canvasHeader,
+  .canvasMeta,
+  .stageDetails {
+    display: grid;
+  }
+
+  .screenTab {
+    flex: 1 1 130px;
+  }
+
+  .featureHeader h2 {
+    font-size: clamp(21px, 6vw, 38px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvasContent *,
+  .canvasContent *::before,
+  .canvasContent *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

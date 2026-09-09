@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import Link from 'next/link';
 
 import { api } from '@/lib/client-api';
@@ -141,7 +141,7 @@ function DecorativeGarden() {
 
 function ExpressionScene({ id }: { id: number }) {
   return (
-    <span className={`${styles.expressionScene} ${styles[`scene${id}`]}`} data-testid="expression-scene" aria-hidden="true">
+    <span className={`${styles.expressionScene} ${styles[`scene${id}`]}`} data-testid="expression-scene" data-scene-id={id} aria-hidden="true">
       <span className={styles.sceneGround} />
       <span className={styles.scenePrimary} />
       <span className={styles.sceneSecondary} />
@@ -151,10 +151,35 @@ function ExpressionScene({ id }: { id: number }) {
   );
 }
 
+function ExpressionCluster() {
+  return (
+    <span className={styles.expressionCluster} data-testid="expression-cluster" aria-hidden="true">
+      <i />
+      <b />
+      <em />
+      <small />
+    </span>
+  );
+}
+
 function GrowingBouquet({ selected }: { selected: (typeof EXPRESSIONS)[number][] }) {
+  const firstColor = selected[0]?.color ?? '#ff8e86';
+  const lastColor = selected[selected.length - 1]?.color ?? '#ffd86a';
+  const bouquetStyle = {
+    '--bouquet-start': firstColor,
+    '--bouquet-end': lastColor,
+  } as CSSProperties;
+
   return (
     <div className={styles.bouquetWrap} data-selected-count={selected.length}>
-      <div className={styles.bouquet} data-testid="growing-bouquet" data-selected-count={selected.length} aria-hidden="true">
+      <div
+        className={`${styles.bouquet} ${selected.length > 0 ? styles.bouquetGrowing : ''}`}
+        data-testid="growing-bouquet"
+        data-selected-count={selected.length}
+        style={bouquetStyle}
+        key={selected.map((expression) => expression.id).join('-') || 'empty'}
+        aria-hidden="true"
+      >
         <span className={styles.bouquetGround} />
         {selected.map((expression, index) => (
           <span
@@ -194,30 +219,36 @@ function ExpressionChoice({
   error?: string;
 }) {
   return (
-    <article className={`${styles.expressionCard} ${styles[`expression${expression.id}`]} ${selected ? styles.expressionSelected : ''}`}>
-      <ExpressionScene id={expression.id} />
-      <div className={styles.expressionHeader}>
-        <div className={styles.expressionHeading}>
-          <span className={styles.expressionNumber}>{String(expression.id).padStart(2, '0')}</span>
-          <span className={styles.expressionPhrase}>“{expression.phrase}”</span>
-        </div>
-        <button
-          className={styles.expressionSelect}
-          type="button"
-          aria-label={`${selected ? 'Selected' : 'Select'} expression ${String(expression.id).padStart(2, '0')}: “${expression.phrase}”`}
-          aria-pressed={selected}
-          aria-describedby={error ? 'expressions-error' : undefined}
-          onClick={onToggle}
-        >
-          <span className={styles.expressionCheck} aria-hidden="true">{selected ? '✓' : ''}</span>
-        </button>
-      </div>
-      <div className={styles.principleDetails}>
-        <p className={styles.principle}>{expression.principle}</p>
-        {expression.example && (
-          <p className={styles.expressionExample}>{expression.example}</p>
-        )}
-      </div>
+    <article
+      className={`${styles.expressionCard} ${styles[`expression${expression.id}`]} ${selected ? styles.expressionSelected : ''}`}
+      data-testid={`expression-card-${expression.id}`}
+    >
+      <button
+        className={styles.expressionSelect}
+        type="button"
+        aria-label={`${selected ? 'Selected' : 'Select'} expression ${String(expression.id).padStart(2, '0')}: “${expression.phrase}”`}
+        aria-pressed={selected}
+        aria-describedby={`expression-details-${expression.id}${error ? ' expressions-error' : ''}`}
+        onClick={onToggle}
+      >
+        <ExpressionCluster />
+        <ExpressionScene id={expression.id} />
+        <span className={styles.expressionContent}>
+          <span className={styles.expressionHeader}>
+            <span className={styles.expressionHeading}>
+              <span className={styles.expressionNumber}>{String(expression.id).padStart(2, '0')}</span>
+              <span className={styles.expressionPhrase}>“{expression.phrase}”</span>
+            </span>
+          </span>
+          <span className={styles.principleDetails} id={`expression-details-${expression.id}`}>
+            <span className={styles.principle}>{expression.principle}</span>
+            {expression.example && (
+              <span className={styles.expressionExample}>{expression.example}</span>
+            )}
+          </span>
+        </span>
+        <span className={styles.expressionCheck} aria-hidden="true">{selected ? '✓' : ''}</span>
+      </button>
     </article>
   );
 }
@@ -284,13 +315,13 @@ function Receipt({ status, onReset }: { status: ReceiptStatus; onReset: () => vo
 
   return (
     <section className={`${styles.receiptCard} ${held ? styles.receiptHeld : styles.receiptPublished}`} aria-labelledby="receipt-title" data-testid="submission-receipt">
-      <div className={styles.seedJourney} aria-hidden="true">
-        <span className={styles.seedOrbit}>
+      <div className={styles.seedJourney} data-testid="seed-journey" aria-hidden="true">
+        <span className={styles.seedOrbit} data-testid="seed-orbit">
           <span className={styles.seed} />
           <span className={styles.seedLeaf} />
         </span>
-        <span className={styles.seedTrail} />
-        <span className={styles.seedGarden}>
+        <span className={styles.seedTrail} data-testid="seed-trail" />
+        <span className={styles.seedGarden} data-testid="seed-garden">
           <i />
           <b />
         </span>
@@ -526,7 +557,7 @@ export function SubmissionForm() {
               <fieldset className={`${styles.formSection} ${styles.expressionFieldset}`} aria-describedby={fieldErrors.expressions ? 'expressions-help expressions-error' : 'expressions-help'}>
                 <legend className={styles.label}>Which expression(s) did they practice?</legend>
                 <p className={styles.helper} id="expressions-help">Select one or more. Each phrase keeps its full meaning.</p>
-                <div className={styles.expressionGrid}>
+                <div className={styles.expressionGrid} data-testid="expression-grid">
                   {EXPRESSIONS.map((expression) => (
                     <ExpressionChoice
                       key={expression.id}

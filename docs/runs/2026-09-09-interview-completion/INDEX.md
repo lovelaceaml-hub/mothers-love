@@ -2,25 +2,25 @@
 
 Plan ID: 2026-09-09-interview-completion
 Plan file: /Users/anthony/Projects/mothers-love/docs/PLAN-09-interview-completion.md
-Runner: pending
+Runner: controller with four fresh Luna max lanes
 Started: 2026-09-09T14:10Z
-Coordinator: pending
+Coordinator: current controller; no Terra
 
 ## Baselines
 
 | Repo | Path | Branch | Baseline HEAD |
 |---|---|---|---|
-| pending | pending | pending | pending |
+| mothers-love | /Users/anthony/Projects/mothers-love | codex/mothers-love | 195c05970b967e27addc5e113a858abaa1f4cec6 |
 
 ## Lanes
 
 | Lane | Title | State | Model | Worktree | Review | Depends on |
 |---|---|---|---|---|---|---|
-| LI | Impact and expression stories | planned | pending | pending | pending | pending |
-| LT | Teaching and invitation stories | planned | pending | pending | pending | pending |
-| LS | Submission experience | planned | pending | pending | pending | pending |
-| LC | Actual studio previews | planned | pending | pending | pending | pending |
-| LR | Controller integration and release | planned | pending | pending | pending | pending |
+| LI | Impact and expression stories | verifying | gpt-5.6-luna max | /Users/anthony/Projects/mothers-love-worktrees/interview-insights | pending | none |
+| LT | Teaching and invitation stories | running | gpt-5.6-luna max | /Users/anthony/Projects/mothers-love-worktrees/interview-teaching | pending | none |
+| LS | Submission experience | running | gpt-5.6-luna max | /Users/anthony/Projects/mothers-love-worktrees/interview-submission | pending | none |
+| LC | Actual studio previews | running | gpt-5.6-luna max | /Users/anthony/Projects/mothers-love-worktrees/interview-studio | pending | none |
+| LR | Controller integration and release | running | controller | /Users/anthony/Projects/mothers-love | pending | LI, LT, LS, LC |
 
 ## Folders
 
@@ -32,11 +32,11 @@ Coordinator: pending
 
 ## Artifacts
 
-- Rule diagram: pending
-- Lane board: pending
+- Rule diagram: board/index.html
+- Lane board: board/index.html
 
-<!-- lane: LI state: planned model: pending worktree: pending review: pending updated: 2026-09-09T14:10Z -->
-<!-- lane: LT state: planned model: pending worktree: pending review: pending updated: 2026-09-09T14:10Z -->
-<!-- lane: LS state: planned model: pending worktree: pending review: pending updated: 2026-09-09T14:10Z -->
-<!-- lane: LC state: planned model: pending worktree: pending review: pending updated: 2026-09-09T14:10Z -->
-<!-- lane: LR state: planned model: pending worktree: pending review: pending updated: 2026-09-09T14:10Z -->
+<!-- lane: LI state: verifying model: gpt-5.6-luna max worktree: /Users/anthony/Projects/mothers-love-worktrees/interview-insights review: pending updated: 2026-09-09T14:30Z -->
+<!-- lane: LT state: running model: gpt-5.6-luna max worktree: /Users/anthony/Projects/mothers-love-worktrees/interview-teaching review: pending updated: 2026-09-09T14:30Z -->
+<!-- lane: LS state: running model: gpt-5.6-luna max worktree: /Users/anthony/Projects/mothers-love-worktrees/interview-submission review: pending updated: 2026-09-09T14:30Z -->
+<!-- lane: LC state: running model: gpt-5.6-luna max worktree: /Users/anthony/Projects/mothers-love-worktrees/interview-studio review: pending updated: 2026-09-09T14:30Z -->
+<!-- lane: LR state: running model: controller worktree: /Users/anthony/Projects/mothers-love review: pending updated: 2026-09-09T14:30Z -->

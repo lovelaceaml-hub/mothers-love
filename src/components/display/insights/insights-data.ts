@@ -1,5 +1,62 @@
 import { EXPRESSIONS, expressionById } from '@/lib/catalog';
-import type { Aggregate, Recognition } from '@/lib/contracts';
+import type { Aggregate, DisplayMotion, Recognition } from '@/lib/contracts';
+
+export const INSIGHT_STORY_TIMINGS = {
+  nine: {
+    petalWaveMs: 2_800,
+    cardsOpenMs: 3_400,
+    settledMs: 7_000,
+  },
+  shared: {
+    recognitionMs: 0,
+    weaveMs: 3_200,
+    revealMs: 6_100,
+    settledMs: 8_400,
+  },
+  impact: {
+    totalMs: 0,
+    ribbonsMs: 1_450,
+    settledMs: 5_800,
+  },
+} as const;
+
+export type InsightStory = keyof typeof INSIGHT_STORY_TIMINGS;
+export type InsightStoryPhase = 'opening' | 'weaving' | 'revealing' | 'settled';
+
+export function normalizeElapsedMs(elapsedMs?: number): number {
+  return typeof elapsedMs === 'number' && Number.isFinite(elapsedMs) && elapsedMs >= 0
+    ? Math.floor(elapsedMs)
+    : 0;
+}
+
+/**
+ * Maps the parent display clock to a stable visual phase. The insight views
+ * never create their own timers, so browser checks can seek the same scene
+ * with an injected elapsed value.
+ */
+export function insightStoryPhaseAt(story: InsightStory, elapsedMs?: number): InsightStoryPhase {
+  const elapsed = normalizeElapsedMs(elapsedMs);
+  if (story === 'impact') {
+    const timing = INSIGHT_STORY_TIMINGS.impact;
+    return elapsed < timing.ribbonsMs ? 'opening' : elapsed < timing.settledMs ? 'revealing' : 'settled';
+  }
+  if (story === 'nine') {
+    const timing = INSIGHT_STORY_TIMINGS.nine;
+    return elapsed < timing.cardsOpenMs ? 'opening' : elapsed < timing.settledMs ? 'revealing' : 'settled';
+  }
+  const timing = INSIGHT_STORY_TIMINGS.shared;
+  if (elapsed < timing.weaveMs) return 'opening';
+  if (elapsed < timing.revealMs) return 'weaving';
+  if (elapsed < timing.settledMs) return 'revealing';
+  return 'settled';
+}
+
+export const INSIGHT_MOTION_CLASSES: Record<DisplayMotion, string> = {
+  calm: 'motionCalm',
+  standard: 'motionStandard',
+  lively: 'motionLively',
+  still: 'motionStill',
+};
 
 export type ImpactAggregate = Pick<Aggregate, 'periodStart' | 'recognitions' | 'expressionCounts' | 'expressionTotal'>;
 

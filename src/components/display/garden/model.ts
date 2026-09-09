@@ -206,9 +206,10 @@ export function isNewestGardenCard(
   record: GardenRecognition,
   records: readonly GardenRecognition[],
   nowMs: number,
+  introducedAtMs?: number,
 ): boolean {
   const newestId = newestGardenId(records);
-  const age = nowMs - publishedTime(record);
+  const age = nowMs - (introducedAtMs ?? publishedTime(record));
   return record.id === newestId && age >= 0 && age <= GARDEN_NEWEST_WINDOW_MS;
 }
 

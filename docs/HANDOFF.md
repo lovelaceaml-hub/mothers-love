@@ -1,5 +1,9 @@
 # Handoff
 
+## Interview completion update
+
+The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](PLAN-09-interview-completion.md). Release verification is in progress. Latest instructions use Luna max lanes plus controller corrections, no Terra.
+
 ## Plan 08 TV Garden and submission release
 
 ## Dynamic TV presentation correction

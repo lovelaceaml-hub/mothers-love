@@ -31,7 +31,6 @@
 .eyebrow { margin: 0 0 7px; color: #a83f42; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
 .heroTitle,
 .sectionTitle,
-.previewTitle,
 .playlistItemTitle { margin: 0; color: var(--studio-heading); font-family: Georgia, 'Times New Roman', serif; font-weight: 600; letter-spacing: normal; }
 .heroTitle { font-size: clamp(1.55rem, 3vw, 2.3rem); line-height: 1.08; }
 .heroDescription,
@@ -53,42 +52,14 @@
 .enabledPill,
 .offPill,
 .ownerPill,
-.soundBadge,
-.smoothBadge,
-.previewLiveBadge { display: inline-flex; align-items: center; min-height: 26px; padding: 4px 10px; border-radius: 999px; font-size: 0.68rem; font-weight: 800; white-space: nowrap; }
+.soundBadge { display: inline-flex; align-items: center; min-height: 26px; padding: 4px 10px; border-radius: 999px; font-size: 0.68rem; font-weight: 800; white-space: nowrap; }
 .modeBadge,
 .approvedPill,
 .enabledPill,
 .ownerPill,
 .soundBadge { background: #e6f6d4; color: #366b3a; }
-.countPill,
-.smoothBadge { background: #fff0c7; color: #7a5a16; }
+.countPill { background: #fff0c7; color: #7a5a16; }
 .offPill { background: #e8edf2; color: #4c5c6a; }
-.previewLiveBadge { background: rgba(255, 255, 255, 0.72); color: #4d5a68; }
-
-.previewShell { padding: 18px; border: 1px solid rgba(48, 51, 66, 0.12); border-radius: 20px 16px 22px 16px; background: rgba(255, 253, 246, 0.7); }
-.previewTopline { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.previewKicker,
-.previewOverline { margin: 0 0 5px; color: #a83f42; font-size: 0.67rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
-.previewTitle { font-size: 1.05rem; }
-.previewSwitch { display: inline-flex; margin: 16px 0 14px; padding: 3px; border-radius: 12px; background: rgba(48, 51, 66, 0.08); }
-.previewSwitchButton,
-.previewSwitchActive { min-height: 36px; padding: 8px 11px; border: 0; border-radius: 9px; background: transparent; color: var(--studio-muted); font: inherit; font-size: 0.72rem; font-weight: 750; cursor: pointer; }
-.previewSwitchActive { background: var(--studio-paper); color: var(--studio-ink); box-shadow: 0 2px 8px rgba(48, 51, 66, 0.1); }
-.previewStage { position: relative; display: flex; align-items: center; gap: 15px; min-height: 148px; overflow: hidden; padding: 20px; border-radius: 18px; }
-.previewStageSample { background: linear-gradient(130deg, #ffe4bd, #f4d5ea 54%, #d4eefe); }
-.previewStageApproved { background: linear-gradient(130deg, #e3f5d7, #fff2c3 50%, #d9effd); }
-.previewOrb { position: relative; flex: 0 0 82px; width: 82px; height: 82px; border-radius: 52% 48% 45% 55%; background: linear-gradient(145deg, #f18a81, #f6c95e 50%, #a8d8ee); box-shadow: 12px 14px 0 rgba(105, 59, 83, 0.1); transform: rotate(-8deg); }
-.previewOrb span { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 253, 246, 0.8); }
-.previewOrb span:nth-child(1) { top: 17px; left: 20px; }
-.previewOrb span:nth-child(2) { top: 40px; left: 53px; }
-.previewOrb span:nth-child(3) { top: 57px; left: 28px; }
-.previewCopy { min-width: 0; }
-.previewMessage { max-width: 36ch; margin: 0; color: #4b3041; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(1rem, 2vw, 1.35rem); line-height: 1.24; }
-.previewMeta { margin: 9px 0 0; color: #59626f; font-size: 0.72rem; }
-.previewFacts { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 13px; color: var(--studio-muted); font-size: 0.7rem; }
-.previewFacts strong { color: var(--studio-ink); text-transform: capitalize; }
-
 .statusList { display: grid; gap: 0; margin-top: 20px; border-top: 1px solid rgba(48, 51, 66, 0.1); }
 .statusList > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(48, 51, 66, 0.1); font-size: 0.76rem; }
 .statusList span { color: var(--studio-muted); }
@@ -141,7 +112,7 @@ button.amountButton { cursor: pointer; }
 .amountValue { font-size: 0.82rem; font-weight: 800; }
 .amountInput { width: min(220px, 100%); min-height: 42px; padding: 9px 11px; border: 1px solid rgba(48, 51, 66, 0.22); border-radius: 10px; background: var(--studio-paper); color: var(--studio-ink); font: inherit; font-size: 0.84rem; }
 .amountCallout,
-.smoothNote { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding: 11px 12px; border-radius: 13px; background: #edf5fb; color: #38516a; }
+.effectsNote { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding: 11px 12px; border-radius: 13px; background: #edf5fb; color: #38516a; }
 .amountCallout p { margin: 0; color: #38516a; font-size: 0.72rem; }
 .calloutIcon { color: #467aa4; font-size: 0.9rem; }
 .fieldError,
@@ -178,7 +149,7 @@ button.amountButton { cursor: pointer; }
 .restoreButtons { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 7px; }
 .restoreButton { padding-left: 0; }
 
-.smoothNote { margin-top: 16px; background: #f8f3e8; color: #5f583f; font-size: 0.72rem; line-height: 1.4; }
+.effectsNote { margin-top: 16px; background: #f8f3e8; color: #5f583f; font-size: 0.72rem; line-height: 1.4; }
 .statusDot { flex: 0 0 auto; width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; background: #cb8f3c; box-shadow: 0 0 0 4px rgba(203, 143, 60, 0.14); }
 .volumeField { margin: 18px 0 3px; }
 .volumeRow { display: flex; align-items: center; gap: 12px; }
@@ -205,8 +176,6 @@ button.amountButton { cursor: pointer; }
 .retryButton { margin-left: 8px; }
 .skeleton { min-height: 360px; border-radius: 22px; background: linear-gradient(90deg, rgba(255, 253, 246, 0.55), rgba(255, 255, 255, 0.9), rgba(255, 253, 246, 0.55)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
 
-.previewSwitchButton:focus-visible,
-.previewSwitchActive:focus-visible,
 .quietButton:focus-visible,
 .saveButton:focus-visible,
 .cancelButton:focus-visible,
@@ -231,11 +200,6 @@ button.amountButton { cursor: pointer; }
   .heroHeader { gap: 11px; }
   .statusList > div { display: grid; gap: 4px; }
   .statusList strong { text-align: left; }
-  .previewStage { align-items: flex-start; flex-direction: column; }
-  .previewOrb { flex-basis: 64px; width: 64px; height: 64px; }
-  .previewOrb span:nth-child(1) { top: 13px; left: 16px; }
-  .previewOrb span:nth-child(2) { top: 32px; left: 41px; }
-  .previewOrb span:nth-child(3) { top: 44px; left: 23px; }
   .tempoGroup { grid-template-columns: 1fr; }
   .playlistItem { grid-template-columns: 48px minmax(0, 1fr); gap: 10px; }
   .screenSwatch { min-height: 48px; }

@@ -9,6 +9,7 @@ import {
   type DisplaySnapshot,
   type Recognition,
 } from '@/lib/contracts';
+import { EXPRESSIONS } from '@/lib/catalog';
 import { planGardenRender } from '@/lib/display-performance';
 
 export type DisplayScreen =
@@ -65,6 +66,9 @@ export interface PresentationState {
   readingPageIndex: number;
   readingPageCount: number;
   playlistIndex: number;
+  storyVisits: Partial<Record<DisplayScreen, number>>;
+  featuredHistory: Record<string, number>;
+  gardenIntroducedAt: Record<string, number>;
   gardenIds: string[];
   featuredId: string | null;
   clusterIds: string[];
@@ -220,7 +224,11 @@ function scheduledPlaylist(settings: DisplaySettings): DisplayScreen[] {
   const otherScreens = enabled.filter((entry) => entry.id !== 'garden').map((entry) => playlistScreen(entry.id));
   if (!garden) return otherScreens.length ? otherScreens : ['garden'];
   if (!otherScreens.length) return ['garden'];
-  return otherScreens.flatMap((screen) => ['garden', screen]);
+  const ordered = enabled.map((entry) => playlistScreen(entry.id));
+  return ordered.flatMap((screen, index) => {
+    const following = ordered[(index + 1) % ordered.length];
+    return screen !== 'garden' && following !== 'garden' ? [screen, 'garden' as DisplayScreen] : [screen];
+  });
 }
 
 function availableProgramScreen(settings: DisplaySettings, hasRecognitions: boolean): DisplayScreen {
@@ -239,16 +247,28 @@ function playlistEntry(settings: DisplaySettings, screen: DisplayScreen) {
   return id ? settings.playlist?.find((entry) => entry.id === id) : undefined;
 }
 
-function durationFor(screen: DisplayScreen, settings: DisplaySettings, selected?: Recognition): number {
+export function durationFor(screen: DisplayScreen, settings: DisplaySettings, selected?: Recognition): number {
   const baseSeconds = screen === 'garden' ? (hasModernPlaylist(settings) ? 24 : 20) : screen === 'fallback' ? 20 : screen === 'milestone' ? 8 : 12;
   const entry = playlistEntry(settings, screen);
   const overrideSeconds = entry?.durationSeconds
     ?? (screen === 'all-nine' ? settings.durationOverrides?.expressions : screen === 'cluster' ? settings.durationOverrides?.['shared-expression'] : settings.durationOverrides?.[screen as DisplayScreenId]);
-  const baseMs = Math.max(12_000, (overrideSeconds ?? baseSeconds) * 1_000) * tempoMultiplier(settings.tempo ?? DEFAULT_DISPLAY_TEMPO);
+  const gardenDefault = screen === 'garden' && hasModernPlaylist(settings) && overrideSeconds === undefined
+    ? (() => {
+      const stories = scheduledPlaylist(settings).filter(item => item !== 'garden');
+      return stories.length ? Math.max(baseSeconds, 2 * stories.reduce((sum, item) => sum + durationFor(item, settings), 0) / stories.length / 1_000 / tempoMultiplier(settings.tempo ?? DEFAULT_DISPLAY_TEMPO)) : baseSeconds;
+    })() : baseSeconds;
+  const baseMs = Math.max(12_000, (overrideSeconds ?? gardenDefault) * 1_000 * tempoMultiplier(settings.tempo ?? DEFAULT_DISPLAY_TEMPO));
   if (screen === 'featured') {
     return selected ? Math.max(baseMs, readingTotalDuration(selected)) : baseMs;
   }
-  return Math.round(baseMs);
+  const readingFloor = screen === 'all-nine'
+    ? Math.ceil(EXPRESSIONS.map(item => `${item.phrase} ${item.principle}`).join(' ').split(/\s+/).length / 3) * 1_000 + 4_000
+    : screen === 'spotlight'
+      ? Math.max(...EXPRESSIONS.map(item => Math.ceil(`${item.phrase} ${item.principle} ${item.example ?? ''}`.split(/\s+/).length / 3))) * 1_000 + 4_000
+      : screen === 'everyday-peace' ? 24_000
+        : screen === 'peace-promise' || screen === 'daily-practice' ? 18_000
+          : screen === 'cluster' ? 22_000 : 12_000;
+  return Math.round(Math.max(baseMs, readingFloor));
 }
 
 function graphemes(text: string): string[] {
@@ -315,8 +335,9 @@ function chooseCluster(items: Recognition[], previousExpressionId: number | null
   const options = [...counts.entries()]
     .filter(([, matches]) => matches.length >= 1)
     .sort((left, right) => {
-      const leftDistance = previousExpressionId === left[0] ? 1 : 0;
-      const rightDistance = previousExpressionId === right[0] ? 1 : 0;
+      const previous = previousExpressionId ?? 0;
+      const leftDistance = (left[0] - previous + 8) % 9;
+      const rightDistance = (right[0] - previous + 8) % 9;
       if (leftDistance !== rightDistance) return leftDistance - rightDistance;
       return left[0] - right[0];
     });
@@ -344,6 +365,9 @@ function clearPersonal(state: PresentationState, unauthorized: boolean, offlineS
     queue: [],
     activeArrival: null,
     gardenIds: [],
+    gardenIntroducedAt: {},
+    featuredHistory: {},
+    presentationHistory: {},
     featuredId: null,
     clusterIds: [],
     clusterExpressionId: null,
@@ -418,8 +442,8 @@ function rebuildVisibleState(
   const settings = settingsWithDefaults(snapshot.settings);
   const celebrated = state.celebratedMilestones[periodKey(snapshot)] ?? [];
   const threshold = reset ? null : nextMilestone(snapshot.aggregate.recognitions, celebrated);
-  const currentScreenIsValid =
-    state.screen === 'featured' ? Boolean(byId(items, state.featuredId)) : state.screen !== 'arrival' || Boolean(state.activeArrival);
+  const currentScreenIsValid = !(state.quiet || state.neutral) && (!hasModernPlaylist(settings) || ['arrival', 'milestone'].includes(state.screen) || scheduledPlaylist(settings).includes(state.screen)) && (
+    state.screen === 'featured' ? Boolean(byId(items, state.featuredId)) : state.screen !== 'arrival' || Boolean(state.activeArrival));
   const activeArrivalIsValid = !state.activeArrival || items.some((item) => item.id === state.activeArrival?.id);
   const mode = settings.mode;
   const quiet = mode === 'quiet' || state.operatorModeOverride === 'quiet';
@@ -446,17 +470,17 @@ function rebuildVisibleState(
   const featuredId = byId(items, state.manualFeatureId)?.id ?? byId(items, state.featuredId)?.id ?? sorted[0]?.id ?? null;
   const cluster = chooseCluster(items, state.clusterExpressionId);
   const fallbackScreen = availableProgramScreen(settings, items.length > 0);
-  const startsGardenPresentation = (reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid) && fallbackScreen === 'garden';
+  const startsGardenPresentation = (reset || !currentScreenIsValid || !activeArrivalIsValid) && fallbackScreen === 'garden';
   const screen = neutral
     ? 'neutral'
     : quiet
       ? 'quiet'
-      : reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid
+      : reset || !currentScreenIsValid || !activeArrivalIsValid
         ? fallbackScreen
         : state.screen;
-  const shouldStartClock = reset || wakeForPublication || !currentScreenIsValid || !activeArrivalIsValid || !state.nextTransitionAtMs;
+  const shouldStartClock = reset || !currentScreenIsValid || !activeArrivalIsValid || !state.nextTransitionAtMs;
   const baseScreenStartedAtMs = shouldStartClock ? receivedAtMs : state.screenStartedAtMs;
-  const baseNextTransitionAtMs = shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, settings, byId(items, featuredId)) : state.nextTransitionAtMs;
+  const baseNextTransitionAtMs = shouldStartClock ? receivedAtMs + durationFor(fallbackScreen, settings, byId(items, featuredId)) : wakeForPublication && state.screen === 'garden' ? Math.min(state.nextTransitionAtMs ?? Infinity, receivedAtMs + ORDINARY_GAP_MS) : state.nextTransitionAtMs;
   const pauseResumed = !reset && !settings.pauseRotation && state.pauseRotation && state.pauseStartedAtMs !== null;
   const pauseElapsedMs = pauseResumed ? Math.max(0, receivedAtMs - state.pauseStartedAtMs!) : 0;
   const timedState = shiftPresentationTimers(
@@ -483,10 +507,13 @@ function rebuildVisibleState(
     readingPageIndex: screen === 'featured' ? Math.min(state.readingPageIndex, Math.max(0, (byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1) - 1)) : 0,
     readingPageCount: screen === 'featured' && byId(items, featuredId) ? recognitionReadingPageCount(byId(items, featuredId)!) : 1,
     gardenIds,
+    gardenIntroducedAt: Object.fromEntries(items.map(item => [item.id, newlyEligibleIds.has(item.id) ? receivedAtMs + offset : state.gardenIntroducedAt[item.id] ?? Date.parse(item.firstPublishedAt ?? item.createdAt)])),
+    playlistIndex: shouldStartClock ? Math.max(0, scheduledPlaylist(settings).indexOf(screen)) : state.playlistIndex,
     presentationHistory: startsGardenPresentation ? markPresented(state, gardenIds, receivedAtMs) : state.presentationHistory,
     featuredId,
-    clusterIds: cluster.ids,
-    clusterExpressionId: cluster.expressionId,
+    featuredHistory: screen === 'featured' && shouldStartClock && featuredId ? { ...state.featuredHistory, [featuredId]: receivedAtMs } : state.featuredHistory,
+    clusterIds: !shouldStartClock && state.clusterExpressionId !== null ? items.filter(item => item.expressionIds.includes(state.clusterExpressionId!)).slice(0, 4).map(item => item.id) : cluster.ids,
+    clusterExpressionId: !shouldStartClock && state.clusterExpressionId !== null ? state.clusterExpressionId : cluster.expressionId,
     queue: nextQueue,
     activeArrival: timedState.activeArrival,
     knownPublicationKeys: reset
@@ -538,7 +565,12 @@ function startArrival(state: PresentationState): PresentationState {
   };
 }
 
-function advanceProgram(state: PresentationState): PresentationState {
+export function storyIndexFor(state: PresentationState, screen: DisplayScreen): number {
+  return (state.storyVisits[screen] ?? 0) % (screen === 'one-kind-word' ? 3 : 9);
+}
+
+function advanceProgram(previous: PresentationState): PresentationState {
+  const state = { ...previous, storyVisits: { ...previous.storyVisits, [previous.screen]: (previous.storyVisits[previous.screen] ?? 0) + 1 } };
   const items = eligible(state.snapshot, state.nowMs, state.serverOffsetMs);
   if (!items.length) {
     const playlist = scheduledPlaylist(state.settings);
@@ -563,7 +595,7 @@ function advanceProgram(state: PresentationState): PresentationState {
   const nextScreen = playlist[nextIndex];
   const sorted = fairSort(items, state.presentationHistory);
   const garden = sorted.slice(0, gardenNodeCount(state.settings, items.length));
-  const feature = byId(items, state.manualFeatureId) ?? byId(items, state.featuredId) ?? sorted[0];
+  const feature = byId(items, state.manualFeatureId) ?? fairSort(items, state.featuredHistory).find((item) => item.id !== state.featuredId) ?? sorted[0];
   const cluster = chooseCluster(items, state.clusterExpressionId);
   const selectedIds = nextScreen === 'garden' ? garden.map((item) => item.id) : nextScreen === 'featured' || !feature ? [] : [feature.id];
   const nextReadingPageCount = nextScreen === 'featured' && feature ? recognitionReadingPageCount(feature) : 1;
@@ -578,8 +610,9 @@ function advanceProgram(state: PresentationState): PresentationState {
     readingPageCount: nextReadingPageCount,
     gardenIds: garden.map((item) => item.id),
     featuredId: feature?.id ?? null,
-    clusterIds: cluster.ids,
-    clusterExpressionId: cluster.expressionId,
+    featuredHistory: nextScreen === 'featured' && feature ? { ...state.featuredHistory, [feature.id]: state.nowMs } : state.featuredHistory,
+    clusterIds: nextScreen === 'cluster' ? cluster.ids : state.clusterIds,
+    clusterExpressionId: nextScreen === 'cluster' ? cluster.expressionId : state.clusterExpressionId,
     presentationHistory: markPresented(state, selectedIds, state.nowMs),
     lastActivityAtMs: state.nowMs,
   };
@@ -608,6 +641,7 @@ function completeArrival(state: PresentationState): PresentationState {
   return {
     ...state,
     screen: 'garden',
+    playlistIndex: Math.max(0, scheduledPlaylist(state.settings).indexOf('garden')),
     activeArrival: null,
     queue: nextQueue,
     introducedPublicationKeys: nextIntroduced,
@@ -649,6 +683,9 @@ export function createInitialState(settings?: Partial<DisplaySettings>): Present
     readingPageIndex: 0,
     readingPageCount: 1,
     playlistIndex: 0,
+    storyVisits: {},
+    featuredHistory: {},
+    gardenIntroducedAt: {},
     gardenIds: [],
     featuredId: null,
     clusterIds: [],
@@ -759,20 +796,6 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         };
       }
       if (next.neutral || next.quiet || next.offlineSafe || next.phase !== 'ready') return next;
-      if (!items.length && !next.activeArrival) {
-        const programScreen = availableProgramScreen(next.settings, false);
-        return {
-          ...next,
-          screen: programScreen,
-          nextTransitionAtMs: action.nowMs + durationFor(programScreen, next.settings),
-          gardenIds: [],
-          featuredId: null,
-          clusterIds: [],
-          clusterExpressionId: null,
-          readingPageIndex: 0,
-          readingPageCount: 1,
-        };
-      }
       if (next.lowActivity && next.queue.length) next = { ...next, lowActivity: false };
       if (!next.lowActivity && next.settings.lowActivityMinutes > 0 && action.nowMs - next.lastActivityAtMs >= next.settings.lowActivityMinutes * 60_000) {
         next = { ...next, lowActivity: true };
@@ -826,6 +849,8 @@ export function displayReducer(state: PresentationState, action: CoordinatorActi
         return {
           ...next,
           screen: availableProgramScreen(next.settings, items.length > 0),
+          playlistIndex: Math.max(0, scheduledPlaylist(next.settings).indexOf(availableProgramScreen(next.settings, items.length > 0))),
+          screenStartedAtMs: action.nowMs,
           nextTransitionAtMs: action.nowMs + durationFor(availableProgramScreen(next.settings, items.length > 0), next.settings),
           pendingMilestone: null,
           celebratedMilestones: threshold && period

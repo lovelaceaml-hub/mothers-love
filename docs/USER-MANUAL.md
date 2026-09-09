@@ -40,3 +40,11 @@ The Recognition Garden shows live recognitions as animated bubbles. New recognit
 The Owner uses [Settings and access](https://mothers-love.vercel.app/admin/settings) to invite moderators or remove account access. Moderators can manage recognitions and everyday display controls. Keep your password private.
 
 Heart controls appear at the top right of recognition cards. Tap the heart to like a recognition, or tap it again to remove your like. The number shows the confirmed count.
+
+## Preview and arrange the TV program
+
+Open [Display Studio](https://mothers-love.vercel.app/admin/display). Choose any of the ten screen tabs and press Play or Replay. Safe sample is the default; Current approved explicitly loads public display content and clears it if verification fails or the content expires. Tempo, effects and timing preview your unsaved choices. Save display settings applies them to the TV on refresh.
+
+On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this screen once if the browser requires a sound gesture. Studio volume and event toggles still control sound. Pause also stops decorative motion. Long circle messages move to reveal their complete text, with dedicated reading pages as well. All nine Spotlight and Daily Practice expressions and all three One Kind Word lines rotate fairly. Home, school and work appear in sequence.
+
+The latest owner choice keeps all selected effects active. The app does not automatically reduce effects. Actual TV speed, room audio and a real phone scan remain hardware checks, outside the selected software-only proof.
