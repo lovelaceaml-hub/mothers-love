@@ -41,10 +41,10 @@ describe('display decorative layering', () => {
     expect(gardenCss).toContain('animation: gardenDrift var(--garden-drift-duration, 14s) ease-in-out infinite;');
   });
 
-  it('retains the reduced-motion animation overrides for both contexts', () => {
+  it('retains reduced-motion animation overrides while preserving an explicit Lively TV override', () => {
     expect(displayCss).toMatch(/\.displayApp\.motionstill[\s\S]*?animation:\s*none\s*!important;/);
-    expect(displayCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.displayApp \*[\s\S]*?animation:\s*none\s*!important;/);
+    expect(displayCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.displayApp:not\(\.motionlively\) \*[\s\S]*?animation:\s*none\s*!important;/);
     expect(gardenCss).toMatch(/\.reducedMotion \.backgroundWash[\s\S]*?animation:\s*none;/);
-    expect(gardenCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.backgroundWash[\s\S]*?animation:\s*none;/);
+    expect(gardenCss).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.scene:not\(\[data-tempo="lively"\]\) \.backgroundWash[\s\S]*?animation:\s*none;/);
   });
 });

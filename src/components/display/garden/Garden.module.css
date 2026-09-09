@@ -549,17 +549,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cardMotion,
-  .bud,
-  .milestoneFlower,
-  .backgroundWash,
-  .sparkle {
+  .scene:not([data-tempo="lively"]) .cardMotion,
+  .scene:not([data-tempo="lively"]) .bud,
+  .scene:not([data-tempo="lively"]) .milestoneFlower,
+  .scene:not([data-tempo="lively"]) .backgroundWash,
+  .scene:not([data-tempo="lively"]) .sparkle {
     animation: none;
   }
 
-  .arrivalCard,
-  .groupedArrival,
-  .readerMessage {
+  .scene:not([data-tempo="lively"]) .arrivalCard,
+  .scene:not([data-tempo="lively"]) .groupedArrival,
+  .scene:not([data-tempo="lively"]) .readerMessage {
     animation-duration: 520ms;
   }
 }

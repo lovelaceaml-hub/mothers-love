@@ -1180,9 +1180,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .displayApp *,
-  .displayApp *::before,
-  .displayApp *::after {
+  .displayApp:not(.motionlively) *,
+  .displayApp:not(.motionlively) *::before,
+  .displayApp:not(.motionlively) *::after {
     animation: none !important;
     transition: none !important;
   }
@@ -2507,19 +2507,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .displayApp .screen,
-  .displayApp .arrivalScreen,
-  .displayApp .milestoneScreen,
-  .displayApp .fallbackScreen,
-  .displayApp .quietScreen,
-  .displayApp .liveIndicator,
-  .displayApp .liveRailItem,
-  .displayApp .impactBubble,
-  .displayApp .expressionCard {
+  .displayApp:not(.motionlively) .screen,
+  .displayApp:not(.motionlively) .arrivalScreen,
+  .displayApp:not(.motionlively) .milestoneScreen,
+  .displayApp:not(.motionlively) .fallbackScreen,
+  .displayApp:not(.motionlively) .quietScreen,
+  .displayApp:not(.motionlively) .liveIndicator,
+  .displayApp:not(.motionlively) .liveRailItem,
+  .displayApp:not(.motionlively) .impactBubble,
+  .displayApp:not(.motionlively) .expressionCard {
     animation: none !important;
   }
 
-  .displayApp .atmosphereSparkle {
+  .displayApp:not(.motionlively) .atmosphereSparkle {
     animation: none !important;
   }
 }
