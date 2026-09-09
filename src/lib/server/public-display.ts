@@ -72,7 +72,7 @@ function projectAggregate(value: unknown): Aggregate | null {
   if (!Array.isArray(aggregate.expressionCounts) || aggregate.expressionCounts.length !== 9) return null;
   if (!aggregate.expressionCounts.every((count) => isSafeInteger(count))) return null;
   if (!isSafeInteger(aggregate.expressionTotal)) return null;
-  if (!isSafeInteger(aggregate.revision, 1)) return null;
+  if (!isSafeInteger(aggregate.revision)) return null;
   return {
     periodStart: aggregate.periodStart,
     periodEnd: aggregate.periodEnd,
