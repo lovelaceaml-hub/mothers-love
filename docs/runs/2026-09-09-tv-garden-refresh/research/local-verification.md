@@ -1,6 +1,6 @@
 # Local verification
 
-The final integrated source passes typecheck, lint, the production build, and 175 Vitest tests. The Plan 08 synthetic Chromium suite passes 11 browser journeys. It covers direct TV access, untrusted QR suppression, nine empty Garden buds, startup and post-success reconnect behavior, reduced motion, a 96-recognition active set with at most 12 rendered cards, bounded reaction requests, 1920 by 1080 and 3840 by 2160 geometry, long-message pagination, Expression Spotlight, and the two official invitation forms.
+The final integrated source passes typecheck, lint, the production build, and 176 Vitest tests. The Plan 08 synthetic Chromium suite passes 11 browser journeys. It covers direct TV access, untrusted QR suppression, nine empty Garden buds, startup and post-success reconnect behavior, reduced motion, a 96-recognition active set with at most 12 rendered cards, bounded reaction requests, 1920 by 1080 and 3840 by 2160 geometry, long-message pagination, Expression Spotlight, and the two official invitation forms.
 
 The browser fixtures intercept all application requests before navigation. No production recognition, participant identity, Owner session, or form submission is used.
 

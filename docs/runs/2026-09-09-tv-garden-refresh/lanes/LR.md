@@ -1,13 +1,13 @@
 ---
 lane: LR
 title: Integration and release
-state: active
+state: complete
 model: gpt-5.6-sol high controller
 runner: root Sol integration
 worktree: /Users/anthony/Projects/mothers-love
-review: fresh reviewer Terra high pending
+review: fresh reviewer Terra high passed
 depends_on: LF, LG, LI, LT, LC, LS, LP, LV
-updated: 2026-09-09T08:51Z
+updated: 2026-09-09T09:20Z
 ---
 
 # LR: Integration and release
@@ -18,8 +18,8 @@ Integrate the eight reviewed feature lanes, wire shared display behavior, apply 
 
 ## Result
 
-Root integrated all eight lane commits, supplied the central display coordinator and modern settings persistence, and corrected two defects found by browser checks: synthetic viewport readiness and long featured-message overflow. The implementation remains in final review and release verification.
+Root integrated all eight lane commits, supplied the central display coordinator and modern settings persistence, and corrected two defects found by browser checks: synthetic viewport readiness and long featured-message overflow. The scoped settings migration is applied, source is pushed, and the Vercel production deployment is READY at the canonical campaign alias.
 
 ## Review
 
-Initial integration verification: typecheck, lint, production build, 175 unit tests, 11 Plan 08 synthetic browser journeys, isolated PostgreSQL compilation, default projection, unauthenticated rejection, unlimited positive Garden amount, and runtime-only writer ACL all pass. Production migration and final independent review remain pending.
+Final integration verification: typecheck, lint, production build, 176 unit tests, 11 local Plan 08 synthetic browser journeys, isolated PostgreSQL compilation, default projection, unauthenticated rejection, unlimited positive Garden amount, and runtime-only writer ACL all pass. The same 11 synthetic browser journeys passed against the production alias. Migration postflight verifies ledger, fixed URLs, security definer, empty search path, and runtime-only writer ACL. Fresh independent Terra review passed.

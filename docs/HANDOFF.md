@@ -1,5 +1,15 @@
 # Handoff
 
+## Plan 08 TV Garden and submission release
+
+Live at https://mothers-love.vercel.app/display. The TV View is now a Garden-led playlist with naturally drifting recognition cards, bounded visual rendering, fair rotation, nine waiting buds, ribbons for Monthly Impact and Shared Expression, a flower wheel for Nine Expressions, and friendly teaching and invitation screens. Display Studio at https://mothers-love.vercel.app/admin/display now offers the fixed screen library, add, remove, restore and reorder controls, Safe Sample or approved-content preview, tempo, timing, Garden amount without a user-facing cap, effects and gentle chime controls. The recognition form at https://mothers-love.vercel.app/recognize now gives all nine expression choices matching mini-scenes and the coral-orange-gold Share Recognition selection treatment.
+
+Runtime source d7b51ddd74bc5ed9781018ff5c1df3e643026937 is live as Vercel deployment dpl_3cRXt4eyfV5v24KW7w8V7cFqDhYr, READY with the production alias confirmed. Database migration 008 is applied only inside the `mothers_love` schema. Its versioned settings contract preserves legacy behavior, allows any positive custom Garden amount, fixes the two official invitation URLs, and grants its moderator settings writer only to `mothers_love_runtime` with an empty search path.
+
+Verification passed: typecheck, lint, build, 176 unit and contract tests, 11 local synthetic Plan 08 browser journeys, and the same 11 synthetic journeys against the production alias. Positive display checks intercepted every application API request, so no live recognition, participant identity, Owner session, or submission was read or submitted. A status-only production check confirmed the public display and form, public configuration, and protected admin-settings denial. Final independent Terra review passed. Read [Plan 08](PLAN-08-tv-garden-and-submission.md) and the [Plan 08 run record](runs/2026-09-09-tv-garden-refresh/INDEX.md).
+
+The remaining human commissioning check is physical: open https://mothers-love.vercel.app/display on the connected TV at 1080p and 4K, check viewing-distance readability and chimes, scan the two official QR destinations with a phone, and sign in as Owner at https://mothers-love.vercel.app/admin/login.
+
 ## Direct TV link release
 Anthony removes the TV code requirement. Plan 05 has deployed /display as public and read-only, preserves global controls and privacy clearing, and removes pairing and device-status controls from the interface. Admin authentication stays protected. Read [Plan 05](PLAN-05-direct-tv.md) and its [run index](runs/2026-09-08-direct-tv/INDEX.md). Earlier paired-only release sections below are historical and superseded for TV access. Live fresh-browser, anonymous API,80browser journeys and5visual checks passed. See [publication](runs/2026-09-08-direct-tv/research/publication.md) and [database release](runs/2026-09-08-direct-tv/research/database-release.md). Final native review found a deletion revision regression. Production is temporarily rolled back while the immutable007 follow-up is verified. Final review and backup remain in progress.
 

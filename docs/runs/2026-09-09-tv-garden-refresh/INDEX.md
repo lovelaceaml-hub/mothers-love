@@ -24,7 +24,7 @@ Coordinator: Terra high, non-editing
 | LS | Submission experience | integrated | Luna xhigh | tv-garden-submission | Sol passed | LF |
 | LP | Performance and resilience evidence | integrated | Luna xhigh | tv-garden-performance | Sol passed | LF |
 | LV | Browser and accessibility coverage | integrated | Luna xhigh | tv-garden-verification | Sol passed | LF |
-| LR | Integration and release | active | Sol | main integration worktree | final Terra review | all feature lanes |
+| LR | Integration and release | complete | Sol | main integration worktree | final Terra passed | all feature lanes |
 
 ## Folders
 
@@ -38,6 +38,9 @@ Coordinator: Terra high, non-editing
 
 - Rule diagram: board/index.html
 - Lane board: board/index.html
+- Database receipt: research/database-release.md
+- Production receipt: research/production-publication.md
+- Final review: research/final-review.md
 
 <!-- lane: LF state: integrated model: Luna-xhigh worktree: tv-garden-foundation review: Sol-passed updated: 2026-09-09T07:52Z -->
 <!-- lane: LG state: integrated model: Luna-xhigh worktree: tv-garden-garden review: Sol-passed updated: 2026-09-09T08:51Z -->
@@ -47,4 +50,4 @@ Coordinator: Terra high, non-editing
 <!-- lane: LS state: integrated model: Luna-xhigh worktree: tv-garden-submission review: Sol-passed updated: 2026-09-09T08:51Z -->
 <!-- lane: LP state: integrated model: Luna-xhigh worktree: tv-garden-performance review: Sol-passed updated: 2026-09-09T08:51Z -->
 <!-- lane: LV state: integrated model: Luna-xhigh worktree: tv-garden-verification review: Sol-passed updated: 2026-09-09T08:51Z -->
-<!-- lane: LR state: active model: Sol worktree: main-integration review: final-Terra pending updated: 2026-09-09T08:51Z -->
+<!-- lane: LR state: complete model: Sol worktree: main-integration review: final-Terra-passed updated: 2026-09-09T09:20Z -->
