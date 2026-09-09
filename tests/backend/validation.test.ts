@@ -17,11 +17,23 @@ describe("backend input validation", () => {
     expect(graphemeLength("👩‍👩‍👧‍👦")).toBe(1);
   });
 
-  it("keeps the public name shape aligned with the browser for Unicode names", () => {
-    expect(validateRecognitionInput({ ...base, submittedName: "Mary Jane O.", recipient: "Jean-Luc E\u0301." }).issues).toEqual([]);
-    expect(validateRecognitionInput({ ...base, submittedName: "张 伟", recipient: "Friend M." }).issues).toEqual([]);
-    expect(validateRecognitionInput({ ...base, submittedName: "Maya Rodriguez" }).issues).toContainEqual({ field: "submittedName", code: "invalid_format" });
-    expect(validateRecognitionInput({ ...base, recipient: "hello" }).issues).toContainEqual({ field: "recipient", code: "invalid_format" });
+  it("accepts single, full, nickname, and Unicode names after trimming", () => {
+    const cases = [
+      ["Cher", "Mary Jane"],
+      ["  Maya Rodriguez  ", "  张 伟  "],
+      ["M.", "Jean-Luc E\u0301"],
+    ] as const;
+
+    for (const [submittedName, recipient] of cases) {
+      const result = validateRecognitionInput({ ...base, submittedName, recipient });
+      expect(result.issues).toEqual([]);
+      expect(result.value).toMatchObject({ submittedName: submittedName.trim(), recipient: recipient.trim() });
+    }
+  });
+
+  it("rejects blank names after trimming", () => {
+    expect(validateRecognitionInput({ ...base, submittedName: "   " }).issues).toContainEqual({ field: "submittedName", code: "required" });
+    expect(validateRecognitionInput({ ...base, recipient: "\t\n" }).issues).toContainEqual({ field: "recipient", code: "required" });
   });
 
   it("keeps the 80-grapheme name boundary and rejects 81", () => {
@@ -29,12 +41,13 @@ describe("backend input validation", () => {
     const nameOverLimit = `${"a".repeat(79)} B`;
     expect(validateRecognitionInput({ ...base, submittedName: nameAtLimit }).issues).toEqual([]);
     expect(validateRecognitionInput({ ...base, submittedName: nameOverLimit }).issues).toContainEqual({ field: "submittedName", code: "too_long" });
+    expect(validateRecognitionInput({ ...base, recipient: nameOverLimit }).issues).toContainEqual({ field: "recipient", code: "too_long" });
   });
 
-  it("applies the same name shape to editable fields and preserves trimmed values", () => {
-    expect(validateEditablePatch({ submittedName: " Sender A. ", recipient: " Friend M. " }).value).toEqual({ submittedName: "Sender A.", recipient: "Friend M." });
-    expect(validateEditablePatch({ submittedName: "Sender Fullname" }).issues).toContainEqual({ field: "submittedName", code: "invalid_format" });
-    expect(validateEditablePatch({ recipient: "Friend Fullname" }).issues).toContainEqual({ field: "recipient", code: "invalid_format" });
+  it("accepts flexible editable names and preserves trimmed values", () => {
+    expect(validateEditablePatch({ submittedName: " Sender Fullname ", recipient: " Friend Fullname " }).value).toEqual({ submittedName: "Sender Fullname", recipient: "Friend Fullname" });
+    expect(validateEditablePatch({ submittedName: "   " }).issues).toContainEqual({ field: "submittedName", code: "required" });
+    expect(validateEditablePatch({ recipient: "🙂".repeat(81) }).issues).toContainEqual({ field: "recipient", code: "too_long" });
   });
 
   it("keeps editable requestKey immutable while accepting partial fields", () => {

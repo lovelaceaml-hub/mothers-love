@@ -61,25 +61,28 @@ describe("admin route DTOs", () => {
     expect(await response.json()).toEqual(recognition);
   });
 
-  it("rejects malformed public names before the database call", async () => {
-    readJson.mockResolvedValue({ value: { submittedName: "Sender Fullname", recipient: "Friend M.", message: "Thank you.", expressionIds: [2], requestKey: "request-1234" } });
+  it("accepts full public names and passes trimmed values to the database", async () => {
+    readJson.mockResolvedValue({ value: { submittedName: " Sender Fullname ", recipient: " Friend M. ", message: "Thank you.", expressionIds: [2], requestKey: "request-1234" } });
+    databaseAction.mockResolvedValue({ data: { ok: true, id: recognition.id }, error: null });
     const response = await publicRecognitionRoute.POST(request("/api/recognitions", { method: "POST", headers: { origin: "https://mothers-love.example" } }));
-    expect(response.status).toBe(400);
-    expect(databaseAction).not.toHaveBeenCalled();
+    expect(response.status).toBe(201);
+    expect(databaseAction).toHaveBeenCalledWith("submit", expect.objectContaining({ submittedName: "Sender Fullname", recipient: "Friend M." }));
   });
 
-  it("rejects malformed admin edit names before the database call", async () => {
-    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { submittedName: "Sender Fullname" }, reason: "correction" } });
+  it("accepts full admin edit names before the database call", async () => {
+    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { submittedName: " Sender Fullname " }, reason: "correction" } });
+    databaseAction.mockResolvedValue({ data: { ok: true, recognition }, error: null });
     const response = await adminRecognitionRoute.PATCH(request(`/api/admin/recognitions/${recognition.id}`, { method: "PATCH", headers: { origin: "https://mothers-love.example" } }), { params: Promise.resolve({ id: recognition.id }) });
-    expect(response.status).toBe(400);
-    expect(databaseAction).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(databaseAction).toHaveBeenCalledWith("admin_mutate", expect.objectContaining({ mutation: "edit", fields: { submittedName: "Sender Fullname" } }));
   });
 
-  it("rejects malformed admin edit recipients before the database call", async () => {
-    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { recipient: "Friend Fullname" }, reason: "correction" } });
+  it("accepts single admin edit recipients before the database call", async () => {
+    readJson.mockResolvedValue({ value: { expectedVersion: 1, action: "edit", fields: { recipient: "Cher" }, reason: "correction" } });
+    databaseAction.mockResolvedValue({ data: { ok: true, recognition }, error: null });
     const response = await adminRecognitionRoute.PATCH(request(`/api/admin/recognitions/${recognition.id}`, { method: "PATCH", headers: { origin: "https://mothers-love.example" } }), { params: Promise.resolve({ id: recognition.id }) });
-    expect(response.status).toBe(400);
-    expect(databaseAction).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(databaseAction).toHaveBeenCalledWith("admin_mutate", expect.objectContaining({ mutation: "edit", fields: { recipient: "Cher" } }));
   });
 
   it("returns bare DisplaySettings for GET and PATCH", async () => {

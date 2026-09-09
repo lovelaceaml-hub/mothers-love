@@ -14,19 +14,3 @@ export function countGraphemes(value: string) {
 
   return Array.from(value).length;
 }
-
-function containsLetterOrNumber(value: string) {
-  return /[\p{L}\p{M}\p{N}]/u.test(value);
-}
-
-export function isFirstNameLastInitial(value: string) {
-  const parts = value.trim().split(/\s+/).filter(Boolean);
-  if (parts.length < 2) return false;
-
-  const lastPart = parts.at(-1)?.replace(/\.$/, '') ?? '';
-  if (countGraphemes(lastPart) !== 1 || !containsLetterOrNumber(lastPart)) {
-    return false;
-  }
-
-  return parts.slice(0, -1).every(containsLetterOrNumber);
-}
