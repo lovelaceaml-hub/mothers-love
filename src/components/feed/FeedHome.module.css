@@ -592,6 +592,108 @@ button.secondaryAction {
   backdrop-filter: blur(12px);
 }
 
+.publicFeedCompact {
+  box-sizing: border-box;
+  width: min(100%, 34rem);
+  max-height: 11.25rem;
+  margin: 0 auto 0.85rem;
+  overflow: hidden;
+  padding: 0.55rem 0.7rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 1.15rem;
+  background: rgba(255, 253, 246, 0.9);
+  box-shadow: 0 12px 28px rgba(70, 65, 50, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.publicFeedCompact:focus-visible {
+  outline: 3px solid #215a82;
+  outline-offset: 4px;
+}
+
+.publicFeedCompactHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+  min-height: 2rem;
+}
+
+.publicFeedCompactHeading p {
+  margin: 0;
+  color: #914c55;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.publicFeedCompactHeading h2 {
+  margin: 0;
+  color: var(--heading-ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: right;
+}
+
+.publicFeedCompactViewport {
+  max-height: 8rem;
+  margin-top: 0.35rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.08rem 0.18rem 0.12rem 0.02rem;
+  scrollbar-color: rgba(105, 59, 83, 0.4) rgba(105, 59, 83, 0.08);
+  scrollbar-width: thin;
+}
+
+.publicFeedCompact .publicFeedCompanionList {
+  gap: 0.35rem;
+}
+
+.publicFeedCompact .publicFeedCompanionCard {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.75rem 0.75rem 0.75rem 0.3rem;
+}
+
+.publicFeedCompact .publicFeedCompanionHeader {
+  gap: 0.35rem;
+}
+
+.publicFeedCompact .publicFeedCompanionRecipient {
+  font-size: 0.8rem;
+  line-height: 1.15;
+}
+
+.publicFeedCompact .publicFeedCompanionMessage {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  overflow: visible;
+  white-space: pre-wrap;
+}
+
+.publicFeedCompact .publicFeedCompanionHeader .reactionButton,
+.publicFeedCompact .publicFeedCompanionHeader .reactionRetry {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.publicFeedCompact .companionState {
+  padding: 0.45rem 0.25rem;
+}
+
+.publicFeedCompact .companionState h2 {
+  font-size: 0.95rem;
+}
+
+.publicFeedCompact .companionState p {
+  font-size: 0.75rem;
+}
+
 .publicFeedCompanionHeading p {
   margin: 0;
   color: #914c55;

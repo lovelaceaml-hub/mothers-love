@@ -500,10 +500,32 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   return <PublicFeedContext.Provider value={context}>{children}</PublicFeedContext.Provider>;
 }
 
+export function CompactPublicFeed() {
+  const { items, status } = usePublicFeed();
+
+  return (
+    <section
+      className={styles.publicFeedCompact}
+      role="region"
+      aria-label="Live campaign"
+      data-testid="submission-live-feed"
+      tabIndex={0}
+    >
+      <div className={styles.publicFeedCompactHeading}>
+        <p>Live from the campaign</p>
+        <h2>Latest recognitions</h2>
+      </div>
+      <div className={styles.publicFeedCompactViewport}>
+        {status === 'ready' && items.length > 0 ? <FeedCompanionList items={items} /> : <FeedState compact />}
+      </div>
+    </section>
+  );
+}
+
 export function PublicFeedFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { items, status } = usePublicFeed();
-  if (!isPublicPage(pathname) || pathname === '/') return <>{children}</>;
+  if (!isPublicPage(pathname) || pathname === '/' || pathname === '/recognize') return <>{children}</>;
 
   return (
     <div className={styles.publicFeedFrame}>

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
 import { countGraphemes, isFirstNameLastInitial, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
+import { CompactPublicFeed } from '@/components/feed/PublicFeedProvider';
 
 import styles from './SubmissionForm.module.css';
 
@@ -173,7 +174,7 @@ function ExpressionChoice({
           aria-describedby={error ? 'expressions-error' : undefined}
           onClick={onToggle}
         >
-          {selected ? 'Selected' : 'Select'}
+          <span className={styles.expressionCheck} aria-hidden="true">{selected ? '✓' : ''}</span>
         </button>
       </div>
       <div className={styles.principleDetails}>
@@ -412,6 +413,7 @@ export function SubmissionForm() {
       <DecorativeGarden />
       <div className={styles.shell}>
         <Header />
+        <CompactPublicFeed />
 
         {showLoading && (
           <section className={styles.loadingCard} aria-live="polite" aria-busy="true">
