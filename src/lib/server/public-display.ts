@@ -202,12 +202,19 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
   };
 }
 
-export async function queryPublicDisplaySnapshot(after: string | null): Promise<PublicDisplayQuery> {
+export async function queryPublicDisplaySnapshot(after: string | null, signal?: AbortSignal): Promise<PublicDisplayQuery> {
+  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
   const client = databaseClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
   try {
-    const rows = await client`select public.ml_public_display_snapshot(${after}) as result`;
-    return { data: rows[0]?.result ?? null, error: null };
+    const data = await client.begin("read only", async (transaction) => {
+      if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+      await transaction`set local statement_timeout = '5000ms'`;
+      if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+      const rows = await transaction`select public.ml_public_display_snapshot(${after}) as result`;
+      return rows[0]?.result ?? null;
+    });
+    return { data, error: null };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
   }

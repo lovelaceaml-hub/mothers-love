@@ -8,6 +8,7 @@ import type { ApiResult } from "@/lib/server/types";
 export async function GET(request: NextRequest) {
   const unavailable = requireConfigured();
   if (unavailable) return unavailable;
+  if (request.signal.aborted) return errorResult(503, "UNAVAILABLE");
   const admission = admitPublicDisplayRequest(request);
   if (!admission) {
     const response = errorResult(429, "TOO_MANY_REQUESTS");
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     return response;
   }
   try {
-    const result = await queryPublicDisplaySnapshot(request.nextUrl.searchParams.get("after"));
+    const result = await queryPublicDisplaySnapshot(request.nextUrl.searchParams.get("after"), request.signal);
     if (result.error) return errorResult(503, "UNAVAILABLE");
     const snapshot = projectPublicDisplaySnapshot(result.data);
     if (!snapshot) return errorResult(503, "UNAVAILABLE");
