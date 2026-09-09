@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <p className={styles.updated}>How to share</p>
           <h2>Share a recognition</h2>
           <p>
-            No account is needed. Enter your first name and last initial, the recipient’s first name and last initial, one or more expressions, and a message.
+            No account is needed. Enter your name, the recipient’s name, one or more expressions, and a message.
           </p>
           <p>
             Your name is visible to campaign administrators and is not shown publicly. The recipient, selected expressions, and message may appear on the home page and TV after basic checks.

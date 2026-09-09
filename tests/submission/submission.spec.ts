@@ -10,9 +10,9 @@ async function openCollection(page: Page) {
   await expect(page.getByRole('heading', { name: "THE WORDS OF MOTHER'S LOVE" })).toBeVisible();
 }
 
-async function fillValidDraft(page: Page) {
-  await page.getByLabel('Your name').fill('Maya R.');
-  await page.getByLabel('Who would you like to recognize?').fill('Michelle R.');
+async function fillValidDraft(page: Page, names: { submitter?: string; recipient?: string } = {}) {
+  await page.getByLabel('Your name').fill(names.submitter ?? 'Maya R.');
+  await page.getByLabel('Who would you like to recognize?').fill(names.recipient ?? 'Michelle R.');
   await page.getByRole('button', { name: /Thank you\. It's all thanks/ }).click();
   await page.getByRole('button', { name: /I'd love to hear more/ }).click();
   await page.getByRole('button', { name: /Can I give you a hand/ }).click();
@@ -99,6 +99,28 @@ test('publishes a normal recognition and resets all fields for a new recognition
   await expect(page.getByLabel('Who would you like to recognize?')).toHaveValue('');
   await expect(page.getByLabel('Share your appreciation')).toHaveValue('');
   await expect(page.getByText('0 selected')).toBeVisible();
+});
+
+test('submits full and single names through the intercepted API', async ({ page }) => {
+  await openCollection(page);
+  const bodies: Record<string, unknown>[] = [];
+  await page.route('**/api/recognitions', async (route) => {
+    bodies.push(route.request().postDataJSON() as Record<string, unknown>);
+    await route.fulfill({ status: 201, json: { id: `synthetic-${bodies.length}`, status: 'published', expiresAt: '2030-01-08T00:00:00.000Z' } });
+  });
+
+  await fillValidDraft(page, { submitter: 'Ana María Rodríguez', recipient: 'Kim' });
+  await page.getByRole('button', { name: 'Send recognition' }).click();
+  await expect(page.getByRole('heading', { name: /Thank you for sharing Mother's Love/ })).toBeVisible();
+  expect(bodies[0]?.submittedName).toBe('Ana María Rodríguez');
+  expect(bodies[0]?.recipient).toBe('Kim');
+
+  await page.getByRole('button', { name: 'Recognize Someone Else' }).click();
+  await fillValidDraft(page, { submitter: 'Mimi', recipient: '张伟' });
+  await page.getByRole('button', { name: 'Send recognition' }).click();
+  await expect(page.getByRole('heading', { name: /Thank you for sharing Mother's Love/ })).toBeVisible();
+  expect(bodies[1]?.submittedName).toBe('Mimi');
+  expect(bodies[1]?.recipient).toBe('张伟');
 });
 
 test('shows a held receipt without promising display publication', async ({ page }) => {
