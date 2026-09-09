@@ -146,7 +146,8 @@ test('uses verified server time for initial suppression and monotonic expiry', a
 });
 
 test('removes each item at its own expiry without waiting for polling', async ({ page }) => {
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2029-12-31T12:00:00.000Z') });
+  await page.clock.pauseAt(new Date(serverTime));
   await routeReactions(page);
   await routeFeed(page, snapshot([
     item({ id: 'expires-first', recipient: 'First expiry R.', expiresAt: '2030-01-01T12:00:01.000Z' }),
@@ -154,7 +155,10 @@ test('removes each item at its own expiry without waiting for polling', async ({
   ]));
 
   await page.goto('/');
-  await expect(page.getByText('First expiry R.')).toBeVisible();
+  await expect.poll(async () => {
+    await page.clock.runFor(1);
+    return page.getByText('First expiry R.').count();
+  }).toBe(1);
   await expect(page.getByText('Second expiry R.')).toBeVisible();
   await page.clock.fastForward(1_200);
   await expect(page.getByText('First expiry R.')).toHaveCount(0);
@@ -219,7 +223,7 @@ test('bounds home to 30 items and keeps the list keyboard-scrollable', async ({ 
   await expect(page.getByRole('article')).toHaveCount(30);
 });
 
-test('shares the same public feed companion beside the recognition form', async ({ page }) => {
+test('shares the same public feed companion above the recognition form', async ({ page }) => {
   const companionItems = Array.from({ length: 35 }, (_, index) => item({
     id: `companion-${index}`,
     recipient: index === 0 ? 'Companion R.' : `Companion ${index} R.`,
