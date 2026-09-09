@@ -299,6 +299,10 @@
 .expression8 { background: var(--green); }
 .expression9 { background: var(--sky); }
 
+.expressionCard.expressionSelected {
+  background: linear-gradient(135deg, #ffe9a3 0%, #f8d875 56%, #efc861 100%);
+}
+
 .expressionHeader {
   display: flex;
   align-items: flex-start;
