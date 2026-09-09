@@ -350,6 +350,22 @@ button.secondaryAction {
   opacity: 0.72;
 }
 
+.reactionRecovery {
+  display: grid;
+  justify-items: end;
+  gap: 0.18rem;
+  min-width: 0;
+  max-width: 10rem;
+}
+
+.reactionRecoveryMessage {
+  max-width: 10rem;
+  color: #7b3f4f;
+  font-size: 0.63rem;
+  line-height: 1.2;
+  text-align: right;
+}
+
 .reactionButton > span:first-child {
   font-size: 0.875rem;
   line-height: 1;
@@ -362,6 +378,11 @@ button.secondaryAction {
   text-align: center;
   color: #7b3f4f;
   background: #fff2ef;
+}
+
+.reactionRetry > span:first-child {
+  font-size: 0.875rem;
+  line-height: 1;
 }
 
 .loadingDots {
@@ -606,7 +627,7 @@ button.secondaryAction {
   backdrop-filter: blur(12px);
 }
 
-.publicFeedCompact:focus-visible {
+.publicFeedCompactViewport:focus-visible {
   outline: 3px solid #215a82;
   outline-offset: 4px;
 }
@@ -766,7 +787,8 @@ button.secondaryAction {
 }
 
 .publicFeedCompanionHeader .reactionButton,
-.publicFeedCompanionHeader .reactionRetry {
+.publicFeedCompanionHeader .reactionRetry,
+.publicFeedCompanionHeader .reactionRecovery {
   max-width: 8.5rem;
   margin-top: 0;
 }
