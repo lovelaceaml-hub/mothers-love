@@ -1,11 +1,11 @@
 ---
 lane: LI
 title: Impact and expression stories
-state: verifying
+state: complete
 model: gpt-5.6-luna max
 runner: current controller
 worktree: /Users/anthony/Projects/mothers-love-worktrees/interview-insights
-review: pending
+review: controller
 depends_on: none
 updated: 2026-09-09T14:30Z
 ---
@@ -19,4 +19,4 @@ See the bounded lane in /Users/anthony/Projects/mothers-love/docs/PLAN-09-interv
 Integrated insights sources and focused tests. Lane reported 10/10 focused tests, ESLint and nonincremental typecheck passed. Controller corrected doubled CSS elapsed progression and wired the controlled screen clock. Actual-browser phase and layout checks pending.
 
 ## Review
-Pending integrated review.
+Controller reviewed the integrated result; see ../logs/release.md.

@@ -118,10 +118,12 @@ test('studio renders real sample and approved previews and saves settings', asyn
   await page.getByRole('button', { name: 'Current approved', exact: true }).click();
   await page.getByRole('tab', { name: 'Featured Recognition', exact: false }).click();
   await expect(page.frameLocator('iframe[title="TV screen preview"]').getByTestId('featured-reading')).toContainText('Synthetic recipient A');
+  await expect.poll(() => page.frameLocator('iframe[title="TV screen preview"]').getByTestId('featured-reading').evaluate(node => { let opacity = 1; for (let el: Element | null = node; el; el = el.parentElement) opacity *= Number(getComputedStyle(el).opacity); return opacity; })).toBeGreaterThan(0.9);
   await page.screenshot({ path: info.outputPath('studio-desktop.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByTestId('preview-canvas')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.getByTestId('preview-canvas').screenshot({ path: info.outputPath('preview-phone.png') });
   await page.screenshot({ path: info.outputPath('studio-phone.png'), fullPage: true });
   expect(saves).toBe(0);
   await page.getByRole('group', { name: 'Global tempo' }).getByRole('button', { name: /Lively/ }).click();

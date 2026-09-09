@@ -31,3 +31,5 @@ Map all interview choices in research/completion-matrix.md. Verify animation pha
 - 2026-09-09: Clean baseline recorded after other task completed. Luna max and no Terra honored. Four disjoint lanes start together; root corrects shared implementation. In progress.
 
 - 2026-09-09: User requested immediate completion with less overhead. All four lanes integrated. Root fixed timeline double advancement, readable card layout, true single-scene everyday journey, stable preview lessons, isolated scaled preview canvas, stale preview clearing, and shared readable Featured view. Final focused checks and release in progress.
+
+- 2026-09-09: Released code 5bb9077 through deployment dpl_FkoZ7a6SgkFSWZfjxRsrga5wpPCL. All 14 final browser checks, 3 production checks and unauthenticated route denials passed. Completion proof and limits: runs/2026-09-09-interview-completion/logs/release.md.

@@ -2,7 +2,7 @@
 
 ## Interview completion update
 
-The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](docs/PLAN-09-interview-completion.md). Release verification is in progress. Latest instructions use Luna max lanes plus controller corrections, no Terra.
+The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](docs/PLAN-09-interview-completion.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
 
 ## Quick links
 

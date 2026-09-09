@@ -1,6 +1,6 @@
 # Interview completion matrix
 
-Source quotations in the answer column preserve the original interview wording. All implementation rows remain pending final integration verification until the release receipt is recorded. Latest direct corrections take precedence over earlier selections. No physical hardware proof is claimed.
+Source quotations in the answer column preserve the original interview wording. Implementation rows are covered by the integrated checks and controller review in ../logs/release.md; the recorded hardware limits remain explicit. Latest direct corrections take precedence over earlier selections. No physical hardware proof is claimed.
 
 | Decision | Selected answer (verbatim) | Delivery lane | Verification basis |
 | --- | --- | --- | --- |

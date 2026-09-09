@@ -255,9 +255,9 @@ export function DisplayStudioPreview({ settings, source, sessionKey, onSourceCha
   const approvedState = useApprovedSnapshot(settings, source, sessionKey);
   const [selectedScreen, setSelectedScreen] = useState<DisplayScreenId>('garden');
   const timelineKey = `${selectedScreen}:${source}:${sessionKey ?? ''}`;
-  const [timeline, setTimeline] = useState({ key: 'garden:sample:', elapsedMs: 0, playing: false, replayKey: 0 });
+  const [timeline, setTimeline] = useState({ key: 'garden:sample:', elapsedMs: 0, playing: true, replayKey: 0 });
   const elapsedMs = timeline.key === timelineKey ? timeline.elapsedMs : 0;
-  const playing = timeline.key === timelineKey ? timeline.playing : false;
+  const playing = timeline.key === timelineKey ? timeline.playing : true;
   const replayKey = timeline.key === timelineKey ? timeline.replayKey : 0;
   const elapsedRef = useRef(0);
   const snapshot = source === 'sample'
