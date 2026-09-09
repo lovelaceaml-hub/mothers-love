@@ -10,13 +10,14 @@
 - **Storage:** [Release evidence in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw). Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love).
 - [Handoff](docs/HANDOFF.md)
+- [Garden live refresh correction](docs/PLAN-06-garden-refresh.md)
 - [Direct TV link plan](docs/PLAN-05-direct-tv.md)
 - [Presentation and hearts plan](docs/PLAN-04-polish-and-hearts.md)
 - [Earlier live feed plan](docs/PLAN-03-live-feed.md)
 - [User manual](docs/USER-MANUAL.md)
 - [Product brief](docs/PRODUCT-BRIEF.md)
 - [Clickable journeys](docs/USER-JOURNEYS.md)
-- [Run record](docs/runs/2026-09-08-direct-tv/INDEX.md)
+- [Run record](docs/runs/2026-09-08-garden-refresh/INDEX.md)
 - [Product contract](docs/CONTRACT.md)
 - [Approved visual references](docs/source-handoff/references/README.md)
 

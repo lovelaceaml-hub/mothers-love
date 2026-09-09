@@ -1,0 +1,3 @@
+# Integration
+
+G4811300and R668f45b integrated sequentially from clean baselinee0d32df.109unit tests, typecheck, lint and build passed. Actual silent TCP test settled after8007ms and socket closed.81deployed synthetic browser journeys passed including full paused Garden additions. Live APIs and fresh anonymous TV readiness passed. Private evidence provider permissions, size and mounted checksum verified. Both clean task worktrees removed after integration; branches and unrelated worktrees preserved. No schema or credential changes. Native controller review and final source publication are recorded at closure.

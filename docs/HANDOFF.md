@@ -61,3 +61,8 @@ User requested gentle animation and a brighter dominant Share a recognition butt
 Direct TV runtime77d23b7 is restored at the canonical link after explicit Vercel promotion.101unit tests,80fresh deployed browser journeys and6supplemental checks passed. Anonymous direct access and protected admin denial were verified without capturing real content. Final evidence is privately backed up at https://drive.google.com/file/d/12yjHaJlikBuAMx3G87qxj7V32Hd006Of/view, with mounted SHA256 verified. Exact release and review records are in runs/2026-09-08-direct-tv/research/. Physical TV readability and a real phone QR scan remain unverified.
 
 PLAN-05integration review passed with native Sol high and independent Terra high. TV View requires only its link. Source and final publication closure receipts are in runs/2026-09-08-direct-tv/research/closure.md.
+
+## Garden live refresh correction
+PLAN-06and runs/2026-09-08-garden-refresh record the user-reported live update defect. G updates the Garden selection on accepted snapshots; R isolates and bounds TV reads so they cannot reserve the mutation pool indefinitely. Initial process recycle restored service. Final integration and publication verification follow in the run records. Approved visuals and database objects remain unchanged.
+
+PLAN-06integration is complete: new recognitions join Garden automatically, including full/paused screens; TV reads use isolated eight-second recovery.109unit tests and81deployed browser checks passed, native Sol review passed. Private evidence: https://drive.google.com/file/d/1f-3pJyqR-BuWCT9iWkoNdxdw3wvPXV3Z/view. Final source/deployment receipts: runs/2026-09-08-garden-refresh/research/closure.md. An already-open TV browser needs one refresh to load the corrected code.

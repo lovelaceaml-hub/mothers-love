@@ -48,3 +48,8 @@ The corrected cumulative native review passed. Independent public-data review al
 Sol B5 added a transaction-scoped query deadline after the controller identified a server-side stall gap. The real disposable database test stopped a stalled statement after5008ms, recovered the shared client and restored the session setting. No global database setting changed. Parallel workflow remains approved; visual-result feedback is pending and does not block release.
 
 Direct TV completion reviews passed with all accepted findings corrected. Restored production, private synthetic evidence and source manifest are verified. Actual physical TV/phone feedback remains pending. The approved parallel workflow is unchanged.
+
+## Garden refresh follow-up
+A live user report exposed two gaps despite prior startup tests: Garden retained its original slots on successful polls, and the server-side SQL timeout did not bound pool acquisition or protocol progress. The correction adds full/paused Garden polling regressions and a separate bounded TV-read connection lifecycle. A read-only metadata check confirmed healthy database state, and recycling the affected app restored service before the permanent correction. The approved Luna parallel workflow remains; result feedback is pending and nonblocking. No global instruction change is added.
+
+Garden correction completed its native Sol review with no actionable finding. The full deployed regression suite and safe actual service checks passed; private evidence checksum is verified. Existing workflow preference remains approved and no result feedback is required to close.

@@ -34,7 +34,7 @@ Open [TV View](https://mothers-love.vercel.app/display) on the TV browser. No ac
 
 Use [Display controls](https://mothers-love.vercel.app/admin/display) to change motion, pause the display or stop showing messages. These settings apply to all open TV screens when they refresh. If an offline TV must stop showing a message immediately, turn off or blank that screen.
 
-The Recognition Garden shows live recognitions as animated bubbles. Other rotating screens have a recent-recognition rail. Motion follows the display setting and the device's reduced-motion preference.
+The Recognition Garden shows live recognitions as animated bubbles. New recognitions appear automatically, including while screen rotation is paused. Other rotating screens have a recent-recognition rail. Motion follows the display setting and the device's reduced-motion preference.
 
 ## Manage access
 The Owner uses [Settings and access](https://mothers-love.vercel.app/admin/settings) to invite moderators or remove account access. Moderators can manage recognitions and everyday display controls. Keep your password private.

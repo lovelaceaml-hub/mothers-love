@@ -4,8 +4,8 @@
 Anthony explicitly requested: "I want you to plan out this entire app and deploy it." This supersedes the historical planning-only handoff. Local implementation, dependencies, isolated new app hosting and deployment are authorized. Purchases need explicit budget authority. Existing apps/databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
 
 ## Read first
-- /Users/anthony/Projects/mothers-love/docs/PLAN-05-direct-tv.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-direct-tv/INDEX.md.
+- /Users/anthony/Projects/mothers-love/docs/PLAN-06-garden-refresh.md including Build log.
+- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-garden-refresh/INDEX.md.
 - /Users/anthony/Projects/mothers-love/docs/CONTRACT.md.
 - /Users/anthony/Projects/mothers-love/docs/source-handoff/03_CONTENT_AND_DESIGN.md and relevant phases/tests.
 
@@ -37,3 +37,6 @@ Preserve the approved circular Bubble Board and expressive drift, sparkle, bounc
 
 ## Direct TV access correction
 Anthony removes TV pairing: /display opens directly for anyone with the link. Public TV snapshot is read-only and explicitly projected, with no code, login, device registration, session token or acknowledgement. Admin access remains secured. Global settings, neutral/quiet, expiry, cleanup gating and offline safety remain. Historical paired-only wording below older plans is superseded. Read PLAN-05.
+
+## Garden refresh correction
+New eligible records must enter Garden on the next successful snapshot even while full or rotation is paused. Keep unchanged polls stable and refill hidden/expired slots. TV reads use their own bounded client lifecycle; never retire the mutation pool to recover a public read. PLAN-06tracks the correction.
