@@ -118,6 +118,38 @@ describe("public display projection", () => {
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: Array.from({ length: 1001 }, (_, index) => ({ ...recognition, id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}` })) })).toBeNull();
   });
 
+  it("accepts PostgreSQL timestamp ordering when sub-millisecond values tie in JavaScript", () => {
+    const newestAt = "2026-09-08T10:00:00.000900Z";
+    const olderAt = "2026-09-08T10:00:00.000100Z";
+    const projected = projectPublicDisplaySnapshot({
+      ...snapshot,
+      sync: "reset",
+      arrivals: [],
+      recognitions: [
+        {
+          ...recognition,
+          id: "00000000-0000-4000-8000-000000000001",
+          featured: false,
+          createdAt: newestAt,
+          firstPublishedAt: newestAt,
+        },
+        {
+          ...recognition,
+          id: "00000000-0000-4000-8000-000000000099",
+          featured: false,
+          createdAt: olderAt,
+          firstPublishedAt: olderAt,
+        },
+      ],
+    });
+
+    expect(Date.parse(newestAt)).toBe(Date.parse(olderAt));
+    expect(projected?.recognitions.map((item) => item.id)).toEqual([
+      "00000000-0000-4000-8000-000000000001",
+      "00000000-0000-4000-8000-000000000099",
+    ]);
+  });
+
   it("accepts a new month with no aggregate rows yet", () => {
     const projected = projectPublicDisplaySnapshot({
       ...snapshot,
