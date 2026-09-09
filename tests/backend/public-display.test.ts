@@ -3,13 +3,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type ConfiguredResult = ReturnType<typeof import("@/lib/server/http")["requireConfigured"]>;
 
-const { databaseClient, requireConfigured, admitPublicDisplayRequest } = vi.hoisted(() => ({
-  databaseClient: vi.fn(),
+const { publicDisplayClient, retirePublicDisplayClient, requireConfigured, admitPublicDisplayRequest } = vi.hoisted(() => ({
+  publicDisplayClient: vi.fn(),
+  retirePublicDisplayClient: vi.fn(),
   requireConfigured: vi.fn<() => ConfiguredResult>(() => null),
   admitPublicDisplayRequest: vi.fn(),
 }));
 
-vi.mock("@/lib/server/supabase", () => ({ databaseClient }));
+vi.mock("@/lib/server/public-display-client", () => ({ getPublicDisplayClient: publicDisplayClient, retirePublicDisplayClient }));
 vi.mock("@/lib/server/http", () => ({ requireConfigured }));
 vi.mock("@/lib/server/public-display-admission", () => ({ admitPublicDisplayRequest }));
 
@@ -76,12 +77,13 @@ function mockTransactionalDatabase(select: () => Promise<unknown>) {
     return select();
   });
   const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => callback(transaction));
-  databaseClient.mockReturnValue({ begin });
+  publicDisplayClient.mockReturnValue({ begin });
   return { begin, transaction };
 }
 
 beforeEach(() => {
-  databaseClient.mockReset();
+  publicDisplayClient.mockReset();
+  retirePublicDisplayClient.mockReset();
   requireConfigured.mockReturnValue(null);
   admitPublicDisplayRequest.mockReturnValue({ release: vi.fn() });
 });
@@ -226,7 +228,7 @@ describe("GET /api/display/snapshot", () => {
     requireConfigured.mockReturnValue(NextResponse.json({ ok: false, code: "UNAVAILABLE" }, { status: 503 }));
     const response = await GET(request());
     expect(response.status).toBe(503);
-    expect(databaseClient).not.toHaveBeenCalled();
+    expect(publicDisplayClient).not.toHaveBeenCalled();
   });
 
   it("refuses an unadmitted request before the database and marks it uncached", async () => {
@@ -235,7 +237,7 @@ describe("GET /api/display/snapshot", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("retry-after")).toBe("5");
     expect(response.headers.get("cache-control")).toBe("no-store");
-    expect(databaseClient).not.toHaveBeenCalled();
+    expect(publicDisplayClient).not.toHaveBeenCalled();
   });
 
   it("releases the admission slot when the database query fails", async () => {
@@ -249,6 +251,24 @@ describe("GET /api/display/snapshot", () => {
     expect(release).toHaveBeenCalledTimes(1);
   });
 
+  it("releases the admission slot when a public read reaches its wall deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      const release = vi.fn();
+      admitPublicDisplayRequest.mockReturnValue({ release });
+      publicDisplayClient.mockReturnValue({ begin: vi.fn(() => new Promise<never>(() => undefined)) });
+
+      const pendingResponse = GET(request());
+      await vi.advanceTimersByTimeAsync(8_000);
+      const response = await pendingResponse;
+
+      expect(response.status).toBe(503);
+      expect(release).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("does not admit or enqueue a request that was already aborted", async () => {
     const controller = new AbortController();
     controller.abort();
@@ -258,7 +278,7 @@ describe("GET /api/display/snapshot", () => {
     expect(response.status).toBe(503);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(admitPublicDisplayRequest).not.toHaveBeenCalled();
-    expect(databaseClient).not.toHaveBeenCalled();
+    expect(publicDisplayClient).not.toHaveBeenCalled();
   });
 
   it("skips every transaction statement when a queued request aborts before execution", async () => {
@@ -273,7 +293,7 @@ describe("GET /api/display/snapshot", () => {
       });
       return callback(transaction);
     });
-    databaseClient.mockReturnValue({ begin });
+    publicDisplayClient.mockReturnValue({ begin });
 
     const pendingResponse = GET(request("/api/display/snapshot", controller.signal));
     await vi.waitFor(() => expect(releaseQueue).toBeDefined());
@@ -298,7 +318,7 @@ describe("GET /api/display/snapshot", () => {
       });
     });
     const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => callback(transaction));
-    databaseClient.mockReturnValue({ begin });
+    publicDisplayClient.mockReturnValue({ begin });
 
     const pendingResponse = GET(request("/api/display/snapshot", controller.signal));
     await vi.waitFor(() => expect(finishTimeoutSetup).toBeDefined());

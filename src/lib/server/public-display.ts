@@ -1,7 +1,7 @@
 import type { Aggregate, DisplaySettings, DisplaySnapshot, Recognition } from "@/lib/contracts";
 import { isFirstNameLastInitial } from "../name-validation";
 import { isIsoDate, graphemeLength } from "./time";
-import { databaseClient } from "./supabase";
+import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 
 export type PublicDisplayQuery = {
   data: unknown;
@@ -13,6 +13,7 @@ const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_CURSOR_LENGTH = 64;
 const MAX_RECOGNITIONS = 1000;
 const MAX_BIGINT = BigInt("9223372036854775807");
+const PUBLIC_DISPLAY_OPERATION_DEADLINE_MS = 8_000;
 
 function parseTimestamp(value: unknown): number | null {
   if (typeof value !== "string" || value.length === 0 || value.length > MAX_TIMESTAMP_LENGTH) return null;
@@ -204,18 +205,32 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
 
 export async function queryPublicDisplaySnapshot(after: string | null, signal?: AbortSignal): Promise<PublicDisplayQuery> {
   if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
-  const client = databaseClient();
+  const client = getPublicDisplayClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+
+  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
+  const operation = Promise.resolve().then(() => client.begin("read only", async (transaction) => {
+    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+    await transaction`set local statement_timeout = '5000ms'`;
+    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+    const rows = await transaction`select public.ml_public_display_snapshot(${after}) as result`;
+    return rows[0]?.result ?? null;
+  }));
+  void operation.then(() => undefined, () => undefined);
+
+  const deadline = new Promise<never>((_, reject) => {
+    deadlineTimer = setTimeout(() => {
+      retirePublicDisplayClient(client);
+      reject(new Error("DATABASE_TIMEOUT"));
+    }, PUBLIC_DISPLAY_OPERATION_DEADLINE_MS);
+  });
+
   try {
-    const data = await client.begin("read only", async (transaction) => {
-      if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-      await transaction`set local statement_timeout = '5000ms'`;
-      if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-      const rows = await transaction`select public.ml_public_display_snapshot(${after}) as result`;
-      return rows[0]?.result ?? null;
-    });
+    const data = await Promise.race([operation, deadline]);
     return { data, error: null };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+  } finally {
+    if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
   }
 }
