@@ -17,3 +17,9 @@ The only checks that cannot be automated safely are physical TV readability, act
 After the reported live regression, commits `66ff4fa`, `fcff843`, and `98f06cc` were published in sequence. The final source commit `98f06cc` is deployed as Vercel production deployment `dpl_GHX7pC61f94emNrjfkM2wqihKq3g`, READY with the same production alias.
 
 The final production Chromium suite passed 12 synthetic browser journeys. It explicitly proves that owner-selected Lively motion keeps Garden animation active when the browser requests reduced motion and Studio tempo remains Standard. The suite still proves Standard reduced-motion behavior, bounded high-density rendering, reconnect behavior, empty Garden handling, fixed invitation destinations, and 1080p and 4K bounds. All application API responses were intercepted with synthetic content.
+
+## Dynamic presentation publication
+
+Source commit `ad1acc9` is deployed as Vercel production deployment `dpl_8fZceLWZaNVDACepyfMP6azzo1Hd`, READY with the production alias. It restores perfect Garden circles, keeps complete public messages in their circles, retains Owner-enabled effects, and adds continuous glow and sparkle motion across the core, insight, and teaching screen modules.
+
+The same 12 synthetic production Chromium journeys passed after publication, including the 1920 by 1080 and 3840 by 2160 bounds checks. No live recognition, Owner session, submission, or application API response was used during those browser checks.
