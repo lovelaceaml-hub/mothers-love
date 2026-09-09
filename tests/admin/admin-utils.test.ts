@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AdminRecognition, DisplaySettings } from '@/lib/contracts';
 import {
-  ackLabel,
   actionExplanation,
   capabilitiesFor,
   displaySettingChanges,
@@ -72,17 +71,10 @@ describe('admin editor safety helpers', () => {
   });
 });
 
-describe('admin role and display acknowledgement helpers', () => {
+describe('admin role and display helpers', () => {
   it('keeps owner-only controls separate from moderator controls', () => {
     expect(capabilitiesFor('owner')).toEqual({ canInvite: true, canRevoke: true, canPairDevices: true, canDelete: true, canChangeCollection: true });
     expect(capabilitiesFor('moderator')).toEqual({ canInvite: false, canRevoke: false, canPairDevices: false, canDelete: false, canChangeCollection: false });
-  });
-
-  it('distinguishes saved, pending and browser-applied acknowledgement', () => {
-    expect(ackLabel('saved', false)).toBe('Unsaved changes');
-    expect(ackLabel('pending', false)).toBe('Pending delivery');
-    expect(ackLabel('applied', false)).toBe('Saved');
-    expect(ackLabel('applied', true)).toBe('Applied by browser');
   });
 
   it('only sends changed display fields and produces aggregate-only CSV', () => {

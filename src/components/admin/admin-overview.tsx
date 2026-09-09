@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Aggregate, Device, DisplaySettings } from '@/lib/contracts';
+import type { Aggregate, DisplaySettings } from '@/lib/contracts';
 import { adminApi, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, periodLabel } from './admin-utils';
+import { periodLabel } from './admin-utils';
 import styles from './admin.module.css';
 
 type OverviewResponse = {
@@ -12,7 +12,6 @@ type OverviewResponse = {
   nearestExpiry: string | null;
   lastCleanupAt: string | null;
   overduePurgeCount: number;
-  devices: Device[];
   aggregate: Aggregate;
   settings: DisplaySettings;
 };
@@ -64,8 +63,6 @@ export function AdminOverview() {
   if (error) return <div className={styles.error} role="alert">{error} <button type="button" className={styles.authLink} onClick={() => void load()}>Try again</button></div>;
   if (!data) return null;
 
-  const activeDevice = data.devices.find((device) => !device.revoked);
-  const heartbeat = activeDevice?.lastSeenAt ? `Browser last connected ${formatDateTime(activeDevice.lastSeenAt)}` : 'No paired browser has connected yet';
   const modeLabel = data.settings.mode[0].toUpperCase() + data.settings.mode.slice(1);
   const lastCleanupTime = data.lastCleanupAt ? new Date(data.lastCleanupAt).getTime() : Number.NaN;
   const cleanupNeverRan = !data.lastCleanupAt;
@@ -87,9 +84,9 @@ export function AdminOverview() {
         </article>
 
         <article className={`${styles.card} ${styles.cardBlue} ${styles.col3}`}>
-          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Display mode</h2><p className={styles.cardDescription}>Current setting for the paired browser.</p></div><span className={styles.badge}>{modeLabel}</span></div>
+          <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Global display mode</h2><p className={styles.cardDescription}>Current setting for open TV View screens.</p></div><span className={styles.badge}>{modeLabel}</span></div>
           <div className={styles.metric}><span className={styles.metricValue}>{data.settings.pauseArrivals || data.settings.pauseRotation ? 'Paused' : 'Ready'}</span></div>
-          <p className={styles.cardDescription}>{heartbeat}. This does not confirm that a physical TV is powered on.</p>
+          <p className={styles.cardDescription}>Open TV View screens apply this setting when they refresh.</p>
           <Link className={styles.buttonSecondary} href="/admin/display" style={{ marginTop: 14 }}>Open display controls</Link>
         </article>
 
@@ -113,7 +110,7 @@ export function AdminOverview() {
       <section className={styles.grid} aria-label="Common actions">
         <article className={`${styles.card} ${styles.col4}`}><h2 className={styles.cardTitle}>Manage recognitions</h2><p className={styles.cardDescription}>Filter records and review submitted names.</p><Link className={styles.button} href="/admin/recognitions" style={{ marginTop: 16 }}>Open recognition manager</Link></article>
         <article className={`${styles.card} ${styles.col4}`}><h2 className={styles.cardTitle}>Emergency neutral</h2><p className={styles.cardDescription}>Hide personal content and stop new arrivals on the display.</p><Link className={styles.buttonDanger} href="/admin/display" style={{ marginTop: 16 }}>Open neutral control</Link></article>
-        <article className={`${styles.card} ${styles.col4}`}><h2 className={styles.cardTitle}>Access and devices</h2><p className={styles.cardDescription}>Invite moderators and pair display browsers.</p><Link className={styles.buttonSecondary} href="/admin/settings" style={{ marginTop: 16 }}>Open settings</Link></article>
+        <article className={`${styles.card} ${styles.col4}`}><h2 className={styles.cardTitle}>Access and TV View</h2><p className={styles.cardDescription}>Invite moderators and open the public TV View.</p><Link className={styles.buttonSecondary} href="/admin/settings" style={{ marginTop: 16 }}>Open settings</Link></article>
       </section>
     </>
   );
