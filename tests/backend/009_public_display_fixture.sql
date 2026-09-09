@@ -159,6 +159,43 @@ BEGIN
 END
 $bounded_display_assertions$;
 
+DO $arrival_overflow_assertions$
+DECLARE
+  index_value integer;
+  cursor_before text;
+  overflow_result jsonb;
+  normal_delta_result jsonb;
+  expected_recognition_id constant uuid := '00000000-0000-4000-8000-000000000010'::uuid;
+BEGIN
+  -- Use a currently returned featured recognition, so all 1,001 events are
+  -- eligible arrivals rather than events omitted by the 1,000-record snapshot cap.
+  cursor_before := public.ml_public_display_snapshot(NULL)->>'cursor';
+  FOR index_value IN 1..1001 LOOP
+    INSERT INTO mothers_love.display_events (recognition_id, event_kind, recognition_version, payload, created_at, expires_at)
+    VALUES (expected_recognition_id, 'published', 1, '{}'::jsonb, clock_timestamp(), clock_timestamp() + interval '1 hour');
+  END LOOP;
+
+  overflow_result := public.ml_public_display_snapshot(cursor_before);
+  IF overflow_result->>'ok' IS DISTINCT FROM 'true'
+     OR overflow_result->>'sync' IS DISTINCT FROM 'reset'
+     OR overflow_result->'arrivals' IS DISTINCT FROM '[]'::jsonb
+     OR overflow_result->>'cursor' IS NOT DISTINCT FROM cursor_before
+     OR jsonb_array_length(overflow_result->'recognitions') IS DISTINCT FROM 1000 THEN
+    RAISE EXCEPTION 'arrival overflow did not return a bounded reset: %', overflow_result;
+  END IF;
+
+  INSERT INTO mothers_love.display_events (recognition_id, event_kind, recognition_version, payload, created_at, expires_at)
+  VALUES (expected_recognition_id, 'published', 1, '{}'::jsonb, clock_timestamp(), clock_timestamp() + interval '1 hour');
+  normal_delta_result := public.ml_public_display_snapshot(overflow_result->>'cursor');
+  IF normal_delta_result->>'ok' IS DISTINCT FROM 'true'
+     OR normal_delta_result->>'sync' IS DISTINCT FROM 'delta'
+     OR jsonb_array_length(normal_delta_result->'arrivals') IS DISTINCT FROM 1
+     OR normal_delta_result->'arrivals'->0->>'recognitionId' IS DISTINCT FROM expected_recognition_id::text THEN
+    RAISE EXCEPTION 'normal delta did not resume after arrival overflow reset: %', normal_delta_result;
+  END IF;
+END
+$arrival_overflow_assertions$;
+
 DO $mode_display_assertions$
 DECLARE
   result jsonb;

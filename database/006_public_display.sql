@@ -26,6 +26,7 @@ BEGIN
       sync_value text := 'reset';
       items jsonb := '[]'::jsonb;
       arrivals jsonb := '[]'::jsonb;
+      arrival_overflow boolean := false;
       aggregate_value jsonb;
       settings_value jsonb;
     BEGIN
@@ -139,19 +140,7 @@ BEGIN
               r.id DESC
             LIMIT 1000
           )
-          SELECT COALESCE(
-            pg_catalog.jsonb_agg(
-              pg_catalog.jsonb_build_object(
-                'eventId', bounded.event_id::text,
-                'recognitionId', bounded.recognition_id::text,
-                'publishedAt', bounded.created_at
-              )
-              ORDER BY bounded.event_id
-            ),
-            '[]'::jsonb
-          )
-          INTO arrivals
-          FROM (
+          , bounded AS (
             SELECT de.event_id, de.recognition_id, de.created_at
             FROM mothers_love.display_events AS de
             JOIN selected ON selected.id = de.recognition_id
@@ -165,8 +154,36 @@ BEGIN
               AND current_rec.first_published_at IS NOT NULL
               AND current_rec.expires_at > now_value
             ORDER BY de.event_id
-            LIMIT 1000
-          ) AS bounded;
+            LIMIT 1001
+          ), numbered AS (
+            SELECT
+              bounded.*,
+              pg_catalog.row_number() OVER (ORDER BY bounded.event_id) AS arrival_index
+            FROM bounded
+          )
+          SELECT
+            COALESCE(
+              pg_catalog.jsonb_agg(
+                pg_catalog.jsonb_build_object(
+                  'eventId', numbered.event_id::text,
+                  'recognitionId', numbered.recognition_id::text,
+                  'publishedAt', numbered.created_at
+                )
+                ORDER BY numbered.event_id
+              ) FILTER (WHERE numbered.arrival_index <= 1000),
+              '[]'::jsonb
+            ),
+            COALESCE(pg_catalog.bool_or(numbered.arrival_index > 1000), false)
+          INTO arrivals, arrival_overflow
+          FROM numbered;
+
+          -- A truncated delta would make the cursor claim events the display
+          -- never received. Return a bounded reset snapshot instead, so the
+          -- next poll starts cleanly from the current cursor.
+          IF arrival_overflow THEN
+            sync_value := 'reset';
+            arrivals := '[]'::jsonb;
+          END IF;
         END IF;
       ELSE
         sync_value := 'reset';
