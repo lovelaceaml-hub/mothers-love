@@ -539,14 +539,16 @@ function FeedCompanionCard({ item }: { item: PublicFeedItem }) {
   const reaction = reactions[item.id];
   return (
     <article className={styles.publicFeedCompanionCard}>
-      <p className={styles.publicFeedCompanionRecipient}>For {item.recipient}</p>
+      <div className={styles.publicFeedCompanionHeader}>
+        <p className={styles.publicFeedCompanionRecipient}>For {item.recipient}</p>
+        <ReactionButton
+          item={item}
+          reaction={reaction}
+          onToggle={() => toggleReaction(item)}
+          onRetry={retryReactions}
+        />
+      </div>
       <p className={styles.publicFeedCompanionMessage}>{item.message}</p>
-      <ReactionButton
-        item={item}
-        reaction={reaction}
-        onToggle={() => toggleReaction(item)}
-        onRetry={retryReactions}
-      />
     </article>
   );
 }

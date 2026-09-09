@@ -38,8 +38,18 @@ function FeedCard({ item }: { item: PublicFeedItem }) {
     <article className={styles.feedCard} aria-labelledby={`feed-recipient-${item.id}`}>
       <div className={styles.cardAccent} aria-hidden="true" />
       <div className={styles.cardHeader}>
-        <p className={styles.cardEyebrow}>A recognition for</p>
-        <h3 id={`feed-recipient-${item.id}`}>{item.recipient}</h3>
+        <div className={styles.cardHeaderCopy}>
+          <p className={styles.cardEyebrow}>A recognition for</p>
+          <h3 id={`feed-recipient-${item.id}`}>{item.recipient}</h3>
+        </div>
+        <div className={styles.reactionRow}>
+          <ReactionButton
+            item={item}
+            reaction={reactions[item.id]}
+            onToggle={() => toggleReaction(item)}
+            onRetry={retryReactions}
+          />
+        </div>
       </div>
       <p className={styles.message}>{item.message}</p>
       <ul className={styles.expressionList} aria-label="Selected expressions">
@@ -47,14 +57,6 @@ function FeedCard({ item }: { item: PublicFeedItem }) {
           <li key={expression.id}>{expression.phrase}</li>
         ))}
       </ul>
-      <div className={styles.reactionRow}>
-        <ReactionButton
-          item={item}
-          reaction={reactions[item.id]}
-          onToggle={() => toggleReaction(item)}
-          onRetry={retryReactions}
-        />
-      </div>
     </article>
   );
 }
