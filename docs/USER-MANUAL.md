@@ -4,11 +4,11 @@
 Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Scroll the recent recognitions box to read the latest 30. Tap a heart to like a recognition, or tap it again to remove your like. No sign-in is needed. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the paired display. Use Pause animation to stop decorative movement.
 
 ## Share a recognition
-Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Preview it, then send it. Your submitted name is visible only to administrators.
+Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your first name and last initial, then the recipient's. Read the explanations beneath each expression, select the ones that fit, and write your message. Each expression has its own row. Selected expressions turn gold and show a checkmark. Preview it, then send it. Your submitted name is visible only to administrators.
 
 Keep contact information and private details out of your message. If sending fails, keep the tab open and try again. A message received for review will appear only after approval.
 
-A compact live feed also appears beside the form and other public pages.
+A compact live feed appears below the form title, above the fields. Scroll it to read the latest 30 recognitions. Other public pages also show the live feed.
 
 The [expression guide](https://mothers-love.vercel.app/expressions) explains all nine expressions with everyday examples.
 
@@ -35,6 +35,8 @@ If another admin changes a message while you are editing, review their changes b
 3. Check that the text is readable and scan the QR code with your phone.
 
 Use [Display controls](https://mothers-love.vercel.app/admin/display) to change motion, pause the display or stop showing messages. A pending change has not yet reached the TV. If an offline TV must stop showing a message immediately, turn off or blank that screen.
+
+The Recognition Garden shows live recognitions as animated bubbles. Other rotating screens have a recent-recognition rail. Motion follows the display setting and the device's reduced-motion preference.
 
 ## Manage access
 The Owner uses [Settings and access](https://mothers-love.vercel.app/admin/settings) to invite moderators or remove account and TV access. Moderators can manage recognitions and everyday display controls. Keep your password private.

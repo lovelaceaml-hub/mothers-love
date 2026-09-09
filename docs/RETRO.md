@@ -30,3 +30,8 @@ Final local capture-inclusive verification exposed an intermittent pauseAt(Date.
 Sol resolved the two timing fixtures without changing app code. Both fixtures passed16 stress cases and the full74-test normal suite passed. Fallback model choices matched the explicit user instruction; visual feedback remains pending.
 
 Anthony then requested smaller top-right heart controls. A final bounded Luna lane changed markup and CSS only. The follow-up passed16 affected deployed journeys and12 measured/accessibility views. It is included in the final cumulative review.
+
+## Restoring the approved Bubble Board
+Anthony rejected the flattened TV cards because circular compositions and organic movement were already approved. The implementation had interpreted the request for fitting text panels too broadly. New Luna lanes restored circles, drift, sparkle, top-right screen headings and the Garden itself as the live feed without a duplicate rail. Long reading content retains fitting panels and exact words. The form now stacks expression cards, shows selected cards in gold with shimmer and a checkmark, and places a compact keyboard-scrollable feed below its titles. Anthony clarified that gold applies to selected expressions, not the submit button.
+
+Rendered checks caught clipped moving-circle rims, a milestone count overridden by body text styles, low circle-label contrast and overlapping impact circles. These are corrected within the same approved direction, with geometric and motion checks added. A provider usage error stopped one Luna turn; the live usage check then reported a fresh0percent window and the same lane resumed successfully. No reset credit or purchase was used.

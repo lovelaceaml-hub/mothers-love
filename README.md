@@ -3,7 +3,7 @@
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).
-- **Status:** Live hearts, scrollable latest 30 recognitions, public live feeds, warmer typography and animated TV screens. Admin and TV View links remain at the bottom.
+- **Status:** Live hearts, gold selected expressions, compact above-form feed and restored animated circular TV screens. Admin and TV View links remain at the bottom.
 - **Expression guide:** [Nine expressions and everyday examples](https://mothers-love.vercel.app/expressions), live.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login), Sign in with the existing password; no authenticator required.
 - **TV:** [Paired display](https://mothers-love.vercel.app/display), pair it with an Owner-issued code.

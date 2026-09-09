@@ -1,0 +1,3 @@
+# Task cleanup
+
+The form-compact and tv-bubbles-restore worktrees were clean and their commits integrated before removal. Their branches remain available. Earlier task worktrees were already removed after integration. Older unrelated worktrees remain untouched. The local verification server and isolated PostgreSQL runner are stopped. All implementation agents completed. The final review process exited successfully and its read-only mount was detached. Review source exports and disk images are removed after durable hash receipts are written. No global caches, user browser state, unrelated processes or original Downloads prototypes were removed.
