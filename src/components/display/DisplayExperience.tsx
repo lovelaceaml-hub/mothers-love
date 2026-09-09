@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import QRCode from 'qrcode';
 
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
@@ -74,51 +74,6 @@ function isUnauthorized(error: unknown): boolean {
 
 function snapshotRequestPath(cursor: string | null): string {
   return cursor ? `/api/display/snapshot?after=${encodeURIComponent(cursor)}` : '/api/display/snapshot';
-}
-
-function PairingPanel({ onPair, pending, error }: { onPair: (code: string) => void; pending: boolean; error: string }) {
-  const [code, setCode] = useState('');
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onPair(code.trim());
-  };
-  return (
-    <main className={styles.pairingPage} aria-labelledby="pairing-title">
-      <div className={styles.pairingDecor} aria-hidden="true">
-        <span className={styles.decorBubbleBlue} />
-        <span className={styles.decorBubbleYellow} />
-        <span className={styles.decorLeaf} />
-      </div>
-      <section className={styles.pairingCard}>
-        <p className={styles.eyebrow}>THE WORDS OF MOTHER&apos;S LOVE</p>
-        <h1 id="pairing-title">Connect this display.</h1>
-        <p className={styles.tagline}>Where a mother&apos;s love resides, peace abides.</p>
-        <p className={styles.pairingCopy}>
-          Enter the 8-character display code from the campaign owner.
-        </p>
-        <form className={styles.pairingForm} onSubmit={submit}>
-          <label htmlFor="display-code">Display code</label>
-          <input
-            id="display-code"
-            name="code"
-            inputMode="text"
-            autoCapitalize="characters"
-            autoComplete="one-time-code"
-            value={code}
-            onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^0-9A-HJKMNP-TV-Z]/g, '').slice(0, 8))}
-            placeholder="Enter your code"
-            aria-describedby={error ? 'pairing-error' : 'pairing-help'}
-            disabled={pending}
-          />
-          <span id="pairing-help" className={styles.fieldHint}>Ask the campaign owner for a code if you need one.</span>
-          {error ? <p id="pairing-error" className={styles.formError} role="alert">{error}</p> : null}
-          <button type="submit" disabled={pending || code.trim().length !== 8}>
-            {pending ? 'Connecting…' : 'Connect this display'}
-          </button>
-        </form>
-      </section>
-    </main>
-  );
 }
 
 function ExpressionPill({ id }: { id: number }) {
@@ -505,6 +460,19 @@ function FallbackScreen() {
   );
 }
 
+function StartupScreen({ unavailable }: { unavailable: boolean }) {
+  return (
+    <section className={styles.startupScreen} aria-live="polite" aria-labelledby="display-startup-title">
+      <div className={styles.startupCard}>
+        <span className={styles.startupFlower} aria-hidden="true" />
+        <p className={styles.eyebrow}>{unavailable ? 'DISPLAY UNAVAILABLE' : 'THE RECOGNITION GARDEN'}</p>
+        <h2 id="display-startup-title">{unavailable ? 'The display is temporarily unavailable.' : 'The display is connecting.'}</h2>
+        <p>{unavailable ? 'It will keep trying automatically.' : 'Your campaign view will appear here.'}</p>
+      </div>
+    </section>
+  );
+}
+
 function LiveRail({ items, reactionCounts }: { items: Recognition[]; reactionCounts: ReadonlyMap<string, ReactionItem> }) {
   if (!items.length) return null;
   return (
@@ -631,8 +599,6 @@ function Screen({ state, reactionCounts }: ScreenProps) {
 
 export function DisplayExperience() {
   const [state, dispatch] = useReducer(displayReducer, undefined, createInitialState);
-  const [pairingPending, setPairingPending] = useState(false);
-  const [pairingError, setPairingError] = useState('');
   const stateRef = useRef<PresentationState | null>(null);
   const displayOpenedAt = useRef<number | null>(null);
   const snapshotRequestInFlight = useRef(false);
@@ -653,7 +619,6 @@ export function DisplayExperience() {
 
   const loadSnapshot = useCallback(async (probe = false) => {
     const currentState = stateRef.current;
-    if (!probe && !currentState?.paired) return;
     if (snapshotRequestInFlight.current) return;
     snapshotRequestInFlight.current = true;
     const requestGeneration = snapshotRequestGeneration.current + 1;
@@ -662,7 +627,7 @@ export function DisplayExperience() {
     try {
       const snapshot = await api<DisplaySnapshot>(snapshotRequestPath(requestCursor), {
         method: 'GET',
-        credentials: 'include',
+        auth: false,
         cache: 'no-store',
       });
       if (requestGeneration !== snapshotRequestGeneration.current) return;
@@ -676,61 +641,26 @@ export function DisplayExperience() {
   }, [monotonicNow]);
 
   useEffect(() => {
+    dispatch({ type: 'PAIRING_SUCCEEDED' });
     void loadSnapshot(true);
   }, [loadSnapshot]);
 
-  const pairDisplay = useCallback(async (code: string) => {
-    if (!code) return;
-    setPairingPending(true);
-    setPairingError('');
-    dispatch({ type: 'PAIRING_STARTED' });
-    try {
-      await api<{ paired: boolean }>('/api/display/pair', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      snapshotRequestGeneration.current += 1;
-      snapshotRequestInFlight.current = false;
-      dispatch({ type: 'PAIRING_SUCCEEDED' });
-      setPairingPending(false);
-      window.setTimeout(() => void loadSnapshot(true), 0);
-    } catch (error) {
-      setPairingPending(false);
-      setPairingError(isUnauthorized(error) ? 'That code is no longer valid. Ask the campaign owner for a new code.' : 'The display could not connect. Check the code and try again.');
-      dispatch({ type: 'PAIRING_REQUIRED' });
-    }
-  }, [loadSnapshot]);
-
   useEffect(() => {
-    if (!state.paired) return;
     const tickTimer = window.setInterval(() => dispatch({ type: 'TICK', nowMs: monotonicNow() }), 500);
     const pollTimer = window.setInterval(() => void loadSnapshot(), 5_000);
     return () => {
       window.clearInterval(tickTimer);
       window.clearInterval(pollTimer);
     };
-  }, [loadSnapshot, monotonicNow, state.paired]);
+  }, [loadSnapshot, monotonicNow]);
 
   useEffect(() => {
-    if (!state.paired) return;
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => dispatch({ type: 'SET_REDUCED_MOTION', reduced: media.matches });
     update();
     media.addEventListener?.('change', update);
     return () => media.removeEventListener?.('change', update);
-  }, [state.paired]);
-
-  useEffect(() => {
-    if (!state.snapshot || !state.paired || state.unauthorized) return;
-    void api('/api/display/ack', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ settingsVersion: state.settings.version, snapshotRevision: state.snapshot.revision }),
-    }).catch(() => undefined);
-  }, [state.paired, state.settings.version, state.snapshot, state.unauthorized]);
+  }, []);
 
   const motion = effectiveMotion(state);
   const personalContentVisible = state.paired && state.phase === 'ready' && !state.quiet && !state.neutral && !state.offlineSafe && !state.stale && !state.unauthorized;
@@ -750,9 +680,6 @@ export function DisplayExperience() {
     () => reactionEligibleKey ? reactionEligibleKey.split('\u001f') : [],
     [reactionEligibleKey],
   );
-  if (!state.paired && state.phase !== 'loading') {
-    return <PairingPanel onPair={pairDisplay} pending={pairingPending} error={pairingError} />;
-  }
   return (
     <main
       className={`${styles.displayApp} ${styles[`motion${motion}`]} ${state.lowActivity ? styles.lowActivity : ''} ${state.stale ? styles.stale : ''}`}
@@ -779,7 +706,7 @@ export function DisplayExperience() {
           {state.queue.length ? <span>{state.queue.length} waiting</span> : null}
         </div>
       </header>
-      {personalContentVisible ? (
+      {state.phase !== 'ready' || (!state.snapshot && !state.offlineSafe) ? <StartupScreen unavailable={state.stale || state.unauthorized} /> : personalContentVisible ? (
         <ReactionCounts key={reactionEligibleKey} eligibleIds={reactionEligibleIds}>
           {(reactionCounts) => <DisplayStage state={state} personalContentVisible={personalContentVisible} liveRailItems={liveRailItems} reactionCounts={reactionCounts} />}
         </ReactionCounts>

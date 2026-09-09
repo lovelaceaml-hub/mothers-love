@@ -110,18 +110,15 @@ async function routeReactionCounts(page: Page) {
   });
 }
 
-async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOptions = {}) {
+async function loadAndRead(page: Page, size: FixtureSize, options: FixtureOptions = {}) {
   await routeReactionCounts(page);
-  await page.route('**/api/display/pair', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
+  const forbiddenRequests: string[] = [];
+  page.on('request', (request) => {
+    if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
   });
   let snapshotCalls = 0;
   await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
     snapshotCalls += 1;
-    if (snapshotCalls === 1) {
-      await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'pairing required', code: 'UNAUTHORIZED' }) });
-      return;
-    }
     const response = fixture(size, options);
     const body = options.continuous && snapshotCalls > 2
       ? {
@@ -136,28 +133,21 @@ async function pairAndRead(page: Page, size: FixtureSize, options: FixtureOption
       : response;
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   });
-  await page.route('**/api/display/ack', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-  });
   await page.goto('/display');
-  await page.getByLabel('Display code').fill('A7C9F2H4');
-  await page.getByRole('button', { name: 'Connect this display' }).click();
   await expect(page.getByTestId('display-app')).toBeVisible();
+  await expect.poll(() => forbiddenRequests).toEqual([]);
 }
 
-async function pairLongAcceptance(page: Page, withArrival: boolean, message = LONG_MESSAGE, options: Pick<FixtureOptions, 'motion'> = {}) {
+async function loadLongAcceptance(page: Page, withArrival: boolean, message = LONG_MESSAGE, options: Pick<FixtureOptions, 'motion'> = {}) {
   await routeReactionCounts(page);
-  await page.route('**/api/display/pair', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
+  const forbiddenRequests: string[] = [];
+  page.on('request', (request) => {
+    if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
   });
   let snapshotCalls = 0;
   await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
     snapshotCalls += 1;
     if (snapshotCalls === 1) {
-      await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'pairing required', code: 'UNAUTHORIZED' }) });
-      return;
-    }
-    if (snapshotCalls === 2) {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(longAcceptanceFixture(1, 'reset', [], message, options)) });
       return;
     }
@@ -168,20 +158,15 @@ async function pairLongAcceptance(page: Page, withArrival: boolean, message = LO
       body: JSON.stringify(longAcceptanceFixture(snapshotCalls, 'delta', withArrival ? [arrival] : [], message, options)),
     });
   });
-  await page.route('**/api/display/ack', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-  });
   await page.goto('/display');
-  await page.getByLabel('Display code').fill('A7C9F2H4');
-  await page.getByRole('button', { name: 'Connect this display' }).click();
-  await page.clock.runFor(1);
   await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '1', { timeout: 15_000 });
+  await expect.poll(() => forbiddenRequests).toEqual([]);
 }
 
 test.describe('Bubble Board display synthetic fixtures', () => {
   for (const size of [0, 1, 2, 20, 'long'] as const) {
     test(`renders the ${size} fixture without unsafe sample content`, async ({ page }) => {
-      await pairAndRead(page, size);
+      await loadAndRead(page, size);
       await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', String(size === 'long' ? 1 : size), { timeout: 15_000 });
       await expect(page.getByText('Synthetic recipient 1')).toBeVisible({ timeout: 10_000 }).catch(() => undefined);
       const screenshot = await page.screenshot({ fullPage: true });
@@ -190,34 +175,47 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     });
   }
 
-  test('keeps the pairing gate before the first verified snapshot', async ({ page }) => {
-    await page.goto('/display');
-    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible();
-    await expect(page.getByTestId('display-app')).toHaveCount(0);
-  });
-
-  test('probes an existing paired display cookie before asking for a new code', async ({ page }) => {
-    let pairCalls = 0;
-    await page.route('**/api/display/pair', async (route) => {
-      pairCalls += 1;
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
+  test('opens directly without a pairing form', async ({ page }) => {
+    const forbiddenRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
     });
     await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(1)) });
     });
-    await page.route('**/api/display/ack', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-    });
     await page.goto('/display');
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 15_000 });
-    expect(pairCalls).toBe(0);
+    await expect(page.getByLabel('Display code')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Connect this display/ })).toHaveCount(0);
+    expect(forbiddenRequests).toEqual([]);
   });
 
-  test('applies a delayed startup snapshot and clears the paired wall on a 401 resync', async ({ page }) => {
-    let snapshotCalls = 0;
-    await page.route('**/api/display/pair', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
+  test('retries a temporary startup failure without asking for a code', async ({ page }) => {
+    const forbiddenRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
     });
+    let snapshotCalls = 0;
+    await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
+      snapshotCalls += 1;
+      if (snapshotCalls === 1) {
+        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'unavailable', code: 'UNAVAILABLE' }) });
+        return;
+      }
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fixture(1)) });
+    });
+    await page.goto('/display');
+    await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible();
+    await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 12_000 });
+    expect(forbiddenRequests).toEqual([]);
+  });
+
+  test('shows a concise startup state, then clears content after an unauthorized resync', async ({ page }) => {
+    const forbiddenRequests: string[] = [];
+    page.on('request', (request) => {
+      if (/\/api\/display\/(pair|ack)/.test(request.url())) forbiddenRequests.push(request.url());
+    });
+    let snapshotCalls = 0;
     await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
       snapshotCalls += 1;
       if (snapshotCalls === 1) {
@@ -231,20 +229,15 @@ test.describe('Bubble Board display synthetic fixtures', () => {
       }
       await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'revoked', code: 'UNAUTHORIZED' }) });
     });
-    await page.route('**/api/display/ack', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-    });
     await page.goto('/display');
-    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible();
-    await page.getByLabel('Display code').fill('A7C9F2H4');
-    await page.getByRole('button', { name: 'Connect this display' }).click();
+    await expect(page.getByRole('heading', { name: 'The display is connecting.' })).toBeVisible();
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 15_000 });
-    await page.waitForTimeout(5_500);
-    await expect(page.getByRole('heading', { name: 'Connect this display.' })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible({ timeout: 15_000 });
+    expect(forbiddenRequests).toEqual([]);
   });
 
   test('honors trail and constellation flags and only links shared expressions', async ({ page }) => {
-    await pairAndRead(page, 2, { showTrails: false, showConstellations: false, nonSharedExpressions: true });
+    await loadAndRead(page, 2, { showTrails: false, showConstellations: false, nonSharedExpressions: true });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 10_000 });
     const board = page.getByTestId('garden-board');
     await expect(board).toHaveAttribute('data-connection-count', '0');
@@ -253,10 +246,10 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await expect(board.locator('[class*="bubbleTrail"]')).toHaveCount(0);
   });
 
-  test('keeps garden bubbles circular and shows the paired live rail on other screens', async ({ page }) => {
+  test('keeps garden bubbles circular and shows the direct live rail on other screens', async ({ page }) => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairAndRead(page, 2, { continuous: true });
+    await loadAndRead(page, 2, { continuous: true });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 10_000 });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
     await expect(page.getByTestId('live-rail')).toHaveCount(0);
@@ -313,7 +306,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     const message = `${'A'.repeat(108)}e\u0301👩‍👩‍👧‍👦Z`;
     const expected = `${'A'.repeat(108)}e\u0301👩‍👩‍👧‍👦…`;
-    await pairAndRead(page, 1, { continuous: true, message });
+    await loadAndRead(page, 1, { continuous: true, message });
     for (let step = 0; step < 6; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
       await page.clock.runFor(5_000);
@@ -339,16 +332,9 @@ test.describe('Bubble Board display synthetic fixtures', () => {
         body: JSON.stringify({ items: ids.map((id) => ({ id, count: Number(id.split('-').pop()), liked: false })) }),
       });
     });
-    await page.route('**/api/display/pair', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ paired: true }) });
-    });
     let snapshotCalls = 0;
     await page.route(/\/api\/display\/snapshot(?:\?.*)?$/, async (route) => {
       snapshotCalls += 1;
-      if (snapshotCalls === 1) {
-        await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'pairing required', code: 'UNAUTHORIZED' }) });
-        return;
-      }
       const response = fixture(31);
       const arrival = { eventId: 'older-arrival', recognitionId: 'synthetic-1', publishedAt: '2026-09-08T12:00:00.000Z' };
       await route.fulfill({
@@ -357,13 +343,8 @@ test.describe('Bubble Board display synthetic fixtures', () => {
         body: JSON.stringify(snapshotCalls === 2 ? response : { ...response, revision: snapshotCalls, cursor: `fixture-31-${snapshotCalls}`, sync: 'delta', arrivals: [arrival] }),
       });
     });
-    await page.route('**/api/display/ack', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-    });
 
     await page.goto('/display');
-    await page.getByLabel('Display code').fill('A7C9F2H4');
-    await page.getByRole('button', { name: 'Connect this display' }).click();
     await page.clock.runFor(1);
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
     let railSeen = false;
@@ -383,7 +364,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1280, height: 720 });
-    await pairAndRead(page, 2, { continuous: true });
+    await loadAndRead(page, 2, { continuous: true });
     for (let step = 0; step < 30; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'cluster') break;
       await page.clock.runFor(5_000);
@@ -430,7 +411,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1280, height: 720 });
-    await pairAndRead(page, 2, { continuous: true });
+    await loadAndRead(page, 2, { continuous: true });
     for (let step = 0; step < 30; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'all-nine') break;
       await page.clock.runFor(5_000);
@@ -468,7 +449,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
   });
 
   test('removes the live rail and personal counts in neutral mode', async ({ page }) => {
-    await pairAndRead(page, 2, { mode: 'neutral' });
+    await loadAndRead(page, 2, { mode: 'neutral' });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '0');
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
@@ -477,7 +458,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
   });
 
   test('renders the quiet message with a literal apostrophe', async ({ page }) => {
-    await pairAndRead(page, 2, { mode: 'quiet' });
+    await loadAndRead(page, 2, { mode: 'quiet' });
     await expect(page.getByRole('heading', { name: "Mother's Love is still here." })).toBeVisible();
     await expect(page.getByText("Mother&apos;s Love is still here.")).toHaveCount(0);
   });
@@ -486,7 +467,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairAndRead(page, 2, { continuous: true, motion: 'standard' });
+    await loadAndRead(page, 2, { continuous: true, motion: 'standard' });
     const seen = new Map<string, string>();
     const capture = async () => {
       const screen = await page.getByTestId('display-app').getAttribute('data-screen');
@@ -511,7 +492,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1280, height: 720 });
-    await pairAndRead(page, 2, { continuous: true, motion: 'still' });
+    await loadAndRead(page, 2, { continuous: true, motion: 'still' });
     for (let step = 0; step < 30; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'impact') break;
       await page.clock.runFor(5_000);
@@ -577,7 +558,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairLongAcceptance(page, true, LONG_MESSAGE, { motion: 'standard' });
+    await loadLongAcceptance(page, true, LONG_MESSAGE, { motion: 'standard' });
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
       await page.clock.runFor(500);
@@ -592,7 +573,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairAndRead(page, 2, { continuous: true, milestone: true, motion: 'standard' });
+    await loadAndRead(page, 2, { continuous: true, milestone: true, motion: 'standard' });
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
       await page.clock.runFor(500);
@@ -604,7 +585,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
   });
 
   test('keeps garden bubbles inside the board and long excerpts readable at TV sizes', async ({ page }) => {
-    await pairAndRead(page, 'long');
+    await loadAndRead(page, 'long');
     for (const viewport of [{ width: 1920, height: 1080 }, { width: 3840, height: 2160 }]) {
       await page.setViewportSize(viewport);
       const bounds = await page.getByTestId('garden-board').evaluate((board) => {
@@ -632,7 +613,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await pairLongAcceptance(page, false);
+    await loadLongAcceptance(page, false);
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
       await page.clock.runFor(500);
@@ -672,7 +653,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
     await page.setViewportSize({ width: 1280, height: 720 });
-    await pairLongAcceptance(page, true);
+    await loadLongAcceptance(page, true);
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
       await page.clock.runFor(500);
@@ -724,7 +705,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     await page.clock.install({ time: testStart });
     await page.clock.pauseAt(testStart);
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await pairLongAcceptance(page, false, DENSE_LINE_MESSAGE);
+    await loadLongAcceptance(page, false, DENSE_LINE_MESSAGE);
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'featured') break;
       await page.clock.runFor(500);
@@ -757,7 +738,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
   test('captures the current multi-record garden, featured, all-nine, and cluster screens', async ({ page }) => {
     test.skip(!DISPLAY_CAPTURE_ENABLED || !DISPLAY_CAPTURE_DIRECTORY, 'Set DISPLAY_SCREENSHOTS=1 and DISPLAY_SCREENSHOT_DIR to capture evidence.');
     test.setTimeout(140_000);
-    await pairAndRead(page, 2, { continuous: true });
+    await loadAndRead(page, 2, { continuous: true });
     const directory = DISPLAY_CAPTURE_DIRECTORY!;
     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 15_000 });
     await page.screenshot({ path: join(directory, 'garden-multi-record.png'), fullPage: true });
@@ -774,19 +755,19 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     const directory = DISPLAY_CAPTURE_DIRECTORY!;
 
     const fallbackPage = await page.context().newPage();
-    await pairAndRead(fallbackPage, 0);
+    await loadAndRead(fallbackPage, 0);
     await expect(fallbackPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'fallback', { timeout: 10_000 });
     await fallbackPage.screenshot({ path: join(directory, 'fallback-empty.png'), fullPage: true });
     await fallbackPage.close();
 
     const quietPage = await page.context().newPage();
-    await pairAndRead(quietPage, 2, { mode: 'quiet' });
+    await loadAndRead(quietPage, 2, { mode: 'quiet' });
     await expect(quietPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'quiet', { timeout: 10_000 });
     await quietPage.screenshot({ path: join(directory, 'quiet-mode.png'), fullPage: true });
     await quietPage.close();
 
     const neutralPage = await page.context().newPage();
-    await pairAndRead(neutralPage, 2, { mode: 'neutral' });
+    await loadAndRead(neutralPage, 2, { mode: 'neutral' });
     await expect(neutralPage.getByTestId('display-app')).toHaveAttribute('data-screen', 'neutral', { timeout: 10_000 });
     await neutralPage.screenshot({ path: join(directory, 'neutral-mode.png'), fullPage: true });
     await neutralPage.close();
@@ -798,7 +779,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
     const directory = DISPLAY_CAPTURE_DIRECTORY!;
 
     await page.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairLongAcceptance(page, true);
+    await loadLongAcceptance(page, true);
     for (let step = 0; step < 50; step += 1) {
       if (await page.getByTestId('display-app').getAttribute('data-screen') === 'arrival') break;
       await page.clock.runFor(500);
@@ -808,7 +789,7 @@ test.describe('Bubble Board display synthetic fixtures', () => {
 
     const milestonePage = await page.context().newPage();
     await milestonePage.clock.install({ time: new Date('2026-09-08T12:00:00.000Z') });
-    await pairAndRead(milestonePage, 2, { continuous: true, milestone: true });
+    await loadAndRead(milestonePage, 2, { continuous: true, milestone: true });
     for (let step = 0; step < 50; step += 1) {
       if (await milestonePage.getByTestId('display-app').getAttribute('data-screen') === 'milestone') break;
       await milestonePage.clock.runFor(500);
