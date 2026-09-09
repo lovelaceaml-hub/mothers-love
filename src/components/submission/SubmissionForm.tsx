@@ -6,12 +6,12 @@ import Link from 'next/link';
 
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
-import { countGraphemes, isFirstNameLastInitial, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
+import { countGraphemes, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
 import { CompactPublicFeed } from '@/components/feed/PublicFeedProvider';
 
 import styles from './SubmissionForm.module.css';
 
-export { countGraphemes, isFirstNameLastInitial };
+export { countGraphemes };
 
 type ConfigResponse = { collectionOpen: boolean; configured: boolean };
 type ReceiptStatus = 'published' | 'held';
@@ -55,19 +55,15 @@ export function getValidationErrors(draft: Draft): FieldErrors {
   const message = draft.message.trim();
 
   if (!submitter) {
-    errors.submitter = 'Enter your first name and last initial.';
+    errors.submitter = 'Enter your name.';
   } else if (countGraphemes(submitter) > MAX_NAME_GRAPHEMES) {
     errors.submitter = `Your name must be ${MAX_NAME_GRAPHEMES} characters or fewer.`;
-  } else if (!isFirstNameLastInitial(submitter)) {
-    errors.submitter = 'Use your first name and last initial, such as Maya R.';
   }
 
   if (!recipient) {
-    errors.recipient = 'Enter the recipient’s first name and last initial.';
+    errors.recipient = 'Enter the recipient name.';
   } else if (countGraphemes(recipient) > MAX_NAME_GRAPHEMES) {
     errors.recipient = `The recipient name must be ${MAX_NAME_GRAPHEMES} characters or fewer.`;
-  } else if (!isFirstNameLastInitial(recipient)) {
-    errors.recipient = 'Use a first name and last initial, such as Michelle R.';
   }
 
   if (draft.expressionIds.length === 0) {
@@ -446,7 +442,6 @@ export function SubmissionForm() {
 
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="submitter">Your name</label>
-                <p className={styles.helper} id="submitter-help">First name and last initial.</p>
                 <input
                   ref={submitterRef}
                   className={styles.textInput}
@@ -456,16 +451,15 @@ export function SubmissionForm() {
                   autoComplete="name"
                   value={draft.submitter}
                   onChange={(event) => updateDraft('submitter', event.target.value)}
-                  placeholder="First name + last initial"
+                  placeholder="For example, Maya Rodriguez"
                   aria-invalid={Boolean(fieldErrors.submitter)}
-                  aria-describedby={fieldErrors.submitter ? 'submitter-help submitter-error' : 'submitter-help'}
+                  aria-describedby={fieldErrors.submitter ? 'submitter-error' : undefined}
                 />
                 <FieldMessage id="submitter-error">{fieldErrors.submitter}</FieldMessage>
               </div>
 
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="recipient">Who would you like to recognize?</label>
-                <p className={styles.helper} id="recipient-help">Enter their first name and last initial.</p>
                 <input
                   ref={recipientRef}
                   className={styles.textInput}
@@ -474,9 +468,9 @@ export function SubmissionForm() {
                   type="text"
                   value={draft.recipient}
                   onChange={(event) => updateDraft('recipient', event.target.value)}
-                  placeholder="For example, Michelle R."
+                  placeholder="For example, Michelle"
                   aria-invalid={Boolean(fieldErrors.recipient)}
-                  aria-describedby={fieldErrors.recipient ? 'recipient-help recipient-error' : 'recipient-help'}
+                  aria-describedby={fieldErrors.recipient ? 'recipient-error' : undefined}
                 />
                 <FieldMessage id="recipient-error">{fieldErrors.recipient}</FieldMessage>
               </div>

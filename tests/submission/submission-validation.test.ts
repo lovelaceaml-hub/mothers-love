@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { countGraphemes, getValidationErrors, isFirstNameLastInitial } from '@/components/submission/SubmissionForm';
+import { countGraphemes, getValidationErrors } from '@/components/submission/SubmissionForm';
 
 describe('submission validation', () => {
   it('counts grapheme clusters instead of UTF-16 code units', () => {
@@ -8,16 +8,43 @@ describe('submission validation', () => {
     expect(countGraphemes('👩🏽‍💻')).toBe(1);
   });
 
-  it('accepts Unicode, apostrophes, hyphens, and multiword first names', () => {
-    expect(isFirstNameLastInitial("Mary Jane O.")).toBe(true);
-    expect(isFirstNameLastInitial('Jean-Luc É.')).toBe(true);
-    expect(isFirstNameLastInitial('张 伟')).toBe(true);
-    expect(isFirstNameLastInitial('Michelle')).toBe(false);
+  it('accepts single, full, nickname, and Unicode names', () => {
+    const errors = getValidationErrors({
+      submitter: '  Mimi  ',
+      recipient: '张 伟',
+      message: 'Thank you for your kindness.',
+      expressionIds: [2],
+    });
+
+    expect(errors).toEqual({});
   });
 
-  it('uses the shared name validator for the same malformed cases rejected by the server', () => {
-    expect(isFirstNameLastInitial('Maya Rodriguez')).toBe(false);
-    expect(isFirstNameLastInitial('hello')).toBe(false);
+  it('rejects missing names while accepting names with any shape', () => {
+    const errors = getValidationErrors({
+      submitter: '',
+      recipient: '  ',
+      message: 'Thank you for your kindness.',
+      expressionIds: [2],
+    });
+
+    expect(errors.submitter).toBe('Enter your name.');
+    expect(errors.recipient).toBe('Enter the recipient name.');
+  });
+
+  it('rejects over-limit names without shortening them', () => {
+    const submitter = '🙂'.repeat(81);
+    const recipient = 'a'.repeat(81);
+    const errors = getValidationErrors({
+      submitter,
+      recipient,
+      message: 'Thank you for your kindness.',
+      expressionIds: [2],
+    });
+
+    expect(errors.submitter).toContain('80');
+    expect(errors.recipient).toContain('80');
+    expect(submitter).toHaveLength(162);
+    expect(recipient).toHaveLength(81);
   });
 
   it('returns field level errors without shortening the draft', () => {
