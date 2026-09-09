@@ -117,6 +117,30 @@ describe("public display projection", () => {
     expect(projectPublicDisplaySnapshot({ ...snapshot, settings: { ...settings, mode: "quiet" }, recognitions: [recognition] })).toBeNull();
     expect(projectPublicDisplaySnapshot({ ...snapshot, recognitions: Array.from({ length: 1001 }, (_, index) => ({ ...recognition, id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}` })) })).toBeNull();
   });
+
+  it("accepts a new month with no aggregate rows yet", () => {
+    const projected = projectPublicDisplaySnapshot({
+      ...snapshot,
+      recognitions: [],
+      arrivals: [],
+      aggregate: {
+        ...aggregate,
+        recognitions: 0,
+        expressionCounts: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        expressionTotal: 0,
+        revision: 0,
+      },
+      sync: "reset",
+    });
+
+    expect(projected?.aggregate).toEqual({
+      ...aggregate,
+      recognitions: 0,
+      expressionCounts: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      expressionTotal: 0,
+      revision: 0,
+    });
+  });
 });
 
 describe("GET /api/display/snapshot", () => {
