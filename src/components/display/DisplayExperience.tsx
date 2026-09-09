@@ -166,6 +166,9 @@ function Atmosphere() {
       <span className={styles.atmosphereOrbTwo} />
       <span className={styles.atmosphereOrbThree} />
       <span className={styles.atmosphereDaisy} />
+      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleOne}`} />
+      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleTwo}`} />
+      <span className={`${styles.atmosphereSparkle} ${styles.atmosphereSparkleThree}`} />
     </div>
   );
 }
