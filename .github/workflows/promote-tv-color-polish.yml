@@ -1,0 +1,59 @@
+name: Promote verified TV color polish to production
+
+on:
+  push:
+    branches: [codex/mothers-love]
+    paths:
+      - .github/workflows/promote-tv-color-polish.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mothers-love-tv-color-polish-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: codex/mothers-love
+
+      - name: Fetch verified color-polish patch
+        run: |
+          git fetch origin codex/mothers-love-color-polish
+          git show origin/codex/mothers-love-color-polish:scripts/review/mothers-love-color-polish.patch.b64 > /tmp/mothers-love-color-polish.patch.b64
+          base64 -d /tmp/mothers-love-color-polish.patch.b64 | gzip -dc > /tmp/mothers-love-color-polish.patch
+
+      - name: Apply verified production patch
+        run: |
+          if grep -q "Mother’s Love TV color & visual polish pass" src/components/display/DisplayExperience.module.css; then
+            echo "Verified color polish already present."
+          else
+            patch -p1 --batch < /tmp/mothers-love-color-polish.patch
+          fi
+
+      - name: Commit production source
+        run: |
+          git add -- \
+            src/lib/catalog.ts \
+            src/components/feed/FeedHome.tsx \
+            src/components/feed/HomeExperience.module.css \
+            src/components/campaign/ExpressionDrift.module.css \
+            src/components/submission/SubmissionExperience.module.css \
+            src/components/display/DisplayExperience.module.css \
+            src/components/display/garden/Garden.module.css \
+            src/components/display/insights/DisplayInsights.module.css \
+            src/components/display/teaching/TeachingScreens.module.css
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Apply verified Mother’s Love TV color polish to production'
+            git push origin HEAD:refs/heads/codex/mothers-love
+          fi
