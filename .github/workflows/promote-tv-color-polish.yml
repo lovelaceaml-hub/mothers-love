@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
           ref: codex/mothers-love
 
-      - name: Reconstruct verified color-polish source
+      - name: Reconstruct verified TV color-polish source
         run: |
           set -euo pipefail
           BASE=9f0e46a15c491efe67b871476d7c1541d288e39b
@@ -34,59 +34,37 @@ jobs:
           cd /tmp/verified
           patch -p1 --batch < /tmp/mothers-love-color-polish.patch
 
-      - name: Merge verified visual changes with current production
+      - name: Replace TV visual files with verified versions
         run: |
           set -euo pipefail
-          BASE=9f0e46a15c491efe67b871476d7c1541d288e39b
           files=(
-            src/lib/catalog.ts
-            src/components/feed/FeedHome.tsx
-            src/components/feed/HomeExperience.module.css
             src/components/campaign/ExpressionDrift.module.css
-            src/components/submission/SubmissionExperience.module.css
             src/components/display/DisplayExperience.module.css
             src/components/display/garden/Garden.module.css
             src/components/display/insights/DisplayInsights.module.css
             src/components/display/teaching/TeachingScreens.module.css
           )
-          mkdir -p /tmp/base-files /tmp/merged-files
-          conflicts=0
           for f in "${files[@]}"; do
-            mkdir -p "/tmp/base-files/$(dirname "$f")" "/tmp/merged-files/$(dirname "$f")"
-            git show "$BASE:$f" > "/tmp/base-files/$f"
-            if git merge-file -p "$f" "/tmp/base-files/$f" "/tmp/verified/$f" > "/tmp/merged-files/$f"; then
-              cp "/tmp/merged-files/$f" "$f"
-            else
-              echo "Conflict while merging $f"
-              conflicts=1
-            fi
+            cp "/tmp/verified/$f" "$f"
           done
-          if [ "$conflicts" -ne 0 ]; then
-            echo "One or more source files require manual reconciliation."
-            exit 1
-          fi
-          if grep -R "<<<<<<<\|=======\|>>>>>>>" src/lib/catalog.ts src/components/feed/FeedHome.tsx src/components/feed/HomeExperience.module.css src/components/campaign/ExpressionDrift.module.css src/components/submission/SubmissionExperience.module.css src/components/display/DisplayExperience.module.css src/components/display/garden/Garden.module.css src/components/display/insights/DisplayInsights.module.css src/components/display/teaching/TeachingScreens.module.css; then
+          if grep -R "<<<<<<<\|=======\|>>>>>>>" "${files[@]}"; then
             echo "Conflict markers found."
             exit 1
           fi
 
-      - name: Commit production source
+      - name: Commit production TV source
         run: |
           git add -- \
-            src/lib/catalog.ts \
-            src/components/feed/FeedHome.tsx \
-            src/components/feed/HomeExperience.module.css \
             src/components/campaign/ExpressionDrift.module.css \
-            src/components/submission/SubmissionExperience.module.css \
             src/components/display/DisplayExperience.module.css \
             src/components/display/garden/Garden.module.css \
             src/components/display/insights/DisplayInsights.module.css \
             src/components/display/teaching/TeachingScreens.module.css
           if git diff --cached --quiet; then
-            echo "No source changes to commit."
+            echo "No TV source changes to commit."
           else
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Apply verified Mother’s Love TV color polish to production'
+            git commit -m 'Deploy verified Mother’s Love TV display polish'
             git push origin HEAD:refs/heads/codex/mothers-love
           fi
