@@ -11,7 +11,7 @@ export default function DisplayPage() {
       }}
     >
       <iframe
-        src="/api/tv-v6?v=20260910-1003"
+        src="/api/tv-v6?v=20260910-1006-color-material"
         title="Mother's Love TV Display"
         style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
         allow="autoplay; fullscreen"
