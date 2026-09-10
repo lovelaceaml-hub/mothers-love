@@ -103,114 +103,115 @@ async function signInAs(page: Page, role: 'owner' | 'moderator' = 'owner') {
 }
 
 
-test('usable Color Polish TV and Studio', async ({ page }) => {
-  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
-  const fixture = (() => {
-const settings = {
-  version: 7,
-  mode: "normal",
-  motion: "standard",
-  pauseArrivals: false,
-  pauseRotation: false,
-  collectionOpen: true,
-  lowActivityMinutes: 20,
-  readingSeconds: 20,
-  maxBubbles: 4,
-  showTrails: true,
-  showConstellations: true,
-};
-
-const currentCounts = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-const currentAggregate = {
-  periodStart: "2026-09-06",
-  periodEnd: "2026-09-10",
-  recognitions: 4,
-  expressionCounts: currentCounts,
-  expressionTotal: 36,
-  revision: 6,
-};
-const monthAggregate = {
-  periodStart: "2026-09-01",
-  periodEnd: "2026-09-10",
-  recognitions: 6,
-  expressionCounts: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  expressionTotal: 45,
-  revision: 9,
-};
-const calendarAggregate = {
-  periodStart: "2026-09-10",
-  periodEnd: "2026-09-10",
-  recognitions: 2,
-  expressionCounts: [0, 1, 1, 0, 0, 0, 0, 0, 0],
-  expressionTotal: 2,
-  revision: 8,
-};
-const presentation = {
-  version: "color-polish-v6",
-  enabled: false,
-  playlist: [
-    ["welcome", 30],
-    ["garden", 180],
-    ["featured", 30],
-    ["calendar", 30],
-    ["peacemakers", 60],
-    ["status", 30],
-    ["expressions", 30],
-    ["peace-in-practice", 60],
-    ["orbit", 30],
-    ["milestone", 30],
-  ].map(([id, durationSeconds]) => ({ id, enabled: true, durationSeconds })),
-};
-
-function snapshot(overrides: Record<string, unknown> = {}) {
-  return {
-    ok: true,
-    serverTime: "2026-09-10T18:00:00.000Z",
-    revision: 12,
-    recognitions: [],
-    aggregate: monthAggregate,
-    settings,
-    submissionUrl: "https://mothers-love.vercel.app/recognize",
-    cursor: "12.1789063200",
-    sync: "reset",
-    arrivals: [],
-    presentation,
-    insights: {
-      calendar: [calendarAggregate],
-      currentWeek: currentAggregate,
-      previousWeek: {
-        periodStart: "2026-08-30",
-        periodEnd: "2026-09-05",
-        recognitions: 3,
-        expressionCounts: [2, 2, 2, 2, 2, 2, 2, 2, 2],
-        expressionTotal: 18,
-        revision: 5,
-      },
-      month: monthAggregate,
-      campaign: {
-        periodStart: "2026-08-30",
-        periodEnd: "2026-09-10",
-        recognitions: 9,
-        expressionCounts: [2, 3, 4, 5, 6, 7, 8, 9, 10],
-        expressionTotal: 54,
-        revision: 10,
-      },
-      goal: {
-        weekStart: "2026-09-06",
-        weekEnd: "2026-09-12",
-        expressionId: 1,
-        value: 0,
-        target: 6,
-        achieved: false,
-      },
-    },
-    ...overrides,
+function buildActiveDisplayFixture() {
+  const settings = {
+    version: 7,
+    mode: "normal",
+    motion: "standard",
+    pauseArrivals: false,
+    pauseRotation: false,
+    collectionOpen: true,
+    lowActivityMinutes: 20,
+    readingSeconds: 20,
+    maxBubbles: 4,
+    showTrails: true,
+    showConstellations: true,
   };
+
+  const currentCounts = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  const currentAggregate = {
+    periodStart: "2026-09-06",
+    periodEnd: "2026-09-10",
+    recognitions: 4,
+    expressionCounts: currentCounts,
+    expressionTotal: 36,
+    revision: 6,
+  };
+  const monthAggregate = {
+    periodStart: "2026-09-01",
+    periodEnd: "2026-09-10",
+    recognitions: 6,
+    expressionCounts: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    expressionTotal: 45,
+    revision: 9,
+  };
+  const calendarAggregate = {
+    periodStart: "2026-09-10",
+    periodEnd: "2026-09-10",
+    recognitions: 2,
+    expressionCounts: [0, 1, 1, 0, 0, 0, 0, 0, 0],
+    expressionTotal: 2,
+    revision: 8,
+  };
+  const presentation = {
+    version: "color-polish-v6",
+    enabled: false,
+    playlist: [
+      ["welcome", 30],
+      ["garden", 180],
+      ["featured", 30],
+      ["calendar", 30],
+      ["peacemakers", 60],
+      ["status", 30],
+      ["expressions", 30],
+      ["peace-in-practice", 60],
+      ["orbit", 30],
+      ["milestone", 30],
+    ].map(([id, durationSeconds]) => ({ id, enabled: true, durationSeconds })),
+  };
+
+  function snapshot(overrides: Record<string, unknown> = {}) {
+    return {
+      ok: true,
+      serverTime: "2026-09-10T18:00:00.000Z",
+      revision: 12,
+      recognitions: [],
+      aggregate: monthAggregate,
+      settings,
+      submissionUrl: "https://mothers-love.vercel.app/recognize",
+      cursor: "12.1789063200",
+      sync: "reset",
+      arrivals: [],
+      presentation,
+      insights: {
+        calendar: [calendarAggregate],
+        currentWeek: currentAggregate,
+        previousWeek: {
+          periodStart: "2026-08-30",
+          periodEnd: "2026-09-05",
+          recognitions: 3,
+          expressionCounts: [2, 2, 2, 2, 2, 2, 2, 2, 2],
+          expressionTotal: 18,
+          revision: 5,
+        },
+        month: monthAggregate,
+        campaign: {
+          periodStart: "2026-08-30",
+          periodEnd: "2026-09-10",
+          recognitions: 9,
+          expressionCounts: [2, 3, 4, 5, 6, 7, 8, 9, 10],
+          expressionTotal: 54,
+          revision: 10,
+        },
+        goal: {
+          weekStart: "2026-09-06",
+          weekEnd: "2026-09-12",
+          expressionId: 1,
+          value: 0,
+          target: 6,
+          achieved: false,
+        },
+      },
+      ...overrides,
+    };
+  }
+
+  return snapshot({presentation:{...presentation,enabled:true},recognitions:[{id:'00000000-0000-4000-8000-000000000001',recipient:'Synthetic Friend',message:'Thank you for helping today.',expressionIds:[2],createdAt:'2026-09-10T17:00:00Z',firstPublishedAt:'2026-09-10T17:00:00Z',expiresAt:'2026-09-17T17:00:00Z',version:1,status:'published',featured:false}]});
 }
 
-
-return snapshot({presentation:{...presentation,enabled:true},recognitions:[{id:'00000000-0000-4000-8000-000000000001',recipient:'Synthetic Friend',message:'Thank you for helping today.',expressionIds:[2],createdAt:'2026-09-10T17:00:00Z',firstPublishedAt:'2026-09-10T17:00:00Z',expiresAt:'2026-09-17T17:00:00Z',version:1,status:'published',featured:false}]});
-})();
+test('usable Color Polish TV and Studio', async ({ page }) => {
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  const fixture = buildActiveDisplayFixture();
   let quiet = false;
   await page.route('**/api/display/color-polish**', route => fulfillJson(route, quiet ? {...fixture,settings:{...fixture.settings,mode:'quiet'},recognitions:[]} : fixture));
   await page.goto('/display');
@@ -229,6 +230,52 @@ return snapshot({presentation:{...presentation,enabled:true},recognitions:[{id:'
   await expect(page.frameLocator('iframe').first().getByText('Appreciation, all around us.')).toBeVisible();
   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
   await expect(selector).toHaveValue('garden');
+});
+
+test('click or tap on the display advances to the next scene', async ({ page }) => {
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  const fixture = buildActiveDisplayFixture();
+  await page.route('**/api/display/color-polish**', route => fulfillJson(route, fixture));
+  await page.goto('/display');
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+
+  await expect.poll(() => page.frames().some(f => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+  const tvFrame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
+  if (!tvFrame) throw new Error('color-polish renderer frame not found on /display');
+  await tvFrame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
+
+  const playlistOrder = [1, 2, 4, 5, 8, 6, 7, 9, 10, 11];
+  const currentScene = await tvFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+  const expectedNextScene = playlistOrder[(playlistOrder.indexOf(currentScene) + 1) % playlistOrder.length];
+
+  const viewport = page.viewportSize() ?? { width: 1280, height: 720 };
+  await page.mouse.click(viewport.width / 2, viewport.height / 2);
+
+  await tvFrame.waitForFunction(
+    (expected) => (window as any).colorPolishRuntime.getState().scene === expected,
+    expectedNextScene,
+    { timeout: 3000 },
+  );
+
+  await mockCommon(page);
+  await signInAs(page);
+  await page.goto('/admin/display');
+  await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+  const selector = page.getByLabel('Color Polish preview scene');
+  await expect(selector).toHaveValue('welcome');
+
+  await expect.poll(() => page.frames().some(f => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+  const studioFrame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
+  if (!studioFrame) throw new Error('color-polish renderer frame not found on /admin/display');
+  await studioFrame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
+  const studioSceneBefore = await studioFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+
+  await page.frameLocator('iframe').first().locator('body').click();
+  await page.waitForTimeout(300);
+
+  const studioSceneAfter = await studioFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+  expect(studioSceneAfter).toBe(studioSceneBefore);
+  await expect(selector).toHaveValue('welcome');
 });
 
 test('display falls back to the legacy renderer when color-polish stays unavailable', async ({ page }) => {

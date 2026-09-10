@@ -61,7 +61,7 @@ function daysInMonth(aggregate){const key=monthKey(aggregate),parts=key.split('-
 const sum=a=>a.reduce((n,v)=>n+v,0);
 const EMPTY_AGGREGATE={rec:0,expr:Array(9).fill(0),periodStart:'',periodEnd:''};
 const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
-let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false, reducedMotionPreferred=false;
+let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false, reducedMotionPreferred=false, lastManualAdvanceAt=-Infinity;
 function motionStill(motion,forced){return forced||motion==='still'||(reducedMotionPreferred&&motion!=='lively')}
 const qaLog=[];function log(type,data={}){qaLog.push({at:+S.t.toFixed(3),type,...data});if(qaLog.length>1400)qaLog.shift()}
 function finiteNumber(value){return typeof value==='number'&&Number.isFinite(value)}
@@ -282,6 +282,27 @@ function requestScene(id,{force=false}={}){
  el.innerHTML=['offline','neutral'].includes(S.mode)?safeScene():S.mode==='empty'?emptyPanel():renderers[id]();
  $('stage').append(el);postRender();log('scene_transition_start',{from:prev,to:id});
  if(S.still){old?.remove();return}el.style.opacity=0;transition={old,next:el,age:0,duration:1.15};
+}
+function nextPlaylistEntry(){
+ const list=S.playlist;if(!list?.length)return null;
+ const current=list.findIndex(entry=>entry.id===S.s);if(current<0)return null;
+ return list[(current+1)%list.length]||null;
+}
+function manualAdvance(){
+ if(S.mode!=='normal'||S.source!=='live')return;
+ if(active||transition)return;
+ const now=typeof performance!=='undefined'?performance.now():Date.now();
+ if(now-lastManualAdvanceAt<700)return;
+ const next=nextPlaylistEntry();if(!next)return;
+ lastManualAdvanceAt=now;
+ const from=S.s;
+ requestScene(next.id,{force:true});
+ log('manual_advance',{from,to:next.id});
+}
+function manualAdvanceKey(event){
+ if(event.code==='ArrowRight'||event.code==='Space'||event.key==='ArrowRight'||event.key===' '||event.key==='Spacebar'){
+  event.preventDefault();manualAdvance();
+ }
 }
 function tickTransition(dt){if(!transition)return;transition.age+=dt;const p=ease(transition.age/transition.duration);transition.old.style.opacity=1-p;transition.old.style.transform=`translateX(${-15*p}px) scale(${1-.004*p})`;transition.next.style.opacity=p;transition.next.style.transform=`translateX(${20*(1-p)}px) scale(${.997+.003*p})`;if(p>=1){transition.old.remove();transition.next.style.opacity='';transition.next.style.transform='';transition=null;log('scene_transition_end',{scene:S.s});if(S.pendingScene&&!active){const n=S.pendingScene;S.pendingScene=null;requestScene(n)}}}
 function swapSlot(b){if(b.reader){b.phase='pop';b.since=S.t;b.reshape=true;b.el.querySelector('.orb-life').classList.add('orb-pop');log('bubble_pop',{scene:S.s,id:b.id,age:S.t-b.born});return}const otherIds=slots.map(x=>x.id);const r=choose(otherIds,b.expression);if(!r){b.born=S.t;return}if(S.s===2&&!smallFits(r)){// Preserve the full message by using the measured large-bubble layout.
@@ -509,7 +530,7 @@ function coordinator(dt){
  else if(!transition){
   if(!S.still){S.sceneAge+=dt;if(S.s===7){S.eduAge+=dt;tickEducation()}tickSlots(dt);tickTributes(dt);tickHearts(dt);}
  }
- if(!active&&!transition&&!S.still&&!S.sceneControlled&&!S.pauseRotation&&S.playlist?.length){const current=S.playlist.findIndex(entry=>entry.id===S.s),duration=S.dwell?.[S.s]??DWELL[S.s]??30;if(current>=0&&S.sceneAge>=duration){const next=S.playlist[(current+1)%S.playlist.length];if(next)requestScene(next.id)}}
+ if(!active&&!transition&&!S.still&&!S.sceneControlled&&!S.pauseRotation&&S.playlist?.length){const duration=S.dwell?.[S.s]??DWELL[S.s]??30;if(S.sceneAge>=duration){const next=nextPlaylistEntry();if(next)requestScene(next.id)}}
  if(!active&&!transition&&S.milestonePending&&!S.queue.length&&S.sceneAge>=10){captureMilestone(S.milestonePending);S.milestonePending=null;requestScene(11)}
  tickFeeds(dt);tickNumbers();
  if(!S.still&&!active&&!transition&&heartRenderer&&heartRenderer.canvas.isConnected)heartRenderer.draw(V.clock*.55+6);
@@ -533,6 +554,8 @@ function init(){
  $('flowers').src=ASSETS.flowers;$('foliage').src=ASSETS.foliage;size();
  const observer=typeof ResizeObserver==='function'?new ResizeObserver(size):null;observer?.observe($('frame'));window.addEventListener('resize',size);
  document.addEventListener('visibilitychange',()=>{lastFrame=performance.now()});
+ document.addEventListener('click',manualAdvance);
+ document.addEventListener('keydown',manualAdvanceKey);
  if(typeof window.matchMedia==='function'){
   const reduceMotionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
   const updateReducedMotion=()=>{reducedMotionPreferred=reduceMotionQuery.matches;S.still=motionStill(S.motion,!S.playing);applyStill()};
