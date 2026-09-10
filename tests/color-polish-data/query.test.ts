@@ -1,0 +1,58 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { postgres, getServerConfig } = vi.hoisted(() => ({
+  postgres: vi.fn(),
+  getServerConfig: vi.fn(),
+}));
+
+vi.mock("postgres", () => ({ default: postgres }));
+vi.mock("@/lib/server/env", () => ({ getServerConfig }));
+
+const config = {
+  databaseUrl: "postgresql://mothers_love_runtime@example.test:6543/postgres",
+  databaseSsl: { ca: "synthetic-ca", rejectUnauthorized: true as const },
+};
+
+function successfulClient(result: unknown) {
+  const transaction = vi.fn((strings: TemplateStringsArray) => {
+    if (strings.join("?").includes("set local statement_timeout")) return Promise.resolve([]);
+    if (strings.join("?").includes("set transaction isolation level")) return Promise.resolve([]);
+    return Promise.resolve([{ result }]);
+  });
+  const begin = vi.fn(async (_options: string, callback: (sql: typeof transaction) => Promise<unknown>) => callback(transaction));
+  return { begin, end: vi.fn().mockResolvedValue(undefined), transaction };
+}
+
+beforeEach(() => {
+  vi.resetModules();
+  vi.clearAllMocks();
+  getServerConfig.mockReturnValue(config);
+});
+
+describe("Color Polish snapshot query", () => {
+  it("uses a bounded read-write repeatable-read transaction for the versioned bridge", async () => {
+    const client = successfulClient({ ok: true, source: "color-polish" });
+    postgres.mockReturnValue(client);
+    const { queryColorPolishSnapshot } = await import("@/lib/server/color-polish");
+
+    await expect(queryColorPolishSnapshot("11.1789061600")).resolves.toEqual({
+      data: { ok: true, source: "color-polish" },
+      error: null,
+    });
+    expect(client.begin).toHaveBeenCalledWith("read write", expect.any(Function));
+    expect(client.transaction.mock.calls.map(([strings]) => strings.join("?"))).toEqual([
+      "set local statement_timeout = '5000ms'",
+      "set transaction isolation level repeatable read",
+      "select public.ml_color_polish_snapshot(?) as result",
+    ]);
+  });
+
+  it("fails before opening a client when the request is already aborted", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const { queryColorPolishSnapshot } = await import("@/lib/server/color-polish");
+
+    await expect(queryColorPolishSnapshot(null, controller.signal)).resolves.toMatchObject({ data: null, error: { message: "REQUEST_ABORTED" } });
+    expect(postgres).not.toHaveBeenCalled();
+  });
+});
