@@ -8,7 +8,7 @@ on:
       - src/components/submission/**
       - src/components/campaign/**
       - tests/mobile-recognition/**
-      - scripts/review/apply-mobile-layout.py
+      - tests/submission/**
 permissions:
   contents: write
 concurrency:
@@ -28,17 +28,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply the reviewed Home and submission migration on this design branch only
+      - name: Apply final rendered fixes and restore read-only verification
         run: |
           test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
-          if test -f scripts/review/apply-mobile-layout.py; then
-            python3 scripts/review/apply-mobile-layout.py
-            git add -- src/components/feed/FeedHome.tsx src/components/feed/HomeExperience.module.css src/components/submission/SubmissionForm.tsx tests/feed/home-design.spec.ts tests/submission/plan08/submission-form-refresh.spec.ts tests/interview/submission-experience.spec.ts scripts/review/apply-mobile-layout.py scripts/review/mobile-home.fragment.css
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Implement compact mobile Home and recognition submission experience'
-            git push origin HEAD:refs/heads/codex/home-tv-family
-          fi
+          python3 scripts/review/finalize-mobile-review.py
+          git add -- src/components/submission/SubmissionExperience.module.css tests/submission/submission.spec.ts .github/workflows/mobile-recognition-review.yml scripts/review/finalize-mobile-review.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Fix rendered contrast and verify keyboard-dismissible preview; restore read-only CI'
+          git push origin HEAD:refs/heads/codex/home-tv-family
       - uses: actions/setup-node@v4
         with:
           node-version: 22
