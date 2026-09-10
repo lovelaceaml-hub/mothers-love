@@ -23,3 +23,6 @@ updated: 2026-09-10T21:08Z
 ## Review
 
 (coordinator appends)
+
+## Execution started
+Sequential executor_luna max /root/integration now owns only capsule paths in controller checkout after both lanes stopped. Root owns Git/docs/scripts/provider actions. One Opus high review after combined tests, no additional review after second failed verdict. Production remains unchanged.
