@@ -54,6 +54,10 @@ jobs:
           done
       - name: Home, reaction, accessibility and protected-route checks
         run: npx playwright test tests/feed --workers=2 --reporter=line,json
+      - name: Repeat reading-position regression without retries
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: home-review-evidence/reading-stability.json
+        run: npx playwright test tests/feed/home-design.spec.ts -g 'polling preserves' --repeat-each=8 --retries=0 --workers=2 --reporter=line,json
       - name: Record exact source and artwork
         if: always()
         run: |

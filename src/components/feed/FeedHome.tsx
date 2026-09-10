@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { Component, createRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS, expressionById } from '@/lib/catalog';
 import { ReactionButton, usePublicFeed, type PublicFeedStatus } from './PublicFeedProvider';
@@ -101,51 +101,50 @@ function FeedStateCard({ status, onRetry }: { status: PublicFeedStatus; onRetry:
   );
 }
 
-// Keep a reader's position through a prepend, edit or removal without retaining
-// personal content. Expired/hidden records are never held back for presentation.
-function useReadingAnchor(items: PublicFeedItem[], status: PublicFeedStatus) {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const anchors = useRef<Array<{ id: string; top: number }>>([]);
-  const atTop = useRef(true);
-  const capture = useCallback(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    atTop.current = viewport.scrollTop < 2;
-    const top = viewport.getBoundingClientRect().top;
-    anchors.current = Array.from(viewport.querySelectorAll<HTMLElement>('[data-recognition-id]'))
-      .filter((node) => node.getBoundingClientRect().bottom > top + 2)
-      .map((node) => ({ id: node.dataset.recognitionId!, top: node.getBoundingClientRect().top - top }));
-  }, []);
+type FeedViewportProps = { status: PublicFeedStatus; children: ReactNode };
+type ReadingSnapshot = { atTop: boolean; anchors: Array<{ id: string; top: number }> };
 
-  useLayoutEffect(() => {
-    const viewport = viewportRef.current;
+// Measure the current DOM immediately before React changes it, not in a scroll
+// listener that may still be queued when a poll arrives. Store no personal text.
+class ReadingViewport extends Component<FeedViewportProps, Record<string, never>, ReadingSnapshot | null> {
+  private viewportRef = createRef<HTMLDivElement>();
+
+  getSnapshotBeforeUpdate(previous: Readonly<FeedViewportProps>): ReadingSnapshot | null {
+    const viewport = this.viewportRef.current;
+    if (!viewport || previous.status !== 'ready' || this.props.status !== 'ready') return null;
+    const top = viewport.getBoundingClientRect().top;
+    return {
+      atTop: viewport.scrollTop < 2,
+      anchors: Array.from(viewport.querySelectorAll<HTMLElement>('[data-recognition-id]'))
+        .filter(node => node.getBoundingClientRect().bottom > top + 2)
+        .map(node => ({ id: node.dataset.recognitionId!, top: node.getBoundingClientRect().top - top })),
+    };
+  }
+
+  componentDidUpdate(_previous: Readonly<FeedViewportProps>, _state: Readonly<Record<string, never>>, snapshot: ReadingSnapshot | null) {
+    const viewport = this.viewportRef.current;
     if (!viewport) return;
-    if (status !== 'ready') {
-      anchors.current = [];
-      atTop.current = true;
+    if (!snapshot || snapshot.atTop) {
+      viewport.scrollTop = 0;
       return;
     }
-    if (atTop.current) {
-      viewport.scrollTop = 0;
-    } else {
-      const nodes = Array.from(viewport.querySelectorAll<HTMLElement>('[data-recognition-id]'));
-      for (const anchor of anchors.current) {
-        const node = nodes.find((candidate) => candidate.dataset.recognitionId === anchor.id);
-        if (!node) continue;
-        viewport.scrollTop += node.getBoundingClientRect().top - viewport.getBoundingClientRect().top - anchor.top;
-        break;
-      }
+    const nodes = Array.from(viewport.querySelectorAll<HTMLElement>('[data-recognition-id]'));
+    for (const anchor of snapshot.anchors) {
+      const node = nodes.find(candidate => candidate.dataset.recognitionId === anchor.id);
+      if (!node) continue;
+      viewport.scrollTop += node.getBoundingClientRect().top - viewport.getBoundingClientRect().top - anchor.top;
+      break;
     }
-    capture();
-  }, [items, status, capture]);
+  }
 
-  return { viewportRef, capture };
+  render() {
+    return <div id="recent-recognitions" className={styles.feedViewport} role="region" tabIndex={0} aria-label="Recent recognitions" ref={this.viewportRef}>{this.props.children}</div>;
+  }
 }
 
 export function FeedHome() {
   const { items, status, retry } = usePublicFeed();
   const [motionPaused, setMotionPaused] = useState(false);
-  const { viewportRef, capture } = useReadingAnchor(items, status);
   const titleBreak = CAMPAIGN_TITLE.indexOf("MOTHER");
 
   return (
@@ -154,7 +153,7 @@ export function FeedHome() {
       <a className={styles.skipLink} href="#recent-recognitions">Skip to recognitions</a>
       <div className={styles.shell}>
         <nav className={styles.topbar} aria-label="Main navigation">
-          <Link className={styles.wordmark} href="/" ><Medallion id={8} />Mother&apos;s Love</Link>
+          <Link className={styles.wordmark} href="/"><Medallion id={8} />Mother&apos;s Love</Link>
           <div className={styles.topLinks}>
             <a href="#recent-recognitions" aria-current="page">Recognitions</a>
             <Link href="/expressions">Expressions</Link>
@@ -178,11 +177,11 @@ export function FeedHome() {
               <div><p className={styles.eyebrow}>Newest first</p><h2 id="feed-section-heading">Recent recognitions</h2></div>
               <span className={styles.liveLabel} data-live={status === 'ready'}><i aria-hidden="true" />{status === 'ready' ? 'Live' : status === 'empty' ? 'Newest first' : status === 'error' ? 'Unavailable' : 'Updating'}</span>
             </div>
-            <div id="recent-recognitions" className={styles.feedViewport} role="region" tabIndex={0} aria-label="Recent recognitions" ref={viewportRef} onScroll={capture}>
+            <ReadingViewport status={status}>
               {status === 'ready' && items.length > 0 ? (
                 <div className={styles.feedList}>{items.map((item) => <FeedCard key={item.id} item={item} />)}</div>
               ) : <FeedStateCard status={status} onRetry={retry} />}
-            </div>
+            </ReadingViewport>
           </section>
 
           <aside className={styles.guidePanel} aria-labelledby="expression-guide-heading">
