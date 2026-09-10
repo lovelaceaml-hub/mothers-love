@@ -1,0 +1,27 @@
+name: Package production source
+
+on:
+  push:
+    branches: [codex/mothers-love-color-polish]
+    paths:
+      - .github/workflows/package-production-source.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Archive exact verified source
+        run: git archive --format=tar HEAD > deploy-source.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mothers-love-production-source
+          retention-days: 1
+          path: deploy-source.tar
