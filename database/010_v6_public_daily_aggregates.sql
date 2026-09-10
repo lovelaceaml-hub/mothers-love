@@ -7,26 +7,20 @@ SECURITY DEFINER
 STABLE
 SET search_path = ''
 AS $function$
-  SELECT COALESCE(
-    pg_catalog.jsonb_agg(
-      pg_catalog.jsonb_build_object(
-        'date', daily.period_start,
-        'recognitions', daily.recognitions,
-        'expressionCounts', pg_catalog.to_jsonb(daily.expression_counts),
-        'expressionTotal', daily.expression_total
-      )
-      ORDER BY daily.period_start
-    ),
-    '[]'::jsonb
-  )
-  FROM mothers_love.daily_aggregates AS daily
-  WHERE daily.period_start BETWEEN
-    (
-      ((pg_catalog.clock_timestamp() AT TIME ZONE 'America/Los_Angeles')::date
-        - pg_catalog.extract(day FROM (pg_catalog.clock_timestamp() AT TIME ZONE 'America/Los_Angeles'))::integer + 1)
-      - 14
-    )
-    AND (pg_catalog.clock_timestamp() AT TIME ZONE 'America/Los_Angeles')::date
+  SELECT COALESCE(pg_catalog.jsonb_agg(ordered.obj), '[]'::jsonb)
+  FROM (
+    SELECT pg_catalog.jsonb_build_object(
+      'date', d.period_start,
+      'recognitions', d.recognitions,
+      'expressionCounts', pg_catalog.to_jsonb(d.expression_counts),
+      'expressionTotal', d.expression_total
+    ) AS obj
+    FROM mothers_love.daily_aggregates AS d
+    WHERE d.period_start BETWEEN
+      (pg_catalog.date_trunc('month', pg_catalog.clock_timestamp() AT TIME ZONE 'America/Los_Angeles')::date - 14)
+      AND (pg_catalog.clock_timestamp() AT TIME ZONE 'America/Los_Angeles')::date
+    ORDER BY d.period_start
+  ) AS ordered
 $function$;
 
 REVOKE ALL ON FUNCTION public.ml_public_display_daily_aggregates() FROM PUBLIC;
