@@ -4,3 +4,11 @@
 .orb img { width: 72%; height: 72%; object-fit: contain; }
 @keyframes freeDrift { 0%,100% { transform: translate3d(0,0,0) rotate(-3deg); } 28% { transform: translate3d(var(--x1),var(--y1),0) rotate(5deg); } 57% { transform: translate3d(var(--x2),var(--y2),0) rotate(-5deg); } 82% { transform: translate3d(var(--x3),var(--y3),0) rotate(2deg); } }
 @media(prefers-reduced-motion:reduce) { .orb { animation: none; } }
+/* Scope the document-height correction to this field on phone Home only.
+   The original body's 100vh minimum must not exceed Home's 100dvh shell
+   when a mobile browser's address bar changes height. Navigation removes
+   the matching ancestor, so submission and all other routes still scroll. */
+@media(max-width:560px) {
+  :global(html):has(:global([data-home-experience]) .field) { height: 100%; overflow: hidden; }
+  :global(body):has(:global([data-home-experience]) .field) { min-height: 0; height: 100svh; height: 100dvh; overflow: hidden; }
+}
