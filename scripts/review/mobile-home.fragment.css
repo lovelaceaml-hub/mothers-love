@@ -1,0 +1,66 @@
+/* Phone is a stationary app shell. Only the recognition pane scrolls. */
+.mobileExpressions, .mobileShareDock { display: none; }
+@media (max-width: 560px) {
+  .page { height: 100svh; height: 100dvh; min-height: 0; overflow: hidden; padding: env(safe-area-inset-top, 0px) 12px max(6px, env(safe-area-inset-bottom, 0px)); }
+  .shell { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+  .topbar { min-height: 40px; flex: 0 0 auto; gap: 8px; }
+  .wordmark { font-size: .85rem; gap: 7px; }
+  .wordmark .medallion { width: 26px; height: 26px; }
+  .topLinks { gap: 12px; }
+  .topLinks a { font-size: .72rem; min-height: 40px; }
+  .topLinks a:last-child { display: inline-flex; }
+  .welcome { display: block; flex: 0 0 auto; padding: 10px 4px 2px; }
+  .welcome::after { display: none; }
+  .welcome .eyebrow { display: none; }
+  .welcome h1 { font-size: clamp(1.12rem, 5.1vw, 1.35rem); line-height: 1.15; letter-spacing: -.035em; margin: 0; font-weight: 600; }
+  .welcome h1 > span { display: inline; }
+  .welcome h1 > span:first-child::after { content: ' '; }
+  .tagline { font-size: .8rem; line-height: 1.4; margin: 5px 0 0; max-width: none; }
+  .welcomeCopy > .primaryAction { display: none; }
+  .mobileExpressions { display: block; height: 52px; }
+  .contentLayout { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; gap: 0; }
+  .feedSection { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; }
+  .sectionHeader { flex: 0 0 auto; min-height: 44px; padding: 5px 5px 8px; gap: 6px; }
+  .sectionHeader > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 8px; }
+  .sectionHeader .eyebrow { order: 2; font-size: .55rem; letter-spacing: .05em; }
+  .sectionHeader h2 { font-size: 1.02rem; margin: 0; font-weight: 600; }
+  .liveLabel { font-size: .66rem; padding: 0; }
+  .feedViewport { flex: 1 1 0; min-height: 0; max-height: none; overscroll-behavior-y: contain; padding: 1px 3px 6px 1px; border-radius: 14px; }
+  .feedList { gap: 6px; }
+  .feedCard { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 5px; padding: 8px 10px 10px; border-radius: 14px 14px 14px 5px; box-shadow: 0 3px 10px -7px #78694b38; }
+  .cardHeader { grid-column: 1; grid-row: 1; gap: 7px; min-height: 36px; }
+  .cardHeader .eyebrow { display: none; }
+  .recipientMedallion { width: 28px; height: 28px; }
+  .cardHeader h3 { font-size: .97rem; line-height: 1.3; margin: 0; }
+  .message { grid-column: 1 / -1; grid-row: 2; margin: 3px 0 7px; font-size: .91rem; line-height: 1.42; }
+  .cardFooter { display: contents; }
+  .expressionList { grid-column: 1 / -1; grid-row: 3; gap: 4px 6px; }
+  .expressionList li { border-radius: 7px; gap: 3px; font-size: .72rem; line-height: 1.35; padding: 3px 5px 3px 3px; }
+  .phraseMedallion { width: 17px; height: 17px; }
+  .reactionRow { grid-column: 2; grid-row: 1; align-self: center; min-width: 44px; max-width: 102px; margin: 0; }
+  .reactionRow button { min-height: 44px; min-width: 44px; font-size: .72rem; padding: 5px 7px; border-color: transparent; background: transparent; }
+  .reactionRow button::before { width: .95rem; height: .95rem; }
+  .reactionRow > div > span { max-width: 102px; font-size: .67rem; }
+  .guidePanel { display: flex; flex: 0 0 auto; justify-content: space-between; align-items: center; margin: 0; padding: 0 4px; gap: 7px; border: 0; border-radius: 0; box-shadow: none; background: none; }
+  .guidePanel > .eyebrow, .guidePanel h2, .expressionGarden, .guideDivider, .quietLink { display: none; }
+  .guideLink { width: 100%; min-height: 34px; font-size: .74rem; font-weight: 500; }
+  .mobileShareDock { display: block; flex: 0 0 auto; padding-top: 3px; }
+  .mobileShareDock .primaryAction { min-height: 52px; padding-inline: 18px; font-size: 1rem; border-radius: 14px; background: linear-gradient(115deg, #bf5b76, #a94563); box-shadow: inset 0 1px 0 #ffffff40, 0 7px 15px -10px #84304c80; }
+  .footer { margin: 4px 0 0; padding: 0; border: 0; flex: 0 0 auto; }
+  .footer > p { display: none; }
+  .utilityLinks { justify-content: space-between; width: 100%; gap: 4px; }
+  .utilityLinks a, .motionToggle { font-size: .7rem; min-height: 38px; padding: 3px 5px; }
+  .motionToggle { margin-left: 0; }
+  .stateCard { min-height: 100%; padding: 18px 12px; border-radius: 14px; }
+  .stateCard h2 { font-size: 1.1rem; }
+}
+@media (max-width: 560px) and (max-height: 580px) {
+  .topbar { min-height: 34px; }
+  .welcome { padding-top: 5px; }
+  .welcome h1 { font-size: .97rem; }
+  .tagline { font-size: .7rem; }
+  .mobileExpressions { height: 36px; }
+  .sectionHeader { min-height: 33px; padding-bottom: 5px; }
+  .guidePanel { display: none; }
+  .mobileShareDock .primaryAction { min-height: 44px; }
+}

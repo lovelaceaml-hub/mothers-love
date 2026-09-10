@@ -8,23 +8,79 @@ on:
       - src/components/submission/**
       - src/components/campaign/**
       - tests/mobile-recognition/**
+      - scripts/review/apply-mobile-layout.py
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: mobile-recognition-review
   cancel-in-progress: true
 jobs:
-  source-review:
+  review:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      npm_config_cache: /tmp/npm-cache
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+      HOME_BASELINE_URL: http://127.0.0.1:3102
+      PLAYWRIGHT_JSON_OUTPUT_NAME: mobile-recognition-evidence/results.json
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
-      - name: Package exact review source without credentials or live data
-        run: git archive --format=tar HEAD > review-source.tar
-      - uses: actions/upload-artifact@v4
+          fetch-depth: 0
+      - name: Apply the reviewed Home and submission migration on this design branch only
+        run: |
+          test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
+          if test -f scripts/review/apply-mobile-layout.py; then
+            python3 scripts/review/apply-mobile-layout.py
+            git add -- src/components/feed/FeedHome.tsx src/components/feed/HomeExperience.module.css src/components/submission/SubmissionForm.tsx tests/feed/home-design.spec.ts tests/submission/plan08/submission-form-refresh.spec.ts tests/interview/submission-experience.spec.ts scripts/review/apply-mobile-layout.py scripts/review/mobile-home.fragment.css
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Implement compact mobile Home and recognition submission experience'
+            git push origin HEAD:refs/heads/codex/home-tv-family
+          fi
+      - uses: actions/setup-node@v4
         with:
-          name: mobile-recognition-source
-          path: review-source.tar
-          retention-days: 1
+          node-version: 22
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type check and lint
+        run: npm run typecheck && npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Build without production credentials
+        run: npm run build
+      - name: Build previous design for protected-route comparison
+        run: |
+          git worktree add --detach /tmp/mobile-before e07d9c8fb8ffb4005d75ff399e5f9feab803a021
+          cp -al node_modules /tmp/mobile-before/node_modules
+          cd /tmp/mobile-before
+          npm run build
+      - name: Install browser and start isolated servers
+        run: |
+          npx playwright install --with-deps chromium
+          mkdir -p mobile-recognition-evidence home-review-evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > mobile-recognition-evidence/server.log 2>&1 &
+          (cd /tmp/mobile-before && npm run start -- --hostname 127.0.0.1 --port 3102) > mobile-recognition-evidence/baseline.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3100/ >/dev/null && curl -fsS http://127.0.0.1:3102/ >/dev/null; then break; fi
+            sleep 1
+          done
+      - name: Home, submission, privacy, accessibility and motion browser checks
+        run: npx playwright test tests/feed tests/submission tests/interview/submission-experience.spec.ts tests/mobile-recognition --workers=2 --retries=0 --reporter=line,json
+      - name: Record exact source and changes
+        if: always()
+        run: |
+          mkdir -p mobile-recognition-evidence
+          git rev-parse HEAD > mobile-recognition-evidence/reviewed-commit.txt
+          git diff --name-only e07d9c8fb8ffb4005d75ff399e5f9feab803a021 HEAD > mobile-recognition-evidence/changed-files.txt
+          git archive --format=tar HEAD > mobile-recognition-evidence/review-source.tar
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-recognition-review
+          retention-days: 3
+          path: |
+            mobile-recognition-evidence/
+            home-review-evidence/
+            test-results/
