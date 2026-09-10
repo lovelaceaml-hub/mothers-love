@@ -27,16 +27,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Materialize reviewed color-only source on the isolated design branch
+      - name: Apply measured color contrast correction on the design branch only
         run: |
           test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
-          if test -f scripts/review/materialize-color-pass.py; then
-            python3 scripts/review/materialize-color-pass.py
-            python3 scripts/review/materialize-color-tests.py
-            git add -- src tests/feed/home-design.spec.ts scripts/review/materialize-color-pass.py scripts/review/materialize-color-tests.py scripts/review/color-materials.css
+          if test -f scripts/review/refine-color-pass.py; then
+            python3 scripts/review/refine-color-pass.py
+            git add -- src/app/expressions/expressions.module.css tests/interview/submission-experience.spec.ts tests/submission/plan08/submission-form-refresh.spec.ts scripts/review/refine-color-pass.py
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Apply reference-board color materials without changing layout or behavior'
+            git commit -m 'Keep all nine guide colors readable and update explicit color expectations'
             test "$(git ls-remote origin refs/heads/codex/home-tv-family | cut -f1)" = "$GITHUB_SHA"
             git push origin HEAD:refs/heads/codex/home-tv-family
           fi
@@ -45,6 +44,8 @@ jobs:
           node-version: 22
       - name: Install locked dependencies
         run: npm ci
+      - name: Check color-only source boundary
+        run: node scripts/review/check-color-boundary.mjs
       - name: Type check, lint and unit tests
         run: npm run typecheck && npm run lint && npm test
       - name: Build app and color-only prototype without production credentials
