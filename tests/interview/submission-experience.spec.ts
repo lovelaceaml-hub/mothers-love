@@ -117,8 +117,8 @@ test.describe('interview completion submission experience', () => {
       const style = getComputedStyle(element);
       return { backgroundColor: style.backgroundColor, backgroundImage: style.backgroundImage };
     });
-    expect(unselectedStyles.backgroundColor).toBe('rgb(255, 253, 246)');
-    expect(unselectedStyles.backgroundImage).toBe('none');
+    expect(unselectedStyles.backgroundImage).toContain('linear-gradient');
+    expect(unselectedStyles.backgroundImage).toContain('rgb(255, 254, 251)');
 
     await firstChoice.click({ position: { x: 24, y: 56 } });
     await expect(firstCard.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
@@ -129,9 +129,9 @@ test.describe('interview completion submission experience', () => {
       return { backgroundImage: style.backgroundImage, transform: style.transform, boxShadow: style.boxShadow };
     });
     expect(selectedStyles.backgroundImage).toContain('linear-gradient');
-    expect(selectedStyles.backgroundImage).toContain('rgb(255, 242, 200)');
+    expect(selectedStyles.backgroundImage).toContain('rgb(255, 233, 164)');
     expect(selectedStyles.transform).toBe('none');
-    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).toContain('rgba(150, 117, 40');
+    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).toContain('rgba(164, 119, 34');
 
     const secondCard = page.getByTestId('expression-card-2');
     const secondChoice = secondCard.getByRole('button', { name: /^Select expression 02:/ });
