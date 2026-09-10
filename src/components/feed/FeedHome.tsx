@@ -6,6 +6,7 @@ import { Component, createRef, useState, type CSSProperties, type ReactNode } fr
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS, expressionById } from '@/lib/catalog';
 import { ReactionButton, usePublicFeed, type PublicFeedStatus } from './PublicFeedProvider';
 import type { PublicFeedItem } from './feed-types';
+import { ExpressionDrift } from '@/components/campaign/ExpressionDrift';
 import styles from './HomeExperience.module.css';
 
 const ART = '/home-art';
@@ -169,6 +170,7 @@ export function FeedHome() {
             <Link className={styles.primaryAction} href="/recognize">Share a recognition<Arrow diagonal /></Link>
           </div>
           <WelcomeArt />
+          <ExpressionDrift className={styles.mobileExpressions} />
         </header>
 
         <div className={styles.contentLayout}>
@@ -196,6 +198,9 @@ export function FeedHome() {
           </aside>
         </div>
 
+        <div className={styles.mobileShareDock}>
+          <Link className={styles.primaryAction} href="/recognize">Share a recognition<Arrow diagonal /></Link>
+        </div>
         <footer className={styles.footer}>
           <p>{CAMPAIGN_TAGLINE}</p>
           <nav className={styles.utilityLinks} aria-label="Campaign links">

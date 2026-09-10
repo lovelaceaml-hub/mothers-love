@@ -129,9 +129,9 @@ test.describe('interview completion submission experience', () => {
       return { backgroundImage: style.backgroundImage, transform: style.transform, boxShadow: style.boxShadow };
     });
     expect(selectedStyles.backgroundImage).toContain('linear-gradient');
-    expect(selectedStyles.backgroundImage).toContain('rgb(255, 128, 120)');
-    expect(selectedStyles.transform).not.toBe('none');
-    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).toContain('rgba(168, 88, 66');
+    expect(selectedStyles.backgroundImage).toContain('rgb(255, 242, 200)');
+    expect(selectedStyles.transform).toBe('none');
+    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).toContain('rgba(150, 117, 40');
 
     const secondCard = page.getByTestId('expression-card-2');
     const secondChoice = secondCard.getByRole('button', { name: /^Select expression 02:/ });

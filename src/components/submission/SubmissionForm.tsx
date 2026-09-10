@@ -9,7 +9,12 @@ import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
 import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
 import { CompactPublicFeed } from '@/components/feed/PublicFeedProvider';
 
-import styles from './SubmissionForm.module.css';
+import baseStyles from './SubmissionForm.module.css';
+import experienceStyles from './SubmissionExperience.module.css';
+import { ExpressionDrift } from '@/components/campaign/ExpressionDrift';
+
+// Retain existing bouquet and receipt animation classes.
+const styles = { ...baseStyles, ...experienceStyles };
 
 export { countGraphemes, hasVisibleNameContent };
 
@@ -141,12 +146,9 @@ function DecorativeGarden() {
 
 function ExpressionScene({ id }: { id: number }) {
   return (
-    <span className={`${styles.expressionScene} ${styles[`scene${id}`]}`} data-testid="expression-scene" data-scene-id={id} aria-hidden="true">
-      <span className={styles.sceneGround} />
-      <span className={styles.scenePrimary} />
-      <span className={styles.sceneSecondary} />
-      <span className={styles.sceneAccent} />
-      <span className={styles.sceneSpark} />
+    <span className={styles.expressionScene} data-testid="expression-scene" data-scene-id={id} aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`/home-art/icon${id}.webp`} width="56" height="56" alt="" draggable="false" />
     </span>
   );
 }
@@ -212,11 +214,13 @@ function ExpressionChoice({
   selected,
   onToggle,
   error,
+  disabled,
 }: {
   expression: (typeof EXPRESSIONS)[number];
   selected: boolean;
   onToggle: () => void;
   error?: string;
+  disabled?: boolean;
 }) {
   return (
     <article
@@ -230,6 +234,7 @@ function ExpressionChoice({
         aria-pressed={selected}
         aria-describedby={`expression-details-${expression.id}${error ? ' expressions-error' : ''}`}
         onClick={onToggle}
+        disabled={disabled}
       >
         <ExpressionCluster />
         <ExpressionScene id={expression.id} />
@@ -256,10 +261,16 @@ function ExpressionChoice({
 function Header() {
   return (
     <header className={styles.header}>
-      <Link className={styles.backLink} href="/">Back to live recognitions</Link>
-      <p className={styles.kicker}>A small word of encouragement</p>
       <h1>{CAMPAIGN_TITLE}</h1>
+      <h2 className={styles.pageTitle}>Share a<br className={styles.desktopBreak} /> recognition</h2>
       <p className={styles.tagline}>{CAMPAIGN_TAGLINE}</p>
+      <ExpressionDrift className={styles.headerExpressions} />
+      <div className={styles.headerArt} aria-hidden="true">
+        <span />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/home-art/community.webp" alt="" width="1000" height="340" draggable="false" />
+      </div>
+      <p className={styles.invitation}>A small word of encouragement.</p>
     </header>
   );
 }
@@ -287,10 +298,17 @@ function ClosedState({ configured }: { configured: boolean }) {
 }
 
 function Preview({ draft, onClose }: { draft: Draft; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { if (dialog?.open) dialog.close(); };
+  }, []);
   const selected = EXPRESSIONS.filter((expression) => draft.expressionIds.includes(expression.id));
 
   return (
-    <section className={styles.previewPanel} aria-labelledby="preview-title">
+    <dialog ref={dialogRef} className={styles.previewPanel} aria-labelledby="preview-title" onCancel={onClose}>
+      <section role="region" aria-labelledby="preview-title">
       <div className={styles.previewHeader}>
         <div>
           <p className={styles.cardEyebrow}>Public preview</p>
@@ -306,15 +324,18 @@ function Preview({ draft, onClose }: { draft: Draft; onClose: () => void }) {
         </ul>
         <p className={styles.previewNote}>Your name is not shown here.</p>
       </div>
-    </section>
+      </section>
+    </dialog>
   );
 }
 
 function Receipt({ status, onReset }: { status: ReceiptStatus; onReset: () => void }) {
   const held = status === 'held';
+  const receiptRef = useRef<HTMLElement>(null);
+  useEffect(() => { receiptRef.current?.focus(); }, []);
 
   return (
-    <section className={`${styles.receiptCard} ${held ? styles.receiptHeld : styles.receiptPublished}`} aria-labelledby="receipt-title" data-testid="submission-receipt">
+    <section className={`${styles.receiptCard} ${held ? styles.receiptHeld : styles.receiptPublished}`} aria-labelledby="receipt-title" data-testid="submission-receipt" ref={receiptRef} tabIndex={-1}>
       <div className={styles.seedJourney} data-testid="seed-journey" aria-hidden="true">
         <span className={styles.seedOrbit} data-testid="seed-orbit">
           <span className={styles.seed} />
@@ -344,6 +365,8 @@ function Receipt({ status, onReset }: { status: ReceiptStatus; onReset: () => vo
 }
 
 export function SubmissionForm() {
+  const [motionPaused, setMotionPaused] = useState(false);
+  const sendingRef = useRef(false);
   const [config, setConfig] = useState<ConfigResponse | null>(null);
   const [configError, setConfigError] = useState(false);
   const [viewState, setViewState] = useState<ViewState>('editing');
@@ -421,7 +444,7 @@ export function SubmissionForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (viewState === 'sending') return;
+    if (sendingRef.current || viewState === 'sending') return;
 
     const errors = getValidationErrors(draft);
     if (Object.keys(errors).length > 0) {
@@ -432,6 +455,7 @@ export function SubmissionForm() {
 
     setFieldErrors({});
     setSubmissionError('');
+    sendingRef.current = true;
     setViewState('sending');
 
     try {
@@ -445,6 +469,13 @@ export function SubmissionForm() {
           requestKey,
         }),
       });
+      // HTTP success alone is not confirmation of receipt or publication.
+      if (!result || typeof result.id !== 'string' || !result.id ||
+          !['published', 'held'].includes(result.status) ||
+          typeof result.expiresAt !== 'string' || !Number.isFinite(Date.parse(result.expiresAt))) {
+        throw new Error('We could not confirm the response.');
+      }
+      setShowPreview(false);
       setReceiptStatus(result.status);
       setViewState(result.status);
     } catch (error) {
@@ -458,6 +489,8 @@ export function SubmissionForm() {
         setSubmissionError(error instanceof Error ? error.message : 'We could not send your recognition. Please try again.');
         setViewState('editing');
       }
+    } finally {
+      sendingRef.current = false;
     }
   }
 
@@ -469,7 +502,7 @@ export function SubmissionForm() {
     setViewState('editing');
     setShowPreview(false);
     setRequestKey(makeRequestKey());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: motionPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
   function focusField(field: FieldName) {
@@ -484,11 +517,16 @@ export function SubmissionForm() {
   const showReceipt = receiptStatus && (viewState === 'published' || viewState === 'held');
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-submission-experience data-motion-paused={motionPaused}>
       <DecorativeGarden />
+      <nav className={styles.topbar} aria-label="Recognition navigation">
+        <Link className={styles.backLink} href="/"><span aria-hidden="true">←</span>Back to live recognitions</Link>
+        <button className={styles.motionToggle} type="button" aria-pressed={motionPaused} onClick={() => setMotionPaused(value => !value)}>{motionPaused ? 'Resume animation' : 'Pause animation'}</button>
+      </nav>
       <div className={styles.shell}>
         <Header />
-        <CompactPublicFeed />
+        <div className={styles.formColumn}>
+        <div className={styles.liveFeed}><CompactPublicFeed /></div>
 
         {showLoading && (
           <section className={styles.loadingCard} aria-live="polite" aria-busy="true">
@@ -503,7 +541,8 @@ export function SubmissionForm() {
 
         {!showLoading && !showClosed && !showReceipt && (
           <>
-            <form className={styles.formCard} onSubmit={submit} noValidate>
+            <form className={styles.formCard} onSubmit={submit} noValidate aria-busy={viewState === 'sending'}>
+              <div className={styles.sectionIntro}><span>01</span><h2>A kindness worth recognizing</h2></div>
               <div className={styles.privateCallout}>
                 <span className={styles.privateIcon} aria-hidden="true"><span /></span>
                 <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The recipient, expressions, and message appear on the home page and TV.</p>
@@ -519,6 +558,7 @@ export function SubmissionForm() {
                 </div>
               )}
 
+              <div className={styles.nameFields}>
               <div className={styles.formSection}>
                 <label className={styles.label} htmlFor="submitter">Your name</label>
                 <input
@@ -527,6 +567,7 @@ export function SubmissionForm() {
                   id="submitter"
                   name="submitter"
                   type="text"
+                  disabled={viewState === 'sending'}
                   autoComplete="name"
                   value={draft.submitter}
                   onChange={(event) => updateDraft('submitter', event.target.value)}
@@ -545,6 +586,7 @@ export function SubmissionForm() {
                   id="recipient"
                   name="recipient"
                   type="text"
+                  disabled={viewState === 'sending'}
                   value={draft.recipient}
                   onChange={(event) => updateDraft('recipient', event.target.value)}
                   placeholder="For example, Michelle"
@@ -554,8 +596,9 @@ export function SubmissionForm() {
                 <FieldMessage id="recipient-error">{fieldErrors.recipient}</FieldMessage>
               </div>
 
+              </div>
               <fieldset className={`${styles.formSection} ${styles.expressionFieldset}`} aria-describedby={fieldErrors.expressions ? 'expressions-help expressions-error' : 'expressions-help'}>
-                <legend className={styles.label}>Which expression(s) did they practice?</legend>
+                <legend className={styles.label}><span className={styles.sectionNumber}>02</span>Which expression(s) did they practice?</legend>
                 <p className={styles.helper} id="expressions-help">Select one or more. Each phrase keeps its full meaning.</p>
                 <div className={styles.expressionGrid} data-testid="expression-grid">
                   {EXPRESSIONS.map((expression) => (
@@ -565,6 +608,7 @@ export function SubmissionForm() {
                       selected={draft.expressionIds.includes(expression.id)}
                       onToggle={() => toggleExpression(expression.id)}
                       error={fieldErrors.expressions}
+                      disabled={viewState === 'sending'}
                     />
                   ))}
                 </div>
@@ -573,13 +617,14 @@ export function SubmissionForm() {
               </fieldset>
 
               <div className={styles.formSection}>
-                <label className={styles.label} htmlFor="message">Share your appreciation</label>
+                <label className={styles.label} htmlFor="message"><span className={styles.sectionNumber} aria-hidden="true">03</span>Share your appreciation</label>
                 <p className={styles.helper} id="message-help">Write a message of thanks. Leave out contact information and private details.</p>
                 <textarea
                   ref={messageRef}
                   className={styles.messageInput}
                   id="message"
                   name="message"
+                  disabled={viewState === 'sending'}
                   value={draft.message}
                   onChange={(event) => updateDraft('message', event.target.value)}
                   placeholder="What did they do, and how did it encourage you?"
@@ -599,7 +644,7 @@ export function SubmissionForm() {
               )}
 
               <div className={styles.actions}>
-                <button className={styles.previewButton} type="button" onClick={() => setShowPreview(true)} disabled={!draft.recipient.trim() || !draft.message.trim() || selectedExpressions.length === 0}>Preview public message</button>
+                <button className={styles.previewButton} type="button" onClick={() => setShowPreview(true)} disabled={viewState === 'sending' || !draft.recipient.trim() || !draft.message.trim() || selectedExpressions.length === 0}>Preview public message</button>
                 <button className={styles.submitButton} type="submit" disabled={viewState === 'sending'}>
                   {viewState === 'sending' ? 'Sending…' : viewState === 'unconfirmed' ? 'Retry recognition' : 'Send recognition'}
                   <span className={styles.submitHeart} aria-hidden="true" />
@@ -616,6 +661,7 @@ export function SubmissionForm() {
 
         {showPreview && !showReceipt && <Preview draft={draft} onClose={() => setShowPreview(false)} />}
         {viewState === 'sending' && <p className={styles.srOnly} role="status">{statusLabel(viewState)}</p>}
+        </div>
       </div>
     </main>
   );

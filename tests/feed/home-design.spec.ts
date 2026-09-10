@@ -63,7 +63,7 @@ for (const [width, height, label] of [[1440, 1000, 'desktop'], [768, 1024, 'tabl
     await expect(page.getByText(CAMPAIGN_TAGLINE, { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: 'Share a recognition', exact: true }).first()).toHaveAttribute('href', '/recognize');
     await expect(page.getByRole('link', { name: 'Explore the nine expressions' })).toHaveAttribute('href', '/expressions');
-    await expect(page.getByRole('link', { name: 'Read the sharing guide' })).toHaveAttribute('href', '/privacy');
+    await expect(page.getByRole('link', { name: width <= 560 ? 'Sharing guide' : 'Read the sharing guide', exact: true })).toHaveAttribute('href', '/privacy');
     await expect(page.getByRole('link', { name: 'TV View' })).toHaveAttribute('href', '/display');
     await expect(page.getByRole('link', { name: 'Admin', exact: true })).toHaveAttribute('href', '/admin/login');
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
@@ -183,7 +183,7 @@ test('keyboard access, independent circular motion, pause and reduced motion', a
 test('unmodified routes contain no Home theme and have no unexpected browser errors', async ({ page }) => {
   const errors = await mock(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  for (const route of ['/recognize', '/expressions', '/privacy', '/admin/login', '/display']) {
+  for (const route of ['/expressions', '/privacy', '/admin/login', '/display']) {
     await page.goto(route);
     await expect(page.locator('[data-home-experience]')).toHaveCount(0);
     await page.waitForTimeout(400);
@@ -205,7 +205,7 @@ test('protected routes match baseline within tiny rasterization tolerance', asyn
   await mock(before); await mock(after);
   mkdirSync('home-review-evidence', { recursive: true });
   const checks = [];
-  for (const route of ['/recognize', '/expressions', '/privacy', '/admin/login', '/display']) {
+  for (const route of ['/expressions', '/privacy', '/admin/login', '/display']) {
     await before.goto(process.env.HOME_BASELINE_URL! + route);
     await after.goto(route);
     for (const page of [before, after]) {
