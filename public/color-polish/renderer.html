@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'none'; object-src 'none';">
+  <link rel="stylesheet" href="/color-polish/renderer.css">
+  <title>Mother's Love display renderer</title>
+</head>
+<body>
+  <div class="frame" id="frame">
+    <div class="tv" id="tv">
+      <div class="background"></div>
+      <div class="sunlight"></div>
+      <div class="arch" id="arch"></div>
+      <img id="flowers" class="botanical flowers" alt="">
+      <img id="foliage" class="botanical foliage" alt="">
+      <canvas id="atmosphere" width="1920" height="686" aria-hidden="true"></canvas>
+      <header class="tv-header">
+        <div>
+          <div class="brand">THE WORDS OF <span class="text-shimmer pearl">MOTHER’S LOVE</span></div>
+          <div class="tagline">Where a mother’s love resides, peace abides.</div>
+        </div>
+        <div class="header-right">
+          <div class="campaign-likes" id="campaign-likes"></div>
+          <div class="header-time" id="header-time"></div>
+        </div>
+      </header>
+      <div class="queue-dock" id="queue" hidden role="status"></div>
+      <section class="stage" id="stage" aria-label="Current TV scene"></section>
+      <section class="event-stage" id="event" aria-label="Recognition arrival"></section>
+      <footer class="footer">
+        <div class="qr-zone" id="qr-zone">
+          <div class="qr-halo"></div>
+          <img id="qr" alt="QR to the recognition form">
+          <div class="qr-label">Recognize<br>Someone<small>Who encouraged<br>you today?</small></div>
+          <div class="qr-url">mothers-love.vercel.app/recognize</div>
+        </div>
+        <div class="feed-region">
+          <div class="feed-title"><span><i class="live-dot"></i> LIVE RECOGNITIONS</span><small>LIVE CAMPAIGN</small></div>
+          <div class="feed-columns" id="feed-columns"></div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  <script src="/color-polish/renderer.js" defer></script>
+</body>
+</html>
