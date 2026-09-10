@@ -80,7 +80,8 @@ BEGIN
   END IF;
 
   FOR item IN SELECT entry_value FROM pg_catalog.jsonb_array_elements(playlist_value) AS entries(entry_value) LOOP
-    IF pg_catalog.jsonb_typeof(item) IS DISTINCT FROM 'object' OR pg_catalog.jsonb_object_length(item) <> 3 THEN
+    IF pg_catalog.jsonb_typeof(item) IS DISTINCT FROM 'object'
+       OR (SELECT pg_catalog.count(*) FROM pg_catalog.jsonb_object_keys(item)) <> 3 THEN
       RETURN false;
     END IF;
     IF EXISTS (
@@ -104,7 +105,7 @@ BEGIN
     IF item->'durationSeconds' IS NULL
        OR pg_catalog.jsonb_typeof(item->'durationSeconds') IS DISTINCT FROM 'number'
        OR COALESCE(item->>'durationSeconds', '') !~ '^[0-9]+$'
-       OR (item->>'durationSeconds')::numeric NOT BETWEEN 1 AND 180 THEN
+       OR (item->>'durationSeconds')::numeric NOT BETWEEN 12 AND 180 THEN
       RETURN false;
     END IF;
     seen_ids := pg_catalog.array_append(seen_ids, item_id);
@@ -194,37 +195,75 @@ STABLE
 SET search_path = ''
 AS $function$
 DECLARE
+  legacy_value jsonb;
   count_values integer[];
-  recognition_value bigint;
   expression_total_value bigint;
-  revision_value bigint;
 BEGIN
-  count_values := mothers_love.ml_color_polish_expression_counts(period_from, period_to, through_date);
-  SELECT
-    COALESCE(pg_catalog.sum(d.recognitions), 0)::bigint,
-    COALESCE(pg_catalog.sum(d.expression_total), 0)::bigint,
-    COALESCE(pg_catalog.max(d.revision), 0)::bigint
-  INTO recognition_value, expression_total_value, revision_value
-  FROM mothers_love.daily_aggregates AS d
-  WHERE period_from IS NOT NULL
-    AND period_to IS NOT NULL
-    AND through_date IS NOT NULL
-    AND d.period_start BETWEEN period_from AND period_to
-    AND d.period_start = d.period_end
-    AND d.period_start <= through_date
-    AND d.period_end <= through_date
-    AND d.recognitions >= 0
-    AND d.expression_total >= 0
-    AND pg_catalog.array_length(d.expression_counts, 1) = 9
-    AND d.expression_counts[1] >= 0
-    AND d.expression_counts[2] >= 0
-    AND d.expression_counts[3] >= 0
-    AND d.expression_counts[4] >= 0
-    AND d.expression_counts[5] >= 0
-    AND d.expression_counts[6] >= 0
-    AND d.expression_counts[7] >= 0
-    AND d.expression_counts[8] >= 0
-    AND d.expression_counts[9] >= 0;
+  IF period_from IS NULL OR period_to IS NULL OR through_date IS NULL OR period_from > period_to OR period_to > through_date THEN
+    RAISE EXCEPTION 'invalid color polish aggregate range';
+  END IF;
+
+  -- Use the legacy aggregate as the source of truth for period selection and
+  -- revision. This keeps the month projection byte-for-byte compatible while
+  -- retaining strict validation for the new anonymous insights.
+  legacy_value := mothers_love.ml_aggregate_json(period_from, period_to);
+  IF EXISTS (
+    SELECT 1
+    FROM mothers_love.daily_aggregates AS d
+    WHERE d.period_start BETWEEN period_from AND period_to
+      AND (
+        d.period_start <> d.period_end
+        OR d.period_end > through_date
+        OR d.recognitions < 0
+        OR d.expression_total < 0
+        OR pg_catalog.array_length(d.expression_counts, 1) IS DISTINCT FROM 9
+        OR d.expression_counts[1] IS NULL
+        OR d.expression_counts[2] IS NULL
+        OR d.expression_counts[3] IS NULL
+        OR d.expression_counts[4] IS NULL
+        OR d.expression_counts[5] IS NULL
+        OR d.expression_counts[6] IS NULL
+        OR d.expression_counts[7] IS NULL
+        OR d.expression_counts[8] IS NULL
+        OR d.expression_counts[9] IS NULL
+        OR d.expression_counts[1] < 0
+        OR d.expression_counts[2] < 0
+        OR d.expression_counts[3] < 0
+        OR d.expression_counts[4] < 0
+        OR d.expression_counts[5] < 0
+        OR d.expression_counts[6] < 0
+        OR d.expression_counts[7] < 0
+        OR d.expression_counts[8] < 0
+        OR d.expression_counts[9] < 0
+        OR d.expression_total <> d.expression_counts[1]
+          + d.expression_counts[2]
+          + d.expression_counts[3]
+          + d.expression_counts[4]
+          + d.expression_counts[5]
+          + d.expression_counts[6]
+          + d.expression_counts[7]
+          + d.expression_counts[8]
+          + d.expression_counts[9]
+      )
+  ) THEN
+    RAISE EXCEPTION 'invalid color polish aggregate source';
+  END IF;
+  IF legacy_value IS NULL
+     OR pg_catalog.jsonb_typeof(legacy_value->'expressionCounts') IS DISTINCT FROM 'array'
+     OR pg_catalog.jsonb_array_length(legacy_value->'expressionCounts') <> 9
+     OR COALESCE(legacy_value->>'expressionTotal', '') !~ '^[0-9]+$'
+     OR COALESCE(legacy_value->>'recognitions', '') !~ '^[0-9]+$'
+     OR COALESCE(legacy_value->>'revision', '') !~ '^[0-9]+$' THEN
+    RAISE EXCEPTION 'invalid color polish aggregate';
+  END IF;
+
+  SELECT pg_catalog.array_agg(entry_value::integer ORDER BY ordinal)
+  INTO count_values
+  FROM pg_catalog.jsonb_array_elements_text(legacy_value->'expressionCounts') WITH ORDINALITY AS entries(entry_value, ordinal);
+  IF count_values IS NULL OR pg_catalog.cardinality(count_values) <> 9 OR count_values[1] < 0 OR count_values[2] < 0 OR count_values[3] < 0 OR count_values[4] < 0 OR count_values[5] < 0 OR count_values[6] < 0 OR count_values[7] < 0 OR count_values[8] < 0 OR count_values[9] < 0 THEN
+    RAISE EXCEPTION 'invalid color polish aggregate';
+  END IF;
+  expression_total_value := (legacy_value->>'expressionTotal')::bigint;
 
   IF count_values[1]::bigint
      + count_values[2]::bigint
@@ -238,14 +277,7 @@ BEGIN
     RAISE EXCEPTION 'invalid color polish aggregate';
   END IF;
 
-  RETURN pg_catalog.jsonb_build_object(
-    'periodStart', period_from,
-    'periodEnd', period_to,
-    'recognitions', recognition_value,
-    'expressionCounts', pg_catalog.to_jsonb(count_values),
-    'expressionTotal', expression_total_value,
-    'revision', revision_value
-  );
+  RETURN legacy_value;
 END
 $function$;
 
@@ -261,8 +293,8 @@ DECLARE
   presentation_row mothers_love.color_polish_presentation%ROWTYPE;
   now_value timestamptz;
   local_date date;
-  week_start date;
-  week_end date;
+  current_week_start date;
+  current_week_end date;
   previous_week_start date;
   previous_week_end date;
   month_start date;
@@ -285,7 +317,6 @@ BEGIN
   -- One short campaign lock serializes first use of the anonymous weekly row.
   -- It does not touch the legacy display client or settings payload.
   PERFORM pg_catalog.pg_advisory_xact_lock(910202611::bigint);
-  now_value := pg_catalog.clock_timestamp();
 
   base_snapshot := public.ml_public_display_snapshot(after_cursor);
   IF base_snapshot IS NULL OR COALESCE((base_snapshot->>'ok')::boolean, false) IS DISTINCT FROM true THEN
@@ -294,7 +325,10 @@ BEGIN
   IF base_snapshot->>'submissionUrl' IS DISTINCT FROM 'https://mothers-love.vercel.app/recognize' THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');
   END IF;
-  base_snapshot := base_snapshot || pg_catalog.jsonb_build_object('serverTime', now_value);
+  now_value := (base_snapshot->>'serverTime')::timestamptz;
+  IF now_value IS NULL THEN
+    RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');
+  END IF;
 
   SELECT *
   INTO presentation_row
@@ -306,10 +340,10 @@ BEGIN
   END IF;
 
   local_date := (now_value AT TIME ZONE 'America/Los_Angeles')::date;
-  week_start := local_date - EXTRACT(dow FROM local_date)::integer;
-  week_end := week_start + 6;
-  previous_week_start := week_start - 7;
-  previous_week_end := week_start - 1;
+  current_week_start := local_date - EXTRACT(dow FROM local_date)::integer;
+  current_week_end := current_week_start + 6;
+  previous_week_start := current_week_start - 7;
+  previous_week_end := current_week_start - 1;
   month_start := pg_catalog.date_trunc('month', local_date)::date;
 
   prior_counts := mothers_love.ml_color_polish_expression_counts(previous_week_start, previous_week_end, local_date);
@@ -319,7 +353,7 @@ BEGIN
     END IF;
   END LOOP;
 
-  current_counts := mothers_love.ml_color_polish_expression_counts(week_start, local_date, local_date);
+  current_counts := mothers_love.ml_color_polish_expression_counts(current_week_start, local_date, local_date);
 
   SELECT COALESCE(
     pg_catalog.jsonb_agg(
@@ -373,7 +407,7 @@ BEGIN
     AND d.expression_counts[8] >= 0
     AND d.expression_counts[9] >= 0;
 
-  current_week_value := mothers_love.ml_color_polish_aggregate_json(week_start, local_date, local_date);
+  current_week_value := mothers_love.ml_color_polish_aggregate_json(current_week_start, local_date, local_date);
   previous_week_value := mothers_love.ml_color_polish_aggregate_json(previous_week_start, previous_week_end, local_date);
   month_value := mothers_love.ml_color_polish_aggregate_json(month_start, local_date, local_date);
   campaign_value := mothers_love.ml_color_polish_aggregate_json(campaign_start, local_date, local_date);
@@ -382,13 +416,13 @@ BEGIN
   END IF;
 
   INSERT INTO mothers_love.color_polish_weekly_focus (week_start, week_end, expression_id)
-  VALUES (week_start, week_end, selected_expression)
+  VALUES (current_week_start, current_week_end, selected_expression)
   ON CONFLICT (week_start) DO NOTHING;
 
   SELECT f.expression_id
   INTO frozen_expression
   FROM mothers_love.color_polish_weekly_focus AS f
-  WHERE f.week_start = week_start;
+  WHERE f.week_start = current_week_start;
   IF frozen_expression IS NULL THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');
   END IF;
@@ -407,8 +441,8 @@ BEGIN
     'month', month_value,
     'campaign', campaign_value,
     'goal', pg_catalog.jsonb_build_object(
-      'weekStart', week_start,
-      'weekEnd', week_end,
+      'weekStart', current_week_start,
+      'weekEnd', current_week_end,
       'expressionId', frozen_expression,
       'value', current_counts[frozen_expression],
       'target', goal_target,
@@ -484,13 +518,10 @@ BEGIN
   IF changes IS NULL OR pg_catalog.jsonb_typeof(changes) IS DISTINCT FROM 'object' OR changes = '{}'::jsonb THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST');
   END IF;
-  IF EXISTS (SELECT 1 FROM pg_catalog.jsonb_object_keys(changes) AS key_name WHERE key_name NOT IN ('enabled', 'playlist')) THEN
+  IF EXISTS (SELECT 1 FROM pg_catalog.jsonb_object_keys(changes) AS key_name WHERE key_name <> 'playlist') THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST');
   END IF;
-  IF changes ? 'enabled' AND pg_catalog.jsonb_typeof(changes->'enabled') IS DISTINCT FROM 'boolean' THEN
-    RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST');
-  END IF;
-  IF changes ? 'playlist' AND NOT mothers_love.ml_color_polish_valid_playlist(changes->'playlist') THEN
+  IF NOT changes ? 'playlist' OR NOT mothers_love.ml_color_polish_valid_playlist(changes->'playlist') THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST');
   END IF;
 
@@ -500,8 +531,7 @@ BEGIN
   END IF;
 
   UPDATE mothers_love.color_polish_presentation
-  SET enabled = CASE WHEN changes ? 'enabled' THEN (changes->>'enabled')::boolean ELSE enabled END,
-      playlist = CASE WHEN changes ? 'playlist' THEN changes->'playlist' ELSE playlist END,
+  SET playlist = changes->'playlist',
       revision = revision + 1,
       updated_at = pg_catalog.clock_timestamp()
   WHERE singleton_id = true;
@@ -552,7 +582,7 @@ BEGIN
   expected_settings_version := settings_version_value::bigint;
   expected_revision := revision_value::bigint;
   action_value := payload->>'action';
-  IF action_value NOT IN ('activate', 'rollback') THEN
+  IF action_value IS NULL OR action_value NOT IN ('activate', 'rollback') THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 400, 'code', 'INVALID_REQUEST');
   END IF;
   enabled_value := action_value = 'activate';

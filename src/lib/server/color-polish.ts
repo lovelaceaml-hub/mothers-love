@@ -19,13 +19,13 @@ export type ColorPolishQuery = {
 };
 
 export type ColorPolishPresentationChanges = {
-  enabled?: boolean;
   playlist?: ColorPolishPresentation["playlist"];
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_CALENDAR_DAYS = 31;
+const MIN_PRESENTATION_DURATION_SECONDS = 12;
 const MAX_PRESENTATION_DURATION_SECONDS = 180;
 const COLOR_POLISH_OPERATION_DEADLINE_MS = 8_000;
 const COLOR_POLISH_SUBMISSION_URL = "https://mothers-love.vercel.app/recognize";
@@ -124,7 +124,7 @@ function projectPresentation(value: unknown): ColorPolishPresentation | null {
   for (const item of value.playlist) {
     if (!isPlainRecord(item) || !hasExactKeys(item, PRESENTATION_ITEM_KEYS)) return null;
     if (typeof item.id !== "string" || !allowedScenes.has(item.id) || seen.has(item.id)) return null;
-    if (typeof item.enabled !== "boolean" || typeof item.durationSeconds !== "number" || !Number.isSafeInteger(item.durationSeconds) || item.durationSeconds < 1 || item.durationSeconds > MAX_PRESENTATION_DURATION_SECONDS) return null;
+    if (typeof item.enabled !== "boolean" || typeof item.durationSeconds !== "number" || !Number.isSafeInteger(item.durationSeconds) || item.durationSeconds < MIN_PRESENTATION_DURATION_SECONDS || item.durationSeconds > MAX_PRESENTATION_DURATION_SECONDS) return null;
     seen.add(item.id);
     playlist.push({ id: item.id as ColorPolishScene, enabled: item.enabled, durationSeconds: item.durationSeconds });
   }
@@ -133,17 +133,11 @@ function projectPresentation(value: unknown): ColorPolishPresentation | null {
 }
 
 export function projectColorPolishPresentationChanges(value: unknown): ColorPolishPresentationChanges | null {
-  if (!isPlainRecord(value) || !hasOnlyKeys(value, ["enabled", "playlist"]) || Object.keys(value).length === 0) return null;
+  if (!isPlainRecord(value) || !hasOnlyKeys(value, ["playlist"]) || Object.keys(value).length === 0) return null;
   const changes: ColorPolishPresentationChanges = {};
-  if (Object.prototype.hasOwnProperty.call(value, "enabled")) {
-    if (typeof value.enabled !== "boolean") return null;
-    changes.enabled = value.enabled;
-  }
-  if (Object.prototype.hasOwnProperty.call(value, "playlist")) {
-    const projected = projectPresentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist });
-    if (!projected) return null;
-    changes.playlist = projected.playlist;
-  }
+  const projected = projectPresentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist });
+  if (!projected) return null;
+  changes.playlist = projected.playlist;
   return changes;
 }
 

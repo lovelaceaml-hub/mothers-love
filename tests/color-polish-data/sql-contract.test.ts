@@ -14,6 +14,10 @@ describe("Color Polish migration contract", () => {
     expect(migration).toContain("ON CONFLICT (week_start) DO NOTHING");
     expect(migration).toContain("AT TIME ZONE 'America/Los_Angeles'");
     expect(migration).toContain("mothers_love.daily_aggregates");
+    expect(migration).not.toContain("jsonb_object_length");
+    expect(migration).toContain("current_week_start date");
+    expect(migration).toContain("current_week_end date");
+    expect(migration).toContain("legacy_value := mothers_love.ml_aggregate_json(period_from, period_to)");
     expect(migration).not.toMatch(/ALTER TABLE public\./u);
   });
 
@@ -25,6 +29,8 @@ describe("Color Polish migration contract", () => {
     expect(migration).toContain("SET version = version + 1");
     expect(migration).toContain("RAISE EXCEPTION 'legacy aggregate mismatch'");
     expect(migration).toContain("RAISE EXCEPTION 'invalid color polish aggregate'");
+    expect(migration).toContain("action_value IS NULL OR action_value NOT IN ('activate', 'rollback')");
+    expect(migration).toContain("jsonb_object_keys(changes) AS key_name WHERE key_name <> 'playlist'");
   });
 
   it("revokes direct public access and grants only the restricted runtime", () => {

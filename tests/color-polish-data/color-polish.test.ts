@@ -168,8 +168,10 @@ describe("Color Polish projection", () => {
 
 describe("Color Polish presentation patch projection", () => {
   it("accepts only allowlisted patch fields and the 180 second Garden preset", () => {
-    expect(projectColorPolishPresentationChanges({ enabled: true, playlist: presentation.playlist })).toEqual({ enabled: true, playlist: presentation.playlist });
+    expect(projectColorPolishPresentationChanges({ playlist: presentation.playlist })).toEqual({ playlist: presentation.playlist });
+    expect(projectColorPolishPresentationChanges({ enabled: true })).toBeNull();
     expect(projectColorPolishPresentationChanges({ internalSecret: "drop" })).toBeNull();
+    expect(projectColorPolishPresentationChanges({ playlist: presentation.playlist.map((item) => ({ ...item, durationSeconds: 11 })) })).toBeNull();
     expect(projectColorPolishPresentationChanges({ playlist: presentation.playlist.map((item) => ({ ...item, durationSeconds: 181 })) })).toBeNull();
   });
 });
