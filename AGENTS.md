@@ -1,3 +1,6 @@
+## Active Color Polish implementation
+Read /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md and its Build log first. It supersedes older TV visual, role and timing requirements. Two Luna max worktrees then sequential integration; Sol controller and Sonnet independent review, no Terra. Approved target includes the persistent Garden feed.
+
 # The Words of Mother's Love
 
 ## Current authority
