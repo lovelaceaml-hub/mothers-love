@@ -10,7 +10,7 @@ on:
       - tests/mobile-recognition/**
       - tests/submission/**
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: mobile-recognition-review
   cancel-in-progress: true
@@ -28,15 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply final rendered fixes and restore read-only verification
-        run: |
-          test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
-          python3 scripts/review/finalize-mobile-review.py
-          git add -- src/components/submission/SubmissionExperience.module.css tests/submission/submission.spec.ts .github/workflows/mobile-recognition-review.yml scripts/review/finalize-mobile-review.py
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Fix rendered contrast and verify keyboard-dismissible preview; restore read-only CI'
-          git push origin HEAD:refs/heads/codex/home-tv-family
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
