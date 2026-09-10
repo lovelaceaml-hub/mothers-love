@@ -60,3 +60,13 @@ The user supersedes the former name-format rule. The correction must remove the 
 The first flexible-name review caught invisible-only names passing trim-based required checks. A shared content predicate closes that blank-input case without reintroducing initials or changing meaningful Unicode names. This is a task correction, not a new global policy.
 
 Flexible-names correction completed with the existing approved parallel Luna workflow. Accepted review finding was corrected and the native Sol retry passed. No new preference or memory update is required.
+
+## Color Polish
+
+On 2026-09-10, Codex shipped the Color Polish TV renderer and sample preview (commit a7dca27), a Claude Sonnet 5 lane completed the remaining fixes (commit 06172bb), migration 012 was applied, and Anthony activated it at settings version 6 with a single SQL paste. The result is live at https://mothers-love.vercel.app/display.
+
+The narrowed running and usable scope let the release land the same day. The single consolidated Opus 5 review passed but still found two real resilience gaps: no legacy fallback when the new feed fails, and a global advisory lock on every public read. The coordinator's scene by scene visual comparison against the approved reference caught a live visible defect in the Milestone scene that no automated test covered. Anthony confirmed the two design source files match the repo's frozen references byte for byte.
+
+For next time: Antigravity's headless gate only allows ls, cat, pwd, find, grep, node, npm, git status and git diff, so a Gemini lane could not run environment prefixed npm commands or psql and produced nothing; decide whether to broaden the gate or route verification heavy lanes elsewhere at planning time. Claude Desktop's Auto mode safety classifier blocks production database writes even through the enabled Supabase connector, for both DDL and data writes, so production SQL needs Anthony's paste or a Codex session with its own connector; plan for that step explicitly. Codex ran out of usage minutes before activation, so keep a prepared activation and rollback SQL in the run record from the start. Migrations 010 and 011 were applied through Supabase's migration history without campaign ledger rows; add a ledger row whenever a migration is applied. Add an automated check for the Milestone scene's week text so a blank state cannot regress silently.
+
+Open follow-ups: pixel parity details, preset editing and advanced preview drafts, an admin route for activate and rollback, full lint cleanup, and physical TV and phone checks.

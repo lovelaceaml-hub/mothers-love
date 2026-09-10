@@ -1,10 +1,14 @@
-## September 10: usable Color Polish release
+## September 10: Color Polish live
 
-Anthony narrowed this release to running and usable, deferring detailed polish. TV and basic sample preview share the Color Polish renderer. Ten scene choices, replay and pause are available in the new preview; existing admin controls remain. Home and submission files are preserved.
+Color Polish TV and sample preview are live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, running the new renderer with 10 scenes, replay and pause. Database settings are at version 6, revision 2, presentation enabled true.
 
-Production build and essential synthetic TV/Quiet/authenticated Studio smoke passed. Anonymous database support is deployed, initially disabled. Activation and production verification are pending this release step. Detailed pixel parity, advanced preview drafts/preset editing, full lint cleanup and physical TV/audio/phone-camera checks remain follow-up. One Opus blocker review replaces earlier cancelled reviews, with at most two failed verdicts.
+Fix commit 06172bb deployed as dpl_BaxrmngrNd8yEjFttZUQBQBKTMRr, READY. Migration 012 and activation were applied through Anthony's prepared SQL paste in the Supabase SQL editor at about 4:15 PM Pacific time. The campaign ledger mothers_love.schema_migrations now has 10 rows, with a matching hash and one settings event recorded.
 
-Rollback: prior deployment dpl_CmSSPmnFHXQcTq9jew1jsT1GFHsH and version-checked disable of the separate presentation preset. Original settings version5 and legacy display_config hash9331b79472e7ef847c08e949cae96117 are preserved until activation increments the version.
+Verified: typecheck clean, 222 of 222 unit tests, production build, 2 of 2 color-polish-usable browser journeys, the isolated PostgreSQL fixture for migration 012, and all 10 renderer probe scenes matching the approved design, including the fixed Milestone scene. Live checks confirm the API, the database ledger and the TV display all agree.
+
+Rollback: docs/runs/2026-09-10-color-polish/research/rollback.sql runs a version-checked disable. The TV returns to the preserved V6 renderer on its next 5 second poll. Prior deployments dpl_2ba7dzvVR8kH8YKh4HzwfBsuqbNc and dpl_CmSSPmnFHXQcTq9jew1jsT1GFHsH remain available in Vercel.
+
+Open follow-ups: pixel parity, advanced preview drafts and preset editing (deferred by Anthony), an admin route for activate and rollback (SQL only today), full lint cleanup, and the physical TV, audio chime and phone camera QR checks. Ledger rows for migrations 010 and 011 are tracked only in Supabase migration history.
 
 # Handoff
 

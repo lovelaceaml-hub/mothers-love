@@ -1,5 +1,5 @@
-## Active Color Polish implementation
-Read /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md and its Build log first. It supersedes older TV visual, role and timing requirements. Two Luna max worktrees then sequential integration; Codex controller and one consolidated Opus high review with no further review after the second failed verdict, per Anthony's latest correction. No Terra. Approved target includes the persistent Garden feed.
+## Color Polish live (September 10)
+The Color Polish release is complete and live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, database settings version 6, revision 2, presentation enabled true. Activation and rollback are SQL-only today, through the two research files docs/runs/2026-09-10-color-polish/research/activation.sql and docs/runs/2026-09-10-color-polish/research/rollback.sql; no admin route exists yet for either. Read /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md and its Build log, and the run record at /Users/anthony/Projects/mothers-love/docs/runs/2026-09-10-color-polish/INDEX.md, for the full history and the remaining follow-ups.
 
 # The Words of Mother's Love
 

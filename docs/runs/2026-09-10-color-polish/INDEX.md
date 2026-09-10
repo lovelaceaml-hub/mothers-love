@@ -14,15 +14,22 @@ Authoritative application baseline: facab7a06d6b6364df710bf08aafe072df04d09d on 
 | LV | Landed,15e737e | Luna max | [Renderer lane](lanes/LV.md), [browser summary](logs/renderer-probe.json) |
 | LD | Landed,d8278c7 and532ae8e | Luna max | [Data lane](lanes/LD.md) |
 | LI | Implementing TV and Studio integration | Luna max | [Integration capsule](orders/LI.md), [lane](lanes/LI.md) |
+| LF | Landed, 06172bb | Sonnet 5 (spilled from Gemini 3.8 Flash) | [Order](orders/LF.md), [lane](lanes/LF.md), [gate decision](decisions/2026-09-10T22-55Z-LF-gemini-gate-unmet.md), [launch log](launch/LF.out) |
 
 Visual worktree: /Users/anthony/Projects/.worktrees/mothers-love-color-v6/visual. Data worktree: /Users/anthony/Projects/.worktrees/mothers-love-color-v6/data. Both writers stopped before integration began in /Users/anthony/Projects/mothers-love. Root owns Git, scripts, documentation, review, database and deployment actions.
 
 ## Verification so far
 
-222 unit tests passed after data support. Corrected011 executes in an isolated local PostgreSQL cluster with rollback-only synthetic checks for zero, ties, focus freeze, live target, anonymous history, auth, activation, stale version and rollback. Production migration not applied.
+222 unit tests passed after data support. Corrected011 executes in an isolated local PostgreSQL cluster with rollback-only synthetic checks for zero, ties, focus freeze, live target, anonymous history, auth, activation, stale version and rollback. Migration 011 was applied by Codex through its Supabase connector at 3:13 PM Pacific time, named mothers_love_color_polish_v6 and mothers_love_color_polish_qr_compat in Supabase migration history; it was not added to the campaign ledger mothers_love.schema_migrations at that time. Migration 012 and full activation followed later the same day; see the Closing section below.
 
 Standalone opaque-iframe browser probe passed10scenes and6single/5group entrance styles after fixing counter resets. Typecheck, renderer syntax and focused lint passed. Matched-state fidelity, long messages, privacy transitions, combined Studio/TV journeys, full lint/build, Opus review, production release and private backup remain pending.
 
 ## Reference evidence
 
-[Approved source manifest](../../design/color-polish-v6/manifest.json), [additional user files](research/additional-sources.json), [baseline checks](logs/baseline-verification.md). Downloads originals remain unchanged. All captures and fixture records are fictional.
+[Approved source manifest](../../design/color-polish-v6/manifest.json), [additional user files](research/additional-sources.json), [baseline checks](logs/baseline-verification.md), [consolidated Opus review](research/opus-review.md). Downloads originals remain unchanged. All captures and fixture records are fictional.
+
+## Closing
+
+Color Polish TV and sample preview are live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display. Fix lane LF landed as commit 06172bb, deployed as dpl_BaxrmngrNd8yEjFttZUQBQBKTMRr, READY. Migration 012 and activation were applied through Anthony's prepared paste, [research/release-paste.sql](research/release-paste.sql), which combined migration 012, its ledger row and the activation block from [research/activation.sql](research/activation.sql), all preconditions checked, all or nothing. The result matched: settings version 6, enabled true, revision 2, cleanup healthy, ledger rows 10. Live checks confirmed the API, the database ledger and the TV display all agree. Rollback runs through [research/rollback.sql](research/rollback.sql), a version-checked disable that returns the TV to the preserved V6 renderer on its next 5 second poll. Prior deployments dpl_2ba7dzvVR8kH8YKh4HzwfBsuqbNc (a7dca27) and dpl_CmSSPmnFHXQcTq9jew1jsT1GFHsH (facab7a) remain available in Vercel.
+
+Open follow-ups: detailed pixel parity, advanced preview drafts and preset editing (deferred by Anthony), no admin route yet for activate or rollback (SQL only), full lint cleanup, and the physical TV, audio chime and phone camera QR checks as unexecuted human checks. Ledger rows for migrations 010 and 011 remain absent from mothers_love.schema_migrations, tracked only in Supabase migration history. The Antigravity gate decision is also open: add bash, python3 and psql to its allow-list, or route such lanes elsewhere.
