@@ -870,3 +870,17 @@
   .card { padding: 16px; }
   .buttonRow > * { flex: 1 1 auto; }
 }
+
+
+/* Reference-board color material pass. */
+.app { --heading-ink:#2D463E; --ink:#2D463E; --muted:#596B61; --paper:#FFFEFB; --cream:#FFFCF5; --line:#D5DFD2; --coral:#E891A7; --coral-dark:#A6385A; --blue:#E2F0FC; --lavender:#EEE7F9; --green:#E8F3DE; background:radial-gradient(ellipse at 94% 5%,#DBEDF977,transparent 40%),radial-gradient(ellipse at 5% 90%,#FBE2EC66,transparent 45%),#FFFCF5; }
+.sidebar { background:#FAFCF5F2; border-color:#D2DECE; }
+.brandMark { background:#FFE083; box-shadow:5px 6px 0 #FF8BA724; }
+.navLinkActive { color:#903858; background:#FBE6ED; }
+.card, .authCard { background:#FFFEFB; border-color:#D6DFD2; box-shadow:0 18px 44px #446D6A14; }
+.cardBlue { background:#EEF7FD; }
+.cardLavender { background:#F5F0FD; }
+.cardGreen { background:#F1F8E9; }
+.cardWarm { background:#FFF7DE; }
+.button { background:#AC355B; border-color:#A33356; color:#fff; }
+.buttonSecondary { background:#EEF5F8; border-color:#A8C2CF; color:#345970; }

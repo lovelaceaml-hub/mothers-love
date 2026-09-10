@@ -1,0 +1,55 @@
+{
+  "referenceSha256": "9fd625cea86eebd6d8cf342b375cb86b65bb9466ec49726d55e208f78707d45e",
+  "files": [
+    {
+      "path": "public/home-art/community.webp",
+      "bytes": 77718,
+      "sha256": "ff6f96d64f4adc2305ba86370016f5050b00413697e9eeb9ef6406390f88153e"
+    },
+    {
+      "path": "public/home-art/icon1.webp",
+      "bytes": 2470,
+      "sha256": "755552ca9cd84f226a6e1a914d5077eabf5a43cab0ae10f9984a3726e742e6c4"
+    },
+    {
+      "path": "public/home-art/icon2.webp",
+      "bytes": 2260,
+      "sha256": "4bae02b6383c9d92004c448b5fd3a2ff031ac4afd7df945ce6fb19e8b356f381"
+    },
+    {
+      "path": "public/home-art/icon3.webp",
+      "bytes": 2198,
+      "sha256": "87f728402cf16a2ac130ce96f88b00ed39b1c94a80e2046a20d77e7855fb4819"
+    },
+    {
+      "path": "public/home-art/icon4.webp",
+      "bytes": 2178,
+      "sha256": "adea197ee52ce138eba6b90cea9d0cae11502fdf0f982fa3a501389b1c3a1e2d"
+    },
+    {
+      "path": "public/home-art/icon5.webp",
+      "bytes": 2418,
+      "sha256": "2d94e74dd6fc6270a9a2ce3184520e47c5222533ccecfb42b13f3a8027557d77"
+    },
+    {
+      "path": "public/home-art/icon6.webp",
+      "bytes": 2464,
+      "sha256": "bd771d09d210e420a1dab3cc588d14a6e72fb108f988d228f19733c27138ab04"
+    },
+    {
+      "path": "public/home-art/icon7.webp",
+      "bytes": 1944,
+      "sha256": "6955256ea3549311491fdcb9230b2104875f1d7ba18153dd38c3beb74fcd7735"
+    },
+    {
+      "path": "public/home-art/icon8.webp",
+      "bytes": 2350,
+      "sha256": "e6c0387890f37a3b391c4da99a1df109407cbc0e71d986317f2b0a37a48d4815"
+    },
+    {
+      "path": "public/home-art/icon9.webp",
+      "bytes": 2866,
+      "sha256": "3272977b2d1dac83b04db48f2368afb6e876bd3aabd99c224a4a77b9efebba9f"
+    }
+  ]
+}

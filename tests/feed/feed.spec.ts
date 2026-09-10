@@ -170,11 +170,15 @@ test('removes each item at its own expiry without waiting for polling', async ({
 test('clears the feed when a request exceeds the deadline', async ({ page }) => {
   await page.clock.install();
   await routeReactions(page);
+  let requestStarted = false;
   await page.route('**/api/feed', async () => {
+    requestStarted = true;
     await new Promise<void>(() => undefined);
   });
 
   await page.goto('/');
+  // Production HTML can arrive before hydration installs the request deadline.
+  await expect.poll(() => requestStarted).toBe(true);
   await page.clock.fastForward(8_100);
   await expect(page.getByRole('heading', { name: 'Unable to load recognitions' })).toBeVisible();
 });
@@ -196,6 +200,8 @@ test('ignores a stale response after a visibility refresh', async ({ page }) => 
   });
 
   await page.goto('/');
+  // Wait for the first request and visibility listeners before sending events.
+  await expect.poll(() => requestCount).toBe(1);
   await page.clock.runFor(0);
   await page.evaluate(() => {
     Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });

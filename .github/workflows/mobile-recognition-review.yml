@@ -1,0 +1,76 @@
+name: Mobile Home and recognition review (no deployment)
+on:
+  push:
+    branches: [codex/home-tv-family]
+    paths:
+      - .github/workflows/mobile-recognition-review.yml
+      - src/components/feed/**
+      - src/components/submission/**
+      - src/components/campaign/**
+      - tests/mobile-recognition/**
+      - tests/submission/**
+permissions:
+  contents: read
+concurrency:
+  group: mobile-recognition-review
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      npm_config_cache: /tmp/npm-cache
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+      HOME_BASELINE_URL: http://127.0.0.1:3102
+      PLAYWRIGHT_JSON_OUTPUT_NAME: mobile-recognition-evidence/results.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type check and lint
+        run: npm run typecheck && npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Build without production credentials
+        run: npm run build
+      - name: Build previous design for protected-route comparison
+        run: |
+          git worktree add --detach /tmp/mobile-before e07d9c8fb8ffb4005d75ff399e5f9feab803a021
+          cp -al node_modules /tmp/mobile-before/node_modules
+          cd /tmp/mobile-before
+          npm run build
+      - name: Install browser and start isolated servers
+        run: |
+          npx playwright install --with-deps chromium
+          mkdir -p mobile-recognition-evidence home-review-evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > mobile-recognition-evidence/server.log 2>&1 &
+          (cd /tmp/mobile-before && npm run start -- --hostname 127.0.0.1 --port 3102) > mobile-recognition-evidence/baseline.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3100/ >/dev/null && curl -fsS http://127.0.0.1:3102/ >/dev/null; then break; fi
+            sleep 1
+          done
+      - name: Home, submission, privacy, accessibility and motion browser checks
+        run: npx playwright test tests/feed tests/submission tests/interview/submission-experience.spec.ts tests/mobile-recognition --workers=2 --retries=0 --reporter=line,json
+      - name: Record exact source and changes
+        if: always()
+        run: |
+          mkdir -p mobile-recognition-evidence
+          git rev-parse HEAD > mobile-recognition-evidence/reviewed-commit.txt
+          git diff --name-only e07d9c8fb8ffb4005d75ff399e5f9feab803a021 HEAD > mobile-recognition-evidence/changed-files.txt
+          git archive --format=tar HEAD > mobile-recognition-evidence/review-source.tar
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-recognition-review
+          retention-days: 3
+          path: |
+            mobile-recognition-evidence/
+            home-review-evidence/
+            test-results/

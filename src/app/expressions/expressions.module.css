@@ -361,3 +361,9 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Reference-board color material pass. */
+.page { --heading-ink:#244665; --card-heading-ink:#2D463E; --cream:#FFFCF5; --paper:#FFFEFB; --ink:#2D463E; --muted:#596B61; background:radial-gradient(ellipse at 10% 3%,#DCEFFB,transparent 44%),radial-gradient(ellipse at 97% 83%,#FBE1EB,transparent 45%),#FFFCF5; }
+.header h1 { text-decoration-color:#FFB2C7; }
+.backLink, .footer a, .sourceLink { color:#3D5978; }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import "@/styles/campaign-colors.css";
 import { PublicFeedFrame, PublicFeedProvider } from '@/components/feed/PublicFeedProvider';
 
 export const metadata: Metadata = {

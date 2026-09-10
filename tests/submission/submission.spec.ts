@@ -178,9 +178,13 @@ test('public preview excludes the submitted name and is keyboard reachable', asy
   await expect(preview).toContainText("I'd love to hear more about your thoughts.");
 
   await page.keyboard.press('Escape');
-  await expect(preview).toBeVisible();
+  await expect(preview).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Preview public message' })).toBeFocused();
+  await page.getByRole('button', { name: 'Preview public message' }).click();
   await page.getByRole('button', { name: 'Close public preview' }).focus();
   await expect(page.getByRole('button', { name: 'Close public preview' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(preview).toHaveCount(0);
 });
 
 test('shows every expression explanation and lets selection buttons toggle independently', async ({ page }) => {

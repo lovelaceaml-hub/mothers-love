@@ -33,3 +33,10 @@
 .decorativeCircle::after { position: absolute; inset: 14%; border: 2px solid rgba(255,255,255,0.55); border-radius: 50%; content: ''; }
 
 @media (min-width: 42rem) { .page { padding-top: 2.5rem; } }
+
+
+/* Reference-board color material pass. */
+.page { --heading-ink:#2D463E; --cream:#FFFCF5; --paper:#FFFEFB; --ink:#2D463E; --muted:#596B61; background:radial-gradient(ellipse at 4% 0%,#E4F1E1,transparent 46%),radial-gradient(ellipse at 98% 85%,#E3EFF977,transparent 48%),#FFFCF5; }
+.card { background:#FFFEFB; border-color:#D6E0D2; box-shadow:0 18px 48px #466C7420; }
+.header h1 { text-decoration-color:#FFBBCD; }
+.backLink, .footer a { color:#345B74; }
