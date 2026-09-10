@@ -61,7 +61,8 @@ function daysInMonth(aggregate){const key=monthKey(aggregate),parts=key.split('-
 const sum=a=>a.reduce((n,v)=>n+v,0);
 const EMPTY_AGGREGATE={rec:0,expr:Array(9).fill(0),periodStart:'',periodEnd:''};
 const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
-let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false;
+let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false, reducedMotionPreferred=false;
+function motionStill(motion,forced){return forced||motion==='still'||(reducedMotionPreferred&&motion!=='lively')}
 const qaLog=[];function log(type,data={}){qaLog.push({at:+S.t.toFixed(3),type,...data});if(qaLog.length>1400)qaLog.shift()}
 function finiteNumber(value){return typeof value==='number'&&Number.isFinite(value)}
 function safeText(value,max){return typeof value==='string'&&value.length>=1&&value.length<=max?value:null}
@@ -93,7 +94,7 @@ function setStateFromSnapshot(snapshot,control={}){
  next.s=playlist.some(entry=>entry.id===requestedScene)?requestedScene:playlist[0].id;
  next.featured=clamp(Number(snapshot?.insights?.goal?.expressionId)||2,1,9);
  next.mode=control.status==='ready'&&usableSnapshot(snapshot)&&settings?.mode==='normal'?'normal':control.status==='quiet'?'neutral':'offline';
- next.still=settings?.motion==='still'||control.playing===false;
+ next.still=motionStill(next.motion,control.playing===false);
  next.pool=(Array.isArray(snapshot?.recognitions)?snapshot.recognitions:[]).map(value=>normalizedRecord(value,control.reactionCounts)).filter(Boolean).slice(0,1000);
  next.seen=new Set(next.pool.map(r=>r.id));
  next.arrivalIds=new Set((Array.isArray(snapshot?.arrivals)?snapshot.arrivals:[]).map(item=>safeText(item?.eventId,128)).filter(Boolean));
@@ -203,7 +204,7 @@ function recordsChanged(previous,next){if(previous.length!==next.length)return t
 function cancelActiveEvent(){active=null;transition=null;S.chain=false;$('event')?.replaceChildren();$('event')?.classList.remove('active');$('stage')?.classList.remove('dimmed');$('qr-zone')?.classList.remove('qr-active');renderQueue()}
 function pruneRemovedIds(ids){if(!ids.length)return;const removed=new Set(ids);document.querySelectorAll('[data-record-id],[data-event-id],[data-tribute-id],[data-feed-id]').forEach(el=>{const id=el.dataset.recordId||el.dataset.eventId||el.dataset.tributeId||el.dataset.feedId;if(removed.has(id))el.remove()});slots=slots.filter(slot=>!removed.has(slot.id));if(typeof V!=='undefined'){V.actors=V.actors.filter(actor=>!removed.has(actor.id)&&!removed.has(actor.nextId));V.planets=V.planets.filter(planet=>!removed.has(planet.b?.id))}feedLanes.forEach(lane=>{lane.list=lane.list.filter(id=>!removed.has(id));lane.next=lane.next.filter(id=>!removed.has(id))})}
 function preserveRuntimeState(next,previous,nextById){
- const fields=['bloomIndex','bloomNext','groupNumber','replenishAt','idCounter','singleStyle','groupStyle','singleBag','groupBag','singleBagLast','groupBagLast','feedArrivalCounter','returnScene','returnAge','pendingScene','chain','countJobs','lowSince','lowAutomatic','week','goalExpression','milestonePending','milestoneContributors','milestonesSeen','privacyAt','shimmerUntil','lastHeader'];
+ const fields=['bloomIndex','bloomNext','groupNumber','replenishAt','idCounter','singleStyle','groupStyle','singleBag','groupBag','singleBagLast','groupBagLast','feedArrivalCounter','returnScene','returnAge','pendingScene','chain','countJobs','lowSince','lowAutomatic','milestonePending','milestoneContributors','milestonesSeen','privacyAt','shimmerUntil','lastHeader'];
  for(const key of fields){const value=previous?.[key];if(value===undefined)continue;if(Array.isArray(value))next[key]=[...value];else if(value instanceof Map)next[key]=new Map(value);else if(value instanceof Set)next[key]=new Set(value);else next[key]=value}
  next.lastShown=new Map(previous?.lastShown instanceof Map?[...previous.lastShown].filter(([id])=>nextById.has(id)):[]);
 }
@@ -532,6 +533,12 @@ function init(){
  $('flowers').src=ASSETS.flowers;$('foliage').src=ASSETS.foliage;size();
  const observer=typeof ResizeObserver==='function'?new ResizeObserver(size):null;observer?.observe($('frame'));window.addEventListener('resize',size);
  document.addEventListener('visibilitychange',()=>{lastFrame=performance.now()});
+ if(typeof window.matchMedia==='function'){
+  const reduceMotionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const updateReducedMotion=()=>{reducedMotionPreferred=reduceMotionQuery.matches;S.still=motionStill(S.motion,!S.playing);applyStill()};
+  updateReducedMotion();
+  reduceMotionQuery.addEventListener?.('change',updateReducedMotion);
+ }
  requestAnimationFrame(frame);
 }
 let V={root:null,clock:0,actors:[],fx:[],garden:null,planets:[],stream:null,status:[],next:14,serial:0};
@@ -869,7 +876,7 @@ window.colorPolishRuntime={
  getState:runtimeState,
  visualState,
  setScene:id=>{if(S.mode==='normal')requestScene(sceneNumber(id),{force:true})},
- setPlaying:value=>{S.playing=value===true;S.still=S.motion==='still'||!S.playing;applyStill()},
+ setPlaying:value=>{S.playing=value===true;S.still=motionStill(S.motion,!S.playing);applyStill()},
  setClock:ms=>{if(finiteNumber(ms)&&ms>=0){S.t=ms/1000;S.clockControlled=true;updateHeader();tickNumbers()}},
  step:stepRuntime,
  clear:()=>{S=blankState();clearPresentation()},

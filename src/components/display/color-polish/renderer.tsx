@@ -262,6 +262,7 @@ export function ColorPolishRenderer({
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const channelRef = useRef<BridgeChannel | null>(null);
   const readyCallbackRef = useRef(onReady);
+  const bootstrapCleanupRef = useRef<{ listener: (event: MessageEvent) => void; timeoutId: number } | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const safeMode = status !== 'ready' || snapshot === null;
   const frameKey = `${source}:${safeMode ? 'safe' : 'active'}`;
@@ -286,6 +287,12 @@ export function ColorPolishRenderer({
       const channel = channelRef.current;
       channelRef.current = null;
       channel?.port.close();
+      const bootstrapCleanup = bootstrapCleanupRef.current;
+      if (bootstrapCleanup) {
+        bootstrapCleanupRef.current = null;
+        window.clearTimeout(bootstrapCleanup.timeoutId);
+        window.removeEventListener('message', bootstrapCleanup.listener);
+      }
     };
   }, [frameKey]);
 
@@ -322,6 +329,12 @@ export function ColorPolishRenderer({
     const iframe = event.currentTarget;
     const previous = channelRef.current;
     previous?.port.close();
+    const previousBootstrapCleanup = bootstrapCleanupRef.current;
+    if (previousBootstrapCleanup) {
+      bootstrapCleanupRef.current = null;
+      window.clearTimeout(previousBootstrapCleanup.timeoutId);
+      window.removeEventListener('message', previousBootstrapCleanup.listener);
+    }
     const nonce = createNonce();
     const messageChannel = new MessageChannel();
     const channel: BridgeChannel = { nonce, port: messageChannel.port1, sequence: 0, ready: false };
@@ -369,7 +382,11 @@ export function ColorPolishRenderer({
     messageChannel.port1.onmessage = (messageEvent) => markReady(messageEvent.data);
     messageChannel.port1.start();
     iframe.contentWindow?.postMessage({ version: COLOR_POLISH_VERSION, type: 'color-polish:bootstrap', nonce, sequence: 0 }, '*', [messageChannel.port2]);
-    window.setTimeout(() => window.removeEventListener('message', onWindowMessage), 10_000);
+    const timeoutId = window.setTimeout(() => {
+      bootstrapCleanupRef.current = null;
+      window.removeEventListener('message', onWindowMessage);
+    }, 10_000);
+    bootstrapCleanupRef.current = { listener: onWindowMessage, timeoutId };
   }
 
   return (

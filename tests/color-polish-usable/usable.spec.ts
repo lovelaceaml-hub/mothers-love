@@ -230,3 +230,12 @@ return snapshot({presentation:{...presentation,enabled:true},recognitions:[{id:'
   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
   await expect(selector).toHaveValue('garden');
 });
+
+test('display falls back to the legacy renderer when color-polish stays unavailable', async ({ page }) => {
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  await page.route('**/api/display/color-polish**', route => fulfillJson(route, { error: 'unavailable' }, 503));
+  await page.goto('/display');
+  await expect(page.locator('[data-testid="color-polish-display"]')).toBeVisible({ timeout: 12000 });
+  await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+  await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+});

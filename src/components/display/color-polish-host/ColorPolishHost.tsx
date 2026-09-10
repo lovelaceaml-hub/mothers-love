@@ -6,6 +6,7 @@ import { ColorPolishRenderer } from '@/components/display/color-polish';
 import { V6DisplayExperience } from '@/components/display/V6DisplayExperience';
 import type { ColorPolishSnapshot } from '@/lib/color-polish/contracts';
 import { validateColorPolishSnapshot } from '@/lib/color-polish/validation';
+import type { DisplayMode } from '@/lib/contracts';
 
 const POLL_MS = 5_000;
 const REQUEST_TIMEOUT_MS = 5_000;
@@ -41,6 +42,7 @@ export function ColorPolishHost() {
   const [phase, setPhase] = useState<HostPhase>('checking');
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [frameGeneration, setFrameGeneration] = useState(0);
+  const [lastMode, setLastMode] = useState<DisplayMode | null>(null);
   const snapshotRef = useRef<ColorPolishSnapshot | null>(null);
   const phaseRef = useRef<HostPhase>('checking');
   const cursorRef = useRef<string | null>(null);
@@ -72,7 +74,7 @@ export function ColorPolishHost() {
       const after = cursorRef.current;
       try {
         const path = after ? `/api/display/color-polish?after=${encodeURIComponent(after)}` : '/api/display/color-polish';
-        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'include', headers: { accept: 'application/json' }, signal: controller.signal });
+        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'omit', headers: { accept: 'application/json' }, signal: controller.signal });
         if (!response.ok) throw new Error(`SNAPSHOT_${response.status}`);
         const next = validateColorPolishSnapshot(await response.json());
         if (!next) throw new Error('INVALID_SNAPSHOT');
@@ -84,6 +86,7 @@ export function ColorPolishHost() {
         monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
         cursorRef.current = next.cursor;
         lastVerifiedRef.current = receivedPerformanceMs;
+        setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {
           snapshotRef.current = null;
           setSnapshot(null);
@@ -172,6 +175,9 @@ export function ColorPolishHost() {
     return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#fff9ed' }}><ColorPolishRenderer key={`active-${frameGeneration}`} snapshot={snapshot} nowMs={nowMs} status="ready" source="live" reactionCounts={reactionCounts} /></div>;
   }
   if (phase === 'disabled' && snapshot) return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience /></div>;
+  if (phase === 'unavailable' && lastMode !== 'quiet' && lastMode !== 'neutral') {
+    return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience /></div>;
+  }
   return <SafeDisplay phase={phase} />;
 }
 
