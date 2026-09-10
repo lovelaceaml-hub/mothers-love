@@ -304,17 +304,23 @@ function Preview({ draft, onClose }: { draft: Draft; onClose: () => void }) {
     dialog?.showModal();
     return () => { if (dialog?.open) dialog.close(); };
   }, []);
+  // Close the native modal while it is still connected. Removing an open
+  // dialog first leaves the browser unable to restore focus to its trigger.
+  function dismissPreview() {
+    dialogRef.current?.close();
+    onClose();
+  }
   const selected = EXPRESSIONS.filter((expression) => draft.expressionIds.includes(expression.id));
 
   return (
-    <dialog ref={dialogRef} className={styles.previewPanel} aria-labelledby="preview-title" onCancel={onClose}>
+    <dialog ref={dialogRef} className={styles.previewPanel} aria-labelledby="preview-title" onCancel={(event) => { event.preventDefault(); dismissPreview(); }}>
       <section role="region" aria-labelledby="preview-title">
       <div className={styles.previewHeader}>
         <div>
           <p className={styles.cardEyebrow}>Public preview</p>
           <h2 id="preview-title">This is what people may see</h2>
         </div>
-        <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Close public preview">×</button>
+        <button className={styles.closeButton} type="button" onClick={dismissPreview} aria-label="Close public preview">×</button>
       </div>
       <div className={styles.previewBubble}>
         <p className={styles.previewRecipient}>THANK YOU, {draft.recipient.trim()}</p>
@@ -377,6 +383,7 @@ export function SubmissionForm() {
   const [showPreview, setShowPreview] = useState(false);
   const [requestKey, setRequestKey] = useState(makeRequestKey);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
+  const previewTriggerRef = useRef<HTMLButtonElement>(null);
   const submitterRef = useRef<HTMLInputElement>(null);
   const recipientRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
@@ -503,6 +510,12 @@ export function SubmissionForm() {
     setShowPreview(false);
     setRequestKey(makeRequestKey());
     window.scrollTo({ top: 0, behavior: motionPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+
+  function closePreview() {
+    setShowPreview(false);
+    // Explicitly return to the trigger for pointer users as well as keyboards.
+    previewTriggerRef.current?.focus({ preventScroll: true });
   }
 
   function focusField(field: FieldName) {
@@ -644,7 +657,7 @@ export function SubmissionForm() {
               )}
 
               <div className={styles.actions}>
-                <button className={styles.previewButton} type="button" onClick={() => setShowPreview(true)} disabled={viewState === 'sending' || !draft.recipient.trim() || !draft.message.trim() || selectedExpressions.length === 0}>Preview public message</button>
+                <button ref={previewTriggerRef} className={styles.previewButton} type="button" onClick={() => setShowPreview(true)} disabled={viewState === 'sending' || !draft.recipient.trim() || !draft.message.trim() || selectedExpressions.length === 0}>Preview public message</button>
                 <button className={styles.submitButton} type="submit" disabled={viewState === 'sending'}>
                   {viewState === 'sending' ? 'Sending…' : viewState === 'unconfirmed' ? 'Retry recognition' : 'Send recognition'}
                   <span className={styles.submitHeart} aria-hidden="true" />
@@ -659,7 +672,7 @@ export function SubmissionForm() {
           </>
         )}
 
-        {showPreview && !showReceipt && <Preview draft={draft} onClose={() => setShowPreview(false)} />}
+        {showPreview && !showReceipt && <Preview draft={draft} onClose={closePreview} />}
         {viewState === 'sending' && <p className={styles.srOnly} role="status">{statusLabel(viewState)}</p>}
         </div>
       </div>
