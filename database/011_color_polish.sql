@@ -322,9 +322,10 @@ BEGIN
   IF base_snapshot IS NULL OR COALESCE((base_snapshot->>'ok')::boolean, false) IS DISTINCT FROM true THEN
     RETURN COALESCE(base_snapshot, pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE'));
   END IF;
-  IF base_snapshot->>'submissionUrl' IS DISTINCT FROM 'https://mothers-love.vercel.app/recognize' THEN
+  IF COALESCE(base_snapshot->>'submissionUrl', '') NOT IN ('https://mothers-love.vercel.app', 'https://mothers-love.vercel.app/', 'https://mothers-love.vercel.app/recognize') THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');
   END IF;
+  base_snapshot := base_snapshot || pg_catalog.jsonb_build_object('submissionUrl', 'https://mothers-love.vercel.app/recognize');
   now_value := (base_snapshot->>'serverTime')::timestamptz;
   IF now_value IS NULL THEN
     RETURN pg_catalog.jsonb_build_object('ok', false, 'status', 503, 'code', 'UNAVAILABLE');

@@ -29,3 +29,5 @@ The missing interview sequences, whole-card selection, true screen previews, and
 - [Approved visual references](docs/source-handoff/references/README.md)
 
 A live appreciation feed and submission form, secured administrative workspace and public TV Living Wall. Code and synthetic fixtures may be privately backed up; live personal recognitions never belong in this repository. Existing database resources outside the campaign namespace are protected.
+
+Color Polish usable release: [TV](https://mothers-love.vercel.app/display), [admin preview](https://mothers-love.vercel.app/admin/display). See [current release handoff](docs/HANDOFF.md) for verification and deferred refinements.

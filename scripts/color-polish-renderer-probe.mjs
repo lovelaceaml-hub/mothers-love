@@ -9,6 +9,11 @@ import assert from 'node:assert/strict';
 // Controller-owned synthetic probe. It never requests campaign records.
 const source = resolve(process.argv[2] || resolve(import.meta.dirname, '..'));
 const output = resolve(process.argv[3] || '/private/tmp/ml-color-polish-renderer-probe');
+const referenceResets = process.argv.includes('--reference-resets');
+const checkpointMs = Number(process.argv.find(value => value.startsWith('--ms='))?.split('=')[1] ?? 14000);
+const width = Number(process.argv.find(value => value.startsWith('--width='))?.split('=')[1] ?? 1920);
+assert.ok([0, 6000, 14000, 21000].includes(checkpointMs));
+assert.ok([1920, 3840].includes(width));
 await mkdir(output, { recursive: true });
 const compiled = buildSync({ entryPoints: [resolve(source, 'src/components/display/color-polish/sample.ts')], bundle: true, platform: 'node', format: 'cjs', write: false, tsconfig: resolve(source, 'tsconfig.json') });
 const moduleFile = resolve(output, 'sample.cjs');
@@ -21,7 +26,7 @@ const qr = await QRCode.toDataURL('https://mothers-love.vercel.app/recognize', {
 const browser = await chromium.launch({ headless: true });
 const issues = [];
 try {
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+  const page = await browser.newPage({ viewport: { width, height: width * 9 / 16 } });
   page.on('pageerror', error => issues.push(String(error)));
   page.on('console', message => { if (message.type() === 'error') issues.push(message.text()); });
   await page.addInitScript(() => {
@@ -53,18 +58,23 @@ try {
   }, { snapshot, qr, reactionCounts });
   const frame = page.frames().find(frame => frame.url().endsWith('/color-polish/renderer.html'));
   await frame.waitForFunction(() => window.colorPolishRuntime?.getState().mode === 'normal');
-  await frame.evaluate(() => { window.colorPolishRuntime.step(14000); document.getAnimations().forEach(animation => { animation.pause(); animation.currentTime = 14000; }); });
+  await frame.evaluate(ms => { window.colorPolishRuntime.step(ms); document.getAnimations().forEach(animation => { animation.pause(); animation.currentTime = ms; }); }, checkpointMs);
   await frame.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(image => image.decode().catch(() => {}))); });
   await page.screenshot({ path: resolve(output, 'welcome.png') });
   const states = [await frame.evaluate(() => window.colorPolishRuntime.getState())];
   const scenes = [['garden', 2], ['featured', 4], ['calendar', 5], ['peacemakers', 8], ['status', 6], ['expressions', 7], ['peace-in-practice', 9], ['orbit', 10], ['milestone', 11]];
   for (let index = 0; index < scenes.length; index++) {
     const [scene, id] = scenes[index];
+    if (referenceResets) await frame.evaluate(() => window.colorPolishRuntime.clear());
     await page.evaluate(({ snapshot, qr, scene, index, reactionCounts }) => {
       window.probePort.postMessage({ version: 'color-polish-v6', type: 'color-polish:update', nonce: window.probeNonce, sequence: index + 2, snapshot, control: { nowMs: Date.parse(snapshot.serverTime), elapsedMs: 0, replayKey: index + 1, status: 'ready', source: 'sample', playing: true, scene, reactionCounts, qrDataUrl: qr, submissionUrl: snapshot.submissionUrl } });
-    }, { snapshot, qr, scene, index, reactionCounts });
+    }, { snapshot, qr, scene: referenceResets ? 'welcome' : scene, index, reactionCounts });
+    if (referenceResets) {
+      await frame.waitForFunction(() => window.colorPolishRuntime.getState().mode === 'normal');
+      await frame.evaluate(scene => window.colorPolishRuntime.setScene(scene), scene);
+    }
     await frame.waitForFunction(id => window.colorPolishRuntime.getState().scene === id, id);
-    await frame.evaluate(() => { window.colorPolishRuntime.step(14000); document.getAnimations().forEach(animation => { animation.pause(); animation.currentTime = 14000; }); });
+    await frame.evaluate(ms => { window.colorPolishRuntime.step(ms); document.getAnimations().forEach(animation => { animation.pause(); animation.currentTime = ms; }); }, checkpointMs);
     await frame.evaluate(async () => { await Promise.all([...document.images].map(image => image.decode().catch(() => {}))); });
     await page.screenshot({ path: resolve(output, scene + '.png') });
     states.push(await frame.evaluate(() => window.colorPolishRuntime.getState()));
@@ -97,7 +107,7 @@ try {
       await frame.evaluate(() => window.colorPolishRuntime.step(50000));
     }
   }
-  await writeFile(resolve(output, 'result.json'), JSON.stringify({ issues, states, arrivals }, null, 2));
+  await writeFile(resolve(output, 'result.json'), JSON.stringify({ width, checkpointMs, referenceResets, issues, states, arrivals }, null, 2));
   console.log(JSON.stringify({ issues, scenes: states.map(state => state.scene), arrivals: arrivals.map(state => state.active && { kind: state.active.kind, style: state.active.style }), output }));
   assert.deepEqual(issues, [], 'Browser errors in renderer');
   assert.equal(new Set(states.map(state => state.scene)).size, 10, 'Not every scene rendered');

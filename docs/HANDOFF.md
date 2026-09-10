@@ -1,3 +1,11 @@
+## September 10: usable Color Polish release
+
+Anthony narrowed this release to running and usable, deferring detailed polish. TV and basic sample preview share the Color Polish renderer. Ten scene choices, replay and pause are available in the new preview; existing admin controls remain. Home and submission files are preserved.
+
+Production build and essential synthetic TV/Quiet/authenticated Studio smoke passed. Anonymous database support is deployed, initially disabled. Activation and production verification are pending this release step. Detailed pixel parity, advanced preview drafts/preset editing, full lint cleanup and physical TV/audio/phone-camera checks remain follow-up. One Opus blocker review replaces earlier cancelled reviews, with at most two failed verdicts.
+
+Rollback: prior deployment dpl_CmSSPmnFHXQcTq9jew1jsT1GFHsH and version-checked disable of the separate presentation preset. Original settings version5 and legacy display_config hash9331b79472e7ef847c08e949cae96117 are preserved until activation increments the version.
+
 # Handoff
 
 ## Interview completion update

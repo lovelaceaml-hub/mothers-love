@@ -1,5 +1,5 @@
-import { V6DisplayExperience } from '@/components/display/V6DisplayExperience';
+import { ColorPolishHost } from '@/components/display/color-polish-host/ColorPolishHost';
 
 export default function DisplayPage() {
-  return <V6DisplayExperience />;
+  return <ColorPolishHost />;
 }
