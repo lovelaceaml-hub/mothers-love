@@ -8,12 +8,13 @@ try {
  for(const width of [1920,3840]) {
   const page=await browser.newPage({viewport:{width,height:width*9/16}});
   await page.route('**/*',route => /^(file:|data:)/.test(route.request().url())?route.continue():route.abort());
-  await page.addInitScript(()=>{let seed=7301;Math.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};});
+  await page.addInitScript(()=>{let seed=7301;Math.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};window.requestAnimationFrame=()=>1;window.cancelAnimationFrame=()=>{};});
   await page.goto(`file://${root}/docs/design/color-polish-v6/approved.html?capture`);
   await page.evaluate(()=>window.preview.freeze(true));
   if(width===1920) await writeFile(`${root}/docs/design/color-polish-v6/fixtures.json`,JSON.stringify(await page.evaluate(()=>({records:window.preview.records(),state:window.preview.getState()})),null,2)+'\n');
   for(const [id,name] of scenes){
    await page.evaluate(id=>{window.preview.reset();window.preview.freeze(true);window.preview.go(id);window.preview.step(14000);},id);
+   await page.evaluate(()=>{for(const animation of document.getAnimations()){animation.pause();animation.currentTime=14000;}});
    await page.locator('#tv').screenshot({path:`${root}/docs/design/color-polish-v6/references/${name}-${width}-14s.png`});
   }
   await page.close();

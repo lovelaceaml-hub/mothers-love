@@ -1,0 +1,291 @@
+{
+  "cases": [
+    {
+      "name": "scene-1-0ms",
+      "id": 1,
+      "ms": 0
+    },
+    {
+      "name": "scene-1-6000ms",
+      "id": 1,
+      "ms": 6000
+    },
+    {
+      "name": "scene-2-0ms",
+      "id": 2,
+      "ms": 0
+    },
+    {
+      "name": "scene-2-6000ms",
+      "id": 2,
+      "ms": 6000
+    },
+    {
+      "name": "scene-4-0ms",
+      "id": 4,
+      "ms": 0
+    },
+    {
+      "name": "scene-4-6000ms",
+      "id": 4,
+      "ms": 6000
+    },
+    {
+      "name": "scene-5-0ms",
+      "id": 5,
+      "ms": 0
+    },
+    {
+      "name": "scene-5-6000ms",
+      "id": 5,
+      "ms": 6000
+    },
+    {
+      "name": "scene-8-0ms",
+      "id": 8,
+      "ms": 0
+    },
+    {
+      "name": "scene-8-6000ms",
+      "id": 8,
+      "ms": 6000
+    },
+    {
+      "name": "scene-6-0ms",
+      "id": 6,
+      "ms": 0
+    },
+    {
+      "name": "scene-6-6000ms",
+      "id": 6,
+      "ms": 6000
+    },
+    {
+      "name": "scene-7-0ms",
+      "id": 7,
+      "ms": 0
+    },
+    {
+      "name": "scene-7-6000ms",
+      "id": 7,
+      "ms": 6000
+    },
+    {
+      "name": "scene-9-0ms",
+      "id": 9,
+      "ms": 0
+    },
+    {
+      "name": "scene-9-6000ms",
+      "id": 9,
+      "ms": 6000
+    },
+    {
+      "name": "scene-10-0ms",
+      "id": 10,
+      "ms": 0
+    },
+    {
+      "name": "scene-10-6000ms",
+      "id": 10,
+      "ms": 6000
+    },
+    {
+      "name": "scene-11-0ms",
+      "id": 11,
+      "ms": 0
+    },
+    {
+      "name": "scene-11-6000ms",
+      "id": 11,
+      "ms": 6000
+    },
+    {
+      "name": "garden-replacement-21s",
+      "id": 2,
+      "ms": 21000
+    },
+    {
+      "name": "arrival-single-0-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 0
+    },
+    {
+      "name": "arrival-single-1-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 1
+    },
+    {
+      "name": "arrival-single-2-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 2
+    },
+    {
+      "name": "arrival-single-3-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 3
+    },
+    {
+      "name": "arrival-single-4-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 4
+    },
+    {
+      "name": "arrival-single-5-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 5
+    },
+    {
+      "name": "arrival-group-0-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 0
+    },
+    {
+      "name": "arrival-group-1-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 1
+    },
+    {
+      "name": "arrival-group-2-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 2
+    },
+    {
+      "name": "arrival-group-3-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 3
+    },
+    {
+      "name": "arrival-group-4-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 4
+    },
+    {
+      "name": "neutral",
+      "id": 2,
+      "ms": 14000,
+      "mode": "neutral"
+    },
+    {
+      "name": "empty",
+      "id": 2,
+      "ms": 14000,
+      "mode": "empty"
+    },
+    {
+      "name": "unverified",
+      "id": 2,
+      "ms": 14000,
+      "mode": "offline"
+    },
+    {
+      "name": "still-garden",
+      "id": 2,
+      "ms": 14000,
+      "still": true
+    }
+  ],
+  "hashes": {
+    "scene-1-0ms": "bf10838fcab2a1bf9630d8b774cf6bd1ff754b473ec3530b7de2414b40b29e37",
+    "scene-1-6000ms": "d40290b34d2ef54067d8cabf2a17cd6916f3820ae77dfa3fbb54c0ab1fe96853",
+    "scene-2-0ms": "0b599e795740b870a0ad10b7eb85608dcf7846df502a9b0f63f516cdabe4bd52",
+    "scene-2-6000ms": "7a080eea042dddd8e5432daa31ea3f89ac3ada799b01d06d2e99d337c57d375f",
+    "scene-4-0ms": "f09ef4110ef83a44cdb39b3c3f374e6209a45eb6d0dae2a0823af9801582f78e",
+    "scene-4-6000ms": "9d56d790fc73761beebfaa6b501503a3a6006a6270db740ae2c9d2933dce9c49",
+    "scene-5-0ms": "ac3f3dc305a3af2c84cbbae8ae134a3e847168124f7fbdc0382a783729ccec87",
+    "scene-5-6000ms": "ee132da8662a9de033279022f1abe487172143e8da4cb13c03b08b85b757d58a",
+    "scene-8-0ms": "c2cbd4ae4b0122d68f89687be5f43b57468b039c3f0ee880fe3dc5b2a03f8828",
+    "scene-8-6000ms": "ea0a5dd5a66ae19c5be4091a1c84df0e1c322c03182597d7af542dd42950b80b",
+    "scene-6-0ms": "c4b0630365cafb495276974a7a27079db3ddbc7882c2725e85d4f36d3e460b3b",
+    "scene-6-6000ms": "02f79354038af585a99d01d3005498aea58b7612e16533bb410fa29fc9a32b34",
+    "scene-7-0ms": "685cd106e1ec64ef398e8524dc58b2524d1b1cc98575f68ae21fc89d2e0a51a7",
+    "scene-7-6000ms": "0a06d1fe926329951957d0fb4c155e2eff3f4e5dacbcf0c79d77f83c781e9fc6",
+    "scene-9-0ms": "ca4f67808ea74c3882a1a2e94b53e1c34a54ec8cfce83cbfd0ce919b84cddd87",
+    "scene-9-6000ms": "91b92eb35d0ee88bbaecdbad47b8e7abf29bb3c6479dd3ec791b18ef6e0cb4c7",
+    "scene-10-0ms": "1b8ab2f56800a56e99b475778a40cc52708b2ea045fc81fa1a506d023019e510",
+    "scene-10-6000ms": "38a4ba59222b1168b170cadc1d145107bbafefb63bf6842a2a7b944042b07cf6",
+    "scene-11-0ms": "442a7fecb8ee58dcb5dd1189c823d9277368596fb098f6b20d5dd73974a99f3f",
+    "scene-11-6000ms": "807b1534fe0775dbe357db8fa1eada28df429093555184fcfd2efb51b7cfdf60",
+    "garden-replacement-21s": "d7a96aef1e5b7a50dab38563de9d9b9399c355d68a75d21ee0c92b0ca3a1423b",
+    "arrival-single-0-entry": "23d8e9d61e31d58296f01dc71ef6d6cbfb54848a87357f960e2057792847cdf8",
+    "arrival-single-1-entry": "86927e48744ce6d538a6ea3ae7f136b0f0b22c3f5a5098860249274eb50577f2",
+    "arrival-single-2-entry": "86927e48744ce6d538a6ea3ae7f136b0f0b22c3f5a5098860249274eb50577f2",
+    "arrival-single-3-entry": "23d8e9d61e31d58296f01dc71ef6d6cbfb54848a87357f960e2057792847cdf8",
+    "arrival-single-4-entry": "23d8e9d61e31d58296f01dc71ef6d6cbfb54848a87357f960e2057792847cdf8",
+    "arrival-single-5-entry": "86927e48744ce6d538a6ea3ae7f136b0f0b22c3f5a5098860249274eb50577f2",
+    "arrival-group-0-entry": "05a653375af00cd76e0fe4fa9fa97cf796dd23a2c41aa61b7d073d8abe7ce7ce",
+    "arrival-group-1-entry": "05a653375af00cd76e0fe4fa9fa97cf796dd23a2c41aa61b7d073d8abe7ce7ce",
+    "arrival-group-2-entry": "ec398a6463ff815676b81d9ca10876404aefdcbdc517b18c46d22ebb79a8097d",
+    "arrival-group-3-entry": "ec398a6463ff815676b81d9ca10876404aefdcbdc517b18c46d22ebb79a8097d",
+    "arrival-group-4-entry": "ec398a6463ff815676b81d9ca10876404aefdcbdc517b18c46d22ebb79a8097d",
+    "neutral": "90a01f73214491b3697e845675b7a6364b3f5972419437e9d758505093f2cf09",
+    "empty": "95b846d0b715aa268d0693456c0a4eb4284c73aa4f65ee09d2e9ca1b0af98dd4",
+    "unverified": "02bc955a810e4365e1acb3abaa60a4b6392c3fc524f8342a5d42f4afb5fdd6b7",
+    "still-garden": "e6a1c8c0d594676739fc11d21e3aae376feb342b23c5d1666e2837aa09441411",
+    "repeat-scene-1-0ms": "451a1fb743c5c019aaabb696cca1710841c32f8f108cf4ed78ec381b5dc7072b"
+  },
+  "stateHashes": {
+    "scene-1-0ms": "9bc27ef0dabbffa3f913d3b011ddc9b52f61ef773df45eac980197d396e9c9c1",
+    "scene-1-6000ms": "88219316b7dabaf4500e90947fd0d147378273f1d28684a351bbea5a01c135cc",
+    "scene-2-0ms": "6c007997c8cedfcbe43f721bfb5ea898f4b31c376a329974d7362b2212432e67",
+    "scene-2-6000ms": "1105e8074f71538e1a84a50340a0129c424067d90c05df93b1d473fd79827cd0",
+    "scene-4-0ms": "ebb17d3b0c739c10933631e1de14f1a0dbe18e75eaebf257b60874a9ee043813",
+    "scene-4-6000ms": "ce310e3bb6b9f6b39e8ac969a99aad894272463ba6db77e95f28bd31739fea2f",
+    "scene-5-0ms": "cdb84963cfee454a0157a5e54dc3575bef138a1bcb0eadc7d5403d503b48c1f1",
+    "scene-5-6000ms": "040dc6c9b3bb2ad84ddfc0cd16e12815828e7a17923b994abbb83277bc9a466a",
+    "scene-8-0ms": "71b8fad682a2119d6cbcba927f82dce06b94849068dfa40c1e69ad721d9b7ad8",
+    "scene-8-6000ms": "5ece7022425693975df6a26cd3ff0418e479dac478638122b174062252cad762",
+    "scene-6-0ms": "e696d7ca218624e90db6b7671840287ed05cdc92022d68cb5bee80dfbd12b878",
+    "scene-6-6000ms": "59d1a6c96b7eca79aaa027d6007998b420b3ee1cd8fd60eb7251f2de56a4f881",
+    "scene-7-0ms": "fa36038483f876f57857627b38fdc4e276f1fda584a2d0dd8a2fe0e331cd9de9",
+    "scene-7-6000ms": "c8299bfb145dd9d0c5edb2a187558fe7f064adb952cb569dbdecaee0d3e39a64",
+    "scene-9-0ms": "7e0e05d272b9d0001a4744a39c87689dc8274783d057c0a26075260ecf8222c3",
+    "scene-9-6000ms": "9a6c05d937cc0f57993514b19c2e5dcf63bada1b12039739c264ded3d71ef6d9",
+    "scene-10-0ms": "a9ea4570cc7e409fe77e6b4b5200e22000d44bed23df4db9709d0f598c136b73",
+    "scene-10-6000ms": "0f226bb42b2bcb618c48fad8258ebac1bfdd41997c48273e11d5f007f795bd8e",
+    "scene-11-0ms": "b9fdd564803b5b499cf11120ea9ae51246116add55ad78525a6502770757ae96",
+    "scene-11-6000ms": "765908e0a7fd0d0e9eb8f8bf3949292665e55b58e0847af3b0701a586b5ccdaf",
+    "garden-replacement-21s": "23d0c1ceadecf9cbbfaae46f6b5eb402b50470fe536c49b0545bf9b3189f7ca7",
+    "arrival-single-0-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-single-1-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-single-2-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-single-3-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-single-4-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-single-5-entry": "e3dbcc6147c8225aca0fbef6aac1141ffd54f3a7cb94b16f8c0c905ff9fecf98",
+    "arrival-group-0-entry": "dbfc447b1db4e5c0a8a3ef9d7f5b3363260f01fb436a36415c4e5b793813ea6b",
+    "arrival-group-1-entry": "dbfc447b1db4e5c0a8a3ef9d7f5b3363260f01fb436a36415c4e5b793813ea6b",
+    "arrival-group-2-entry": "dbfc447b1db4e5c0a8a3ef9d7f5b3363260f01fb436a36415c4e5b793813ea6b",
+    "arrival-group-3-entry": "dbfc447b1db4e5c0a8a3ef9d7f5b3363260f01fb436a36415c4e5b793813ea6b",
+    "arrival-group-4-entry": "dbfc447b1db4e5c0a8a3ef9d7f5b3363260f01fb436a36415c4e5b793813ea6b",
+    "neutral": "1109e48c423c449e08418f690f4ab0906f708f1f625cafc68f451b5c9a53c2ca",
+    "empty": "3b56c72d1841974be051a1e4b699871f3a8637283da5d0bb21336600e3a63693",
+    "unverified": "7a3677a9e697f9b46a9a61f87d0434a45bfd4e0eb8bff2af8c1dbd18848cb6ab",
+    "still-garden": "02730663627b4b63ddfee78ea9defbbd37d7f641129bc344f3a9210bc3a44097",
+    "repeat-scene-1-0ms": "9bc27ef0dabbffa3f913d3b011ddc9b52f61ef773df45eac980197d396e9c9c1"
+  },
+  "repeatStateIdentical": true,
+  "repeatImageIdentical": false,
+  "repeatPixelFraction": 0.0003452932098765432
+}

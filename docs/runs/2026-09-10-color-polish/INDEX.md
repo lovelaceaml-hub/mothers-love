@@ -38,3 +38,9 @@ Coordinator: pending
 <!-- lane: LV state: planned model: pending worktree: pending review: pending updated: 2026-09-10T21:08Z -->
 <!-- lane: LD state: planned model: pending worktree: pending review: pending updated: 2026-09-10T21:08Z -->
 <!-- lane: LI state: planned model: pending worktree: pending review: pending updated: 2026-09-10T21:08Z -->
+
+## Current execution
+
+Application baseline: facab7a06d6b6364df710bf08aafe072df04d09d. Frozen reference milestone632efc9. Latest GitHub release and64changed paths preserved. Visual and data writers run in separate worktrees. Root owns integration and provider actions.
+
+Reference manifest: [Approved source](../../design/color-polish-v6/manifest.json). Additional user files: [Source inventory](research/additional-sources.json). Baseline checks: [Verification](logs/baseline-verification.md).

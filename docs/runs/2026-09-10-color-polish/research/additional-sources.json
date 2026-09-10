@@ -1,0 +1,37 @@
+{
+  "files": [
+    {
+      "source": "/Users/anthony/Downloads/FloatingExpressions.module.css",
+      "sha256": "8a078cc7bf658acc55124c8fa1484b608321ef2111f9791ab0db9d8a8e3ab1ad",
+      "bytes": 602
+    },
+    {
+      "source": "/Users/anthony/Downloads/FloatingExpressions.tsx",
+      "sha256": "cf44adafc6828b2ac00dbe60951d9ced491f795efff2830ead417d9001d93061",
+      "bytes": 4366
+    },
+    {
+      "source": "/Users/anthony/Downloads/SubmissionExperience.module.css",
+      "sha256": "195a38e8b3c5fe469120165734482e9797d626cbc8704b94e113f7513024478c",
+      "bytes": 14919
+    },
+    {
+      "source": "/Users/anthony/Downloads/SubmissionForm.tsx",
+      "sha256": "07e180e2317051ac7dbb5c88de490de68005eaca3da7676c716dec46441110bd",
+      "bytes": 27535
+    },
+    {
+      "source": "/Users/anthony/Downloads/HomeMobile.module.css",
+      "sha256": "2960929bc5935b59706547af1f04c6afbf98d8b7c9361fdfc6a3955d86d0f18b",
+      "bytes": 5207
+    },
+    {
+      "source": "/Users/anthony/Downloads/FeedHome.tsx",
+      "sha256": "d1ff468afa0ff6b8c5f496d1d27ba4d30ebdf1036c0c7fb79a55878e995e7c48",
+      "bytes": 12055
+    }
+  ],
+  "colorPrototypeMatchesApproved": true,
+  "mobileReviewCommit": "df88a5db68feb2ba209a9753a7ca3ecad6b27f86",
+  "treatment": "Supplementary references only. Preserve Downloads originals. Current approved implementation scope remains TV and preview. Individual source files differ from deployed Home/submission and are not blanket replacements."
+}

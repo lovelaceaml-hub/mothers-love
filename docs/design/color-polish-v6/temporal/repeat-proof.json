@@ -1,0 +1,221 @@
+{
+  "cases": [
+    {
+      "name": "scene-1-0ms",
+      "id": 1,
+      "ms": 0
+    },
+    {
+      "name": "scene-1-6000ms",
+      "id": 1,
+      "ms": 6000
+    },
+    {
+      "name": "scene-2-0ms",
+      "id": 2,
+      "ms": 0
+    },
+    {
+      "name": "scene-2-6000ms",
+      "id": 2,
+      "ms": 6000
+    },
+    {
+      "name": "scene-4-0ms",
+      "id": 4,
+      "ms": 0
+    },
+    {
+      "name": "scene-4-6000ms",
+      "id": 4,
+      "ms": 6000
+    },
+    {
+      "name": "scene-5-0ms",
+      "id": 5,
+      "ms": 0
+    },
+    {
+      "name": "scene-5-6000ms",
+      "id": 5,
+      "ms": 6000
+    },
+    {
+      "name": "scene-8-0ms",
+      "id": 8,
+      "ms": 0
+    },
+    {
+      "name": "scene-8-6000ms",
+      "id": 8,
+      "ms": 6000
+    },
+    {
+      "name": "scene-6-0ms",
+      "id": 6,
+      "ms": 0
+    },
+    {
+      "name": "scene-6-6000ms",
+      "id": 6,
+      "ms": 6000
+    },
+    {
+      "name": "scene-7-0ms",
+      "id": 7,
+      "ms": 0
+    },
+    {
+      "name": "scene-7-6000ms",
+      "id": 7,
+      "ms": 6000
+    },
+    {
+      "name": "scene-9-0ms",
+      "id": 9,
+      "ms": 0
+    },
+    {
+      "name": "scene-9-6000ms",
+      "id": 9,
+      "ms": 6000
+    },
+    {
+      "name": "scene-10-0ms",
+      "id": 10,
+      "ms": 0
+    },
+    {
+      "name": "scene-10-6000ms",
+      "id": 10,
+      "ms": 6000
+    },
+    {
+      "name": "scene-11-0ms",
+      "id": 11,
+      "ms": 0
+    },
+    {
+      "name": "scene-11-6000ms",
+      "id": 11,
+      "ms": 6000
+    },
+    {
+      "name": "garden-replacement-21s",
+      "id": 2,
+      "ms": 21000
+    },
+    {
+      "name": "arrival-single-0-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 0
+    },
+    {
+      "name": "arrival-single-1-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 1
+    },
+    {
+      "name": "arrival-single-2-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 2
+    },
+    {
+      "name": "arrival-single-3-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 3
+    },
+    {
+      "name": "arrival-single-4-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 4
+    },
+    {
+      "name": "arrival-single-5-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "single",
+      "style": 5
+    },
+    {
+      "name": "arrival-group-0-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 0
+    },
+    {
+      "name": "arrival-group-1-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 1
+    },
+    {
+      "name": "arrival-group-2-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 2
+    },
+    {
+      "name": "arrival-group-3-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 3
+    },
+    {
+      "name": "arrival-group-4-entry",
+      "id": 2,
+      "ms": 1000,
+      "kind": "group",
+      "style": 4
+    },
+    {
+      "name": "neutral",
+      "id": 2,
+      "ms": 14000,
+      "mode": "neutral"
+    },
+    {
+      "name": "empty",
+      "id": 2,
+      "ms": 14000,
+      "mode": "empty"
+    },
+    {
+      "name": "unverified",
+      "id": 2,
+      "ms": 14000,
+      "mode": "offline"
+    },
+    {
+      "name": "still-garden",
+      "id": 2,
+      "ms": 14000,
+      "still": true
+    }
+  ],
+  "hashes": {
+    "scene-1-0ms": "451a1fb743c5c019aaabb696cca1710841c32f8f108cf4ed78ec381b5dc7072b",
+    "repeat-scene-1-0ms": "451a1fb743c5c019aaabb696cca1710841c32f8f108cf4ed78ec381b5dc7072b"
+  },
+  "stateHashes": {
+    "scene-1-0ms": "9bc27ef0dabbffa3f913d3b011ddc9b52f61ef773df45eac980197d396e9c9c1",
+    "repeat-scene-1-0ms": "9bc27ef0dabbffa3f913d3b011ddc9b52f61ef773df45eac980197d396e9c9c1"
+  },
+  "repeatStateIdentical": true,
+  "repeatImageIdentical": true,
+  "repeatPixelFraction": 0
+}

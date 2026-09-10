@@ -1,7 +1,7 @@
 ---
 lane: LD
 title: Anonymous data support
-state: planned
+state: running
 model: pending
 runner: pending
 worktree: pending
@@ -23,3 +23,7 @@ updated: 2026-09-10T21:08Z
 ## Review
 
 (coordinator appends)
+
+## Execution update
+
+Running on refreshed facab7a baseline. Model gpt-5.6-luna max. Root owns source integration and release.
