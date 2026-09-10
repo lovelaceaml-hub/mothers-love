@@ -34,7 +34,7 @@ jobs:
           if grep -q "Mother’s Love TV color & visual polish pass" src/components/display/DisplayExperience.module.css; then
             echo "Verified color polish already present."
           else
-            patch -p1 --batch < /tmp/mothers-love-color-polish.patch
+            git apply --3way --whitespace=nowarn /tmp/mothers-love-color-polish.patch
           fi
 
       - name: Commit production source
