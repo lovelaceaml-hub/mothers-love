@@ -198,9 +198,6 @@ export function FeedHome() {
           </aside>
         </div>
 
-        <div className={styles.mobileShareDock}>
-          <Link className={styles.primaryAction} href="/recognize">Share a recognition<Arrow diagonal /></Link>
-        </div>
         <footer className={styles.footer}>
           <p>{CAMPAIGN_TAGLINE}</p>
           <nav className={styles.utilityLinks} aria-label="Campaign links">

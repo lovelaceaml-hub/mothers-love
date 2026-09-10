@@ -229,11 +229,10 @@ test('bounds home to 30 items and keeps the list keyboard-scrollable', async ({ 
   await expect(page.getByRole('article')).toHaveCount(30);
 });
 
-test('shares the same public feed companion above the recognition form', async ({ page }) => {
-  const companionItems = Array.from({ length: 35 }, (_, index) => item({
+test('shows the form only on the recognize page, with no live campaign feed', async ({ page }) => {
+  const companionItems = Array.from({ length: 5 }, (_, index) => item({
     id: `companion-${index}`,
     recipient: index === 0 ? 'Companion R.' : `Companion ${index} R.`,
-    firstPublishedAt: `2030-01-01T11:${String(59 - Math.floor(index / 60)).padStart(2, '0')}:${String(59 - (index % 60)).padStart(2, '0')}.000Z`,
   }));
   await routeFeed(page, snapshot(companionItems));
   await routeReactions(page);
@@ -242,14 +241,9 @@ test('shares the same public feed companion above the recognition form', async (
   });
 
   await page.goto('/recognize');
-  const companion = page.getByTestId('submission-live-feed');
-  await expect(companion).toHaveAttribute('aria-label', 'Live campaign');
-  const viewport = companion.getByRole('region', { name: 'Latest recognitions' });
-  await expect(viewport).toHaveAttribute('tabindex', '0');
-  await expect(companion).toContainText('Companion R.');
-  await expect(page.getByRole('region', { name: 'Recent recognitions' })).toHaveCount(0);
-  await viewport.focus();
-  await viewport.press('End');
-  await expect.poll(() => viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
+  await expect(page.getByTestId('submission-live-feed')).toHaveCount(0);
+  await expect(page.getByText('Live from the campaign')).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Recent recognitions' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Latest recognitions' })).toHaveCount(0);
 });

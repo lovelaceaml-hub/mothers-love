@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
 import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
-import { CompactPublicFeed } from '@/components/feed/PublicFeedProvider';
 
 import baseStyles from './SubmissionForm.module.css';
 import experienceStyles from './SubmissionExperience.module.css';
@@ -539,7 +538,6 @@ export function SubmissionForm() {
       <div className={styles.shell}>
         <Header />
         <div className={styles.formColumn}>
-        <div className={styles.liveFeed}><CompactPublicFeed /></div>
 
         {showLoading && (
           <section className={styles.loadingCard} aria-live="polite" aria-busy="true">
@@ -584,7 +582,7 @@ export function SubmissionForm() {
                   autoComplete="name"
                   value={draft.submitter}
                   onChange={(event) => updateDraft('submitter', event.target.value)}
-                  placeholder="For example, Maya Rodriguez"
+                  placeholder="For example, Michelle, Maya Rodriguez, Mo, B. Daniel, S. Grace L., or D. Kim"
                   aria-invalid={Boolean(fieldErrors.submitter)}
                   aria-describedby={fieldErrors.submitter ? 'submitter-error' : undefined}
                 />
@@ -602,7 +600,7 @@ export function SubmissionForm() {
                   disabled={viewState === 'sending'}
                   value={draft.recipient}
                   onChange={(event) => updateDraft('recipient', event.target.value)}
-                  placeholder="For example, Michelle"
+                  placeholder="For example, Michelle, Maya Rodriguez, Mo, B. Daniel, S. Grace L., or D. Kim"
                   aria-invalid={Boolean(fieldErrors.recipient)}
                   aria-describedby={fieldErrors.recipient ? 'recipient-error' : undefined}
                 />
