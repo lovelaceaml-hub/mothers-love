@@ -1060,3 +1060,22 @@
 .spotlightCopy h2 { font-size: clamp(34px, 3vw, 72px); }
 .spotlightPhrase { font-size: clamp(32px, 2.8vw, 70px); }
 .spotlightBadge { top: 2rem; left: 2rem; right: auto; bottom: auto; width: clamp(80px, 7vw, 160px); }
+
+
+/* Reference-board color material pass. */
+.teachingScreen { --teaching-ink: #2D463E; --teaching-muted: #596960; --teaching-paper: #FFFEFBF5; --teaching-line: #CBDACB; background: radial-gradient(ellipse at 82% 13%,#FFE08366,transparent 40%),linear-gradient(145deg,#EAF5FAE6,#FFFBEEE6 50%,#EFE4FBDD); border-color:#FFFDF3; box-shadow:0 24px 70px #38577524; }
+.teachingScreen::before { background:#FFE08338; }
+.teachingScreen::after { background:#C9B7F63D; }
+.spotlightScreen { background:radial-gradient(ellipse at 15% 30%,#C7E6FA,transparent 52%),radial-gradient(ellipse at 87% 79%,#FFCFDF,transparent 62%),#FFF7E6; }
+.spotlightDetails, .practiceExpression, .peaceSceneCard { background:#FFFEFBF2; border-color:#D4DED4; box-shadow:0 14px 32px #477B7526; }
+.spotlightPhrase, .practiceCopy h2 { color:#244665; }
+.decorativeOrb { background:radial-gradient(circle at 29% 17%,#FFFFFFF2 5%,#FFFFFFAA 35%,color-mix(in srgb,var(--orb-color) 48%,#FFFCF2)); box-shadow: inset 4px 6px 12px #fff9,0 0 28px color-mix(in srgb,var(--orb-color) 40%,transparent); }
+.dailyPracticeScreen { background:radial-gradient(ellipse at 80% 24%,#D3BFEF,transparent 62%),radial-gradient(ellipse at 8% 78%,#D7EBBB,transparent 53%),#FFF7E5; }
+.oneKindWordScreen { background:radial-gradient(ellipse at 48% 44%,#FFEEF2 4%,#FFD5DC7A 42%,#C6E5FA99 84%),#FBF7EC; }
+.wordHalo { background:radial-gradient(circle,#FFD05F66,transparent 70%); }
+.everydayPeaceScreen { background:linear-gradient(160deg,#CBE7FC,#FAF6DE 57%,#D7EAB7); }
+.sceneHome { background:linear-gradient(165deg,#B7E0F8,#FFEDB1); }
+.sceneSchool { background:linear-gradient(165deg,#D4C0EF,#FFF0C5); }
+.sceneWork { background:linear-gradient(165deg,#C8E6B3,#FFF0CC); }
+.peacePromiseScreen { background:radial-gradient(ellipse at 18% 5%,#B9DFFC,transparent 57%),radial-gradient(ellipse at 90% 84%,#D1E6B0,transparent 54%),#FFF2D3; }
+.qrInvitation { background:#FFFEF8F5; border-color:#D6C5A2; }

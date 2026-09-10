@@ -1619,3 +1619,22 @@
 .expressionCards .flowerPhrase { margin-top: 8px; }
 .heartReveal { border-radius: 32px; }
 .heartRibbonStage { width: min(100%, 26vh); }
+
+
+/* Reference-board color material pass. */
+.insights { --insight-ink: #2D463E; --insight-muted: #586B5E; --insight-paper: #FFFEFBF5; --insight-shadow: 0 24px 70px #41668524; }
+.screen { background: radial-gradient(ellipse at 5% 2%,#CBE5FA85,transparent 46%), radial-gradient(ellipse at 90% 89%,#D6EBAD6B,transparent 50%), #FFFCF2CE; }
+.impactScreen { --insight-title-glow: #FF8BA76B; --insight-title-sparkle: #FFF2AB; background: radial-gradient(ellipse at 9% 7%,#C9E6FA99,transparent 50%),radial-gradient(ellipse at 89% 83%,#FFE9A280,transparent 56%),#FFFCF4DC; }
+.impactTotalNumber { color: #B5305C; text-shadow: 0 10px 0 #FF9BB326; }
+.impactTotalLabel { color: #354D43; }
+.ribbon { background: linear-gradient(110deg,color-mix(in srgb,var(--ribbon-color) 32%,#FFFEFB),#FFFEFB 72%); border-color: color-mix(in srgb,var(--ribbon-color) 64%,white); box-shadow: 0 10px 24px #51728D19; }
+.ribbonNumber { background: color-mix(in srgb,var(--ribbon-color) 65%,white); color: #263F46; }
+.ribbonCount { color: #294645; }
+.expressionsScreen { background: radial-gradient(ellipse at 9% 90%,#DEECCA66,transparent 48%),radial-gradient(ellipse at 93% 8%,#D6E8FC77,transparent 51%),#FFFCF5E8; }
+.flowerCard { background: linear-gradient(145deg,color-mix(in srgb,var(--flower-color) 25%,#FFFEFA),#FFFEFB 56%); border-color: color-mix(in srgb,var(--flower-color) 62%,white); box-shadow: 0 12px 30px #315E8024,inset 0 1px 0 #fff; }
+.flowerNumber { background: color-mix(in srgb,var(--flower-color) 62%,white); color: #29414A; }
+.flowerPhrase, .flowerPrinciple { color: #31493F; }
+.sharedScreen { --insight-title-glow: #B9A4F080; background: radial-gradient(ellipse at 26% 24%,#A7D3F77A,transparent 50%),radial-gradient(ellipse at 84% 72%,#D4ADF080,transparent 56%),#F1F5F9B3; }
+.connectedBubble { background: radial-gradient(circle at 28% 15%,#FFFFFFF7 7%,#FFFEFBED 58%,color-mix(in srgb,var(--connected-color) 35%,#FFFCF4)); border-color: color-mix(in srgb,var(--connected-color) 72%,white); box-shadow: 0 18px 40px #526B962B,0 0 20px color-mix(in srgb,var(--connected-color) 34%,transparent),inset 3px 5px 10px #fff9; }
+.heartBubble { background: radial-gradient(circle at 30% 20%,#FFFEFA,#FFE2EF 64%,#D6C1F2); border-color: #EFA3C7; }
+.heartPrinciple, .heartLabel { color: #4C4161; }

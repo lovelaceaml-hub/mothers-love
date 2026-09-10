@@ -605,3 +605,20 @@
 .reducedMotion .card { animation: none; }
 
 .cardMotion, .cardTrail, .backgroundWash { will-change: transform, opacity; }
+
+
+/* Reference-board color material pass. */
+.scene { --garden-ink: #2D463E; --garden-muted: #57695A; }
+.board { background: #FFFDF207; }
+.backgroundWash { background: radial-gradient(ellipse at 24% 70%,#B7E0888C,transparent 46%), radial-gradient(ellipse at 82% 69%,#FF8BA767,transparent 44%), radial-gradient(ellipse at 51% 18%,#A7D3F780,transparent 55%), radial-gradient(ellipse at 55% 91%,#FFE08373,transparent 43%); }
+.sparkle { background: #E9B947; filter: drop-shadow(0 0 10px #FFE0838C); }
+.card { background: radial-gradient(circle at 27% 17%,#FFFFFFF7 7%,#FFFEFDF2 38%,#FFFFFFE8 58%,color-mix(in srgb,var(--garden-accent) 34%,#FFFAF0) 100%); border-color: color-mix(in srgb,var(--garden-accent) 80%,white); box-shadow: inset 4px 6px 12px #fffd, inset -5px -8px 16px color-mix(in srgb,var(--garden-accent) 22%,transparent), 0 22px 48px #325C702B, 0 0 24px color-mix(in srgb,var(--garden-accent) 38%,transparent); }
+.card::after { background: color-mix(in srgb,var(--garden-accent) 30%,transparent); }
+.cardTrail { background: radial-gradient(circle,color-mix(in srgb,var(--garden-accent) 68%,transparent),transparent 73%); }
+.card h3, .message, .messageContent { color: #2D463E; }
+.expressionChip { color: #2C4146; }
+.arrivalCard { background: radial-gradient(circle at 27% 18%,#FFFEFDF7 8%,#FFFEF5EF 57%,color-mix(in srgb,var(--garden-accent) 32%,#FFFEF7)); border-color: var(--garden-accent); box-shadow: inset 3px 5px 8px #fffc, 0 0 30px color-mix(in srgb,var(--garden-accent) 36%,transparent), 0 15px 35px #AD57702E; }
+.messageReader { background: #FFFEF9F5; border-color: #E7C2AD; }
+.milestone { background: radial-gradient(ellipse at 50% 37%,#FFFEF2 8%,#FFE69BCC 47%,#FFE0E6BB 80%,#F2D9FF80); box-shadow: 0 25px 65px #97712825, 0 0 50px #FFD67644; }
+.milestone h2 { color: #86621B; }
+.milestoneFlower { background: conic-gradient(from 12deg,#FF977C 0 11%,transparent 11% 15%,#FFD05F 15% 26%,transparent 26% 30%,#FFAD69 30% 41%,transparent 41% 45%,#F582AF 45% 56%,transparent 56% 60%,#82B0ED 60% 71%,transparent 71% 75%,#B293E7 75% 86%,transparent 86% 90%,#EF7A96 90%); filter: drop-shadow(0 0 18px #FFD66760); }

@@ -2820,3 +2820,46 @@
 .motionstill .arrivalOrb { animation: none !important; }
 
 .displayApp[data-paused="true"] *, .displayApp[data-paused="true"] *::before, .displayApp[data-paused="true"] *::after { animation-play-state: paused !important; }
+
+
+/* Reference-board color material pass. */
+.displayApp, .pairingPage {
+ --cream: #FFFCF4; --paper: #FFFEFB; --ink: #2D463E; --muted: #556A61;
+ --heading-ink: #244665; --warm-ink: #2D463E; --blue: #A7D3F7; --yellow: #FFE083;
+ --orange: #FFC7A2; --coral: #FF8BA7; --red: #EF7A96; --lavender: #C9B7F6; --lime: #B7E088; --green: #A8D386; --sky: #A7D3F7;
+ --panel: #FFFEFBF2; --panel-edge: #E5DACE; --coral-glow: #FF8BA738; --gold-glow: #FFE0834D;
+ background: radial-gradient(ellipse at 16% 2%, #CFE9FD, transparent 53%), radial-gradient(ellipse at 90% 92%, #DDEFBF, transparent 50%), #FFFCF3;
+}
+.displayApp[data-screen='garden'] { background: radial-gradient(ellipse at 50% 0%, #B6DFFB, transparent 58%), radial-gradient(ellipse at 9% 82%, #C1E596, transparent 58%), radial-gradient(ellipse at 95% 80%, #FFCEDB, transparent 53%), #F9F6DE; }
+.displayApp[data-screen='featured'], .displayApp[data-screen='spotlight'] { background: radial-gradient(ellipse at 4% 10%, #C6E7F9, transparent 55%), radial-gradient(ellipse at 96% 60%, #FFCDDF, transparent 60%), #FFF5DB; }
+.displayApp[data-screen='cluster'] { background: radial-gradient(ellipse at 25% 30%, #A7CBF5, transparent 60%), radial-gradient(ellipse at 85% 78%, #DEBEF4, transparent 67%), #D4E2FA; }
+.displayApp[data-screen='impact'] { background: radial-gradient(ellipse at 9% 15%, #D2EAFA, transparent 55%), radial-gradient(ellipse at 98% 88%, #D3EBAF, transparent 56%), #FFF7E7; }
+.displayApp[data-screen='all-nine'] { background: radial-gradient(ellipse at 10% 2%, #E4EDFB, transparent 50%), radial-gradient(ellipse at 92% 97%, #FFE8D7, transparent 52%), #FFFCF5; }
+.displayApp[data-screen='everyday-peace'], .displayApp[data-screen='peace-promise'] { background: radial-gradient(ellipse at 48% 0%, #BBE1FC, transparent 70%), radial-gradient(ellipse at 3% 90%, #CAE6A1, transparent 53%), radial-gradient(ellipse at 93% 76%, #FFD3DF, transparent 54%), #FFF5DA; }
+.displayApp[data-screen='one-kind-word'], .displayApp[data-screen='daily-practice'] { background: radial-gradient(ellipse at 20% 25%, #E1CEF8, transparent 54%), radial-gradient(ellipse at 89% 79%, #FFE5AE, transparent 63%), #EAF6F9; }
+.displayApp[data-screen='arrival'] { background: radial-gradient(ellipse at 49% 38%, #FFFBDA 1%, #FFE49A 24%, #FFD1C3 57%, #F5B4CE 100%); }
+.displayApp[data-screen='milestone'] { background: radial-gradient(ellipse at 51% 20%, #FFF2B4, transparent 47%), radial-gradient(ellipse at 92% 70%, #F6BED7, transparent 56%), radial-gradient(ellipse at 2% 79%, #CEE4FB, transparent 55%), #FFE9BD; }
+.displayApp[data-screen='quiet'], .displayApp[data-screen='neutral'] { background: linear-gradient(135deg,#F7F9F2,#FFF9EF); --coral-glow: transparent; --gold-glow: transparent; }
+.atmosphere::before { background: #A7D3F733; }
+.atmosphere::after { background: #FF8BA72E; }
+.displayHeader h1, .displayScreenHeading h2 { color: #244665; }
+.headerTagline, .eyebrow { color: #526455; }
+.displayScreenHeading { border-color: #C4D6D1; }
+.qrDock { background: #FFFEF8F5; border-color: #D9CEAE; box-shadow: 0 10px 35px #44796429; }
+.qrGraphic { background: #FFFEFB; }
+.recognitionCard { background: radial-gradient(circle at 28% 16%,#FFFFFFF7 7%,#FFFEFBF2 39%,#FFFDFBE6 59%,color-mix(in srgb,var(--bubble-accent,#FF8BA7) 33%,#FFFCF2) 100%); border-color: color-mix(in srgb,var(--bubble-accent,#FF8BA7) 78%,white); box-shadow: inset 4px 6px 12px #fffa, inset -5px -8px 16px color-mix(in srgb,var(--bubble-accent,#FF8BA7) 20%,transparent), 0 19px 44px #38586D24, 0 0 24px color-mix(in srgb,var(--bubble-accent,#FF8BA7) 34%,transparent); }
+.recognitionCard::after { background: color-mix(in srgb,var(--bubble-accent,#FF8BA7) 28%,transparent); }
+.recognitionMessage, .fullMessage, .liveRailMessage { color: #2D463E; }
+.expressionPill, .expressionChip { color: #293D44; box-shadow: inset 0 1px 0 #FFFFFF8A; }
+.featureReading { background: #FFFEFBF2; border-color: #DAB6CD; box-shadow: 0 22px 56px #44607F24, 0 0 32px #FF8BA72A; }
+.featureExpression { border-color: #FFE083; box-shadow: 0 16px 32px #66807026, 0 0 24px #FFE08345; }
+.arrivalScreen, .arrivalPersonalScreen { background: radial-gradient(ellipse at 50% 25%,#FFFEF5F5 10%,#FFF8E4F2 60%,#FFE9C6DA); border-color: #F0B4BF; box-shadow: 0 24px 62px #A5416B26, 0 0 45px #FFC65F70; }
+.arrivalGroupScreen { background: linear-gradient(145deg,#FFF4D7F2,#FFF8F4EB,#FFE1EEE6); border-color: #EDABCB; box-shadow: 0 24px 62px #95629729, 0 0 38px #FF8BA760; }
+.milestoneScreen { background: radial-gradient(ellipse at 45% 35%,#FFFEF1,#FFF0C4 68%,#FFD9D2); border-color: #DDB349; }
+.milestoneNumber { color: #947022; text-shadow: 0 3px 0 #FFEA9D, 0 0 22px #F6C84C55; }
+.liveRail { background: #FFFEF9F5; border-color: #CADDD8; box-shadow: 0 14px 30px #39748620; }
+.liveRailItem { background: #FFFFFFEB; border-color: #D9E4E0; }
+.liveIndicator { color: #3F714F; }
+.progressTrack { background: #D5E0D5; }
+.progressTrack > span { background: linear-gradient(90deg,#F78CA9,#F4C253,#A1CC8F); }
+.quietScreen, .fallbackScreen, .startupCard { background: #FFFEF6F2; border-color: #D6DCCB; }

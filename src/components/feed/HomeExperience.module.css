@@ -268,3 +268,39 @@
   .guidePanel { display: none; }
   .mobileShareDock .primaryAction { min-height: 44px; }
 }
+
+
+/* Reference-board color material pass. */
+.page { --home-cream: var(--ml-ivory); --home-ink: var(--ml-ink); --home-muted: var(--ml-muted); --home-rose: var(--ml-rose-ink); --home-line: #C9DACE; background: #F5FAF0; }
+.atmosphere { background: radial-gradient(ellipse at 88% 2%, #CEE8FF 0%, transparent 48%), radial-gradient(ellipse at 0% 20%, #FFE2DA, transparent 47%), radial-gradient(ellipse at 78% 83%, #D9EDBF, transparent 58%), #FFFCF5; }
+.atmosphere::after { background: radial-gradient(ellipse at 46% 18%, #FFE08347, transparent 58%); }
+.topbar { border-color: #C8DACF; }
+.topLinks a[aria-current] { border-color: #D34470; }
+.arch { background: linear-gradient(145deg, #FFE6AD, #FFF9DB 43%, #A7D3F7); border-color: #FFFDF3; box-shadow: inset 9px 12px 16px #fff8, inset -8px -7px 14px #468AB529, 0 12px 30px -22px #386A8250; }
+.arch::before { background: radial-gradient(ellipse at 45% 0%, #A7D3F7, #D7EDFD 42%, #E1EFC4 76%, #FFE9A6); box-shadow: inset 3px 6px 12px #3B8CAE20; }
+.communityArt { filter: saturate(1.18) drop-shadow(0 6px 3px #467B661F); }
+.medallion { background: radial-gradient(circle at 29% 20%, #FFFFFFF5 7%, #FFFDF9E8 37%, color-mix(in srgb, var(--expression-color) 42%, #FFFEFC) 100%); border-color: color-mix(in srgb, var(--expression-color) 56%, white); box-shadow: inset 2px 3px 4px #fffd, inset -3px -4px 7px color-mix(in srgb, var(--expression-color) 22%, transparent), 0 5px 10px -7px #37645270; }
+.heroMedallionOne, .heroMedallionTwo, .heroMedallionThree { box-shadow: inset 3px 5px 8px #fffc, 0 0 18px color-mix(in srgb, var(--expression-color) 35%, transparent), 0 12px 16px -10px #53638066; }
+.heroMedallionOne::after, .heroMedallionTwo::after, .heroMedallionThree::after { border-top-color: var(--expression-color); border-left-color: var(--expression-color); }
+.decorativeBubble { background: radial-gradient(circle at 28% 20%, #fff, #FFDDE5 60%, #FFABC0); box-shadow: 0 5px 9px -6px #C6598275; }
+.bubbleTwo { background: radial-gradient(circle at 28% 20%, #fff, #FFF0B8 60%, #FFD05F); }
+.primaryAction, .mobileShareDock .primaryAction { background: var(--ml-action); border-color: #AC3158; box-shadow: inset 0 1px 0 #ffffff70, 0 8px 20px -10px #BB396F70; }
+.primaryAction:hover, .mobileShareDock .primaryAction:hover { background: linear-gradient(120deg, #A72D52, #913753); }
+.secondaryAction { color: #365B4A; background: #F3F8EA; border-color: #97BCA2; }
+.feedCard { background: linear-gradient(120deg, #FFFEFB, #FFFEFB 87%, #FFF4E8); border-color: #CADDD5; box-shadow: 0 8px 20px -15px #416D8060, inset 0 1px 0 #fff; }
+.message { color: #354C42; }
+.cardFooter { border-color: #DDE6DC; }
+.expressionList li { color: #354F47; background: color-mix(in srgb, var(--expression-color) 18%, #FFFEFC); border-color: color-mix(in srgb, var(--expression-color) 57%, #EFE7D9); }
+.guidePanel { background: linear-gradient(145deg, #EEF8E6, #F2F5FF 56%, #FFF1E4); border-color: #C7DCC2; box-shadow: 0 12px 28px -22px #39785060; }
+.expressionGarden .medallion:nth-child(9) { background: radial-gradient(circle at 28% 15%, #fff, #E7D9FA 55%, #FFBCA9); }
+.liveLabel[data-live='true'] i { background: #447D50; box-shadow: 0 0 0 3px #77B77926; }
+.reactionRow button { color: #A82F58; background: #FFEAF0; border-color: #E5A5B7; }
+.reactionRow button[aria-pressed='true'] { background: #AF315A; color: white; border-color: #AF315A; }
+.stateCard { background: #FFFEFB; border-color: #CEE0D5; }
+@media(max-width:560px) {
+ .feedCard { box-shadow: 0 3px 10px -7px #426A7560; }
+ .guidePanel { background: transparent; box-shadow: none; }
+ .reactionRow button { background: transparent; border-color: transparent; }
+ .reactionRow button[aria-pressed='true'] { background: #AF315A; border-color: #AF315A; }
+}
+@media(forced-colors:active) { .page { background: Canvas; color: CanvasText; } .feedCard, .medallion { border-color: CanvasText; } .primaryAction { background: ButtonFace; color: ButtonText; border-color: ButtonText; } }
