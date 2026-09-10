@@ -1,5 +1,5 @@
 {
-  "baseline": "ad1e6d5",
+  "baseline": "facab7a06d6b6364df710bf08aafe072df04d09d",
   "referenceCommit": "b8c7e23",
   "privateRepository": true,
   "defaultBranch": "codex/mothers-love",
@@ -10,5 +10,6 @@
     "ml_display_settings_patch": "5cd4491227492cec806edde12b60107d",
     "ml_public_display_snapshot": "b2a114e7c0ef1727240fa0cd3917ca43"
   },
-  "nonCampaignFunctionsHash": "8673fe6b83cf1c56bc5cc3483ae4fd85"
+  "nonCampaignFunctionsHash": "8673fe6b83cf1c56bc5cc3483ae4fd85",
+  "localStaleBaseline": "ad1e6d5"
 }
