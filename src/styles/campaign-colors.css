@@ -1,0 +1,10 @@
+/* Shared color/material tokens, never layout or animation controls. */
+:root {
+ --ml-blush: #FF8BA7; --ml-peach: #FFC7A2; --ml-sunshine: #FFE083;
+ --ml-leaf: #B7E088; --ml-sky: #A7D3F7; --ml-lavender: #C9B7F6;
+ --ml-ivory: #FFFCF5; --ml-paper: #FFFEFB; --ml-ink: #2D463E;
+ --ml-navy: #244665; --ml-muted: #596B61; --ml-rose-ink: #AB2E58;
+ --ml-gold-ink: #805C16; --ml-blue-ink: #2D588B; --ml-purple-ink: #704C9B;
+ --ml-action: linear-gradient(120deg, #BD365F, #AA3756);
+ --ml-line: #D9DECF; --ml-focus: #275F7C;
+}

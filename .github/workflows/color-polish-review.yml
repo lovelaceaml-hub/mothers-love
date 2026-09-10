@@ -1,0 +1,86 @@
+name: Color materials review (no deployment)
+on:
+  push:
+    branches: [codex/home-tv-family]
+    paths:
+      - .github/workflows/color-polish-review.yml
+      - scripts/review/*color*
+      - prototypes/tv-v6/**
+      - src/**
+      - tests/color-polish/**
+permissions:
+  contents: write
+concurrency:
+  group: color-polish-review
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      npm_config_cache: /tmp/npm-cache
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+      HOME_BASELINE_URL: http://127.0.0.1:3102
+      PLAYWRIGHT_JSON_OUTPUT_NAME: color-review-evidence/results.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Materialize reviewed color-only source on the isolated design branch
+        run: |
+          test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
+          if test -f scripts/review/materialize-color-pass.py; then
+            python3 scripts/review/materialize-color-pass.py
+            python3 scripts/review/materialize-color-tests.py
+            git add -- src tests/feed/home-design.spec.ts scripts/review/materialize-color-pass.py scripts/review/materialize-color-tests.py scripts/review/color-materials.css
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Apply reference-board color materials without changing layout or behavior'
+            test "$(git ls-remote origin refs/heads/codex/home-tv-family | cut -f1)" = "$GITHUB_SHA"
+            git push origin HEAD:refs/heads/codex/home-tv-family
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type check, lint and unit tests
+        run: npm run typecheck && npm run lint && npm test
+      - name: Build app and color-only prototype without production credentials
+        run: npm run build && node scripts/review/build-color-prototype.mjs
+      - name: Build previous approved design for geometry comparison
+        run: |
+          git worktree add --detach /tmp/color-before df88a5db68feb2ba209a9753a7ca3ecad6b27f86
+          cp -al node_modules /tmp/color-before/node_modules
+          cd /tmp/color-before && npm run build
+      - name: Install browser and serve isolated builds
+        run: |
+          npx playwright install --with-deps chromium
+          mkdir -p color-review-evidence home-review-evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > color-review-evidence/server.log 2>&1 &
+          (cd /tmp/color-before && npm run start -- --hostname 127.0.0.1 --port 3102) > color-review-evidence/baseline.log 2>&1 &
+          python3 -m http.server 3103 --bind 127.0.0.1 > color-review-evidence/prototype-server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3100/ >/dev/null && curl -fsS http://127.0.0.1:3102/ >/dev/null; then break; fi
+            sleep 1
+          done
+      - name: Functional, geometry, contrast and complete scene review
+        run: npx playwright test tests/feed tests/submission tests/interview/submission-experience.spec.ts tests/mobile-recognition tests/color-polish --workers=2 --retries=0 --reporter=line,json
+      - name: Record source boundary and review package
+        if: always()
+        run: |
+          mkdir -p color-review-evidence
+          git rev-parse HEAD > color-review-evidence/reviewed-commit.txt
+          git diff --stat df88a5db68feb2ba209a9753a7ca3ecad6b27f86 HEAD > color-review-evidence/changed-files.txt
+          git archive --format=tar HEAD > color-review-evidence/review-source.tar
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: color-polish-review
+          retention-days: 3
+          path: |
+            color-review-evidence/
+            home-review-evidence/
+            mobile-recognition-evidence/
+            test-results/
