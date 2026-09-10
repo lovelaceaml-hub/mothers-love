@@ -3,7 +3,7 @@ on:
   push:
     branches: [codex/home-tv-family]
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: home-design-review
   cancel-in-progress: true
@@ -14,42 +14,64 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: '1'
       npm_config_cache: /tmp/npm-cache
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+      HOME_BASELINE_URL: http://127.0.0.1:3102
+      PLAYWRIGHT_JSON_OUTPUT_NAME: home-review-evidence/results.json
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Install locked dependencies
         run: npm ci
-      - name: Type check
-        run: npm run typecheck
+      - name: Extract and commit only approved static artwork on design branch
+        run: |
+          test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
+          node scripts/review/extract-home-art.mjs
+          git add -- public/home-art
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Add verified V6 campaign artwork for Home only'
+            git push origin HEAD:refs/heads/codex/home-tv-family
+          fi
+      - name: Type check and lint
+        run: npm run typecheck && npm run lint
       - name: Unit tests
         run: npm test
       - name: Build application without production credentials
         run: npm run build
-      - name: Install test browser
-        run: npx playwright install --with-deps chromium
-      - name: Home, reaction and isolated design checks
-        if: hashFiles('tests/feed/home-design.spec.ts') != ''
-        run: npx playwright test tests/feed --workers=2
-      - name: Package source and local runtime for isolated browser review
-        if: success()
+      - name: Build unchanged baseline for visual comparison
         run: |
-          mkdir -p /tmp/home-review
-          git archive HEAD | tar -x -C /tmp/home-review
-          cp -a .next node_modules /tmp/home-review/
-          rm -f /tmp/home-review/.env /tmp/home-review/.env.local
-          tar -czf /tmp/home-review-workspace.tgz -C /tmp/home-review .
+          git worktree add --detach /tmp/home-before ad1e6d5e8482746f9e84fa514b61d343ccba01e1
+          cp -al node_modules /tmp/home-before/node_modules
+          cd /tmp/home-before
+          npm run build
+      - name: Install test browser and start isolated servers
+        run: |
+          npx playwright install --with-deps chromium
+          mkdir -p home-review-evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > home-review-evidence/server.log 2>&1 &
+          (cd /tmp/home-before && npm run start -- --hostname 127.0.0.1 --port 3102) > home-review-evidence/baseline.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3100/ >/dev/null && curl -fsS http://127.0.0.1:3102/ >/dev/null; then break; fi
+            sleep 1
+          done
+      - name: Home, reaction, accessibility and protected-route checks
+        run: npx playwright test tests/feed --workers=2 --reporter=line,json
+      - name: Record exact source and artwork
+        if: always()
+        run: |
+          git rev-parse HEAD > home-review-evidence/reviewed-commit.txt
+          git diff --name-only ad1e6d5e8482746f9e84fa514b61d343ccba01e1 HEAD > home-review-evidence/changed-files.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: home-design-review
-          retention-days: 1
+          retention-days: 3
           path: |
-            /tmp/home-review-workspace.tgz
-            test-results/
-            playwright-report/
             home-review-evidence/
+            test-results/
+            public/home-art/
