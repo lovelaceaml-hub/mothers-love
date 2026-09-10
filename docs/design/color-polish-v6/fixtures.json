@@ -1,0 +1,921 @@
+{
+  "records": [
+    {
+      "id": "fixture-0",
+      "name": "Maya R.",
+      "message": "Thank you for staying to help me finish. Your kindness made a long day feel lighter.",
+      "ids": [
+        2,
+        8
+      ],
+      "createdAt": 1788447600000,
+      "publishedAt": 1788447601000,
+      "expiresAt": 1789052400000,
+      "status": "published",
+      "valid": true,
+      "likes": 3
+    },
+    {
+      "id": "fixture-1",
+      "name": "Daniel K.",
+      "message": "You noticed the little things and thanked everyone who helped. It meant a lot.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788537660000,
+      "publishedAt": 1788537661000,
+      "expiresAt": 1789142460000,
+      "status": "published",
+      "valid": true,
+      "likes": 10
+    },
+    {
+      "id": "fixture-2",
+      "name": "Elena M.",
+      "message": "You welcomed me with such a warm smile. I felt included from the moment I arrived.",
+      "ids": [
+        1,
+        4
+      ],
+      "createdAt": 1788627720000,
+      "publishedAt": 1788627721000,
+      "expiresAt": 1789232520000,
+      "status": "published",
+      "valid": true,
+      "likes": 17
+    },
+    {
+      "id": "fixture-3",
+      "name": "Noah T.",
+      "message": "You took time to listen without rushing me. Thank you for making room for my thoughts.",
+      "ids": [
+        6,
+        8
+      ],
+      "createdAt": 1788706980000,
+      "publishedAt": 1788706981000,
+      "expiresAt": 1789311780000,
+      "status": "published",
+      "valid": true,
+      "likes": 2
+    },
+    {
+      "id": "fixture-4",
+      "name": "Sofia L.",
+      "message": "Your encouraging words helped me try again. Thank you for believing in me.",
+      "ids": [
+        7,
+        9
+      ],
+      "createdAt": 1788797040000,
+      "publishedAt": 1788797041000,
+      "expiresAt": 1789401840000,
+      "status": "published",
+      "valid": true,
+      "likes": 9
+    },
+    {
+      "id": "fixture-5",
+      "name": "Caleb A.",
+      "message": "Thank you for understanding when I made a mistake. Your patience helped me feel at ease.",
+      "ids": [
+        3,
+        4
+      ],
+      "createdAt": 1788887100000,
+      "publishedAt": 1788887101000,
+      "expiresAt": 1789491900000,
+      "status": "published",
+      "valid": true,
+      "likes": 16
+    },
+    {
+      "id": "fixture-6",
+      "name": "Grace H.",
+      "message": "You let me go first even though you were waiting too. Your thoughtfulness stayed with me.",
+      "ids": [
+        5,
+        8
+      ],
+      "createdAt": 1788966360000,
+      "publishedAt": 1788966361000,
+      "expiresAt": 1789571160000,
+      "status": "published",
+      "valid": true,
+      "likes": 1
+    },
+    {
+      "id": "fixture-7",
+      "name": "Ethan P.",
+      "message": "You made time to greet every person. Those small conversations made everyone feel welcome.",
+      "ids": [
+        1,
+        2
+      ],
+      "createdAt": 1788451620000,
+      "publishedAt": 1788451621000,
+      "expiresAt": 1789056420000,
+      "status": "published",
+      "valid": true,
+      "likes": 8
+    },
+    {
+      "id": "fixture-8",
+      "name": "Leah S.",
+      "message": "You listened kindly and helped us understand each other. Thank you for choosing peace.",
+      "ids": [
+        3,
+        6
+      ],
+      "createdAt": 1788541680000,
+      "publishedAt": 1788541681000,
+      "expiresAt": 1789146480000,
+      "status": "published",
+      "valid": true,
+      "likes": 15
+    },
+    {
+      "id": "fixture-9",
+      "name": "Jonah C.",
+      "message": "You made space for my idea and encouraged me to share it. I really appreciated that.",
+      "ids": [
+        5,
+        7
+      ],
+      "createdAt": 1788620940000,
+      "publishedAt": 1788620941000,
+      "expiresAt": 1789225740000,
+      "status": "published",
+      "valid": true,
+      "likes": 0
+    },
+    {
+      "id": "fixture-10",
+      "name": "Nora J.",
+      "message": "Thank you for recognizing my effort. Your thoughtful compliment brightened my whole day.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788711000000,
+      "publishedAt": 1788711001000,
+      "expiresAt": 1789315800000,
+      "status": "published",
+      "valid": true,
+      "likes": 7
+    },
+    {
+      "id": "fixture-11",
+      "name": "Micah B.",
+      "message": "You patiently heard me out and helped me feel understood. Thank you for your kindness.",
+      "ids": [
+        4,
+        6
+      ],
+      "createdAt": 1788801060000,
+      "publishedAt": 1788801061000,
+      "expiresAt": 1789405860000,
+      "status": "published",
+      "valid": true,
+      "likes": 14
+    },
+    {
+      "id": "fixture-12",
+      "name": "Anna F.",
+      "message": "Your sincere apology helped us begin again with a lighter heart. Thank you.",
+      "ids": [
+        3,
+        7
+      ],
+      "createdAt": 1788880320000,
+      "publishedAt": 1788880321000,
+      "expiresAt": 1789485120000,
+      "status": "published",
+      "valid": true,
+      "likes": 21
+    },
+    {
+      "id": "fixture-13",
+      "name": "Isaac W.",
+      "message": "You greeted me by name and made room for me at the table. It was such a kind welcome.",
+      "ids": [
+        1,
+        5
+      ],
+      "createdAt": 1788970380000,
+      "publishedAt": 1788970381000,
+      "expiresAt": 1789575180000,
+      "status": "published",
+      "valid": true,
+      "likes": 6
+    },
+    {
+      "id": "fixture-14",
+      "name": "Clara D.",
+      "message": "You offered help before I asked. Thank you for making time for me.",
+      "ids": [
+        2,
+        8
+      ],
+      "createdAt": 1788455640000,
+      "publishedAt": 1788455641000,
+      "expiresAt": 1789060440000,
+      "status": "published",
+      "valid": true,
+      "likes": 13
+    },
+    {
+      "id": "fixture-15",
+      "name": "Amos P.",
+      "message": "You thanked everyone for their effort. Your thoughtful words lifted us up.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788534900000,
+      "publishedAt": 1788534901000,
+      "expiresAt": 1789139700000,
+      "status": "published",
+      "valid": true,
+      "likes": 20
+    },
+    {
+      "id": "fixture-16",
+      "name": "Lydia C.",
+      "message": "Your friendly welcome helped me feel comfortable joining the group.",
+      "ids": [
+        1,
+        4
+      ],
+      "createdAt": 1788624960000,
+      "publishedAt": 1788624961000,
+      "expiresAt": 1789229760000,
+      "status": "published",
+      "valid": true,
+      "likes": 5
+    },
+    {
+      "id": "fixture-17",
+      "name": "Theo M.",
+      "message": "You listened with patience and noticed when I needed support. Thank you.",
+      "ids": [
+        6,
+        8
+      ],
+      "createdAt": 1788715020000,
+      "publishedAt": 1788715021000,
+      "expiresAt": 1789319820000,
+      "status": "published",
+      "valid": true,
+      "likes": 12
+    },
+    {
+      "id": "fixture-18",
+      "name": "Ruth V.",
+      "message": "Your encouragement gave me the courage to finish. You saw the best in me.",
+      "ids": [
+        7,
+        9
+      ],
+      "createdAt": 1788794280000,
+      "publishedAt": 1788794281000,
+      "expiresAt": 1789399080000,
+      "status": "published",
+      "valid": true,
+      "likes": 19
+    },
+    {
+      "id": "fixture-19",
+      "name": "Ezra N.",
+      "message": "You understood my mistake and spoke gently. Thank you for helping us move on.",
+      "ids": [
+        3,
+        4
+      ],
+      "createdAt": 1788884340000,
+      "publishedAt": 1788884341000,
+      "expiresAt": 1789489140000,
+      "status": "published",
+      "valid": true,
+      "likes": 4
+    },
+    {
+      "id": "fixture-20",
+      "name": "Lila B.",
+      "message": "You gave me your turn without hesitation. I appreciated your consideration.",
+      "ids": [
+        5,
+        8
+      ],
+      "createdAt": 1788974400000,
+      "publishedAt": 1788974401000,
+      "expiresAt": 1789579200000,
+      "status": "published",
+      "valid": true,
+      "likes": 11
+    },
+    {
+      "id": "fixture-21",
+      "name": "Eli S.",
+      "message": "Your kind greeting and thoughtful thanks made me feel welcome.",
+      "ids": [
+        1,
+        2
+      ],
+      "createdAt": 1788448860000,
+      "publishedAt": 1788448861000,
+      "expiresAt": 1789053660000,
+      "status": "published",
+      "valid": true,
+      "likes": 18
+    },
+    {
+      "id": "fixture-22",
+      "name": "Mara H.",
+      "message": "You heard my concerns and helped us begin again with understanding.",
+      "ids": [
+        3,
+        6
+      ],
+      "createdAt": 1788538920000,
+      "publishedAt": 1788538921000,
+      "expiresAt": 1789143720000,
+      "status": "published",
+      "valid": true,
+      "likes": 3
+    },
+    {
+      "id": "fixture-23",
+      "name": "Owen G.",
+      "message": "You made room for my suggestion and encouraged me to give it a try.",
+      "ids": [
+        5,
+        7
+      ],
+      "createdAt": 1788628980000,
+      "publishedAt": 1788628981000,
+      "expiresAt": 1789233780000,
+      "status": "published",
+      "valid": true,
+      "likes": 10
+    },
+    {
+      "id": "fixture-24",
+      "name": "Nora F.",
+      "message": "Your sincere thanks helped me notice the progress I had made.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788706800000,
+      "publishedAt": 1788706801000,
+      "expiresAt": 1789311600000,
+      "status": "published",
+      "valid": true,
+      "likes": 17
+    },
+    {
+      "id": "fixture-25",
+      "name": "Ada W.",
+      "message": "You listened to my point of view and made me feel understood.",
+      "ids": [
+        4,
+        6
+      ],
+      "createdAt": 1788796860000,
+      "publishedAt": 1788796861000,
+      "expiresAt": 1789401660000,
+      "status": "published",
+      "valid": true,
+      "likes": 2
+    },
+    {
+      "id": "fixture-26",
+      "name": "Levi L.",
+      "message": "You reached out to make peace and encouraged me to start again.",
+      "ids": [
+        3,
+        7
+      ],
+      "createdAt": 1788886920000,
+      "publishedAt": 1788886921000,
+      "expiresAt": 1789491720000,
+      "status": "published",
+      "valid": true,
+      "likes": 9
+    },
+    {
+      "id": "fixture-27",
+      "name": "Iris T.",
+      "message": "You welcomed me warmly and made space for me to join you.",
+      "ids": [
+        1,
+        5
+      ],
+      "createdAt": 1788966180000,
+      "publishedAt": 1788966181000,
+      "expiresAt": 1789570980000,
+      "status": "published",
+      "valid": true,
+      "likes": 16
+    },
+    {
+      "id": "fixture-28",
+      "name": "Rose A.",
+      "message": "You stayed a little longer to help. I am grateful for your kindness.",
+      "ids": [
+        2,
+        8
+      ],
+      "createdAt": 1788451440000,
+      "publishedAt": 1788451441000,
+      "expiresAt": 1789056240000,
+      "status": "published",
+      "valid": true,
+      "likes": 1
+    },
+    {
+      "id": "fixture-29",
+      "name": "Jude K.",
+      "message": "Your words of thanks made a small effort feel worthwhile.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788541500000,
+      "publishedAt": 1788541501000,
+      "expiresAt": 1789146300000,
+      "status": "published",
+      "valid": true,
+      "likes": 8
+    },
+    {
+      "id": "fixture-30",
+      "name": "Milo R.",
+      "message": "You welcomed me into the conversation so naturally. I felt included.",
+      "ids": [
+        1,
+        4
+      ],
+      "createdAt": 1788620760000,
+      "publishedAt": 1788620761000,
+      "expiresAt": 1789225560000,
+      "status": "published",
+      "valid": true,
+      "likes": 15
+    },
+    {
+      "id": "fixture-31",
+      "name": "June P.",
+      "message": "You paused your work to listen and help me. It meant a great deal.",
+      "ids": [
+        6,
+        8
+      ],
+      "createdAt": 1788710820000,
+      "publishedAt": 1788710821000,
+      "expiresAt": 1789315620000,
+      "status": "published",
+      "valid": true,
+      "likes": 0
+    },
+    {
+      "id": "fixture-32",
+      "name": "Aria C.",
+      "message": "You praised my effort and encouraged me not to give up.",
+      "ids": [
+        7,
+        9
+      ],
+      "createdAt": 1788800880000,
+      "publishedAt": 1788800881000,
+      "expiresAt": 1789405680000,
+      "status": "published",
+      "valid": true,
+      "likes": 7
+    },
+    {
+      "id": "fixture-33",
+      "name": "Joel B.",
+      "message": "You met my apology with understanding. Thank you for your patience.",
+      "ids": [
+        3,
+        4
+      ],
+      "createdAt": 1788880140000,
+      "publishedAt": 1788880141000,
+      "expiresAt": 1789484940000,
+      "status": "published",
+      "valid": true,
+      "likes": 14
+    },
+    {
+      "id": "fixture-34",
+      "name": "Eva D.",
+      "message": "You patiently let me finish first and offered a helping hand.",
+      "ids": [
+        5,
+        8
+      ],
+      "createdAt": 1788970200000,
+      "publishedAt": 1788970201000,
+      "expiresAt": 1789575000000,
+      "status": "published",
+      "valid": true,
+      "likes": 21
+    },
+    {
+      "id": "fixture-35",
+      "name": "Luca H.",
+      "message": "Your warm hello and words of thanks brightened my afternoon.",
+      "ids": [
+        1,
+        2
+      ],
+      "createdAt": 1788455460000,
+      "publishedAt": 1788455461000,
+      "expiresAt": 1789060260000,
+      "status": "published",
+      "valid": true,
+      "likes": 6
+    },
+    {
+      "id": "fixture-36",
+      "name": "Dina M.",
+      "message": "You gave me time to explain and helped us understand each other.",
+      "ids": [
+        3,
+        6
+      ],
+      "createdAt": 1788534720000,
+      "publishedAt": 1788534721000,
+      "expiresAt": 1789139520000,
+      "status": "published",
+      "valid": true,
+      "likes": 13
+    },
+    {
+      "id": "fixture-37",
+      "name": "Luke F.",
+      "message": "You stepped aside and encouraged me to take the next step.",
+      "ids": [
+        5,
+        7
+      ],
+      "createdAt": 1788624780000,
+      "publishedAt": 1788624781000,
+      "expiresAt": 1789229580000,
+      "status": "published",
+      "valid": true,
+      "likes": 20
+    },
+    {
+      "id": "fixture-38",
+      "name": "Hope W.",
+      "message": "You noticed my effort and offered such a kind compliment. Thank you.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788714840000,
+      "publishedAt": 1788714841000,
+      "expiresAt": 1789319640000,
+      "status": "published",
+      "valid": true,
+      "likes": 5
+    },
+    {
+      "id": "fixture-39",
+      "name": "Naomi S.",
+      "message": "You listened without judgment and made room for my feelings.",
+      "ids": [
+        4,
+        6
+      ],
+      "createdAt": 1788794100000,
+      "publishedAt": 1788794101000,
+      "expiresAt": 1789398900000,
+      "status": "published",
+      "valid": true,
+      "likes": 12
+    },
+    {
+      "id": "fixture-40",
+      "name": "Ava J.",
+      "message": "Your gentle apology and encouragement helped restore peace.",
+      "ids": [
+        3,
+        7
+      ],
+      "createdAt": 1788884160000,
+      "publishedAt": 1788884161000,
+      "expiresAt": 1789488960000,
+      "status": "published",
+      "valid": true,
+      "likes": 19
+    },
+    {
+      "id": "fixture-41",
+      "name": "Silas T.",
+      "message": "You greeted me by name and let me join your group first.",
+      "ids": [
+        1,
+        5
+      ],
+      "createdAt": 1788974220000,
+      "publishedAt": 1788974221000,
+      "expiresAt": 1789579020000,
+      "status": "published",
+      "valid": true,
+      "likes": 4
+    },
+    {
+      "id": "fixture-42",
+      "name": "Tessa K.",
+      "message": "You saw that I needed help and quietly stepped in. Thank you.",
+      "ids": [
+        2,
+        8
+      ],
+      "createdAt": 1788448680000,
+      "publishedAt": 1788448681000,
+      "expiresAt": 1789053480000,
+      "status": "published",
+      "valid": true,
+      "likes": 11
+    },
+    {
+      "id": "fixture-43",
+      "name": "Aaron D.",
+      "message": "Your thoughtful praise made me feel that my contribution mattered.",
+      "ids": [
+        2,
+        9
+      ],
+      "createdAt": 1788538740000,
+      "publishedAt": 1788538741000,
+      "expiresAt": 1789143540000,
+      "status": "published",
+      "valid": true,
+      "likes": 18
+    },
+    {
+      "id": "fixture-44",
+      "name": "Mina B.",
+      "message": "You welcomed a new face and made sure I was included.",
+      "ids": [
+        1,
+        4
+      ],
+      "createdAt": 1788628800000,
+      "publishedAt": 1788628801000,
+      "expiresAt": 1789233600000,
+      "status": "published",
+      "valid": true,
+      "likes": 3
+    },
+    {
+      "id": "fixture-45",
+      "name": "Isla V.",
+      "message": "You heard me out and offered practical help at just the right time.",
+      "ids": [
+        6,
+        8
+      ],
+      "createdAt": 1788708060000,
+      "publishedAt": 1788708061000,
+      "expiresAt": 1789312860000,
+      "status": "published",
+      "valid": true,
+      "likes": 10
+    },
+    {
+      "id": "fixture-46",
+      "name": "Emma P.",
+      "message": "You reminded me how far I had come and encouraged my next step.",
+      "ids": [
+        7,
+        9
+      ],
+      "createdAt": 1788798120000,
+      "publishedAt": 1788798121000,
+      "expiresAt": 1789402920000,
+      "status": "published",
+      "valid": true,
+      "likes": 17
+    },
+    {
+      "id": "fixture-47",
+      "name": "Ben C.",
+      "message": "You forgave a small mistake and helped me feel at ease again.",
+      "ids": [
+        3,
+        4
+      ],
+      "createdAt": 1788888180000,
+      "publishedAt": 1788888181000,
+      "expiresAt": 1789492980000,
+      "status": "published",
+      "valid": true,
+      "likes": 2
+    }
+  ],
+  "state": {
+    "scene": 1,
+    "sceneAge": 0.09831000000000001,
+    "still": false,
+    "mode": "normal",
+    "eduAge": 0,
+    "bloom": 1,
+    "bloomNext": 1,
+    "tour": false,
+    "order": [
+      1,
+      2,
+      4,
+      5,
+      8,
+      6,
+      7,
+      9,
+      10,
+      11
+    ],
+    "totals": {
+      "today": {
+        "rec": 6,
+        "expr": [
+          3,
+          0,
+          0,
+          0,
+          6,
+          0,
+          0,
+          3,
+          0
+        ]
+      },
+      "month": {
+        "rec": 118,
+        "expr": [
+          34,
+          52,
+          26,
+          37,
+          30,
+          37,
+          47,
+          37,
+          45
+        ]
+      },
+      "week": {
+        "rec": 47,
+        "expr": [
+          8,
+          16,
+          7,
+          12,
+          11,
+          15,
+          23,
+          17,
+          20
+        ]
+      },
+      "all": {
+        "rec": 1918,
+        "expr": [
+          427,
+          494,
+          255,
+          341,
+          298,
+          388,
+          436,
+          357,
+          442
+        ]
+      }
+    },
+    "goal": {
+      "id": 3,
+      "value": 7,
+      "target": 17,
+      "rank": 9,
+      "ratio": 0.4117647058823529,
+      "week": "2026-09-06",
+      "referenceFourth": 16,
+      "achieved": false
+    },
+    "queue": [],
+    "active": null,
+    "chain": false,
+    "transition": null,
+    "time": 0.09831000000000001,
+    "slots": [
+      {
+        "id": "fixture-20",
+        "key": "slot-1",
+        "x": 886.800018099208,
+        "y": 22.575552203648954,
+        "d": 312,
+        "born": 0,
+        "phase": "steady",
+        "since": 0,
+        "serial": 1,
+        "expression": null,
+        "large": false,
+        "motion": true,
+        "reading": {
+          "pages": [
+            "You gave me your turn without hesitation. I appreciated your consideration."
+          ],
+          "index": 0,
+          "at": 0,
+          "duration": 9
+        }
+      },
+      {
+        "id": "fixture-41",
+        "key": "slot-2",
+        "x": 1300.0652361339917,
+        "y": 25.79644470959181,
+        "d": 320,
+        "born": 0,
+        "phase": "steady",
+        "since": 0,
+        "serial": 2,
+        "expression": null,
+        "large": false,
+        "motion": true,
+        "reading": {
+          "pages": [
+            "You greeted me by name and let me join your group first."
+          ],
+          "index": 0,
+          "at": 0,
+          "duration": 9
+        }
+      },
+      {
+        "id": "fixture-13",
+        "key": "slot-3",
+        "x": 822.0039403536564,
+        "y": 323.8973323782197,
+        "d": 304,
+        "born": 0,
+        "phase": "steady",
+        "since": 0,
+        "serial": 3,
+        "expression": null,
+        "large": false,
+        "motion": true,
+        "reading": {
+          "pages": [
+            "You greeted me by name and made room for me at the table. It was such a kind welcome."
+          ],
+          "index": 0,
+          "at": 0,
+          "duration": 9
+        }
+      },
+      {
+        "id": "fixture-34",
+        "key": "slot-4",
+        "x": 1452.4973139371057,
+        "y": 330.13292015148534,
+        "d": 295,
+        "born": 0,
+        "phase": "steady",
+        "since": 0,
+        "serial": 4,
+        "expression": null,
+        "large": false,
+        "motion": true,
+        "reading": {
+          "pages": [
+            "You patiently let me finish first and offered a helping hand."
+          ],
+          "index": 0,
+          "at": 0,
+          "duration": 9
+        }
+      }
+    ],
+    "low": false,
+    "particles": 0,
+    "feedOffsets": [
+      0.540705,
+      24.540705000000003
+    ],
+    "log": [
+      {
+        "at": 0,
+        "type": "reset"
+      }
+    ]
+  }
+}

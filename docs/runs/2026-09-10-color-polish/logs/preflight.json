@@ -1,0 +1,14 @@
+{
+  "baseline": "ad1e6d5",
+  "referenceCommit": "b8c7e23",
+  "privateRepository": true,
+  "defaultBranch": "codex/mothers-love",
+  "rollbackDeployment": "dpl_CmSSPmnFHXQcTq9jew1jsT1GFHsH",
+  "productionAlias": "https://mothers-love.vercel.app",
+  "supabaseProject": "cvuwdlmlukepwfffpgdu",
+  "existingBridgeHashes": {
+    "ml_display_settings_patch": "5cd4491227492cec806edde12b60107d",
+    "ml_public_display_snapshot": "b2a114e7c0ef1727240fa0cd3917ca43"
+  },
+  "nonCampaignFunctionsHash": "8673fe6b83cf1c56bc5cc3483ae4fd85"
+}
