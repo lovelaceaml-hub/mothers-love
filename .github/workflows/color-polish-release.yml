@@ -1,0 +1,114 @@
+name: Mother's Love color polish verification
+
+on:
+  push:
+    branches: [codex/mothers-love-color-polish]
+    paths:
+      - .github/workflows/color-polish-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mothers-love-color-polish
+  cancel-in-progress: true
+
+jobs:
+  verify-and-save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      npm_config_cache: /tmp/npm-cache
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+      DISPLAY_SCREENSHOTS: 1
+      DISPLAY_SCREENSHOT_DIR: ${{ github.workspace }}/color-polish-evidence/tv
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply reviewed color polish patch
+        shell: bash
+        run: |
+          cat > /tmp/color.patch.b64 <<'PATCH_B64'
+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
+PATCH_B64
+          base64 -d /tmp/color.patch.b64 | gzip -dc > /tmp/mothers-love-color-polish.patch
+          if grep -q "Mother’s Love TV color & visual polish pass" src/components/display/DisplayExperience.module.css; then
+            echo "Color polish already applied."
+          else
+            patch -p1 --batch < /tmp/mothers-love-color-polish.patch
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Type check and lint
+        run: npm run typecheck && npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build without production credentials
+        run: npm run build
+
+      - name: Install Chromium and start isolated application
+        run: |
+          npx playwright install --with-deps chromium
+          mkdir -p color-polish-evidence/tv home-review-evidence mobile-recognition-evidence
+          npm run start -- --hostname 127.0.0.1 --port 3100 > color-polish-evidence/server.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3100/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3100/ >/dev/null
+
+      - name: Home, submission, and TV browser verification
+        run: |
+          npx playwright test \
+            tests/feed \
+            tests/submission \
+            tests/mobile-recognition \
+            tests/display/display.e2e.spec.ts \
+            --workers=2 --retries=0 --reporter=line
+
+      - name: Save verified visual-only implementation to review branch
+        run: |
+          git add -- \
+            src/lib/catalog.ts \
+            src/components/feed/FeedHome.tsx \
+            src/components/feed/HomeExperience.module.css \
+            src/components/campaign/ExpressionDrift.module.css \
+            src/components/submission/SubmissionExperience.module.css \
+            src/components/display/DisplayExperience.module.css \
+            src/components/display/garden/Garden.module.css \
+            src/components/display/insights/DisplayInsights.module.css \
+            src/components/display/teaching/TeachingScreens.module.css
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Apply Mother’s Love color and visual polish across public and TV views'
+            git push origin HEAD:refs/heads/codex/mothers-love-color-polish
+          fi
+          git rev-parse HEAD > color-polish-evidence/verified-commit.txt
+          git status --short > color-polish-evidence/worktree-status.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mothers-love-color-polish-review
+          retention-days: 3
+          path: |
+            color-polish-evidence/
+            home-review-evidence/
+            mobile-recognition-evidence/
+            test-results/
