@@ -23,18 +23,51 @@ jobs:
           fetch-depth: 0
           ref: codex/mothers-love
 
-      - name: Fetch verified color-polish patch
+      - name: Reconstruct verified color-polish source
         run: |
+          set -euo pipefail
+          BASE=9f0e46a15c491efe67b871476d7c1541d288e39b
           git fetch origin codex/mothers-love-color-polish
           git show origin/codex/mothers-love-color-polish:scripts/review/mothers-love-color-polish.patch.b64 > /tmp/mothers-love-color-polish.patch.b64
           base64 -d /tmp/mothers-love-color-polish.patch.b64 | gzip -dc > /tmp/mothers-love-color-polish.patch
+          git worktree add --detach /tmp/verified "$BASE"
+          cd /tmp/verified
+          patch -p1 --batch < /tmp/mothers-love-color-polish.patch
 
-      - name: Apply verified production patch
+      - name: Merge verified visual changes with current production
         run: |
-          if grep -q "Mother’s Love TV color & visual polish pass" src/components/display/DisplayExperience.module.css; then
-            echo "Verified color polish already present."
-          else
-            git apply --3way --whitespace=nowarn /tmp/mothers-love-color-polish.patch
+          set -euo pipefail
+          BASE=9f0e46a15c491efe67b871476d7c1541d288e39b
+          files=(
+            src/lib/catalog.ts
+            src/components/feed/FeedHome.tsx
+            src/components/feed/HomeExperience.module.css
+            src/components/campaign/ExpressionDrift.module.css
+            src/components/submission/SubmissionExperience.module.css
+            src/components/display/DisplayExperience.module.css
+            src/components/display/garden/Garden.module.css
+            src/components/display/insights/DisplayInsights.module.css
+            src/components/display/teaching/TeachingScreens.module.css
+          )
+          mkdir -p /tmp/base-files /tmp/merged-files
+          conflicts=0
+          for f in "${files[@]}"; do
+            mkdir -p "/tmp/base-files/$(dirname "$f")" "/tmp/merged-files/$(dirname "$f")"
+            git show "$BASE:$f" > "/tmp/base-files/$f"
+            if git merge-file -p "$f" "/tmp/base-files/$f" "/tmp/verified/$f" > "/tmp/merged-files/$f"; then
+              cp "/tmp/merged-files/$f" "$f"
+            else
+              echo "Conflict while merging $f"
+              conflicts=1
+            fi
+          done
+          if [ "$conflicts" -ne 0 ]; then
+            echo "One or more source files require manual reconciliation."
+            exit 1
+          fi
+          if grep -R "<<<<<<<\|=======\|>>>>>>>" src/lib/catalog.ts src/components/feed/FeedHome.tsx src/components/feed/HomeExperience.module.css src/components/campaign/ExpressionDrift.module.css src/components/submission/SubmissionExperience.module.css src/components/display/DisplayExperience.module.css src/components/display/garden/Garden.module.css src/components/display/insights/DisplayInsights.module.css src/components/display/teaching/TeachingScreens.module.css; then
+            echo "Conflict markers found."
+            exit 1
           fi
 
       - name: Commit production source
