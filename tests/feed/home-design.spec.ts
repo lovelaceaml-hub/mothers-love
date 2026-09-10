@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
+import sharp from 'sharp';
 import { EXPRESSIONS, CAMPAIGN_TITLE, CAMPAIGN_TAGLINE } from '../../src/lib/catalog';
 
 // Isolated browser fixtures. These records never reach the application server.
@@ -166,12 +167,13 @@ test('keyboard access, independent circular motion, pause and reduced motion', a
   const stopped = await moving.evaluate(el => getComputedStyle(el).transform);
   await page.waitForTimeout(250);
   expect(await moving.evaluate(el => getComputedStyle(el).transform)).toBe(stopped);
+  // Focused skip link and region provide keyboard reading without animation.
   await page.getByRole('link', { name: 'Skip to recognitions' }).focus();
   await page.getByRole('link', { name: 'Skip to recognitions' }).press('Enter');
   const viewport = page.getByRole('region', { name: 'Recent recognitions' });
   await expect(viewport).toBeFocused();
   await viewport.press('End');
-  expect(await viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+  await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   expect(await page.locator('[data-home-experience]').evaluate(el => el.getAnimations({ subtree: true }).filter(x => x.playState === 'running').length)).toBe(0);
   await page.getByRole('button', { name: 'Resume animation' }).click();
@@ -191,7 +193,7 @@ test('unmodified routes contain no Home theme and have no unexpected browser err
   expect(errors).toEqual([]);
 });
 
-// Optional exact baseline image comparison in the dedicated review workflow.
+// Compare decoded pixels, not PNG compression, after the same settled state.
 test('protected routes match baseline pixels', async ({ browser }) => {
   test.skip(!process.env.HOME_BASELINE_URL, 'Baseline server is provided by the dedicated review workflow.');
   const before = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
@@ -199,16 +201,32 @@ test('protected routes match baseline pixels', async ({ browser }) => {
   await before.clock.setFixedTime(new Date(serverTime));
   await after.clock.setFixedTime(new Date(serverTime));
   await mock(before); await mock(after);
+  mkdirSync('home-review-evidence', { recursive: true });
   const checks = [];
   for (const route of ['/recognize', '/expressions', '/privacy', '/admin/login', '/display']) {
     await before.goto(process.env.HOME_BASELINE_URL! + route);
     await after.goto(route);
-    await before.waitForTimeout(500); await after.waitForTimeout(500);
-    const a = await before.screenshot({ animations: 'disabled' });
-    const b = await after.screenshot({ animations: 'disabled' });
-    checks.push({ route, identical: a.equals(b) });
+    for (const page of [before, after]) {
+      if (route === '/recognize') {
+        await expect(page.getByRole('heading', { name: 'Recognition sharing is paused' })).toBeVisible();
+      }
+      if (['/recognize', '/expressions', '/privacy'].includes(route)) {
+        await expect(page.getByRole('button', { name: 'Like recognition for Avery', exact: true })).toBeEnabled();
+      }
+      await page.evaluate(async () => { await document.fonts.ready; });
+      await page.waitForTimeout(500);
+    }
+    const name = route.slice(1).replaceAll('/', '-');
+    const a = await before.screenshot({ path: `home-review-evidence/baseline-${name}.png`, animations: 'disabled' });
+    const b = await after.screenshot({ path: `home-review-evidence/review-${name}.png`, animations: 'disabled' });
+    const rawA = await sharp(a).ensureAlpha().raw().toBuffer();
+    const rawB = await sharp(b).ensureAlpha().raw().toBuffer();
+    let differentPixels = 0;
+    for (let i = 0; i < rawA.length; i += 4) {
+      if (rawA[i] !== rawB[i] || rawA[i + 1] !== rawB[i + 1] || rawA[i + 2] !== rawB[i + 2] || rawA[i + 3] !== rawB[i + 3]) differentPixels++;
+    }
+    checks.push({ route, identical: rawA.equals(rawB), differentPixels, pixels: rawA.length / 4 });
   }
-  mkdirSync('home-review-evidence', { recursive: true });
   writeFileSync('home-review-evidence/protected-routes.json', JSON.stringify(checks, null, 2));
   expect(checks.every(x => x.identical)).toBe(true);
   await before.close(); await after.close();

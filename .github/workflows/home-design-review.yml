@@ -3,7 +3,7 @@ on:
   push:
     branches: [codex/home-tv-family]
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: home-design-review
   cancel-in-progress: true
@@ -21,22 +21,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Install locked dependencies
         run: npm ci
-      - name: Extract and commit only approved static artwork on design branch
+      - name: Record existing dependency audit without modifying dependencies
         run: |
-          test "$GITHUB_REF" = "refs/heads/codex/home-tv-family"
-          node scripts/review/extract-home-art.mjs
-          git add -- public/home-art
-          if ! git diff --cached --quiet; then
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Add verified V6 campaign artwork for Home only'
-            git push origin HEAD:refs/heads/codex/home-tv-family
-          fi
+          mkdir -p home-review-evidence
+          npm audit --json > home-review-evidence/dependency-audit.json || true
       - name: Type check and lint
         run: npm run typecheck && npm run lint
       - name: Unit tests
@@ -52,7 +46,6 @@ jobs:
       - name: Install test browser and start isolated servers
         run: |
           npx playwright install --with-deps chromium
-          mkdir -p home-review-evidence
           npm run start -- --hostname 127.0.0.1 --port 3100 > home-review-evidence/server.log 2>&1 &
           (cd /tmp/home-before && npm run start -- --hostname 127.0.0.1 --port 3102) > home-review-evidence/baseline.log 2>&1 &
           for i in $(seq 1 60); do
