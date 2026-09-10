@@ -2821,45 +2821,69 @@
 
 .displayApp[data-paused="true"] *, .displayApp[data-paused="true"] *::before, .displayApp[data-paused="true"] *::after { animation-play-state: paused !important; }
 
-
-/* Reference-board color material pass. */
-.displayApp, .pairingPage {
- --cream: #FFFCF4; --paper: #FFFEFB; --ink: #2D463E; --muted: #556A61;
- --heading-ink: #244665; --warm-ink: #2D463E; --blue: #A7D3F7; --yellow: #FFE083;
- --orange: #FFC7A2; --coral: #FF8BA7; --red: #EF7A96; --lavender: #C9B7F6; --lime: #B7E088; --green: #A8D386; --sky: #A7D3F7;
- --panel: #FFFEFBF2; --panel-edge: #E5DACE; --coral-glow: #FF8BA738; --gold-glow: #FFE0834D;
- background: radial-gradient(ellipse at 16% 2%, #CFE9FD, transparent 53%), radial-gradient(ellipse at 90% 92%, #DDEFBF, transparent 50%), #FFFCF3;
+/* ===== Mother’s Love TV color & visual polish pass =====
+   Color, surface and lighting only. Existing scene geometry, timing, motion and data behavior are preserved. */
+.displayApp {
+  --cream:#FFF9ED;
+  --paper:#fffdf8;
+  --ink:#34463F;
+  --muted:#687567;
+  --blush:#FF8BA7;
+  --peach:#FFC7A2;
+  --yellow:#FFE083;
+  --green:#B7E088;
+  --blue:#A7D3F7;
+  --lavender:#C9B7F6;
+  --coral:#EB876F;
+  --rose:#C75E77;
+  --gold:#E6B83F;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 12%,rgb(167 211 247 / 44%),transparent 31%),
+    radial-gradient(circle at 88% 12%,rgb(201 183 246 / 30%),transparent 32%),
+    radial-gradient(circle at 14% 84%,rgb(183 224 136 / 22%),transparent 31%),
+    radial-gradient(circle at 86% 82%,rgb(255 139 167 / 21%),transparent 32%),
+    linear-gradient(145deg,#fff8e8 0%,#fffdf8 52%,#fff1dc 100%);
 }
-.displayApp[data-screen='garden'] { background: radial-gradient(ellipse at 50% 0%, #B6DFFB, transparent 58%), radial-gradient(ellipse at 9% 82%, #C1E596, transparent 58%), radial-gradient(ellipse at 95% 80%, #FFCEDB, transparent 53%), #F9F6DE; }
-.displayApp[data-screen='featured'], .displayApp[data-screen='spotlight'] { background: radial-gradient(ellipse at 4% 10%, #C6E7F9, transparent 55%), radial-gradient(ellipse at 96% 60%, #FFCDDF, transparent 60%), #FFF5DB; }
-.displayApp[data-screen='cluster'] { background: radial-gradient(ellipse at 25% 30%, #A7CBF5, transparent 60%), radial-gradient(ellipse at 85% 78%, #DEBEF4, transparent 67%), #D4E2FA; }
-.displayApp[data-screen='impact'] { background: radial-gradient(ellipse at 9% 15%, #D2EAFA, transparent 55%), radial-gradient(ellipse at 98% 88%, #D3EBAF, transparent 56%), #FFF7E7; }
-.displayApp[data-screen='all-nine'] { background: radial-gradient(ellipse at 10% 2%, #E4EDFB, transparent 50%), radial-gradient(ellipse at 92% 97%, #FFE8D7, transparent 52%), #FFFCF5; }
-.displayApp[data-screen='everyday-peace'], .displayApp[data-screen='peace-promise'] { background: radial-gradient(ellipse at 48% 0%, #BBE1FC, transparent 70%), radial-gradient(ellipse at 3% 90%, #CAE6A1, transparent 53%), radial-gradient(ellipse at 93% 76%, #FFD3DF, transparent 54%), #FFF5DA; }
-.displayApp[data-screen='one-kind-word'], .displayApp[data-screen='daily-practice'] { background: radial-gradient(ellipse at 20% 25%, #E1CEF8, transparent 54%), radial-gradient(ellipse at 89% 79%, #FFE5AE, transparent 63%), #EAF6F9; }
-.displayApp[data-screen='arrival'] { background: radial-gradient(ellipse at 49% 38%, #FFFBDA 1%, #FFE49A 24%, #FFD1C3 57%, #F5B4CE 100%); }
-.displayApp[data-screen='milestone'] { background: radial-gradient(ellipse at 51% 20%, #FFF2B4, transparent 47%), radial-gradient(ellipse at 92% 70%, #F6BED7, transparent 56%), radial-gradient(ellipse at 2% 79%, #CEE4FB, transparent 55%), #FFE9BD; }
-.displayApp[data-screen='quiet'], .displayApp[data-screen='neutral'] { background: linear-gradient(135deg,#F7F9F2,#FFF9EF); --coral-glow: transparent; --gold-glow: transparent; }
-.atmosphere::before { background: #A7D3F733; }
-.atmosphere::after { background: #FF8BA72E; }
-.displayHeader h1, .displayScreenHeading h2 { color: #244665; }
-.headerTagline, .eyebrow { color: #526455; }
-.displayScreenHeading { border-color: #C4D6D1; }
-.qrDock { background: #FFFEF8F5; border-color: #D9CEAE; box-shadow: 0 10px 35px #44796429; }
-.qrGraphic { background: #FFFEFB; }
-.recognitionCard { background: radial-gradient(circle at 28% 16%,#FFFFFFF7 7%,#FFFEFBF2 39%,#FFFDFBE6 59%,color-mix(in srgb,var(--bubble-accent,#FF8BA7) 33%,#FFFCF2) 100%); border-color: color-mix(in srgb,var(--bubble-accent,#FF8BA7) 78%,white); box-shadow: inset 4px 6px 12px #fffa, inset -5px -8px 16px color-mix(in srgb,var(--bubble-accent,#FF8BA7) 20%,transparent), 0 19px 44px #38586D24, 0 0 24px color-mix(in srgb,var(--bubble-accent,#FF8BA7) 34%,transparent); }
-.recognitionCard::after { background: color-mix(in srgb,var(--bubble-accent,#FF8BA7) 28%,transparent); }
-.recognitionMessage, .fullMessage, .liveRailMessage { color: #2D463E; }
-.expressionPill, .expressionChip { color: #293D44; box-shadow: inset 0 1px 0 #FFFFFF8A; }
-.featureReading { background: #FFFEFBF2; border-color: #DAB6CD; box-shadow: 0 22px 56px #44607F24, 0 0 32px #FF8BA72A; }
-.featureExpression { border-color: #FFE083; box-shadow: 0 16px 32px #66807026, 0 0 24px #FFE08345; }
-.arrivalScreen, .arrivalPersonalScreen { background: radial-gradient(ellipse at 50% 25%,#FFFEF5F5 10%,#FFF8E4F2 60%,#FFE9C6DA); border-color: #F0B4BF; box-shadow: 0 24px 62px #A5416B26, 0 0 45px #FFC65F70; }
-.arrivalGroupScreen { background: linear-gradient(145deg,#FFF4D7F2,#FFF8F4EB,#FFE1EEE6); border-color: #EDABCB; box-shadow: 0 24px 62px #95629729, 0 0 38px #FF8BA760; }
-.milestoneScreen { background: radial-gradient(ellipse at 45% 35%,#FFFEF1,#FFF0C4 68%,#FFD9D2); border-color: #DDB349; }
-.milestoneNumber { color: #947022; text-shadow: 0 3px 0 #FFEA9D, 0 0 22px #F6C84C55; }
-.liveRail { background: #FFFEF9F5; border-color: #CADDD8; box-shadow: 0 14px 30px #39748620; }
-.liveRailItem { background: #FFFFFFEB; border-color: #D9E4E0; }
-.liveIndicator { color: #3F714F; }
-.progressTrack { background: #D5E0D5; }
-.progressTrack > span { background: linear-gradient(90deg,#F78CA9,#F4C253,#A1CC8F); }
-.quietScreen, .fallbackScreen, .startupCard { background: #FFFEF6F2; border-color: #D6DCCB; }
+.displayApp::before { border-color:rgb(255 255 255 / 82%); box-shadow:0 0 100px rgb(167 211 247 / 11%),0 0 80px rgb(255 224 131 / 9%); }
+.atmosphere { opacity:1; }
+.atmosphere::before { background:rgb(167 211 247 / 32%); filter:blur(2px); }
+.atmosphere::after { background:rgb(255 139 167 / 22%); filter:blur(2px); }
+.atmosphereOrbOne { background:var(--blue); box-shadow:0 0 38px rgb(167 211 247 / 34%); opacity:.5; }
+.atmosphereOrbTwo { background:var(--lavender); box-shadow:0 0 34px rgb(201 183 246 / 32%); opacity:.48; }
+.atmosphereOrbThree { background:var(--peach); box-shadow:0 0 34px rgb(255 199 162 / 30%); opacity:.48; }
+.atmosphereSparkle { background:var(--yellow); filter:drop-shadow(0 0 12px rgb(255 224 131 / 66%)); }
+.statusCluster span { background:rgb(255 253 246 / 92%); border:1px solid rgb(91 112 92 / 12%); box-shadow:0 9px 24px rgb(65 72 55 / 10%); }
+.eyebrow { color:#9e5268; }
+.headerTagline,.tagline { color:#65705f; }
+.recognitionCard {
+  border-color:color-mix(in srgb,var(--bubble-accent,#B7E088) 72%,white);
+  background:radial-gradient(circle at 25% 14%,rgb(255 255 255 / 98%) 0 18%,rgb(255 255 255 / 92%) 38%,color-mix(in srgb,var(--bubble-accent,#B7E088) 9%,rgb(255 253 247 / 95%)) 70%,color-mix(in srgb,var(--bubble-accent,#B7E088) 18%,rgb(255 249 237 / 94%)) 100%);
+  box-shadow:inset 5px 7px 13px rgb(255 255 255 / 92%),inset -8px -10px 18px color-mix(in srgb,var(--bubble-accent,#B7E088) 12%,transparent),0 22px 58px rgb(65 55 35 / 14%),0 0 30px color-mix(in srgb,var(--bubble-accent,#B7E088) 28%,transparent);
+}
+.recognitionCard::after { background:color-mix(in srgb,var(--bubble-accent,#B7E088) 48%,white); opacity:.28; }
+.bubbleTrail { opacity:.42; background:radial-gradient(circle,color-mix(in srgb,var(--bubble-accent,#B7E088) 78%,white) 0%,transparent 68%); }
+.expressionPill { border-color:color-mix(in srgb,currentColor 10%,rgb(72 78 62 / 12%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 55%); }
+.featureExpression,.clusterCore { background-image:radial-gradient(circle at 24% 15%,rgb(255 255 255 / 34%),transparent 28%),linear-gradient(145deg,color-mix(in srgb,currentColor 5%,transparent),transparent); }
+.featureReading,.liveRail,.fallbackScreen,.quietScreen,.startupCard { background:linear-gradient(145deg,rgb(255 255 252 / 94%),rgb(255 248 235 / 91%)); border-color:rgb(255 255 255 / 88%); backdrop-filter:blur(7px) saturate(1.08); }
+.liveRail { box-shadow:0 18px 52px rgb(84 65 57 / 13%),0 0 32px rgb(167 211 247 / 13%); }
+.qrDock { background:linear-gradient(145deg,rgb(255 255 252 / 96%),rgb(255 247 233 / 94%)); border-color:rgb(255 255 255 / 88%); box-shadow:0 17px 40px rgb(83 67 51 / 14%),0 0 24px rgb(255 224 131 / 14%); }
+.progressTrack span { background:linear-gradient(90deg,#C75E77,#EB876F,#FFE083); box-shadow:0 0 16px rgb(255 139 167 / 52%); }
+.arrivalOrb { box-shadow:0 18px 46px rgb(199 94 119 / 24%),0 0 0 12px rgb(255 139 167 / 20%),0 0 50px rgb(255 224 131 / 36%); filter:saturate(1.08); }
+.milestoneScreen { background:radial-gradient(circle at 50% 28%,rgb(255 224 131 / 46%),transparent 32%),radial-gradient(circle at 80% 40%,rgb(255 139 167 / 23%),transparent 27%),linear-gradient(145deg,rgb(255 248 216 / 97%),rgb(255 253 246 / 90%)); box-shadow:0 0 70px rgb(230 184 63 / 16%); }
+.milestoneScreen p.milestoneNumber { color:#b98520; text-shadow:0 6px 28px rgb(230 184 63 / 27%),0 0 34px rgb(255 224 131 / 36%); }
+/* Scene-specific atmosphere: same family, deliberately different intensity. */
+.displayApp[data-screen='garden'] { background:radial-gradient(circle at 50% -8%,rgb(167 211 247 / 68%),transparent 42%),radial-gradient(circle at 6% 74%,rgb(183 224 136 / 42%),transparent 34%),radial-gradient(circle at 91% 72%,rgb(255 139 167 / 30%),transparent 31%),radial-gradient(circle at 34% 89%,rgb(255 224 131 / 28%),transparent 33%),linear-gradient(180deg,#eff8fd 0%,#fff9ea 55%,#f3f6df 100%); }
+.displayApp[data-screen='featured'] { background:radial-gradient(circle at 8% 26%,rgb(255 199 162 / 35%),transparent 30%),radial-gradient(circle at 80% 5%,rgb(167 211 247 / 54%),transparent 38%),radial-gradient(circle at 90% 78%,rgb(201 183 246 / 28%),transparent 32%),linear-gradient(145deg,#fff7e8,#fffdf8 56%,#f1ecfb); }
+.displayApp[data-screen='arrival'] { background:radial-gradient(circle at 52% 30%,rgb(255 255 255 / 80%) 0 7%,rgb(255 224 131 / 48%) 19%,rgb(255 139 167 / 38%) 39%,transparent 62%),radial-gradient(circle at 20% 78%,rgb(255 199 162 / 42%),transparent 34%),linear-gradient(145deg,#fff1e7,#fff8d9 56%,#ffeaf1); }
+.displayApp[data-screen='impact'] { background:radial-gradient(circle at 12% 10%,rgb(167 211 247 / 44%),transparent 28%),radial-gradient(circle at 84% 15%,rgb(255 139 167 / 23%),transparent 29%),radial-gradient(circle at 84% 86%,rgb(183 224 136 / 20%),transparent 29%),linear-gradient(145deg,#fffaf0,#fffdf9 58%,#f2f7ec); }
+.displayApp[data-screen='all-nine'] { background:radial-gradient(circle at 10% 15%,rgb(255 199 162 / 22%),transparent 27%),radial-gradient(circle at 88% 16%,rgb(167 211 247 / 25%),transparent 29%),radial-gradient(circle at 12% 84%,rgb(183 224 136 / 16%),transparent 29%),radial-gradient(circle at 86% 84%,rgb(201 183 246 / 18%),transparent 29%),linear-gradient(145deg,#fffaf1,#fffdf9 62%,#f8f4ff); }
+.displayApp[data-screen='cluster'] { background:radial-gradient(circle at 50% 45%,rgb(201 183 246 / 32%),transparent 24%),radial-gradient(circle at 12% 20%,rgb(167 211 247 / 50%),transparent 31%),radial-gradient(circle at 88% 78%,rgb(255 139 167 / 27%),transparent 31%),linear-gradient(150deg,#eef6ff,#fff8ee 52%,#f1eafd); }
+.displayApp[data-screen='spotlight'] { background:radial-gradient(circle at 78% 14%,rgb(255 224 131 / 32%),transparent 29%),radial-gradient(circle at 12% 82%,rgb(183 224 136 / 23%),transparent 30%),radial-gradient(circle at 12% 10%,rgb(167 211 247 / 30%),transparent 28%),linear-gradient(145deg,#fff9ed,#fffdf8 55%,#f1f6e8); }
+.displayApp[data-screen='daily-practice'] { background:radial-gradient(circle at 12% 15%,rgb(255 224 131 / 35%),transparent 30%),radial-gradient(circle at 88% 15%,rgb(167 211 247 / 30%),transparent 30%),radial-gradient(circle at 83% 82%,rgb(183 224 136 / 24%),transparent 30%),linear-gradient(145deg,#fff9e8,#fffdf8 55%,#f3f8e9); }
+.displayApp[data-screen='one-kind-word'] { background:radial-gradient(circle at 50% 45%,rgb(255 139 167 / 23%),transparent 28%),radial-gradient(circle at 12% 12%,rgb(167 211 247 / 34%),transparent 28%),radial-gradient(circle at 88% 82%,rgb(201 183 246 / 23%),transparent 29%),linear-gradient(145deg,#fff8ec,#fffdf8 56%,#f4edfb); }
+.displayApp[data-screen='everyday-peace'] { background:radial-gradient(circle at 50% -6%,rgb(167 211 247 / 58%),transparent 42%),radial-gradient(circle at 9% 86%,rgb(183 224 136 / 35%),transparent 33%),radial-gradient(circle at 91% 79%,rgb(255 139 167 / 22%),transparent 31%),linear-gradient(180deg,#eef8ff,#fff9ec 60%,#f0f5df); }
+.displayApp[data-screen='peace-promise'] { background:radial-gradient(circle at 50% 35%,rgb(255 139 167 / 32%),transparent 29%),radial-gradient(circle at 76% 20%,rgb(255 224 131 / 30%),transparent 28%),radial-gradient(circle at 12% 80%,rgb(183 224 136 / 18%),transparent 28%),linear-gradient(145deg,#fff3eb,#fffdf8 56%,#fff1da); }
+.displayApp[data-screen='milestone'] { background:radial-gradient(circle at 50% 24%,rgb(255 255 255 / 74%) 0 7%,rgb(255 224 131 / 50%) 21%,transparent 46%),radial-gradient(circle at 20% 76%,rgb(255 139 167 / 36%),transparent 33%),radial-gradient(circle at 82% 77%,rgb(167 211 247 / 22%),transparent 31%),linear-gradient(145deg,#fff0db,#fff8d9 54%,#ffe8ef); }
+.displayApp[data-screen='quiet'],.displayApp[data-screen='fallback'],.displayApp[data-screen='neutral'] { background:radial-gradient(circle at 12% 12%,rgb(167 211 247 / 24%),transparent 29%),radial-gradient(circle at 87% 82%,rgb(183 224 136 / 18%),transparent 29%),linear-gradient(145deg,#fffaf0,#fffdf9 58%,#f3f7ec); }
+

@@ -1620,21 +1620,19 @@
 .heartReveal { border-radius: 32px; }
 .heartRibbonStage { width: min(100%, 26vh); }
 
+/* Mother’s Love analytics/showcase color polish. Structure and story timing are unchanged. */
+.insights { --insight-ink:#34463F; --insight-muted:#687567; --insight-paper:rgb(255 253 246 / 93%); --insight-shadow:0 25px 72px rgb(65 55 35 / 14%),0 0 34px rgb(167 211 247 / 11%); }
+.screen { background:radial-gradient(circle at 10% 8%,rgb(167 211 247 / 34%),transparent 29%),radial-gradient(circle at 85% 12%,rgb(255 224 131 / 32%),transparent 28%),radial-gradient(circle at 90% 86%,rgb(255 139 167 / 18%),transparent 29%),radial-gradient(circle at 10% 88%,rgb(183 224 136 / 17%),transparent 29%),linear-gradient(135deg,rgb(255 249 234 / 94%),rgb(255 253 248 / 96%)); }
+.impactScreen { --insight-title-glow:rgb(255 139 167 / 50%); --insight-title-sparkle:#FFE083; }
+.expressionsScreen { --insight-title-glow:rgb(167 211 247 / 48%); --insight-title-sparkle:#E6B83F; }
+.sharedScreen { --insight-title-glow:rgb(201 183 246 / 50%); --insight-title-sparkle:#FF8BA7; }
+.impactTotal { background:linear-gradient(145deg,rgb(255 255 252 / 94%),rgb(255 247 231 / 90%)); border-color:rgb(199 94 119 / 16%); box-shadow:0 15px 34px -24px rgb(96 69 62 / 48%); }
+.impactTotalNumber { color:#C75E77; text-shadow:0 0 26px rgb(255 139 167 / 22%); }
+.ribbon { box-shadow:inset 0 1px 0 rgb(255 255 255 / 58%),0 7px 15px -11px color-mix(in srgb,var(--ribbon-color) 42%,transparent); filter:saturate(1.06); }
+.flowerCard { background:radial-gradient(circle at 24% 13%,rgb(255 255 255 / 96%),color-mix(in srgb,var(--flower-color) 11%,rgb(255 251 241 / 94%)) 70%,color-mix(in srgb,var(--flower-color) 22%,rgb(255 247 231 / 93%))); border-color:color-mix(in srgb,var(--flower-color) 44%,white); box-shadow:0 14px 34px -22px color-mix(in srgb,var(--flower-color) 48%,rgb(78 64 51 / 30%)),0 0 18px color-mix(in srgb,var(--flower-color) 18%,transparent); }
+.radialPetal { filter:saturate(1.08); box-shadow:0 12px 30px -20px color-mix(in srgb,var(--petal-color) 42%,transparent),inset 0 1px 0 rgb(255 255 255 / 55%); }
+.flowerCenter { background:radial-gradient(circle at 34% 28%,#fff8cb,#FFE083 52%,#e6b83f); box-shadow:0 0 35px rgb(255 224 131 / 35%),inset 0 1px 0 rgb(255 255 255 / 55%); }
+.connectedBubble { background:radial-gradient(circle at 25% 14%,rgb(255 255 255 / 98%) 0 20%,rgb(255 255 255 / 90%) 42%,color-mix(in srgb,var(--connected-color) 12%,rgb(255 253 247 / 94%)) 74%,color-mix(in srgb,var(--connected-color) 22%,rgb(255 248 235 / 93%))); border-color:color-mix(in srgb,var(--connected-color) 68%,white); box-shadow:0 20px 50px -24px rgb(68 57 44 / 42%),0 0 27px color-mix(in srgb,var(--connected-color) 30%,transparent); }
+.heartReveal { background:radial-gradient(circle at 50% 44%,rgb(255 139 167 / 28%),transparent 31%),radial-gradient(circle at 52% 48%,rgb(255 224 131 / 20%),transparent 49%); }
+.heartCenterGlow { filter:drop-shadow(0 0 18px color-mix(in srgb,var(--heart-color) 54%,transparent)); }
 
-/* Reference-board color material pass. */
-.insights { --insight-ink: #2D463E; --insight-muted: #586B5E; --insight-paper: #FFFEFBF5; --insight-shadow: 0 24px 70px #41668524; }
-.screen { background: radial-gradient(ellipse at 5% 2%,#CBE5FA85,transparent 46%), radial-gradient(ellipse at 90% 89%,#D6EBAD6B,transparent 50%), #FFFCF2CE; }
-.impactScreen { --insight-title-glow: #FF8BA76B; --insight-title-sparkle: #FFF2AB; background: radial-gradient(ellipse at 9% 7%,#C9E6FA99,transparent 50%),radial-gradient(ellipse at 89% 83%,#FFE9A280,transparent 56%),#FFFCF4DC; }
-.impactTotalNumber { color: #B5305C; text-shadow: 0 10px 0 #FF9BB326; }
-.impactTotalLabel { color: #354D43; }
-.ribbon { background: linear-gradient(110deg,color-mix(in srgb,var(--ribbon-color) 32%,#FFFEFB),#FFFEFB 72%); border-color: color-mix(in srgb,var(--ribbon-color) 64%,white); box-shadow: 0 10px 24px #51728D19; }
-.ribbonNumber { background: color-mix(in srgb,var(--ribbon-color) 65%,white); color: #263F46; }
-.ribbonCount { color: #294645; }
-.expressionsScreen { background: radial-gradient(ellipse at 9% 90%,#DEECCA66,transparent 48%),radial-gradient(ellipse at 93% 8%,#D6E8FC77,transparent 51%),#FFFCF5E8; }
-.flowerCard { background: linear-gradient(145deg,color-mix(in srgb,var(--flower-color) 25%,#FFFEFA),#FFFEFB 56%); border-color: color-mix(in srgb,var(--flower-color) 62%,white); box-shadow: 0 12px 30px #315E8024,inset 0 1px 0 #fff; }
-.flowerNumber { background: color-mix(in srgb,var(--flower-color) 62%,white); color: #29414A; }
-.flowerPhrase, .flowerPrinciple { color: #31493F; }
-.sharedScreen { --insight-title-glow: #B9A4F080; background: radial-gradient(ellipse at 26% 24%,#A7D3F77A,transparent 50%),radial-gradient(ellipse at 84% 72%,#D4ADF080,transparent 56%),#F1F5F9B3; }
-.connectedBubble { background: radial-gradient(circle at 28% 15%,#FFFFFFF7 7%,#FFFEFBED 58%,color-mix(in srgb,var(--connected-color) 35%,#FFFCF4)); border-color: color-mix(in srgb,var(--connected-color) 72%,white); box-shadow: 0 18px 40px #526B962B,0 0 20px color-mix(in srgb,var(--connected-color) 34%,transparent),inset 3px 5px 10px #fff9; }
-.heartBubble { background: radial-gradient(circle at 30% 20%,#FFFEFA,#FFE2EF 64%,#D6C1F2); border-color: #EFA3C7; }
-.heartPrinciple, .heartLabel { color: #4C4161; }

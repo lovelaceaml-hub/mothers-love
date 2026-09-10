@@ -13,8 +13,11 @@
   :global(body):has(:global([data-home-experience]) .field) { min-height: 0; height: 100svh; height: 100dvh; overflow: hidden; }
 }
 
+/* Mother’s Love color polish: preserve the existing independent paths, strengthen glass and rim color. */
+.orb {
+  border-color: rgb(255 255 255 / 95%);
+  background: radial-gradient(circle at 24% 13%, #fff 0 17%, rgb(255 255 255 / 91%) 33%, color-mix(in srgb,var(--color) 15%,#fffdf7) 67%, color-mix(in srgb,var(--color) 44%,#fff5e7) 100%);
+  box-shadow: inset 2px 3px 5px #fff, inset -3px -4px 7px color-mix(in srgb,var(--color) 20%,transparent), 0 6px 13px -7px rgb(70 75 58 / 56%), 0 0 13px color-mix(in srgb,var(--color) 40%,transparent);
+}
+.orb::after { border-color: color-mix(in srgb,var(--color) 58%,transparent); border-left-color: transparent; border-bottom-color: rgb(255 255 255 / 84%); box-shadow: 0 0 8px color-mix(in srgb,var(--color) 24%,transparent); }
 
-/* Reference-board color material pass. */
-.orb { background: radial-gradient(circle at 26% 18%, #FFFFFFF7 5%, #FFFFFFCE 34%, color-mix(in srgb, var(--color) 40%, #FFFEFA) 100%); border-color: color-mix(in srgb, var(--color) 60%, white); box-shadow: inset 2px 3px 4px #fffd, inset -3px -4px 6px color-mix(in srgb, var(--color) 24%, transparent), 0 5px 12px -7px #3B587777, 0 0 10px color-mix(in srgb, var(--color) 34%, transparent); }
-.orb::after { border-top-color: var(--color); border-right-color: color-mix(in srgb, var(--color) 75%, transparent); }
-.orb:nth-child(9) { background: radial-gradient(circle at 25% 15%, #fff, #E8DBF8 50%, #FFC6B1); }
