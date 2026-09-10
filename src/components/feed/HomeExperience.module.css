@@ -40,9 +40,13 @@
 .titleAccent { color: var(--home-rose); }
 .tagline { max-width: 24rem; margin: 1rem 0 1.4rem; color: var(--home-muted); font-family: Georgia, 'Times New Roman', serif; font-size: 1.23rem; line-height: 1.55; font-style: italic; }
 .primaryAction, .secondaryAction { display: inline-flex; align-items: center; justify-content: center; gap: 1.3rem; min-height: 3.25rem; padding: .85rem 1.3rem; border-radius: 1rem; font: 600 1rem/1.35 Arial, Helvetica, sans-serif; text-decoration: none; cursor: pointer; }
-.primaryAction { border: 1px solid #a6435d; background: linear-gradient(135deg, #ba5b72, #a94360); color: #fff; box-shadow: inset 0 1px 0 #ffffff3d, 0 9px 22px -12px #99415d77; transition: box-shadow .2s, background .2s; }
+.primaryAction { position: relative; isolation: isolate; overflow: hidden; border: 1px solid #a6435d; background: linear-gradient(135deg, #ba5b72, #a94360); color: #3e2c32; box-shadow: inset 0 1px 0 #ffffff3d, 0 9px 22px -12px #99415d77; transition: box-shadow .2s, background .2s; }
 .primaryAction:hover { background: #a3445f; box-shadow: inset 0 1px 0 #ffffff3d, 0 10px 24px -10px #99415d88; }
 .primaryAction:active { box-shadow: inset 0 2px 5px #5a243840; }
+.primaryAction::before, .primaryAction::after { position: absolute; content: ''; pointer-events: none; }
+.primaryAction::before { inset: 0; z-index: -1; background: radial-gradient(circle at 18% 15%, rgba(255, 255, 255, .7), transparent 42%); opacity: .7; }
+.primaryAction::after { top: -30%; bottom: -30%; left: -30%; z-index: -1; width: 24%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent); opacity: .7; transform: translateX(-180%) skewX(-20deg); animation: primaryShimmer 6s ease-in-out infinite; }
+.primaryAction > * { position: relative; z-index: 1; }
 .secondaryAction { color: var(--home-ink); background: #fffdf5; border: 1px solid #9caa9f; margin-top: 1.2rem; }
 .secondaryAction:hover { background: #f1f2e5; }
 .welcomeArt { position: relative; min-width: 0; height: 17.4rem; pointer-events: none; }
@@ -122,6 +126,7 @@
 @keyframes lightDrift { from { opacity: .55; } to { opacity: 1; } }
 @keyframes cardReveal { from { opacity: .55; } to { opacity: 1; } }
 @keyframes dotGlow { from { opacity: .45; } to { opacity: 1; } }
+@keyframes primaryShimmer { 0%, 20%, 100% { transform: translateX(-180%) skewX(-20deg); } 55% { transform: translateX(560%) skewX(-20deg); } }
 @media (max-width: 1050px) {
   .contentLayout { grid-template-columns: minmax(0,1fr) 13rem; gap: 1rem; }
   .guidePanel { padding: 1.4rem 1rem; }
@@ -203,7 +208,7 @@
 .page[data-motion-paused='true'] .feedCard { animation: none !important; opacity: 1; }
 
 /* Phone is a stationary app shell. Only the recognition pane scrolls. */
-.mobileExpressions, .mobileShareDock { display: none; }
+.mobileExpressions { display: none; }
 @media (max-width: 560px) {
   .page { height: 100svh; height: 100dvh; min-height: 0; overflow: hidden; padding: env(safe-area-inset-top, 0px) 12px max(6px, env(safe-area-inset-bottom, 0px)); }
   .shell { height: 100%; display: flex; flex-direction: column; min-height: 0; }
@@ -220,7 +225,7 @@
   .welcome h1 > span { display: inline; }
   .welcome h1 > span:first-child::after { content: ' '; }
   .tagline { font-size: .8rem; line-height: 1.4; margin: 5px 0 0; max-width: none; }
-  .welcomeCopy > .primaryAction { display: none; }
+  .welcomeCopy > .primaryAction { margin: 12px 0 6px; }
   .mobileExpressions { display: block; height: 52px; }
   .contentLayout { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; gap: 0; }
   .feedSection { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; }
@@ -248,8 +253,6 @@
   .guidePanel { display: flex; flex: 0 0 auto; justify-content: space-between; align-items: center; margin: 0; padding: 0 4px; gap: 7px; border: 0; border-radius: 0; box-shadow: none; background: none; }
   .guidePanel > .eyebrow, .guidePanel h2, .expressionGarden, .guideDivider, .quietLink { display: none; }
   .guideLink { width: 100%; min-height: 34px; font-size: .74rem; font-weight: 500; }
-  .mobileShareDock { display: block; flex: 0 0 auto; padding-top: 3px; }
-  .mobileShareDock .primaryAction { min-height: 52px; padding-inline: 18px; font-size: 1rem; border-radius: 14px; background: linear-gradient(115deg, #bf5b76, #a94563); box-shadow: inset 0 1px 0 #ffffff40, 0 7px 15px -10px #84304c80; }
   .footer { margin: 4px 0 0; padding: 0; border: 0; flex: 0 0 auto; }
   .footer > p { display: none; }
   .utilityLinks { justify-content: space-between; width: 100%; gap: 4px; }
@@ -266,7 +269,7 @@
   .mobileExpressions { height: 36px; }
   .sectionHeader { min-height: 33px; padding-bottom: 5px; }
   .guidePanel { display: none; }
-  .mobileShareDock .primaryAction { min-height: 44px; }
+  .primaryAction { min-height: 44px; }
 }
 
 
@@ -284,8 +287,8 @@
 .heroMedallionOne::after, .heroMedallionTwo::after, .heroMedallionThree::after { border-top-color: var(--expression-color); border-left-color: var(--expression-color); }
 .decorativeBubble { background: radial-gradient(circle at 28% 20%, #fff, #FFDDE5 60%, #FFABC0); box-shadow: 0 5px 9px -6px #C6598275; }
 .bubbleTwo { background: radial-gradient(circle at 28% 20%, #fff, #FFF0B8 60%, #FFD05F); }
-.primaryAction, .mobileShareDock .primaryAction { background: var(--ml-action); border-color: #AC3158; box-shadow: inset 0 1px 0 #ffffff70, 0 8px 20px -10px #BB396F70; }
-.primaryAction:hover, .mobileShareDock .primaryAction:hover { background: linear-gradient(120deg, #A72D52, #913753); }
+.primaryAction { background: linear-gradient(120deg, var(--ml-blush), var(--ml-peach) 55%, var(--ml-sunshine)); border-color: #E2A24A; box-shadow: inset 0 1px 0 #ffffffb3, 0 10px 26px -12px #BB396F70, 0 0 28px rgba(255, 196, 110, .55); }
+.primaryAction:hover { background: linear-gradient(120deg, #FF9FB6, #FFD2AA 55%, #FFE799); }
 .secondaryAction { color: #365B4A; background: #F3F8EA; border-color: #97BCA2; }
 .feedCard { background: linear-gradient(120deg, #FFFEFB, #FFFEFB 87%, #FFF4E8); border-color: #CADDD5; box-shadow: 0 8px 20px -15px #416D8060, inset 0 1px 0 #fff; }
 .message { color: #354C42; }
