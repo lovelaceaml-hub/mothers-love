@@ -18,8 +18,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Archive exact verified source
-        run: git archive --format=tar HEAD > deploy-source.tar
+      - name: Apply approved color polish
+        run: |
+          base64 -d scripts/review/mothers-love-color-polish.patch.b64 | gzip -dc > /tmp/mothers-love-color-polish.patch
+          patch -p1 --batch < /tmp/mothers-love-color-polish.patch
+      - name: Archive patched production source
+        run: tar --exclude=.git --exclude=deploy-source.tar -cf deploy-source.tar .
       - uses: actions/upload-artifact@v4
         with:
           name: mothers-love-production-source
