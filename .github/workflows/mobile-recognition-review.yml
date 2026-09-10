@@ -1,0 +1,30 @@
+name: Mobile Home and recognition review (no deployment)
+on:
+  push:
+    branches: [codex/home-tv-family]
+    paths:
+      - .github/workflows/mobile-recognition-review.yml
+      - src/components/feed/**
+      - src/components/submission/**
+      - src/components/campaign/**
+      - tests/mobile-recognition/**
+permissions:
+  contents: read
+concurrency:
+  group: mobile-recognition-review
+  cancel-in-progress: true
+jobs:
+  source-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Package exact review source without credentials or live data
+        run: git archive --format=tar HEAD > review-source.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-recognition-source
+          path: review-source.tar
+          retention-days: 1
