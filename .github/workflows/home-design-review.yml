@@ -1,0 +1,55 @@
+name: Home design review (no deployment)
+on:
+  push:
+    branches: [codex/home-tv-family]
+permissions:
+  contents: read
+concurrency:
+  group: home-design-review
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      npm_config_cache: /tmp/npm-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Build application without production credentials
+        run: npm run build
+      - name: Install test browser
+        run: npx playwright install --with-deps chromium
+      - name: Home, reaction and isolated design checks
+        if: hashFiles('tests/feed/home-design.spec.ts') != ''
+        run: npx playwright test tests/feed --workers=2
+      - name: Package source and local runtime for isolated browser review
+        if: success()
+        run: |
+          mkdir -p /tmp/home-review
+          git archive HEAD | tar -x -C /tmp/home-review
+          cp -a .next node_modules /tmp/home-review/
+          rm -f /tmp/home-review/.env /tmp/home-review/.env.local
+          tar -czf /tmp/home-review-workspace.tgz -C /tmp/home-review .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: home-design-review
+          retention-days: 1
+          path: |
+            /tmp/home-review-workspace.tgz
+            test-results/
+            playwright-report/
+            home-review-evidence/
