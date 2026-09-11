@@ -286,3 +286,130 @@ test('display falls back to the legacy renderer when color-polish stays unavaila
   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
 });
+
+async function findRendererFrame(page: Page) {
+  await expect.poll(() => page.frames().some(f => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+  const frame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
+  if (!frame) throw new Error('color-polish renderer frame not found');
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
+  return frame;
+}
+
+test('scene countdown ring counts down and resets on manual advance', async ({ page }) => {
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  const fixture = buildActiveDisplayFixture();
+  await page.route('**/api/display/color-polish**', route => fulfillJson(route, fixture));
+  await page.goto('/display');
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+
+  const tvFrame = await findRendererFrame(page);
+  const countdown = tvFrame.locator('#scene-countdown');
+  await expect(countdown).toBeVisible();
+
+  const readCountdown = async () => {
+    const state = await tvFrame.evaluate(() => (window as any).colorPolishRuntime.getState());
+    const number = await tvFrame.locator('#scene-countdown-number').textContent();
+    return { scene: state.scene as number, dwell: state.visual.dwell[state.scene] as number, number: Number(number) };
+  };
+
+  const before = await readCountdown();
+  expect(Number.isFinite(before.number)).toBe(true);
+  expect(before.number).toBeLessThanOrEqual(before.dwell);
+  expect(before.number).toBeGreaterThanOrEqual(0);
+
+  const viewport = page.viewportSize() ?? { width: 1280, height: 720 };
+  await page.mouse.click(viewport.width / 2, viewport.height / 2);
+  await tvFrame.waitForFunction(
+    (previousScene) => (window as any).colorPolishRuntime.getState().scene !== previousScene,
+    before.scene,
+    { timeout: 3000 },
+  );
+
+  const after = await readCountdown();
+  expect(after.scene).not.toBe(before.scene);
+  expect(after.number).toBe(after.dwell);
+});
+
+test('stays visually stable through brief connecting glitches', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  const fixture = buildActiveDisplayFixture();
+  let requestCount = 0;
+  await page.route('**/api/display/color-polish**', async (route) => {
+    requestCount += 1;
+    const count = requestCount;
+    // Every third poll fails outright, and one healthy poll answers slowly
+    // (well past the old 5 s timeout, comfortably inside the new one).
+    if (count % 3 === 0) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'unavailable' }) });
+      return;
+    }
+    if (count === 2) await new Promise((resolve) => setTimeout(resolve, 7_000));
+    await fulfillJson(route, fixture);
+  });
+  await page.goto('/display');
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    const target = document.querySelector('[data-testid="color-polish-display"] iframe');
+    if (target instanceof HTMLElement) target.dataset.stableMountStamp = 'stable-mount';
+    const history: string[] = [];
+    (window as any).__phaseHistory = history;
+    const record = (el: Element | null) => {
+      const phase = el?.getAttribute('data-display-phase');
+      if (phase) history.push(phase);
+    };
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'attributes') {
+          record(mutation.target as Element);
+        } else {
+          mutation.addedNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+            record(node);
+            node.querySelectorAll('[data-display-phase]').forEach((nested) => record(nested));
+          });
+        }
+      }
+    });
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-display-phase'], childList: true });
+  });
+
+  // Cover several poll cycles: the slow-but-healthy read and at least one 503.
+  await page.waitForTimeout(22_000);
+
+  const phaseHistory = await page.evaluate(() => (window as any).__phaseHistory as string[]);
+  expect(phaseHistory.filter((phase) => phase === 'unavailable' || phase === 'checking')).toEqual([]);
+  await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+  await expect(page.getByText('The display is connecting.')).toHaveCount(0);
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+
+  const mountStable = await page.evaluate(() =>
+    document.querySelector('[data-testid="color-polish-display"] iframe') instanceof HTMLElement &&
+    (document.querySelector('[data-testid="color-polish-display"] iframe') as HTMLElement).dataset.stableMountStamp === 'stable-mount');
+  expect(mountStable).toBe(true);
+
+  const tvFrame = await findRendererFrame(page);
+  const scene = await tvFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+  expect(typeof scene).toBe('number');
+});
+
+test('falls back after the color-polish API stays down for more than 60 seconds', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  const fixture = buildActiveDisplayFixture();
+  let outage = false;
+  await page.route('**/api/display/color-polish**', route => {
+    if (outage) return route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'unavailable' }) });
+    return fulfillJson(route, fixture);
+  });
+  await page.goto('/display');
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+
+  outage = true;
+  // The 60 s stale rule only fires once no poll has verified in that long;
+  // wait comfortably past it for the existing fallback behavior to run.
+  await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+  await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+  await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+});

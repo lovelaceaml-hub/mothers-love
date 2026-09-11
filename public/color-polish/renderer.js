@@ -271,6 +271,7 @@ function postRender(){
  if(S.s===10)tickOrbit(0);
  if(S.s===11)tickTributes(0);
  updateNotes();
+ updateSceneCountdown();
 }
 function checkFullFits(){slots.forEach(b=>{const r=S.pool.find(x=>x.id===b.id);if(!r||!b.el)return;b.reading=fitCircle(b.el,r,b.d,V.clock);b.el.dataset.long=String(!smallFits(r))})}
 function fullReader(r,w,h){return completeOrb(r,Math.min(w,h))}
@@ -503,6 +504,35 @@ function clearPresentation(){
  const atmosphere=$('atmosphere');const context=atmosphere?.getContext?.('2d');context?.clearRect(0,0,atmosphere.width,atmosphere.height);
  const qr=$('qr');if(qr)qr.removeAttribute('src');$('qr-zone')?.classList.remove('qr-active');$('stage')?.classList.remove('dimmed');
  S.pool=[];S.queue=[];S.seen=new Set();S.arrivalIds=new Set();S.lastShown=new Map();S.milestoneContributors=[];S.pendingScene=null;S.chain=false;
+ const countdown=$('scene-countdown');if(countdown)countdown.hidden=true;
+}
+
+const SCENE_COUNTDOWN_RADIUS=16;
+const SCENE_COUNTDOWN_CIRCUMFERENCE=2*Math.PI*SCENE_COUNTDOWN_RADIUS;
+function sceneCountdownDwell(){return S.dwell?.[S.s]??DWELL[S.s]??30}
+function sceneCountdownHidden(){
+ // Explicit stillness (owner-selected still motion, or a forced pause such as
+ // the Studio Pause button) hides the ring outright. A viewer's own reduced
+ // motion preference does not hide it, it only changes how often it redraws
+ // below, per the discreet-not-hidden requirement.
+ const explicitlyStill=S.motion==='still'||S.playing===false;
+ // Studio (and the renderer probe) always pass an explicit control.scene, so
+ // sceneControlled is true there by design and the ring still shows while
+ // that sample preview is playing. Only a scene forced away from the normal
+ // playlist on a non-sample source would hide it, which live TV never does.
+ const forcedElsewhere=S.sceneControlled&&S.source!=='sample';
+ return S.mode!=='normal'||S.pauseRotation||explicitlyStill||forcedElsewhere||!!active||!!transition;
+}
+function updateSceneCountdown(){
+ const el=$('scene-countdown');if(!el)return;
+ if(sceneCountdownHidden()){el.hidden=true;return}
+ const dwell=Math.max(1,sceneCountdownDwell());
+ const rawAge=clamp(S.sceneAge,0,dwell);
+ const age=reducedMotionPreferred?Math.min(dwell,Math.floor(rawAge)):rawAge;
+ el.hidden=false;
+ const fill=$('scene-countdown-fill');
+ if(fill){fill.style.strokeDasharray=String(SCENE_COUNTDOWN_CIRCUMFERENCE);fill.style.strokeDashoffset=(SCENE_COUNTDOWN_CIRCUMFERENCE*(age/dwell)).toFixed(2)}
+ const number=$('scene-countdown-number');if(number)number.textContent=String(Math.max(0,Math.ceil(dwell-age)));
 }
 
 function mandatoryPrune(){
@@ -536,11 +566,13 @@ function coordinator(dt){
  if(!S.still&&!active&&!transition&&heartRenderer&&heartRenderer.canvas.isConnected)heartRenderer.draw(V.clock*.55+6);
  if(Math.floor(S.t/30)!==S.lastHeader)updateHeader();
  if(S.shimmerUntil&&S.t>S.shimmerUntil){$('tv')?.classList.remove('force-shimmer');S.shimmerUntil=0}
+ updateSceneCountdown();
 }
 function updateNotes(){}
 function applyStill(){
  $('tv')?.classList.toggle('still',S.still);
  if(S.still){particles=[];numCache.forEach(c=>c.value=c.target);if(active?.phase==='entrance')active.entrance=0}
+ updateSceneCountdown();
 }
 function size(){const f=$('frame').getBoundingClientRect(),scale=Math.min(f.width/1920,f.height/1080);$('tv').style.transform=`scale(${scale})`;$('tv').style.left=(f.width-1920*scale)/2+'px';$('tv').style.top=(f.height-1080*scale)/2+'px'}
 let drawAccum=0;function frame(t){

@@ -30,6 +30,13 @@
       <div class="queue-dock" id="queue" hidden role="status"></div>
       <section class="stage" id="stage" aria-label="Current TV scene"></section>
       <section class="event-stage" id="event" aria-label="Recognition arrival"></section>
+      <div class="scene-countdown" id="scene-countdown" hidden aria-hidden="true">
+        <svg class="scene-countdown-ring" viewBox="0 0 36 36" aria-hidden="true">
+          <circle class="scene-countdown-track" cx="18" cy="18" r="16"></circle>
+          <circle class="scene-countdown-fill" id="scene-countdown-fill" cx="18" cy="18" r="16"></circle>
+        </svg>
+        <span class="scene-countdown-number" id="scene-countdown-number"></span>
+      </div>
       <footer class="footer">
         <div class="qr-zone" id="qr-zone">
           <div class="qr-halo"></div>

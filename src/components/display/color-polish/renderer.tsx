@@ -265,7 +265,11 @@ export function ColorPolishRenderer({
   const bootstrapCleanupRef = useRef<{ listener: (event: MessageEvent) => void; timeoutId: number } | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const safeMode = status !== 'ready' || snapshot === null;
-  const frameKey = `${source}:${safeMode ? 'safe' : 'active'}`;
+  // Keyed on source only: a status change (ready to unavailable and back) is
+  // carried to the child through the postMessage control below, never by
+  // remounting the iframe. Remounting would drop the bootstrap handshake and
+  // force a fresh blank state, which is exactly the flash this avoids.
+  const frameKey = source;
   const bridgedSnapshot = useMemo(() => bridgeSnapshot(snapshot), [snapshot]);
 
   useEffect(() => {

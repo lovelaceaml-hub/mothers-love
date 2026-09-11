@@ -9,7 +9,11 @@ import { validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
 
 const POLL_MS = 5_000;
-const REQUEST_TIMEOUT_MS = 5_000;
+// Sits above POLL_MS so a healthy but slow read can still finish before it is
+// treated as a failure. A poll that is already in flight is never aborted by
+// the next scheduled tick (see the load function below); this timeout only
+// protects against a request that never resolves at all.
+const REQUEST_TIMEOUT_MS = 9_000;
 const STALE_MS = 60_000;
 
 type HostPhase = 'checking' | 'active' | 'disabled' | 'quiet' | 'neutral' | 'unavailable';
@@ -66,8 +70,11 @@ export function ColorPolishHost() {
   useEffect(() => {
     let mounted = true;
     const load = async () => {
+      // A poll already in flight is left alone so a healthy but slow read can
+      // finish; the next scheduled tick simply waits its turn instead of
+      // aborting good progress in favor of a fresh attempt.
+      if (controllerRef.current) return;
       const generation = ++requestGenerationRef.current;
-      controllerRef.current?.abort();
       const controller = new AbortController();
       controllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
