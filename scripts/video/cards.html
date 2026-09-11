@@ -358,6 +358,21 @@
           view.appendChild(qrImg);
           root.appendChild(view);
 
+          let headingFontSize = 64;
+          headingEl.style.fontSize = headingFontSize + 'px';
+          while (headingFontSize > 20) {
+            let overflow = false;
+            for (const child of headingEl.children) {
+              if (child.scrollWidth > child.clientWidth || child.scrollWidth > 960) {
+                overflow = true;
+                break;
+              }
+            }
+            if (!overflow) break;
+            headingFontSize -= 2;
+            headingEl.style.fontSize = headingFontSize + 'px';
+          }
+
           let urlFontSize = 46;
           urlEl.style.fontSize = urlFontSize + 'px';
           while (urlEl.scrollWidth > urlEl.clientWidth && urlFontSize > 12) {

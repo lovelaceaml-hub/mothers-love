@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import QRCode from 'qrcode';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
@@ -9,6 +9,15 @@ const ROOT = resolve(import.meta.dirname, '..', '..');
 const FFMPEG = '/opt/homebrew/bin/ffmpeg';
 const FFPROBE = '/opt/homebrew/bin/ffprobe';
 const TARGET_URL = 'https://mothers-love.vercel.app/recognize';
+
+function serializeCardData(data) {
+  return JSON.stringify(data)
+    .replaceAll('<', '\\u003c')
+    .replaceAll('>', '\\u003e')
+    .replaceAll('&', '\\u0026')
+    .replaceAll('\u2028', '\\u2028')
+    .replaceAll('\u2029', '\\u2029');
+}
 
 async function main() {
   // 1. Load inputs
@@ -84,6 +93,7 @@ async function main() {
       n: beat.n,
       slug: beat.slug,
       clip: beat.clip,
+      portrait: beat.portrait,
       start: start_i,
       length: L_i,
       speechStart: speech_i,
@@ -135,7 +145,19 @@ async function main() {
       viewport: { width: variant.width, height: variant.height },
       deviceScaleFactor: 1
     });
-    page.on('pageerror', err => console.error('Browser page error:', err));
+    const pageErrors = [];
+    page.on('pageerror', err => {
+      console.error('Browser page error:', err);
+      pageErrors.push(err);
+    });
+
+    function checkPageErrors(cardName) {
+      if (pageErrors.length > 0) {
+        const msg = pageErrors.map(e => e?.message || String(e)).join('; ');
+        console.error(`Page error during ${variant.name} ${cardName}: ${msg}`);
+        process.exit(1);
+      }
+    }
 
     // Title card
     const titleData = {
@@ -148,8 +170,47 @@ async function main() {
       url: TARGET_URL,
       qrDataUrl: ''
     };
-    await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => JSON.stringify(titleData)), { waitUntil: 'load' });
+    await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => serializeCardData(titleData)), { waitUntil: 'load' });
+
+    // Measure title card elements
+    const titleMetrics = await page.evaluate(() => {
+      const titleEl = document.querySelector('.title-heading-16x9, .title-heading-9x16');
+      const taglineEl = document.querySelector('.title-tagline-16x9, .title-tagline-9x16');
+      if (!titleEl) throw new Error('title heading element not found');
+      if (!taglineEl) throw new Error('title tagline element not found');
+
+      const tr = titleEl.getBoundingClientRect();
+      const tagr = taglineEl.getBoundingClientRect();
+      return [
+        {
+          name: 'title',
+          scrollWidth: titleEl.scrollWidth,
+          clientWidth: titleEl.clientWidth,
+          rect: { left: tr.left, top: tr.top, right: tr.right, bottom: tr.bottom, width: tr.width, height: tr.height }
+        },
+        {
+          name: 'tagline',
+          scrollWidth: taglineEl.scrollWidth,
+          clientWidth: taglineEl.clientWidth,
+          rect: { left: tagr.left, top: tagr.top, right: tagr.right, bottom: tagr.bottom, width: tagr.width, height: tagr.height }
+        }
+      ];
+    });
+
+    for (const item of titleMetrics) {
+      if (item.scrollWidth > item.clientWidth) {
+        console.error(`Title card overflow for ${variant.name} ${item.name}: scrollWidth=${item.scrollWidth} > clientWidth=${item.clientWidth}`);
+        process.exit(1);
+      }
+      const r = item.rect;
+      if (r.left < 40 || r.top < 40 || r.right > variant.width - 40 || r.bottom > variant.height - 40) {
+        console.error(`Title card margin violation for ${variant.name} ${item.name}: bounds [${r.left}, ${r.top}, ${r.right}, ${r.bottom}] in ${variant.width}x${variant.height} (40px margin)`);
+        process.exit(1);
+      }
+    }
+
     await page.screenshot({ path: resolve(cardDir, 'title.png') });
+    checkPageErrors('title card');
 
     // End card
     const beat7 = timeline.find(b => b.n === 7);
@@ -163,8 +224,50 @@ async function main() {
       url: TARGET_URL,
       qrDataUrl
     };
-    await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => JSON.stringify(endData)), { waitUntil: 'load' });
+    await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => serializeCardData(endData)), { waitUntil: 'load' });
+
+    // Measure end card elements
+    const endMetrics = await page.evaluate(() => {
+      const headingLines = Array.from(document.querySelectorAll('.end-heading-line-16x9, .end-heading-line-9x16'));
+      const urlEl = document.querySelector('.end-url-16x9, .end-url-9x16');
+      if (headingLines.length === 0) throw new Error('end heading lines not found');
+      if (!urlEl) throw new Error('end-url element not found');
+
+      const items = headingLines.map((el, idx) => {
+        const r = el.getBoundingClientRect();
+        return {
+          name: `end heading line ${idx + 1}`,
+          scrollWidth: el.scrollWidth,
+          clientWidth: el.clientWidth,
+          rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }
+        };
+      });
+
+      const ur = urlEl.getBoundingClientRect();
+      items.push({
+        name: 'end-url',
+        scrollWidth: urlEl.scrollWidth,
+        clientWidth: urlEl.clientWidth,
+        rect: { left: ur.left, top: ur.top, right: ur.right, bottom: ur.bottom, width: ur.width, height: ur.height }
+      });
+
+      return items;
+    });
+
+    for (const item of endMetrics) {
+      if (item.scrollWidth > item.clientWidth) {
+        console.error(`End card overflow for ${variant.name} ${item.name}: scrollWidth=${item.scrollWidth} > clientWidth=${item.clientWidth}`);
+        process.exit(1);
+      }
+      const r = item.rect;
+      if (r.left < 40 || r.top < 40 || r.right > variant.width - 40 || r.bottom > variant.height - 40) {
+        console.error(`End card margin violation for ${variant.name} ${item.name}: bounds [${r.left}, ${r.top}, ${r.right}, ${r.bottom}] in ${variant.width}x${variant.height} (40px margin)`);
+        process.exit(1);
+      }
+    }
+
     await page.screenshot({ path: resolve(cardDir, 'end.png') });
+    checkPageErrors('end card');
 
     // Caption cards (1 through 7)
     for (const b of timeline) {
@@ -178,7 +281,7 @@ async function main() {
         url: TARGET_URL,
         qrDataUrl: ''
       };
-      await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => JSON.stringify(captionData)), { waitUntil: 'load' });
+      await page.setContent(cardsTemplate.replace('__CARD_DATA__', () => serializeCardData(captionData)), { waitUntil: 'load' });
       await page.waitForSelector('#caption-panel', { timeout: 5000 });
 
       // Measure panel
@@ -197,6 +300,7 @@ async function main() {
         path: resolve(cardDir, `caption-${b.n}.png`),
         omitBackground: true
       });
+      checkPageErrors(`caption-${b.n}`);
     }
 
     await page.close();
@@ -235,61 +339,86 @@ async function main() {
       const segOut = resolve(workDir, `seg-${b.n}.mp4`);
       const cardDir = resolve(ROOT, `docs/private/video/cards/${variant.name}`);
       const captionPng = resolve(cardDir, `caption-${b.n}.png`);
-      if (b.clip === 'card') {
-        const cardPng = resolve(cardDir, b.n === 1 ? 'title.png' : 'end.png');
-        const filter = `[0:v]scale=${variant.width}:${variant.height},fps=30[v]`;
-        execFileSync(FFMPEG, [
-          '-y',
-          '-loop', '1',
-          '-t', L_i.toFixed(3),
-          '-i', cardPng,
-          '-filter_complex', filter,
-          '-map', '[v]',
-          '-t', L_i.toFixed(3),
-          '-c:v', 'libx264',
-          '-preset', 'veryfast',
-          '-crf', '18',
-          '-pix_fmt', 'yuv420p',
-          '-r', '30',
-          '-an',
-          segOut
-        ], { stdio: 'pipe' });
-      } else if (variant.name === '16x9') {
-        const clip = clips.find(c => c.n === b.n && c.variant === '16x9');
-        if (!clip) throw new Error(`Missing 16x9 clip for beat ${b.n}`);
-        const clipPath = resolveClip(clip);
-        const available = clip.durationSeconds - clip.inSeconds;
-        let baseFilter = 'scale=1920:1080,fps=30';
-        if (available < L_i) {
-          const deficit = L_i - available;
-          baseFilter += `,tpad=stop_mode=clone:stop_duration=${(deficit + 0.5).toFixed(3)}`;
+      if (variant.name === '16x9') {
+        if (b.clip === 'card') {
+          const cardPng = resolve(cardDir, b.n === 1 ? 'title.png' : 'end.png');
+          const filter = `[0:v]scale=${variant.width}:${variant.height},fps=${FPS}[v]`;
+          execFileSync(FFMPEG, [
+            '-y',
+            '-loop', '1',
+            '-t', L_i.toFixed(3),
+            '-i', cardPng,
+            '-filter_complex', filter,
+            '-map', '[v]',
+            '-t', L_i.toFixed(3),
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '18',
+            '-pix_fmt', 'yuv420p',
+            '-r', String(FPS),
+            '-an',
+            segOut
+          ], { stdio: 'pipe' });
+        } else {
+          const clip = clips.find(c => c.n === b.n && c.variant === '16x9');
+          if (!clip) throw new Error(`Missing 16x9 clip for beat ${b.n}`);
+          const clipPath = resolveClip(clip);
+          const available = clip.durationSeconds - clip.inSeconds;
+          let baseFilter = `scale=1920:1080,fps=${FPS}`;
+          if (available < L_i) {
+            const deficit = L_i - available;
+            baseFilter += `,tpad=stop_mode=clone:stop_duration=${(deficit + 0.5).toFixed(3)}`;
+          }
+          const filter = `[0:v]${baseFilter}[base];[base][1:v]overlay=enable='between(t,0.3,${(L_i - 0.3).toFixed(3)})'[v]`;
+          execFileSync(FFMPEG, [
+            '-y',
+            '-ss', clip.inSeconds.toFixed(3),
+            '-i', clipPath,
+            '-loop', '1',
+            '-t', L_i.toFixed(3),
+            '-i', captionPng,
+            '-filter_complex', filter,
+            '-map', '[v]',
+            '-t', L_i.toFixed(3),
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '18',
+            '-pix_fmt', 'yuv420p',
+            '-r', String(FPS),
+            '-an',
+            segOut
+          ], { stdio: 'pipe' });
         }
-        const filter = `[0:v]${baseFilter}[base];[base][1:v]overlay=enable='between(t,0.3,${(L_i - 0.3).toFixed(3)})'[v]`;
-        execFileSync(FFMPEG, [
-          '-y',
-          '-ss', clip.inSeconds.toFixed(3),
-          '-i', clipPath,
-          '-loop', '1',
-          '-t', L_i.toFixed(3),
-          '-i', captionPng,
-          '-filter_complex', filter,
-          '-map', '[v]',
-          '-t', L_i.toFixed(3),
-          '-c:v', 'libx264',
-          '-preset', 'veryfast',
-          '-crf', '18',
-          '-pix_fmt', 'yuv420p',
-          '-r', '30',
-          '-an',
-          segOut
-        ], { stdio: 'pipe' });
       } else {
-        // 9x16 route beat
-        const clip9x16 = clips.find(c => c.n === b.n && c.variant === '9x16');
-        if (clip9x16) {
+        // 9:16 segment builder: decide by beat.portrait
+        if (b.portrait === 'card') {
+          const cardPng = resolve(cardDir, b.n === 1 ? 'title.png' : 'end.png');
+          const filter = `[0:v]scale=${variant.width}:${variant.height},fps=${FPS}[v]`;
+          execFileSync(FFMPEG, [
+            '-y',
+            '-loop', '1',
+            '-t', L_i.toFixed(3),
+            '-i', cardPng,
+            '-filter_complex', filter,
+            '-map', '[v]',
+            '-t', L_i.toFixed(3),
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '18',
+            '-pix_fmt', 'yuv420p',
+            '-r', String(FPS),
+            '-an',
+            segOut
+          ], { stdio: 'pipe' });
+        } else if (b.portrait === 'phone') {
+          const clip9x16 = clips.find(c => c.n === b.n && c.variant === '9x16');
+          if (!clip9x16) {
+            console.error(`Missing required 9x16 clip for beat ${b.n} (portrait=phone)`);
+            process.exit(1);
+          }
           const clipPath = resolveClip(clip9x16);
           const available = clip9x16.durationSeconds - clip9x16.inSeconds;
-          let baseFilter = 'scale=1080:1920,fps=30';
+          let baseFilter = `scale=1080:1920,fps=${FPS}`;
           if (available < L_i) {
             const deficit = L_i - available;
             baseFilter += `,tpad=stop_mode=clone:stop_duration=${(deficit + 0.5).toFixed(3)}`;
@@ -309,17 +438,24 @@ async function main() {
             '-preset', 'veryfast',
             '-crf', '18',
             '-pix_fmt', 'yuv420p',
-            '-r', '30',
+            '-r', String(FPS),
             '-an',
             segOut
           ], { stdio: 'pipe' });
-        } else {
-          // TV beat on 9x16: scale desktop clip to 1080x608, overlay centered on 1080x1920 paper color
+        } else if (b.portrait === 'crop') {
+          const unexpected9x16 = clips.find(c => c.n === b.n && c.variant === '9x16');
+          if (unexpected9x16) {
+            console.error(`Unexpected 9x16 clip found for crop beat ${b.n}`);
+            process.exit(1);
+          }
           const clipDesktop = clips.find(c => c.n === b.n && c.variant === '16x9');
-          if (!clipDesktop) throw new Error(`Missing desktop clip for TV beat ${b.n}`);
+          if (!clipDesktop) {
+            console.error(`Missing desktop clip for TV beat ${b.n}`);
+            process.exit(1);
+          }
           const clipPath = resolveClip(clipDesktop);
           const available = clipDesktop.durationSeconds - clipDesktop.inSeconds;
-          let clipFilter = 'scale=1080:608,fps=30';
+          let clipFilter = `scale=1080:608,fps=${FPS}`;
           if (available < L_i) {
             const deficit = L_i - available;
             clipFilter += `,tpad=stop_mode=clone:stop_duration=${(deficit + 0.5).toFixed(3)}`;
@@ -333,7 +469,7 @@ async function main() {
             '-t', L_i.toFixed(3),
             '-i', captionPng,
             '-f', 'lavfi',
-            '-i', `color=c=0xfffdf6:s=1080x1920:r=30:d=${L_i.toFixed(3)}`,
+            '-i', `color=c=0xfffdf6:s=1080x1920:r=${FPS}:d=${L_i.toFixed(3)}`,
             '-filter_complex', filter,
             '-map', '[v]',
             '-t', L_i.toFixed(3),
@@ -341,10 +477,13 @@ async function main() {
             '-preset', 'veryfast',
             '-crf', '18',
             '-pix_fmt', 'yuv420p',
-            '-r', '30',
+            '-r', String(FPS),
             '-an',
             segOut
           ], { stdio: 'pipe' });
+        } else {
+          console.error(`Unknown portrait mode '${b.portrait}' for beat ${b.n}`);
+          process.exit(1);
         }
       }
     }
@@ -400,7 +539,7 @@ async function main() {
   const mixInputs = timeline.map((_, idx) => `[d${idx}]`).join('');
   const filterSteps = [
     ...adelayFilters,
-    `${mixInputs}amix=inputs=7:normalize=0:dropout_transition=0[narration_raw]`,
+    `${mixInputs}amix=inputs=${timeline.length}:normalize=0:dropout_transition=0[narration_raw]`,
     `[narration_raw]loudnorm=I=-16:TP=-1.5:LRA=11[voice]`
   ];
 
@@ -445,7 +584,7 @@ async function main() {
       '-preset', 'medium',
       '-crf', '20',
       '-pix_fmt', 'yuv420p',
-      '-r', '30',
+      '-r', String(FPS),
       '-c:a', 'aac',
       '-b:a', '160k',
       '-movflags', '+faststart',
@@ -504,8 +643,8 @@ async function main() {
       process.exit(1);
     }
 
-    if (v.r_frame_rate !== '30/1') {
-      console.error(`Frame rate mismatch in ${mp4Path}: expected 30/1, got ${v.r_frame_rate}`);
+    if (v.r_frame_rate !== `${FPS}/1`) {
+      console.error(`Frame rate mismatch in ${mp4Path}: expected ${FPS}/1, got ${v.r_frame_rate}`);
       process.exit(1);
     }
 
@@ -521,15 +660,15 @@ async function main() {
     }
 
     // Clean decode check
-    const decodeCheck = execFileSync(FFMPEG, [
+    const result = spawnSync(FFMPEG, [
       '-v', 'error',
       '-i', mp4Path,
       '-f', 'null',
       '-'
     ], { encoding: 'utf8' });
 
-    if (decodeCheck.trim().length > 0) {
-      console.error(`Decode errors in ${mp4Path}: ${decodeCheck}`);
+    if (result.status !== 0 || result.stderr.trim().length > 0) {
+      console.error(`Decode errors in ${mp4Path}: status=${result.status} error=${result.error ?? ''}\n${result.stderr}`);
       process.exit(1);
     }
   }
@@ -564,7 +703,7 @@ async function main() {
   const pyCode = [
     'import sys',
     'import cv2',
-    'expected = "https://mothers-love.vercel.app/recognize"',
+    `expected = ${JSON.stringify(TARGET_URL)}`,
     'for path in sys.argv[1:]:',
     '    img = cv2.imread(path)',
     '    if img is None:',
