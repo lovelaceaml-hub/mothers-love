@@ -33,7 +33,7 @@ async function scrollShowcase(page: Page, distance: number, durationMs = 1200) {
   }, { distance, durationMs });
 }
 
-test('record deployed Mother's Love app for promo', async ({ browser }) => {
+test("record deployed Mother's Love app for promo", async ({ browser }) => {
   test.setTimeout(120_000);
   await mkdir(OUT, { recursive: true });
 
