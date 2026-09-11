@@ -1,0 +1,29 @@
+Load-order race corrected: `window.colorPolishRuntime` and `window.addEventListener('message', receiveBootstrap)` now initialize in [boot.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js) after all scripts load.
+
+The host page polled `window.colorPolishRuntime.getState()` between deferred scripts before `SINGLE_STYLES` existed in [arrival.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.js). Moving both the runtime object and the bootstrap listener to the bottom of [boot.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js) guarantees all core modules and scene descriptors exist before any host polling or message handling begins.
+
+### Changes made
+
+1. Cut `window.colorPolishRuntime = { ... };` from [stage.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js), leaving `runtimeState`, `visualState`, `stepRuntime`, and `changeRate` in place.
+2. Cut `window.addEventListener('message', receiveBootstrap);` from [host.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js).
+3. Pasted both verbatim into [boot.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js) right before `init();`, with the clarifying comment above them.
+4. Appended the round 2 tracking row to the Files moved table in [base.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md).
+
+## COMPLETION
+
+- Code files changed:
+  - [/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js)
+  - [/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js)
+  - [/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js)
+- Record row added:
+  - [/Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md) (`| public/color-polish/boot.js (round 2) | 243, 930-940 | window.addEventListener('message', receiveBootstrap), window.colorPolishRuntime (moved from host.js and stage.js so the runtime is exposed only after every script loads) |`)
+- Confirmed: [stage.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js) no longer contains `window.colorPolishRuntime`.
+- Confirmed: [host.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js) no longer contains `addEventListener('message'`.
+
+### What Anthony must do
+
+Nothing, you're clear.
+
+### Next step
+
+Notify the coordinator to run the Playwright verification suite.

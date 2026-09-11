@@ -1,0 +1,45 @@
+The Section 0 lane record and all eleven scene CSS headers are written and ready for coordinator verification.
+
+All 941 lines of `renderer.js` are accounted for in the lane record with zero unplaced lines. Each scene CSS file contains its scoped header comment, and no `.js` files or `renderer.html` were modified.
+
+### Files written
+
+1. [base.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md): Section 0 lane record with files moved table, branch conversions table, descriptor fields glossary, and landed summary.
+2. [welcome.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.css): Scoped to `#tv .scene[data-scene="1"]`.
+3. [garden.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.css): Scoped to `#tv .scene[data-scene="2"]`.
+4. [arrival.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.css): Scoped to `#tv .event-stage`.
+5. [featured.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.css): Scoped to `#tv .scene[data-scene="4"]`.
+6. [calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.css): Scoped to `#tv .scene[data-scene="5"]`.
+7. [peacemakers.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.css): Scoped to `#tv .scene[data-scene="8"]`.
+8. [status.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.css): Scoped to `#tv .scene[data-scene="6"]`.
+9. [expressions.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.css): Scoped to `#tv .scene[data-scene="7"]`.
+10. [peace-in-practice.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.css): Scoped to `#tv .scene[data-scene="9"]`.
+11. [orbit.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.css): Scoped to `#tv .scene[data-scene="10"]`.
+12. [milestone.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.css): Scoped to `#tv .scene[data-scene="11"]`.
+
+### What Anthony must do
+
+Nothing, you're clear.
+
+### Next step
+
+Have the coordinator run verification checks (typecheck, lint, test, build, test:e2e, and pixel probe) and delete `renderer.js`.
+
+## COMPLETION
+
+Files written:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.css`
+
+Unplaced lines of `renderer.js`:
+none (all 941 lines accounted for).
