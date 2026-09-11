@@ -31,7 +31,7 @@
 - Portrait: phone
 - Target seconds: 12
 - Action: A steady scroll moves down the guide on /expressions, passing all nine expression cards in the catalog.
-- Narration: The guide shares nine expressions, including "How Are You?", "It's okay. I understand.", and "You're amazing. You're doing great!" Simple words that bring comfort, warmth, and hope.
+- Narration: The guide shares nine expressions of comfort and hope, including "How Are You?", "It's okay. I understand.", and "You're amazing. You're doing great!"
 - Caption: How Are You? / It's okay. I understand.
 
 ## Beat 4: feed
@@ -75,6 +75,6 @@
 - Caption: Share one recognition today / Join us now!
 
 ## Totals
-- Narration word count: 177
+- Narration word count: 173
 - Sum of target seconds: 74
 - Narrated phrase IDs in Beat 3: 1, 4, 9
