@@ -24,6 +24,8 @@ updated: 2026-09-11T04:53Z
 
 ## Result
 Welcome scene depth layering and heading changes are fully implemented and covered by automated Playwright behavior specs. No CSS rules were added beyond the existing scoped header comment. Ready for coordinator verification and landing review.
+Round 1: removed the still-mode early return in place() so depth layering styles apply on mount under reduced motion, and updated the spec to assert layer scales within .02 and stability over 1000 ms.
+Round 2: updated the reduced motion test scale assertion to between 0.88 and 1.02 times layer scale inclusive to account for actor depth breathing.
 
 ## Coordinator verification (Fable 5.1)
 - typecheck, vitest, build pass; lint at the pre-existing 18; probe clean across six configs plus arrivals (logs/welcome/probe); first Playwright run had three renderer-frame timeouts while two other runs shared the machine; isolated rerun of helpers.spec plus welcome.spec 7 of 7 (logs/welcome/spec-rerun.out).

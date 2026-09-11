@@ -136,21 +136,43 @@ test('reduced motion renders the welcome scene still', async ({ page }) => {
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
 
-  const transforms = await frame.evaluate(() => {
-    const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
-    return slots.map((el) => ({
-      inline: el.style.transform,
-      computed: window.getComputedStyle(el).transform,
-    }));
+  const layerScales: Record<string, number> = {
+    far: 0.84,
+    mid: 0.93,
+    near: 1,
+  };
+
+  const readSlots = async () => {
+    return await frame.evaluate(() => {
+      const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
+      return slots.map((el) => ({
+        depth: el.dataset.depth,
+        inline: el.style.transform,
+        computed: window.getComputedStyle(el).transform,
+      }));
+    });
+  };
+
+  const firstReading = await readSlots();
+  expect(firstReading.length).toBeGreaterThan(0);
+
+  for (const slot of firstReading) {
+    expect(slot.depth).toBeDefined();
+    expect(layerScales).toHaveProperty(slot.depth!);
+    const layerScale = layerScales[slot.depth!];
+
+    const match = slot.computed.match(/^matrix(?:3d)?\(([^)]+)\)$/);
+    expect(match).not.toBeNull();
+    const values = match![1].split(',').map((v) => parseFloat(v.trim()));
+    const scale = Math.hypot(values[0], values[1]);
+    expect(scale).toBeGreaterThanOrEqual(layerScale * 0.88);
+    expect(scale).toBeLessThanOrEqual(layerScale * 1.02);
+  }
+
+  await frame.evaluate(() => {
+    (window as any).colorPolishRuntime.step(1000);
   });
 
-  expect(transforms.length).toBeGreaterThan(0);
-  for (const t of transforms) {
-    const isIdentityOrEmpty =
-      !t.inline ||
-      t.inline === 'none' ||
-      t.computed === 'none' ||
-      t.computed === 'matrix(1, 0, 0, 1, 0, 0)';
-    expect(isIdentityOrEmpty).toBe(true);
-  }
+  const secondReading = await readSlots();
+  expect(secondReading).toEqual(firstReading);
 });

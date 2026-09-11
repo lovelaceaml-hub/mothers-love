@@ -52,7 +52,6 @@
   }
 
   function placeWelcome(a) {
-    if (S.still) return true;
     const layer = a.layer || 'near';
     const L = LAYERS[layer] || LAYERS.near;
     const scale = a.screenScale * L.scale;
