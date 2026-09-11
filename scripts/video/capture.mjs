@@ -145,6 +145,11 @@ async function setupRoutes(context) {
 
 async function recordClip(beat, variant, browser) {
   const context = await browser.newContext(getContextOptions(variant, TMP_DIR));
+  await context.addInitScript(() => {
+    const style = document.createElement('style');
+    style.textContent = 'nextjs-portal{display:none!important}';
+    document.documentElement.appendChild(style);
+  });
   await setupRoutes(context);
   const page = await context.newPage();
   const t0 = Date.now();
@@ -310,36 +315,70 @@ async function main() {
   const narration = JSON.parse(await readFile(narrationPath, 'utf8'));
 
   let devChild = null;
-  const serverReady = await isServerRunning('http://127.0.0.1:3100/');
-  if (!serverReady) {
-    console.log('Starting dev server on port 3100...');
-    devChild = spawn('npm', ['run', 'dev', '--', '--hostname', '127.0.0.1', '--port', '3100'], {
-      cwd: ROOT,
-      env: { ...process.env, npm_config_cache: '/tmp/npm-cache' },
-      stdio: 'inherit',
-    });
-
-    const startTime = Date.now();
-    let online = false;
-    while (Date.now() - startTime < 120_000) {
-      if (await isServerRunning('http://127.0.0.1:3100/')) {
-        online = true;
-        break;
-      }
-      await pause(1000);
-    }
-
-    if (!online) {
-      throw new Error('Dev server failed to start within 120s on http://127.0.0.1:3100/');
-    }
-    console.log('Dev server is up.');
-  }
-
   let desktopBrowser = null;
   let phoneBrowser = null;
-  const clips = [];
+  let cleanupPromise = null;
+
+  async function cleanup() {
+    if (cleanupPromise) return cleanupPromise;
+    cleanupPromise = (async () => {
+      if (desktopBrowser) {
+        await desktopBrowser.close().catch(() => {});
+        desktopBrowser = null;
+      }
+      if (phoneBrowser) {
+        await phoneBrowser.close().catch(() => {});
+        phoneBrowser = null;
+      }
+      if (devChild) {
+        try {
+          process.kill(-devChild.pid, 'SIGTERM');
+        } catch {}
+        await pause(2000);
+        if (await isServerRunning('http://127.0.0.1:3100/')) {
+          try {
+            process.kill(-devChild.pid, 'SIGKILL');
+          } catch {}
+        }
+        devChild = null;
+      }
+    })();
+    return cleanupPromise;
+  }
+
+  process.on('SIGINT', async () => {
+    await cleanup();
+    process.exit(130);
+  });
 
   try {
+    const serverReady = await isServerRunning('http://127.0.0.1:3100/');
+    if (!serverReady) {
+      console.log('Starting dev server on port 3100...');
+      devChild = spawn('npm', ['run', 'dev', '--', '--hostname', '127.0.0.1', '--port', '3100'], {
+        cwd: ROOT,
+        env: { ...process.env, npm_config_cache: '/tmp/npm-cache' },
+        stdio: 'inherit',
+        detached: true,
+      });
+
+      const startTime = Date.now();
+      let online = false;
+      while (Date.now() - startTime < 120_000) {
+        if (await isServerRunning('http://127.0.0.1:3100/')) {
+          online = true;
+          break;
+        }
+        await pause(1000);
+      }
+
+      if (!online) {
+        throw new Error('Dev server failed to start within 120s on http://127.0.0.1:3100/');
+      }
+      console.log('Dev server is up.');
+    }
+
+    const clips = [];
     desktopBrowser = await chromium.launch();
     phoneBrowser = await chromium.launch({ args: ['--force-device-scale-factor=2'] });
 
@@ -363,12 +402,14 @@ async function main() {
       const desktopClip = clips.find((c) => c.n === beat.n && c.variant === '16x9');
       if (!desktopClip) {
         console.error(`Missing desktop clip for beat ${beat.n} (${beat.slug})`);
+        await cleanup();
         process.exit(1);
       }
       if (beat.portrait === 'phone') {
         const phoneClip = clips.find((c) => c.n === beat.n && c.variant === '9x16');
         if (!phoneClip) {
           console.error(`Missing phone clip for beat ${beat.n} (${beat.slug})`);
+          await cleanup();
           process.exit(1);
         }
       }
@@ -380,6 +421,7 @@ async function main() {
         (clip.width === 1080 && clip.height === 1920);
       if (!validDimensions) {
         console.error(`Invalid dimensions for ${clip.slug} ${clip.variant}: ${clip.width}x${clip.height}`);
+        await cleanup();
         process.exit(1);
       }
 
@@ -388,6 +430,7 @@ async function main() {
         console.error(
           `Clip ${clip.slug} ${clip.variant} duration after inPoint (${netDuration.toFixed(2)}s) is less than targetSeconds + 2 (${clip.targetSeconds + 2}s)`,
         );
+        await cleanup();
         process.exit(1);
       }
     }
@@ -399,17 +442,7 @@ async function main() {
     }
     console.log('CAPTURE OK');
   } finally {
-    if (desktopBrowser) {
-      await desktopBrowser.close().catch(() => {});
-    }
-    if (phoneBrowser) {
-      await phoneBrowser.close().catch(() => {});
-    }
-    if (devChild) {
-      try {
-        devChild.kill('SIGTERM');
-      } catch {}
-    }
+    await cleanup();
   }
 }
 
