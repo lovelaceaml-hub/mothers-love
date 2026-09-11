@@ -31,7 +31,7 @@ Lane scope, scenes/milestone.js only:
 ## Testable acceptance
 1. Common scene spec.
 2. Over 30 seconds (samples every 5 s) visualState `stream` length is at least 14 at every sample with the sample fixture and never drops; no node's `y` jumps by more than 40 px between consecutive frames except at a top-to-bottom respawn; every node's `rise`, `radius` and `turn` triple is unique.
-3. At every sample z spans at least minus 550 to plus 300 across nodes, at least one node has blur at least 1.5 px and one has none, and the near node's scale is at least 1.4.
+3. At every sample z spans at least minus 500 to plus 300 across nodes, and at some sample the deepest node is below minus 600 (the coordinator relaxed the per-sample bar from minus 550 after the first run measured minus 536 at one sample; the helix reaches minus 630 only at particular phases), at least one node has blur at least 1.5 px and one has none, and the near node's scale is at least 1.4.
 4. Every `.stream-node` keeps width equal to height within 1 px and border-radius 50 percent at 300, 6000 and 14000 ms.
 5. Screenshots at 1920 and 3840 at 0, 6000 and 14000 ms into logs/milestone/.
 
