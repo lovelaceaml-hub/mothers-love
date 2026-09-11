@@ -26,10 +26,14 @@ function tickOrbit(dt){
  c.beginPath();for(let j=0;j<=160;j++){const a=j/160*TAU,p=projectOrbit(a),x=906+(p.x-906)*(1+n*.055),y=270+(p.y-270)*(1+n*.23);j?c.lineTo(x,y):c.moveTo(x,y)}c.strokeStyle=n?'#d4c3af2b':'#d3bb8840';c.lineWidth=1;c.stroke();
  }
  V.planets.forEach(p=>{
-  const theta=p.phase+V.clock*.102,pos=projectOrbit(theta),b=p.b;
-  p.z=pos.z;p.scale=pos.k;
+  const theta=p.phase+V.clock*.082,pos=projectOrbit(theta),b=p.b;
+  p.z=pos.z;p.scale=pos.k;p.theta=theta;p.angle=theta;
   p.el.style.transform=`translate(${pos.x-b.d/2}px,${pos.y-b.d/2}px) scale(${pos.k})`;
-  p.el.style.zIndex=String(Math.round(10000+pos.z));p.el.style.opacity=String(pos.z<0?.78+.22*(pos.z+395)/395:1);p.el.style.filter=pos.z< -120?`blur(${(-pos.z-120)/1000}px)`:'none';
+  p.el.style.zIndex=String(Math.round(10000+pos.z));
+  p.el.style.opacity=String(pos.z<0?.72+.28*(pos.z+395)/395:1);
+  const blur=Math.min(1.8,Math.max(0,(-pos.z-100)/160));
+  const shadow=`drop-shadow(0 ${(6*pos.k).toFixed(1)}px ${(10*pos.k).toFixed(1)}px #5C659240)`;
+  p.el.style.filter=blur>0?`blur(${blur.toFixed(2)}px) ${shadow}`:shadow;
   b.x=pos.x-b.d/2;b.y=pos.y-b.d/2+84;
   if(b.reading)tickCirclePages(b,V.clock);
   p.moons.forEach((moon,j)=>{const a=V.clock*(.33+j*.04)+j*Math.PI+p.phase,mz=Math.sin(a)*52,k=600/(600-mz),r=157;moon.style.transform=`translate(${142+Math.cos(a)*r*k-21.5}px,${142+Math.sin(a)*50*k-21.5}px) scale(${k})`;moon.style.zIndex=mz>0?'4':'1';moon.style.opacity=mz>0?'1':'.8'});
