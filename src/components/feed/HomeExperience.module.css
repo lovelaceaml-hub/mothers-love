@@ -127,6 +127,15 @@
 @keyframes cardReveal { from { opacity: .55; } to { opacity: 1; } }
 @keyframes dotGlow { from { opacity: .45; } to { opacity: 1; } }
 @keyframes primaryShimmer { 0%, 20%, 100% { transform: translateX(-180%) skewX(-20deg); } 55% { transform: translateX(560%) skewX(-20deg); } }
+/* Second attention cue for the phone dominant action: a slow, gentle pulse and glow
+   bloom that repeats about once every 6 seconds, on top of the existing shimmer.
+   The bloom itself lasts about 900ms (from 84% to 100% of the 6s cycle). It never
+   flashes or strobes, and the page-wide reduced-motion rule below turns it off. */
+@keyframes ctaPulse {
+  0%, 84% { transform: scale(1); box-shadow: inset 0 1px 0 #ffffffb3, 0 10px 26px -12px #99415d77, 0 0 28px rgba(255, 196, 110, .55); }
+  92% { transform: scale(1.04); box-shadow: inset 0 1px 0 #ffffffb3, 0 10px 26px -12px #99415d77, 0 0 46px 8px rgba(255, 196, 110, .9); }
+  100% { transform: scale(1); box-shadow: inset 0 1px 0 #ffffffb3, 0 10px 26px -12px #99415d77, 0 0 28px rgba(255, 196, 110, .55); }
+}
 @media (max-width: 1050px) {
   .contentLayout { grid-template-columns: minmax(0,1fr) 13rem; gap: 1rem; }
   .guidePanel { padding: 1.4rem 1rem; }
@@ -225,7 +234,18 @@
   .welcome h1 > span { display: inline; }
   .welcome h1 > span:first-child::after { content: ' '; }
   .tagline { font-size: .8rem; line-height: 1.4; margin: 5px 0 0; max-width: none; }
-  .welcomeCopy > .primaryAction { margin: 12px 0 6px; }
+  /* Dominant action: full width, at least 58px tall, larger bold text, and pulled
+     down with a raised z-index so it visibly overlaps and outranks the floating
+     expression medallions that follow it (mobileExpressions, below). */
+  .welcomeCopy > .primaryAction {
+    display: flex;
+    position: relative;
+    z-index: 5;
+    margin: 10px 0 -18px;
+    min-height: 60px;
+    font: 700 1.05rem/1.3 Arial, Helvetica, sans-serif;
+    animation: ctaPulse 6s ease-in-out infinite;
+  }
   .mobileExpressions { display: block; height: 52px; }
   .contentLayout { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; gap: 0; }
   .feedSection { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; }
@@ -235,19 +255,30 @@
   .sectionHeader h2 { font-size: 1.02rem; margin: 0; font-weight: 600; }
   .liveLabel { font-size: .66rem; padding: 0; }
   .feedViewport { flex: 1 1 0; min-height: 0; max-height: none; overscroll-behavior-y: contain; padding: 1px 3px 6px 1px; border-radius: 14px; }
-  .feedList { gap: 6px; }
-  .feedCard { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 5px; padding: 8px 10px 10px; border-radius: 14px 14px 14px 5px; box-shadow: 0 3px 10px -7px #78694b38; }
-  .cardHeader { grid-column: 1; grid-row: 1; gap: 7px; min-height: 36px; }
+  .feedList { gap: 4px; }
+  /* Compact recognition cards: tighter padding, a single header line for name and
+     heart, and smaller expression chips, cutting the first card's height versus
+     the pre-polish sizing (see tests/mobile-recognition for the measured before
+     and after heights). Message text, the recipient name, the chip text and icon,
+     and the recipient medallion sit at a legibility floor so the compacting never
+     goes below comfortably readable: padding, gaps, list gap, margins and the
+     header min-height stay as compact as before, only those five carry a floor. */
+  .feedCard { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 0 5px; padding: 4px 8px 4px; border-radius: 12px 12px 12px 5px; box-shadow: 0 2px 8px -6px #78694b38; }
+  .cardHeader { grid-column: 1; grid-row: 1; gap: 5px; min-height: 20px; }
   .cardHeader .eyebrow { display: none; }
-  .recipientMedallion { width: 28px; height: 28px; }
-  .cardHeader h3 { font-size: .97rem; line-height: 1.3; margin: 0; }
-  .message { grid-column: 1 / -1; grid-row: 2; margin: 3px 0 7px; font-size: .91rem; line-height: 1.42; }
+  .recipientMedallion { width: 22px; height: 22px; }
+  .cardHeader h3 { font-size: .9rem; line-height: 1.25; margin: 0; }
+  .message { grid-column: 1 / -1; grid-row: 2; margin: 2px 0 3px; font-size: .875rem; line-height: 1.3; }
   .cardFooter { display: contents; }
-  .expressionList { grid-column: 1 / -1; grid-row: 3; gap: 4px 6px; }
-  .expressionList li { border-radius: 7px; gap: 3px; font-size: .72rem; line-height: 1.35; padding: 3px 5px 3px 3px; }
-  .phraseMedallion { width: 17px; height: 17px; }
-  .reactionRow { grid-column: 2; grid-row: 1; align-self: center; min-width: 44px; max-width: 102px; margin: 0; }
-  .reactionRow button { min-height: 44px; min-width: 44px; font-size: .72rem; padding: 5px 7px; border-color: transparent; background: transparent; }
+  .expressionList { grid-column: 1 / -1; grid-row: 3; gap: 3px 4px; }
+  .expressionList li { border-radius: 6px; gap: 2px; font-size: .72rem; line-height: 1.2; padding: 3px 6px 3px 4px; }
+  .phraseMedallion { width: 14px; height: 14px; }
+  .reactionRow { grid-column: 2; grid-row: 1; align-self: center; min-width: 32px; max-width: 102px; margin: 0; }
+  /* The visible heart button stays compact (32px) so it does not push the card
+     taller; a transparent ::after extends the actual tap target to 40px by
+     40px by overlapping into the card's own padding, per the legibility floor. */
+  .reactionRow button { position: relative; min-height: 32px; min-width: 32px; font-size: .64rem; padding: 3px 5px; border-color: transparent; background: transparent; }
+  .reactionRow button::after { content: ''; position: absolute; inset: -4px; }
   .reactionRow button::before { width: .95rem; height: .95rem; }
   .reactionRow > div > span { max-width: 102px; font-size: .67rem; }
   .guidePanel { display: flex; flex: 0 0 auto; justify-content: space-between; align-items: center; margin: 0; padding: 0 4px; gap: 7px; border: 0; border-radius: 0; box-shadow: none; background: none; }
@@ -269,7 +300,10 @@
   .mobileExpressions { height: 36px; }
   .sectionHeader { min-height: 33px; padding-bottom: 5px; }
   .guidePanel { display: none; }
-  .primaryAction { min-height: 44px; }
+  /* Matches the selector specificity of the dominant-action rule above so this
+     genuinely takes effect on very short screens; still comfortably above the
+     44px accessible minimum tested in tests/mobile-recognition. */
+  .welcomeCopy > .primaryAction { min-height: 48px; }
 }
 
 
