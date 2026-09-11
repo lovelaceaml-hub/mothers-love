@@ -1,0 +1,6 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 1
+test:e2e exit 1
+DONE

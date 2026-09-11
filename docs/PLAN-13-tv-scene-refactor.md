@@ -29,7 +29,7 @@ Branches let Anthony pick any subset only after the single 941-line renderer is 
 - Gemini model: only Gemini 3.8 Flash. Anthony's ruling, September 10: Gemini 3.1 Pro is outdated and is never used, not even as a fallback. When a section needs more thought, raise effort within 3.8 Flash before spilling to Sonnet 5.
 - Haiku 4.5 (low) carries every mechanical row: the hygiene sweep before each review, ledger rows, lane-state updates in INDEX.md, filing probe screenshots into logs/<slug>/, README, HANDOFF and AGENTS link updates, and Build log format checks. Never Haiku for scene code or reviews.
 
-Cross-cutting rules for every lane: circular bubbles at all times; no added white overlays; readable from across a room; reduced motion respected (S.still); fictional data only; header, feed rail, QR, durations, playlist order, click-advance (live only) and safe states untouched; Studio sample preview keeps working; no em or en dash in produced text or comments; every scene CSS rule scoped to .scene[data-scene="N"] (arrival: .event-stage).
+Cross-cutting rules for every lane: circular bubbles at all times; no added white overlays; readable from across a room; reduced motion respected (S.still); fictional data only; header, feed rail, QR, durations, playlist order, click-advance (live only) and safe states untouched; Studio sample preview keeps working; no em or en dash in produced text or comments; every scene CSS rule scoped to `#tv .scene[data-scene="N"]` (arrival: `#tv .event-stage`), where N is the renderer id, never Anthony's section number. The `#tv` prefix is required because renderer.css already prefixes its Color Polish rules with `#tv`, so a rule scoped only by class would lose the cascade (Lane 0 objection 1).
 
 Scene id map (Anthony's number, renderer id, slug): 1/1 welcome, 2/2 garden, 3/3 arrival, 4/4 featured, 5/5 calendar, 6/8 peacemakers, 7/6 status, 8/7 expressions, 9/9 peace-in-practice, 10/10 orbit, 11/11 milestone. Files and branches use the slug only.
 
@@ -65,7 +65,7 @@ Owns: public/color-polish/** (renderer.js, renderer.css, renderer.html, new core
 
 Split renderer.js into ordered classic scripts sharing one global scope, listed in renderer.html in fixed order under the existing CSP (script-src 'self', no inline scripts):
 - core/state.js: version, ASSETS, catalog, helpers, NAMES, ORDER, DWELL, S/slots/V, snapshot normalization, numbers (today lines 1 to 134).
-- core/orbs.js: completeOrb, addOrb, smallFits, readerSlot, fitCircle, tickCirclePages, emptyPanel, safeScene.
+- core/orbs.js: completeOrb, addOrb, smallFits, readerSlot, rightBubbles (shared by welcome, peacemakers and peace-in-practice, so it is core, never a scene file; Lane 0 objection 5), fitCircle, tickCirclePages, emptyPanel, safeScene, checkFullFits, fullReader.
 - core/motion.js: floaters, actor physics, separation, burstAt, drawSceneFX, tickSlots (lines 309 to 341, 651 to 737, 771 to 792).
 - core/chrome.js: feed rail, header, atmosphere, countdown, queue dock.
 - core/arrivals.js: the event state machine; style tables and trajectories move to scenes/arrival.js.
@@ -76,7 +76,7 @@ Split renderer.js into ordered classic scripts sharing one global scope, listed 
 
 Registry contract registerScene(id, descriptor): markup(), mount(root), tick(dt), draw(dt), motion parameters (floaters, fxCanvas, arch opacity, topMargin, pace, depth range, retire, replaceEvery, replaceMode, entrance, burst), keepOut(), optional overrides integrate(actor, dt), place(actor), onRetire(actor). Shared code reads these instead of branching on scene numbers. Behavior must be identical after the split.
 
-Also: replace the dead inline onclick on calendar days (renderer.js line 178, blocked by CSP today) with a data-day attribute and a delegated listener; today it never fires, so this is still no visual change.
+Also: replace the dead inline onclick on calendar days (renderer.js line 178, blocked by CSP today) with a data-day attribute and a delegated listener; today it never fires, so this is still no visual change. The listener never calls stopPropagation: on the live TV the document click listener from Plan 11 still advances the scene, so day selection is effectively a Studio sample preview affordance only (coordinator ruling on Lane 0 objection 6; Anthony may overturn it in Section 5).
 
 Acceptance (all must hold):
 1. Before the split, on untouched tv/base, run the probe six times (widths 1920 and 3840; ms 0, 6000, 14000) into docs/runs/2026-09-11-tv-scenes/logs/base/before/, then run the same six again and hash every PNG to learn which scenes are byte-deterministic.
@@ -85,7 +85,19 @@ Acceptance (all must hold):
 4. npm_config_cache=/tmp/npm-cache npm run typecheck, lint, test, build, test:e2e all pass (the three pre-existing failures recorded in Plan 12 remain the only failures).
 5. Lane record lists every file moved with its old line range.
 
-## Section 1: Welcome
+## Section 0b: Shared scene test helpers and visualState depth
+Setup: balanced · high · Lane: Antigravity · Review: controller
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
+Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv/base
+Depends on: Section 0 landed and reviewed
+Agents: none
+Reviewers: controller=Claude Sonnet 5 · high; independent=none
+Hygiene: Haiku 4.5 · low sweep before review
+Owns: tests/color-polish-scenes/helpers.ts (new), public/color-polish/core/stage.js (visualState only), docs/runs/2026-09-11-tv-scenes/lanes/base-b.md.
+Work: export from helpers.ts the admin session and overview mocks and the renderer bootstrap used by tests/color-polish-usable/usable.spec.ts (copied, since that spec is protected), plus `loadScene(page, slug, ms)` and `circularity(page)` helpers every scene spec calls; add z, depth, scale and blur to the visualState actor mapping (additive). Added at Lane 0 objections 3 and 8.
+Acceptance: a smoke spec tests/color-polish-scenes/helpers.spec.ts loads the welcome scene through the helpers on /admin/display and asserts circularity; typecheck, lint, test, build, test:e2e pass; probe hashes unchanged from logs/base/after.
+
+## Section 1: Welcome (renderer id 1)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome, branch tv/scene-welcome
@@ -95,9 +107,9 @@ Reviewers: controller=Claude Sonnet 5 · high; independent=none
 Hygiene: Haiku 4.5 · low sweep before review
 Owns: public/color-polish/scenes/welcome.js, scenes/welcome.css, tests/color-polish-scenes/welcome.spec.ts, docs/runs/2026-09-11-tv-scenes/lanes/welcome.md, logs/welcome/.
 Work: per-actor physics exists (mountFloaters: own rng, vx, vy, pace, phase, z). Widen speed and depth spread through motion params, add slow heading changes (nextTurn), keep keepOut around the copy block. Some bubbles rise, some drift left or right, some hover; visible near and far layers.
-Acceptance: the common scene spec (below) plus a visualState check that at least three actors differ in speed by 30 percent or more and depth spans at least two layers.
+Acceptance: the common scene spec (below) plus a visualState check that at least three actors differ in speed by 30 percent or more and actor depth values span at least two layers (visualState actors expose z and depth after Section 0b; Lane 0 objection 3).
 
-## Section 2: Recognition Garden
+## Section 2: Recognition Garden (renderer id 2)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden, branch tv/scene-garden
@@ -109,7 +121,7 @@ Owns: scenes/garden.js, scenes/garden.css, tests/color-polish-scenes/garden.spec
 Work: keep 5 bubbles and the 7 second cadence. Stronger sprout entrance. Replace the single bloom exit with swell, burst to petals, petals carried on a breeze, an energy spark back to the garden line, and a new plant growing. Add sway and light passes to the garden canvas. Cap particles as the existing fx cap does.
 Acceptance: common spec plus visualState flower count strictly increases over 60 seconds; never more than 5 bubbles.
 
-## Section 3: Recognition Arrival
+## Section 3: Recognition Arrival (renderer id 3)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival, branch tv/scene-arrival
@@ -119,9 +131,9 @@ Reviewers: controller=Claude Sonnet 5 · high; independent=none
 Hygiene: Haiku 4.5 · low sweep before review
 Owns: scenes/arrival.js, scenes/arrival.css, tests/color-polish-scenes/arrival.spec.ts, lanes/arrival.md, logs/arrival/.
 Work: audit the 6 single (singleTrajectory) and 5 group (groupTrajectory) styles for genuine difference. Keep the counts (the probe asserts them). Add particles, trails and real z spread to the weakest two of each. Every style resolves into the normal circular bubble.
-Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 styles, with a screenshot per style at its entrance midpoint.
+Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 styles; the lane's own arrival.spec.ts captures one screenshot per style at its entrance midpoint into logs/arrival/ (the probe script is protected and takes no arrival screenshots; Lane 0 objection 3).
 
-## Section 4: Featured Recognition
+## Section 4: Featured Recognition (renderer id 4)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured, branch tv/scene-featured
@@ -133,7 +145,7 @@ Owns: scenes/featured.js, scenes/featured.css, tests/color-polish-scenes/feature
 Work: staggered single replacement (retireAt offsets) instead of whole-scene repopulation; the expression panel stays dominant; keep the choose() fallback for sparse expressions.
 Acceptance: common spec plus bubble count never drops to zero during 30 seconds and no two bubbles retire within the same second.
 
-## Section 5: Calendar
+## Section 5: Calendar (renderer id 5)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-calendar, branch tv/scene-calendar
@@ -145,7 +157,7 @@ Owns: scenes/calendar.js, scenes/calendar.css, tests/color-polish-scenes/calenda
 Work: day number small in a corner, count large and centered; past days get a warm completed treatment and a small entry pulse (the --day-delay hook). Placement stays on the frozen Los Angeles first-publish date; presentation only.
 Acceptance: common spec plus screenshots at 1920 and 3840 showing the corner date and centered count, no cell overflow.
 
-## Section 6: We Are Peacemakers
+## Section 6: We Are Peacemakers (renderer id 8, data-scene="8")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers, branch tv/scene-peacemakers
@@ -157,7 +169,7 @@ Owns: scenes/peacemakers.js, scenes/peacemakers.css, tests/color-polish-scenes/p
 Work: staggered replacement as in Section 4, plus depth layering with blur on deeper layers; nearest layer stays sharp.
 Acceptance: common spec plus bubble count never zero; at least one actor blurred and one sharp at the 14 second checkpoint.
 
-## Section 7: Status
+## Section 7: Status (renderer id 6, data-scene="6")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-status, branch tv/scene-status
@@ -169,7 +181,7 @@ Owns: scenes/status.js, scenes/status.css, tests/color-polish-scenes/status.spec
 Work: replace the single tickStatus transform with per-icon seeded phase, rate and amplitude, plus one ambient light or shimmer layer. No bouncing. Numbers stay still and legible.
 Acceptance: common spec plus the nine medallion transforms differ from each other at the 6 second checkpoint.
 
-## Section 8: Nine Expressions
+## Section 8: Nine Expressions (renderer id 7, data-scene="7")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions, branch tv/scene-expressions
@@ -181,7 +193,7 @@ Owns: scenes/expressions.js, scenes/expressions.css, tests/color-polish-scenes/e
 Work: fit only. Card geometry is animated in JS (590 by 167 to 950 by 530), so change those numbers and the CSS together; responsive font size, line height, consistent alignment, no overflow at 1920 and 3840.
 Acceptance: common spec plus scrollWidth and scrollHeight never exceed client size on all nine cards in both grid and focused states.
 
-## Section 9: Peace in Practice
+## Section 9: Peace in Practice (renderer id 9)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv/scene-peace-in-practice
@@ -193,7 +205,7 @@ Owns: scenes/peace-in-practice.js, scenes/peace-in-practice.css, tests/color-pol
 Work: independent motion; exit pops into hearts, peace symbols and soft particles (the hearts burst kind exists); replacement enters on its own timing.
 Acceptance: common spec plus a burst is observed in visualState within 60 seconds and bubble count never zero.
 
-## Section 10: Expression Orbit
+## Section 10: Expression Orbit (renderer id 10)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-orbit, branch tv/scene-orbit
@@ -205,7 +217,7 @@ Owns: scenes/orbit.js, scenes/orbit.css, tests/color-polish-scenes/orbit.spec.ts
 Work: slow the system (rate .102 today). Real depth: wider scale range, blur behind (the divide-by-1000 makes blur zero today), occlusion by z-index, shadow. Moons already orbit each planet; make them read as expression icons. Coordinated motion only, no independent drift.
 Acceptance: common spec plus orbit z values span both signs and at least one planet passes behind the sun (z-index below the sun) within 30 seconds.
 
-## Section 11: Milestone and Weekly Goal
+## Section 11: Milestone and Weekly Goal (renderer id 11)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone, branch tv/scene-milestone
@@ -215,7 +227,7 @@ Reviewers: controller=Claude Sonnet 5 · high; independent=none
 Hygiene: Haiku 4.5 · low sweep before review
 Owns: scenes/milestone.js, scenes/milestone.css, tests/color-polish-scenes/milestone.spec.ts, lanes/milestone.md, logs/milestone/.
 Work: ground-up build. Compact milestone and goal text on the left of the content area, a vertical 3D helix stream of small bubbles on the right, extreme depth (scale, blur, opacity, occlusion), per-bubble speed, radius, pace and rotation, expression icons in the stream, never empty, no visible loop. mountTributes and tickTributes become this lane's file.
-Acceptance: common spec plus stream node count stays above a floor for the full 30 seconds and no node repeats the same path twice.
+Acceptance: common spec plus the stream shows at least 12 nodes at every sampled second for 30 seconds, each node carries its own seeded radius, speed and phase (no two nodes share all three), and no node moves more than 40 px between consecutive frames at 60 fps except at a deliberate respawn (Lane 0 objection 3 replaced the unverifiable "never repeats a path").
 
 ## Section 12: Pick, integration and release
 Setup: balanced · high · Lane: Claude (coordinator glue) · Review: controller + independent
@@ -225,9 +237,9 @@ Depends on: whichever scene lanes Anthony picks
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high on the merge; independent=Claude Opus 5 · high completion review
 Hygiene: Haiku 4.5 · low sweep before review
-Work: recreate tv/pick from tv/base, merge the chosen scene branches, run the full probe with --arrivals and the whole Playwright suite, push, send Anthony the Vercel preview URL. He watches a full playlist cycle and one click advance on the TV. Opus review, fix blocking findings, merge into codex/color-polish-v6 then codex/mothers-love, verify the production deployment, update README quick links, HANDOFF, AGENTS read-first list and /Users/anthony/Projects/README.md.
+Work: recreate tv/pick from tv/base, merge the chosen scene branches, run the full probe with --arrivals and the whole Playwright suite, push, send Anthony the Vercel preview URL. He watches a full playlist cycle and one click advance on the TV. Opus review, fix blocking findings, merge into codex/color-polish-v6 then codex/mothers-love, verify the production deployment, update README quick links, HANDOFF, AGENTS read-first list and /Users/anthony/Projects/README.md. Rollback (Lane 0 objection 7): before promoting, record the production commit of codex/mothers-love in the Build log; if the TV shows a rendering fault after promotion, `git revert -m 1 <merge commit>` on codex/mothers-love and push (Vercel redeploys), or promote the previous production deployment in the Vercel dashboard; both restore the Plan 12 renderer with no database change.
 
-## Common scene spec (tests/color-polish-scenes/<slug>.spec.ts)
+## Common scene spec (tests/color-polish-scenes/<slug>.spec.ts, built on Section 0b helpers.ts)
 1. Circularity during entrance, steady state and exit, including a transition and an arrival: every .orb-slot, .orb and .event-orb has width equal to height within one pixel and computed border-radius of 50 percent.
 2. No overflow on the scene root.
 3. Reduced motion: reducedMotion reduce renders the scene, getState().still is true, no runtime error.
@@ -239,7 +251,7 @@ Plus, per lane: typecheck, lint, test, build, test:e2e, and the probe at 1920 an
 One per scene at docs/runs/2026-09-11-tv-scenes/gaps/<slug>.md, written by Fable before that lane codes, with fields: Prompt asks, Prototype v6 2 does, Live does (renderer line), Gap, Decision, Testable acceptance, Risk. Anthony approves each report before its lane launches; reports for one sitting are written together.
 
 ## Order of work
-1. Section 0 alone, pixel-proven, plus Lane 0 critique alongside. Then gap reports for sitting one.
+1. Section 0 alone, pixel-proven, plus Lane 0 critique alongside. Then Section 0b on tv/base. Gap reports for sitting one are written while those run.
 2. Sitting one: Sections 5, 7, 8 (calendar, status, expressions).
 3. Sitting two: Sections 1, 4, 6 (welcome, featured, peacemakers).
 4. Sitting three: Sections 9, 2 (peace in practice, garden).
@@ -256,3 +268,8 @@ Anthony can call Section 12 after any sitting.
 ## Build log
 - 2026-09-10: Anthony chose Parallel mode, ruled out Gemini 3.1 Pro entirely (3.8 Flash only), and asked that Haiku 4.5 carry the mechanical rows; setup lines updated before launch.
 - 2026-09-10: Plan approved by Anthony in plan mode (Fable 5.1 planner, per his instruction). Baseline for the completion review: codex/color-polish-v6, codex/mothers-love and origin/codex/mothers-love all at 1532068. Working tree dirty only with two untracked Plan 10 order files (docs/runs/2026-09-10-color-polish/orders/LM.md, LT.md), not touched by this plan. Codex primary at 100 percent, Gemini weekly at 2 percent, Claude weekly at 36 percent at planning time. Anthony rejected the v8 prototype; /Users/anthony/Downloads/Mothers_Love_TV_Prototype_v8.html moved to the Trash by the coordinator. Section 0 not started.
+- 2026-09-10 (evening, coordinator Fable 5.1, Parallel run started): Baseline confirmed before the first edit: codex/color-polish-v6 at 626ee3d, which is 1532068 plus the two Plan 13 docs commits (03456b4, 626ee3d); the working tree was clean. tv/base was cut from 626ee3d rather than 1532068 so the plan and record tree are readable inside the worktree under the Antigravity read gate (code identical). Worktree /Users/anthony/.claude/worktrees/mothers-love-tv-base with node_modules symlinked to the main checkout. Before-split probe baseline: two identical passes of six configs plus arrivals into docs/runs/2026-09-11-tv-scenes/logs/base/before/run1 and run2; 37 of 70 PNGs byte-deterministic, 33 vary between identical runs (listed in logs/base/before/determinism.txt), so the after-split comparison uses the deterministic set plus result.json state for every scene. Arrival style sequence before: singles 1,5,2,3,4,0 then groups 2,4,3,1,0.
+- 2026-09-10: Lane 0 critique ran on Gemini 3.8 Flash (High) through agy (the plan's named fallback; Codex primary at 100 percent, resets Tuesday 6:12 PM). Eight objections, disposition: 1 (CSS specificity, #tv prefix required) accepted, plan rule updated; 2 (section number versus renderer id) accepted, every scene section header now carries its renderer id; 3 (untestable acceptance in Sections 1, 3, 11) accepted, criteria rewritten and Section 0b added for visualState depth; 4 (Section 0 refactors all scenes, so tv/pick never runs the monolith) rejected as a finding: that is the design, the split is pixel-proven before any scene branch is cut, and "unchosen branches stay parked" refers to behavior work, not source layout; 5 (rightBubbles unowned) accepted, it lives in core/orbs.js; 6 (calendar click versus click-advance) accepted with the coordinator ruling that the day listener never stops propagation, so live TV still advances and day selection is a Studio preview affordance, open for Anthony to overturn; 7 (no rollback) accepted, rollback added to Section 12; 8 (no shared test fixtures) accepted, Section 0b adds tests/color-polish-scenes/helpers.ts on tv/base. Full critique at docs/runs/2026-09-11-tv-scenes/logs/lane0/critique.out.
+- 2026-09-10: Section 0 launched on Gemini 3.8 Flash (High) through agy in the tv/base worktree from the compiled order docs/runs/2026-09-11-tv-scenes/orders/base.md. Gap reports for sitting one written by Fable and awaiting Anthony's approval: gaps/calendar.md (only the entry pulse is missing; corner date, centered count and past-day shimmer are already live), gaps/status.md (per-icon timing already live; gap is motion vocabulary and an ambient layer; the plan's stated acceptance was already satisfied and is strengthened in the report), gaps/expressions.md (no overflow today; the real defect is the focused card 43 percent empty; the plan's scrollHeight acceptance must measure the visible layer because the hidden detail layer always overflows).
+- 2026-09-10 (late evening): Section 0 landed and reviewed, commit 313edb9 on tv/base. Writer Gemini 3.8 Flash (High) via agy in three dispatches: the split (ended on a headless-denied command after writing every file, so the coordinator deleted renderer.js), the record and CSS headers, and a round-2 correction. Setup line held (balanced, high). Evidence: every probe state identical to the baseline in all six configs plus arrivals, both before and after round 2; 27 of 37 deterministic PNGs byte-identical, the other 10 within 68 pixels of feed-rail text noise; typecheck, vitest and build pass; lint has 14 pre-existing errors identical on the baseline; the full Playwright suite has 70 pre-existing failures identical to the baseline (Plan 12 counted only the four folders it ran). The coordinator's like-for-like e2e comparison found one real regression the Sonnet 5 review had missed: window.colorPolishRuntime was exposed by core/stage.js before scenes/arrival.js declared the style tables, so the host's getState poll between deferred scripts threw; round 2 moved the runtime exposure and the bootstrap listener to boot.js and the usable spec passes 6 of 6. Sonnet note carried into Section 0b: registry default replaceMode becomes null with peacemakers registering drift explicitly. Worktree node_modules is a real npm ci install (Turbopack rejects a symlink). Large probe PNG sets stay local under logs/base; the repo keeps the text evidence and the after-r2 1920 checkpoint set. Anthony still owes: approval of the three sitting-one gap reports and a ruling on the calendar click (day selection is Studio-only under the coordinator ruling).
+
