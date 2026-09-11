@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cards</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body, #card-root {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .paper-bg {
+      background: radial-gradient(circle at 50% 50%, #fff6dc 0%, rgba(255, 246, 220, 0.45) 50%, #fffdf6 80%);
+      background-color: #fffdf6;
+    }
+    .transparent-bg {
+      background: transparent !important;
+    }
+
+    /* Title Layout */
+    .title-view {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px;
+    }
+    .title-heart {
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .title-heart svg {
+      width: 56px;
+      height: 56px;
+    }
+    .title-heading-16x9 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 96px;
+      line-height: 1.15;
+      color: #693b53;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      max-width: 1600px;
+    }
+    .title-heading-9x16 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 84px;
+      line-height: 1.15;
+      color: #693b53;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      max-width: 900px;
+    }
+    .title-tagline-16x9 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-size: 44px;
+      line-height: 1.3;
+      color: #303342;
+      margin-top: 32px;
+      max-width: 1500px;
+    }
+    .title-tagline-9x16 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-size: 40px;
+      line-height: 1.3;
+      color: #303342;
+      margin-top: 28px;
+      max-width: 880px;
+    }
+
+    /* Caption Layout */
+    .caption-view {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    #caption-panel {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 28px;
+      background: rgba(255, 253, 246, 0.94);
+      border: 2px solid #fff6dc;
+      box-shadow: 0 16px 48px rgba(48, 51, 66, 0.16);
+      padding: 28px 48px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .caption-panel-16x9 {
+      bottom: 96px;
+      max-width: 1500px;
+    }
+    .caption-panel-9x16 {
+      bottom: 340px;
+      max-width: 940px;
+    }
+    .caption-line-16x9 {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      font-size: 46px;
+      line-height: 1.25;
+      color: #303342;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .caption-line-9x16 {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      font-size: 50px;
+      line-height: 1.25;
+      color: #303342;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* End Layout 16x9 */
+    .end-view-16x9 {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      padding: 60px;
+    }
+    .end-qr-16x9 {
+      width: 520px;
+      height: 520px;
+      flex-shrink: 0;
+      display: block;
+    }
+    .end-info-16x9 {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 36px;
+      max-width: 1040px;
+    }
+    .end-heading-16x9 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 72px;
+      line-height: 1.2;
+      color: #693b53;
+      font-weight: 700;
+    }
+    .end-url-16x9 {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      font-size: 52px;
+      line-height: 1.2;
+      color: #303342;
+      word-break: break-all;
+    }
+
+    /* End Layout 9x16 */
+    .end-view-9x16 {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 60px 40px;
+      text-align: center;
+    }
+    .end-heading-9x16 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 64px;
+      line-height: 1.2;
+      color: #693b53;
+      font-weight: 700;
+      max-width: 960px;
+    }
+    .end-url-9x16 {
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 600;
+      font-size: 60px;
+      line-height: 1.2;
+      color: #303342;
+      max-width: 960px;
+      word-break: break-all;
+    }
+    .end-qr-9x16 {
+      width: 620px;
+      height: 620px;
+      flex-shrink: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="card-root"></div>
+  <script>
+    (function() {
+      const data = __CARD_DATA__;
+      const root = document.getElementById('card-root');
+      root.innerHTML = '';
+      const is16x9 = data.width >= data.height;
+
+      document.documentElement.style.width = data.width + 'px';
+      document.documentElement.style.height = data.height + 'px';
+      document.body.style.width = data.width + 'px';
+      document.body.style.height = data.height + 'px';
+      root.style.width = data.width + 'px';
+      root.style.height = data.height + 'px';
+
+      if (data.kind === 'title') {
+        document.body.className = 'paper-bg';
+        const view = document.createElement('div');
+        view.className = 'title-view';
+
+        const heart = document.createElement('div');
+        heart.className = 'title-heart';
+        heart.innerHTML = '<svg viewBox="0 0 24 24" fill="#ff8e86"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = is16x9 ? 'title-heading-16x9' : 'title-heading-9x16';
+        titleEl.textContent = data.title;
+
+        const taglineEl = document.createElement('div');
+        taglineEl.className = is16x9 ? 'title-tagline-16x9' : 'title-tagline-9x16';
+        taglineEl.textContent = data.tagline;
+
+        view.appendChild(heart);
+        view.appendChild(titleEl);
+        view.appendChild(taglineEl);
+        root.appendChild(view);
+      } else if (data.kind === 'caption') {
+        document.documentElement.className = 'transparent-bg';
+        document.body.className = 'transparent-bg';
+
+        const view = document.createElement('div');
+        view.className = 'caption-view';
+
+        const panel = document.createElement('div');
+        panel.id = 'caption-panel';
+        panel.className = is16x9 ? 'caption-panel-16x9' : 'caption-panel-9x16';
+
+        for (const line of (data.lines || [])) {
+          const lineEl = document.createElement('div');
+          lineEl.className = is16x9 ? 'caption-line-16x9' : 'caption-line-9x16';
+          lineEl.textContent = line;
+          panel.appendChild(lineEl);
+        }
+
+        view.appendChild(panel);
+        root.appendChild(view);
+      } else if (data.kind === 'end') {
+        document.body.className = 'paper-bg';
+
+        if (is16x9) {
+          const view = document.createElement('div');
+          view.className = 'end-view-16x9';
+
+          const qrImg = document.createElement('img');
+          qrImg.className = 'end-qr-16x9';
+          qrImg.src = data.qrDataUrl;
+
+          const info = document.createElement('div');
+          info.className = 'end-info-16x9';
+
+          const headingEl = document.createElement('div');
+          headingEl.className = 'end-heading-16x9';
+          for (const line of (data.lines || [])) {
+            const l = document.createElement('div');
+            l.textContent = line;
+            headingEl.appendChild(l);
+          }
+
+          const urlEl = document.createElement('div');
+          urlEl.className = 'end-url-16x9';
+          urlEl.textContent = data.url;
+
+          info.appendChild(headingEl);
+          info.appendChild(urlEl);
+
+          view.appendChild(qrImg);
+          view.appendChild(info);
+          root.appendChild(view);
+        } else {
+          const view = document.createElement('div');
+          view.className = 'end-view-9x16';
+
+          const headingEl = document.createElement('div');
+          headingEl.className = 'end-heading-9x16';
+          for (const line of (data.lines || [])) {
+            const l = document.createElement('div');
+            l.textContent = line;
+            headingEl.appendChild(l);
+          }
+
+          const urlEl = document.createElement('div');
+          urlEl.className = 'end-url-9x16';
+          urlEl.textContent = data.url;
+
+          const qrImg = document.createElement('img');
+          qrImg.className = 'end-qr-9x16';
+          qrImg.src = data.qrDataUrl;
+
+          view.appendChild(headingEl);
+          view.appendChild(urlEl);
+          view.appendChild(qrImg);
+          root.appendChild(view);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
