@@ -23,7 +23,8 @@ We Are Peacemakers scene (renderer id 8) implements three depth layers through m
 Round 1: the spec types the visualState actors (strict tsc had three implicit any errors).
 Round r2: top-level identifiers renamed with the PEACEMAKERS_ prefix to avoid cross-scene collisions in the shared global scope; blur capped at 0.9 px.
 Round r3: updated the depth-layer test sharp condition to parseBlur(a.blur) < 0.15 to accommodate default breathing blur on near actors.
-
+Round r4: six-bubble layout with staggered replacement, globe float and light sweep, kindness threads and light beads on fx canvas, departure petals, and thread-hit glow.
+Round r5: staggered retireAt to 9 + i * 4.6 s, added integrate exit gate and large-actor retirement exemption to prevent overlapping exits, localized overflow test to steady elements, reduced bead tail to 6 samples, and noted that in drift mode core fires no heart burst on exit, so the petals are the only departure effect.
 
 ## Coordinator verification (Fable 5.1)
 - Three corrections: spec typing for strict tsc; PEACEMAKERS_ prefix on the top-level const after the featured review found the cross-scene collision, plus a 0.9 px blur cap; sharp threshold below 0.15 px because the core path already writes sub-0.1 px blurs on near actors. typecheck, vitest, build pass; lint at the pre-existing 18; probe clean; Playwright on the production runner 12 of 13, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.

@@ -1,1 +1,76 @@
 /* Scene 8, We Are Peacemakers. Every rule in this file is scoped to #tv .scene[data-scene="8"]. Colors stay as shipped in renderer.css. */
+
+#tv .scene[data-scene="8"] img.art {
+  animation: peacemakers-globe-float 9s ease-in-out infinite;
+}
+
+#tv .scene[data-scene="8"] .globe-light {
+  position: absolute;
+  left: 271px;
+  top: 134px;
+  width: 604px;
+  height: 482px;
+  pointer-events: none;
+  z-index: 20;
+  overflow: hidden;
+  border-radius: 50%;
+  animation: peacemakers-globe-float 9s ease-in-out infinite;
+}
+
+#tv .scene[data-scene="8"] .globe-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.18) 50%, transparent 65%);
+  background-size: 260% 100%;
+  animation: peacemakers-globe-sweep 12s ease-in-out infinite;
+}
+
+#tv .scene[data-scene="8"] .orb-slot.thread-hit::before {
+  opacity: 1;
+  box-shadow: 0 0 38px var(--tint, #f3e7c6), 0 0 16px #ffffff;
+  transition: opacity 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+@keyframes peacemakers-globe-float {
+  0%, 100% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes peacemakers-globe-sweep {
+  0%, 40% {
+    background-position: 200% 0;
+  }
+  70%, 100% {
+    background-position: -100% 0;
+  }
+}
+
+#tv.still .scene[data-scene="8"] img.art,
+#tv.still .scene[data-scene="8"] .globe-light,
+#tv.still .scene[data-scene="8"] .globe-light::after {
+  animation: none !important;
+  transform: none !important;
+}
+
+#tv.still .scene[data-scene="8"] .orb-slot.thread-hit::before {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tv .scene[data-scene="8"] img.art,
+  #tv .scene[data-scene="8"] .globe-light,
+  #tv .scene[data-scene="8"] .globe-light::after {
+    animation: none !important;
+    transform: none !important;
+  }
+  #tv .scene[data-scene="8"] .orb-slot.thread-hit::before {
+    transition: none !important;
+  }
+}
+
