@@ -1,0 +1,11 @@
+The petal carry test in [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) has been rewritten to drive the renderer directly through the sandboxed probe harness.
+
+### Summary of changes
+1. In [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts), added a local `setupGardenHarness` function using Playwright routing and Node built-ins (`readFile`, `resolve`). It loads `/probe` with the sandboxed `/color-polish/renderer.html` iframe, serves static assets from `public`, bootstraps the `MessageChannel`, posts the initial update with `scene: 'garden'`, and waits until `getState().scene === 2`.
+2. Updated `petals are carried, not dropped` to advance time using `window.colorPolishRuntime.step(ms)` to 15000, 17000, 20500, and 23000 ms, asserting petal counts on `#living-garden` dataset after each step (> 0, > 0, === 0, > 0). The other five scene tests remain unchanged.
+3. Appended the Round r6 execution summary to the Result section of [garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

@@ -1,0 +1,12 @@
+welcome typecheck exit 0
+welcome syntax ok
+welcome spec isolated: spec rerun exit 0   7 passed (13.6s) DONE 
+welcome probe PASS
+welcome committed 880ea9f and pushed
+merged into pick 22133ff
+pick build exit 0
+pick scenes+usable final exit 1   1 failed   63 passed (2.3m) 
+  1) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 sec
+probe nonzero exits: 0
+pick pushed 22133ff
+FINISHED
