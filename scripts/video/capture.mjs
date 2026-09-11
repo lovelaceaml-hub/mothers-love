@@ -148,9 +148,8 @@ async function setupRoutes(context) {
 async function recordClip(beat, variant, browser) {
   const context = await browser.newContext(getContextOptions(variant, TMP_DIR));
   await context.addInitScript(() => {
-    const style = document.createElement('style');
-    style.textContent = 'nextjs-portal{display:none!important}';
-    document.documentElement.appendChild(style);
+    const hide = () => document.querySelectorAll('nextjs-portal').forEach((el) => el.style.setProperty('display', 'none', 'important'));
+    setInterval(hide, 100);
   });
   await setupRoutes(context);
   const page = await context.newPage();
