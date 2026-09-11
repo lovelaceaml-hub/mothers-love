@@ -6,6 +6,8 @@ import { resolve } from 'node:path';
 import { FEED_ITEMS, REACTION_COUNTS, buildDisplayFixture, RECEIPT } from './fixtures.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
+const PORT = String(process.env.VIDEO_PORT || '3100');
+const BASE = `http://127.0.0.1:${PORT}`;
 const CLIPS_DIR = resolve(ROOT, 'docs/private/video/clips');
 const TMP_DIR = resolve(CLIPS_DIR, 'tmp');
 const SHEETS_DIR = resolve(CLIPS_DIR, 'sheets');
@@ -36,7 +38,7 @@ async function isServerRunning(url) {
 function getContextOptions(variant, tmpDir) {
   if (variant === '16x9') {
     return {
-      baseURL: 'http://127.0.0.1:3100',
+      baseURL: BASE,
       viewport: { width: 1920, height: 1080 },
       deviceScaleFactor: 1,
       reducedMotion: 'no-preference',
@@ -48,7 +50,7 @@ function getContextOptions(variant, tmpDir) {
     };
   }
   return {
-    baseURL: 'http://127.0.0.1:3100',
+    baseURL: BASE,
     viewport: { width: 540, height: 960 },
     deviceScaleFactor: 2,
     isMobile: true,
@@ -335,7 +337,7 @@ async function main() {
           process.kill(-devChild.pid, 'SIGTERM');
         } catch {}
         await pause(2000);
-        if (await isServerRunning('http://127.0.0.1:3100/')) {
+        if (await isServerRunning(`${BASE}/`)) {
           try {
             process.kill(-devChild.pid, 'SIGKILL');
           } catch {}
@@ -352,10 +354,10 @@ async function main() {
   });
 
   try {
-    const serverReady = await isServerRunning('http://127.0.0.1:3100/');
+    const serverReady = await isServerRunning(`${BASE}/`);
     if (!serverReady) {
-      console.log('Starting dev server on port 3100...');
-      devChild = spawn('npm', ['run', 'dev', '--', '--hostname', '127.0.0.1', '--port', '3100'], {
+      console.log(`Starting dev server on port ${PORT}...`);
+      devChild = spawn('npm', ['run', 'dev', '--', '--hostname', '127.0.0.1', '--port', PORT], {
         cwd: ROOT,
         env: { ...process.env, npm_config_cache: '/tmp/npm-cache' },
         stdio: 'inherit',
@@ -365,7 +367,7 @@ async function main() {
       const startTime = Date.now();
       let online = false;
       while (Date.now() - startTime < 120_000) {
-        if (await isServerRunning('http://127.0.0.1:3100/')) {
+        if (await isServerRunning(`${BASE}/`)) {
           online = true;
           break;
         }
@@ -373,7 +375,7 @@ async function main() {
       }
 
       if (!online) {
-        throw new Error('Dev server failed to start within 120s on http://127.0.0.1:3100/');
+        throw new Error(`Dev server failed to start within 120s on ${BASE}/`);
       }
       console.log('Dev server is up.');
     }
