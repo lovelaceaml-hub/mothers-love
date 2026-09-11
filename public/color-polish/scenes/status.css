@@ -1,1 +1,64 @@
 /* Scene 6, Participation Status. Every rule in this file is scoped to #tv .scene[data-scene="6"]. Colors stay as shipped in renderer.css. */
+
+#tv .scene[data-scene="6"] .expression-stats {
+  overflow: hidden;
+}
+
+#tv .scene[data-scene="6"] .stat-expression {
+  position: relative;
+  z-index: 1;
+}
+
+#tv .scene[data-scene="6"] .expression-stats::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 38%, #FFFFFF59 50%, transparent 62%);
+  background-size: 320% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #tv .scene[data-scene="6"] .expression-stats::after {
+    animation: status-light-sweep 22s ease-in-out infinite;
+  }
+
+  #tv .scene[data-scene="6"] .stat-expression {
+    animation: status-card-glow 9s ease-in-out infinite;
+  }
+
+  #tv .scene[data-scene="6"] .stat-expression:nth-child(3n+1) {
+    animation-delay: 0s;
+  }
+
+  #tv .scene[data-scene="6"] .stat-expression:nth-child(3n+2) {
+    animation-delay: -3s;
+  }
+
+  #tv .scene[data-scene="6"] .stat-expression:nth-child(3n+3) {
+    animation-delay: -6s;
+  }
+
+  @keyframes status-light-sweep {
+    0% {
+      background-position: 160% 0;
+    }
+    100% {
+      background-position: -160% 0;
+    }
+  }
+
+  @keyframes status-card-glow {
+    0%, 100% {
+      box-shadow: 0 17px 29px -22px #79684755, inset 0 2px 0 #fff;
+    }
+    50% {
+      box-shadow: 0 17px 29px -22px #79684755, inset 0 2px 0 #fff, 0 0 22px #D5BC7940;
+    }
+  }
+}
+
+#tv.still .scene[data-scene="6"] .expression-stats::after,
+#tv.still .scene[data-scene="6"] .stat-expression {
+  animation: none !important;
+}
