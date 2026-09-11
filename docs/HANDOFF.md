@@ -1,3 +1,7 @@
+## September 10: TV click advance and home action
+
+Two follow-up changes from Plan 10 are live at https://mothers-love.vercel.app. On the TV display at /display, a click, tap, ArrowRight or Space now advances to the next scene, live only, never in the Studio sample preview. On phones, the single Share a recognition action now sits above Recent recognitions with a coral, peach and gold shimmer, and /recognize shows only the form, with no live campaign feed; both name fields show titled examples like B. Daniel and S. Grace L. Verified in the main checkout: typecheck clean, 222 of 222 unit tests, a production build, and 55 browser journeys passing, 1 skipped, and 3 pre-existing failures unchanged from before this release. Deployed as commit 076c4cd, Vercel deployment dpl_9DsFVYvDX1fSXRirH3vGHfxeFwQd, READY. Rollback runs npx vercel rollback to dpl_BaxrmngrNd8yEjFttZUQBQBKTMRr, commit 06172bb, the Plan 10 build; no database change was involved. Read /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md for the full history.
+
 ## September 10: Color Polish live
 
 Color Polish TV and sample preview are live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, running the new renderer with 10 scenes, replay and pause. Database settings are at version 6, revision 2, presentation enabled true.

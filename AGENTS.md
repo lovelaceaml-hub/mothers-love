@@ -1,12 +1,15 @@
 ## Color Polish live (September 10)
 The Color Polish release is complete and live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, database settings version 6, revision 2, presentation enabled true. Activation and rollback are SQL-only today, through the two research files docs/runs/2026-09-10-color-polish/research/activation.sql and docs/runs/2026-09-10-color-polish/research/rollback.sql; no admin route exists yet for either. Read /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md and its Build log, and the run record at /Users/anthony/Projects/mothers-love/docs/runs/2026-09-10-color-polish/INDEX.md, for the full history and the remaining follow-ups.
 
+A click, tap, ArrowRight or Space on the live TV display now advances to the next scene, never in the Studio sample preview. Read /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md for that change and the two home page follow-ups alongside it.
+
 # The Words of Mother's Love
 
 ## Current authority
 Anthony explicitly requested: "I want you to plan out this entire app and deploy it." This supersedes the historical planning-only handoff. Local implementation, dependencies, isolated new app hosting and deployment are authorized. Purchases need explicit budget authority. Existing apps/databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
 
 ## Read first
+- /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md including Build log.
 - /Users/anthony/Projects/mothers-love/docs/PLAN-09-interview-completion.md including Build log.
 - /Users/anthony/Projects/mothers-love/docs/runs/2026-09-09-interview-completion/INDEX.md.
 - /Users/anthony/Projects/mothers-love/docs/PLAN-07-flexible-names.md including Build log.
@@ -39,7 +42,7 @@ Home motion is approved and deployed: coral/gold primary action, gentle decorati
 Anthony approved warmer, lighter typography, distinct TV screen animations, fitting rounded content panels, heart counts with one toggleable like per browser without sign-in, and a scrollable latest-30 feed. Shared feed appears only on public pages and every eligible TV screen; admin/sign-in remain focused. TV personal content derives only from the verified public display snapshot. Neutral, Quiet, expired and stale states clear personal content. Likes never affect campaign totals, ordering, feature priority or lifetime. See PLAN-04 and its reaction contract for the additive runtime-only database and anonymous-cookie boundaries.
 
 ## Confirmed presentation correction
-Preserve the approved circular Bubble Board and expressive drift, sparkle, bounce, trails and constellation movement. Readable long-message panels do not replace the signature circular compositions. TV screen titles occupy the main header top-right. Recognition Garden uses bubbles as its live feed and has no duplicate recent-recognition rail; other eligible TV screens retain the rail. On /recognize, expressions stack one per row at every width, selected expression cards turn gold with shimmer and a check indicator, and a compact scrollable live feed sits below titles and above the form. Gold shimmer applies to selected expressions, not the submit button. Respect reduced motion and existing privacy states.
+Preserve the approved circular Bubble Board and expressive drift, sparkle, bounce, trails and constellation movement. Readable long-message panels do not replace the signature circular compositions. TV screen titles occupy the main header top-right. Recognition Garden uses bubbles as its live feed and has no duplicate recent-recognition rail; other eligible TV screens retain the rail. On /recognize, expressions stack one per row at every width, selected expression cards turn gold with shimmer and a check indicator. As of September 10, at Anthony's request, /recognize shows only the form, with no live feed; the home page keeps the feed, with the single shimmering Share a recognition action above Recent recognitions on phones. Gold shimmer applies to selected expressions, not the submit button. Respect reduced motion and existing privacy states.
 
 ## Direct TV access correction
 Anthony removes TV pairing: /display opens directly for anyone with the link. Public TV snapshot is read-only and explicitly projected, with no code, login, device registration, session token or acknowledgement. Admin access remains secured. Global settings, neutral/quiet, expiry, cleanup gating and offline safety remain. Historical paired-only wording below older plans is superseded. Read PLAN-05.
