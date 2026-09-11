@@ -1,0 +1,23 @@
+Landing review corrections for Round r3 are complete across all allowlisted files.
+
+The wave animation delays now start with a 0.8s base offset so the entry pulse completes cleanly, `.day.today` no longer runs the entry pulse, count wave cresting relies on brightness and text-shadow without scale transforms to prevent cell scroll overflow, expression glow highlights use shipped color `#b4677b`, `calendarCacheCells` queries counts directly from `numberValue`, and the Playwright day-click test verifies the selected day through the runtime state.
+
+### What works now
+1. [calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css): Delayed `calendarWave` and `calendarWaveCount` by `calc(0.8s + var(--day-index, 0) * 0.35s)`, preserved the 60ms stagger on `.day.past` entry pulse, removed entry pulse from `.day.today`, eliminated transform scale on `b` in `calendarWaveCount` in favor of `filter: brightness(1.12)` and `text-shadow`, and aligned the highlight color stop in `calendarRowGlowB` with `#b4677b`.
+2. [calendar.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js): `calendarCacheCells` now constructs the month day key from `el.dataset.day` and reads `numberValue('d:' + key + ':rec')` instead of relying on zeroed text nodes during mount.
+3. [calendar.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts): Studio day click test now evaluates `document.querySelector('.day.today')?.dataset.day` against `targetDay` directly.
+4. [calendar.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md): Appended the Round r3 result entry to the lane run log.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step
+Review the modified files and trigger coordinator validation.
+
+1. Proceed with coordinator verification tests?
+
+## COMPLETION
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)

@@ -1,0 +1,13 @@
+The welcome scene coordinates now clamp using the rotated bounding box extent to eliminate stage overflow.
+
+During entrance and exit animations, Z rotation enlarges a slot's axis-aligned bounding box by a spread factor of `|cos R| + |sin R|`. Computing the rotated half extent before applying the 8 px margin keeps bubbles inside the 1812 by 636 stage bounds at every angle. The clamping logic is updated in [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) and logged in [welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md).
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Run the coordinator Playwright test to verify the welcome scene assertions pass.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md

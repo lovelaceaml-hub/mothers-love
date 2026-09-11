@@ -1,17 +1,17 @@
 
 Running 13 tests using 2 workers
 
-  ✓   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (2.5s)
-  ✓   2 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (3.1s)
-  ✓   4 [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies (1.3s)
-  ✓   3 [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s (3.1s)
-  ✓   6 [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed (8.3s)
-  ✓   5 [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms (9.7s)
-  ✓   7 [chromium] › tests/color-polish-scenes/status.spec.ts:242:5 › no icon exceeds the motion envelope over 30 seconds (6.0s)
-  ✓   8 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.2s)
-  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (298ms)
-  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (626ms)
-  ✓   9 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.6s)
+  ✓   2 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (877ms)
+  ✓   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (1.4s)
+  ✓   4 [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies (772ms)
+  ✓   3 [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s (2.5s)
+  ✓   5 [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms (1.4s)
+  ✓   6 [chromium] › tests/color-polish-scenes/status.spec.ts:204:5 › the ambient sweep runs only when motion is allowed (1.9s)
+  ✓   7 [chromium] › tests/color-polish-scenes/status.spec.ts:236:5 › no icon exceeds the motion envelope over 30 seconds (5.4s)
+  ✓   9 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.2s)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (210ms)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (415ms)
+  ✓   8 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.0s)
   ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.2s)
   ✘  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
 
@@ -43,4 +43,4 @@ Running 13 tests using 2 workers
 
   1 failed
     [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
-  12 passed (1.7m)
+  12 passed (1.5m)

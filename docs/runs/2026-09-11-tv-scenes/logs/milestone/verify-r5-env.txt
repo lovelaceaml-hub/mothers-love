@@ -1,0 +1,14 @@
+build (env) exit 0
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  3) [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s 
+  4) [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual 
+  5) [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth ────────────────
+  6) [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms 
+  7) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches 
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  9 failed
+  4 passed (4.6m)
+DONE

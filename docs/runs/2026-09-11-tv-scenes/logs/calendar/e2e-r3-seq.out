@@ -1,0 +1,89 @@
+
+Running 16 tests using 5 workers
+
+  ✓   1 [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms (4.8s)
+  ✓   3 [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms (4.7s)
+  ✓   4 [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s (5.6s)
+  ✘   5 [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count (5.7s)
+  ✓   7 [chromium] › tests/color-polish-scenes/calendar.spec.ts:225:5 › reduced motion renders the calendar still with no pulse (2.6s)
+  ✓   2 [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle (7.4s)
+  ✓   6 [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance (3.1s)
+  ✓   9 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (1.2s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (268ms)
+  ✘   8 [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840 (3.6s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (529ms)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.7s)
+  ✓  15 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (1.4s)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.1s)
+  ✓  16 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.3s)
+  ✘  14 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m164[39m
+    Received:    [31m167[39m
+
+      47 |     expect(cell.bCenterXDiff).toBeLessThanOrEqual(2);
+      48 |     expect(cell.bCenterYDiff).toBeLessThanOrEqual(2);
+    > 49 |     expect(cell.scrollWidth).toBeLessThanOrEqual(cell.clientWidth);
+         |                              ^
+      50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
+      51 |   }
+      52 | }
+        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:73:3
+
+    Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840 ────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m164[39m
+    Received:    [31m167[39m
+
+      47 |     expect(cell.bCenterXDiff).toBeLessThanOrEqual(2);
+      48 |     expect(cell.bCenterYDiff).toBeLessThanOrEqual(2);
+    > 49 |     expect(cell.scrollWidth).toBeLessThanOrEqual(cell.clientWidth);
+         |                              ^
+      50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
+      51 |   }
+      52 | }
+        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:243:3
+
+    Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840 ─────────
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  13 passed (1.4m)

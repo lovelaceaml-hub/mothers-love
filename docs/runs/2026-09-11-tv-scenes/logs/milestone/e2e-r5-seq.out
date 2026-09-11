@@ -1,0 +1,65 @@
+
+Running 13 tests using 5 workers
+
+  ✓   5 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (3.9s)
+  ✓   6 [chromium] › tests/color-polish-scenes/milestone.spec.ts:178:5 › reduced motion renders the milestone still (2.4s)
+  ✓   4 [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual (8.5s)
+  ✘   7 [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms (1.4s)
+  ✓   2 [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s (9.1s)
+  ✓   9 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (239ms)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (636ms)
+  ✓   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (10.2s)
+  ✓   3 [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth (11.7s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.9s)
+  ✓   8 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.0s)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.4s)
+  ✘  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m540[39m
+    Received:    [31m259[39m
+
+      215 |     expect(rail.scrollWidth).toBeLessThanOrEqual(rail.clientWidth + 1);
+      216 |     expect(rail.leftWithinScene).toBeLessThan(60);
+    > 217 |     expect(rail.width).toBeGreaterThanOrEqual(540);
+          |                        ^
+      218 |   }
+      219 | });
+      220 |
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:217:24
+
+    Error Context: test-results/color-polish-scenes-milest-f731a-without-overflow-at-2000-ms-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  2 failed
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  11 passed (1.5m)

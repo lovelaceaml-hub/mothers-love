@@ -1,0 +1,5 @@
+e2e exit 1
+  1) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  1 failed
+  15 passed (1.6m)
+DONE

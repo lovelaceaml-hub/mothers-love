@@ -1,0 +1,324 @@
+
+Running 15 tests using 5 workers
+
+  ✘   2 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (19.2s)
+  ✘   3 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:42:5 › at 2000 ms visualState actors count is at least 5 unless one actor is large (35.7s)
+  ✘   1 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:59:5 › bubble count never zero and at most one actor exiting at fresh opens (35.5s)
+  ✘   5 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (35.2s)
+  ✘   4 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:27:5 › peacemakers renders circular bubbles and no overflow at 14 s (35.1s)
+  ✘   6 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:79:5 › bubbles span two depth layers with blur only on deeper layers (50.7s)
+  ✘   7 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:141:5 › the globe-light element and fx canvas exist at 6000 ms (38.7s)
+  ✘   9 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:159:5 › reduced motion renders the peacemakers scene still (59.9s)
+  ✘   8 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:149:5 › bubbles stay circular during replacement (1.1m)
+  ✘  10 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (52.5s)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (27.5s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (9.6s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (15.4s)
+  ✓  14 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (27.1s)
+  ✘  15 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3124/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    - unexpected value "http://127.0.0.1:3124/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3124/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    7 × unexpected value "http://127.0.0.1:3124/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:27:5 › peacemakers renders circular bubbles and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3124/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    5 × unexpected value "http://127.0.0.1:3124/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:28:21
+
+    Error Context: test-results/color-polish-scenes-peacem-2daa7-les-and-no-overflow-at-14-s-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:42:5 › at 2000 ms visualState actors count is at least 5 unless one actor is large 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('color-polish-studio')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('color-polish-studio')[22m
+
+
+       at color-polish-scenes/helpers.ts:289
+
+      287 |   await signInAs(page);
+      288 |   await page.goto('/admin/display');
+    > 289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+          |                                                         ^
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+      292 |   const selector = page.getByLabel('Color Polish preview scene');
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:289:57)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:43:21
+
+    Error Context: test-results/color-polish-scenes-peacem-55728-5-unless-one-actor-is-large-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:59:5 › bubble count never zero and at most one actor exiting at fresh opens 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3124/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    5 × unexpected value "http://127.0.0.1:3124/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:62:23
+
+    Error Context: test-results/color-polish-scenes-peacem-e7b49-ctor-exiting-at-fresh-opens-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:79:5 › bubbles span two depth layers with blur only on deeper layers 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3124/admin/login", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:124
+
+      122 |  */
+      123 | export async function signInAs(page: Page, role: 'owner' | 'moderator' = 'owner') {
+    > 124 |   await page.goto('/admin/login');
+          |              ^
+      125 |   await page.getByLabel('Email address').fill(`${role}@synthetic.test`);
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:124:14)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:9)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:80:21
+
+  7) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:141:5 › the globe-light element and fx canvas exist at 6000 ms 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: frame.$: Test timeout of 30000ms exceeded.
+
+      143 |   const globeLight = await frame.$('.globe-light');
+      144 |   expect(globeLight).not.toBeNull();
+    > 145 |   const fxCanvas = await frame.$('canvas.scene-fx');
+          |                                ^
+      146 |   expect(fxCanvas).not.toBeNull();
+      147 | });
+      148 |
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:145:32
+
+    Error Context: test-results/color-polish-scenes-peacem-f2ef0--fx-canvas-exist-at-6000-ms-chromium/error-context.md
+
+  8) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:149:5 › bubbles stay circular during replacement 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3124/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    3 × unexpected value "http://127.0.0.1:3124/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:152:23
+
+    Error Context: test-results/color-polish-scenes-peacem-6db64-circular-during-replacement-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:159:5 › reduced motion renders the peacemakers scene still 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Sign in' })[22m
+    [2m    - locator resolved to <button type="submit" class="admin-module__nc4JNq__button">Sign in</button>[22m
+    [2m  - attempting click action[22m
+    [2m    - waiting for element to be visible, enabled and stable[22m
+
+
+       at color-polish-scenes/helpers.ts:127
+
+      125 |   await page.getByLabel('Email address').fill(`${role}@synthetic.test`);
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+    > 127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+          |                                                       ^
+      128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+      129 | }
+      130 |
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:127:55)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:160:28
+
+    Error Context: test-results/color-polish-scenes-peacem-d29dd-the-peacemakers-scene-still-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('iframe').contentFrame().getByText('Synthetic Friend').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('iframe').contentFrame().getByText('Synthetic Friend').first()[22m
+
+
+      217 |   await page.goto('/display');
+      218 |   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+    > 219 |   await expect(page.frameLocator('iframe').getByText('Synthetic Friend').first()).toBeVisible();
+          |                                                                                   ^
+      220 |   quiet = true;
+      221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
+      222 |   await expect(page.locator('iframe')).toHaveCount(0);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:219:83
+
+    Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
+
+  11) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  11 failed
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:27:5 › peacemakers renders circular bubbles and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:42:5 › at 2000 ms visualState actors count is at least 5 unless one actor is large 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:59:5 › bubble count never zero and at most one actor exiting at fresh opens 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:79:5 › bubbles span two depth layers with blur only on deeper layers 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:141:5 › the globe-light element and fx canvas exist at 6000 ms 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:149:5 › bubbles stay circular during replacement 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:159:5 › reduced motion renders the peacemakers scene still 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  4 passed (7.2m)

@@ -1,0 +1,18 @@
+build (env) exit 0
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/featured.spec.ts:10:5 › featured renders circular bubbles and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/featured.spec.ts:24:5 › the scene stays populated and replaces one bubble at a time 
+  3) [chromium] › tests/color-polish-scenes/featured.spec.ts:36:5 › bubbles span two depth layers ──
+  4) [chromium] › tests/color-polish-scenes/featured.spec.ts:56:5 › bubbles stay circular during an exit 
+  5) [chromium] › tests/color-polish-scenes/featured.spec.ts:67:5 › reduced motion renders the featured scene still 
+  6) [chromium] › tests/color-polish-scenes/featured.spec.ts:76:5 › expression panel displays catalog content and eight orbit icons at 2 s and 17 s 
+  7) [chromium] › tests/color-polish-scenes/featured.spec.ts:118:5 › expression panel rotates across fresh opens 
+  8) [chromium] › tests/color-polish-scenes/featured.spec.ts:132:5 › in-pass advance flips cleanly with no error at 16 s 
+  9) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  10) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  11) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  12) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+  13) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  13 failed
+  3 passed (7.1m)
+DONE

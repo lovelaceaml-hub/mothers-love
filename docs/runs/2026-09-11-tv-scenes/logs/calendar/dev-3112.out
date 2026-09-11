@@ -1,0 +1,34 @@
+
+> mothers-love@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3112
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3112
+- Network:       http://127.0.0.1:3112
+✓ Ready in 2.6s
+✓ Running next.config.ts took 2.5s
+
+ GET /admin/login 200 in 2.5s (next.js: 1697ms, application-code: 795ms)
+ GET /admin/display 200 in 207ms (next.js: 48ms, application-code: 159ms)
+○ Compiling /display ...
+ GET /display 200 in 9.8s (next.js: 8.1s, application-code: 1697ms)
+ GET /admin/login 200 in 1303ms (next.js: 81ms, application-code: 1222ms)
+ GET /admin/login 200 in 1555ms (next.js: 385ms, application-code: 1170ms)
+ GET /admin/login 200 in 1411ms (next.js: 216ms, application-code: 1195ms)
+ GET /admin/login 200 in 1743ms (next.js: 597ms, application-code: 1145ms)
+ GET /admin/login 200 in 1156ms (next.js: 455ms, application-code: 701ms)
+○ Compiling /admin ...
+ GET /admin 200 in 15.8s
+ GET /admin 200 in 21.0s (next.js: 20.9s, application-code: 135ms)
+ GET /admin 200 in 22.9s (next.js: 22.1s, application-code: 812ms)
+ GET /admin/login 200 in 3.4s (next.js: 54ms, application-code: 3.4s)
+ GET /admin 200 in 1883ms (next.js: 464ms, application-code: 1419ms)
+ GET /admin/display 200 in 13.1s (next.js: 7.8s, application-code: 5.3s)
+ GET /display 200 in 5.4s (next.js: 480ms, application-code: 5.0s)
+ GET /admin/login 200 in 4.3s (next.js: 836ms, application-code: 3.5s)
+ GET /display 200 in 4.1s (next.js: 1778ms, application-code: 2.3s)
+ GET /display 200 in 21.5s (next.js: 401ms, application-code: 21.1s)
+ GET /display 200 in 491ms (next.js: 28ms, application-code: 463ms)
+ GET /display 200 in 520ms (next.js: 101ms, application-code: 419ms)
+ GET /display 200 in 542ms (next.js: 154ms, application-code: 388ms)
+[?25h
