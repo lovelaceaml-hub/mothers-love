@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Frame, type Page } from '@playwright/test';
 import {
   circularity,
   noOverflow,
@@ -6,6 +6,101 @@ import {
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
+import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
+const publicFolder = resolve(process.cwd(), 'public');
+
+async function setupOrbitHarness(page: Page): Promise<{ frame: Frame }> {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.addInitScript(() => {
+    let seed = 7301;
+    Math.random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    window.requestAnimationFrame = () => 0;
+  });
+
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/probe') {
+      return route.fulfill({
+        contentType: 'text/html',
+        body: '<html><body style="margin:0"><iframe title="Probe" sandbox="allow-scripts" referrerpolicy="no-referrer" src="/color-polish/renderer.html" style="width:100vw;height:100vh;border:0"></iframe></body></html>',
+      });
+    }
+    if (!url.pathname.startsWith('/color-polish/') || url.pathname.includes('..')) {
+      return route.abort();
+    }
+    const file = resolve(publicFolder, '.' + url.pathname);
+    const type = file.endsWith('.js')
+      ? 'text/javascript'
+      : file.endsWith('.css')
+      ? 'text/css'
+      : file.endsWith('.html')
+      ? 'text/html'
+      : file.endsWith('.svg')
+      ? 'image/svg+xml'
+      : 'image/png';
+    try {
+      const body = await readFile(file);
+      await route.fulfill({ contentType: type, body });
+    } catch {
+      await route.abort();
+    }
+  });
+
+  await page.goto('/probe');
+  const snapshot = buildColorPolishSampleSnapshot();
+
+  await page.evaluate(
+    async ({ snapshot }) => {
+      const frame = document.querySelector('iframe');
+      if (!frame || !frame.contentWindow) throw new Error('iframe not found');
+      const channel = new MessageChannel();
+      const nonce = crypto.randomUUID();
+      await new Promise<void>((resolve) => {
+        channel.port1.onmessage = (event) => {
+          if (event.data.type === 'color-polish:ready') resolve();
+        };
+        channel.port1.start();
+        frame.contentWindow!.postMessage(
+          { version: 'color-polish-v6', type: 'color-polish:bootstrap', nonce, sequence: 0 },
+          '*',
+          [channel.port2],
+        );
+      });
+      (window as any).probePort = channel.port1;
+      (window as any).probeNonce = nonce;
+      channel.port1.postMessage({
+        version: 'color-polish-v6',
+        type: 'color-polish:update',
+        nonce,
+        sequence: 1,
+        snapshot,
+        control: {
+          nowMs: Date.parse(snapshot.serverTime),
+          status: 'ready',
+          source: 'sample',
+          playing: true,
+          scene: 'orbit',
+          reactionCounts: {},
+          qrDataUrl: '',
+          submissionUrl: snapshot.submissionUrl,
+        },
+      });
+    },
+    { snapshot },
+  );
+
+  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+  if (!frame) throw new Error('renderer frame not found');
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().scene === 10);
+
+  return { frame };
+}
 
 test('orbit renders circular planets and no overflow at 14 s', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'orbit', 14000);
@@ -23,7 +118,7 @@ test('orbit renders circular planets and no overflow at 14 s', async ({ page }) 
 });
 
 test('planets orbit in 3D at the slower rate', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'orbit', 1000);
+  const { frame } = await setupOrbitHarness(page);
 
   type OrbitSample = {
     ms: number;
@@ -33,7 +128,7 @@ test('planets orbit in 3D at the slower rate', async ({ page }) => {
 
   const checkpoints = [1000, 6000, 11000, 16000, 21000, 26000];
   const samples: OrbitSample[] = [];
-  let currentMs = 1000;
+  let currentMs = 0;
 
   for (const cp of checkpoints) {
     if (cp > currentMs) {
@@ -112,6 +207,7 @@ test('planets orbit in 3D at the slower rate', async ({ page }) => {
   }
 
   expect(measuredRate).not.toBeNull();
+  // The direct renderer harness is deterministic with no host poll interruptions.
   expect(measuredRate!).toBeGreaterThanOrEqual(0.082 * 0.92);
   expect(measuredRate!).toBeLessThanOrEqual(0.082 * 1.08);
 });
@@ -209,3 +305,33 @@ test('reduced motion renders the orbit still', async ({ page }) => {
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
 });
+
+test('across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names', async ({ context }) => {
+  test.setTimeout(60000);
+  const names = new Set<string>();
+  for (let i = 0; i < 6; i++) {
+    const page = await context.newPage();
+    const { frame } = await openStudioScene(page, 'orbit', 300);
+    const text = await frame.locator('.orbit-sun h2').innerText();
+    names.add(text.trim());
+    await page.close();
+  }
+  expect(names.size).toBeGreaterThanOrEqual(2);
+});
+
+test('at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'orbit', 300);
+  const sunName = (await frame.locator('.orbit-sun h2').innerText()).trim();
+  const catalogNames = await frame.evaluate(() => {
+    return (window as any).colorPolishRuntime.catalog.map((c: { name: string }) => c.name);
+  });
+  expect(catalogNames).toContain(sunName);
+
+  const orbSlotCounts = await frame.evaluate(() => {
+    const systems = Array.from(document.querySelectorAll('.planet-system'));
+    return systems.map((el) => el.querySelectorAll('.orb-slot').length);
+  });
+  expect(orbSlotCounts.length).toBeGreaterThan(0);
+  expect(orbSlotCounts.every((count) => count === 1)).toBe(true);
+});
+

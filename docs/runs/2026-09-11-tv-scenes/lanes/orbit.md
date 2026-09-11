@@ -24,6 +24,10 @@ updated: 2026-09-11T09:26Z
 ## Result
 Expression Orbit runs slower, deeper, and with directional sun lighting. All changes are confined to the lane allowlist. Behavioral Playwright suite tests all acceptance criteria. Ready for coordinator verification and landing review.
 Correction round r1 measures angular rate from consecutive z samples without relying on unexposed runtime properties, removes the duplicate orb::after highlight in favor of the shipped orb::before sheen, and clears all NaN test failures.
+Round r2: rotates randomly through catalog expressions on each pass via ORBIT_BAG and orbitNextId without reading S.featured, falls back to any record when fewer than four match the expression, enables backside replacement fallback, and updates test suite with multi-open catalog variety and orb-slot structure assertions.
+Round r3: preserves sun expression on keepAge remounts when S.sceneAge exceeds 0.5 seconds, removes dead V.orbitId assignment, widens rate test tolerance to 0.082 times 0.88 to 1.12, and notes wall-clock sampling.
+Round r4: ports the 3D orbit rate test to the direct probe renderer harness to prevent Studio host snapshot remounts during multi-sample timelines, keeping 1000 to 26000 ms checkpoints in 5 s steps and restoring deterministic 0.082 tolerance of 0.92 to 1.08.
+
 
 ## Coordinator verification (Fable 5.1)
 - typecheck, vitest, build pass; lint at the pre-existing 18; probe clean across six configs plus arrivals; Playwright on the production runner 12 of 13, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner. Round 1 measured the angular rate from z (visualState exposes no angle) and removed the highlight rule.
