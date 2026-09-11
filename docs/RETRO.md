@@ -72,3 +72,9 @@ For next time: Antigravity's headless gate only allows ls, cat, pwd, find, grep,
 Open follow-ups: pixel parity details, preset editing and advanced preview drafts, an admin route for activate and rollback, full lint cleanup, and physical TV and phone checks.
 
 The two follow-up lanes that same evening, the TV click advance and the home action polish, both failed on Gemini through agy even after the gate was widened: one stalled on its own background task, the other hit an unlogged headless denial. Both were completed by Sonnet 5, and routing implementation to Gemini through agy should wait until the headless denial is understood.
+
+## Plan 12
+
+What went well: the Vercel runtime logs ruled out the backend in minutes, so the coordinator did not waste time suspecting the database or API for what turned out to be a client-side flash. The writer found a real startup race, a React strict-mode polling guard, only because the browser tests ran in the real environment during correction rather than staying theoretical. The coordinator's legibility floor of .875rem kept the compact recognition cards readable instead of shrinking text past use.
+
+What to change: worktree writers cannot run the dev server because of the node_modules symlink, so browser-verified lanes should either run in the main checkout one at a time or the worktree setup should copy or install dependencies instead of symlinking them. A reasoned pixel number is not a measurement; the first pass at the card height correction estimated a number instead of measuring it, and the coordinator had to require an actual measured value before accepting the result.
