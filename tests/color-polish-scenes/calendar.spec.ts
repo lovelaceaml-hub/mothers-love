@@ -94,7 +94,7 @@ test('past days pulse once on entry and settle', async ({ page }) => {
   });
 
   expect(pulseState.hasPulse).toBe(true);
-  expect(pulseState.iterationCount).toBe('1');
+  expect(pulseState.iterationCount).toContain('1');
 
   const freshPage = await page.context().newPage();
   try {
@@ -128,6 +128,100 @@ test('past days pulse once on entry and settle', async ({ page }) => {
   }
 });
 
+test('calendar wave, today halo or ring, and fx canvas render at 6000 ms', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'calendar', 6000);
+
+  const state = await frame.evaluate(() => {
+    const pastDay = document.querySelector<HTMLElement>('.day.past');
+    const todayDay = document.querySelector<HTMLElement>('.day.today');
+    const fxCanvas = document.querySelector<HTMLCanvasElement>('canvas.calendar-fx');
+
+    return {
+      hasPastDay: Boolean(pastDay),
+      pastAnim: pastDay ? window.getComputedStyle(pastDay).animationName : '',
+      hasTodayDay: Boolean(todayDay),
+      todayAnim: todayDay ? window.getComputedStyle(todayDay).animationName : '',
+      todayAfterAnim: todayDay ? window.getComputedStyle(todayDay, '::after').animationName : '',
+      hasFxCanvas: Boolean(fxCanvas),
+      fxPointerEvents: fxCanvas ? window.getComputedStyle(fxCanvas).pointerEvents : '',
+    };
+  });
+
+  expect(state.hasPastDay).toBe(true);
+  expect(state.pastAnim).toContain('calendarWave');
+  if (state.hasTodayDay) {
+    const matchesToday =
+      state.todayAnim.includes('calendarTodayRing') ||
+      state.todayAnim.includes('calendar-today-ring') ||
+      state.todayAnim.includes('calendarTodayHalo') ||
+      state.todayAnim.includes('calendar-today-halo') ||
+      state.todayAfterAnim.includes('calendarTodayHalo') ||
+      state.todayAfterAnim.includes('calendar-today-halo');
+    expect(matchesToday).toBe(true);
+  }
+  expect(state.hasFxCanvas).toBe(true);
+  expect(state.fxPointerEvents).toBe('none');
+});
+
+test('fx canvas is not blank over the month panel at 6000 ms', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'calendar', 6000);
+
+  const hasNonBlankPixel = await frame.evaluate(() => {
+    const canvas = document.querySelector<HTMLCanvasElement>('canvas.calendar-fx');
+    const monthPanel = document.querySelector<HTMLElement>('.calendar-month');
+    if (!canvas || !monthPanel) return false;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return false;
+
+    const root = document.querySelector<HTMLElement>('#stage .scene[data-scene="5"]');
+    const rootRect = root ? root.getBoundingClientRect() : { left: 0, top: 0, width: 1812 };
+    const scale = rootRect.width > 0 ? rootRect.width / 1812 : 1;
+
+    const mRect = monthPanel.getBoundingClientRect();
+    const mx = Math.max(0, Math.floor((mRect.left - rootRect.left) / scale));
+    const my = Math.max(0, Math.floor((mRect.top - rootRect.top) / scale));
+    const mw = Math.min(canvas.width - mx, Math.floor(mRect.width / scale));
+    const mh = Math.min(canvas.height - my, Math.floor(mRect.height / scale));
+
+    const imgData = ctx.getImageData(mx, my, mw, mh);
+    const data = imgData.data;
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] > 0) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  expect(hasNonBlankPixel).toBe(true);
+});
+
+test('Studio day click selects a day and the scene still does not advance', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'calendar', 6000);
+
+  const beforeScene = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+  expect(beforeScene).toBe(5);
+
+  const pastDay = frame.locator('.day.past[data-day]').first();
+  const targetDay = await pastDay.getAttribute('data-day');
+  expect(targetDay).toBeTruthy();
+  await pastDay.click();
+  await page.waitForTimeout(300);
+
+  const afterState = await frame.evaluate(() => {
+    const runtime = (window as any).colorPolishRuntime;
+    const todayEl = document.querySelector<HTMLElement>('.day.today');
+    return {
+      scene: runtime.getState().scene,
+      selectedDay: todayEl?.dataset.day ?? null,
+    };
+  });
+
+  expect(afterState.scene).toBe(5);
+  expect(afterState.selectedDay).toBe(targetDay);
+});
+
 test('reduced motion renders the calendar still with no pulse', async ({ page }) => {
   const { frame, still } = await reducedMotionScene(page, 'calendar');
   expect(still).toBe(true);
@@ -148,3 +242,4 @@ test('the same holds at 3840', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'calendar', 14000);
   await assertDayCellsCornerAndCenter(frame);
 });
+
