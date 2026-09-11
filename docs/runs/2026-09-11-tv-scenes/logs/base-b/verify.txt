@@ -1,0 +1,18 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+stage syntax ok
+w1920-ms0 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+w1920-ms6000 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+w1920-ms14000 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+w3840-ms0 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+w3840-ms6000 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+w3840-ms14000 state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+arrivals state diffs [(1, 'visual'), (2, 'visual'), (4, 'visual'), (8, 'visual'), (9, 'visual')] 
+arrival sequence identical: [('single', 1), ('single', 5), ('single', 2), ('single', 3), ('single', 4), ('single', 0), ('group', 2), ('group', 4), ('group', 3), ('group', 1), ('group', 0)]
+RESULT FAIL 7
+scenes+usable e2e exit 0
+  8 passed (1.1m)
+DONE

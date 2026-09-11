@@ -1,0 +1,6995 @@
+{
+  "width": 1920,
+  "checkpointMs": 14000,
+  "referenceResets": false,
+  "issues": [],
+  "states": [
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-20",
+          "key": "slot-1",
+          "x": 1071.87981017807,
+          "y": 9.446695629699548,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 1,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You gave me your turn without hesitation. I appreciated your consideration."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-41",
+          "key": "slot-2",
+          "x": 1398.5921326094165,
+          "y": 23.861881283229422,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 2,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You greeted me by name and let me join your group first."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-13",
+          "key": "slot-3",
+          "x": 924.4441569102121,
+          "y": 306.53580019628873,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 3,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You greeted me by name and made room for me at the table. It was such a kind welcome."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-34",
+          "key": "slot-4",
+          "x": 1259.0851713183117,
+          "y": 305.0867240825832,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 4,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You patiently let me finish first and offered a helping hand."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-20",
+            "x": 1227.87981017807,
+            "y": 165.44669562969955,
+            "d": 312,
+            "scale": 0.9958196701825399,
+            "opacity": 1,
+            "vx": 14.711040255984425,
+            "vy": 0.3627755020499672,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -20.80174562521279,
+            "depth": 0.9958196701825399,
+            "screenScale": 0.9958196701825399,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-41",
+            "x": 1558.5921326094165,
+            "y": 183.86188128322942,
+            "d": 320,
+            "scale": 0.9525707192228764,
+            "opacity": 1,
+            "vx": 14.721859902838675,
+            "vy": 4.8952699858724324,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -6.402832167223096,
+            "depth": 0.9525707192228764,
+            "screenScale": 0.9525707192228764,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-13",
+            "x": 1076.444156910212,
+            "y": 458.53580019628873,
+            "d": 304,
+            "scale": 0.9958506578182917,
+            "opacity": 1,
+            "vx": 4.395390505409961,
+            "vy": -4.659341530624545,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -31.404767269268632,
+            "depth": 0.9958506578182917,
+            "screenScale": 0.9958506578182917,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-34",
+            "x": 1406.5851713183117,
+            "y": 452.5867240825832,
+            "d": 295,
+            "scale": 0.9003400499506505,
+            "opacity": 1,
+            "vx": -9.875836386400142,
+            "vy": -9.244795240950054,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -36.43481739796698,
+            "depth": 0.9003400499506505,
+            "screenScale": 0.9003400499506505,
+            "blur": "blur(0.09px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": []
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 2,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-6",
+          "key": "slot-5",
+          "x": 167.785380421328,
+          "y": 247.69274894196172,
+          "d": 304,
+          "born": 0,
+          "phase": "swelling",
+          "since": 0,
+          "serial": 5,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You let me go first even though you were waiting too. Your thoughtfulness stayed with me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-27",
+          "key": "slot-6",
+          "x": 466.83386817612575,
+          "y": 309.9945652110849,
+          "d": 299,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 6,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You welcomed me warmly and made space for me to join you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-47",
+          "key": "slot-7",
+          "x": 977.8323239692184,
+          "y": 89.69067939538425,
+          "d": 303,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 7,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You forgave a small mistake and helped me feel at ease again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-5",
+          "key": "slot-8",
+          "x": 1215.2724675669826,
+          "y": 305.2788218447545,
+          "d": 302,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 8,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for understanding when I made a mistake. Your patience helped me feel at ease."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-26",
+          "key": "slot-9",
+          "x": 1502.6420292363907,
+          "y": 192.23427693722914,
+          "d": 300,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 9,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You reached out to make peace and encouraged me to start again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 2,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-6",
+            "x": 319.785380421328,
+            "y": 399.6927489419617,
+            "d": 304,
+            "scale": 0.9735935558578587,
+            "opacity": 1,
+            "vx": 12.576251448041479,
+            "vy": 4.177548276011311,
+            "life": "swelling",
+            "readingPages": 1,
+            "z": -47.67610879149288,
+            "depth": 0.9735935558578587,
+            "screenScale": 0.9735935558578587,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-27",
+            "x": 616.3338681761257,
+            "y": 459.4945652110849,
+            "d": 299,
+            "scale": 0.919425907970219,
+            "opacity": 1,
+            "vx": -16.522911835928987,
+            "vy": 0.07913000226603634,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 16.93465535994619,
+            "depth": 0.919425907970219,
+            "screenScale": 0.919425907970219,
+            "blur": "blur(0.03px)"
+          },
+          {
+            "id": "fixture-47",
+            "x": 1129.3323239692184,
+            "y": 241.19067939538425,
+            "d": 303,
+            "scale": 0.9940045850319399,
+            "opacity": 1,
+            "vx": 3.966435415607984,
+            "vy": 2.5340655348253223,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -55.76674543786794,
+            "depth": 0.9940045850319399,
+            "screenScale": 0.9940045850319399,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-5",
+            "x": 1366.2724675669826,
+            "y": 456.2788218447545,
+            "d": 302,
+            "scale": 0.9959777170679773,
+            "opacity": 1,
+            "vx": 4.614569124704587,
+            "vy": 6.497218451402804,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -59.11149942781776,
+            "depth": 0.9959777170679773,
+            "screenScale": 0.9959777170679773,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-26",
+            "x": 1652.6420292363907,
+            "y": 342.23427693722914,
+            "d": 300,
+            "scale": 0.9601497803155704,
+            "opacity": 1,
+            "vx": -4.15815340231935,
+            "vy": -1.2824114732285443,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -14.500199411995709,
+            "depth": 0.9601497803155704,
+            "screenScale": 0.9601497803155704,
+            "blur": "none"
+          }
+        ],
+        "flowers": 28,
+        "gardenNext": 21,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 4,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-19",
+          "key": "slot-10",
+          "x": 586.9949145104757,
+          "y": 135.05143269549973,
+          "d": 356,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 10,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You understood my mistake and spoke gently. Thank you for helping us move on."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-40",
+          "key": "slot-11",
+          "x": 997.4622801053404,
+          "y": 169.56831849264375,
+          "d": 337,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 11,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your gentle apology and encouragement helped restore peace."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-12",
+          "key": "slot-12",
+          "x": 1454.5337033684955,
+          "y": 272.6393569192777,
+          "d": 342,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 12,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your sincere apology helped us begin again with a lighter heart. Thank you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 4,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-19",
+            "x": 764.9949145104757,
+            "y": 313.0514326954997,
+            "d": 356,
+            "scale": 0.9841246438415608,
+            "opacity": 1,
+            "vx": -18.98477625828132,
+            "vy": 6.238735170196099,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 27.662547640502453,
+            "depth": 0.9841246438415608,
+            "screenScale": 0.9841246438415608,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-40",
+            "x": 1165.9622801053404,
+            "y": 338.06831849264375,
+            "d": 337,
+            "scale": 0.9007163463534744,
+            "opacity": 1,
+            "vx": 4.504507429166255,
+            "vy": -18.35020847212709,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 8.165579065680504,
+            "depth": 0.9007163463534744,
+            "screenScale": 0.9007163463534744,
+            "blur": "blur(0.09px)"
+          },
+          {
+            "id": "fixture-12",
+            "x": 1625.5337033684955,
+            "y": 443.6393569192777,
+            "d": 342,
+            "scale": 0.9808910725992988,
+            "opacity": 1,
+            "vx": -4.427117459803147,
+            "vy": 11.114821774465385,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -9.176895595155656,
+            "depth": 0.9808910725992988,
+            "screenScale": 0.9808910725992988,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 5,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 5,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 8,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-33",
+          "key": "slot-13",
+          "x": 965.8854724687808,
+          "y": 25.35049936454672,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 13,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You met my apology with understanding. Thank you for your patience."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-11",
+          "key": "slot-14",
+          "x": 1296.1331114518723,
+          "y": 6.9036695662157115,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 14,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You patiently heard me out and helped me feel understood. Thank you for your kindness."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-32",
+          "key": "slot-15",
+          "x": 821.0515327800734,
+          "y": 319.02508277802866,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 15,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You praised my effort and encouraged me not to give up."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-46",
+          "key": "slot-16",
+          "x": 1496.2826004025692,
+          "y": 277.4399844951494,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 16,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You reminded me how far I had come and encouraged my next step."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 8,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-33",
+            "x": 1121.8854724687808,
+            "y": 181.35049936454672,
+            "d": 312,
+            "scale": 0.978696296838072,
+            "opacity": 1,
+            "vx": -11.003920210293368,
+            "vy": 8.47980047461458,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -40.671445559710264,
+            "depth": 0.978696296838072,
+            "screenScale": 0.978696296838072,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-11",
+            "x": 1456.1331114518723,
+            "y": 166.9036695662157,
+            "d": 320,
+            "scale": 0.9449777038520236,
+            "opacity": 1,
+            "vx": -0.8404565596983536,
+            "vy": 6.175045646613384,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 7.575684282928705,
+            "depth": 0.9449777038520236,
+            "screenScale": 0.9449777038520236,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-32",
+            "x": 973.0515327800734,
+            "y": 471.02508277802866,
+            "d": 304,
+            "scale": 0.9860485402977365,
+            "opacity": 1,
+            "vx": -19.577399216393705,
+            "vy": 1.1054922453615257,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 13.993895971216261,
+            "depth": 0.9860485402977365,
+            "screenScale": 0.9860485402977365,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-46",
+            "x": 1643.7826004025692,
+            "y": 424.9399844951494,
+            "d": 295,
+            "scale": 0.9959475184634242,
+            "opacity": 1,
+            "vx": -0.7618825218151929,
+            "vy": 7.015403849427627,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -42.14560290798545,
+            "depth": 0.9959475184634242,
+            "screenScale": 0.9959475184634242,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 6,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 6,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 7,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 7,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 9,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-4",
+          "key": "slot-17",
+          "x": 983.9761945354853,
+          "y": 56.50127045349345,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 17,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your encouraging words helped me try again. Thank you for believing in me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-25",
+          "key": "slot-18",
+          "x": 1322.5837168359442,
+          "y": 56.76718185610943,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 18,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You listened to my point of view and made me feel understood."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-18",
+          "key": "slot-19",
+          "x": 576.729165650106,
+          "y": 284.5896181959627,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 19,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your encouragement gave me the courage to finish. You saw the best in me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-39",
+          "key": "slot-20",
+          "x": 1503.7174760917349,
+          "y": 336.1836103208408,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 20,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You listened without judgment and made room for my feelings."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 9,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-4",
+            "x": 1139.9761945354853,
+            "y": 212.50127045349345,
+            "d": 312,
+            "scale": 0.9847607406544959,
+            "opacity": 1,
+            "vx": -11.564640829687175,
+            "vy": 8.716421156887598,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -21.065489193424582,
+            "depth": 0.9847607406544959,
+            "screenScale": 0.9847607406544959,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-25",
+            "x": 1482.5837168359442,
+            "y": 216.76718185610943,
+            "d": 320,
+            "scale": 0.9664989375364714,
+            "opacity": 1,
+            "vx": -9.956934867553393,
+            "vy": 5.464420157272323,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -26.089962958358228,
+            "depth": 0.9664989375364714,
+            "screenScale": 0.9664989375364714,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-18",
+            "x": 728.729165650106,
+            "y": 436.5896181959627,
+            "d": 304,
+            "scale": 0.9174675043699008,
+            "opacity": 1,
+            "vx": -9.734445304523145,
+            "vy": -0.015175785362831555,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -5.798260648734868,
+            "depth": 0.9174675043699008,
+            "screenScale": 0.9174675043699008,
+            "blur": "blur(0.04px)"
+          },
+          {
+            "id": "fixture-39",
+            "x": 1651.2174760917349,
+            "y": 483.6836103208408,
+            "d": 295,
+            "scale": 0.9413996062123995,
+            "opacity": 1,
+            "vx": -1.7192943205456304,
+            "vy": -0.9369115751562629,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -3.311707000248134,
+            "depth": 0.9413996062123995,
+            "screenScale": 0.9413996062123995,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 10,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-8",
+          "key": "slot-21",
+          "x": 627.574637420885,
+          "y": 274.6433297374212,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 21,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You listened kindly and helped us understand each other. Thank you for choosing peace."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-22",
+          "key": "slot-22",
+          "x": 165.84257419282721,
+          "y": 205.0989164076916,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 22,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You heard my concerns and helped us begin again with understanding."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-36",
+          "key": "slot-23",
+          "x": 841.619040424502,
+          "y": 176.35915542907506,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 23,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You gave me time to explain and helped us understand each other."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-47",
+          "key": "slot-24",
+          "x": 1416.6282671878816,
+          "y": 219.52952656316074,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 24,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You forgave a small mistake and helped me feel at ease again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 10,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [
+          {
+            "id": "fixture-8",
+            "z": 390.12922686952504,
+            "scale": 1.3788137667832423,
+            "moons": 2
+          },
+          {
+            "id": "fixture-22",
+            "z": -61.840006000861926,
+            "scale": 0.9582680952394088,
+            "moons": 2
+          },
+          {
+            "id": "fixture-36",
+            "z": -390.1292268695251,
+            "scale": 0.7844743783601447,
+            "moons": 2
+          },
+          {
+            "id": "fixture-47",
+            "z": 61.84000600086187,
+            "scale": 1.045532195230381,
+            "moons": 2
+          }
+        ],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 11,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 11,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [
+          {
+            "id": "fixture-5",
+            "x": 477.32190032804164,
+            "y": 572.0061904815382,
+            "z": 235.50534799498524,
+            "scale": 1.3080536238904132,
+            "rise": 23.398501282790676,
+            "radius": 174.16903650388122,
+            "turn": 0.2023212189041078
+          },
+          {
+            "id": "fixture-12",
+            "x": 475.5437115060283,
+            "y": 649.3554666939492,
+            "z": -472.3679992941643,
+            "scale": 0.6791780319046516,
+            "rise": 28.25124563788995,
+            "radius": 239.50059068389237,
+            "turn": 0.23970882907276975
+          },
+          {
+            "id": "fixture-19",
+            "x": 740.5904945689934,
+            "y": 729.058926336134,
+            "z": -153.46537203211884,
+            "scale": 0.8669527705354941,
+            "rise": 31.381180027499795,
+            "radius": 255.78714112192392,
+            "turn": 0.2098737669480033
+          },
+          {
+            "id": "fixture-26",
+            "x": 322.6011929442172,
+            "y": -116.55416056922846,
+            "z": -296.2447785270027,
+            "scale": 0.7714592309766966,
+            "rise": 31.14105438091792,
+            "radius": 291.8415501900017,
+            "turn": 0.2256168348318897
+          },
+          {
+            "id": "fixture-33",
+            "x": 696.4397542148898,
+            "y": 130.56894653245638,
+            "z": -12.81907933565023,
+            "scale": 0.9873431695776714,
+            "rise": 22.25672974716872,
+            "radius": 205.06738132610917,
+            "turn": 0.16308688781689853
+          },
+          {
+            "id": "fixture-40",
+            "x": 652.3390047272609,
+            "y": 238.89178669504184,
+            "z": -296.9184341767059,
+            "scale": 0.7710585135099941,
+            "rise": 24.120177898788825,
+            "radius": 190.5917784795165,
+            "turn": 0.1468063674471341
+          },
+          {
+            "id": "fixture-47",
+            "x": 651.3935344807614,
+            "y": 423.9304717647369,
+            "z": -426.6573791682113,
+            "scale": 0.7009391425031799,
+            "rise": 20.222032650141045,
+            "radius": 283.82560443133116,
+            "turn": 0.21432218203088269
+          }
+        ],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    }
+  ],
+  "arrivals": [
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 0.6400000000000002,
+      "clock": 15.199999999999974,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 1,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-0-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-0-0",
+          "key": "slot-25",
+          "x": 897.7843691427115,
+          "y": 14.444454845111323,
+          "d": 312,
+          "born": 14,
+          "phase": "steady",
+          "since": 14,
+          "serial": 25,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-17",
+          "key": "slot-26",
+          "x": 1288.0895894418077,
+          "y": 26.893608025456302,
+          "d": 320,
+          "born": 14,
+          "phase": "steady",
+          "since": 14,
+          "serial": 26,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You listened with patience and noticed when I needed support. Thank you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-38",
+          "key": "slot-27",
+          "x": 829.9723771883675,
+          "y": 325.71605597896905,
+          "d": 304,
+          "born": 14,
+          "phase": "steady",
+          "since": 14,
+          "serial": 27,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You noticed my effort and offered such a kind compliment. Thank you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-10",
+          "key": "slot-28",
+          "x": 1445.2793561621904,
+          "y": 325.9949579010552,
+          "d": 295,
+          "born": 14,
+          "phase": "steady",
+          "since": 14,
+          "serial": 28,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for recognizing my effort. Your thoughtful compliment brightened my whole day."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-0-0",
+            "x": 1053.7843691427115,
+            "y": 170.44445484511132,
+            "d": 312,
+            "scale": 0.9844757244104366,
+            "opacity": 1,
+            "vx": 18.57222305373952,
+            "vy": -7.188969840108404,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -17.346680131740868,
+            "depth": 0.9844757244104366,
+            "screenScale": 0.9844757244104366,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-17",
+            "x": 1448.0895894418077,
+            "y": 186.8936080254563,
+            "d": 320,
+            "scale": 0.9021393005929561,
+            "opacity": 1,
+            "vx": -20.914232966118995,
+            "vy": 0.6240173212712768,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 37.89644768461585,
+            "depth": 0.9021393005929561,
+            "screenScale": 0.9021393005929561,
+            "blur": "blur(0.08px)"
+          },
+          {
+            "id": "fixture-38",
+            "x": 981.9723771883675,
+            "y": 477.71605597896905,
+            "d": 304,
+            "scale": 0.9899933304519716,
+            "opacity": 1,
+            "vx": 11.805460701469514,
+            "vy": 2.3747769579979967,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -12.516841609030962,
+            "depth": 0.9899933304519716,
+            "screenScale": 0.9899933304519716,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-10",
+            "x": 1592.7793561621904,
+            "y": 473.4949579010552,
+            "d": 295,
+            "scale": 0.9930804394654158,
+            "opacity": 1,
+            "vx": -11.785220496692341,
+            "vy": -6.935742549103337,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -35.93948170542717,
+            "depth": 0.9930804394654158,
+            "screenScale": 0.9930804394654158,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 38.81999999999825,
+      "clock": 66.40000000000192,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 5,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-1-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-1-0",
+          "key": "slot-29",
+          "x": 874.6971365999332,
+          "y": 22.253335803254032,
+          "d": 312,
+          "born": 65.20000000000216,
+          "phase": "steady",
+          "since": 65.20000000000216,
+          "serial": 29,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-31",
+          "key": "slot-30",
+          "x": 1309.9043216870737,
+          "y": 24.4758149917553,
+          "d": 320,
+          "born": 65.20000000000216,
+          "phase": "steady",
+          "since": 65.20000000000216,
+          "serial": 30,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You paused your work to listen and help me. It meant a great deal."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-45",
+          "key": "slot-31",
+          "x": 815.276373691781,
+          "y": 326.24571106560586,
+          "d": 304,
+          "born": 65.20000000000216,
+          "phase": "steady",
+          "since": 65.20000000000216,
+          "serial": 31,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You heard me out and offered practical help at just the right time."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-3",
+          "key": "slot-32",
+          "x": 1466.0053263901386,
+          "y": 328.6191212371505,
+          "d": 295,
+          "born": 65.20000000000216,
+          "phase": "steady",
+          "since": 65.20000000000216,
+          "serial": 32,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You took time to listen without rushing me. Thank you for making room for my thoughts."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-1-0",
+            "x": 1030.6971365999332,
+            "y": 178.25333580325403,
+            "d": 312,
+            "scale": 0.9494496285285481,
+            "opacity": 1,
+            "vx": -14.995291416079787,
+            "vy": 1.3591571596176055,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -38.59651807229966,
+            "depth": 0.9494496285285481,
+            "screenScale": 0.9494496285285481,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-31",
+            "x": 1469.9043216870737,
+            "y": 184.4758149917553,
+            "d": 320,
+            "scale": 0.9955110129048393,
+            "opacity": 1,
+            "vx": 14.048863630310558,
+            "vy": -1.6661758396376947,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -47.97801153268665,
+            "depth": 0.9955110129048393,
+            "screenScale": 0.9955110129048393,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-45",
+            "x": 967.276373691781,
+            "y": 478.24571106560586,
+            "d": 304,
+            "scale": 0.9076809953360727,
+            "opacity": 1,
+            "vx": -14.442624672836342,
+            "vy": 2.9417381422896645,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -16.386224133893847,
+            "depth": 0.9076809953360727,
+            "screenScale": 0.9076809953360727,
+            "blur": "blur(0.07px)"
+          },
+          {
+            "id": "fixture-3",
+            "x": 1613.5053263901386,
+            "y": 476.1191212371505,
+            "d": 295,
+            "scale": 0.9959746274628861,
+            "opacity": 1,
+            "vx": 17.967101670825674,
+            "vy": -10.27129014067331,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -6.142571419477463,
+            "depth": 0.9959746274628861,
+            "screenScale": 0.9959746274628861,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 76.99999999999739,
+      "clock": 117.59999999998952,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 2,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-2-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-2-0",
+          "key": "slot-33",
+          "x": 894.4176961298704,
+          "y": 25.403728767769422,
+          "d": 312,
+          "born": 116.39999999998976,
+          "phase": "steady",
+          "since": 116.39999999998976,
+          "serial": 33,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-24",
+          "key": "slot-34",
+          "x": 1292.9615722516842,
+          "y": 24.28003743680506,
+          "d": 320,
+          "born": 116.39999999998976,
+          "phase": "steady",
+          "since": 116.39999999998976,
+          "serial": 34,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your sincere thanks helped me notice the progress I had made."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-23",
+          "key": "slot-35",
+          "x": 813.7488109955203,
+          "y": 325.60831157382154,
+          "d": 304,
+          "born": 116.39999999998976,
+          "phase": "steady",
+          "since": 116.39999999998976,
+          "serial": 35,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You made room for my suggestion and encouraged me to give it a try."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-44",
+          "key": "slot-36",
+          "x": 1448.151634911687,
+          "y": 329.9445909049412,
+          "d": 295,
+          "born": 116.39999999998976,
+          "phase": "steady",
+          "since": 116.39999999998976,
+          "serial": 36,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You welcomed a new face and made sure I was included."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-2-0",
+            "x": 1050.4176961298704,
+            "y": 181.40372876776942,
+            "d": 312,
+            "scale": 0.948640230489649,
+            "opacity": 1,
+            "vx": 14.202231877530641,
+            "vy": 6.008281548726136,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 32.95726576820016,
+            "depth": 0.948640230489649,
+            "screenScale": 0.948640230489649,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-24",
+            "x": 1452.9615722516842,
+            "y": 184.28003743680506,
+            "d": 320,
+            "scale": 0.9843276522447859,
+            "opacity": 1,
+            "vx": -11.038598650479061,
+            "vy": -2.3807499643399437,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 30.93821933493018,
+            "depth": 0.9843276522447859,
+            "screenScale": 0.9843276522447859,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-23",
+            "x": 965.7488109955203,
+            "y": 477.60831157382154,
+            "d": 304,
+            "scale": 0.9036598616905452,
+            "opacity": 1,
+            "vx": -16.561606588186137,
+            "vy": 2.005267439187027,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 31.916878963820636,
+            "depth": 0.9036598616905452,
+            "screenScale": 0.9036598616905452,
+            "blur": "blur(0.08px)"
+          },
+          {
+            "id": "fixture-44",
+            "x": 1595.651634911687,
+            "y": 477.4445909049412,
+            "d": 295,
+            "scale": 0.9829535768803549,
+            "opacity": 1,
+            "vx": -8.180749385926717,
+            "vy": -3.685435552648513,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 34.25011184066534,
+            "depth": 0.9829535768803549,
+            "screenScale": 0.9829535768803549,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 115.17999999998757,
+      "clock": 168.8000000000061,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 3,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-3-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-3-0",
+          "key": "slot-37",
+          "x": 895.7226444266362,
+          "y": 20.94471813566767,
+          "d": 312,
+          "born": 167.60000000000548,
+          "phase": "steady",
+          "since": 167.60000000000548,
+          "serial": 37,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-2",
+          "key": "slot-38",
+          "x": 1308.0664560522803,
+          "y": 27.214605433200063,
+          "d": 320,
+          "born": 167.60000000000548,
+          "phase": "steady",
+          "since": 167.60000000000548,
+          "serial": 38,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You welcomed me with such a warm smile. I felt included from the moment I arrived."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-16",
+          "key": "slot-39",
+          "x": 831.7151909510774,
+          "y": 327.5066049744393,
+          "d": 304,
+          "born": 167.60000000000548,
+          "phase": "steady",
+          "since": 167.60000000000548,
+          "serial": 39,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your friendly welcome helped me feel comfortable joining the group."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-37",
+          "key": "slot-40",
+          "x": 1441.7932719593025,
+          "y": 333.6523339385551,
+          "d": 295,
+          "born": 167.60000000000548,
+          "phase": "steady",
+          "since": 167.60000000000548,
+          "serial": 40,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You stepped aside and encouraged me to take the next step."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-3-0",
+            "x": 1051.7226444266362,
+            "y": 176.94471813566767,
+            "d": 312,
+            "scale": 0.9080433324523526,
+            "opacity": 1,
+            "vx": 15.095474477221789,
+            "vy": -1.4982093910665863,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -10.629052007570863,
+            "depth": 0.9080433324523526,
+            "screenScale": 0.9080433324523526,
+            "blur": "blur(0.07px)"
+          },
+          {
+            "id": "fixture-2",
+            "x": 1468.0664560522803,
+            "y": 187.21460543320006,
+            "d": 320,
+            "scale": 0.9537457381652475,
+            "opacity": 1,
+            "vx": 11.375487413270722,
+            "vy": 2.8000004074557636,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -0.1539613725617528,
+            "depth": 0.9537457381652475,
+            "screenScale": 0.9537457381652475,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-16",
+            "x": 983.7151909510774,
+            "y": 479.5066049744393,
+            "d": 304,
+            "scale": 0.966927522865351,
+            "opacity": 1,
+            "vx": 13.482142199853651,
+            "vy": -0.2086723056431023,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 18.276017284952104,
+            "depth": 0.966927522865351,
+            "screenScale": 0.966927522865351,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-37",
+            "x": 1589.2932719593025,
+            "y": 481.1523339385551,
+            "d": 295,
+            "scale": 0.9271234476760438,
+            "opacity": 1,
+            "vx": -19.99782430788089,
+            "vy": 6.2474140009651205,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -7.828244837000966,
+            "depth": 0.9271234476760438,
+            "screenScale": 0.9271234476760438,
+            "blur": "blur(0.01px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 153.3999999999958,
+      "clock": 220.00000000003007,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 4,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-4-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-4-0",
+          "key": "slot-41",
+          "x": 874.5217288297665,
+          "y": 18.487403836163423,
+          "d": 312,
+          "born": 218.80000000002946,
+          "phase": "steady",
+          "since": 218.80000000002946,
+          "serial": 41,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-9",
+          "key": "slot-42",
+          "x": 1292.715849781565,
+          "y": 29.689617983287633,
+          "d": 320,
+          "born": 218.80000000002946,
+          "phase": "steady",
+          "since": 218.80000000002946,
+          "serial": 42,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You made space for my idea and encouraged me to share it. I really appreciated that."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-30",
+          "key": "slot-43",
+          "x": 813.1038463697871,
+          "y": 325.6107028595276,
+          "d": 304,
+          "born": 218.80000000002946,
+          "phase": "steady",
+          "since": 218.80000000002946,
+          "serial": 43,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You welcomed me into the conversation so naturally. I felt included."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-29",
+          "key": "slot-44",
+          "x": 1446.9746843549106,
+          "y": 324.28293762067204,
+          "d": 295,
+          "born": 218.80000000002946,
+          "phase": "steady",
+          "since": 218.80000000002946,
+          "serial": 44,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your words of thanks made a small effort feel worthwhile."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-4-0",
+            "x": 1030.5217288297665,
+            "y": 174.48740383616342,
+            "d": 312,
+            "scale": 0.9011808059314651,
+            "opacity": 1,
+            "vx": -17.571342335975938,
+            "vy": -5.665549684974061,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 34.90861645899713,
+            "depth": 0.9011808059314651,
+            "screenScale": 0.9011808059314651,
+            "blur": "blur(0.09px)"
+          },
+          {
+            "id": "fixture-9",
+            "x": 1452.715849781565,
+            "y": 189.68961798328763,
+            "d": 320,
+            "scale": 0.9259368480705146,
+            "opacity": 1,
+            "vx": -14.093443640961194,
+            "vy": 6.332262618995914,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 8.080091779120266,
+            "depth": 0.9259368480705146,
+            "screenScale": 0.9259368480705146,
+            "blur": "blur(0.01px)"
+          },
+          {
+            "id": "fixture-30",
+            "x": 965.1038463697871,
+            "y": 477.6107028595276,
+            "d": 304,
+            "scale": 0.9782525878880254,
+            "opacity": 1,
+            "vx": -15.005963661989004,
+            "vy": -3.862319624933519,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -29.081231858581305,
+            "depth": 0.9782525878880254,
+            "screenScale": 0.9782525878880254,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-29",
+            "x": 1594.4746843549106,
+            "y": 471.78293762067204,
+            "d": 295,
+            "scale": 0.9895638305912359,
+            "opacity": 1,
+            "vx": -9.988432329547832,
+            "vy": -9.498578007080004,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -21.140576610341668,
+            "depth": 0.9895638305912359,
+            "screenScale": 0.9895638305912359,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 191.62000000001314,
+      "clock": 271.20000000003245,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 0,
+        "hold": 8,
+        "page": 0,
+        "ids": [
+          "arrival-5-0"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-5-0",
+          "key": "slot-45",
+          "x": 876.0452389143904,
+          "y": 18.118987958054504,
+          "d": 312,
+          "born": 270.00000000003354,
+          "phase": "steady",
+          "since": 270.00000000003354,
+          "serial": 45,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-43",
+          "key": "slot-46",
+          "x": 1292.7497023795936,
+          "y": 21.81367764142081,
+          "d": 320,
+          "born": 270.00000000003354,
+          "phase": "steady",
+          "since": 270.00000000003354,
+          "serial": 46,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your thoughtful praise made me feel that my contribution mattered."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-1",
+          "key": "slot-47",
+          "x": 812.690237336504,
+          "y": 323.22870658281056,
+          "d": 304,
+          "born": 270.00000000003354,
+          "phase": "steady",
+          "since": 270.00000000003354,
+          "serial": 47,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You noticed the little things and thanked everyone who helped. It meant a lot."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-15",
+          "key": "slot-48",
+          "x": 1446.304026993128,
+          "y": 331.58671701870287,
+          "d": 295,
+          "born": 270.00000000003354,
+          "phase": "steady",
+          "since": 270.00000000003354,
+          "serial": 48,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You thanked everyone for their effort. Your thoughtful words lifted us up."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-5-0",
+            "x": 1032.0452389143904,
+            "y": 174.1189879580545,
+            "d": 312,
+            "scale": 0.9072082848191085,
+            "opacity": 1,
+            "vx": -15.029168958473626,
+            "vy": -4.417655455314494,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -46.255659465678036,
+            "depth": 0.9072082848191085,
+            "screenScale": 0.9072082848191085,
+            "blur": "blur(0.07px)"
+          },
+          {
+            "id": "fixture-43",
+            "x": 1452.7497023795936,
+            "y": 181.8136776414208,
+            "d": 320,
+            "scale": 0.9108259131674605,
+            "opacity": 1,
+            "vx": -14.181949610332316,
+            "vy": -6.721481144008815,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 35.696571469306946,
+            "depth": 0.9108259131674605,
+            "screenScale": 0.9108259131674605,
+            "blur": "blur(0.06px)"
+          },
+          {
+            "id": "fixture-1",
+            "x": 964.690237336504,
+            "y": 475.22870658281056,
+            "d": 304,
+            "scale": 0.9945341240765341,
+            "opacity": 1,
+            "vx": -16.293254679311467,
+            "vy": -9.972824266702151,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 23.949977974407375,
+            "depth": 0.9945341240765341,
+            "screenScale": 0.9945341240765341,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-15",
+            "x": 1593.804026993128,
+            "y": 479.08671701870287,
+            "d": 295,
+            "scale": 0.9234541524740616,
+            "opacity": 1,
+            "vx": -13.156160241894986,
+            "vy": 2.917186137302572,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -9.214562657289207,
+            "depth": 0.9234541524740616,
+            "screenScale": 0.9234541524740616,
+            "blur": "blur(0.02px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 229.80000000003045,
+      "clock": 322.39999999998366,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "group",
+        "phase": "entrance",
+        "style": 2,
+        "hold": 30,
+        "page": 0,
+        "ids": [
+          "arrival-6-0",
+          "arrival-6-1",
+          "arrival-6-2",
+          "arrival-6-3",
+          "arrival-6-4",
+          "arrival-6-5",
+          "arrival-6-6",
+          "arrival-6-7",
+          "arrival-6-8",
+          "arrival-6-9"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-6-0",
+          "key": "slot-49",
+          "x": 895.1284064174881,
+          "y": 20.35336762240479,
+          "d": 312,
+          "born": 321.19999999998475,
+          "phase": "steady",
+          "since": 321.19999999998475,
+          "serial": 49,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-1",
+          "key": "slot-50",
+          "x": 1293.971905593021,
+          "y": 29.95858608580724,
+          "d": 320,
+          "born": 321.19999999998475,
+          "phase": "steady",
+          "since": 321.19999999998475,
+          "serial": 50,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-2",
+          "key": "slot-51",
+          "x": 814.5086532701208,
+          "y": 329.7791832952497,
+          "d": 304,
+          "born": 321.19999999998475,
+          "phase": "steady",
+          "since": 321.19999999998475,
+          "serial": 51,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-3",
+          "key": "slot-52",
+          "x": 1461.91238093372,
+          "y": 329.4545193600757,
+          "d": 295,
+          "born": 321.19999999998475,
+          "phase": "steady",
+          "since": 321.19999999998475,
+          "serial": 52,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-6-0",
+            "x": 1051.1284064174881,
+            "y": 176.3533676224048,
+            "d": 312,
+            "scale": 0.995282650188161,
+            "opacity": 1,
+            "vx": 15.202272562278795,
+            "vy": -2.423412927313313,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -30.178710599429905,
+            "depth": 0.995282650188161,
+            "screenScale": 0.995282650188161,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-6-1",
+            "x": 1453.971905593021,
+            "y": 189.95858608580724,
+            "d": 320,
+            "scale": 0.9082111639924583,
+            "opacity": 1,
+            "vx": -12.218636293709961,
+            "vy": 5.843861746192306,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 29.824093994684517,
+            "depth": 0.9082111639924583,
+            "screenScale": 0.9082111639924583,
+            "blur": "blur(0.07px)"
+          },
+          {
+            "id": "arrival-6-2",
+            "x": 966.5086532701208,
+            "y": 481.7791832952497,
+            "d": 304,
+            "scale": 0.9020349894858003,
+            "opacity": 1,
+            "vx": -14.49857965053408,
+            "vy": 7.035537596146466,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 12.304898407310247,
+            "depth": 0.9020349894858003,
+            "screenScale": 0.9020349894858003,
+            "blur": "blur(0.08px)"
+          },
+          {
+            "id": "arrival-6-3",
+            "x": 1609.41238093372,
+            "y": 476.9545193600757,
+            "d": 295,
+            "scale": 0.91170408442463,
+            "opacity": 1,
+            "vx": 11.184296697276368,
+            "vy": -0.9900469056747269,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -25.679424931295216,
+            "depth": 0.91170408442463,
+            "screenScale": 0.91170408442463,
+            "blur": "blur(0.05px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 274.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 282.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 283.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 283.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 321.86,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Spiral constellation",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 244.88000000003595,
+      "clock": 373.5999999999349,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "group",
+        "phase": "entrance",
+        "style": 4,
+        "hold": 30,
+        "page": 0,
+        "ids": [
+          "arrival-7-0",
+          "arrival-7-1",
+          "arrival-7-2",
+          "arrival-7-3",
+          "arrival-7-4",
+          "arrival-7-5",
+          "arrival-7-6",
+          "arrival-7-7",
+          "arrival-7-8",
+          "arrival-7-9"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-6-4",
+          "key": "slot-53",
+          "x": 879.1209970123084,
+          "y": 9.54743537089837,
+          "d": 312,
+          "born": 372.39999999993597,
+          "phase": "steady",
+          "since": 372.39999999993597,
+          "serial": 53,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-5",
+          "key": "slot-54",
+          "x": 1312.6686641962947,
+          "y": 28.788199484470454,
+          "d": 320,
+          "born": 372.39999999993597,
+          "phase": "steady",
+          "since": 372.39999999993597,
+          "serial": 54,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-6",
+          "key": "slot-55",
+          "x": 831.7591941535972,
+          "y": 324.7098222486742,
+          "d": 304,
+          "born": 372.39999999993597,
+          "phase": "steady",
+          "since": 372.39999999993597,
+          "serial": 55,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-7",
+          "key": "slot-56",
+          "x": 1465.5801459422128,
+          "y": 328.486136377942,
+          "d": 295,
+          "born": 372.39999999993597,
+          "phase": "steady",
+          "since": 372.39999999993597,
+          "serial": 56,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-6-4",
+            "x": 1035.1209970123084,
+            "y": 165.54743537089837,
+            "d": 312,
+            "scale": 0.9804965089307204,
+            "opacity": 1,
+            "vx": -8.126017564011928,
+            "vy": -13.426833240146976,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 2.832461344078183,
+            "depth": 0.9804965089307204,
+            "screenScale": 0.9804965089307204,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-6-5",
+            "x": 1472.6686641962947,
+            "y": 188.78819948447045,
+            "d": 320,
+            "scale": 0.9098681415543044,
+            "opacity": 1,
+            "vx": 16.979881495312718,
+            "vy": 4.077724636782011,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -8.469122778624296,
+            "depth": 0.9098681415543044,
+            "screenScale": 0.9098681415543044,
+            "blur": "blur(0.06px)"
+          },
+          {
+            "id": "arrival-6-6",
+            "x": 983.7591941535972,
+            "y": 476.7098222486742,
+            "d": 304,
+            "scale": 0.9955675476751246,
+            "opacity": 1,
+            "vx": 13.956782113845364,
+            "vy": -4.807845894307461,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -9.674689630046487,
+            "depth": 0.9955675476751246,
+            "screenScale": 0.9955675476751246,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-6-7",
+            "x": 1613.0801459422128,
+            "y": 475.986136377942,
+            "d": 295,
+            "scale": 0.9124987567295286,
+            "opacity": 1,
+            "vx": 16.940301373197276,
+            "vy": -2.4598244876907103,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 22.745948084630072,
+            "depth": 0.9124987567295286,
+            "screenScale": 0.9124987567295286,
+            "blur": "blur(0.05px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 274.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 282.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 283.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 283.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 321.86,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Spiral constellation",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 326.58,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 356.6,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 357.96,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 357.96,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 373.06,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Ripple of kindness",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 259.9600000000358,
+      "clock": 424.7999999998861,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "group",
+        "phase": "entrance",
+        "style": 3,
+        "hold": 30,
+        "page": 0,
+        "ids": [
+          "arrival-8-0",
+          "arrival-8-1",
+          "arrival-8-2",
+          "arrival-8-3",
+          "arrival-8-4",
+          "arrival-8-5",
+          "arrival-8-6",
+          "arrival-8-7",
+          "arrival-8-8",
+          "arrival-8-9"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-6-8",
+          "key": "slot-57",
+          "x": 898.7253289269217,
+          "y": 14.85030987212869,
+          "d": 312,
+          "born": 423.5999999998872,
+          "phase": "steady",
+          "since": 423.5999999998872,
+          "serial": 57,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-6-9",
+          "key": "slot-58",
+          "x": 1309.0956348828506,
+          "y": 25.17854237578308,
+          "d": 320,
+          "born": 423.5999999998872,
+          "phase": "steady",
+          "since": 423.5999999998872,
+          "serial": 58,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-7-0",
+          "key": "slot-59",
+          "x": 828.1322516178361,
+          "y": 325.471061013835,
+          "d": 304,
+          "born": 423.5999999998872,
+          "phase": "steady",
+          "since": 423.5999999998872,
+          "serial": 59,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-7-1",
+          "key": "slot-60",
+          "x": 1464.527414090856,
+          "y": 328.8546056568026,
+          "d": 295,
+          "born": 423.5999999998872,
+          "phase": "steady",
+          "since": 423.5999999998872,
+          "serial": 60,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-6-8",
+            "x": 1054.7253289269217,
+            "y": 170.8503098721287,
+            "d": 312,
+            "scale": 0.993792633612752,
+            "opacity": 1,
+            "vx": 20.400131197674725,
+            "vy": -9.546403494383247,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -47.99363791476935,
+            "depth": 0.993792633612752,
+            "screenScale": 0.993792633612752,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-6-9",
+            "x": 1469.0956348828506,
+            "y": 185.17854237578308,
+            "d": 320,
+            "scale": 0.9029989143664174,
+            "opacity": 1,
+            "vx": 11.698803836889294,
+            "vy": -1.9846161486900165,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 14.827000452205539,
+            "depth": 0.9029989143664174,
+            "screenScale": 0.9029989143664174,
+            "blur": "blur(0.08px)"
+          },
+          {
+            "id": "arrival-7-0",
+            "x": 980.1322516178361,
+            "y": 477.471061013835,
+            "d": 304,
+            "scale": 0.9191561855002705,
+            "opacity": 1,
+            "vx": 5.930530426177284,
+            "vy": 0.6027066961659286,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -12.365523530170321,
+            "depth": 0.9191561855002705,
+            "screenScale": 0.9191561855002705,
+            "blur": "blur(0.03px)"
+          },
+          {
+            "id": "arrival-7-1",
+            "x": 1612.027414090856,
+            "y": 476.3546056568026,
+            "d": 295,
+            "scale": 0.9082591539265993,
+            "opacity": 1,
+            "vx": 13.95097137248389,
+            "vy": -1.9829867450519192,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -42.561888289637864,
+            "depth": 0.9082591539265993,
+            "screenScale": 0.9082591539265993,
+            "blur": "blur(0.07px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 274.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 282.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 283.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 283.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 321.86,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Spiral constellation",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 326.58,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 356.6,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 357.96,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 357.96,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 373.06,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Ripple of kindness",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 377.78,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 407.8,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 409.16,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 409.16,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 424.26,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Petal fountains",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 275.04000000001986,
+      "clock": 475.9999999998373,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "group",
+        "phase": "entrance",
+        "style": 1,
+        "hold": 30,
+        "page": 0,
+        "ids": [
+          "arrival-9-0",
+          "arrival-9-1",
+          "arrival-9-2",
+          "arrival-9-3",
+          "arrival-9-4",
+          "arrival-9-5",
+          "arrival-9-6",
+          "arrival-9-7",
+          "arrival-9-8",
+          "arrival-9-9"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-7-2",
+          "key": "slot-61",
+          "x": 896.7313088721742,
+          "y": 18.642259380291904,
+          "d": 312,
+          "born": 474.7999999998384,
+          "phase": "steady",
+          "since": 474.7999999998384,
+          "serial": 61,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-7-3",
+          "key": "slot-62",
+          "x": 1291.574240324325,
+          "y": 23.711751599733162,
+          "d": 320,
+          "born": 474.7999999998384,
+          "phase": "steady",
+          "since": 474.7999999998384,
+          "serial": 62,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-7-4",
+          "key": "slot-63",
+          "x": 829.8834074558777,
+          "y": 321.6026164903289,
+          "d": 304,
+          "born": 474.7999999998384,
+          "phase": "steady",
+          "since": 474.7999999998384,
+          "serial": 63,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-7-5",
+          "key": "slot-64",
+          "x": 1444.33591787759,
+          "y": 327.98164782177656,
+          "d": 295,
+          "born": 474.7999999998384,
+          "phase": "steady",
+          "since": 474.7999999998384,
+          "serial": 64,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-7-2",
+            "x": 1052.7313088721742,
+            "y": 174.6422593802919,
+            "d": 312,
+            "scale": 0.9000018004351166,
+            "opacity": 1,
+            "vx": 16.974038510525325,
+            "vy": -4.732288701770487,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -29.24908417277038,
+            "depth": 0.9000018004351166,
+            "screenScale": 0.9000018004351166,
+            "blur": "blur(0.09px)"
+          },
+          {
+            "id": "arrival-7-3",
+            "x": 1451.574240324325,
+            "y": 183.71175159973316,
+            "d": 320,
+            "scale": 0.9771703364488652,
+            "opacity": 1,
+            "vx": -13.388954643330841,
+            "vy": -3.3254213790302507,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -55.9081995068118,
+            "depth": 0.9771703364488652,
+            "screenScale": 0.9771703364488652,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-7-4",
+            "x": 981.8834074558777,
+            "y": 473.6026164903289,
+            "d": 304,
+            "scale": 0.988430317962891,
+            "opacity": 1,
+            "vx": 10.734448548852555,
+            "vy": -11.311278406729492,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 3.2672386709600687,
+            "depth": 0.988430317962891,
+            "screenScale": 0.988430317962891,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-7-5",
+            "x": 1591.83591787759,
+            "y": 475.48164782177656,
+            "d": 295,
+            "scale": 0.9606608843434037,
+            "opacity": 1,
+            "vx": -14.349083780487687,
+            "vy": -2.350186371672813,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -45.05825682077557,
+            "depth": 0.9606608843434037,
+            "screenScale": 0.9606608843434037,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 274.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 282.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 283.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 283.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 321.86,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Spiral constellation",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 326.58,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 356.6,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 357.96,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 357.96,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 373.06,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Ripple of kindness",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 377.78,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 407.8,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 409.16,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 409.16,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 424.26,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Petal fountains",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 428.98,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 459,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 460.36,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 460.36,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 475.46,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Two tides, one wave",
+          "ids": [
+            "arrival-9-0",
+            "arrival-9-1",
+            "arrival-9-2",
+            "arrival-9-3",
+            "arrival-9-4",
+            "arrival-9-5",
+            "arrival-9-6",
+            "arrival-9-7",
+            "arrival-9-8",
+            "arrival-9-9"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 290.1200000000039,
+      "clock": 527.1999999997886,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": {
+        "kind": "group",
+        "phase": "entrance",
+        "style": 0,
+        "hold": 30,
+        "page": 0,
+        "ids": [
+          "arrival-10-0",
+          "arrival-10-1",
+          "arrival-10-2",
+          "arrival-10-3",
+          "arrival-10-4",
+          "arrival-10-5",
+          "arrival-10-6",
+          "arrival-10-7",
+          "arrival-10-8",
+          "arrival-10-9"
+        ]
+      },
+      "transition": null,
+      "slots": [
+        {
+          "id": "arrival-10-0",
+          "key": "slot-65",
+          "x": 898.0830590752207,
+          "y": 15.175960459367815,
+          "d": 312,
+          "born": 525.9999999997897,
+          "phase": "steady",
+          "since": 525.9999999997897,
+          "serial": 65,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-10-1",
+          "key": "slot-66",
+          "x": 1291.860977360628,
+          "y": 26.516708714315513,
+          "d": 320,
+          "born": 525.9999999997897,
+          "phase": "steady",
+          "since": 525.9999999997897,
+          "serial": 66,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-10-2",
+          "key": "slot-67",
+          "x": 833.0022961486229,
+          "y": 325.80004532413045,
+          "d": 304,
+          "born": 525.9999999997897,
+          "phase": "steady",
+          "since": 525.9999999997897,
+          "serial": 67,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "arrival-10-3",
+          "key": "slot-68",
+          "x": 1445.6712398711234,
+          "y": 328.0919473490748,
+          "d": 295,
+          "born": 525.9999999997897,
+          "phase": "steady",
+          "since": 525.9999999997897,
+          "serial": 68,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for helping today."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 0.6400000000000002,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "arrival-10-0",
+            "x": 1054.0830590752207,
+            "y": 171.17596045936781,
+            "d": 312,
+            "scale": 0.9848173058044053,
+            "opacity": 1,
+            "vx": 19.893544973006914,
+            "vy": -6.154082715701981,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 32.210607905872166,
+            "depth": 0.9848173058044053,
+            "screenScale": 0.9848173058044053,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-10-1",
+            "x": 1451.860977360628,
+            "y": 186.5167087143155,
+            "d": 320,
+            "scale": 0.9547762969886281,
+            "opacity": 1,
+            "vx": -13.40973478392806,
+            "vy": 1.689342531550893,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 0.5992724653333426,
+            "depth": 0.9547762969886281,
+            "screenScale": 0.9547762969886281,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-10-2",
+            "x": 985.0022961486229,
+            "y": 477.80004532413045,
+            "d": 304,
+            "scale": 0.9890135433572347,
+            "opacity": 1,
+            "vx": 16.59531150624947,
+            "vy": -1.6456618601256858,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 24.798564459197223,
+            "depth": 0.9890135433572347,
+            "screenScale": 0.9890135433572347,
+            "blur": "none"
+          },
+          {
+            "id": "arrival-10-3",
+            "x": 1593.1712398711234,
+            "y": 475.5919473490748,
+            "d": 295,
+            "scale": 0.9953309177999076,
+            "opacity": 1,
+            "vx": -12.256193940218006,
+            "vy": -8.371066677851541,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -49.00588471442461,
+            "depth": 0.9953309177999076,
+            "screenScale": 0.9953309177999076,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        },
+        {
+          "at": 14.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Comet sweep",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 18.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 26.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ]
+        },
+        {
+          "at": 27.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-0-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 27.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 65.86,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Petals into pearl",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 69.48,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 77.5,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ]
+        },
+        {
+          "at": 78.86,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-1-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 78.86,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 117.06,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "A thousand kind sparks",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 120.68,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 128.7,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ]
+        },
+        {
+          "at": 130.06,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-2-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 130.06,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 168.26,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Pearl spring",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 171.86,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 179.86,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ]
+        },
+        {
+          "at": 181.22,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-3-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 181.22,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 219.46,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Spiral bloom",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 223.06,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 231.06,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ]
+        },
+        {
+          "at": 232.42,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-4-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 232.42,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 270.66,
+          "type": "entrance_start",
+          "kind": "single",
+          "style": "Through the light",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 274.28,
+          "type": "reading_start",
+          "kind": "single",
+          "duration": 8,
+          "page": 0,
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 282.3,
+          "type": "reading_end",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ]
+        },
+        {
+          "at": 283.66,
+          "type": "presentation_complete",
+          "kind": "single",
+          "ids": [
+            "arrival-5-0"
+          ],
+          "hold": 8
+        },
+        {
+          "at": 283.66,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 321.86,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Spiral constellation",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 326.58,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 356.6,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ]
+        },
+        {
+          "at": 357.96,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-6-0",
+            "arrival-6-1",
+            "arrival-6-2",
+            "arrival-6-3",
+            "arrival-6-4",
+            "arrival-6-5",
+            "arrival-6-6",
+            "arrival-6-7",
+            "arrival-6-8",
+            "arrival-6-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 357.96,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 373.06,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Ripple of kindness",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 377.78,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 407.8,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ]
+        },
+        {
+          "at": 409.16,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-7-0",
+            "arrival-7-1",
+            "arrival-7-2",
+            "arrival-7-3",
+            "arrival-7-4",
+            "arrival-7-5",
+            "arrival-7-6",
+            "arrival-7-7",
+            "arrival-7-8",
+            "arrival-7-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 409.16,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 424.26,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Petal fountains",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 428.98,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 459,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ]
+        },
+        {
+          "at": 460.36,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-8-0",
+            "arrival-8-1",
+            "arrival-8-2",
+            "arrival-8-3",
+            "arrival-8-4",
+            "arrival-8-5",
+            "arrival-8-6",
+            "arrival-8-7",
+            "arrival-8-8",
+            "arrival-8-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 460.36,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 475.46,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Two tides, one wave",
+          "ids": [
+            "arrival-9-0",
+            "arrival-9-1",
+            "arrival-9-2",
+            "arrival-9-3",
+            "arrival-9-4",
+            "arrival-9-5",
+            "arrival-9-6",
+            "arrival-9-7",
+            "arrival-9-8",
+            "arrival-9-9"
+          ]
+        },
+        {
+          "at": 480.18,
+          "type": "reading_start",
+          "kind": "group",
+          "duration": 30,
+          "page": 0,
+          "ids": [
+            "arrival-9-0",
+            "arrival-9-1",
+            "arrival-9-2",
+            "arrival-9-3",
+            "arrival-9-4",
+            "arrival-9-5",
+            "arrival-9-6",
+            "arrival-9-7",
+            "arrival-9-8",
+            "arrival-9-9"
+          ]
+        },
+        {
+          "at": 510.2,
+          "type": "reading_end",
+          "kind": "group",
+          "ids": [
+            "arrival-9-0",
+            "arrival-9-1",
+            "arrival-9-2",
+            "arrival-9-3",
+            "arrival-9-4",
+            "arrival-9-5",
+            "arrival-9-6",
+            "arrival-9-7",
+            "arrival-9-8",
+            "arrival-9-9"
+          ]
+        },
+        {
+          "at": 511.56,
+          "type": "presentation_complete",
+          "kind": "group",
+          "ids": [
+            "arrival-9-0",
+            "arrival-9-1",
+            "arrival-9-2",
+            "arrival-9-3",
+            "arrival-9-4",
+            "arrival-9-5",
+            "arrival-9-6",
+            "arrival-9-7",
+            "arrival-9-8",
+            "arrival-9-9"
+          ],
+          "hold": 30
+        },
+        {
+          "at": 511.56,
+          "type": "queue_drained",
+          "resumeScene": 1
+        },
+        {
+          "at": 526.66,
+          "type": "entrance_start",
+          "kind": "group",
+          "style": "Cascading constellation",
+          "ids": [
+            "arrival-10-0",
+            "arrival-10-1",
+            "arrival-10-2",
+            "arrival-10-3",
+            "arrival-10-4",
+            "arrival-10-5",
+            "arrival-10-6",
+            "arrival-10-7",
+            "arrival-10-8",
+            "arrival-10-9"
+          ]
+        }
+      ]
+    }
+  ]
+}
