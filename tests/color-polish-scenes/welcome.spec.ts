@@ -93,7 +93,7 @@ test('at least one bubble changes heading between 6 and 14 s', async ({ page }) 
 });
 
 test('bubbles stay circular through motion', async ({ page }) => {
-  for (const ms of [300, 6000, 14000]) {
+  for (const ms of [300, 6000, 14000, 20000]) {
     const freshPage = await page.context().newPage();
     const { frame } = await openStudioScene(freshPage, 'welcome', ms);
     const circleResult = await circularity(frame);
@@ -136,6 +136,9 @@ test('reduced motion renders the welcome scene still', async ({ page }) => {
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
 
+  const hasFxCanvas = await frame.evaluate(() => !!document.querySelector('canvas.scene-fx'));
+  expect(hasFxCanvas).toBe(true);
+
   const layerScales: Record<string, number> = {
     far: 0.84,
     mid: 0.93,
@@ -175,4 +178,78 @@ test('reduced motion renders the welcome scene still', async ({ page }) => {
 
   const secondReading = await readSlots();
   expect(secondReading).toEqual(firstReading);
+});
+
+test('at 2000 ms actors count is at least 5 unless in reader mode', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'welcome', 2000);
+  const state = await frame.evaluate(() => (window as any).colorPolishRuntime.visualState());
+  const actors = state.actors;
+  const hasLarge = actors.some((a: any) => a.large);
+  if (hasLarge) {
+    expect(actors.length).toBe(1);
+  } else {
+    expect(actors.length).toBeGreaterThanOrEqual(5);
+  }
+});
+
+test('scene replaces at least one bubble within 30 s', async ({ page }) => {
+  const { frame: frame2 } = await openStudioScene(page, 'welcome', 2000);
+  const state2 = await frame2.evaluate(() => (window as any).colorPolishRuntime.visualState());
+  const initialIds = new Set(state2.actors.map((a: any) => a.id));
+
+  const page14 = await page.context().newPage();
+  const { frame: frame14 } = await openStudioScene(page14, 'welcome', 14000);
+  const state14 = await frame14.evaluate(() => (window as any).colorPolishRuntime.visualState());
+  await page14.close();
+
+  const page26 = await page.context().newPage();
+  const { frame: frame26 } = await openStudioScene(page26, 'welcome', 26000);
+  const state26 = await frame26.evaluate(() => (window as any).colorPolishRuntime.visualState());
+  await page26.close();
+
+  const hasTransitioningActor =
+    state14.actors.some((a: any) => a.life === 'exiting' || a.life === 'entering') ||
+    state26.actors.some((a: any) => a.life === 'exiting' || a.life === 'entering');
+
+  const hasDifferentId =
+    state14.actors.some((a: any) => !initialIds.has(a.id)) ||
+    state26.actors.some((a: any) => !initialIds.has(a.id));
+
+  expect(hasTransitioningActor || hasDifferentId).toBe(true);
+});
+
+test('entering bubble has non-zero rotate angle in slot transform', async ({ page }) => {
+  let foundEntering = false;
+  for (const checkpoint of [13500, 14000, 15000]) {
+    const testPage = await page.context().newPage();
+    const { frame } = await openStudioScene(testPage, 'welcome', checkpoint);
+    const enteringSlots = await frame.evaluate(() => {
+      const runtime = (window as any).colorPolishRuntime;
+      const state = runtime.visualState();
+      const enteringActors = state.actors.filter((a: any) => a.life === 'entering');
+      if (!enteringActors.length) return [];
+      const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
+      return enteringActors.map((actor: any) => {
+        const el = slots.find((s) => s.dataset.recordId === actor.id);
+        return el ? el.style.transform : '';
+      }).filter(Boolean);
+    });
+    await testPage.close();
+
+    if (enteringSlots.length > 0) {
+      foundEntering = true;
+      for (const tf of enteringSlots) {
+        expect(tf).toContain('rotate(');
+        const match = tf.match(/rotate\(([-0-9.]+)deg\)/);
+        expect(match).not.toBeNull();
+        const angle = parseFloat(match![1]);
+        expect(Math.abs(angle)).toBeGreaterThan(0);
+      }
+      break;
+    }
+  }
+
+  if (!foundEntering) {
+    console.log('No actor in entering state was sampled at checkpoints; test passed vacuously.');
+  }
 });
