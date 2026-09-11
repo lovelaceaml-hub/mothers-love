@@ -27,7 +27,9 @@ Participation Status (renderer id 6) now features three distinct motion vocabula
 All changes are strictly confined to the allowed files with zero em dashes or en dashes.
 The coordinator runs typecheck, lint, test, build, the status test suite, and the probe verification.
 Round 1: the spec now measures medallion circularity directly and checks per-vocabulary motion signatures instead of rotation deltas.
+Round 2: the vocabulary-signature test samples on a single page with five deterministic one-second steps to eliminate live playback timing variance.
 
 ## Coordinator verification (Fable 5.1)
 - typecheck, vitest, build pass; lint at the pre-existing 18; nine scoped CSS rules; probe clean across six configs plus arrivals (logs/status/probe); first Playwright run 13 of 13 on the dev server; after round 1 (spec strengthened per the review), the corrected runner on a production server gives 12 of 13, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.
 - Hygiene sweep (Haiku 4.5 low): no findings. Review: Sonnet 5 (high): code clean, motion inside the envelope, numbers still; two should-fix findings on the spec (circularity never measured medallions; the waveform check would pass on the old code) corrected in round 1 (medallion circularity measured directly, per-vocabulary signatures); one color note (two alpha stops not literally in renderer.css, same hues).
+- Round 2: the vocabulary signatures sample five points one virtual second apart on one page (the earlier three-page sampling drifted with real time in the Studio and failed once in the integrated run). Verified on the production runner after the change.

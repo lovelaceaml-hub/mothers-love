@@ -111,23 +111,21 @@ test('the nine medallions carry at least three motion vocabularies', async ({ pa
 });
 
 test('icon transforms differ pairwise and follow different waveforms', async ({ page }) => {
-  const { frame: frame6 } = await openStudioScene(page, 'status', 6000);
-  const motions = await frame6.evaluate(() => {
+  const { frame } = await openStudioScene(page, 'status', 6000);
+  const motions = await frame.evaluate(() => {
     const medallions = Array.from(document.querySelectorAll('.stat-expression .medallion'));
     return medallions.map((el) => el.getAttribute('data-motion') || '');
   });
-  const transforms6 = await frame6.evaluate(() => {
+  const initialTransforms = await frame.evaluate(() => {
     const icons = Array.from(document.querySelectorAll('.stat-expression .medallion img'));
     return icons.map((el) => (el as HTMLElement).style.transform);
   });
 
-  expect(transforms6).toHaveLength(9);
-  const transformSet6 = new Set(transforms6);
-  expect(transformSet6.size).toBe(9);
+  expect(initialTransforms).toHaveLength(9);
+  const transformSet = new Set(initialTransforms);
+  expect(transformSet.size).toBe(9);
 
-  const parsed6 = transforms6.map(parseTransform);
-
-  const staticTransforms = await frame6.evaluate(() => {
+  const staticTransforms = await frame.evaluate(() => {
     const elements = Array.from(document.querySelectorAll('.metric-value, .stat-expression b'));
     return elements.map((el) => window.getComputedStyle(el).transform);
   });
@@ -136,74 +134,70 @@ test('icon transforms differ pairwise and follow different waveforms', async ({ 
     expect(tr).toBe('none');
   }
 
-  const page7 = await page.context().newPage();
-  const page8 = await page.context().newPage();
-  try {
-    const { frame: frame7 } = await openStudioScene(page7, 'status', 7000);
-    const transforms7 = await frame7.evaluate(() => {
+  const samples = [initialTransforms.map(parseTransform)];
+
+  for (let stepIndex = 1; stepIndex <= 4; stepIndex++) {
+    const checkpointMs = 6000 + stepIndex * 1000;
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    await frame.evaluate((ms) => {
+      document.getAnimations().forEach((animation) => {
+        animation.pause();
+        animation.currentTime = ms;
+      });
+    }, checkpointMs);
+    const stepTransforms = await frame.evaluate(() => {
       const icons = Array.from(document.querySelectorAll('.stat-expression .medallion img'));
       return icons.map((el) => (el as HTMLElement).style.transform);
     });
-    expect(transforms7).toHaveLength(9);
-    const parsed7 = transforms7.map(parseTransform);
+    expect(stepTransforms).toHaveLength(9);
+    samples.push(stepTransforms.map(parseTransform));
+  }
 
-    const { frame: frame8 } = await openStudioScene(page8, 'status', 8000);
-    const transforms8 = await frame8.evaluate(() => {
-      const icons = Array.from(document.querySelectorAll('.stat-expression .medallion img'));
-      return icons.map((el) => (el as HTMLElement).style.transform);
-    });
-    expect(transforms8).toHaveLength(9);
-    const parsed8 = transforms8.map(parseTransform);
+  type IconSeries = {
+    index: number;
+    motion: string;
+    samples: Array<{ x: number; y: number; rot: number; scale: number }>;
+  };
 
-    type IconSeries = {
-      index: number;
-      motion: string;
-      samples: Array<{ x: number; y: number; rot: number; scale: number }>;
-    };
+  const iconSeries: IconSeries[] = motions.map((motion, idx) => ({
+    index: idx,
+    motion,
+    samples: samples.map((s) => s[idx]),
+  }));
 
-    const iconSeries: IconSeries[] = motions.map((motion, idx) => ({
-      index: idx,
-      motion,
-      samples: [parsed6[idx], parsed7[idx], parsed8[idx]],
-    }));
+  const floatGroup = iconSeries.filter((item) => item.motion === 'float');
+  const swayGroup = iconSeries.filter((item) => item.motion === 'sway');
+  const breatheGroup = iconSeries.filter((item) => item.motion === 'breathe');
 
-    const floatGroup = iconSeries.filter((item) => item.motion === 'float');
-    const swayGroup = iconSeries.filter((item) => item.motion === 'sway');
-    const breatheGroup = iconSeries.filter((item) => item.motion === 'breathe');
+  expect(floatGroup.length).toBeGreaterThan(0);
+  expect(swayGroup.length).toBeGreaterThan(0);
+  expect(breatheGroup.length).toBeGreaterThan(0);
 
-    expect(floatGroup.length).toBeGreaterThan(0);
-    expect(swayGroup.length).toBeGreaterThan(0);
-    expect(breatheGroup.length).toBeGreaterThan(0);
-
-    for (const icon of floatGroup) {
-      const ys = icon.samples.map((s) => s.y);
-      const yDelta = Math.max(...ys) - Math.min(...ys);
-      expect(yDelta).toBeGreaterThan(0.8);
-      for (const sample of icon.samples) {
-        expect(Math.abs(sample.rot)).toBeLessThanOrEqual(3.5);
-      }
+  for (const icon of floatGroup) {
+    const ys = icon.samples.map((s) => s.y);
+    const yDelta = Math.max(...ys) - Math.min(...ys);
+    expect(yDelta).toBeGreaterThan(0.8);
+    for (const sample of icon.samples) {
+      expect(Math.abs(sample.rot)).toBeLessThanOrEqual(3.5);
     }
+  }
 
-    for (const icon of swayGroup) {
-      const maxAbsRot = Math.max(...icon.samples.map((s) => Math.abs(s.rot)));
-      expect(maxAbsRot).toBeGreaterThanOrEqual(3);
-      for (const sample of icon.samples) {
-        expect(Math.abs(sample.y)).toBeLessThanOrEqual(0.5);
-      }
+  for (const icon of swayGroup) {
+    const maxAbsRot = Math.max(...icon.samples.map((s) => Math.abs(s.rot)));
+    expect(maxAbsRot).toBeGreaterThanOrEqual(3);
+    for (const sample of icon.samples) {
+      expect(Math.abs(sample.y)).toBeLessThanOrEqual(0.5);
     }
+  }
 
-    for (const icon of breatheGroup) {
-      for (const sample of icon.samples) {
-        expect(Math.abs(sample.rot)).toBeLessThanOrEqual(0.2);
-      }
-      const scales = icon.samples.map((s) => s.scale);
-      const scaleDelta = Math.max(...scales) - Math.min(...scales);
-      const liftInProgress = icon.samples.some((s) => Math.abs(s.y) > 0.5 && Math.abs(s.y) <= 6);
-      expect(scaleDelta > 0.01 || liftInProgress).toBe(true);
+  for (const icon of breatheGroup) {
+    for (const sample of icon.samples) {
+      expect(Math.abs(sample.rot)).toBeLessThanOrEqual(0.2);
     }
-  } finally {
-    await page7.close();
-    await page8.close();
+    const scales = icon.samples.map((s) => s.scale);
+    const scaleDelta = Math.max(...scales) - Math.min(...scales);
+    const liftInProgress = icon.samples.some((s) => Math.abs(s.y) > 0.5 && Math.abs(s.y) <= 6);
+    expect(scaleDelta > 0.01 || liftInProgress).toBe(true);
   }
 });
 
