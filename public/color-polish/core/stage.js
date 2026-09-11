@@ -2,7 +2,7 @@
 'use strict';
 
 const SCENES=Object.create(null);
-function registerScene(id,descriptor){SCENES[id]=Object.assign({markup:()=>'',mount:null,tick:null,draw:null,prime:null,tickAge:null,floaters:false,fxCanvas:false,archOpacity:'.52',topMargin:7,pace:null,replaceEvery:null,replaceMode:'drift',entrance:'entering',burst:'hearts',keepOut:()=>[],integrate:null,place:null,onRetire:null},descriptor)}
+function registerScene(id,descriptor){SCENES[id]=Object.assign({markup:()=>'',mount:null,tick:null,draw:null,prime:null,tickAge:null,floaters:false,fxCanvas:false,archOpacity:'.52',topMargin:7,pace:null,replaceEvery:null,replaceMode:null,entrance:'entering',burst:'hearts',keepOut:()=>[],integrate:null,place:null,onRetire:null},descriptor)}
 function sceneDescriptor(id=S.s){return SCENES[id]||SCENES[0]}
 registerScene(0,{});
 
@@ -98,7 +98,7 @@ let drawAccum=0;function frame(t){
 
 function changeRate(value){playbackRate=clamp(+value,.25,6)}
 function visualState(){
- return{clock:V.clock,scene:S.s,dwell:{...(S.dwell||DWELL)},actors:V.actors.map(a=>({id:a.id,x:a.screenX,y:a.screenY,d:a.d,scale:a.screenScale,opacity:a.opacity,vx:a.vx,vy:a.vy,life:a.life,readingPages:a.reading?.pages.length||1})),flowers:V.garden?.plants.length||0,gardenNext:V.next,fx:V.fx.length,orbit:V.planets.map(p=>({id:p.b.id,z:p.z,scale:p.scale,moons:p.moons.length})),stream:V.stream?.nodes.map(a=>({id:a.id,x:a.x,y:a.screenY,z:a.z,scale:a.scale,rise:a.rise,radius:a.radius,turn:a.turn}))||[],singleStyles:SINGLE_STYLES,groupStyles:GROUP_STYLES};
+ return{clock:V.clock,scene:S.s,dwell:{...(S.dwell||DWELL)},actors:V.actors.map(a=>({id:a.id,x:a.screenX,y:a.screenY,d:a.d,scale:a.screenScale,opacity:a.opacity,vx:a.vx,vy:a.vy,life:a.life,readingPages:a.reading?.pages.length||1,z:a.z,depth:a.depth,screenScale:a.screenScale,blur:a.el?a.el.style.filter:''})),flowers:V.garden?.plants.length||0,gardenNext:V.next,fx:V.fx.length,orbit:V.planets.map(p=>({id:p.b.id,z:p.z,scale:p.scale,moons:p.moons.length})),stream:V.stream?.nodes.map(a=>({id:a.id,x:a.x,y:a.screenY,z:a.z,scale:a.scale,rise:a.rise,radius:a.radius,turn:a.turn}))||[],singleStyles:SINGLE_STYLES,groupStyles:GROUP_STYLES};
 }
 function stepRuntime(ms){
  if(!finiteNumber(ms)||ms<=0||S.mode!=='normal')return;
