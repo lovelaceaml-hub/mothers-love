@@ -1,0 +1,7 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+scene syntax ok
+scoped rules: 2

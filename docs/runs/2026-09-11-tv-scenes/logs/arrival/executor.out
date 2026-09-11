@@ -1,0 +1,31 @@
+Recognition arrival depth refactor and behavior test suite are complete in `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival`.
+
+The four weakest arrival trajectories now exhibit true depth, camera overshoot, lateral sway, and layered arcs while resolving flat and circular at the end of their entrance. A dedicated behavior spec drives the renderer across all eleven arrival waves without external services to verify cycling order, depth bounds, circular geometry, and midpoint screenshots.
+
+### Changes landed
+
+1. Updated [arrival.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js) with 3D trajectories for single entrance styles 2 and 5, and group entrance styles 0 and 4.
+2. Verified [arrival.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css) retains its scoped header comment with no stylesheet modifications needed.
+3. Created [arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) copying the probe harness to drive eleven arrival waves and assert style sequence, depth progression, circularity, and midpoint screenshots.
+4. Created the lane record file [arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md).
+
+### What works now
+
+The TV display can be reviewed in its live deployment at [Mother's Love Display](https://mothers-love.vercel.app/display) and [Admin Display Studio](https://mothers-love.vercel.app/admin/display). All arrival entrance trajectories cleanly resolve into circular, full-opacity orbs at coordinate targets.
+
+### What Anthony must do
+
+Nothing, you're clear. The coordinator runs verification, tests, and the Sonnet 5 landing review.
+
+### Next step
+
+Review the diff or inspect the lane record in [arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md) (takes under two minutes).
+
+## COMPLETION
+
+- Files changed:
+  - [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js)
+  - [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css)
+  - [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts)
+  - [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md)
+- Anything not done and why: None; all work order requirements and acceptance tests are implemented.

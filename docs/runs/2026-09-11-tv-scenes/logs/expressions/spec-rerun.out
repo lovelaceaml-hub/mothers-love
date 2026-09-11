@@ -1,0 +1,311 @@
+
+Running 15 tests using 5 workers
+
+  ✘   5 [chromium] › tests/color-polish-scenes/expressions.spec.ts:153:5 › compact cards fit (34.3s)
+  ✘   1 [chromium] › tests/color-polish-scenes/expressions.spec.ts:141:5 › grid cards fit with slack (35.4s)
+  ✘   4 [chromium] › tests/color-polish-scenes/expressions.spec.ts:172:5 › every expression can be the focused one (34.6s)
+  ✘   3 [chromium] › tests/color-polish-scenes/expressions.spec.ts:163:5 › the focused card is balanced (34.6s)
+  ✘   2 [chromium] › tests/color-polish-scenes/expressions.spec.ts:110:5 › expressions renders with circular medallions and no overflow at 14 s (35.3s)
+  ✘   6 [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › reduced motion renders the scene still (1.5m)
+  ✘   9 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (1.5m)
+  ✘  10 [chromium] › tests/color-polish-scenes/expressions.spec.ts:219:5 › the same holds at 3840 (1.5m)
+  ✘   7 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (1.5m)
+  ✘   8 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (1.5m)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.1m)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (10.5s)
+  ✓  14 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (39.5s)
+  ✓  15 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (50.6s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.5m)
+
+
+  1) [chromium] › tests/color-polish-scenes/expressions.spec.ts:110:5 › expressions renders with circular medallions and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    4 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:111:21
+
+    Error Context: test-results/color-polish-scenes-expres-765ee-ons-and-no-overflow-at-14-s-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/expressions.spec.ts:141:5 › grid cards fit with slack ──
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    5 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:142:21
+
+    Error Context: test-results/color-polish-scenes-expressions-grid-cards-fit-with-slack-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/expressions.spec.ts:153:5 › compact cards fit ──────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    6 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:154:21
+
+    Error Context: test-results/color-polish-scenes-expressions-compact-cards-fit-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/expressions.spec.ts:163:5 › the focused card is balanced 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    4 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:164:21
+
+    Error Context: test-results/color-polish-scenes-expressions-the-focused-card-is-balanced-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish-scenes/expressions.spec.ts:172:5 › every expression can be the focused one 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    3 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:173:21
+
+    Error Context: test-results/color-polish-scenes-expres-a5318-sion-can-be-the-focused-one-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › reduced motion renders the scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    7 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:209:28
+
+    Error Context: test-results/color-polish-scenes-expres-6734f-ion-renders-the-scene-still-chromium/error-context.md
+
+  7) [chromium] › tests/color-polish-scenes/expressions.spec.ts:219:5 › the same holds at 3840 ─────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    6 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:222:32
+
+    Error Context: test-results/color-polish-scenes-expressions-the-same-holds-at-3840-chromium/error-context.md
+
+  8) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    7 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3112/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3112/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('iframe').contentFrame().getByText('Synthetic Friend').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('iframe').contentFrame().getByText('Synthetic Friend').first()[22m
+
+
+      217 |   await page.goto('/display');
+      218 |   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+    > 219 |   await expect(page.frameLocator('iframe').getByText('Synthetic Friend').first()).toBeVisible();
+          |                                                                                   ^
+      220 |   quiet = true;
+      221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
+      222 |   await expect(page.locator('iframe')).toHaveCount(0);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-usable/usable.spec.ts:219:83
+
+    Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
+
+  10 failed
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:110:5 › expressions renders with circular medallions and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:141:5 › grid cards fit with slack ───
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:153:5 › compact cards fit ───────────
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:163:5 › the focused card is balanced 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:172:5 › every expression can be the focused one 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › reduced motion renders the scene still 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:219:5 › the same holds at 3840 ──────
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  5 passed (7.1m)

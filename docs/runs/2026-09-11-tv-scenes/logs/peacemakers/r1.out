@@ -1,0 +1,24 @@
+The spec typing for [`peacemakers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts) is corrected and ready for the coordinator typecheck.
+
+Strict TypeScript typechecking failed because callbacks over visual state actors lacked explicit types. Declaring `VisualActor`, casting the evaluate result to `{ actors: VisualActor[]; fx: number; flowers: number }`, and annotating every callback parameter resolves all implicit `any` errors without adding `any` annotations or eslint comments.
+
+**Progress:** Round 1 correction complete: [`peacemakers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts) types actors and [`peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) records the result.
+
+### What now works
+1. [`tests/color-polish-scenes/peacemakers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts): Declares `VisualActor`, casts `frame.evaluate` output for `visualState()`, annotates actor callbacks with `(a: VisualActor)`, and types actor element states.
+2. [`docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md): Result section updated with the Round 1 note.
+
+### Two-minute action
+Trigger the coordinator typecheck to confirm strict compilation passes across all lane specs. (1 minute)
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step questions
+1. Should we proceed with the integration check across the remaining scene lanes?
+2. Would you like to review the updated spec diff first?
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`

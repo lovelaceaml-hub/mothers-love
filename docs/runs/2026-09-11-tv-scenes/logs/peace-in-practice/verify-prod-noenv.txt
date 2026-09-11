@@ -1,0 +1,22 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+scene syntax ok
+scoped rules: 1
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  9 failed
+  4 passed (1.6m)
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  3) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:10:5 › peace in practice renders circular bubbles and no overflow at 14 s 
+  4) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:25:5 › a bubble pops into hearts, peace signs and glow within 60 s 
+  5) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:108:5 › bubbles span two depth layers 
+  6) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:143:5 › bubbles stay circular through swell and burst 
+  7) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:171:5 › reduced motion renders the scene still 
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+DONE

@@ -1,0 +1,14 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+scene syntax ok
+scoped rules: 8
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  1 failed
+  14 passed (1.8m)
+  1) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+DONE

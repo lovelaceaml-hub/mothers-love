@@ -1,0 +1,12 @@
+
+Running 7 tests using 5 workers
+
+  ✓  5 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (14.6s)
+  ✓  4 [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s (16.7s)
+  ✓  2 [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers (16.6s)
+  ✓  3 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (17.2s)
+  ✓  1 [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s (24.3s)
+  ✓  7 [chromium] › tests/color-polish-scenes/welcome.spec.ts:131:5 › reduced motion renders the welcome scene still (7.6s)
+  ✓  6 [chromium] › tests/color-polish-scenes/welcome.spec.ts:95:5 › bubbles stay circular through motion (12.7s)
+
+  7 passed (29.5s)

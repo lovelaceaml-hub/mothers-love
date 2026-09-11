@@ -1,0 +1,108 @@
+
+Running 5 tests using 5 workers
+
+  ✘  3 [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies (32.4s)
+  ✘  5 [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms (32.3s)
+  ✘  1 [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed (32.4s)
+  ✘  2 [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s (31.9s)
+  ✓  4 [chromium] › tests/color-polish-scenes/status.spec.ts:242:5 › no icon exceeds the motion envelope over 30 seconds (48.0s)
+
+
+  1) [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3111/admin/display", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:288
+
+      286 |   await mockCommon(page);
+      287 |   await signInAs(page);
+    > 288 |   await page.goto('/admin/display');
+          |              ^
+      289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/helpers.ts:288:14)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts:72:21
+
+    Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3111/admin/display", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:288
+
+      286 |   await mockCommon(page);
+      287 |   await signInAs(page);
+    > 288 |   await page.goto('/admin/display');
+          |              ^
+      289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/helpers.ts:288:14)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts:99:21
+
+    Error Context: test-results/color-polish-scenes-status-8a161-t-three-motion-vocabularies-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3111/admin/display", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:288
+
+      286 |   await mockCommon(page);
+      287 |   await signInAs(page);
+    > 288 |   await page.goto('/admin/display');
+          |              ^
+      289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/helpers.ts:288:14)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts:114:29
+
+    Error Context: test-results/color-polish-scenes-status-9643b--follow-different-waveforms-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3111/admin/display", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:288
+
+      286 |   await mockCommon(page);
+      287 |   await signInAs(page);
+    > 288 |   await page.goto('/admin/display');
+          |              ^
+      289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/helpers.ts:288:14)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts:211:21
+
+    Error Context: test-results/color-polish-scenes-status-bf11e-only-when-motion-is-allowed-chromium/error-context.md
+
+  4 failed
+    [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed 
+  1 passed (51.3s)

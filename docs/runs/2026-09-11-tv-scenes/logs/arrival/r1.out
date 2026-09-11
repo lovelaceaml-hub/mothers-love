@@ -1,0 +1,14 @@
+The spec typing correction is complete and ready for coordinator verification.
+
+Explicit types [`ArrivalRecord`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts#L12-L21), [`ArrivalEvent`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts#L23-L28), and [`ArrivalSnapshot`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts#L30-L34) are now declared in [arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts). The fixture snapshot, record batches, and arrival arrays are typed with these contracts, eliminating the `never[]` collapse at line 60 without adding any `any` or `eslint-disable` comments. The lane execution record in [arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md#L42) has been updated with the Round 1 entry.
+
+### What now works
+- [arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts): `snapshot.recognitions[0].id` and wave records resolve to explicit `ArrivalRecord` and `ArrivalEvent` properties instead of `never`.
+- [arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md): Records the Round 1 spec typing fix.
+
+### What Anthony must do
+Nothing, you're clear.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts
+- /Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md

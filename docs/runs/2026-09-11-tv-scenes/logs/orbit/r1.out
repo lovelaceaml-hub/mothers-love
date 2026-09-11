@@ -1,0 +1,24 @@
+Orbit correction round r1 is complete across all three allowlist files.
+
+The angular rate test now computes orbital progression directly from consecutive planet z coordinate samples where |z| is under 300, avoiding unreachable runtime properties. The duplicate `.orb::after` highlight rule has been removed from [orbit.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css) so the scene relies on the existing `.orb::before` sheen from renderer.css. The lane record in [orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md) now reflects that the sheen already shipped and records the completion of this round.
+
+### Completed changes
+
+1. [orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts): Replaced the direct `thetas` assertion with a rate calculation derived from `asin(z / 395)` on a planet matched by id across samples 5 seconds apart, disambiguating branch orientation by direction of change and asserting 0.082 rad/s within 8 percent.
+2. [orbit.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css): Removed the `.planet-system .orb::after` rule so the file contains only its header comment.
+3. [orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md): Corrected the highlight description to cite the shipped `.orb::before` radial highlight in renderer.css and appended the r1 completion sentence to the Result section.
+
+### What Anthony must do
+
+Nothing, you're clear.
+
+### Next step
+
+Ready for the coordinator to run verification and review.
+
+1. Proceed with coordinator landing verification?
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
+- /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
+- /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css
