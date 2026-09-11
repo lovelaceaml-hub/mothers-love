@@ -22,13 +22,35 @@ async function main() {
   const timing = JSON.parse(await readFile(timingPath, 'utf8'));
   const catalogSource = await readFile(catalogPath, 'utf8');
 
-  const titleMatch = catalogSource.match(/export const CAMPAIGN_TITLE\s*=\s*["']([^"']+)["']/);
-  const taglineMatch = catalogSource.match(/export const CAMPAIGN_TAGLINE\s*=\s*["']([^"']+)["']/);
-  if (!titleMatch || !taglineMatch) {
-    throw new Error('Failed to read CAMPAIGN_TITLE or CAMPAIGN_TAGLINE from catalog.ts');
+  const titleMatch = catalogSource.match(/CAMPAIGN_TITLE\s*=\s*"([^"]+)"/);
+  const taglineMatch = catalogSource.match(/CAMPAIGN_TAGLINE\s*=\s*"([^"]+)"/);
+  const CAMPAIGN_TITLE = titleMatch?.[1];
+  const CAMPAIGN_TAGLINE = taglineMatch?.[1];
+
+  if (!CAMPAIGN_TITLE) {
+    console.error('Missing CAMPAIGN_TITLE from catalog.ts');
+    process.exit(1);
   }
-  const CAMPAIGN_TITLE = titleMatch[1];
-  const CAMPAIGN_TAGLINE = taglineMatch[1];
+  if (!CAMPAIGN_TAGLINE) {
+    console.error('Missing CAMPAIGN_TAGLINE from catalog.ts');
+    process.exit(1);
+  }
+  if (!CAMPAIGN_TITLE.includes("'")) {
+    console.error("CAMPAIGN_TITLE does not contain an apostrophe");
+    process.exit(1);
+  }
+  if (!CAMPAIGN_TAGLINE.includes("'")) {
+    console.error("CAMPAIGN_TAGLINE does not contain an apostrophe");
+    process.exit(1);
+  }
+  if (!CAMPAIGN_TITLE.endsWith('LOVE')) {
+    console.error('CAMPAIGN_TITLE does not end with "LOVE"');
+    process.exit(1);
+  }
+  if (!CAMPAIGN_TAGLINE.endsWith('.')) {
+    console.error('CAMPAIGN_TAGLINE does not end with a period');
+    process.exit(1);
+  }
 
   const GAP = Number(narration.gapSeconds ?? 0.8);
   const XFADE = 0.5;
