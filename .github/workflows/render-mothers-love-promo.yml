@@ -1,0 +1,124 @@
+name: Render Mother's Love Promo Commercial
+
+on:
+  push:
+    branches:
+      - codex/mothers-love-promo-commercial
+    paths:
+      - 'promo-commercial/**'
+      - '.github/workflows/render-mothers-love-promo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    name: Render vertical MP4 + cover
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install system audio/video tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+
+      - name: Install browser renderer
+        run: |
+          npm install --prefix promo-commercial
+          cd promo-commercial
+          npx playwright install --with-deps chromium
+
+      - name: Capture real Mother's Love app states
+        env:
+          MOTHERS_LOVE_URL: https://mothers-love.vercel.app
+        run: node promo-commercial/capture-app.mjs
+
+      - name: Start local promo stage
+        run: |
+          nohup python3 -m http.server 4173 --directory . >/tmp/mothers-love-promo-http.log 2>&1 &
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/promo-commercial/promo.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/mothers-love-promo-http.log
+          exit 1
+
+      - name: Record animated vertical commercial and cover
+        run: node promo-commercial/record-promo.mjs
+
+      - name: Synthesize original cinematic bed and sound design
+        run: python promo-commercial/make-audio.py
+
+      - name: Generate warm professional voiceover
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check edge-tts
+          mkdir -p promo-commercial/out
+          TEXT="$(tr '\n' ' ' < promo-commercial/voiceover.txt)"
+          if edge-tts \
+            --voice 'en-US-AvaMultilingualNeural' \
+            --rate='-4%' \
+            --text "$TEXT" \
+            --write-media promo-commercial/out/voiceover.mp3; then
+            echo 'VOICE_FILE=promo-commercial/out/voiceover.mp3' >> "$GITHUB_ENV"
+          else
+            espeak-ng -v en-us -s 145 -p 47 -a 175 \
+              -f promo-commercial/voiceover.txt \
+              -w promo-commercial/out/voiceover.wav
+            echo 'VOICE_FILE=promo-commercial/out/voiceover.wav' >> "$GITHUB_ENV"
+          fi
+
+      - name: Mix, master, and encode final MP4
+        shell: bash
+        run: |
+          ffmpeg -y \
+            -i promo-commercial/out/mothers-love-promo-silent.webm \
+            -i promo-commercial/out/mothers-love-bed.wav \
+            -i "$VOICE_FILE" \
+            -filter_complex "[1:a]volume=0.82[bed];[2:a]adelay=900|900,volume=1.18[vo];[bed][vo]amix=inputs=2:duration=first:dropout_transition=2,loudnorm=I=-14:LRA=9:TP=-1.5[a]" \
+            -map 0:v:0 -map '[a]' \
+            -vf 'scale=1080:1920:flags=lanczos,format=yuv420p' \
+            -c:v libx264 -preset medium -crf 18 -profile:v high -level 4.1 \
+            -c:a aac -b:a 192k -ar 48000 \
+            -movflags +faststart -t 60.0 \
+            promo-commercial/out/mothers-love-promo-vertical.mp4
+
+      - name: Create lightweight preview GIF
+        run: |
+          ffmpeg -y -ss 4 -i promo-commercial/out/mothers-love-promo-vertical.mp4 \
+            -vf "fps=8,scale=360:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4" \
+            -t 18 promo-commercial/out/mothers-love-promo-preview.gif
+
+      - name: Verify outputs
+        run: |
+          test -s promo-commercial/out/mothers-love-promo-vertical.mp4
+          test -s promo-commercial/out/mothers-love-promo-cover.png
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 promo-commercial/out/mothers-love-promo-vertical.mp4
+          file promo-commercial/out/mothers-love-promo-cover.png
+
+      - name: Upload finished commercial
+        uses: actions/upload-artifact@v4
+        with:
+          name: mothers-love-promo-commercial
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            promo-commercial/out/mothers-love-promo-vertical.mp4
+            promo-commercial/out/mothers-love-promo-cover.png
+            promo-commercial/out/mothers-love-promo-preview.gif
+            promo-commercial/voiceover.txt
