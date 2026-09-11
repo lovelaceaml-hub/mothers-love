@@ -10,7 +10,7 @@ registerScene(5,{
  markup:calendarScene,
  archOpacity:'.13',
  mount(root){
-  root.querySelectorAll('.day:not(.future):not(.blank)').forEach(el=>{const day=+el.querySelector('span')?.textContent;if(day<S.selectedDay)el.classList.add('past');el.style.setProperty('--day-delay',`${-day*1.93}s`)});
+  root.querySelectorAll('.day:not(.future):not(.blank)').forEach(el=>{const day=+el.querySelector('span')?.textContent;if(day<S.selectedDay)el.classList.add('past');el.style.setProperty('--day-delay',`${-day*1.93}s`);el.style.setProperty('--day-index',String(day))});
   root.addEventListener('click',e=>{const b=e.target.closest('.day[data-day]');if(b&&!b.disabled)selectDay(+b.dataset.day)});
  }
 });
