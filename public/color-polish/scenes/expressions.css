@@ -1,1 +1,39 @@
 /* Scene 7, The Nine Expressions. Every rule in this file is scoped to #tv .scene[data-scene="7"]. Colors stay as shipped in renderer.css. */
+
+#tv .scene[data-scene="7"] .edu-card:not(.focused):not(.compact) .edu-front {
+  padding: 14px 24px;
+}
+
+#tv .scene[data-scene="7"] .edu-card:not(.focused):not(.compact) .edu-phrase {
+  margin-top: 10px;
+}
+
+#tv .scene[data-scene="7"] .edu-card.focused .edu-detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px 42px 70px 42px;
+}
+
+#tv .scene[data-scene="7"] .edu-card.focused .edu-phrase {
+  font-size: 34px;
+  line-height: 1.28;
+  margin: 14px 0 10px;
+}
+
+#tv .scene[data-scene="7"] .edu-card.focused .edu-principle {
+  font-size: 27px;
+  line-height: 1.35;
+  margin: 0 0 10px;
+}
+
+#tv .scene[data-scene="7"] .edu-card.focused .edu-explanation {
+  font-size: 26px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+#tv .scene[data-scene="7"] .edu-card.focused .edu-source {
+  left: 42px;
+  bottom: 19px;
+}
