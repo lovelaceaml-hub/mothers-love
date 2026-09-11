@@ -26,6 +26,8 @@ Branches let Anthony pick any subset only after the single 941-line renderer is 
 - Completion review: one Opus 5 (high) review of the tv/pick integration branch before production.
 - Lane cap: two or three lanes per sitting. One writer per worktree, disjoint files.
 - Ledger: one row per dispatch via ledger-append.sh (agy) or ledger-from-transcript.py (Claude reviews).
+- Gemini model: only Gemini 3.8 Flash. Anthony's ruling, September 10: Gemini 3.1 Pro is outdated and is never used, not even as a fallback. When a section needs more thought, raise effort within 3.8 Flash before spilling to Sonnet 5.
+- Haiku 4.5 (low) carries every mechanical row: the hygiene sweep before each review, ledger rows, lane-state updates in INDEX.md, filing probe screenshots into logs/<slug>/, README, HANDOFF and AGENTS link updates, and Build log format checks. Never Haiku for scene code or reviews.
 
 Cross-cutting rules for every lane: circular bubbles at all times; no added white overlays; readable from across a room; reduced motion respected (S.still); fictional data only; header, feed rail, QR, durations, playlist order, click-advance (live only) and safe states untouched; Studio sample preview keeps working; no em or en dash in produced text or comments; every scene CSS rule scoped to .scene[data-scene="N"] (arrival: .event-stage).
 
@@ -41,7 +43,7 @@ Scene id map (Anthony's number, renderer id, slug): 1/1 welcome, 2/2 garden, 3/3
 
 ## Lane 0: Plan critique
 Setup: read-only critic · high · Lane: Codex · Review: none
-  Codex: gpt-5.6-sol · high (fallback when Codex primary is exhausted: Antigravity Gemini 3.1 Pro (High), read-only)
+  Codex: gpt-5.6-sol · high (fallback when Codex primary is exhausted: Antigravity Gemini 3.8 Flash (High), read-only)
 Worktree: none, read-only against /Users/anthony/Projects/mothers-love
 Depends on: none; launches alongside Section 0
 Agents: none
@@ -51,7 +53,7 @@ Brief: argue against this plan; find missing decisions, unsafe assumptions, unte
 
 ## Section 0: Foundation split, no visual change
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
   Claude: Sonnet 5 · medium (spill only)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv/base
 Depends on: none
@@ -85,7 +87,7 @@ Acceptance (all must hold):
 
 ## Section 1: Welcome
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome, branch tv/scene-welcome
 Depends on: Section 0; gap report gaps/welcome.md approved by Anthony
 Agents: none
@@ -96,8 +98,8 @@ Work: per-actor physics exists (mountFloaters: own rng, vx, vy, pace, phase, z).
 Acceptance: the common scene spec (below) plus a visualState check that at least three actors differ in speed by 30 percent or more and depth spans at least two layers.
 
 ## Section 2: Recognition Garden
-Setup: frontier · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.1 Pro (High) (fallback: Gemini 3.8 Flash (High))
+Setup: balanced · high · Lane: Antigravity · Review: controller
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden, branch tv/scene-garden
 Depends on: Section 0; gaps/garden.md approved
 Agents: none
@@ -108,8 +110,8 @@ Work: keep 5 bubbles and the 7 second cadence. Stronger sprout entrance. Replace
 Acceptance: common spec plus visualState flower count strictly increases over 60 seconds; never more than 5 bubbles.
 
 ## Section 3: Recognition Arrival
-Setup: frontier · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.1 Pro (High) (fallback: Gemini 3.8 Flash (High))
+Setup: balanced · high · Lane: Antigravity · Review: controller
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival, branch tv/scene-arrival
 Depends on: Section 0; gaps/arrival.md approved
 Agents: none
@@ -121,7 +123,7 @@ Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 s
 
 ## Section 4: Featured Recognition
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured, branch tv/scene-featured
 Depends on: Section 0; gaps/featured.md approved
 Agents: none
@@ -133,7 +135,7 @@ Acceptance: common spec plus bubble count never drops to zero during 30 seconds 
 
 ## Section 5: Calendar
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-calendar, branch tv/scene-calendar
 Depends on: Section 0; gaps/calendar.md approved
 Agents: none
@@ -145,7 +147,7 @@ Acceptance: common spec plus screenshots at 1920 and 3840 showing the corner dat
 
 ## Section 6: We Are Peacemakers
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers, branch tv/scene-peacemakers
 Depends on: Section 0; gaps/peacemakers.md approved
 Agents: none
@@ -157,7 +159,7 @@ Acceptance: common spec plus bubble count never zero; at least one actor blurred
 
 ## Section 7: Status
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-status, branch tv/scene-status
 Depends on: Section 0; gaps/status.md approved
 Agents: none
@@ -169,7 +171,7 @@ Acceptance: common spec plus the nine medallion transforms differ from each othe
 
 ## Section 8: Nine Expressions
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions, branch tv/scene-expressions
 Depends on: Section 0; gaps/expressions.md approved
 Agents: none
@@ -181,7 +183,7 @@ Acceptance: common spec plus scrollWidth and scrollHeight never exceed client si
 
 ## Section 9: Peace in Practice
 Setup: balanced · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.1 Pro (High))
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv/scene-peace-in-practice
 Depends on: Section 0; gaps/peace-in-practice.md approved
 Agents: none
@@ -192,8 +194,8 @@ Work: independent motion; exit pops into hearts, peace symbols and soft particle
 Acceptance: common spec plus a burst is observed in visualState within 60 seconds and bubble count never zero.
 
 ## Section 10: Expression Orbit
-Setup: frontier · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.1 Pro (High) (fallback: Gemini 3.8 Flash (High))
+Setup: balanced · high · Lane: Antigravity · Review: controller
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-orbit, branch tv/scene-orbit
 Depends on: Section 0; gaps/orbit.md approved
 Agents: none
@@ -204,8 +206,8 @@ Work: slow the system (rate .102 today). Real depth: wider scale range, blur beh
 Acceptance: common spec plus orbit z values span both signs and at least one planet passes behind the sun (z-index below the sun) within 30 seconds.
 
 ## Section 11: Milestone and Weekly Goal
-Setup: frontier · high · Lane: Antigravity · Review: controller
-  Antigravity: Gemini 3.1 Pro (High) (fallback: Gemini 3.8 Flash (High))
+Setup: balanced · high · Lane: Antigravity · Review: controller
+  Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
 Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone, branch tv/scene-milestone
 Depends on: Section 0; gaps/milestone.md approved; shared fixture lane if the 48-record sample yields too few nodes
 Agents: none
@@ -252,4 +254,5 @@ Anthony can call Section 12 after any sitting.
 - Arrival style counts stay 6 and 5.
 
 ## Build log
+- 2026-09-10: Anthony chose Parallel mode, ruled out Gemini 3.1 Pro entirely (3.8 Flash only), and asked that Haiku 4.5 carry the mechanical rows; setup lines updated before launch.
 - 2026-09-10: Plan approved by Anthony in plan mode (Fable 5.1 planner, per his instruction). Baseline for the completion review: codex/color-polish-v6, codex/mothers-love and origin/codex/mothers-love all at 1532068. Working tree dirty only with two untracked Plan 10 order files (docs/runs/2026-09-10-color-polish/orders/LM.md, LT.md), not touched by this plan. Codex primary at 100 percent, Gemini weekly at 2 percent, Claude weekly at 36 percent at planning time. Anthony rejected the v8 prototype; /Users/anthony/Downloads/Mothers_Love_TV_Prototype_v8.html moved to the Trash by the coordinator. Section 0 not started.
