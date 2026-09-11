@@ -1,1 +1,55 @@
 /* Scene 1, Welcome. Every rule in this file is scoped to #tv .scene[data-scene="1"]. Colors stay as shipped in renderer.css. */
+
+@property --welcome-ring-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes welcomeRingSpin {
+  from {
+    --welcome-ring-angle: 0deg;
+  }
+  to {
+    --welcome-ring-angle: 360deg;
+  }
+}
+
+#tv .scene[data-scene="1"] .orb-slot {
+  border-radius: 50%;
+  isolation: isolate;
+}
+
+#tv .scene[data-scene="1"] .orb-slot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(from var(--welcome-ring-angle), transparent 0%, #fff9 35%, color-mix(in srgb, var(--tint, #d9b477) 35%, transparent) 70%, transparent 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 6px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 6px));
+  animation: welcomeRingSpin 9s linear infinite;
+  animation-delay: var(--welcome-ring-delay, 0s);
+  pointer-events: none;
+  z-index: -1;
+}
+
+#tv .scene[data-scene="1"] .orb-slot.spin-reverse::after {
+  animation-direction: reverse;
+}
+
+#tv .scene[data-scene="1"] .orb-sheen:after {
+  animation-duration: 7s;
+}
+
+#tv.still .scene[data-scene="1"] .orb-slot::after,
+#tv.still .scene[data-scene="1"] .orb-sheen:after {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tv .scene[data-scene="1"] .orb-slot::after,
+  #tv .scene[data-scene="1"] .orb-sheen:after {
+    animation: none !important;
+  }
+}
