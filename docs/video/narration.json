@@ -1,0 +1,110 @@
+{
+  "voice": "en-US-AvaNeural",
+  "rate": "-5%",
+  "gapSeconds": 0.8,
+  "beats": [
+    {
+      "n": 1,
+      "slug": "title",
+      "clip": "card",
+      "route": null,
+      "portrait": "card",
+      "targetSeconds": 8,
+      "action": "Open on the title card displaying THE WORDS OF MOTHER'S LOVE and Where a mother's love resides, peace abides. The card holds for 3 seconds before a gentle transition.",
+      "narration": "Welcome to The Words of Mother's Love, an invitation to share warmth. From the official campaign site, \"Where a mother's love reaches, peace settles.\"",
+      "caption": [
+        "The Words of Mother's Love",
+        "Where love reaches, peace settles."
+      ]
+    },
+    {
+      "n": 2,
+      "slug": "why",
+      "clip": "route",
+      "route": "/expressions",
+      "portrait": "phone",
+      "targetSeconds": 10,
+      "action": "A slow, smooth scroll moves down the top of the guide on /expressions, showing the opening message and introduction.",
+      "narration": "Even a small act by one person, filled with a mother's love, begins changing the world. You can spread that peace within your home, school, or workplace.",
+      "caption": [
+        "One small act filled with mother's love",
+        "In your home, school, or workplace"
+      ]
+    },
+    {
+      "n": 3,
+      "slug": "nine-words",
+      "clip": "route",
+      "route": "/expressions",
+      "portrait": "phone",
+      "targetSeconds": 12,
+      "action": "A steady scroll moves down the guide on /expressions, passing all nine expression cards in the catalog.",
+      "narration": "The guide shares nine expressions, including \"How Are You?\", \"It's okay. I understand.\", and \"You're amazing. You're doing great!\" Simple words that bring comfort, warmth, and hope.",
+      "caption": [
+        "How Are You?",
+        "It's okay. I understand."
+      ]
+    },
+    {
+      "n": 4,
+      "slug": "feed",
+      "clip": "route",
+      "route": "/",
+      "portrait": "phone",
+      "targetSeconds": 12,
+      "action": "The home feed on / displays recent recognitions. The view scrolls gently down to reveal community cards, then pauses as the heart button named \"Like recognition for David K.\" is tapped once.",
+      "narration": "In the live feed, you can recognize someone who spoke one of these words to you. Your own name stays private and is never shown.",
+      "caption": [
+        "Recognize someone who encouraged you",
+        "Your own name stays private"
+      ]
+    },
+    {
+      "n": 5,
+      "slug": "share",
+      "clip": "route",
+      "route": "/recognize",
+      "portrait": "phone",
+      "targetSeconds": 14,
+      "action": "On /recognize, \"Grace L.\" is typed into \"Who would you like to recognize?\". Expression cards 2 and 8 are selected, turning gold with shimmer. \"Thank you for helping set up the hall and welcoming everyone with such warmth.\" is typed into \"Share your appreciation\". The \"Send recognition\" button is pressed, and the receipt is shown.",
+      "narration": "Sharing a recognition takes just a moment. Enter their name, choose the expressions they shared, and write a short message of heartfelt gratitude to send encouragement.",
+      "caption": [
+        "Share a recognition in moments",
+        "Select expressions and send thanks"
+      ],
+      "share": {
+        "recipient": "Grace L.",
+        "expressionIds": [2, 8],
+        "message": "Thank you for helping set up the hall and welcoming everyone with such warmth."
+      }
+    },
+    {
+      "n": 6,
+      "slug": "tv",
+      "clip": "route",
+      "route": "/display",
+      "portrait": "crop",
+      "targetSeconds": 10,
+      "action": "The /display Garden scene opens with recognitions floating in bubbles. One click advances smoothly to the next TV scene.",
+      "narration": "Every recognition appears on the TV display in our church lobby, or wherever the display is shown, gently floating as a shared reminder of love.",
+      "caption": [
+        "Shown on the church lobby TV display",
+        "Floating bubbles celebrate each message"
+      ]
+    },
+    {
+      "n": 7,
+      "slug": "invite",
+      "clip": "card",
+      "route": null,
+      "portrait": "card",
+      "targetSeconds": 8,
+      "action": "The end card displays the QR code and the URL https://mothers-love.vercel.app/recognize, holding for 5 seconds.",
+      "narration": "Visit the link or scan the code to share one recognition today. Together, we can spread comfort and peace everywhere. Join us now!",
+      "caption": [
+        "Share one recognition today",
+        "Join us now!"
+      ]
+    }
+  ]
+}
