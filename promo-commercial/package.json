@@ -1,0 +1,12 @@
+{
+  "name": "mothers-love-promo-commercial",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node capture-app.mjs",
+    "record": "node record-promo.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.55.0"
+  }
+}
