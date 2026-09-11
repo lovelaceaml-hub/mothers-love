@@ -41,7 +41,7 @@ test("record deployed Mother's Love app for promo", async ({ browser }) => {
   const homeContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: OUT, size: { width: 780, height: 1688 } },
+    recordVideo: { dir: OUT, size: { width: 390, height: 844 } },
   });
   const home = await homeContext.newPage();
   await home.goto(`${LIVE}/`, { waitUntil: 'networkidle', timeout: 45_000 });
@@ -63,7 +63,7 @@ test("record deployed Mother's Love app for promo", async ({ browser }) => {
   const formContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: OUT, size: { width: 780, height: 1688 } },
+    recordVideo: { dir: OUT, size: { width: 390, height: 844 } },
   });
   const form = await formContext.newPage();
   await form.goto(`${LIVE}/recognize`, { waitUntil: 'networkidle', timeout: 45_000 });
@@ -118,7 +118,7 @@ test("record deployed Mother's Love app for promo", async ({ browser }) => {
   const expressionsContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: OUT, size: { width: 780, height: 1688 } },
+    recordVideo: { dir: OUT, size: { width: 390, height: 844 } },
   });
   const expressions = await expressionsContext.newPage();
   await expressions.goto(`${LIVE}/expressions`, { waitUntil: 'networkidle', timeout: 45_000 });
