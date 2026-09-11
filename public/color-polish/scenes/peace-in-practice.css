@@ -1,1 +1,11 @@
 /* Scene 9, Peace in Practice. Every rule in this file is scoped to #tv .scene[data-scene="9"]. Colors stay as shipped in renderer.css. */
+
+#tv .scene[data-scene="9"] #heart-host canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#tv.still .scene[data-scene="9"] #heart-host canvas {
+  animation: none;
+}
