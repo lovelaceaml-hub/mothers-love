@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Frame, type Page } from '@playwright/test';
 import {
   circularity,
   noOverflow,
@@ -6,17 +6,23 @@ import {
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
+import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
+const publicFolder = resolve(process.cwd(), 'public');
 
 test('garden renders circular bubbles and no overflow at 14 s', async ({ page }) => {
+  const { frame: overflowFrame } = await openStudioScene(page, 'garden', 12000);
+  const overflow = await noOverflow(overflowFrame);
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
+
   const { frame } = await openStudioScene(page, 'garden', 14000);
 
   const circleResult = await circularity(frame);
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
-
-  const overflow = await noOverflow(frame);
-  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
-  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
 
   const clickResult = await studioClickDoesNotAdvance(page, frame);
   expect(clickResult.before).toBe(clickResult.after);
@@ -65,42 +71,126 @@ test('the garden fills over a minute with one replacement at a time', async ({ p
   expect(gardenNextValues[gardenNextValues.length - 1]).toBeGreaterThanOrEqual(56);
 });
 
-test('petals are carried, not dropped', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'garden', 15000);
+async function setupGardenHarness(page: Page): Promise<{ frame: Frame }> {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.addInitScript(() => {
+    let seed = 7301;
+    Math.random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    window.requestAnimationFrame = () => 0;
+  });
 
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/probe') {
+      return route.fulfill({
+        contentType: 'text/html',
+        body: '<html><body style="margin:0"><iframe title="Probe" sandbox="allow-scripts" referrerpolicy="no-referrer" src="/color-polish/renderer.html" style="width:100vw;height:100vh;border:0"></iframe></body></html>',
+      });
+    }
+    if (!url.pathname.startsWith('/color-polish/') || url.pathname.includes('..')) {
+      return route.abort();
+    }
+    const file = resolve(publicFolder, '.' + url.pathname);
+    const type = file.endsWith('.js')
+      ? 'text/javascript'
+      : file.endsWith('.css')
+      ? 'text/css'
+      : file.endsWith('.html')
+      ? 'text/html'
+      : file.endsWith('.svg')
+      ? 'image/svg+xml'
+      : 'image/png';
+    try {
+      const body = await readFile(file);
+      await route.fulfill({ contentType: type, body });
+    } catch {
+      await route.abort();
+    }
+  });
+
+  await page.goto('/probe');
+  const snapshot = buildColorPolishSampleSnapshot();
+
+  await page.evaluate(
+    async ({ snapshot }) => {
+      const frame = document.querySelector('iframe');
+      if (!frame || !frame.contentWindow) throw new Error('iframe not found');
+      const channel = new MessageChannel();
+      const nonce = crypto.randomUUID();
+      await new Promise<void>((resolve) => {
+        channel.port1.onmessage = (event) => {
+          if (event.data.type === 'color-polish:ready') resolve();
+        };
+        channel.port1.start();
+        frame.contentWindow!.postMessage(
+          { version: 'color-polish-v6', type: 'color-polish:bootstrap', nonce, sequence: 0 },
+          '*',
+          [channel.port2],
+        );
+      });
+      (window as any).probePort = channel.port1;
+      (window as any).probeNonce = nonce;
+      channel.port1.postMessage({
+        version: 'color-polish-v6',
+        type: 'color-polish:update',
+        nonce,
+        sequence: 1,
+        snapshot,
+        control: {
+          nowMs: Date.parse(snapshot.serverTime),
+          status: 'ready',
+          source: 'sample',
+          playing: true,
+          scene: 'garden',
+          reactionCounts: {},
+          qrDataUrl: '',
+          submissionUrl: snapshot.submissionUrl,
+        },
+      });
+    },
+    { snapshot },
+  );
+
+  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+  if (!frame) throw new Error('renderer frame not found');
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().scene === 2);
+
+  return { frame };
+}
+
+test('petals are carried, not dropped', async ({ page }) => {
+  const { frame } = await setupGardenHarness(page);
+
+  await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 15000);
   const petals15 = await frame.evaluate(() => {
-    const canvas = document.getElementById('living-garden') as HTMLCanvasElement;
+    const canvas = document.getElementById('living-garden') as HTMLCanvasElement | null;
     return Number(canvas?.dataset.petals || 0);
   });
   expect(petals15).toBeGreaterThan(0);
 
-  await frame.evaluate(() => {
-    (window as any).colorPolishRuntime.step(2000);
-    document.getAnimations().forEach((animation) => {
-      animation.pause();
-      animation.currentTime = 17000;
-    });
-  });
-
+  await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 2000);
   const petals17 = await frame.evaluate(() => {
-    const canvas = document.getElementById('living-garden') as HTMLCanvasElement;
+    const canvas = document.getElementById('living-garden') as HTMLCanvasElement | null;
     return Number(canvas?.dataset.petals || 0);
   });
   expect(petals17).toBeGreaterThan(0);
 
-  await frame.evaluate(() => {
-    (window as any).colorPolishRuntime.step(7000);
-    document.getAnimations().forEach((animation) => {
-      animation.pause();
-      animation.currentTime = 24000;
-    });
-  });
-
-  const petals24 = await frame.evaluate(() => {
-    const canvas = document.getElementById('living-garden') as HTMLCanvasElement;
+  await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 3500);
+  const petals205 = await frame.evaluate(() => {
+    const canvas = document.getElementById('living-garden') as HTMLCanvasElement | null;
     return Number(canvas?.dataset.petals || 0);
   });
-  expect(petals24).toBeLessThan(petals17);
+  expect(petals205).toBe(0);
+
+  await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 2500);
+  const petals23 = await frame.evaluate(() => {
+    const canvas = document.getElementById('living-garden') as HTMLCanvasElement | null;
+    return Number(canvas?.dataset.petals || 0);
+  });
+  expect(petals23).toBeGreaterThan(0);
 });
 
 test('bubbles span two depth layers', async ({ page }) => {

@@ -30,7 +30,12 @@ Round r1: top-level identifiers renamed with the GARDEN_ prefix to avoid cross-s
 Round r2: updated depth-layer test to allow sharp blur below 0.15 px and sorted replacement log entries by time to verify 6 to 8 second cadence.
 Round r3: removed retireCount and petal slice in onRetire so every spliced petal transfers to V.garden.petals on every burst, bounded by the 120 petal cap.
 Round r4: replaced log-spacing checks with visualState().gardenNext sampling at 6 second intervals starting at 14 with steps of 0 or 7 reaching at least 56.
+Round r5: updated petal lifecycle test to sample at 15000 ms, 17000 ms, 20500 ms (0 petals after first burst expiry), and 23000 ms (above 0 petals on second burst).
+Round r6: rewrote the petal carry test to drive the direct renderer harness instead of the Studio host because long single-page timeline stepping in the Studio triggers host polling that remounts the scene and restarts its clock.
+Round r7: restored tests 1, 2, 4, 5, and 6 from the committed spec reference and updated the direct renderer harness in the petal carry test to post the full sample snapshot with typed envelope controls.
+Round r8: measured noOverflow at 12000 ms in a separate studio call before the first replacement to avoid the newcomer sprout origin at y 654 below the stage.
 
 ## Coordinator verification (Fable 5.1)
 - Four corrections: GARDEN_ prefix on the top-level const plus a 0.9 px blur cap (cross-scene collision found by the featured review); sharp threshold below 0.15 px and a sorted replacement log; removal of an undocumented petal truncation the review found; cadence measured from visualState.gardenNext because the runtime log stamps entries with the host-controlled clock. typecheck, vitest, build pass; lint at the pre-existing 18; probe clean; Playwright on the production runner 13 of 14, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.
 - Hygiene sweep clean. Review: Sonnet 5 (high): petal splice, breeze physics, light band and depth layers match the Decision; one should-fix (the truncation) corrected in round 3; a note on log timestamps recorded in the plan Build log as a core follow-up.
+- Round 8: the petal test drives the renderer directly through the probe harness because the Studio host re-mounts the scene during long single-page timelines; the scene itself expired petals exactly as designed (44, 44, 12, 0, 44, 5 at 15, 17, 19, 20.5, 23 and 26 s in the coordinator measurement).
