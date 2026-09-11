@@ -1,1 +1,1 @@
-lan preview up: display 200 api 200 pid 5870
+lan preview up (tv/pick 463ce8d): local display 200 api 200; pid 5870; the Mac's LAN address at 19:34Z is 172.20.10.5 (it was 192.168.0.86 earlier today), so the TV link is http://172.20.10.5:3100/display while that address holds
