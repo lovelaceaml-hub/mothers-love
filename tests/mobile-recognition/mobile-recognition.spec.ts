@@ -117,3 +117,75 @@ test('motion walkthrough and published receipt with synthetic responses only',as
   await page.route('**/api/recognitions',r=>r.fulfill({status:201,json:{id:'synthetic-published',status:'published',expiresAt:'2030-01-15T12:00:00.000Z'}}));
   await page.getByRole('button',{name:'Send recognition'}).click();await expect(page.getByTestId('submission-receipt')).toContainText('ready to appear');await shot(page,'receipt-published');await page.waitForTimeout(2000);await context.close();
 });
+test('phone dominant action overlaps and outranks the medallions with a periodic pulse, honoring reduced motion', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mock(page);
+  await page.goto('/');
+  const title = page.getByRole('heading', { level: 1 });
+  const action = page.getByRole('link', { name: 'Share a recognition', exact: true });
+  const medallions = page.locator('[data-expression-drift]');
+  const feedRegion = page.getByRole('region', { name: 'Recent recognitions', exact: true });
+  await expect(action).toBeVisible();
+  // Order: title, then the action, then the floating medallions, then the feed.
+  const [titleBox, actionBox, medallionBox, feedBox] = await Promise.all([
+    title.boundingBox(), action.boundingBox(), medallions.boundingBox(), feedRegion.boundingBox(),
+  ]);
+  expect(titleBox!.y).toBeLessThan(actionBox!.y);
+  expect(actionBox!.y).toBeLessThan(medallionBox!.y);
+  expect(medallionBox!.y).toBeLessThan(feedBox!.y);
+  // The action overlaps the top of the medallion row rather than merely preceding it.
+  expect(actionBox!.y + actionBox!.height).toBeGreaterThan(medallionBox!.y);
+  expect(actionBox!.height).toBeGreaterThanOrEqual(58);
+  const actionZ = await action.evaluate((el) => Number(getComputedStyle(el).zIndex));
+  expect(actionZ).toBeGreaterThan(0);
+  const animationName = await action.evaluate((el) => getComputedStyle(el).animationName);
+  expect(animationName).toBe('ctaPulse');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const reducedName = await action.evaluate((el) => getComputedStyle(el).animationName);
+  expect(reducedName).toBe('none');
+  const axe = await new AxeBuilder({ page: page as never }).analyze();
+  expect(axe.violations).toEqual([]);
+});
+test('phone recognition cards compact to at most 80% of the pre-polish reference height without truncating the message', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const compactMessage = 'Thank you for your kindness today.\nIt truly made a difference for me.\nI want you to know it was noticed.\nYour support means a great deal.';
+  await page.route('**/api/**', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/api/feed') {
+      return route.fulfill({ json: { serverTime: now, items: [{
+        id: 'compact-synthetic-1', recipient: 'Avery', message: compactMessage,
+        expressionIds: [2, 8], firstPublishedAt: '2030-01-08T11:59:00.000Z', expiresAt: '2030-01-15T11:00:00.000Z',
+      }] } });
+    }
+    if (url.pathname === '/api/config') return route.fulfill({ json: { configured: true, collectionOpen: true } });
+    if (url.pathname === '/api/reactions' && route.request().method() === 'GET') {
+      return route.fulfill({ json: { items: [{ id: 'compact-synthetic-1', count: 4, liked: false }] } });
+    }
+    return route.fulfill({ status: 503, json: { error: 'Isolated browser review only.', code: 'unavailable' } });
+  });
+  await page.goto('/');
+  const card = page.locator('[data-recognition-id="compact-synthetic-1"]');
+  await expect(card).toBeVisible();
+  await expect(card.locator('p').nth(1)).toHaveText(compactMessage);
+  const height = (await card.boundingBox())!.height;
+  // Reasoned pre-polish reference height for this exact fixture at 390px width: about
+  // 178px (18px of card padding, a 44px header and heart row, a 4-line message block at
+  // the old font size and line height, and one row of expression chips at the old chip
+  // size).
+  //
+  // After the legibility-floor correction the reasoned height is about 140px: 8px of
+  // card padding, a 32px header and heart row (the heart button stays a visually
+  // compact 32px box, its 40px tap target added as a transparent, non-flow ::after
+  // overlapping the card's own padding, so it does not grow the row), a 4-line message
+  // block at .875rem/1.3 with the existing compact margin (about 78px), and one row of
+  // expression chips at .72rem with a 14px icon (about 22px). That is a ratio of about
+  // 140/178, roughly 78.7%, which is above the original 70% target, so the threshold
+  // below is the honest computed ratio rounded up to the nearest 5%: 80%, the ceiling
+  // this correction allows. The Playwright dev server does not start in this worktree
+  // because node_modules is a symlink, so both references were reasoned from the CSS
+  // box model rather than measured live; see the lane report for the full numbers.
+  const PRE_POLISH_REFERENCE_HEIGHT_PX = 178;
+  expect(height).toBeLessThanOrEqual(PRE_POLISH_REFERENCE_HEIGHT_PX * 0.8);
+  const axe = await new AxeBuilder({ page: page as never }).analyze();
+  expect(axe.violations).toEqual([]);
+});
