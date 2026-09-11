@@ -32,6 +32,9 @@ Featured Recognition (scene 4) depth layers and behavioral spec landed.
 All bubbles maintain perfect circularity, staggered exit cadence, and 520 px keep-out column bounds.
 No shell commands were run by this lane per the headless permission gate rule; the coordinator runs typecheck, lint, test, build, featured.spec.ts, and probe verification.
 Round r1: top-level identifiers renamed with the FEATURED_ prefix to avoid cross-scene collisions in the shared global scope; blur capped at 0.9 px.
+Round r2: rotation through all nine expressions via shuffled bag without reading S.featured, in-pass flip advance at 15 s, dimensional layered expression panel with idle sway, aurora blobs, concentric counter-rotating rings, orbiting icons, staggered word rise, and diagonal light sweep.
+Round r3: keepAge remount preserves current expression id and sets V.featuredAdvanced to avoid duplicate flips; FEATURED_FLIP_CANCEL clears in-flight timers and listeners on remount; removed overflow:hidden from .feature-panel and added .feature-sweep-clip wrapper to preserve 3D depth; removed unread V.featuredId assignments.
+Round r4: replaced unexposed window.V read in keepAge remount test with 900 ms behavioral check verifying panel classes and preserved expression name.
 
 ## Coordinator verification (Fable 5.1)
 - typecheck, vitest, build pass; lint at the pre-existing 18; probe clean across six configs plus arrivals; Playwright on the dev server 13 of 13 before the rename, and 12 of 13 on the production runner after it, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.
