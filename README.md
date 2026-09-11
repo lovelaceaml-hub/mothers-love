@@ -14,6 +14,7 @@ The missing interview sequences, whole-card selection, true screen previews, and
 - **Storage:** [Release evidence in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw). Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love).
 - [Handoff](docs/HANDOFF.md)
+- [Plan 14, campaign commercial video](docs/PLAN-14-commercial-video.md), built, awaiting Anthony's viewing; script at [docs/video/SCRIPT.md](docs/video/SCRIPT.md), pipeline in `scripts/video/`, finished files in Drive under `Project Outputs/The Words of Mother's Love/Commercial` (see Storage above); run record: [2026-09-11-commercial-video](docs/runs/2026-09-11-commercial-video/INDEX.md)
 - [TV Garden and submission plan](docs/PLAN-08-tv-garden-and-submission.md)
 - [TV Garden run record](docs/runs/2026-09-09-tv-garden-refresh/INDEX.md)
 - [Flexible name input](docs/PLAN-07-flexible-names.md)

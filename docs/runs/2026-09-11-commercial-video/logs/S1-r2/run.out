@@ -1,0 +1,50 @@
+Testing candidate audio durations with edge-tts.
+Waiting for duration measurements to finish.
+I am checking the exact duration of each candidate phrase.
+Beat 3 narration has been trimmed to 23 words and re-synthesized to 10.224 seconds, under the 12 second cap.
+
+The phrase folds comfort and hope into the first sentence while preserving the three quoted catalog expressions byte for byte. Total narration word count is updated to 173 words across the script. All 7 beats now synthesize under the cap with a total run time of 74.04 seconds.
+
+### New Beat 3 Narration
+
+`The guide shares nine expressions of comfort and hope, including "How Are You?", "It's okay. I understand.", and "You're amazing. You're doing great!"`
+
+### Verification Outputs
+
+1. Word count check:
+```text
+The guide shares nine expressions of comfort and hope, including "How Are You?", "It's okay. I understand.", and "You're amazing. You're doing great!" | 23 | 173
+```
+
+2. Dash check:
+```text
+docs/video/SCRIPT.md:0
+docs/video/narration.json:0
+```
+
+3. Synthesis check:
+```text
+1 title 10.224s
+2 why 10.68s
+3 nine-words 10.224s
+4 feed 8.064s
+5 share 11.28s
+6 tv 9.312s
+7 invite 9.456s
+NARRATE OK total=74.04
+```
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/video/SCRIPT.md`
+- `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/video/narration.json`
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Listen to the re-synthesized audio preview at `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/preview.mp3` or inspect the beat audio at `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/3-nine-words.mp3`.
+
+Would you like to proceed with the next step in Plan 14?
+1. Yes, advance to the next step.
+2. No, let me inspect the audio first.

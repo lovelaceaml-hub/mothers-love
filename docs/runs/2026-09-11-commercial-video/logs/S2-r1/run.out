@@ -1,0 +1,37 @@
+The dev server process cleanup and Next.js dev indicator badge suppression are now implemented in [capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs).
+
+The script now spawns the dev server detached and terminates the full process group on exit, error, or SIGINT with SIGTERM and a 2-second fallback to SIGKILL if the port still answers. Every recorded page also injects an early style to hide `nextjs-portal` before navigation.
+
+### Verification outputs
+
+1. Syntax check:
+```
+$ node --check scripts/video/capture.mjs
+(exit 0, no output)
+```
+
+2. Required symbols:
+```
+$ grep -n "detached\|process.kill\|nextjs-portal\|SIGINT" scripts/video/capture.mjs
+150:    style.textContent = 'nextjs-portal{display:none!important}';
+335:          process.kill(-devChild.pid, 'SIGTERM');
+340:            process.kill(-devChild.pid, 'SIGKILL');
+349:  process.on('SIGINT', async () => {
+362:        detached: true,
+```
+
+3. Dash character audit:
+```
+$ grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/capture.mjs
+0
+```
+
+## COMPLETION
+File changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs)
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action
+Run the coordinator capture pass to record the clean clips.
