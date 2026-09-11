@@ -83,6 +83,7 @@ async function main() {
     timeline.push({
       n: beat.n,
       slug: beat.slug,
+      clip: beat.clip,
       start: start_i,
       length: L_i,
       speechStart: speech_i,
@@ -234,19 +235,14 @@ async function main() {
       const segOut = resolve(workDir, `seg-${b.n}.mp4`);
       const cardDir = resolve(ROOT, `docs/private/video/cards/${variant.name}`);
       const captionPng = resolve(cardDir, `caption-${b.n}.png`);
-      const isCardBeat = (b.n === 1 || b.n === 7);
-
-      if (isCardBeat) {
+      if (b.clip === 'card') {
         const cardPng = resolve(cardDir, b.n === 1 ? 'title.png' : 'end.png');
-        const filter = `[0:v]scale=${variant.width}:${variant.height},fps=30[base];[base][1:v]overlay=enable='between(t,0.3,${(L_i - 0.3).toFixed(3)})'[v]`;
+        const filter = `[0:v]scale=${variant.width}:${variant.height},fps=30[v]`;
         execFileSync(FFMPEG, [
           '-y',
           '-loop', '1',
           '-t', L_i.toFixed(3),
           '-i', cardPng,
-          '-loop', '1',
-          '-t', L_i.toFixed(3),
-          '-i', captionPng,
           '-filter_complex', filter,
           '-map', '[v]',
           '-t', L_i.toFixed(3),
