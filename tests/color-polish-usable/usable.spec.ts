@@ -335,7 +335,18 @@ test('stays visually stable through brief connecting glitches', async ({ page })
   await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
   const fixture = buildActiveDisplayFixture();
   let requestCount = 0;
+  // Glitches only start once the display is confirmed active below. React's
+  // development strict mode mounts this effect twice (mount, cleanup, mount
+  // again) before the app settles, so an unconditional count from the very
+  // first request would race that harmless double-mount and could land the
+  // deliberately slow response on the request that decides initial activation
+  // instead of on a later poll, which is what this test means to exercise.
+  let glitchesEnabled = false;
   await page.route('**/api/display/color-polish**', async (route) => {
+    if (!glitchesEnabled) {
+      await fulfillJson(route, fixture);
+      return;
+    }
     requestCount += 1;
     const count = requestCount;
     // Every third poll fails outright, and one healthy poll answers slowly
@@ -349,6 +360,7 @@ test('stays visually stable through brief connecting glitches', async ({ page })
   });
   await page.goto('/display');
   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+  glitchesEnabled = true;
 
   await page.evaluate(() => {
     const target = document.querySelector('[data-testid="color-polish-display"] iframe');

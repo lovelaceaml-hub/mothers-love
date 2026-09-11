@@ -72,8 +72,14 @@ export function ColorPolishHost() {
     const load = async () => {
       // A poll already in flight is left alone so a healthy but slow read can
       // finish; the next scheduled tick simply waits its turn instead of
-      // aborting good progress in favor of a fresh attempt.
-      if (controllerRef.current) return;
+      // aborting good progress in favor of a fresh attempt. The aborted check
+      // matters in development, where React's strict-mode double effect
+      // invoke mounts this effect, cleans it up (aborting the first
+      // controller) and mounts it again before that first request's own
+      // `finally` has run to clear the ref: without it, the guard would see
+      // a stale, already-aborted controller and skip starting a new request
+      // at all, leaving the display stuck until the next scheduled tick.
+      if (controllerRef.current && !controllerRef.current.signal.aborted) return;
       const generation = ++requestGenerationRef.current;
       const controller = new AbortController();
       controllerRef.current = controller;
