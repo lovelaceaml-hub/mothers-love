@@ -57,14 +57,14 @@ test('a bubble pops into hearts, peace signs and glow within 60 s', async ({ pag
   const samples: Sample[] = [];
   let burstSampleIndex = -1;
 
-  for (let ms = 2000; ms <= 62000; ms += 6000) {
+  for (let ms = 2000; ms <= 62000; ms += 2000) {
     if (ms > 2000) {
       await frame.evaluate((stepMs) => {
         (window as any).colorPolishRuntime.step(stepMs);
         document.getAnimations().forEach((animation) => {
           animation.pause();
         });
-      }, 6000);
+      }, 2000);
     }
 
     const sample = await frame.evaluate((checkpointMs) => {
@@ -103,9 +103,9 @@ test('a bubble pops into hearts, peace signs and glow within 60 s', async ({ pag
   expect(firstBurstSample.peaceFxCount).toBeGreaterThan(0);
   expect(firstBurstSample.visualFx).toBeGreaterThan(0);
 
-  // two samples later the data-peace-fx count is lower (they expire)
-  expect(samples.length).toBeGreaterThan(burstSampleIndex + 2);
-  const laterSample = samples[burstSampleIndex + 2];
+  // three samples later the data-peace-fx count is lower (they expire)
+  expect(samples.length).toBeGreaterThan(burstSampleIndex + 3);
+  const laterSample = samples[burstSampleIndex + 3];
   expect(laterSample.peaceFxCount).toBeLessThan(firstBurstSample.peaceFxCount);
 });
 
@@ -190,6 +190,80 @@ test('bubbles stay circular through swell and burst', async ({ page }) => {
   }
 });
 
+test('sculpted rotating heart is a real canvas that turns over time', async ({ page }) => {
+  const { frame: frame2000 } = await openStudioScene(page, 'peace-in-practice', 2000);
+
+  const check2000 = await frame2000.evaluate(() => {
+    const host = document.querySelector('#heart-host');
+    const canvas = host?.querySelector('canvas');
+    const img = host?.querySelector('img');
+    return {
+      hasCanvas: Boolean(canvas),
+      hasImg: Boolean(img),
+      dataUrl: canvas ? canvas.toDataURL() : null,
+      role: canvas?.getAttribute('role'),
+      ariaLabel: canvas?.getAttribute('aria-label'),
+    };
+  });
+
+  expect(check2000.hasCanvas).toBe(true);
+  expect(check2000.hasImg).toBe(false);
+  expect(check2000.role).toBe('img');
+  expect(check2000.ariaLabel).toBe('Sculpted rotating heart');
+  expect(check2000.dataUrl).toBeTruthy();
+
+  const { frame: frame4000 } = await openStudioScene(page, 'peace-in-practice', 4000);
+
+  const check4000 = await frame4000.evaluate(() => {
+    const canvas = document.querySelector('#heart-host canvas') as HTMLCanvasElement | null;
+    return canvas ? canvas.toDataURL() : null;
+  });
+
+  expect(check4000).toBeTruthy();
+  expect(check2000.dataUrl).not.toBe(check4000);
+});
+
+test('heart canvas displays distinct luminance shading bands', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'peace-in-practice', 2000);
+
+  const bands = await frame.evaluate(() => {
+    const canvas = document.querySelector('#heart-host canvas') as HTMLCanvasElement | null;
+    if (!canvas) return { shadow: 0, base: 0, highlight: 0, totalOpaque: 0, nonHighlightRatio: 0 };
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return { shadow: 0, base: 0, highlight: 0, totalOpaque: 0, nonHighlightRatio: 0 };
+
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+
+    let shadowCount = 0;
+    let baseCount = 0;
+    let highlightCount = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const alpha = data[i + 3];
+      if (alpha < 50) continue;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      if (lum < 165) shadowCount++;
+      else if (lum <= 215) baseCount++;
+      else highlightCount++;
+    }
+
+    const totalOpaque = shadowCount + baseCount + highlightCount;
+    const nonHighlightRatio = totalOpaque > 0 ? (shadowCount + baseCount) / totalOpaque : 0;
+
+    return { shadow: shadowCount, base: baseCount, highlight: highlightCount, totalOpaque, nonHighlightRatio };
+  });
+
+  expect(bands.shadow).toBeGreaterThan(200);
+  expect(bands.base).toBeGreaterThan(200);
+  expect(bands.highlight).toBeGreaterThan(200);
+  expect(bands.nonHighlightRatio).toBeGreaterThanOrEqual(0.4);
+});
+
 test('reduced motion renders the scene still', async ({ page }) => {
   const { frame, still } = await reducedMotionScene(page, 'peace-in-practice');
   expect(still).toBe(true);
@@ -197,4 +271,11 @@ test('reduced motion renders the scene still', async ({ page }) => {
   const circleResult = await circularity(frame);
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
+
+  const hasCanvas = await frame.evaluate(() => {
+    const host = document.querySelector('#heart-host');
+    const canvas = host?.querySelector('canvas');
+    return Boolean(canvas);
+  });
+  expect(hasCanvas).toBe(true);
 });

@@ -50,6 +50,8 @@ All Section 9 requirements and tests implemented:
 - Round r1: top-level identifiers renamed with the PIP_ prefix to avoid cross-scene collisions in the shared global scope; blur capped at 0.9 px.
 - Round 2: the spec types the visualState actors (strict tsc had two implicit any errors).
 - Round r3: updated the depth-layer test sharp condition to blur below 0.15 px to accommodate screenScale breathing, and adjusted the overflow assertion to exclude the pre-existing background heart field overhang.
+- Round r4: replaced the flat heart image with a real lit 3D heart mesh on canvas, featuring Lambert and Blinn specular shading, 12 orbiting 3D glints, elliptical contact shadow, and updated scene spec tests.
+- Round r5: phase-independent full-canvas shading test requiring shadow, base, and highlight each above 200 px with at least 40 percent non-highlight, precomputed 32-bucket color and blend table, removed unused vertex rotation arrays, 1.5 to 3 px spark sizes, and 2 s step interval for the burst test.
 
 ## Coordinator verification (Fable 5.1)
 - Three corrections: PIP_ prefix on the top-level const plus a 0.9 px blur cap (cross-scene collision found by the featured review); spec typing for strict tsc; sharp threshold below 0.15 px and the overflow measure excluding the pre-existing heart field (its lowest heart reaches about 646 px and predates this lane). typecheck, vitest, build pass; lint at the pre-existing 18; probe clean; Playwright on the production runner 12 of 13, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.
