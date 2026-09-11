@@ -184,3 +184,40 @@ test('reduced motion renders the milestone still', async ({ page }) => {
   });
   expect(stream.length).toBeGreaterThanOrEqual(14);
 });
+
+test('left copy is removed and rail is widened without overflow at 2000 ms', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'milestone', 2000);
+
+  const introExists = await frame.evaluate(() => {
+    return document.querySelector('.progress-intro') !== null;
+  });
+  expect(introExists).toBe(false);
+
+  const rail = await frame.evaluate(() => {
+    const railEl = document.querySelector<HTMLElement>('.progress-rail');
+    const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
+    if (!railEl || !sceneEl) return null;
+    const railRect = railEl.getBoundingClientRect();
+    const sceneRect = sceneEl.getBoundingClientRect();
+    const scale = sceneRect.width / 1812;
+    return {
+      scrollHeight: railEl.scrollHeight,
+      clientHeight: railEl.clientHeight,
+      scrollWidth: railEl.scrollWidth,
+      clientWidth: railEl.clientWidth,
+      leftWithinScene: railRect.left - sceneRect.left,
+      width: railRect.width,
+      scale,
+    };
+  });
+
+  expect(rail).not.toBeNull();
+  if (rail) {
+    const scale = rail.scale;
+    expect(rail.scrollHeight).toBeLessThanOrEqual(rail.clientHeight + 1);
+    expect(rail.scrollWidth).toBeLessThanOrEqual(rail.clientWidth + 1);
+    expect(rail.leftWithinScene / scale).toBeLessThan(60);
+    expect(rail.width / scale).toBeGreaterThanOrEqual(540);
+  }
+});
+

@@ -1,1 +1,96 @@
 /* Scene 11, Milestone and Weekly Goal. Every rule in this file is scoped to #tv .scene[data-scene="11"]. Colors stay as shipped in renderer.css. */
+
+#tv .scene[data-scene="11"] .progress-sculpture {
+  left: 0;
+}
+
+#tv .scene[data-scene="11"] .progress-rail {
+  left: 46px;
+  width: 560px;
+}
+
+#tv .scene[data-scene="11"] .stream-world {
+  left: 650px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .eyebrow {
+  font-size: 15px;
+  letter-spacing: 2.4px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .threshold {
+  font-size: 136px;
+  letter-spacing: -6px;
+  line-height: 1;
+  margin: 6px 0 2px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone h2 {
+  font-size: 32px;
+  line-height: 1.18;
+  letter-spacing: -0.4px;
+  margin: 2px 0 8px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .row {
+  font-size: 19px;
+  margin-bottom: 6px;
+}
+
+#tv .scene[data-scene="11"] .progress-rail .progress-track {
+  height: 12px;
+}
+
+#tv .scene[data-scene="11"] .progress-rail .progress-fill:after {
+  font-size: 24px;
+  top: -8px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal {
+  padding-top: 14px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-head {
+  font-size: 15px;
+  letter-spacing: 2.4px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .week-range {
+  font-size: 15px;
+  margin-top: 3px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-name {
+  margin: 6px 0 8px;
+  gap: 14px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-name .medallion {
+  width: 62px;
+  height: 62px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal h3 {
+  font-size: 36px;
+  line-height: 1.15;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-rank {
+  font-size: 17px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-values {
+  font-size: 19px;
+  margin: 6px 0 8px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-values b {
+  font-size: 38px;
+  letter-spacing: -0.5px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-caption {
+  font-size: 15px;
+  line-height: 1.35;
+  margin-top: 6px;
+}

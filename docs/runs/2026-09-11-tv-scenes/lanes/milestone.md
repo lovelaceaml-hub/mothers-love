@@ -10,9 +10,9 @@ depends_on: base-b
 updated: 2026-09-11T09:37Z
 ---
 ## Files
-- public/color-polish/scenes/milestone.js: Updated contributorPool with a floor of 14 records; widened depth range to 360 to 520; widened rise range to 16 to 44; deepened blur up to 2 px; set far opacity floor to .45.
-- public/color-polish/scenes/milestone.css: The CSS file holds only its header comment and circularity is measured on .stream-pearl.
-- tests/color-polish-scenes/milestone.spec.ts: Playwright test suite covering rendering without overflow at 14 s, circular stream nodes, click-advance prevention, density and continuity across 26 s samples, unique motion triples, extreme depth metrics (z span, scale, and blur), and reduced motion still mode.
+- public/color-polish/scenes/milestone.js: Removed .progress-intro markup, updated stream canvas width to 1162, and widened node radius range to 170 to 380.
+- public/color-polish/scenes/milestone.css: Layout and typography overrides moving sculpture to left 0, rail to left 46 px and width 560 px, stream world to left 650 px, and scaling rail typography without overflow.
+- tests/color-polish-scenes/milestone.spec.ts: Playwright test suite covering rendering without overflow at 14 s, circular stream nodes, click-advance prevention, density and continuity across 26 s samples, extreme depth metrics, reduced motion still mode, and 2 s acceptance verifying .progress-intro removal, rail dimensions, and no overflow.
 - docs/runs/2026-09-11-tv-scenes/lanes/milestone.md: Lane execution record for Section 11.
 
 ## Gap report items closed
@@ -29,7 +29,17 @@ Round 1: the per-sample depth bar is minus 500 with minus 600 required at some s
 Round 2: per-sample depth bars are minZ <= -500 and maxZ >= 200, with across-sample checks requiring smallest minZ <= -600 and largest maxZ >= 300.
 Round 3: removed the inert CSS rule so milestone.css holds only its header comment, and retargeted circularity assertions to .stream-pearl.
 Round 4: per sample maxScale requires at least 1.2, while the check across all samples requires largest maxScale >= 1.4.
+Round r5: removed .progress-intro, shifted sculpture to left 0, widened rail to 560 px at left 46 px with scaled typography, widened stream world to left 650 px with canvas 1162 px, and widened node radius range to 170 to 380.
+Round r6: normalized Studio preview getBoundingClientRect measurements by live stage scale (sceneRect.width / 1812) for rail width (>= 540) and left offset (< 60).
+
+## Deferred follow-up
+- Fixture overrides in openStudioScene: openStudioScene in tests/color-polish-scenes/helpers.ts hardcodes buildActiveDisplayFixture() without forwarding overrides, so testing worst-case conditions (such as four-digit thresholds and 13-character goal names like Encouragement with month expressionCounts summing over 1000 and goal expressionId 7) requires helpers.ts enhancements that are deferred since helpers.ts is outside this lane's allowlist.
 
 ## Coordinator verification (Fable 5.1)
 - Four spec-only corrections: the coordinator's per-sample depth and scale bars were too tight for a helix sampled every 5 s (now minus 500 and 1.2 per sample with minus 600, plus 300 and 1.4 required across samples), and the inert border-radius rule was removed with circularity measured on .stream-pearl. typecheck, vitest, build pass; lint at the pre-existing 18; probe clean; Playwright on the production runner 11 of 12, the one failure being the usable spec's legacy fallback journey that fails identically on untouched tv/base under that runner.
 - Hygiene sweep: flagged the CSS rule, since removed. Review: Sonnet 5 (high): pool floor, depth widening and opacity floor match the Decision; one should-fix (the inert CSS rule) corrected in round 3; notes on the per-sample bars and the pre-existing lint.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
+- /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
+
