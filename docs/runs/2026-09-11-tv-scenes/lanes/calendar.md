@@ -7,7 +7,7 @@ runner: coordinator
 worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-calendar
 review: "sonnet-5 high on landing"
 depends_on: base-b
-updated: 2026-09-11T04:33Z
+updated: 2026-09-11T09:07Z
 ---
 ## Files
 - public/color-polish/scenes/calendar.js: Set --day-index CSS property to String(day) during mount for each non-future day cell alongside --day-delay.
@@ -33,3 +33,6 @@ Round 1: the settle assertion now compares getComputedTiming().endTime with curr
 ## Coordinator verification (Fable 5.1)
 - typecheck, vitest, build pass; lint at the pre-existing 18; scene CSS has 3 scoped rules and nothing unscoped; probe clean across six configs plus arrivals (logs/calendar/probe); Playwright tests/color-polish-scenes plus usable: 12 of 13, the one failure in this lane's own settle assertion (the shared helper pauses animations, so finished pulses report paused); round 1 changed the assertion to compare getComputedTiming().endTime with currentTime and the spec passed 5 of 5 on an isolated port.
 - Hygiene sweep (Haiku 4.5 low): no findings. Review: Sonnet 5 (high), no material findings; notes: the gap report said 3000 ms where the order and spec use 6000 ms (both clear the 1.2 s settle), the still and reduced-motion overrides duplicate renderer.css blanket rules (harmless), and the full 13-test run was not repeated after the assertion-only fix.
+
+## Coordinator verification (Fable 5.1)
+- Full-set rerun on the production runner: 12 of 13, the failure being the usable spec's legacy fallback journey (a runner artifact confirmed on untouched tv/base). This closes the Sonnet note that the full set had not been repeated after the assertion fix.
