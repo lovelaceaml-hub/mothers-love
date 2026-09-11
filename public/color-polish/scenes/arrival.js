@@ -19,7 +19,7 @@ function singleTrajectory(style,p){
  case 1: // Comet with a sweeping volumetric flight path.
   x=curve(-390,80,1830,tx,q);y=curve(530,-285,5,ty,q);z=curve(-460,340,540,0,q);alpha=smooth(p/.1);break;
  case 2: // Particle aggregation: the shell resolves where sparks converge.
-  x=tx;y=ty;z=-150*(1-q);scale=.68+.32*smooth((p-.24)/.62);alpha=smooth((p-.33)/.23);break;
+  x=tx;y=ty;z=-900*(1-q)+120*Math.sin(Math.PI*clamp((p-.6)/.4,0,1));scale=.68+.32*smooth((p-.24)/.62);alpha=smooth((p-.33)/.23);break;
  case 3: // A pearl drops through depth; two diminishing rebounds.
   if(p<.46){const s=p/.46;x=tx+170*(1-s);y=-670+1020*s*s;z=450*(1-s)}
   else{const s=(p-.46)/.54;x=tx;y=ty-Math.abs(Math.sin(s*Math.PI*2.1))*145*(1-s);z=100*Math.sin(s*Math.PI)*(1-s)}
@@ -27,7 +27,7 @@ function singleTrajectory(style,p){
  case 4: // Loose corkscrew: wrap around the destination through depth.
   {const r=630*Math.pow(1-p,1.4),theta=-p*Math.PI*3.4;x=tx+Math.cos(theta)*r;y=ty+Math.sin(theta)*r*.48;z=-360*(1-p)+Math.sin(theta)*r*.85;alpha=smooth(p/.14)}break;
  case 5: // Bloom shell opens; pearl rises from the flower's center.
-  x=tx+Math.sin(p*Math.PI)*35;y=ty+160*(1-q);z=-290*(1-q);scale=.16+.84*smooth(p/.76);alpha=smooth((p-.08)/.21);break;
+  x=tx+Math.sin(p*Math.PI*2)*40*(1-q);y=ty+210*(1-q);z=-760*(1-q);scale=.16+.84*smooth(p/.76);alpha=smooth((p-.08)/.21);break;
  }
  const perspective=1300/(1300-z);return{x:tx+(x-tx)*perspective,y:ty+(y-ty)*perspective,z,k:perspective*scale,alpha};
 }
@@ -40,7 +40,7 @@ function groupTrajectory(style,index,p,b){
  if(p<delay)return{x:tx,y:ty,z:-1000,k:.05,alpha:0};
  switch(style){
  case 0:
-  x=mix(906+(index%3-1)*150,tx,q);y=mix(80-index%2*160,ty,q);z=-1450*Math.pow(1-u,2.5)+Math.sin(Math.PI*u)*70;break;
+  x=mix(906+(index%3-1)*150+(rank%2?60:-60),tx,q);y=mix(80-index%2*160,ty,q);z=(-1450-rank*90)*Math.pow(1-u,2.5)+Math.sin(Math.PI*u)*70;break;
  case 1:
   {const left=rank%2===0;x=curve(left?-350:2162,left?240:1572,tx+(left?170:-170),tx,q);y=curve(170+(rank%3)*125,-160+index*45,ty+75,ty,q);z=Math.sin(Math.PI*u)*340-350*(1-u)}break;
  case 2:
@@ -48,7 +48,7 @@ function groupTrajectory(style,index,p,b){
  case 3:
   {const source=[300,906,1512][index%3];x=mix(source,tx,q);y=curve(940,-300,ty-130,ty,q);z=curve(-400,280,170,0,q);scale=.22+.78*q}break;
  case 4:
-  {const source=[430,906,1382][index%3];x=mix(source,tx,q);y=mix(300,ty,q)+Math.sin(Math.PI*u)*(index<5?-65:65);z=-680*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
+  {const source=[430,906,1382][index%3],zStart=[-900,-500,-700][index%3];x=mix(source,tx,q);y=mix(300,ty,q)+Math.sin(Math.PI*u)*(index<5?-65:65)*(1+(index%3)*.35);z=zStart*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
  }
  const k=1100/(1100-z)*scale;
  return{x:906+(x-906)*(1100/(1100-z)),y:307+(y-307)*(1100/(1100-z)),z,k,alpha};
