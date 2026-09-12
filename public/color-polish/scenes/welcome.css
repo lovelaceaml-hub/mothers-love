@@ -52,4 +52,102 @@
   #tv .scene[data-scene="1"] .orb-sheen:after {
     animation: none !important;
   }
+  #tv .scene[data-scene="1"] .speech-bubble {
+    transition: none !important;
+  }
 }
+
+#tv.still .scene[data-scene="1"] .speech-bubble {
+  transition: none !important;
+}
+
+/* Speech bubbles from the people in community art */
+#tv .scene[data-scene="1"] .speech-bubble {
+  box-sizing: border-box;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.25;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#tv .scene[data-scene="1"] .speech-bubble.fading {
+  opacity: 0;
+}
+
+/* Bubble boxes, nudged clear of the title block. The 29 px serif couplet's
+   ELEMENT rect is the full 831 px block width even though its visible text is
+   much narrower, and it ends at y 350, not the ~344 the gap report estimated,
+   so a bubble at top 348 overlapped it by two pixels. The three boxes now sit
+   at (560, 356), (350, 440) and (675, 440), each 180 by 76: mutually disjoint,
+   below the serif's rect, left of the bubble grid which starts at x 886, and
+   over the community art so they still read as speech from the people in it. */
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="0"],
+#tv .scene[data-scene="1"] .speech-bubble[style*="509px"] {
+  left: 560px !important;
+  top: 356px !important;
+  width: 180px !important;
+  height: 76px !important;
+  transform: none !important;
+}
+
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="0"]::after,
+#tv .scene[data-scene="1"] .speech-bubble[style*="509px"]::after {
+  left: -8px;
+  top: 14px;
+  bottom: auto;
+  transform: none;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 9px solid #fffffffa;
+  border-left: none;
+  filter: drop-shadow(-2px 0 1px #e5dcce);
+}
+
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="1"],
+#tv .scene[data-scene="1"] .speech-bubble[style*="628px"] {
+  left: 350px !important;
+  top: 440px !important;
+  width: 180px !important;
+  height: 76px !important;
+  transform: none !important;
+}
+
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="1"]::after,
+#tv .scene[data-scene="1"] .speech-bubble[style*="628px"]::after {
+  left: 14px;
+  top: -8px;
+  bottom: auto;
+  transform: none;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 9px solid #fffffffa;
+  border-top: none;
+  filter: drop-shadow(0 -2px 1px #e5dcce);
+}
+
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="2"],
+#tv .scene[data-scene="1"] .speech-bubble[style*="702px"] {
+  left: 675px !important;
+  top: 440px !important;
+  width: 180px !important;
+  height: 76px !important;
+  transform: none !important;
+}
+
+#tv .scene[data-scene="1"] .speech-bubble[data-speaker="2"]::after,
+#tv .scene[data-scene="1"] .speech-bubble[style*="702px"]::after {
+  left: 27px;
+  top: -8px;
+  bottom: auto;
+  transform: none;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 9px solid #fffffffa;
+  border-top: none;
+  filter: drop-shadow(0 -2px 1px #e5dcce);
+}
+
