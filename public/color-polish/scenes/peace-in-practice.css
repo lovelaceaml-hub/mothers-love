@@ -1,5 +1,132 @@
 /* Scene 9, Peace in Practice. Every rule in this file is scoped to #tv .scene[data-scene="9"]. Colors stay as shipped in renderer.css. */
 
+#tv .scene[data-scene="9"] {
+  position: relative;
+  width: 1812px;
+  height: 636px;
+  overflow: hidden;
+}
+
+#tv .scene[data-scene="9"] #heart-cards {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1812px;
+  height: 636px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+#tv .scene[data-scene="9"] #heart-field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1812px;
+  height: 636px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 3;
+}
+
+#tv .scene[data-scene="9"] .heart-card {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: auto;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 14px 28px rgba(138, 15, 34, 0.42));
+  clip-path: url(#pip-heart-clip);
+}
+
+#tv .scene[data-scene="9"] .heart-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#tv .scene[data-scene="9"] .heart-card-content {
+  position: absolute;
+  left: 19%;
+  top: 16%;
+  width: 62%;
+  height: 48%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ffffff;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#tv .scene[data-scene="9"] .pip-card-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#tv .scene[data-scene="9"] .pip-card-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#tv .scene[data-scene="9"] .pip-card-name {
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  margin: 0 0 4px 0;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#tv .scene[data-scene="9"] .pip-card-message {
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1.25;
+  margin: 0;
+  color: #fff5f6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  word-break: break-word;
+  overflow: hidden;
+}
+
+#tv .scene[data-scene="9"] .pip-card-page {
+  font-family: inherit;
+  font-size: 11px;
+  color: #ffe6eb;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 0.85;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+#tv .scene[data-scene="9"] .floating-heart {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
 #tv .scene[data-scene="9"] #heart-host canvas {
   width: 100%;
   height: 100%;
@@ -8,4 +135,14 @@
 
 #tv.still .scene[data-scene="9"] #heart-host canvas {
   animation: none;
+}
+
+#tv.still .scene[data-scene="9"] .floating-heart {
+  animation: none;
+}
+
+#tv.still .scene[data-scene="9"] .heart-card {
+  animation: none;
+  transform: scale(1) !important;
+  opacity: 1 !important;
 }
