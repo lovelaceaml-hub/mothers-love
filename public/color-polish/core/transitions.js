@@ -117,8 +117,14 @@ function transitionWashSlide(trans, phase, p, axis, from) {
 // of radius r on a grid of spacing sx by sy cover the plane when
 // r >= sqrt(sx^2 + sy^2) / 2. An 8 by 6 grid over 1920 by 1080 gives sx 240 and
 // sy 180, so r must reach sqrt(240^2 + 180^2) / 2 = 150 and the diameter 300.
-const TRANSITION_GRID_COLS = 8;
-const TRANSITION_GRID_ROWS = 6;
+// Denser and bigger. Anthony, 2026-09-12: "just like that vortex but bigger
+// with more recognitions." A 10 by 7 grid over 1920 by 1080 gives sx 192 and
+// sy 154.3, so full coverage needs a radius of at least
+// sqrt(192^2 + 154.3^2) / 2 = 123.2 and a diameter of 247. These stay at 300,
+// so 70 bubbles cover the screen with generous overlap and read as a crowd
+// rather than a tiling.
+const TRANSITION_GRID_COLS = 10;
+const TRANSITION_GRID_ROWS = 7;
 const TRANSITION_BUBBLE_D = 300;
 const TRANSITION_COVER_W = 1920;
 const TRANSITION_COVER_H = 1080;
@@ -168,75 +174,86 @@ function transitionCreateBubbles(layer) {
       d,
       homeX,
       homeY,
-      // Each bubble enters on its own arm of the spiral.
-      armAngle: (i / recs.length) * TAU * 2.2,
-      armRadius: 900 + ((i * 53) % 420),
-      depth: 260 + ((i * 37) % 300),
+      // Each bubble has its own place on the helix and its own moment of
+      // arrival, so the crowd flows through rather than snapping into place.
+      armAngle: (i / recs.length) * TAU * 2.6,
+      swirlAmp: 150 + ((i * 47) % 260),
+      depth: 240 + ((i * 37) % 320),
+      // Staggered along the direction of travel: bubbles nearer the entry edge
+      // arrive first, which is what makes it read as a flow.
+      flowStagger: (col / (TRANSITION_GRID_COLS - 1)) * 0.5 + (row / (TRANSITION_GRID_ROWS - 1)) * 0.5,
     });
   });
   return items;
 }
 
-// The vortex itself, mirroring scene 11's tribute stream: a perspective helix
-// where a bubble's depth scales it and blurs it, so the crowd reads as a swirl
-// with near and far members rather than a flat sheet of discs.
+// The vortex, as a through-flow. Anthony, 2026-09-12: "they should come in like
+// the vortex. it should be coming from one direction and then leaving in
+// another direction. just like that vortex but bigger with more recognitions."
 //
-// phase 'cover': the bubbles spiral inward from off stage to their grid cells,
-// arriving at full size and zero blur, which is the moment the stage is
-// completely hidden and the scene swap happens behind them.
-// phase 'reveal': they spiral back out, uncovering the new scene as they leave.
+// So this is not a spiral that comes in and backs out the way it came. The
+// crowd travels along an axis, entering off one edge and leaving off a
+// different one, and rotates around that axis of travel as it goes, which is
+// the helix scene 11's tribute stream uses: a bubble's depth scales and blurs
+// it, so the crowd reads as a swirl with near and far members rather than a
+// flat sheet sliding past.
+//
+// cover: the crowd travels from fully off stage along the entry vector to its
+// grid, arriving home at full size with no blur. That is the fully covered
+// moment, and the scene swap happens behind it.
+// reveal: the crowd keeps going, now along the exit vector, until it is fully
+// off stage, and the new scene is revealed by its departure.
+const TRANSITION_FLOWS = [
+  { id: 'rise', entry: [-0.35, 1], exit: [0.35, -1], spin: 1 },
+  { id: 'sweep', entry: [-1, 0.28], exit: [1, -0.28], spin: -1 },
+  { id: 'fall', entry: [0.3, -1], exit: [-0.3, 1], spin: 1 },
+  { id: 'cross', entry: [-1, -0.55], exit: [1, 0.55], spin: -1 },
+];
+
+function transitionNormalize(v) {
+  const len = Math.hypot(v[0], v[1]) || 1;
+  return [v[0] / len, v[1] / len];
+}
+
 function transitionVortex(trans, phase, p) {
+  const flow = trans.flow || TRANSITION_FLOWS[0];
+  const entry = transitionNormalize(flow.entry);
+  const exit = transitionNormalize(flow.exit);
+  const spin = flow.spin || 1;
+
+  // Travel far enough that the crowd is genuinely off screen at both ends.
+  const reach = 2300;
   const eased = outCubic(clamp(p, 0, 1));
-  const t = phase === 'cover' ? 1 - eased : eased;
-  const spin = trans.spinDir || 1;
 
   trans.items.forEach((item) => {
-    // t is 1 when far out on the arm, 0 when home in the grid.
-    const angle = item.armAngle + spin * t * 2.1;
-    const radius = item.armRadius * t;
-    const z = Math.sin(angle) * item.depth * t;
+    // d is how far along the travel axis the bubble is from home: 1 means fully
+    // off stage, 0 means home in the grid. On cover it falls to 0, on reveal it
+    // rises from 0 again, but along the exit vector instead of the entry one.
+    const stagger = item.flowStagger;
+    const q = clamp((eased - stagger * 0.35) / (1 - 0.35), 0, 1);
+    const d = phase === 'cover' ? 1 - q : q;
+    const vec = phase === 'cover' ? entry : exit;
+
+    // Rotation around the axis of travel, so the crowd swirls as it passes.
+    const angle = item.armAngle + spin * d * 3.1;
+    const swirl = Math.sin(angle) * item.swirlAmp * d;
+    const perp = [-vec[1], vec[0]];
+
+    const z = Math.cos(angle) * item.depth * d;
     const k = 1000 / (1000 - z);
 
-    const cx = TRANSITION_COVER_W / 2 + Math.cos(angle) * radius;
-    const cy = TRANSITION_COVER_H / 2 + Math.sin(angle) * radius * 0.52;
-    const x = mix(item.homeX, cx - item.d / 2, t) * 1;
-    const y = mix(item.homeY, cy - item.d / 2, t) * 1;
+    const x = item.homeX + vec[0] * reach * d + perp[0] * swirl;
+    const y = item.homeY + vec[1] * reach * d + perp[1] * swirl;
 
-    const scale = mix(1, 0.34, t) * k;
-    const blur = t > 0.02 ? Math.min(2.4, t * 3.1) : 0;
-    const alpha = clamp(1 - t * 0.15, 0, 1);
+    const scale = mix(1, 0.4, d) * k;
+    const blur = d > 0.03 ? Math.min(2.6, d * 3.4) : 0;
+    const alpha = clamp(1 - d * 0.12, 0, 1);
 
     item.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
     item.el.style.opacity = alpha.toFixed(3);
     item.el.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : 'none';
     item.el.style.zIndex = String(1000 + Math.round(z));
   });
-}
-
-function transitionCreateStormElements(layer) {
-  const items = [];
-  for (let i = 0; i < TRANSITION_BUBBLE_COUNT; i++) {
-    const exprId = (i % 9) + 1;
-    const cat = catalog[exprId - 1];
-    const isHeart = i % 2 === 0;
-    const el = document.createElement('div');
-    el.className = isHeart ? 'transition-heart' : 'transition-petal';
-    el.style.setProperty('--tint', cat.color);
-
-    if (isHeart) {
-      el.innerHTML = heartSVG(cat.color);
-    }
-
-    const img = document.createElement('img');
-    img.className = 'transition-icon';
-    img.src = ASSETS['icon' + exprId];
-    img.alt = '';
-    el.append(img);
-
-    layer.append(el);
-    items.push({ el, exprId, isHeart, d: isHeart ? 140 : 130, index: i });
-  }
-  return items;
 }
 
 function transitionCleanup() {
@@ -281,7 +298,7 @@ registerTransition('flood', {
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
-    trans.spinDir = 1;
+    trans.flow = TRANSITION_FLOWS[0];
   },
   cover(trans, p) {
     transitionWashFade(trans, 'cover', p);
@@ -300,7 +317,7 @@ registerTransition('tide', {
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
-    trans.spinDir = -1;
+    trans.flow = TRANSITION_FLOWS[1];
   },
   cover(trans, p) {
     transitionWashFade(trans, 'cover', p);
@@ -319,7 +336,7 @@ registerTransition('vortex', {
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
-    trans.spinDir = 1;
+    trans.flow = TRANSITION_FLOWS[2];
   },
   cover(trans, p) {
     transitionWashFade(trans, 'cover', p);
@@ -338,7 +355,7 @@ registerTransition('storm', {
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
-    trans.spinDir = -1;
+    trans.flow = TRANSITION_FLOWS[3];
   },
   cover(trans, p) {
     transitionWashFade(trans, 'cover', p);

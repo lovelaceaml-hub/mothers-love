@@ -250,7 +250,7 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(arrivalState.active).not.toBeNull();
   });
 
-  test('7. the cover is 48 real recognition bubbles that tile the entire screen, header and feed included', async ({
+  test('7. the cover is 70 real recognition bubbles that tile the entire screen, header and feed included', async ({
     page,
   }) => {
     test.setTimeout(120000);
@@ -316,13 +316,13 @@ test.describe('Section B: Theatrical transitions', () => {
     });
 
     expect(m).not.toBeNull();
-    expect(m!.count, '48 bubbles, the count at which they tile the stage').toBe(48);
+    expect(m!.count, '70 bubbles, a denser crowd that still tiles the screen').toBe(70);
     expect(m!.coveragePct, 'every sampled point on the whole screen is covered').toBe(100);
     expect(m!.layerZ, 'the vortex is above the header').toBeGreaterThan(m!.headerZ);
     expect(m!.layerZ, 'the vortex is above the footer and feed rail').toBeGreaterThan(m!.footerZ);
     expect(m!.countdownHidden, 'the countdown ring is hidden during a transition').toBe(true);
-    expect(m!.withName, 'every bubble carries a real recipient').toBe(48);
-    expect(m!.withMessage, 'every bubble carries real words').toBe(48);
+    expect(m!.withName, 'every bubble carries a real recipient').toBe(70);
+    expect(m!.withMessage, 'every bubble carries real words').toBe(70);
     // Still circular, like every other bubble on this display.
     expect(m!.borderRadius).toBe('50%');
     expect(m!.square).toBe(true);
@@ -354,7 +354,7 @@ test.describe('Section B: Theatrical transitions', () => {
         p90: samples[Math.floor(samples.length * 0.9)],
       };
     });
-    expect(timings.buildMs, 'building 48 real recognition bubbles').toBeLessThan(120);
+    expect(timings.buildMs, 'building 70 real recognition bubbles').toBeLessThan(160);
     expect(timings.p90, 'per-frame cost during the vortex at 3840').toBeLessThan(40);
   });
 
@@ -582,7 +582,95 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
       expect(m.covers, `style ${key} wash covers the whole stage at the swap`).toBe(true);
       expect(m.opacity, `style ${key} wash is fully opaque at the swap`).toBeGreaterThanOrEqual(0.99);
       expect(m.bg, `style ${key} wash colour has no alpha`).not.toContain('rgba');
-      expect(m.bubbles, `style ${key} carries the full crowd of recognition bubbles`).toBe(48);
+      expect(m.bubbles, `style ${key} carries the full crowd of recognition bubbles`).toBe(70);
     }
+  });
+
+  test('9b. the crowd enters from one direction and leaves through another', async ({ page }) => {
+    test.setTimeout(120000);
+    // Anthony, 2026-09-12: "they should come in like the vortex. it should be
+    // coming from one direction and then leaving in another direction. just
+    // like that vortex but bigger with more recognitions." So this is a
+    // through-flow, not a spiral that backs out the way it came, and this test
+    // is what keeps it one.
+    const frame = await loadRenderer(page, { scene: 1 });
+    await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
+
+    const track = await frame.evaluate(() => {
+      const rt = (window as any).colorPolishRuntime;
+      const measure = () => {
+        const layer = document.getElementById('transition-layer');
+        const tv = document.getElementById('tv');
+        if (!layer || !tv) return null;
+        const bs = Array.from(layer.querySelectorAll<HTMLElement>('.transition-bubble'));
+        if (!bs.length) return null;
+        const tr = tv.getBoundingClientRect();
+        const k = 1920 / tr.width;
+        const rects = bs.map((b) => b.getBoundingClientRect());
+        let sx = 0;
+        let sy = 0;
+        rects.forEach((r) => {
+          sx += (r.left + r.width / 2 - tr.left) * k;
+          sy += (r.top + r.height / 2 - tr.top) * k;
+        });
+        let covered = 0;
+        let total = 0;
+        for (let gx = 0; gx <= 32; gx++) {
+          for (let gy = 0; gy <= 18; gy++) {
+            const px = tr.left + (tr.width * gx) / 32;
+            const py = tr.top + (tr.height * gy) / 18;
+            total += 1;
+            for (const r of rects) {
+              const cx = r.left + r.width / 2;
+              const cy = r.top + r.height / 2;
+              const rr = Math.min(r.width, r.height) / 2;
+              if ((px - cx) ** 2 + (py - cy) ** 2 <= rr * rr) {
+                covered += 1;
+                break;
+              }
+            }
+          }
+        }
+        const st = rt.getState();
+        return {
+          cx: Math.round(sx / bs.length),
+          cy: Math.round(sy / bs.length),
+          pct: Math.round((covered / total) * 100),
+          phase: st.transition ? String(st.transition.phase) : null,
+        };
+      };
+      const trail: { cx: number; cy: number; pct: number; phase: string | null }[] = [];
+      for (let i = 0; i < 130; i += 1) {
+        rt.step(25);
+        const m = measure();
+        if (m) trail.push(m);
+      }
+      return trail;
+    });
+
+    // Only the FIRST transition. Stepping past its end starts the next one,
+    // whose crowd is back at the centre, and reading the last frame overall
+    // was how an earlier version of this test concluded the crowd never left.
+    const firstRevealIdx = track.findIndex((t) => t.phase === 'reveal');
+    expect(firstRevealIdx, 'a reveal phase happens').toBeGreaterThan(0);
+    let endIdx = firstRevealIdx;
+    while (endIdx + 1 < track.length && track[endIdx + 1].phase === 'reveal') endIdx += 1;
+
+    const entry = track[0];
+    const exit = track[endIdx];
+    const peak = track.slice(0, endIdx + 1).reduce((a, b) => (b.pct > a.pct ? b : a));
+
+    // Covers everything at the handover.
+    expect(peak.pct, 'the crowd covers the whole screen at the swap').toBe(100);
+    // Arrives from off screen and departs off screen.
+    expect(Math.hypot(entry.cx - 960, entry.cy - 540), 'enters from off screen').toBeGreaterThan(700);
+    expect(Math.hypot(exit.cx - 960, exit.cy - 540), 'leaves to off screen').toBeGreaterThan(700);
+    // And those are two different directions, not a bounce.
+    expect(
+      Math.hypot(entry.cx - exit.cx, entry.cy - exit.cy),
+      'entry and exit are different directions',
+    ).toBeGreaterThan(900);
+    // It really does clear: coverage returns to nothing by the end of reveal.
+    expect(exit.pct, 'the screen is uncovered again when the crowd has gone').toBeLessThanOrEqual(5);
   });
 });
