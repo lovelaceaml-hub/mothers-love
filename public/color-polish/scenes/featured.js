@@ -7,10 +7,13 @@ const FEATURED_LAYERS = {
   near: { scale: 1, blur: 0, pace: 1.1, z: 80 }
 };
 const FEATURED_DRIFT_TO = { far: 'mid', mid: 'near', near: 'near' };
+const FEATURED_POSITIONS = [[582, 64, 356], [1006, 283, 337], [1430, 76, 342]];
+const FEATURED_READER_BOUNDS = { maxW: 1786, maxH: 623 };
 
 let FEATURED_BAG = [];
 let FEATURED_LAST = 0;
 let FEATURED_PASS_ID = 0;
+let FEATURED_PASS_TOKEN = 0;
 let FEATURED_FLIP_CANCEL = null;
 
 function featuredNextId() {
@@ -35,6 +38,19 @@ function featuredNextId() {
   return id;
 }
 
+function featuredParticlesHtml() {
+  return '<div class="feature-particles" aria-hidden="true">' +
+    '<span class="feature-particle p-1"></span>' +
+    '<span class="feature-particle p-2"></span>' +
+    '<span class="feature-particle p-3"></span>' +
+    '<span class="feature-particle p-4"></span>' +
+    '<span class="feature-particle p-5"></span>' +
+    '<span class="feature-particle p-6"></span>' +
+    '<span class="feature-particle p-7"></span>' +
+    '<span class="feature-particle p-8"></span>' +
+    '</div>';
+}
+
 function featuredMarkupPanel(id) {
   const e = catalog[id - 1];
   const otherIds = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((x) => x !== id);
@@ -50,34 +66,38 @@ function featuredMarkupPanel(id) {
     .map((oid) => icon(oid, 'orbit-icon'))
     .join('');
 
-  return `<div class="feature-stage"><div class="feature-panel" style="--tint:${e.color}"><div class="feature-aurora"><div class="feature-blob blob-1"></div><div class="feature-blob blob-2"></div></div><div class="feature-sweep-clip"><div class="feature-sweep"></div></div><div class="feature-medallion-host"><div class="feature-ring ring-outer"></div><div class="feature-ring ring-inner"></div><div class="feature-orbit">${orbitIconsHtml}</div>${medallion(id)}</div><h2>${shimmer(e.name)}</h2><p class="principle" style="--principle-delay:${words.length * 70 + 80}ms">${esc(e.principle)}</p><p class="serif phrase">${wordsHtml}</p><div class="feature-progress">Recognitions selecting this expression</div></div></div>`;
+  return `<div class="feature-stage" style="--tint:${e.color}"><div class="feature-glow" aria-hidden="true"></div><div class="feature-panel" data-tier="plate" style="--tint:${e.color}">${featuredParticlesHtml()}<div class="feature-aurora"><div class="feature-blob blob-1"></div><div class="feature-blob blob-2"></div></div><div class="feature-sweep-clip"><div class="feature-sweep"></div></div><div class="feature-medallion-host"><div class="feature-ring ring-outer"></div><div class="feature-ring ring-inner"></div><div class="feature-orbit">${orbitIconsHtml}</div><div class="medallion" data-tier="medallion" style="--tint:${e.color}"><img class="icon" data-tier="icon" src="${ASSETS['icon' + id]}" alt="${esc(e.name)}"></div></div><div class="feature-phrase-wrap"><p class="serif phrase" data-tier="phrase">${wordsHtml}</p></div><h2>${shimmer(e.name)}</h2><p class="principle" style="--principle-delay:${words.length * 70 + 80}ms">${esc(e.principle)}</p><div class="feature-progress">Recognitions selecting this expression</div></div></div>`;
+}
+
+function featuredDrawBubbles(id) {
+  const chosen = [];
+  for (let i = 0; i < 3; i++) {
+    const r = chooseRandom(chosen.map((a) => a.id), id);
+    if (r) chosen.push(r);
+  }
+  if (chosen.length < 3) {
+    const count = chosen.length;
+    log('featured_sparse_expression', { expression: id, count });
+    while (chosen.length < 3) {
+      const r = chooseRandom(chosen.map((a) => a.id)) || chooseRandom([]);
+      if (!r) break;
+      chosen.push(r);
+    }
+  }
+  return drawSlots(chosen, FEATURED_POSITIONS, { readerBounds: FEATURED_READER_BOUNDS });
 }
 
 function featured() {
-  const id = (S.sceneAge > 0.5 && FEATURED_PASS_ID) ? FEATURED_PASS_ID : featuredNextId();
+  const id = (FEATURED_PASS_TOKEN && FEATURED_PASS_ID) ? FEATURED_PASS_ID : featuredNextId();
   FEATURED_PASS_ID = id;
   let h = `<div class="eyebrow">Featured Recognition · Expression <span class="feature-count">${String(id).padStart(2, '0')}</span> / 09</div>` + featuredMarkupPanel(id);
-  const chosen = [];
-  for (let i = 0; i < 3; i++) {
-    const r = choose(chosen.map((a) => a.r.id), id);
-    if (r) chosen.push({ r, expr: id });
-  }
-  while (chosen.length < 3) {
-    const r = choose(chosen.map((a) => a.r.id));
-    if (!r) break;
-    chosen.push({ r, expr: null });
-  }
-  const long = chosen.find((item) => !smallFits(item.r));
-  if (long) return h + addOrb(long.r, 820, 37, 580, { expression: long.expr, large: true });
-  const ps = [[582, 64, 356], [1006, 283, 337], [1430, 76, 342]];
-  h += chosen.map((item, i) => addOrb(item.r, ...ps[i], { expression: item.expr })).join('');
-  if (!chosen.length) h += '<p class="subheading" style="position:absolute;left:650px;top:220px">No current recognitions.</p>';
+  h += featuredDrawBubbles(id);
   return h;
 }
 
-function featuredUpdateEyebrow(id) {
-  const root = sceneRoot || document.querySelector('#stage .scene[data-scene="4"]');
-  if (!root) return;
+function featuredUpdateEyebrow(panel, id) {
+  const root = panel?.closest('.scene[data-scene="4"]');
+  if (!root || !panel.isConnected || S.s !== 4) return;
   const countEl = root.querySelector('.feature-count');
   if (countEl) {
     countEl.textContent = String(id).padStart(2, '0');
@@ -95,22 +115,19 @@ function featuredUpdateEyebrow(id) {
 function featuredUpdatePanelContent(panel, id) {
   const e = catalog[id - 1];
   panel.style.setProperty('--tint', e.color);
+  const stage = panel.closest('.feature-stage');
+  if (stage) stage.style.setProperty('--tint', e.color);
 
   const med = panel.querySelector('.medallion');
   if (med) {
     med.style.setProperty('--tint', e.color);
-    med.innerHTML = icon(id);
+    med.innerHTML = `<img class="icon" data-tier="icon" src="${ASSETS['icon' + id]}" alt="${esc(e.name)}">`;
   }
 
   const orbit = panel.querySelector('.feature-orbit');
   if (orbit) {
     const otherIds = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((x) => x !== id);
     orbit.innerHTML = otherIds.map((oid) => icon(oid, 'orbit-icon')).join('');
-  }
-
-  const h2 = panel.querySelector('h2');
-  if (h2) {
-    h2.innerHTML = shimmer(e.name);
   }
 
   const words = e.phrase.split(/\s+/);
@@ -123,6 +140,11 @@ function featuredUpdatePanelContent(panel, id) {
         return `<span class="phrase-word" style="--w-i:${i}">${prefix}${esc(w)}${suffix}</span>`;
       })
       .join(' ');
+  }
+
+  const h2 = panel.querySelector('h2');
+  if (h2) {
+    h2.innerHTML = shimmer(e.name);
   }
 
   const principle = panel.querySelector('.principle');
@@ -140,15 +162,7 @@ function featuredAdvance() {
   V.flipping = true;
   const newId = featuredNextId();
   FEATURED_PASS_ID = newId;
-
-  const nonLarge = V.actors.filter((a) => !a.large);
-  nonLarge.forEach((a, i) => {
-    a.expression = newId;
-    a.retireAt = V.clock + i * 4.2;
-  });
-  slots.forEach((s) => {
-    if (!s.large) s.expression = newId;
-  });
+  FEATURED_PASS_TOKEN = newId;
 
   const root = sceneRoot || document.querySelector('#stage .scene[data-scene="4"]');
   const panel = root?.querySelector('.feature-panel');
@@ -157,6 +171,68 @@ function featuredAdvance() {
     return;
   }
 
+  // 1. Burst outgoing bubbles and log
+  const outgoingIds = slots.map((s) => s.id);
+  log('featured_bubble_burst', { scene: 4, ids: outgoingIds });
+
+  V.actors.forEach((a) => {
+    burstAt(a.screenX, a.screenY, 'spark', 44, a.d * 0.48);
+    a.el?.remove();
+  });
+  slots.length = 0;
+  V.actors.length = 0;
+
+  // 2. Draw 3 new bubbles
+  const newChosen = [];
+  for (let i = 0; i < 3; i++) {
+    const r = chooseRandom(newChosen.map((item) => item.id), newId);
+    if (r) newChosen.push(r);
+  }
+  if (newChosen.length < 3) {
+    const sparseCount = newChosen.length;
+    log('featured_sparse_expression', { expression: newId, count: sparseCount });
+    while (newChosen.length < 3) {
+      const r = chooseRandom(newChosen.map((item) => item.id)) || chooseRandom([]);
+      if (!r) break;
+      newChosen.push(r);
+    }
+  }
+
+  // 3. Mount new bubbles into DOM
+  const sceneEl = panel.closest('.scene[data-scene="4"]') || root;
+  if (sceneEl && newChosen.length) {
+    const newHtml = drawSlots(newChosen, FEATURED_POSITIONS, { readerBounds: FEATURED_READER_BOUNDS });
+    const temp = document.createElement('div');
+    temp.innerHTML = newHtml;
+    while (temp.firstChild) {
+      sceneEl.appendChild(temp.firstChild);
+    }
+    slots.forEach((b) => {
+      b.el = $(b.key);
+      b.expression = newId;
+    });
+    bindNumbers(sceneEl);
+    checkFullFits();
+    mountFloaters();
+    V.actors.forEach((a, i) => {
+      a.expression = newId;
+      if (a.large) {
+        a.layer = 'near';
+        if (a.el) a.el.dataset.depth = 'near';
+        return;
+      }
+      a.layer = ['far', 'mid', 'near'][i % 3];
+      const L = FEATURED_LAYERS[a.layer] || FEATURED_LAYERS.near;
+      a.pace *= L.pace;
+      if (a.el) a.el.dataset.depth = a.layer;
+      a.life = 'entering';
+      a.lifeAt = V.clock;
+      a.originX = a.homeX;
+      a.originY = 680;
+    });
+  }
+
+  // 4. Panel flip animation
   V.flipStartAge = S.sceneAge;
   V.flipSwapped = false;
   panel.classList.add('flip-out');
@@ -182,6 +258,7 @@ function featuredAdvance() {
   let swapped = false;
   function onFlipOutEnd() {
     if (swapped) return;
+    if (!panel.isConnected || S.s !== 4) return;
     swapped = true;
     V.flipSwapped = true;
     panel.removeEventListener('animationend', onFlipOutAnim);
@@ -189,7 +266,7 @@ function featuredAdvance() {
     outTimer = null;
 
     featuredUpdatePanelContent(panel, newId);
-    featuredUpdateEyebrow(newId);
+    featuredUpdateEyebrow(panel, newId);
 
     panel.classList.remove('flip-out');
     panel.classList.add('flip-in');
@@ -197,6 +274,7 @@ function featuredAdvance() {
     let inDone = false;
     function onFlipInEnd() {
       if (inDone) return;
+      if (!panel.isConnected || S.s !== 4) return;
       inDone = true;
       panel.removeEventListener('animationend', onFlipInAnim);
       clearTimeout(inTimer);
@@ -230,11 +308,13 @@ function featuredTickAge(dt) {
 }
 
 function mountFeatured(root) {
+  FEATURED_PASS_TOKEN = FEATURED_PASS_ID;
   FEATURED_FLIP_CANCEL?.();
   FEATURED_FLIP_CANCEL = null;
   V.featuredAdvanced = S.sceneAge >= 15;
   V.flipping = false;
   V.actors.forEach((a, i) => {
+    a.expression = FEATURED_PASS_ID;
     if (a.large) {
       a.layer = 'near';
       if (a.el) a.el.dataset.depth = 'near';
@@ -245,6 +325,17 @@ function mountFeatured(root) {
     a.pace *= L.pace;
     if (a.el) a.el.dataset.depth = a.layer;
   });
+}
+
+function featuredOnLeave(root) {
+  if (FEATURED_FLIP_CANCEL) {
+    FEATURED_FLIP_CANCEL();
+    FEATURED_FLIP_CANCEL = null;
+  }
+  if (S.s !== 4 || S.mode !== 'normal') {
+    FEATURED_PASS_TOKEN = 0;
+    FEATURED_PASS_ID = 0;
+  }
 }
 
 function integrateFeatured(a, dt) {
@@ -306,9 +397,10 @@ registerScene(4, {
   tickAge: featuredTickAge,
   integrate: integrateFeatured,
   place: placeFeatured,
+  onLeave: featuredOnLeave,
   floaters: true,
   fxCanvas: true,
   topMargin: 87,
-  keepOut: () => [{ x: 0, y: 0, w: 520, h: 636 }],
+  keepOut: () => [{ x: 0, y: 0, w: 550, h: 636 }],
   replaceMode: 'drift'
 });
