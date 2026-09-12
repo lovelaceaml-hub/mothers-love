@@ -247,26 +247,24 @@ function drawGarden() {
   }
 }
 
+function gardenReplaceActor(a) {
+  const excluded = V.actors.map(x => x.id).concat(V.actors.map(x => x.nextId).filter(Boolean));
+  const r = chooseRandom(excluded, a.expression);
+  if (!r) return false;
+  a.nextId = r.id;
+  a.life = 'swelling';
+  a.lifeAt = V.clock;
+  a.exitDX = (a.x > 900 ? 1 : -1) * (a.d + 350);
+  a.exitDY = (a.rng() - 0.5) * 220;
+  log('bubble_exit_start', { scene: S.s, id: a.id, kind: 'petals', age: V.clock - a.born });
+  return true;
+}
+
 function gardenReplace() {
   const ready = V.actors
     .filter(a => a.life === 'steady' && V.clock - a.born >= Math.max(13, a.minRead || 0))
     .sort((a, b) => a.born - b.born || a.serial - b.serial);
-  // Call the shared helper rather than reimplementing it. An earlier round
-  // inlined replaceActor's body here so it could swap choose() for
-  // chooseRandom(), and that broke the petal chain: a replacement that does not
-  // go through the shared path never produces the retire that harvests the
-  // 'petals' fx into V.garden.petals, so the garden stopped carrying petals
-  // altogether and a Plan 13 assertion that Anthony had already approved began
-  // failing. This scene's brief from him was about pagination, not about which
-  // record is chosen, and the order for this lane said plainly that anything
-  // else stays as Plan 13 shipped.
-  //
-  // Deliberate deviation, recorded in the lane file: replaceActor uses choose()
-  // internally and lives in core/motion.js, which this lane may not touch, so
-  // the replacement record here is still picked by recency rather than by the
-  // weighted random draw. The five bubbles the scene opens with do use
-  // chooseRandom, which is where the visible variety comes from.
-  if (ready.length && replaceActor(ready[0], 'petals')) {
+  if (ready.length && gardenReplaceActor(ready[0])) {
     log('garden_replacement', { scene: 2, index: ++V.serial, active: V.actors.length });
   }
   V.next += 7;

@@ -48,7 +48,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 30px 42px 70px 42px;
+  padding: 34px 48px 70px 48px;
   opacity: 1;
   pointer-events: auto;
 }
@@ -91,7 +91,7 @@
 }
 
 #tv .scene[data-scene="7"] .edu-card.focused .edu-source {
-  left: 42px;
+  left: 48px;
   bottom: 19px;
   font-size: 12px;
   line-height: 1.3;

@@ -250,8 +250,10 @@ test('no timer survives onLeave on forced scene change', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 9, ms: 3000 });
 
   await frame.evaluate(() => {
-    (window as any).colorPolishRuntime.setScene(1);
-    (window as any).colorPolishRuntime.step(2000);
+    const runtime = (window as any).colorPolishRuntime;
+    runtime.setScene(1);
+    const transition = runtime.getState().transition;
+    runtime.step(transition ? (transition.duration - transition.age) * 1000 + 40 : 40);
   });
 
   const state = await frame.evaluate(() => {

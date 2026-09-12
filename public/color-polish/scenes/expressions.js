@@ -3,6 +3,9 @@
 
 const expressions_ROW_Z = [-40, 0, -40];
 const expressions_COL_ROTY = [7, 0, -7];
+const EXPRESSIONS_FOCUS_START = 6;
+const EXPRESSIONS_FOCUS_CYCLE = 10;
+const EXPRESSIONS_FOCUS_RAMP = 2.4;
 
 function nineScene(){
  let h = heading('The Nine Expressions', 'Words that bring peace.');
@@ -29,13 +32,16 @@ function nineScene(){
      + `<div class="edu-bloom" aria-hidden="true">${Array.from({length: 6}, (_, n) => `<i class="edu-petal" style="--angle:${n * 60}deg"></i>`).join('')}${Array.from({length: 6}, (_, n) => `<i class="edu-spark" style="--angle:${n * 60 + 30}deg"></i>`).join('')}</div>`
      + `</article>`;
  });
- return h + `</div><div class="edu-caption">One expression blossoms into focus on each visit.</div>`;
+ return h + `</div><div class="edu-caption">The stage turns through the complete set of expressions.</div>`;
 }
 
 function tickEducation(){
  if(S.s !== 7 || !eduCards.length) return;
- const p = S.still ? 1 : ease((S.eduAge - 6) / 3);
- const chosen = S.bloomIndex;
+ const focusAge = Math.max(0, S.eduAge - EXPRESSIONS_FOCUS_START);
+ const cycle = S.still ? 0 : Math.floor(focusAge / EXPRESSIONS_FOCUS_CYCLE);
+ const chosen = ((S.bloomIndex - 1 + cycle) % catalog.length) + 1;
+ const cycleAge = S.still ? EXPRESSIONS_FOCUS_RAMP : focusAge % EXPRESSIONS_FOCUS_CYCLE;
+ const p = S.still ? 1 : ease(clamp(cycleAge / EXPRESSIONS_FOCUS_RAMP, 0.02, 1));
  let other = 0;
 
  eduCards.forEach((el, i) => {

@@ -91,9 +91,11 @@ test('with the mostly-long fixture, no two .orb-slot rectangles in scene 1 or sc
   const checkNoOverlap = async (sceneId: number) => {
     const frame = await loadRenderer(page, { scene: sceneId, fixture: mostlyLongFixture });
 
-    // Step the clock past the 1.15 s crossfade so the transition completes and old scene roots are removed.
+    // Finish the selected transition before measuring the settled scene.
     await frame.evaluate(() => {
-      (window as any).colorPolishRuntime.step(1500);
+      const runtime = (window as any).colorPolishRuntime;
+      const transition = runtime.getState().transition;
+      runtime.step(transition ? (transition.duration - transition.age) * 1000 + 40 : 40);
     });
 
     const sceneCount = await frame.evaluate(() => document.querySelectorAll('#stage .scene').length);

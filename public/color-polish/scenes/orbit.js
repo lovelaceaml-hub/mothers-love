@@ -5,6 +5,7 @@ let ORBIT_BAG = [];
 let ORBIT_LAST = 0;
 let ORBIT_PASS_TOKEN = 0;
 let ORBIT_REFILL_COUNT = 0;
+const ORBIT_SESSION_SALT = Math.floor(Math.random() * 0x100000000);
 
 const ORBIT_BASE_DIAMETER = 227;
 const ORBIT_CENTER_DIAMETER = 420;
@@ -21,17 +22,11 @@ function orbitPlanetDiameter(message) {
 function orbitNextId() {
   if (!ORBIT_BAG.length) {
     const ids = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    // Fold in wall-clock seconds as well as the session values. On a fresh page
-    // open S.t is 0, S.idCounter is never incremented anywhere in this renderer,
-    // and ORBIT_REFILL_COUNT starts at 0, so without a clock term every fresh
-    // open picked the identical first expression: six opens showed one name.
-    // Nothing asserts reproducibility of this particular bag (the renderer probe
-    // checks that scenes render and which arrival styles cycle, not which
-    // expression the orbit centre chose), so an earlier round's reproducibility
-    // requirement here was the coordinator over-specifying, and it cost the
-    // variety Anthony sees on the TV.
+    // Keep fresh opens varied while preserving fixed-seed direct renderer runs.
+    // The harness controls Math.random before scripts load, so this salt is
+    // stable for a seeded run and naturally varies between live page opens.
     const rng = randSeed(
-      3301 + (S.idCounter || 0) * 41 + Math.floor(S.t) + (ORBIT_REFILL_COUNT++) * 17 + Math.floor(Date.now() / 1000) * 7,
+      3301 + (S.idCounter || 0) * 41 + Math.floor(S.t) + (ORBIT_REFILL_COUNT++) * 17 + ORBIT_SESSION_SALT,
     );
     for (let i = ids.length - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));

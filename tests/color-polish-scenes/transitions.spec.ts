@@ -703,15 +703,10 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     expect(exit.pct, 'the screen is uncovered again once the crowd has gone').toBeLessThanOrEqual(5);
   });
 
-  test('9c. it is a vortex: the crowd completes multiple revolutions about the centre', async ({ page }) => {
+  test('9c. the vortex makes one graceful turn about the centre', async ({ page }) => {
     test.setTimeout(180000);
-    // Anthony had to ask three times, so this is the assertion that pins the
-    // difference between a sweep and a vortex: measured rotation. Earlier
-    // versions translated the crowd in a straight line with one sinusoidal
-    // wobble and advanced the angle by about a third of a turn over a 0.9 s
-    // cover, which is invisible. "the transition time doesnt need to be limited
-    // to whatever it is now." It is now 5.2 s and the crowd orbits the centre
-    // about three full times, measured by unwrapping one bubble's angle.
+    // Measure the graceful turning Anthony requested after watching the preview.
+    // Keep visible circular travel and full cover while limiting repeated spins.
     const frame = await loadRenderer(page, { scene: 1 });
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
 
@@ -774,7 +769,9 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     const peak = trail.reduce((a, b) => (b.pct > a.pct ? b : a));
     const longest = trail.reduce((a, b) => Math.max(a, b.age ?? 0), 0);
 
-    expect(revolutions, 'the crowd orbits the centre several times').toBeGreaterThan(2.5);
+    // Anthony's preview feedback replaces several rapid spins with one gentle turn.
+    expect(revolutions, 'the crowd makes a gentle visible turn').toBeGreaterThan(0.4);
+    expect(revolutions, 'the movement stays calm instead of spinning repeatedly').toBeLessThan(1.3);
     expect(peak.pct, 'and still covers the whole screen').toBe(100);
     expect(longest, 'with enough time to see it turn').toBeGreaterThan(4.5);
   });

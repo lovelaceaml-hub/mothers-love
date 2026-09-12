@@ -596,6 +596,12 @@ export async function loadRenderer(
   if (options?.scene !== undefined) {
     await frame.evaluate((s) => (window as any).colorPolishRuntime.setScene(s), options.scene);
     await frame.waitForFunction((s) => (window as any).colorPolishRuntime?.getState().scene === s, options.scene);
+    // Scene checkpoints measure time in the requested scene, after its entrance.
+    await frame.evaluate(() => {
+      const runtime = (window as any).colorPolishRuntime;
+      const transition = runtime.getState().transition;
+      if (transition) runtime.step((transition.duration - transition.age) * 1000 + 40);
+    });
   }
 
   if (options?.ms && options.ms > 0) {

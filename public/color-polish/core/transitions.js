@@ -20,36 +20,36 @@ const TRANSITION_NAVE_N = TRANSITION_NAVE_Z.map((z) => z / TRANSITION_NAVE_A);
 const TRANSITION_NAVE_COVER = 2.6;
 const TRANSITION_NAVE_REVEAL = 2.8;
 const TRANSITION_NAVE_TOTAL = 5.4;
-const TRANSITION_NAVE_OMEGA = 5.60;
+const TRANSITION_NAVE_OMEGA = 1.00;
 const TRANSITION_NAVE_ZRIM0 = 6200;
 const TRANSITION_NAVE_ZRIMEND = 135;
 const TRANSITION_NAVE_LN_IN = 2.404368;
-const TRANSITION_NAVE_LN_OUT = 1.422662;
-const TRANSITION_NAVE_ARC = 200;
-const TRANSITION_NAVE_SHIFT = 90;
-const TRANSITION_NAVE_SURGE = 1600;
-const TRANSITION_NAVE_FLARE = 1660;
+const TRANSITION_NAVE_LN_OUT = 1.15;
+const TRANSITION_NAVE_ARC = 150;
+const TRANSITION_NAVE_SHIFT = 44;
+const TRANSITION_NAVE_SURGE = 1800;
+const TRANSITION_NAVE_FLARE = 420;
 const TRANSITION_NAVE_FLARE_CORE = 420;
 const TRANSITION_NAVE_ZNEAR = 140;
 const TRANSITION_NAVE_ZFADE = 330;
 const TRANSITION_NAVE_ZCLEAR = 10200;
 const TRANSITION_NAVE_ZHAZE = 34000;
-const TRANSITION_NAVE_FOG_ALPHA = 0.50;
-const TRANSITION_NAVE_FOG_SAT = 0.55;
-const TRANSITION_NAVE_FOG_LIFT = 0.20;
-const TRANSITION_NAVE_FOG_BLUR = 3.4;
+const TRANSITION_NAVE_FOG_ALPHA = 0.34;
+const TRANSITION_NAVE_FOG_SAT = 0.35;
+const TRANSITION_NAVE_FOG_LIFT = 0.10;
+const TRANSITION_NAVE_FOG_BLUR = 1.8;
 const TRANSITION_NAVE_DSOFT = 1300;
 const TRANSITION_NAVE_DHARD = 1950;
 const TRANSITION_NAVE_ZFOCUS = 1500;
-const TRANSITION_NAVE_COC_K = 3400;
-const TRANSITION_NAVE_COC_CAP = 5.0;
+const TRANSITION_NAVE_COC_K = 2500;
+const TRANSITION_NAVE_COC_CAP = 3.2;
 const TRANSITION_NAVE_LAMP = [-620, -760, 720];
 const TRANSITION_NAVE_LIT_BASE = 0.70;
-const TRANSITION_NAVE_LIT_KEY = 0.95;
+const TRANSITION_NAVE_LIT_KEY = 0.68;
 const TRANSITION_NAVE_LIT_REACH = 1700;
 const TRANSITION_NAVE_LIT_OCU = 0.22;
 const TRANSITION_NAVE_LIT_MIN = 0.68;
-const TRANSITION_NAVE_LIT_MAX = 1.24;
+const TRANSITION_NAVE_LIT_MAX = 1.10;
 const TRANSITION_NAVE_OCU_LO = 600;
 const TRANSITION_NAVE_OCU_HI = 9000;
 const TRANSITION_NAVE_ZI_K = 3000000;
@@ -211,7 +211,7 @@ function transitionNaveFilter(item, projection) {
   const scale = Math.max(projection.D / item.base, 0.001);
   const blurElement = Math.round((projection.blur / scale) / 0.25) * 0.25;
   const brightness = Math.round(projection.lit / 0.02) * 0.02;
-  const saturation = Math.round((1 - TRANSITION_NAVE_FOG_SAT * projection.fog) / 0.02) * 0.02;
+  const saturation = Math.round((0.78 - TRANSITION_NAVE_FOG_SAT * projection.fog) / 0.02) * 0.02;
   const value = `brightness(${brightness.toFixed(2)}) saturate(${saturation.toFixed(2)})${blurElement >= 0.25 ? ` blur(${blurElement.toFixed(2)}px)` : ''}`;
   if (item.lastFilter !== value) {
     item.lastFilter = value;
@@ -275,10 +275,10 @@ function transitionNaveDrawVault(trans, camera) {
 
     if (!near) {
       const haze = ctx.createRadialGradient(vanish.x, vanish.y, 0, vanish.x, vanish.y, 1500);
-      haze.addColorStop(0, `rgba(255,247,228,${(0.55 * camera.haze).toFixed(3)})`);
-      haze.addColorStop(0.34, `rgba(247,226,189,${(0.40 * camera.haze).toFixed(3)})`);
-      haze.addColorStop(0.70, `rgba(234,208,198,${(0.26 * camera.haze).toFixed(3)})`);
-      haze.addColorStop(1, `rgba(230,201,201,${(0.16 * camera.haze).toFixed(3)})`);
+      haze.addColorStop(0, `rgba(255,247,228,${(0.30 * camera.haze).toFixed(3)})`);
+      haze.addColorStop(0.34, `rgba(247,226,189,${(0.24 * camera.haze).toFixed(3)})`);
+      haze.addColorStop(0.70, `rgba(234,208,198,${(0.16 * camera.haze).toFixed(3)})`);
+      haze.addColorStop(1, `rgba(230,201,201,${(0.10 * camera.haze).toFixed(3)})`);
       ctx.fillStyle = haze;
       ctx.fillRect(0, 0, 1920, 1080);
     }
@@ -292,14 +292,14 @@ function transitionNaveDrawVault(trans, camera) {
           const n1 = TRANSITION_NAVE_RIB_N0 + (TRANSITION_NAVE_RIB_N1 - TRANSITION_NAVE_RIB_N0) * (step + 1) / steps;
           const a = point(TRANSITION_NAVE_RIB_R, psi, n0);
           const b = point(TRANSITION_NAVE_RIB_R, psi, n1);
-          if ((a.zd + b.zd) / 2 < TRANSITION_NAVE_SPLIT) drawLine(a, b, 'rgba(255,244,214,0.30)', 1.6);
+          if ((a.zd + b.zd) / 2 < TRANSITION_NAVE_SPLIT) drawLine(a, b, 'rgba(255,244,214,0.18)', 1.6);
         }
       } else {
         const a = point(TRANSITION_NAVE_RIB_R, psi, TRANSITION_NAVE_RIB_N0);
         const mid = point(TRANSITION_NAVE_RIB_R, psi, 3000);
         const b = point(TRANSITION_NAVE_RIB_R, psi, TRANSITION_NAVE_RIB_N1);
-        drawLine(a, mid, 'rgba(255,244,214,0.30)', 1.6);
-        drawLine(mid, b, 'rgba(215,182,140,0.12)', 1.6);
+        drawLine(a, mid, 'rgba(255,244,214,0.18)', 1.6);
+        drawLine(mid, b, 'rgba(215,182,140,0.08)', 1.6);
       }
     }
 
@@ -325,10 +325,10 @@ function transitionNaveDrawVault(trans, camera) {
       const mid = points[Math.floor(points.length / 2)];
       const alpha = 0.30 * (1 - mid.fog) + 0.06;
       if (!near) {
-        drawPath(points, `rgba(243,220,174,${alpha.toFixed(3)})`, 2.2);
+        drawPath(points, `rgba(243,220,174,${(alpha * 0.72).toFixed(3)})`, 2.2);
       } else {
         for (let i = 0; i < points.length - 1; i++) {
-          if ((points[i].zd + points[i + 1].zd) / 2 < TRANSITION_NAVE_SPLIT) drawLine(points[i], points[i + 1], `rgba(243,220,174,${alpha.toFixed(3)})`, 2.2);
+          if ((points[i].zd + points[i + 1].zd) / 2 < TRANSITION_NAVE_SPLIT) drawLine(points[i], points[i + 1], `rgba(243,220,174,${(alpha * 0.72).toFixed(3)})`, 2.2);
         }
       }
     }
@@ -348,7 +348,7 @@ function transitionNaveDrawVault(trans, camera) {
         for (let i = b.length - 1; i >= 0; i--) if (b[i].sy > vanish.y) ctx.lineTo(b[i].sx, b[i].sy);
         if (started) {
           ctx.closePath();
-          ctx.fillStyle = 'rgba(201,169,126,0.12)';
+          ctx.fillStyle = 'rgba(201,169,126,0.08)';
           ctx.fill();
         }
       }
@@ -357,14 +357,14 @@ function transitionNaveDrawVault(trans, camera) {
     if (!near) {
       for (let q = 0; q < TRANSITION_NAVE_M.length; q++) {
         const points = Array.from({ length: 37 }, (_, i) => point(TRANSITION_NAVE_RHO[q], TRANSITION_NAVE_PHASE[q] + i * TAU / 36, TRANSITION_NAVE_N[q]));
-        drawPath(points, 'rgba(255,249,226,0.16)', 1.4, true);
+        drawPath(points, 'rgba(255,249,226,0.10)', 1.4, true);
       }
       for (let i = 0; i < TRANSITION_NAVE_SPOKES; i++) {
         const psi = i * TAU / TRANSITION_NAVE_SPOKES;
-        drawLine(point(TRANSITION_NAVE_RHO[3], psi, TRANSITION_NAVE_N[3]), point(TRANSITION_NAVE_RHO[4], psi, TRANSITION_NAVE_N[4]), 'rgba(255,249,226,0.12)', 1.1);
+        drawLine(point(TRANSITION_NAVE_RHO[3], psi, TRANSITION_NAVE_N[3]), point(TRANSITION_NAVE_RHO[4], psi, TRANSITION_NAVE_N[4]), 'rgba(255,249,226,0.08)', 1.1);
       }
       const bloom = ctx.createRadialGradient(vanish.x, vanish.y, 0, vanish.x, vanish.y, 300);
-      bloom.addColorStop(0, `rgba(255,253,242,${(0.55 * camera.haze).toFixed(3)})`);
+      bloom.addColorStop(0, `rgba(255,253,242,${(0.24 * camera.haze).toFixed(3)})`);
       bloom.addColorStop(1, 'rgba(255,253,242,0)');
       ctx.fillStyle = bloom;
       ctx.fillRect(0, 0, 1920, 1080);
@@ -380,7 +380,7 @@ function transitionNaveDrawVault(trans, camera) {
     if (near) {
       const edge = ctx.createRadialGradient(960, 540, 0, 960, 540, 1400);
       edge.addColorStop(0.62, 'rgba(255,240,210,0)');
-      edge.addColorStop(1, 'rgba(255,236,198,0.22)');
+      edge.addColorStop(1, 'rgba(255,236,198,0.12)');
       ctx.fillStyle = edge;
       ctx.fillRect(0, 0, 1920, 1080);
     }
