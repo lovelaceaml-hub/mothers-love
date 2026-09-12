@@ -1,14 +1,22 @@
 /* Core transition layer and decorative transition elements. */
 
+/* The WHOLE screen, not the stage. Anthony, 2026-09-12: "it needs to cover the
+   ENTIRE screen. even the title and the live feed." So the layer spans the full
+   1920 by 1080 TV rather than the 1812 by 636 stage box, and it sits above the
+   header (z 30), the footer and feed rail (z 32) and the countdown ring
+   (z 900). The countdown is already hidden for the whole duration of a
+   transition, because sceneCountdownHidden ends with a check on `transition`,
+   so nothing is being covered that should still be legible. #tv clips at
+   1920 by 1080, so nothing escapes the TV. */
 #tv #transition-layer {
   position: absolute;
-  top: 126px;
-  left: 54px;
-  width: 1812px;
-  height: 636px;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
   pointer-events: none;
   overflow: hidden;
-  z-index: 25;
+  z-index: 950;
   visibility: hidden;
   opacity: 0;
 }
@@ -93,8 +101,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 1812px;
-  height: 636px;
+  width: 1920px;
+  height: 1080px;
   background-color: #f7e7c8;
   background-image: linear-gradient(118deg, #fff6e4 0%, #f7e2bd 34%, #f3d6c4 64%, #efd0d6 100%);
   opacity: 1;

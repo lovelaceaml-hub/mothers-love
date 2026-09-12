@@ -112,9 +112,16 @@ function transitionWashSlide(trans, phase, p, axis, from) {
 // 1812 by 636 stage an 8 by 6 grid gives sx 226.5 and sy 106, so r must reach
 // 125 and the diameter 250. These are 260, so the 48 of them tile the stage
 // with overlap to spare and nothing of either scene can show through.
+// Sized for the WHOLE screen, not the stage. Anthony, 2026-09-12: the vortex
+// must cover the entire screen including the title and the live feed. Circles
+// of radius r on a grid of spacing sx by sy cover the plane when
+// r >= sqrt(sx^2 + sy^2) / 2. An 8 by 6 grid over 1920 by 1080 gives sx 240 and
+// sy 180, so r must reach sqrt(240^2 + 180^2) / 2 = 150 and the diameter 300.
 const TRANSITION_GRID_COLS = 8;
 const TRANSITION_GRID_ROWS = 6;
-const TRANSITION_BUBBLE_D = 260;
+const TRANSITION_BUBBLE_D = 300;
+const TRANSITION_COVER_W = 1920;
+const TRANSITION_COVER_H = 1080;
 
 function transitionRecordsForCover() {
   const pool = records();
@@ -130,8 +137,8 @@ function transitionCreateBubbles(layer) {
   const recs = transitionRecordsForCover();
   if (!recs.length) return items;
 
-  const sx = 1812 / TRANSITION_GRID_COLS;
-  const sy = 636 / TRANSITION_GRID_ROWS;
+  const sx = TRANSITION_COVER_W / TRANSITION_GRID_COLS;
+  const sy = TRANSITION_COVER_H / TRANSITION_GRID_ROWS;
 
   recs.forEach((r, i) => {
     const col = i % TRANSITION_GRID_COLS;
@@ -190,8 +197,8 @@ function transitionVortex(trans, phase, p) {
     const z = Math.sin(angle) * item.depth * t;
     const k = 1000 / (1000 - z);
 
-    const cx = 906 + Math.cos(angle) * radius;
-    const cy = 318 + Math.sin(angle) * radius * 0.42;
+    const cx = TRANSITION_COVER_W / 2 + Math.cos(angle) * radius;
+    const cy = TRANSITION_COVER_H / 2 + Math.sin(angle) * radius * 0.52;
     const x = mix(item.homeX, cx - item.d / 2, t) * 1;
     const y = mix(item.homeY, cy - item.d / 2, t) * 1;
 
