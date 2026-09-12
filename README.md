@@ -1,5 +1,9 @@
 # The Words of Mother's Love
 
+## September 12: Plan 15 test preview
+
+[Open the TV test preview](https://mothers-love-d4ve0196a-lvzion.vercel.app/display). The full TV scene pass is integrated on `codex/tv15-full-preview` at `b865073`, with the original live transition restored at Anthony's request. Production remains on Plan 12 at `1532068`. [Plan 15](docs/PLAN-15-tv-next-level.md) and [verification record](docs/runs/2026-09-12-tv-next-level/lanes/astra-full-pass.md). The Vercel preview requires an authorized session or a temporary share link.
+
 ## Interview completion update
 
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 13](docs/PLAN-13-tv-scene-refactor.md), scene-by-scene TV refactor; previous: [Plan 12](docs/PLAN-12-tv-stability-countdown-and-home-action.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
@@ -14,6 +18,7 @@ The missing interview sequences, whole-card selection, true screen previews, and
 - **Storage:** [Release evidence in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw). Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love).
 - [Handoff](docs/HANDOFF.md)
+- [Plan 14, campaign commercial video](docs/PLAN-14-commercial-video.md), built, awaiting Anthony's viewing; script at [docs/video/SCRIPT.md](docs/video/SCRIPT.md), pipeline in `scripts/video/`, finished files in Drive under `Project Outputs/The Words of Mother's Love/Commercial` (see Storage above); run record: [2026-09-11-commercial-video](docs/runs/2026-09-11-commercial-video/INDEX.md)
 - [TV Garden and submission plan](docs/PLAN-08-tv-garden-and-submission.md)
 - [TV Garden run record](docs/runs/2026-09-09-tv-garden-refresh/INDEX.md)
 - [Flexible name input](docs/PLAN-07-flexible-names.md)
