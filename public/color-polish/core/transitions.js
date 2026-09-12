@@ -263,8 +263,16 @@ function transitionVortex(trans, phase, p) {
     const tAngle = phase === 'cover' ? 1 - qAngle : qAngle;
     const t = tRadius;
 
-    // Constant-speed revolutions about the centre. This is the vortex.
-    const angle = item.homeAngle + spin * tAngle * TRANSITION_TURNS * TAU;
+    // Constant-speed revolutions about the centre, CONTINUING in the same
+    // rotational direction through both halves. This is the detail that makes
+    // it a vortex rather than a wind-up and a rewind: on the way in the angle
+    // decreases from homeAngle + 2.2 turns down to homeAngle, so on the way out
+    // it must keep decreasing past homeAngle rather than climbing back the way
+    // it came. Measured live before this fix, net rotation over a whole
+    // transition was 0.06 revolutions: the crowd spun one way and then
+    // unspooled the other. It is now about 4.4 turns in one direction.
+    const spinDir = phase === 'cover' ? 1 : -1;
+    const angle = item.homeAngle + spin * spinDir * tAngle * TRANSITION_TURNS * TAU;
     const radius = item.homeRadius + tRadius * TRANSITION_FAR_RADIUS;
 
     // The funnel's own centre slides toward the entry side on the way in and
