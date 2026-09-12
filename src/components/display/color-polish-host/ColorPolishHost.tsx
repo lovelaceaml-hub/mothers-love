@@ -87,7 +87,8 @@ export function ColorPolishHost() {
       const after = cursorRef.current;
       try {
         const path = after ? `/api/display/color-polish?after=${encodeURIComponent(after)}` : '/api/display/color-polish';
-        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'omit', headers: { accept: 'application/json' }, signal: controller.signal });
+        // Keep the Vercel test-preview access cookie for the public snapshot read.
+        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: controller.signal });
         if (!response.ok) throw new Error(`SNAPSHOT_${response.status}`);
         const next = validateColorPolishSnapshot(await response.json());
         if (!next) throw new Error('INVALID_SNAPSHOT');
