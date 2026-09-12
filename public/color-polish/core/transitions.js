@@ -219,7 +219,16 @@ function transitionCreateBubbles(layer) {
 // Four revolutions each way. At 2.6 the measured rotation of a single bubble
 // came to under two turns once the per-bubble stagger and the easing were
 // accounted for, which still reads as a swirl rather than a vortex.
-const TRANSITION_TURNS = 4;
+// Two and a bit turns, at a CONSTANT angular speed. Four turns front-loaded by
+// the easing was the real reason this never looked like a vortex: outCubic
+// means eased reaches 0.14 by p = 0.05, so nearly the whole rotation happened
+// in the first half second and the bubbles teleported from one side of the
+// screen to the other between frames, then sat almost still. Measured live at
+// 0.1 s intervals the tracked bubble jumped from (-2066, -766) to
+// (-188, 2320) to (1579, -916): a strobing scatter, not a swirl. At 2.2 turns
+// over 2.6 s the crowd turns at about 0.85 revolutions a second, which is
+// roughly 0.09 radians a frame at 60 fps and reads as a stately vortex.
+const TRANSITION_TURNS = 2.2;
 const TRANSITION_FAR_RADIUS = 2100;
 const TRANSITION_FUNNEL_OFFSET = 620;
 
@@ -239,17 +248,24 @@ function transitionVortex(trans, phase, p) {
   const flow = trans.flow || TRANSITION_FLOWS[0];
   const spin = flow.spin || 1;
   const vec = transitionNormalize(phase === 'cover' ? flow.entry : flow.exit);
-  const eased = outCubic(clamp(p, 0, 1));
+  // Two progress curves, deliberately. The ROTATION is linear in p so the
+  // crowd turns at a constant, readable speed; only the RADIUS is eased, so the
+  // spiral decelerates as it settles into the grid.
+  const linear = clamp(p, 0, 1);
+  const eased = outCubic(linear);
 
   trans.items.forEach((item) => {
     // t is 1 far out on the spiral, 0 home in the grid.
     const stagger = item.flowStagger;
-    const q = clamp((eased - stagger * 0.3) / (1 - 0.3), 0, 1);
-    const t = phase === 'cover' ? 1 - q : q;
+    const qRadius = clamp((eased - stagger * 0.3) / (1 - 0.3), 0, 1);
+    const qAngle = clamp((linear - stagger * 0.3) / (1 - 0.3), 0, 1);
+    const tRadius = phase === 'cover' ? 1 - qRadius : qRadius;
+    const tAngle = phase === 'cover' ? 1 - qAngle : qAngle;
+    const t = tRadius;
 
-    // Several full revolutions about the centre. This is the vortex.
-    const angle = item.homeAngle + spin * t * TRANSITION_TURNS * TAU;
-    const radius = item.homeRadius + t * TRANSITION_FAR_RADIUS;
+    // Constant-speed revolutions about the centre. This is the vortex.
+    const angle = item.homeAngle + spin * tAngle * TRANSITION_TURNS * TAU;
+    const radius = item.homeRadius + tRadius * TRANSITION_FAR_RADIUS;
 
     // The funnel's own centre slides toward the entry side on the way in and
     // toward the exit side on the way out.
