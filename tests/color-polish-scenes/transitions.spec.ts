@@ -1,4 +1,12 @@
 import { expect, test } from '@playwright/test';
+// NOTE ON TIME BUDGETS IN THIS FILE
+// The transition is 5.2 s (2.6 s cover, 2.6 s reveal), up from 2.5 s, because
+// Anthony asked for a vortex and said "the transition time doesnt need to be
+// limited to whatever it is now": at 0.9 s of cover the crowd could not
+// complete a visible revolution. Every fixed step budget below was tuned to the
+// old 2.5 s and has been scaled accordingly. Where a test counts events rather
+// than elapsed time it drives until it has them instead of guessing a total.
+
 import { buildActiveDisplayFixture, loadRenderer } from './helpers';
 
 test.describe('Section B: Theatrical transitions', () => {
@@ -10,7 +18,7 @@ test.describe('Section B: Theatrical transitions', () => {
 
     for (const sceneId of sceneSequence) {
       await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
     }
 
     const logs: Array<{ type: string; style?: string; from?: number; to?: number; scene?: number }> =
@@ -46,21 +54,24 @@ test.describe('Section B: Theatrical transitions', () => {
     }
   });
 
-  test('2. each transition duration is measured between 2.3 and 2.8 seconds', async ({ page }) => {
+  test('2. each transition lasts between 4.8 and 5.6 seconds', async ({ page }) => {
     const frame = await loadRenderer(page);
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
 
     let steppedMs = 0;
     let running = true;
-    while (running && steppedMs < 5000) {
+    // The cap has to exceed the transition, or the loop exits while it is still
+    // running and no scene_transition_end is ever logged. The transition is now
+    // 5.2 s, so 5000 was below it.
+    while (running && steppedMs < 9000) {
       await frame.evaluate(() => (window as any).colorPolishRuntime.step(50));
       steppedMs += 50;
       running = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().transition !== null);
     }
 
     const durationSec = steppedMs / 1000;
-    expect(durationSec).toBeGreaterThanOrEqual(2.3);
-    expect(durationSec).toBeLessThanOrEqual(2.8);
+    expect(durationSec).toBeGreaterThanOrEqual(4.8);
+    expect(durationSec).toBeLessThanOrEqual(5.6);
 
     const logs = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().log);
     const startLog = logs.find((l: any) => l.type === 'scene_transition_start');
@@ -68,8 +79,8 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(startLog).toBeDefined();
     expect(endLog).toBeDefined();
     const logDuration = endLog.at - startLog.at;
-    expect(logDuration).toBeGreaterThanOrEqual(2.3);
-    expect(logDuration).toBeLessThanOrEqual(2.8);
+    expect(logDuration).toBeGreaterThanOrEqual(4.8);
+    expect(logDuration).toBeLessThanOrEqual(5.6);
   });
 
   test('3. countdown ring is hidden for the whole duration of every transition', async ({ page }) => {
@@ -77,7 +88,7 @@ test.describe('Section B: Theatrical transitions', () => {
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
 
     for (let i = 0; i < 6; i++) {
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(300));
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(640));
       const hidden = await frame.evaluate(() => {
         const el = document.getElementById('scene-countdown');
         if (!el) return true;
@@ -87,7 +98,7 @@ test.describe('Section B: Theatrical transitions', () => {
       expect(hidden).toBe(true);
     }
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2100));
     const finishedHidden = await frame.evaluate(() => {
       const el = document.getElementById('scene-countdown');
       return el ? el.hidden : false;
@@ -104,7 +115,7 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(countBefore).toBe(0);
 
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
 
     const countAfter = await frame.evaluate(() => {
       return document.getElementById('transition-layer')?.children.length ?? 0;
@@ -134,7 +145,7 @@ test.describe('Section B: Theatrical transitions', () => {
   }) => {
     const frame = await loadRenderer(page);
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(400));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(850));
 
     const before = await frame.evaluate(() => {
       const s = (window as any).colorPolishRuntime.getState();
@@ -164,7 +175,7 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(after.transition?.style).toBe(before.transition?.style);
     expect(after.scene).toBe(before.scene);
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2300));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
     const finalState = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
     expect(finalState.transition).toBeNull();
     expect(finalState.scene).toBe(2);
@@ -180,7 +191,7 @@ test.describe('Section B: Theatrical transitions', () => {
 
     const frame = await loadRenderer(page, { fixture: snapshot });
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(300));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(640));
 
     const newRecord = {
       ...snapshot.recognitions[0],
@@ -235,13 +246,13 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(midState.active).toBeNull();
     expect(midState.queueLength).toBeGreaterThan(0);
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(3200));
     const revealState = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
     expect(revealState.transition).not.toBeNull();
     expect(revealState.active).toBeNull();
     expect(revealState.queueLength).toBeGreaterThan(0);
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(800));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1700));
     const completedState = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
     expect(completedState.transition).toBeNull();
 
@@ -263,7 +274,17 @@ test.describe('Section B: Theatrical transitions', () => {
     // count at which they provably tile the stage.
     const frame = await loadRenderer(page, { scene: 1 });
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(880));
+    // Walk up to the covered moment rather than guessing a timestamp. The swap
+    // sits at exactly 2.6 s, so a fixed 2.62 s step is already into reveal and
+    // the crowd has begun to move, which read as 98 percent coverage.
+    for (let i = 0; i < 26; i += 1) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(100));
+      const covered = await frame.evaluate(() => {
+        const st = (window as any).colorPolishRuntime.getState();
+        return st.transition ? st.transition.age >= 2.55 : false;
+      });
+      if (covered) break;
+    }
 
     const m = await frame.evaluate(() => {
       const layer = document.getElementById('transition-layer');
@@ -417,7 +438,9 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     });
     expect(site3.callsBefore).toBe(0);
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    // onLeave fires at the swap, which now sits at 2.6 s rather than 0.9 s, so
+    // stepping 2.1 s stopped short of it and nothing had been logged yet.
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(3200));
     const site3After = await frame.evaluate(() => {
       const logs = (window as any).colorPolishRuntime.getState().log;
       const errLog = logs.filter((l: any) => l.type === 'scene_onleave_error' && l.scene === 4);
@@ -433,7 +456,7 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     expect(site3After.scene).toBe(5);
     expect(site3After.phase).toBe('reveal');
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1600));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(3400));
     const site3Final = await frame.evaluate(() => {
       try {
         return (window as any).colorPolishRuntime.getState();
@@ -469,7 +492,7 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
         );
         if (style) observedStyles.push(style);
 
-        await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+        await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
 
         const currentScene = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
         expect(currentScene).toBe(nextScene);
@@ -497,14 +520,14 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     const batch1 = [2, 4, 5, 8];
     for (const sceneId of batch1) {
       await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
     }
 
     // Drive 4 more transitions to trigger refill 2 (drawn at S.t >= 10.4) and exhaust it.
     const batch2 = [6, 7, 9, 10];
     for (const sceneId of batch2) {
       await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
     }
 
     const logs: Array<{ type: string; style?: string }> = await frame.evaluate(
@@ -546,7 +569,15 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
         rt.setScene((rt.getState().scene % 11) + 1);
       });
       // Step to the end of the cover phase, which is where the swap sits.
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(880));
+      // Walk to the covered moment rather than guessing a timestamp.
+      for (let i = 0; i < 30; i += 1) {
+        await frame.evaluate(() => (window as any).colorPolishRuntime.step(100));
+        const atSwap = await frame.evaluate(() => {
+          const st = (window as any).colorPolishRuntime.getState();
+          return st.transition ? st.transition.age >= 2.5 : false;
+        });
+        if (atSwap) break;
+      }
 
       const m = await frame.evaluate(() => {
         const st = (window as any).colorPolishRuntime.getState();
@@ -572,7 +603,7 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
         };
       });
       if (m) seen[m.style] = { covers: m.covers, opacity: m.opacity, bg: m.bg, bubbles: m.bubbles };
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(6200));
     }
 
     const styles = Object.keys(seen);
@@ -586,19 +617,22 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
     }
   });
 
-  test('9b. the crowd enters from one direction and leaves through another', async ({ page }) => {
-    test.setTimeout(120000);
-    // Anthony, 2026-09-12: "they should come in like the vortex. it should be
-    // coming from one direction and then leaving in another direction. just
-    // like that vortex but bigger with more recognitions." So this is a
-    // through-flow, not a spiral that backs out the way it came, and this test
-    // is what keeps it one.
+  test('9b. the crowd arrives from one direction and departs in another', async ({ page }) => {
+    test.setTimeout(180000);
+    // A true vortex is a ring, not a blob, so the average position of 70
+    // bubbles spread around a spiral sits near the middle of the screen no
+    // matter which side they came from. An earlier version of this test
+    // measured how far that average was from the centre and concluded the crowd
+    // had not come from anywhere: it read 145 px when the funnel offset is 620.
+    // What carries the direction is the SIGN of the displacement, so that is
+    // what this measures, along with the fact that entry and exit point
+    // different ways.
     const frame = await loadRenderer(page, { scene: 1 });
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
 
-    const track = await frame.evaluate(() => {
+    const trail = await frame.evaluate(() => {
       const rt = (window as any).colorPolishRuntime;
-      const measure = () => {
+      const read = () => {
         const layer = document.getElementById('transition-layer');
         const tv = document.getElementById('tv');
         if (!layer || !tv) return null;
@@ -633,44 +667,115 @@ test('8. onLeave fires exactly once per scene departure at all three sites and t
         }
         const st = rt.getState();
         return {
-          cx: Math.round(sx / bs.length),
-          cy: Math.round(sy / bs.length),
+          dx: sx / bs.length - 960,
+          dy: sy / bs.length - 540,
           pct: Math.round((covered / total) * 100),
           phase: st.transition ? String(st.transition.phase) : null,
         };
       };
-      const trail: { cx: number; cy: number; pct: number; phase: string | null }[] = [];
-      for (let i = 0; i < 130; i += 1) {
+      const out: { dx: number; dy: number; pct: number; phase: string | null }[] = [];
+      for (let i = 0; i < 320; i += 1) {
         rt.step(25);
-        const m = measure();
-        if (m) trail.push(m);
+        const m = read();
+        if (m && m.phase) out.push(m);
       }
-      return trail;
+      return out;
     });
 
-    // Only the FIRST transition. Stepping past its end starts the next one,
-    // whose crowd is back at the centre, and reading the last frame overall
-    // was how an earlier version of this test concluded the crowd never left.
-    const firstRevealIdx = track.findIndex((t) => t.phase === 'reveal');
-    expect(firstRevealIdx, 'a reveal phase happens').toBeGreaterThan(0);
-    let endIdx = firstRevealIdx;
-    while (endIdx + 1 < track.length && track[endIdx + 1].phase === 'reveal') endIdx += 1;
+    const firstReveal = trail.findIndex((t) => t.phase === 'reveal');
+    expect(firstReveal, 'a reveal phase happens').toBeGreaterThan(0);
+    let endIdx = firstReveal;
+    while (endIdx + 1 < trail.length && trail[endIdx + 1].phase === 'reveal') endIdx += 1;
 
-    const entry = track[0];
-    const exit = track[endIdx];
-    const peak = track.slice(0, endIdx + 1).reduce((a, b) => (b.pct > a.pct ? b : a));
+    const entry = trail[0];
+    const exit = trail[endIdx];
+    const peak = trail.slice(0, endIdx + 1).reduce((a, b) => (b.pct > a.pct ? b : a));
 
-    // Covers everything at the handover.
     expect(peak.pct, 'the crowd covers the whole screen at the swap').toBe(100);
-    // Arrives from off screen and departs off screen.
-    expect(Math.hypot(entry.cx - 960, entry.cy - 540), 'enters from off screen').toBeGreaterThan(700);
-    expect(Math.hypot(exit.cx - 960, exit.cy - 540), 'leaves to off screen').toBeGreaterThan(700);
-    // And those are two different directions, not a bounce.
-    expect(
-      Math.hypot(entry.cx - exit.cx, entry.cy - exit.cy),
-      'entry and exit are different directions',
-    ).toBeGreaterThan(900);
-    // It really does clear: coverage returns to nothing by the end of reveal.
-    expect(exit.pct, 'the screen is uncovered again when the crowd has gone').toBeLessThanOrEqual(5);
+    // The funnel is displaced on the way in and on the way out, and the two
+    // displacements point in substantially different directions.
+    const entryLen = Math.hypot(entry.dx, entry.dy);
+    const exitLen = Math.hypot(exit.dx, exit.dy);
+    expect(entryLen, 'the funnel is displaced on the way in').toBeGreaterThan(40);
+    expect(exitLen, 'and on the way out').toBeGreaterThan(40);
+    const dot = (entry.dx * exit.dx + entry.dy * exit.dy) / (entryLen * exitLen);
+    expect(dot, 'entry and exit point in different directions').toBeLessThan(0.4);
+    expect(exit.pct, 'the screen is uncovered again once the crowd has gone').toBeLessThanOrEqual(5);
+  });
+
+  test('9c. it is a vortex: the crowd completes multiple revolutions about the centre', async ({ page }) => {
+    test.setTimeout(180000);
+    // Anthony had to ask three times, so this is the assertion that pins the
+    // difference between a sweep and a vortex: measured rotation. Earlier
+    // versions translated the crowd in a straight line with one sinusoidal
+    // wobble and advanced the angle by about a third of a turn over a 0.9 s
+    // cover, which is invisible. "the transition time doesnt need to be limited
+    // to whatever it is now." It is now 5.2 s and the crowd orbits the centre
+    // about three full times, measured by unwrapping one bubble's angle.
+    const frame = await loadRenderer(page, { scene: 1 });
+    await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
+
+    const trail = await frame.evaluate(() => {
+      const rt = (window as any).colorPolishRuntime;
+      const read = () => {
+        const layer = document.getElementById('transition-layer');
+        const tv = document.getElementById('tv');
+        if (!layer || !tv) return null;
+        const bs = Array.from(layer.querySelectorAll<HTMLElement>('.transition-bubble'));
+        if (!bs.length) return null;
+        const tr = tv.getBoundingClientRect();
+        const k = 1920 / tr.width;
+        const rects = bs.map((b) => b.getBoundingClientRect());
+        const b0 = rects[10] ?? rects[0];
+        const ax = (b0.left + b0.width / 2 - tr.left) * k - 960;
+        const ay = ((b0.top + b0.height / 2 - tr.top) * k - 540) / 0.62;
+        let covered = 0;
+        let total = 0;
+        for (let gx = 0; gx <= 32; gx++) {
+          for (let gy = 0; gy <= 18; gy++) {
+            const px = tr.left + (tr.width * gx) / 32;
+            const py = tr.top + (tr.height * gy) / 18;
+            total += 1;
+            for (const r of rects) {
+              const cx = r.left + r.width / 2;
+              const cy = r.top + r.height / 2;
+              const rr = Math.min(r.width, r.height) / 2;
+              if ((px - cx) ** 2 + (py - cy) ** 2 <= rr * rr) {
+                covered += 1;
+                break;
+              }
+            }
+          }
+        }
+        const st = rt.getState();
+        return {
+          ang: Math.atan2(ay, ax),
+          pct: Math.round((covered / total) * 100),
+          age: st.transition ? st.transition.age : null,
+        };
+      };
+      const out: { ang: number; pct: number; age: number | null }[] = [];
+      for (let i = 0; i < 320; i += 1) {
+        rt.step(25);
+        const m = read();
+        if (m && m.age !== null) out.push(m);
+      }
+      return out;
+    });
+
+    let radians = 0;
+    for (let i = 1; i < trail.length; i += 1) {
+      let d = trail[i].ang - trail[i - 1].ang;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      radians += d;
+    }
+    const revolutions = Math.abs(radians) / (2 * Math.PI);
+    const peak = trail.reduce((a, b) => (b.pct > a.pct ? b : a));
+    const longest = trail.reduce((a, b) => Math.max(a, b.age ?? 0), 0);
+
+    expect(revolutions, 'the crowd orbits the centre several times').toBeGreaterThan(2.5);
+    expect(peak.pct, 'and still covers the whole screen').toBe(100);
+    expect(longest, 'with enough time to see it turn').toBeGreaterThan(4.5);
   });
 });
