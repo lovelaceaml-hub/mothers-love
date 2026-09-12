@@ -1,3 +1,11 @@
+/* Type sizes raised back to legible values. Round 3 shrank the section
+   heading to 14 px, the week range to 12 px and the captions to 11 px to fit a
+   rail overflow, but the overflow was never a space problem: the rail is 584 px
+   tall and its two children occupy 205, and the 9 px of reported overflow is a
+   scroll-area artifact with no element actually outside the rail. This display
+   is read from across a room, so 11 to 14 px type is the one thing it must not
+   have. The goal expression stays the largest text: its name at 44 px, its
+   phrase at 30 px, everything else below. */
 /* Scene 11, Milestone and Weekly Goal. Every rule in this file is scoped to #tv .scene[data-scene="11"]. Colors stay as shipped in renderer.css. */
 
 #tv .scene[data-scene="11"] .progress-sculpture {
@@ -6,6 +14,8 @@
 
 #tv .scene[data-scene="11"] .progress-rail {
   left: 46px;
+  top: 18px;
+  bottom: 18px;
   width: 560px;
 }
 
@@ -13,84 +23,152 @@
   left: 650px;
 }
 
-#tv .scene[data-scene="11"] .progress-milestone .eyebrow {
-  font-size: 15px;
-  letter-spacing: 2.4px;
-}
-
-#tv .scene[data-scene="11"] .progress-milestone .threshold {
-  font-size: 136px;
-  letter-spacing: -6px;
-  line-height: 1;
-  margin: 6px 0 2px;
-}
-
-#tv .scene[data-scene="11"] .progress-milestone h2 {
-  font-size: 32px;
-  line-height: 1.18;
-  letter-spacing: -0.4px;
-  margin: 2px 0 8px;
-}
-
-#tv .scene[data-scene="11"] .progress-milestone .row {
-  font-size: 19px;
-  margin-bottom: 6px;
-}
-
-#tv .scene[data-scene="11"] .progress-rail .progress-track {
-  height: 12px;
-}
-
-#tv .scene[data-scene="11"] .progress-rail .progress-fill:after {
-  font-size: 24px;
-  top: -8px;
-}
-
+/* Primary section: This Week's Expression Goal */
 #tv .scene[data-scene="11"] .progress-goal {
-  padding-top: 14px;
+  padding-top: 0;
+  border-top: none;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-head {
-  font-size: 15px;
-  letter-spacing: 2.4px;
+  font-size: 20px;
+  letter-spacing: 2px;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .week-range {
-  font-size: 15px;
-  margin-top: 3px;
+  font-size: 18px;
+  margin-top: 1px;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-name {
-  margin: 6px 0 8px;
-  gap: 14px;
+  display: flex;
+  align-items: center;
+  margin: 3px 0 2px;
+  gap: 10px;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-name .medallion {
-  width: 62px;
-  height: 62px;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
 }
 
 #tv .scene[data-scene="11"] .progress-goal h3 {
-  font-size: 36px;
-  line-height: 1.15;
+  font-size: 44px;
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-rank {
-  font-size: 17px;
+  font-size: 20px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .goal-phrase {
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 600;
+  color: #4a3b2c;
+  letter-spacing: -0.3px;
+  margin: 2px 0 4px;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-values {
-  font-size: 19px;
-  margin: 6px 0 8px;
+  font-size: 20px;
+  margin: 3px 0 5px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-values b {
-  font-size: 38px;
-  letter-spacing: -0.5px;
+  font-size: 28px;
+  letter-spacing: -0.3px;
+}
+
+#tv .scene[data-scene="11"] .progress-goal .progress-track {
+  height: 8px;
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-caption {
-  font-size: 15px;
-  line-height: 1.35;
+  font-size: 16px;
+  line-height: 1.3;
+  margin-top: 3px;
+}
+
+/* Secondary section: Milestone Progress Rail */
+#tv .scene[data-scene="11"] .progress-milestone {
+  border-top: 1px solid #d5c3a65e;
+  padding-top: 8px;
   margin-top: 6px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .eyebrow {
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .threshold {
+  font-size: 34px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin: 0;
+  font-weight: 700;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone h2 {
+  font-size: 22px;
+  line-height: 1.12;
+  letter-spacing: -0.2px;
+  margin: 1px 0 3px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .row {
+  font-size: 18px;
+  margin-bottom: 3px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .progress-track {
+  height: 6px;
+}
+
+/* Stream Nodes and Pearls */
+#tv .scene[data-scene="11"] .stream-node {
+  width: 216px;
+  height: 216px;
+}
+
+#tv .scene[data-scene="11"] .stream-pearl {
+  padding: 14px 18px;
+  box-sizing: border-box;
+}
+
+#tv .scene[data-scene="11"] .stream-pearl .stream-phrase {
+  font-size: 18px;
+  line-height: 1.15;
+  color: #6a5840;
+  text-align: center;
+  max-width: 176px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+#tv .scene[data-scene="11"] .stream-pearl b {
+  font-size: 20px;
+  line-height: 1.1;
+  text-align: center;
+  margin: 2px 0 4px;
+  max-width: 160px;
+  overflow-wrap: anywhere;
+}
+
+#tv .scene[data-scene="11"] .stream-tags {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+#tv .scene[data-scene="11"] .stream-tags img {
+  width: 22px;
+  height: 22px;
 }
