@@ -20,9 +20,14 @@ let TRANSITION_LAST = null;
 function registerTransition(id, descriptor) {
   TRANSITIONS[id] = Object.assign({
     id,
-    duration: 2.5,
-    coverDuration: 0.9,
-    revealDuration: 1.6,
+    // Long enough to see the vortex turn. Anthony: "the transition time doesnt
+    // need to be limited to whatever it is now." At 0.9 s of cover the crowd
+    // could not complete a visible revolution; 2.6 s in and 2.6 s out gives
+    // TRANSITION_TURNS revolutions each way at a readable speed. Scene dwells
+    // are 30 s and up, so a 5.2 s change is a small share of any scene.
+    duration: 5.2,
+    coverDuration: 2.6,
+    revealDuration: 2.6,
     init: null,
     cover: null,
     swap: null,
@@ -161,9 +166,14 @@ function transitionCreateBubbles(layer) {
     el.innerHTML = completeOrb(r, d);
     layer.append(el);
 
-    // Home position: the grid cell's centre, offset to the element's top left.
-    const homeX = col * sx + sx / 2 - d / 2;
-    const homeY = row * sy + sy / 2 - d / 2;
+    // Home position: the grid cell's centre. Kept in polar form about the
+    // centre of the screen, because the vortex moves in polar coordinates.
+    const homeCx = col * sx + sx / 2;
+    const homeCy = row * sy + sy / 2;
+    const dx = homeCx - TRANSITION_COVER_W / 2;
+    const dy = (homeCy - TRANSITION_COVER_H / 2) / 0.62;
+    const homeRadius = Math.hypot(dx, dy);
+    const homeAngle = Math.atan2(dy, dx);
 
     items.push({
       el,
@@ -172,13 +182,11 @@ function transitionCreateBubbles(layer) {
       col,
       row,
       d,
-      homeX,
-      homeY,
+      homeRadius,
+      homeAngle,
       // Each bubble has its own place on the helix and its own moment of
       // arrival, so the crowd flows through rather than snapping into place.
-      armAngle: (i / recs.length) * TAU * 2.6,
-      swirlAmp: 150 + ((i * 47) % 260),
-      depth: 240 + ((i * 37) % 320),
+      depth: 260 + ((i * 37) % 340),
       // Staggered along the direction of travel: bubbles nearer the entry edge
       // arrive first, which is what makes it read as a flow.
       flowStagger: (col / (TRANSITION_GRID_COLS - 1)) * 0.5 + (row / (TRANSITION_GRID_ROWS - 1)) * 0.5,
@@ -187,27 +195,39 @@ function transitionCreateBubbles(layer) {
   return items;
 }
 
-// The vortex, as a through-flow. Anthony, 2026-09-12: "they should come in like
-// the vortex. it should be coming from one direction and then leaving in
-// another direction. just like that vortex but bigger with more recognitions."
+// An actual vortex: the crowd ORBITS the centre, several full turns, spiralling
+// inward until it fills the screen and then spiralling back out.
 //
-// So this is not a spiral that comes in and backs out the way it came. The
-// crowd travels along an axis, entering off one edge and leaving off a
-// different one, and rotates around that axis of travel as it goes, which is
-// the helix scene 11's tribute stream uses: a bubble's depth scales and blurs
-// it, so the crowd reads as a swirl with near and far members rather than a
-// flat sheet sliding past.
+// Anthony had to say this three times, so the record should be blunt about why.
+// The first attempt swept decorative discs across a visible background. The
+// second covered with a flat colour wash. The third translated the crowd along
+// a straight line with one sinusoidal wobble and advanced the rotation by about
+// 2.1 radians, a third of a turn, over a 0.9 second cover. None of those is a
+// vortex: a vortex is rotation around a centre, and a third of a turn in under
+// a second is invisible. "i dont understnad how you arent understanding that.
+// the transition time doesnt need to be limited to whatever it is now."
 //
-// cover: the crowd travels from fully off stage along the entry vector to its
-// grid, arriving home at full size with no blur. That is the fully covered
-// moment, and the scene swap happens behind it.
-// reveal: the crowd keeps going, now along the exit vector, until it is fully
-// off stage, and the new scene is revealed by its departure.
+// So: polar motion about the centre of the screen. Each bubble keeps its grid
+// home, expressed in polar coordinates, and travels in on a spiral that
+// advances TRANSITION_TURNS full revolutions while its radius collapses from
+// far outside the screen to its home. The whole funnel is also offset toward
+// the entry side on the way in and toward the exit side on the way out, so it
+// arrives from one direction and departs in another while spinning throughout.
+// Depth comes from the orbit angle, so bubbles swing toward and away from the
+// viewer, scaling and blurring, which is the helix scene 11's tribute stream
+// uses.
+// Four revolutions each way. At 2.6 the measured rotation of a single bubble
+// came to under two turns once the per-bubble stagger and the easing were
+// accounted for, which still reads as a swirl rather than a vortex.
+const TRANSITION_TURNS = 4;
+const TRANSITION_FAR_RADIUS = 2100;
+const TRANSITION_FUNNEL_OFFSET = 620;
+
 const TRANSITION_FLOWS = [
-  { id: 'rise', entry: [-0.35, 1], exit: [0.35, -1], spin: 1 },
-  { id: 'sweep', entry: [-1, 0.28], exit: [1, -0.28], spin: -1 },
-  { id: 'fall', entry: [0.3, -1], exit: [-0.3, 1], spin: 1 },
-  { id: 'cross', entry: [-1, -0.55], exit: [1, 0.55], spin: -1 },
+  { id: 'rise', entry: [-0.4, 1], exit: [0.4, -1], spin: 1 },
+  { id: 'sweep', entry: [-1, 0.3], exit: [1, -0.3], spin: -1 },
+  { id: 'fall', entry: [0.35, -1], exit: [-0.35, 1], spin: 1 },
+  { id: 'cross', entry: [-1, -0.6], exit: [1, 0.6], spin: -1 },
 ];
 
 function transitionNormalize(v) {
@@ -217,37 +237,38 @@ function transitionNormalize(v) {
 
 function transitionVortex(trans, phase, p) {
   const flow = trans.flow || TRANSITION_FLOWS[0];
-  const entry = transitionNormalize(flow.entry);
-  const exit = transitionNormalize(flow.exit);
   const spin = flow.spin || 1;
-
-  // Travel far enough that the crowd is genuinely off screen at both ends.
-  const reach = 2300;
+  const vec = transitionNormalize(phase === 'cover' ? flow.entry : flow.exit);
   const eased = outCubic(clamp(p, 0, 1));
 
   trans.items.forEach((item) => {
-    // d is how far along the travel axis the bubble is from home: 1 means fully
-    // off stage, 0 means home in the grid. On cover it falls to 0, on reveal it
-    // rises from 0 again, but along the exit vector instead of the entry one.
+    // t is 1 far out on the spiral, 0 home in the grid.
     const stagger = item.flowStagger;
-    const q = clamp((eased - stagger * 0.35) / (1 - 0.35), 0, 1);
-    const d = phase === 'cover' ? 1 - q : q;
-    const vec = phase === 'cover' ? entry : exit;
+    const q = clamp((eased - stagger * 0.3) / (1 - 0.3), 0, 1);
+    const t = phase === 'cover' ? 1 - q : q;
 
-    // Rotation around the axis of travel, so the crowd swirls as it passes.
-    const angle = item.armAngle + spin * d * 3.1;
-    const swirl = Math.sin(angle) * item.swirlAmp * d;
-    const perp = [-vec[1], vec[0]];
+    // Several full revolutions about the centre. This is the vortex.
+    const angle = item.homeAngle + spin * t * TRANSITION_TURNS * TAU;
+    const radius = item.homeRadius + t * TRANSITION_FAR_RADIUS;
 
-    const z = Math.cos(angle) * item.depth * d;
+    // The funnel's own centre slides toward the entry side on the way in and
+    // toward the exit side on the way out.
+    const fx = TRANSITION_COVER_W / 2 + vec[0] * TRANSITION_FUNNEL_OFFSET * t;
+    const fy = TRANSITION_COVER_H / 2 + vec[1] * TRANSITION_FUNNEL_OFFSET * t;
+
+    // Depth from the orbit angle: bubbles swing toward and away from us. It
+    // must fall to exactly zero at full cover, or the perspective factor k
+    // displaces every bubble off its grid cell at the very moment the crowd is
+    // supposed to tile the screen, which is what held coverage at 95 percent.
+    const z = Math.sin(angle) * item.depth * t;
     const k = 1000 / (1000 - z);
 
-    const x = item.homeX + vec[0] * reach * d + perp[0] * swirl;
-    const y = item.homeY + vec[1] * reach * d + perp[1] * swirl;
+    const x = fx + Math.cos(angle) * radius * k - item.d / 2;
+    const y = fy + Math.sin(angle) * radius * 0.62 * k - item.d / 2;
 
-    const scale = mix(1, 0.4, d) * k;
-    const blur = d > 0.03 ? Math.min(2.6, d * 3.4) : 0;
-    const alpha = clamp(1 - d * 0.12, 0, 1);
+    const scale = mix(1, 0.42, t) * k;
+    const blur = t > 0.03 ? Math.min(2.8, t * 3.2) : 0;
+    const alpha = clamp(1 - t * 0.1, 0, 1);
 
     item.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
     item.el.style.opacity = alpha.toFixed(3);
@@ -292,9 +313,9 @@ function transitionStart(styleId, oldRoot, prevSceneId, nextRoot) {
 
 // Register Style 1: flood (sweeping wall across the stage from left, right, up, or down)
 registerTransition('flood', {
-  duration: 2.5,
-  coverDuration: 0.9,
-  revealDuration: 1.6,
+  duration: 5.2,
+  coverDuration: 2.6,
+  revealDuration: 2.6,
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
@@ -311,9 +332,9 @@ registerTransition('flood', {
 });
 
 registerTransition('tide', {
-  duration: 2.5,
-  coverDuration: 0.9,
-  revealDuration: 1.6,
+  duration: 5.2,
+  coverDuration: 2.6,
+  revealDuration: 2.6,
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
@@ -330,9 +351,9 @@ registerTransition('tide', {
 });
 
 registerTransition('vortex', {
-  duration: 2.5,
-  coverDuration: 0.9,
-  revealDuration: 1.6,
+  duration: 5.2,
+  coverDuration: 2.6,
+  revealDuration: 2.6,
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
@@ -349,9 +370,9 @@ registerTransition('vortex', {
 });
 
 registerTransition('storm', {
-  duration: 2.5,
-  coverDuration: 0.9,
-  revealDuration: 1.6,
+  duration: 5.2,
+  coverDuration: 2.6,
+  revealDuration: 2.6,
   init(trans, layer) {
     trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
