@@ -1,10 +1,13 @@
 import { expect, test } from '@playwright/test';
 import {
+  buildActiveDisplayFixture,
   cardShape,
   circularity,
   loadRenderer,
   noOverflow,
+  recognition,
   reducedMotionScene,
+  settings,
   studioClickDoesNotAdvance,
 } from './helpers';
 
@@ -42,7 +45,7 @@ test('background heart count strictly increases at each explosion and never exce
       const runtime = (window as any).colorPolishRuntime;
       const state = runtime?.getState();
       const explosions = (state?.log || []).filter((e: any) => e.type === 'heart_explosion');
-      const heartsCount = document.querySelectorAll('#heart-field .floating-heart').length;
+      const heartsCount = document.querySelectorAll('#heart-field .floating-heart:not(.pip-fading)').length;
       return {
         explosions,
         heartsCount,
@@ -197,7 +200,7 @@ test('every card message is present in full in the DOM and font size is at or ab
 test('noOverflow holds on scene root with 160 background hearts present', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 9, ms: 45000 });
 
-  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart').length);
+  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart:not(.pip-fading)').length);
   expect(heartCount).toBe(160);
 
   const overflow = await noOverflow(frame);
@@ -209,7 +212,7 @@ test('frame time sampled at 3840 stays under 40 ms per frame with 160 background
   await page.setViewportSize({ width: 3840, height: 2160 });
   const frame = await loadRenderer(page, { scene: 9, ms: 45000 });
 
-  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart').length);
+  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart:not(.pip-fading)').length);
   expect(heartCount).toBe(160);
 
   const frameDurationMs = await frame.evaluate(() => {
@@ -337,4 +340,151 @@ test('heart canvas displays distinct luminance shading bands', async ({ page }) 
   expect(bands.base).toBeGreaterThan(200);
   expect(bands.highlight).toBeGreaterThan(200);
   expect(bands.nonHighlightRatio).toBeGreaterThanOrEqual(0.4);
+});
+
+test('still mode renders full 500-character message on card without truncation or paging stalls', async ({ page }) => {
+  const longMessage =
+    'Peace in practice is expressed every single day through patience, gentle understanding, warm encouragement, and unconditional kindness to everyone around us. '.repeat(
+      4,
+    ).slice(0, 500);
+  expect(longMessage.length).toBe(500);
+
+  const fixture = buildActiveDisplayFixture({
+    settings: settings({ motion: 'still' }),
+    recognitions: [
+      recognition({
+        id: 'rec-still-500',
+        recipient: 'Kindness Partner',
+        message: longMessage,
+      }),
+    ],
+  });
+
+  const frame = await loadRenderer(page, {
+    scene: 9,
+    ms: 1000,
+    fixture,
+  });
+
+  const cardData = await frame.evaluate(() => {
+    const card = document.querySelector('#heart-cards .heart-card') as HTMLElement | null;
+    if (!card) return null;
+    const msgEl = card.querySelector('.pip-card-message') as HTMLElement | null;
+    return {
+      text: msgEl?.textContent || '',
+      fullMessage: card.dataset.fullMessage || '',
+      hasPageIndicator: Boolean(card.querySelector('.pip-card-page')),
+    };
+  });
+
+  expect(cardData).not.toBeNull();
+  expect(cardData!.text).toBe(longMessage);
+  expect(cardData!.hasPageIndicator).toBe(false);
+});
+
+test('after cap is reached, excess hearts enter fading state for at least one frame before DOM removal', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 60000 });
+
+  await frame.evaluate(() => {
+    (window as any).colorPolishRuntime.step(50000);
+  });
+
+  const nonFadingCount = await frame.evaluate(() => {
+    const sceneRoot = document.querySelector<HTMLElement>('#stage .scene[data-scene="9"]');
+    if (!sceneRoot) return 0;
+    return sceneRoot.querySelectorAll('#heart-field .floating-heart:not(.pip-fading)').length;
+  });
+  expect(
+    nonFadingCount,
+    'Precondition failed: background heart count never reached the 160 cap',
+  ).toBe(160);
+
+  let foundFading = false;
+  for (let step = 0; step < 30; step++) {
+    await frame.evaluate(() => {
+      (window as any).colorPolishRuntime.step(200);
+    });
+
+    const state = await frame.evaluate(() => {
+      const sceneRoot = document.querySelector<HTMLElement>('#stage .scene[data-scene="9"]');
+      if (!sceneRoot) return { count: 0, connected: false, opacities: [] };
+      const fadingEls = Array.from(
+        sceneRoot.querySelectorAll<HTMLElement>('#heart-field .floating-heart.pip-fading'),
+      );
+      return {
+        count: fadingEls.length,
+        connected: fadingEls.length > 0 && fadingEls.every((el) => el.isConnected),
+        opacities: fadingEls.map((el) => ({
+          inline: parseFloat(el.style.opacity || '1'),
+          computed: parseFloat(window.getComputedStyle(el).opacity || '1'),
+        })),
+      };
+    });
+
+    if (state.count > 0 && state.connected) {
+      foundFading = true;
+      expect(state.count).toBeGreaterThan(0);
+      expect(state.connected).toBe(true);
+      expect(state.opacities.length).toBeGreaterThan(0);
+      for (const op of state.opacities) {
+        expect(op.inline).toBeGreaterThan(0);
+        expect(op.inline).toBeLessThan(1);
+        expect(op.computed).toBeGreaterThan(0);
+        expect(op.computed).toBeLessThan(1);
+      }
+
+      // Advance past the 0.6 s fade duration
+      await frame.evaluate(() => {
+        (window as any).colorPolishRuntime.step(800);
+      });
+
+      const afterFadeState = await frame.evaluate(() => {
+        const sceneRoot = document.querySelector<HTMLElement>('#stage .scene[data-scene="9"]');
+        if (!sceneRoot) return { fadingCount: 0, totalCount: 0 };
+        return {
+          fadingCount: sceneRoot.querySelectorAll('#heart-field .floating-heart.pip-fading').length,
+          totalCount: sceneRoot.querySelectorAll('#heart-field .floating-heart').length,
+        };
+      });
+
+      expect(afterFadeState.fadingCount).toBe(0);
+      expect(afterFadeState.totalCount).toBeLessThanOrEqual(160);
+      break;
+    }
+  }
+
+  expect(foundFading, 'Expected to observe at least one fading heart after reaching cap').toBe(true);
+});
+
+test('card with an 80-character recipient name renders the full name without ellipsis or horizontal overflow', async ({ page }) => {
+  const longName = 'Alexandrina Victoria Elizabeth Montgomery Featherstonehaugh Beresford Harrington';
+  expect(longName.length).toBe(80);
+
+  const frame = await loadRenderer(page, {
+    scene: 9,
+    ms: 1000,
+    fixture: buildActiveDisplayFixture({
+      recognitions: [
+        recognition({
+          id: 'rec-long-name-80',
+          recipient: longName,
+          message: 'Peace begins with warm words and gentle understanding.',
+        }),
+      ],
+    }),
+  });
+
+  const nameData = await frame.evaluate(() => {
+    const nameEl = document.querySelector('#heart-cards .heart-card .pip-card-name') as HTMLElement | null;
+    if (!nameEl) return null;
+    return {
+      text: nameEl.textContent || '',
+      scrollWidth: nameEl.scrollWidth,
+      clientWidth: nameEl.clientWidth,
+    };
+  });
+
+  expect(nameData).not.toBeNull();
+  expect(nameData!.text).toBe(longName);
+  expect(nameData!.scrollWidth).toBeLessThanOrEqual(nameData!.clientWidth);
 });

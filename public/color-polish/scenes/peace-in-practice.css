@@ -93,9 +93,9 @@
   color: #ffffff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
   flex-shrink: 0;
 }
 
@@ -146,3 +146,14 @@
   transform: scale(1) !important;
   opacity: 1 !important;
 }
+
+#tv.still .scene[data-scene="9"] .heart-card-content,
+#tv .scene[data-scene="9"] .heart-card.is-still .heart-card-content {
+  overflow: visible;
+}
+
+#tv.still .scene[data-scene="9"] .pip-card-message,
+#tv .scene[data-scene="9"] .heart-card.is-still .pip-card-message {
+  overflow: visible;
+}
+

@@ -96,19 +96,17 @@ function pipSpawnExplosionHearts(cx, cy, count, cardRecordId) {
   if (!root) return;
   log('heart_explosion', { count, scene: 9, id: cardRecordId });
 
-  if (hearts.length + count > 160) {
-    const excess = (hearts.length + count) - 160;
+  const nonFading = hearts.filter((h) => !h.fading);
+  if (nonFading.length + count > 160) {
+    const excess = (nonFading.length + count) - 160;
     let marked = 0;
     for (let i = 0; i < hearts.length && marked < excess; i++) {
       if (!hearts[i].fading) {
         hearts[i].fading = true;
-        hearts[i].fadeStart = V.clock;
+        hearts[i].fadeStart = V.clock || 0;
+        hearts[i].el.classList.add('pip-fading');
         marked++;
       }
-    }
-    while (hearts.length + count > 160 && hearts.length > 0) {
-      const oldest = hearts.shift();
-      oldest.el.remove();
     }
   }
 
@@ -176,11 +174,12 @@ function pipActiveRecordIds() {
 
 function pipCreateCardElement(def, record, slotIdx) {
   const cardId = 'pip-card-' + slotIdx + '-' + (++V.serial);
+  const isStill = Boolean(S.still);
   const pages = pipPaginateMessage(record.message);
   const holdDuration = Math.max(9, record.message.length / 14);
 
   const el = document.createElement('div');
-  el.className = 'heart-card';
+  el.className = 'heart-card' + (isStill ? ' is-still' : '');
   el.id = cardId;
   el.dataset.recordId = record.id;
   el.dataset.fullMessage = record.message;
@@ -191,9 +190,23 @@ function pipCreateCardElement(def, record, slotIdx) {
   el.style.height = def.height + 'px';
 
   const primaryExpr = record.ids && record.ids.length ? record.ids[0] : 1;
-  const pageIndicator = pages.length > 1 ? `<div class="pip-card-page" style="margin-top:3px;font-size:11px;opacity:0.85;letter-spacing:1px">01 / ${String(pages.length).padStart(2, '0')}</div>` : '';
+  const pageIndicator = (!isStill && pages.length > 1)
+    ? `<div class="pip-card-page" style="margin-top:3px;font-size:11px;opacity:0.85;letter-spacing:1px">01 / ${String(pages.length).padStart(2, '0')}</div>`
+    : '';
 
-  el.innerHTML = `<div class="heart-card-bg" aria-hidden="true">${pipHeartSVG('#d7263d', cardId)}</div><div class="heart-card-content"><div class="pip-card-icon">${icon(primaryExpr, 'pip-icon')}</div><h3 class="pip-card-name">${esc(record.name)}</h3><p class="pip-card-message" data-full-message="${esc(record.message)}" style="font-size:18px">${esc(pages[0])}</p><span class="pip-joined-pages" hidden>${esc(pages.join(''))}</span>${pageIndicator}</div>`;
+  const nameLen = record.name ? record.name.length : 0;
+  let nameFontSize = 19;
+  if (nameLen > 50) {
+    nameFontSize = 13;
+  } else if (nameLen > 30) {
+    nameFontSize = 15;
+  } else if (nameLen > 18) {
+    nameFontSize = 17;
+  }
+
+  const displayMessage = isStill ? record.message : pages[0];
+
+  el.innerHTML = `<div class="heart-card-bg" aria-hidden="true">${pipHeartSVG('#d7263d', cardId)}</div><div class="heart-card-content"><div class="pip-card-icon">${icon(primaryExpr, 'pip-icon')}</div><h3 class="pip-card-name" style="font-size:${nameFontSize}px">${esc(record.name)}</h3><p class="pip-card-message" data-full-message="${esc(record.message)}" style="font-size:18px">${esc(displayMessage)}</p><span class="pip-joined-pages" hidden>${esc(pages.join(''))}</span>${pageIndicator}</div>`;
 
   return {
     el,

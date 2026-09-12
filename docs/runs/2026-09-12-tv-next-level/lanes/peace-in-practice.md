@@ -7,7 +7,7 @@ runner: coordinator
 worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
 review: sonnet-5 on landing
 depends_on: base
-updated: 2026-09-12T02:15Z
+updated: 2026-09-12T04:45Z
 ---
 
 ## Work order
@@ -44,6 +44,24 @@ Section 7 rebuilds Scene 9 (Peace in Practice, renderer id 9) for Mother's Love 
 
 3. `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts`
    - Complete acceptance test suite verifying items 1 through 9 from gap report G1-G10 plus preserved Plan 13 canvas tests.
+
+### Round 2 review corrections
+
+Following read-only Sonnet 5 review of Round 1, three targeted corrections were implemented:
+
+1. Finding 1 (still mode full message reveal): In still mode (`S.still = true`), card elements now directly render the complete message into `.pip-card-message` fitted down to the 18 px floor, with `.heart-card-content` and `.pip-card-message` styled with `overflow: visible` so that long messages (up to 500 characters) are fully presented on screen without requiring tick-based pagination or truncation. Between continuous fitted text and statically stacked page chunks, we selected the continuous message block fitted to the 18 px floor because at 300 by 300 it preserves natural sentence flow, eliminates artificial 85-character chunk fragmentation, and maintains superior visual typography.
+2. Finding 2 (heart eviction fade): In `pipSpawnExplosionHearts`, synchronous eviction (`while` loop shifting hearts and calling `.el.remove()`) was removed. Excess hearts beyond the 160 cap are tagged with `h.fading = true`, `h.fadeStart = V.clock`, and CSS class `pip-fading`, allowing `tickHearts` to smoothly decrease their opacity over 0.6 s before DOM removal. For cap accounting, we chose to count only active, non-fading hearts toward the 160 cap, ensuring active count never exceeds 160 while fading hearts complete their transition across frames without abrupt pops.
+3. Finding 3 (recipient name wrapping without ellipsis): In `peace-in-practice.css`, `text-overflow: ellipsis` and `white-space: nowrap` were removed from `.pip-card-name`, replacing them with `word-break: break-word`, `overflow-wrap: break-word`, and `white-space: normal`. In `pipCreateCardElement`, recipient name font size scales down from 19 px to 17 px, 15 px, and 13 px for names up to 80 characters, ensuring the entire name is displayed verbatim without horizontal overflow (`scrollWidth <= clientWidth`) or card layout disruption.
+4. Normal shading wording clarification: Precomputed quad normals represent the average of the quad's four vertex normals computed at initialization, smoothing transitions between neighboring quads with zero per-frame interpolation overhead.
+
+Three new Playwright assertions were added to `tests/color-polish-scenes/peace-in-practice.spec.ts`:
+- `still mode renders full 500-character message on card without truncation or paging stalls`: Asserts that under still mode with a 500-character recognition, the visible card message text contains the full message verbatim and omits paging indicators.
+- `after cap is reached, excess hearts enter fading state for at least one frame before DOM removal`: Asserts that when the 160 active heart threshold is reached, excess hearts enter the fading state (`pip-fading`) and remain connected to the DOM for multiple frames during their 0.6 s fade before being spliced and removed.
+- `card with an 80-character recipient name renders the full name without ellipsis or horizontal overflow`: Asserts that an 80-character recipient name renders completely (`textContent` matches fixture verbatim) and maintains `scrollWidth <= clientWidth` without ellipsis.
+
+### Round 3 test cap timing correction
+
+Inspection and coordinator verification confirmed that the heart eviction logic in `pipSpawnExplosionHearts` and `tickHearts` is correct. The previous test failure was caused by the test fixture not reaching the 160-heart cap within its dwell window. In the scene lifecycle, with three card slots holding for `max(9, length/14)` seconds plus 1.0 s grow and 0.4 s gap before refilling, each slot explodes roughly every 10.4 s. Across three staggered slots, approximately 12 explosions occur over 42 s. At 12 to 14 hearts per explosion, this yields roughly 150 to 170 hearts on top of the 14 initial ambient hearts, hovering at the 160 threshold rather than deterministically crossing it. The test now drives scene time to 110 s (loading at 60 s and adding an explicit 50 s step call, respecting stepRuntime 120 s clamping), asserts as a precondition that non-fading background hearts reached the 160 cap, steps in 200 ms increments to observe a fading heart with opacity between 0 and 1, and verifies complete DOM removal and a restored cap at or below 160 after stepping past the 0.6 s fade duration. All selectors are strictly scoped to `#stage .scene[data-scene="9"]`.
 
 ### checkFullFits and tickSlots verification
 
