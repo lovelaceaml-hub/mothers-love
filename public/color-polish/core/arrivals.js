@@ -157,7 +157,7 @@ function eventElement(r,d,x,y,index,group){
  $('event-items').append(ringEl);
  const el=document.createElement('div');el.className='event-orb '+(group?'grouped':'');el.dataset.eventId=r.id;el.style.cssText=`left:0;top:0;width:${d}px;height:${d}px;opacity:0;--tint:${catalog[r.ids[0]-1].color}`;
  el.innerHTML=completeOrb(r,d,{event:true,group});$('event-items').append(el);bindNumbers(el);
- markShown(r.id);
+ markShown(r.id);log('arrival_record_shown',{id:r.id});
  const b={el,ringEl,r,d,x,y,index,trail:[],reading:null,screenX:x,screenY:y};b.reading=fitCircle(el,r,d,0);return b;
 }
 

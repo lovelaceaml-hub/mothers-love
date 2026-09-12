@@ -124,31 +124,6 @@ function arrivalSpawnExitBurst(a){
  });
 }
 
-let arrivalSavedRuntime=null;
-try{
- Object.defineProperty(window,'colorPolishRuntime',{
-  configurable:true,
-  enumerable:true,
-  get(){return arrivalSavedRuntime;},
-  set(v){
-   arrivalSavedRuntime=v;
-   if(v&&typeof v.getState==='function'){
-    const origGetState=v.getState;
-    v.getState=function(){
-     const st=origGetState.apply(this,arguments);
-     if(st&&!st.shownCounts){
-      st.shownCounts=Object.fromEntries(S.shownCount);
-      st.shownCount=S.shownCount;
-     }
-     return st;
-    };
-   }
-  }
- });
-}catch(e){
- // Ignore in non-browser execution
-}
-
 function arrivalScene(){
  const r=records()[0];return r?`<div class="scene-copy" style="position:absolute;left:32px;top:78px;width:510px"><div class="eyebrow">Recognition arrival</div><h1 style="font-size:57px;line-height:1.1;margin:24px 0">A little kindness,<br>${shimmer('a moment for you.')}</h1><p class="subheading">Six individual entrances.<br>Five choreographed waves of ten.</p></div>${addOrb(r,943,49,534,{motion:false})}`:emptyPanel();
 }

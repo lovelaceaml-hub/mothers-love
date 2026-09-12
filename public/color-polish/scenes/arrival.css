@@ -59,21 +59,39 @@
 /* Shimmer sweep on recipient name */
 #tv .event-stage .event-orb .recipient {
   position: relative;
-  background-image: linear-gradient(108deg, var(--ink, #2D463E) 0%, var(--ink, #2D463E) 30%, #d5a942 45%, #fff9e6 50%, #d5a942 55%, var(--ink, #2D463E) 70%, var(--ink, #2D463E) 100%);
-  background-size: 260% 100%;
-  background-position: 160% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+#tv .event-stage .event-orb .recipient::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(108deg, transparent 0%, transparent 30%, rgba(213, 169, 66, 0.55) 45%, rgba(255, 249, 230, 0.9) 50%, rgba(213, 169, 66, 0.55) 55%, transparent 70%, transparent 100%);
+  mix-blend-mode: color-dodge;
+  transform: translateX(-150%);
   animation: arrivalNameShimmer 3.2s ease-in-out forwards;
 }
 
 @keyframes arrivalNameShimmer {
   0% {
-    background-position: 160% 0;
+    transform: translateX(-150%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
   }
   100% {
-    background-position: -160% 0;
+    transform: translateX(150%);
+    opacity: 0;
   }
 }
 
@@ -399,10 +417,9 @@
   transition: none !important;
 }
 
-#tv.still .event-stage .event-orb .recipient,
-#tv .event-stage.still .event-orb .recipient {
-  -webkit-text-fill-color: initial !important;
-  background: none !important;
+#tv.still .event-stage .event-orb .recipient::after,
+#tv .event-stage.still .event-orb .recipient::after {
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -412,8 +429,7 @@
     transition: none !important;
   }
 
-  #tv .event-stage .event-orb .recipient {
-    -webkit-text-fill-color: initial !important;
-    background: none !important;
+  #tv .event-stage .event-orb .recipient::after {
+    display: none !important;
   }
 }

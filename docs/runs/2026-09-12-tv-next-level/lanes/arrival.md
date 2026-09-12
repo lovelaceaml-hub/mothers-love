@@ -7,7 +7,7 @@ runner: coordinator
 worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
 review: sonnet-5 on landing
 depends_on: base
-updated: 2026-09-12T03:36Z
+updated: 2026-09-12T04:05Z
 ---
 
 ## Work order
@@ -15,6 +15,15 @@ updated: 2026-09-12T03:36Z
 Section C delivers remarkable, cinematic arrivals on tv15/arrivals according to Plan 15 Section C and the binding gap report gaps/arrival.md. It introduces four distinct frame styles (Light beam, Petal curtain, Aurora, Constellation gather) that combine independently with all existing single and group path styles, deepens stage dimming to near-black with an active backdrop, reveals recipient names with a shimmer sweep, adds a spinning 3D ring behind each bubble as a sibling element with preserve-3d, animates an exit burst of hearts and petals, flies exiting bubbles toward the feed rail slot using geometry reads, counts shown arrival records through markShown, and ensures full reduced-motion stability.
 
 ## Result
+
+### Round 3 runtime interceptor removal, log-based coverage, and transform-only shimmer
+
+In response to code review findings:
+1. Removed runtime interceptor: Deleted `arrivalSavedRuntime` and the `Object.defineProperty(window, 'colorPolishRuntime', ...)` wrapper from `public/color-polish/scenes/arrival.js`. The production runtime interface and `getState()` in `core/stage.js` remain clean and untouched.
+2. Restored `markShown` test coverage through qaLog: Added `log('arrival_record_shown', { id: r.id })` directly in `eventElement` in `public/color-polish/core/arrivals.js` beside `markShown(r.id)`. In `tests/color-polish-scenes/arrival.spec.ts`, verified that:
+   - After a single arrival, exactly one `arrival_record_shown` entry exists for that record id.
+   - After a full oversize group wave of ten driven through all five `buildGroupPage` circular-pair pages, each of the ten record ids has exactly one `arrival_record_shown` entry, confirming that `buildGroupPage` element rebuilds do not duplicate counts or bias downstream selection.
+3. Transform-only recipient name shimmer: Reimplemented the recipient shimmer in `public/color-polish/scenes/arrival.css` using a pseudo-element (`.recipient::after`) with `transform: translateX(...)` and `opacity` keyframes, clipped to its box via `overflow: hidden`, replacing the frame-repainting `background-position` animation. Swept the full CSS file and confirmed all keyframe animations now animate only GPU-accelerated transforms and opacity.
 
 ### Round 2 test harness fixes
 
@@ -26,7 +35,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
 - Test 1 (entrance and frame styles): Removed window.ARRIVAL_FRAME_STYLES read. Driven waves now record entrance events, and the test asserts that the first four consecutive single arrivals log all four distinct frame styles in getState().log matching ['Light beam', 'Petal curtain', 'Aurora', 'Constellation gather'].
 - Test 2 (reduced motion): Diagnosed queue length, mode, and still flag before stepping past the 650 ms queue gap (step(700)), waiting for the queue to drain into active !== null before checking static presentation, absence of bursts, and backdrop presence.
 - Test 3 (G3 stage dimming and backdrop): Added page.waitForTimeout(1000) to allow real wall-clock time past 900 ms for the CSS transition on #stage to complete, confirming stageDimmed, stageOpacity <= 0.23, blur filter, and backdrop alpha >= 0.88.
-- Test 4 (markShown counting): Deleted test 4. Internal state S.shownCount is encapsulated in core/state.js and not exposed on getState(). Observing its downstream statistical biasing effect on chooseRandom cannot be verified deterministically within a single test run without modifying uneditable files. The coordinator confirmed the markShown(r.id) call is present and verified in eventElement in core/arrivals.js line 160.
+- Test 4 (markShown counting): Deleted test 4 in round 2. Internal state S.shownCount was actually exposed on getState() by the runtime interceptor block in scenes/arrival.js, but that interceptor monkey-patched the production contract and was removed in round 3. The coordinator confirmed markShown(r.id) is called in eventElement in core/arrivals.js line 160, and coverage is restored in round 3 via qaLog.
 - Test 5 (feed rail and returnScene preservation): Replaced fragile byte-for-byte innerHTML comparison (which fluctuated due to scrolling translate3d transforms) with semantic assertions verifying scene, chatItemCount, and the ordered data-feed-id list before and after an arrival chain.
 - Test 6 (screenshots): Raised timeout to 180 seconds, assigned unique event prefixes (frame-shot-${f}) to eliminate duplicate event ID suppression in host.js, and waited for active === null and queueLength === 0 after each wave before capturing artifacts.
 
@@ -40,19 +49,19 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - `arrivalResetFrameBag` (lines 29-32): Helper to reset the frame bag state for deterministic test sequences.
    - `arrivalBuildFrameMarkup` (lines 34-106): Pure generator returning GPU-composited HTML markup for the four frame styles (under 40 elements per style).
    - `arrivalSpawnExitBurst` (lines 108-132): Spawns short-lived heart and petal burst elements in `#event-items` that clean up naturally when the container clears.
-   - `arrivalSavedRuntime` (line 134) and `colorPolishRuntime` property wrapper (lines 135-156): Intercepts runtime registration to expose `shownCounts` and `shownCount` on `getState()`.
+   - `arrivalSavedRuntime` and `colorPolishRuntime` property wrapper: Intercepted runtime registration in round 2; removed in round 3.
 
 2. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/core/arrivals.js`
    - `beginEvent` (lines 6-18): Selects frame style via `nextArrivalFrame()`, stores `frameStyle` on `active`, and logs both `style` and `frame` in `entrance_start`.
    - `buildEvent` (lines 20-37): Mounts frame markup via `arrivalBuildFrameMarkup(a.frameStyle, a.kind)` inside `#event`, applies `active` and conditional `still` classes, and sets dataset attributes.
-   - `eventElement` (lines 154-165): Appends `.arrival-ring` with `transform-style: preserve-3d` immediately before `.event-orb`, and invokes `markShown(r.id)` for every shown record.
+   - `eventElement` (lines 154-165): Appends `.arrival-ring` with `transform-style: preserve-3d` immediately before `.event-orb`, and invokes `markShown(r.id)` and `log('arrival_record_shown', { id: r.id })` for every shown record.
    - `positionEvent` (lines 167-179): Positions `.event-orb` with translate and scale only, while applying 3D rotation (`rotateY`, `rotateX`) and translate to `.arrival-ring`.
    - `tickEvent` (lines 45-103): Reads `#feed-columns` geometry once when reading concludes, triggers `arrivalSpawnExitBurst(a)`, and animates exiting orbs toward the feed rail coordinates.
 
 3. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css`
    - `#tv .event-stage.active::before`: Full-bleed near-black backdrop (`rgba(14, 18, 17, 0.9)`).
    - `#tv .event-stage .arrival-ring`: 3D ring with `transform-style: preserve-3d` and dual metallic glowing rims.
-   - `#tv .event-stage .event-orb .recipient`: Text shimmer gradient animation for recipient name reveals.
+   - `#tv .event-stage .event-orb .recipient`: Transform-only shimmer sweep on recipient name pseudo-element.
    - `#tv .event-stage .arrival-frame-*`: Keyframed GPU transforms for Light beam, Petal curtain, Aurora, and Constellation gather.
    - `#tv .event-stage .arrival-burst-item`: Scatter animation for exit burst hearts and petals.
    - `#tv.still` and `@media (prefers-reduced-motion: reduce)`: Static presentation overrides disabling all animations and transitions.
@@ -65,7 +74,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - Added reduced motion test verifying 1-frame display, absence of bursts, and static backdrop.
    - Added G3 computed-style assertions at hold midpoint for stage dimming and backdrop alpha.
    - Added four consecutive single arrivals test verifying all four frame names appear without immediate repeat and vary independently from path styles.
-   - Added `markShown` test verifying all 11 records from single and group arrivals are registered once.
+   - Added `markShown` and `arrival_record_shown` test verifying all records from single arrival and oversize group wave are registered once.
    - Added feed rail and `returnScene` preservation test.
    - Added screenshot capture for 11 path styles and 4 frame styles targeting `docs/runs/2026-09-12-tv-next-level/logs/arrival/`.
 
@@ -80,11 +89,11 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - Lines 58-74: `#feed-columns` geometry read once and `arrivalSpawnExitBurst(a)` called on transition to exit phase in `tickEvent`.
    - Lines 78-95: Orbs animated toward feed rail position during exit phase in `tickEvent`.
    - Lines 155-157: Sibling `.arrival-ring` created and appended before `.event-orb` in `eventElement`.
-   - Line 161: `markShown(r.id)` invoked per record in `eventElement`.
+   - Line 160: `markShown(r.id); log('arrival_record_shown', { id: r.id });` invoked per record in `eventElement`.
    - Lines 172-177: 3D rotation and translation applied to `b.ringEl` in `positionEvent`.
 
 2. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`
-   - Lines 7-156: Declared `ARRIVAL_FRAME_STYLES`, frame bag variables, `nextArrivalFrame`, frame markup builder, exit burst spawner, and runtime shown counts interceptor.
+   - Lines 7-125: Declared `ARRIVAL_FRAME_STYLES`, frame bag variables, `nextArrivalFrame`, frame markup builder, and exit burst spawner (runtime interceptor removed in round 3).
 
 ### The two bag seeds
 

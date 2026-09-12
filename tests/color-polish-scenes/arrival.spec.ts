@@ -35,7 +35,7 @@ async function pushArrivalWave(
   snapshot: ArrivalSnapshot,
   wave: number,
   sequence: number,
-  options?: { idPrefix?: string; expressionIds?: number[] },
+  options?: { idPrefix?: string; expressionIds?: number[]; message?: string },
 ) {
   const count = wave < 6 ? 1 : 10;
   const prefix = options?.idPrefix || `arrival-w${wave}-s${sequence}`;
@@ -43,7 +43,7 @@ async function pushArrivalWave(
     ...snapshot.recognitions[0],
     id: `${prefix}-${index}`,
     recipient: `Sample ${wave + 1}.${index + 1}`,
-    message: 'Thank you for helping today.',
+    message: options?.message || 'Thank you for helping today.',
     createdAt: snapshot.serverTime,
     firstPublishedAt: snapshot.serverTime,
     expiresAt: new Date(Date.parse(snapshot.serverTime) + 86_400_000).toISOString(),
@@ -594,4 +594,78 @@ test('screenshots for frame styles at assembly midpoint and path styles at entra
     });
   }
 });
+
+test('arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave', async ({ page }) => {
+  test.setTimeout(120_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  // 1. Single arrival: exactly one arrival_record_shown entry exists for that record's id
+  let seq = 2;
+  const singlePrefix = 'arrival-single-log';
+  await pushArrivalWave(page, frame, snapshot, 0, seq, { idPrefix: singlePrefix });
+  const singleRecordId = `${singlePrefix}-0`;
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(25000));
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+
+  const singleShownLogs = await frame.evaluate((id: string) => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs.filter((l: any) => l.type === 'arrival_record_shown' && l.id === id);
+  }, singleRecordId);
+  expect(singleShownLogs).toHaveLength(1);
+
+  // 2. Full oversize group wave of ten: each of the ten ids has exactly one entry, not more
+  seq++;
+  const groupPrefix = 'arrival-group-oversize-log';
+  const longMessage =
+    'This is an extended appreciation message designed to test the full oversize group reading flow across all five circular pair pages on the display. Thank you for your continued support and kindness.';
+  await pushArrivalWave(page, frame, snapshot, 6, seq, {
+    idPrefix: groupPrefix,
+    message: longMessage,
+  });
+
+  const expectedGroupIds = Array.from({ length: 10 }, (_, i) => `${groupPrefix}-${i}`);
+
+  // Step through all 5 buildGroupPage pages and exit to completion
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  for (let step = 0; step < 25; step++) {
+    const isDone = await frame.evaluate(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
+    if (isDone) break;
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(8000));
+  }
+
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+
+  // Verify all 5 pages (0 through 4) executed
+  const pagesLogged = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs
+      .filter((l: any) => l.type === 'reading_start' && l.kind === 'group')
+      .map((l: any) => l.page);
+  });
+  expect(pagesLogged).toEqual(expect.arrayContaining([0, 1, 2, 3, 4]));
+
+  // Verify each of the ten record ids has exactly one arrival_record_shown entry
+  const allShownLogs = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs.filter((l: any) => l.type === 'arrival_record_shown');
+  });
+
+  for (const id of expectedGroupIds) {
+    const idLogs = allShownLogs.filter((l: any) => l.id === id);
+    expect(idLogs).toHaveLength(1);
+  }
+});
+
 
