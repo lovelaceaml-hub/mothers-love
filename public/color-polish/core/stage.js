@@ -7,9 +7,24 @@ function sceneDescriptor(id=S.s){return SCENES[id]||SCENES[0]}
 registerScene(0,{});
 
 function renderNow(id,{keepAge=false}={}){
- const oldRoot=sceneRoot,prev=S.s;
- if(prev!==0&&oldRoot){
-  try{sceneDescriptor(prev).onLeave?.(oldRoot)}catch(e){log('scene_onleave_error',{scene:prev})}
+ // When a transition is in flight, S.s and sceneRoot already point to the in-flight
+ // incoming scene, while transition.prev and transition.old hold the genuinely departing scene.
+ // If onLeave has not yet fired (cover phase), fire it once for transition.prev / transition.old.
+ // If onLeave already fired during swap, do not fire again. Never fire onLeave for the incoming scene.
+ if(transition){
+  if(!transition.onLeaveFired&&transition.prev!==0&&transition.old){
+   transition.onLeaveFired=true;
+   try{sceneDescriptor(transition.prev).onLeave?.(transition.old)}catch(e){log('scene_onleave_error',{scene:transition.prev})}
+  }
+  transition.old?.remove();
+  transition.old=null;
+  transition=null;
+  transitionCleanup();
+ }else{
+  const oldRoot=sceneRoot,prev=S.s;
+  if(prev!==0&&oldRoot){
+   try{sceneDescriptor(prev).onLeave?.(oldRoot)}catch(e){log('scene_onleave_error',{scene:prev})}
+  }
  }
  S.s=id;slots=[];eduCards=[];hearts=[];tributes=[];
  const el=document.createElement('div');el.className='scene';el.dataset.scene=id;sceneRoot=el;

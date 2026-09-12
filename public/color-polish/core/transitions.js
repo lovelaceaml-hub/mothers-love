@@ -3,7 +3,14 @@
 
 const TRANSITIONS = Object.create(null);
 const TRANSITION_STYLES = TRANSITIONS;
-const TRANSITION_BUBBLE_COUNT = 24;
+// 40, not 24. A previous round capped this at 24 to protect the frame budget
+// at 3840, and Anthony rejected the result on the TV: 24 bubbles spaced 275 px
+// apart cannot cover an 1812 by 636 stage, so the cover phase read as a thin
+// scatter drifting over a fully visible background. Coverage is now the wash's
+// job (one full-bleed element, animated on transform and opacity only, which
+// costs the compositor almost nothing), and the bubbles are texture on top of
+// it, so the count can go back up.
+const TRANSITION_BUBBLE_COUNT = 40;
 const TRANSITION_STYLE_IDS = ['flood', 'tide', 'vortex', 'storm'];
 const TRANSITION_FLOOD_DIRS = ['left', 'right', 'up', 'down'];
 
@@ -32,7 +39,7 @@ function transitionDescriptor(id) {
 function transitionNextStyle() {
   if (!TRANSITION_BAG.length) {
     const values = [...TRANSITION_STYLE_IDS];
-    const rng = randSeed(4801 + (S.idCounter || 0) * 59);
+    const rng = randSeed(4801 + (S.idCounter || 0) * 59 + Math.floor(S.t));
     for (let i = values.length - 1; i > 0; i--) {
       const j = Math.floor(rng() * (i + 1));
       [values[i], values[j]] = [values[j], values[i]];
@@ -47,33 +54,156 @@ function transitionNextStyle() {
   return next;
 }
 
+// One full-bleed opaque element that sweeps across the stage and occludes it
+// completely at the swap, so neither the outgoing nor the incoming scene is
+// ever visible mid-change. Appended before the decorative elements so it sits
+// behind them. Anthony's brief: "As they cover the screen, the scene will
+// change to the next one, and be revealed as the sweeping flood is completing
+// off the screen."
+function transitionCreateWash(layer) {
+  const el = document.createElement('div');
+  el.className = 'transition-wash';
+  layer.append(el);
+  return el;
+}
+
+// Drives the wash for a translate-swept style. `axis` is 'x' or 'y' and `from`
+// is the edge it enters from, so cover runs the wash from fully off-stage on
+// that edge to exactly covering, and reveal continues in the same direction
+// until it is fully off the opposite edge. Full coverage therefore happens at
+// cover p = 1, which is where the scene swap sits.
+// The wash is no longer the visual. It sits under the bubbles purely so that
+// "cannot see the background" holds even for the frames before the crowd has
+// closed up, and it is tinted to the campaign's warm ground rather than
+// reading as a coloured sheet sweeping the screen, which is what Anthony
+// rejected in the previous attempt.
+function transitionWashFade(trans, phase, p) {
+  if (!trans.wash) return;
+  const eased = outCubic(clamp(p, 0, 1));
+  const alpha = phase === 'cover' ? eased : 1 - eased;
+  trans.wash.style.transform = 'translate3d(0,0,0)';
+  trans.wash.style.opacity = alpha.toFixed(3);
+}
+
+function transitionWashSlide(trans, phase, p, axis, from) {
+  if (!trans.wash) return;
+  const sign = (from === 'left' || from === 'top') ? -1 : 1;
+  const eased = outCubic(clamp(p, 0, 1));
+  let pct;
+  if (phase === 'cover') {
+    pct = sign * 100 * (1 - eased);
+  } else {
+    pct = -sign * 100 * eased;
+  }
+  const t = axis === 'x' ? `translate3d(${pct.toFixed(2)}%, 0, 0)` : `translate3d(0, ${pct.toFixed(2)}%, 0)`;
+  trans.wash.style.transform = t;
+  trans.wash.style.opacity = '1';
+}
+
+// Real recognition bubbles, not decorative discs. Anthony, 2026-09-12: "it
+// should vortex with REAL recognition bubbles and covering the screen
+// completely". This overrides the plan's decision 5, which said the flood's
+// bubbles carry expression icons and never text; his instruction wins over his
+// own earlier decision, and it is recorded at
+// docs/runs/2026-09-12-tv-next-level/decisions/2026-09-12T07-30Z-anthony-transition-vortex-of-real-recognitions.md
+//
+// Coverage is geometric rather than hopeful. Circles of radius r on a grid of
+// spacing sx by sy cover the plane when r >= sqrt(sx^2 + sy^2) / 2. On the
+// 1812 by 636 stage an 8 by 6 grid gives sx 226.5 and sy 106, so r must reach
+// 125 and the diameter 250. These are 260, so the 48 of them tile the stage
+// with overlap to spare and nothing of either scene can show through.
+const TRANSITION_GRID_COLS = 8;
+const TRANSITION_GRID_ROWS = 6;
+const TRANSITION_BUBBLE_D = 260;
+
+function transitionRecordsForCover() {
+  const pool = records();
+  if (!pool.length) return [];
+  const wanted = TRANSITION_GRID_COLS * TRANSITION_GRID_ROWS;
+  const out = [];
+  for (let i = 0; i < wanted; i++) out.push(pool[i % pool.length]);
+  return out;
+}
+
 function transitionCreateBubbles(layer) {
   const items = [];
-  for (let i = 0; i < TRANSITION_BUBBLE_COUNT; i++) {
-    const exprId = (i % 9) + 1;
-    const cat = catalog[exprId - 1];
+  const recs = transitionRecordsForCover();
+  if (!recs.length) return items;
+
+  const sx = 1812 / TRANSITION_GRID_COLS;
+  const sy = 636 / TRANSITION_GRID_ROWS;
+
+  recs.forEach((r, i) => {
+    const col = i % TRANSITION_GRID_COLS;
+    const row = Math.floor(i / TRANSITION_GRID_COLS);
+    const d = TRANSITION_BUBBLE_D;
+
+    // The real recognition card, same markup the scenes use, so these read as
+    // recognitions and stay perfectly circular.
     const el = document.createElement('div');
     el.className = 'transition-bubble';
-    el.style.setProperty('--tint', cat.color);
-
-    const d = 140 + ((i * 17) % 60);
+    el.style.setProperty('--tint', catalog[r.ids[0] - 1].color);
     el.style.width = `${d}px`;
     el.style.height = `${d}px`;
-
-    const inner = document.createElement('div');
-    inner.className = 'transition-bubble-inner';
-
-    const img = document.createElement('img');
-    img.className = 'transition-icon';
-    img.src = ASSETS['icon' + exprId];
-    img.alt = '';
-    inner.append(img);
-    el.append(inner);
-
+    el.innerHTML = completeOrb(r, d);
     layer.append(el);
-    items.push({ el, exprId, d, index: i });
-  }
+
+    // Home position: the grid cell's centre, offset to the element's top left.
+    const homeX = col * sx + sx / 2 - d / 2;
+    const homeY = row * sy + sy / 2 - d / 2;
+
+    items.push({
+      el,
+      record: r,
+      index: i,
+      col,
+      row,
+      d,
+      homeX,
+      homeY,
+      // Each bubble enters on its own arm of the spiral.
+      armAngle: (i / recs.length) * TAU * 2.2,
+      armRadius: 900 + ((i * 53) % 420),
+      depth: 260 + ((i * 37) % 300),
+    });
+  });
   return items;
+}
+
+// The vortex itself, mirroring scene 11's tribute stream: a perspective helix
+// where a bubble's depth scales it and blurs it, so the crowd reads as a swirl
+// with near and far members rather than a flat sheet of discs.
+//
+// phase 'cover': the bubbles spiral inward from off stage to their grid cells,
+// arriving at full size and zero blur, which is the moment the stage is
+// completely hidden and the scene swap happens behind them.
+// phase 'reveal': they spiral back out, uncovering the new scene as they leave.
+function transitionVortex(trans, phase, p) {
+  const eased = outCubic(clamp(p, 0, 1));
+  const t = phase === 'cover' ? 1 - eased : eased;
+  const spin = trans.spinDir || 1;
+
+  trans.items.forEach((item) => {
+    // t is 1 when far out on the arm, 0 when home in the grid.
+    const angle = item.armAngle + spin * t * 2.1;
+    const radius = item.armRadius * t;
+    const z = Math.sin(angle) * item.depth * t;
+    const k = 1000 / (1000 - z);
+
+    const cx = 906 + Math.cos(angle) * radius;
+    const cy = 318 + Math.sin(angle) * radius * 0.42;
+    const x = mix(item.homeX, cx - item.d / 2, t) * 1;
+    const y = mix(item.homeY, cy - item.d / 2, t) * 1;
+
+    const scale = mix(1, 0.34, t) * k;
+    const blur = t > 0.02 ? Math.min(2.4, t * 3.1) : 0;
+    const alpha = clamp(1 - t * 0.15, 0, 1);
+
+    item.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+    item.el.style.opacity = alpha.toFixed(3);
+    item.el.style.filter = blur > 0.01 ? `blur(${blur.toFixed(2)}px)` : 'none';
+    item.el.style.zIndex = String(1000 + Math.round(z));
+  });
 }
 
 function transitionCreateStormElements(layer) {
@@ -142,228 +272,74 @@ registerTransition('flood', {
   coverDuration: 0.9,
   revealDuration: 1.6,
   init(trans, layer) {
+    trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
-    const rng = randSeed(54321 + (S.idCounter || 0) * 31 + Math.floor(S.t));
-    trans.direction = TRANSITION_FLOOD_DIRS[Math.floor(rng() * 4)] || 'right';
+    trans.spinDir = 1;
   },
   cover(trans, p) {
-    const dir = trans.direction;
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 275 + ((row % 2) * 50);
-      const targetY = 45 + row * 145 + ((col % 2) * 20);
-
-      let startX = targetX;
-      let startY = targetY;
-      let stagger = 0;
-
-      if (dir === 'right') {
-        startX = targetX - 1950;
-        stagger = (col / 5) * 0.28;
-      } else if (dir === 'left') {
-        startX = targetX + 1950;
-        stagger = ((5 - col) / 5) * 0.28;
-      } else if (dir === 'down') {
-        startY = targetY - 800;
-        stagger = (row / 3) * 0.28;
-      } else {
-        startY = targetY + 800;
-        stagger = ((3 - row) / 3) * 0.28;
-      }
-
-      const q = clamp((p - stagger) / (1 - 0.28), 0, 1);
-      const curX = mix(startX, targetX, outCubic(q));
-      const curY = mix(startY, targetY, outCubic(q));
-      const scale = mix(0.4, 1.0, outCubic(q));
-      const alpha = clamp(q * 2, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'cover', p);
+    transitionVortex(trans, 'cover', p);
   },
   reveal(trans, p) {
-    const dir = trans.direction;
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 275 + ((row % 2) * 50);
-      const targetY = 45 + row * 145 + ((col % 2) * 20);
-
-      let endX = targetX;
-      let endY = targetY;
-      let stagger = 0;
-
-      if (dir === 'right') {
-        endX = targetX + 1950;
-        stagger = (col / 5) * 0.28;
-      } else if (dir === 'left') {
-        endX = targetX - 1950;
-        stagger = ((5 - col) / 5) * 0.28;
-      } else if (dir === 'down') {
-        endY = targetY + 800;
-        stagger = (row / 3) * 0.28;
-      } else {
-        endY = targetY - 800;
-        stagger = ((3 - row) / 3) * 0.28;
-      }
-
-      const q = clamp((p - stagger) / (1 - 0.28), 0, 1);
-      const curX = mix(targetX, endX, q * q);
-      const curY = mix(targetY, endY, q * q);
-      const scale = mix(1.0, 0.45, q);
-      const alpha = clamp(1 - q * 1.4, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'reveal', p);
+    transitionVortex(trans, 'reveal', p);
   },
 });
 
-// Register Style 2: tide (bubbles rise from the bottom and fill the stage)
 registerTransition('tide', {
   duration: 2.5,
   coverDuration: 0.9,
   revealDuration: 1.6,
   init(trans, layer) {
+    trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
+    trans.spinDir = -1;
   },
   cover(trans, p) {
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 275 + ((row % 2) * 55);
-      const targetY = 45 + row * 145 + ((i * 13) % 25);
-      const startY = 700 + (i % 6) * 60;
-      const stagger = (row / 3) * 0.24;
-
-      const q = clamp((p - stagger) / (1 - 0.24), 0, 1);
-      const curX = targetX + Math.sin(q * 4 + i) * 20;
-      const curY = mix(startY, targetY, outCubic(q));
-      const scale = mix(0.35, 1.0, outCubic(q));
-      const alpha = clamp(q * 2, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'cover', p);
+    transitionVortex(trans, 'cover', p);
   },
   reveal(trans, p) {
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 275 + ((row % 2) * 55);
-      const targetY = 45 + row * 145 + ((i * 13) % 25);
-      const endY = -260 - (i % 6) * 50;
-      const stagger = (row / 3) * 0.24;
-
-      const q = clamp((p - stagger) / (1 - 0.24), 0, 1);
-      const curX = targetX + Math.sin(q * 4 + i) * 25;
-      const curY = mix(targetY, endY, q * q);
-      const scale = mix(1.0, 1.15, q);
-      const alpha = clamp(1 - q * q, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'reveal', p);
+    transitionVortex(trans, 'reveal', p);
   },
 });
 
-// Register Style 3: vortex (bubbles gather to the centre, then burst outward to reveal)
 registerTransition('vortex', {
   duration: 2.5,
   coverDuration: 0.9,
   revealDuration: 1.6,
   init(trans, layer) {
+    trans.wash = transitionCreateWash(layer);
     trans.items = transitionCreateBubbles(layer);
+    trans.spinDir = 1;
   },
   cover(trans, p) {
-    const cx = 906;
-    const cy = 318;
-    trans.items.forEach((item, i) => {
-      const theta = (i / 24) * TAU;
-      const startR = 1100 + (i % 4) * 80;
-      const centerR = 65 + (i % 6) * 35;
-
-      const curTheta = theta + (1 - p) * 2.8;
-      const curR = mix(startR, centerR, outCubic(p));
-      const curX = cx + Math.cos(curTheta) * curR - (item.d / 2);
-      const curY = cy + Math.sin(curTheta) * curR * 0.52 - (item.d / 2);
-      const scale = mix(0.3, 1.06, outCubic(p));
-      const alpha = clamp(p * 2, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'cover', p);
+    transitionVortex(trans, 'cover', p);
   },
   reveal(trans, p) {
-    const cx = 906;
-    const cy = 318;
-    trans.items.forEach((item, i) => {
-      const theta = (i / 24) * TAU;
-      const centerR = 65 + (i % 6) * 35;
-      const burstR = 1400 + (i % 4) * 160;
-
-      const burstTheta = theta + p * 0.7;
-      const curR = mix(centerR, burstR, outCubic(p));
-      const curX = cx + Math.cos(burstTheta) * curR - (item.d / 2);
-      const curY = cy + Math.sin(burstTheta) * curR * 0.52 - (item.d / 2);
-      const scale = mix(1.06, 0.35, p);
-      const alpha = clamp(1 - p * 1.3, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'reveal', p);
+    transitionVortex(trans, 'reveal', p);
   },
 });
 
-// Register Style 4: storm (petals and hearts instead of round bubbles)
 registerTransition('storm', {
   duration: 2.5,
   coverDuration: 0.9,
   revealDuration: 1.6,
   init(trans, layer) {
-    trans.items = transitionCreateStormElements(layer);
+    trans.wash = transitionCreateWash(layer);
+    trans.items = transitionCreateBubbles(layer);
+    trans.spinDir = -1;
   },
   cover(trans, p) {
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 280 + ((i * 31) % 40 - 20);
-      const targetY = 50 + row * 145 + ((i * 23) % 40 - 20);
-      const startX = targetX - 900 - (i % 4) * 120;
-      const startY = targetY - 600 - (i % 3) * 100;
-      const baseRot = (i * 37) % 60 - 30;
-
-      const q = clamp(p * 1.15 - (i % 6) * 0.03, 0, 1);
-      const curX = mix(startX, targetX, outCubic(q)) + Math.sin(q * 4 + i) * 25;
-      const curY = mix(startY, targetY, outCubic(q)) + Math.cos(q * 3 + i) * 20;
-      const rot = mix(-180, baseRot, outCubic(q));
-      const scale = mix(0.3, 1.0, outCubic(q));
-      const alpha = clamp(q * 2, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)}) rotate(${rot.toFixed(1)}deg)`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'cover', p);
+    transitionVortex(trans, 'cover', p);
   },
   reveal(trans, p) {
-    trans.items.forEach((item, i) => {
-      const col = i % 6;
-      const row = Math.floor(i / 6);
-      const targetX = 90 + col * 280 + ((i * 31) % 40 - 20);
-      const targetY = 50 + row * 145 + ((i * 23) % 40 - 20);
-      const endX = targetX + 1100 + (i % 4) * 150;
-      const endY = targetY - 450 - (i % 3) * 100;
-      const baseRot = (i * 37) % 60 - 30;
-
-      const q = clamp(p * 1.15 - (i % 6) * 0.03, 0, 1);
-      const curX = mix(targetX, endX, q * q) + Math.sin(q * 4 + i) * 35;
-      const curY = mix(targetY, endY, q) + Math.cos(q * 3 + i) * 25;
-      const rot = mix(baseRot, baseRot + 180, q);
-      const scale = mix(1.0, 0.5, q);
-      const alpha = clamp(1 - q * 1.2, 0, 1);
-
-      item.el.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0) scale(${scale.toFixed(3)}) rotate(${rot.toFixed(1)}deg)`;
-      item.el.style.opacity = alpha.toFixed(3);
-    });
+    transitionWashFade(trans, 'reveal', p);
+    transitionVortex(trans, 'reveal', p);
   },
 });
+
