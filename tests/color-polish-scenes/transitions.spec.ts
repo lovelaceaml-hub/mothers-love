@@ -250,52 +250,104 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(arrivalState.active).not.toBeNull();
   });
 
-  test('7. decorative element count during cover phase is exactly 24 and contains zero text nodes', async ({
+  test('7. the cover is 48 real recognition bubbles that tile the stage completely', async ({
     page,
   }) => {
-    const frame = await loadRenderer(page);
+    test.setTimeout(120000);
+    // Anthony, 2026-09-12: "it should vortex with REAL recognition bubbles and
+    // covering the screen completely." This replaces the earlier assertion,
+    // which required 40 decorative elements carrying NO text, per the plan's
+    // decision 5. His instruction overrides his own earlier decision, and both
+    // halves of the old assertion are inverted: the bubbles carry real
+    // recipients and real words, and there are 48 of them because that is the
+    // count at which they provably tile the stage.
+    const frame = await loadRenderer(page, { scene: 1 });
+    await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(880));
 
-    for (const targetScene of [2, 4, 5, 8]) {
-      await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), targetScene);
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(450));
+    const m = await frame.evaluate(() => {
+      const layer = document.getElementById('transition-layer');
+      const stage = document.getElementById('stage');
+      if (!layer || !stage) return null;
+      const bubbles = Array.from(layer.querySelectorAll<HTMLElement>('.transition-bubble'));
+      const sr = stage.getBoundingClientRect();
+      const rects = bubbles.map((b) => b.getBoundingClientRect());
 
-      const result = await frame.evaluate(() => {
-        const layer = document.getElementById('transition-layer');
-        if (!layer) return { count: 0, textNodes: [] };
-
-        const children = Array.from(layer.children);
-        const textNodes: string[] = [];
-
-        function checkTextNodes(node: Node) {
-          if (node.nodeType === Node.TEXT_NODE) {
-            const val = node.nodeValue?.trim() || '';
-            if (val.length > 0) {
-              textNodes.push(val);
+      // Coverage is sampled rather than argued: every point on a 25 by 13 grid
+      // over the stage must fall inside some bubble's circle.
+      let covered = 0;
+      let total = 0;
+      for (let gx = 0; gx <= 24; gx++) {
+        for (let gy = 0; gy <= 12; gy++) {
+          const px = sr.left + (sr.width * gx) / 24;
+          const py = sr.top + (sr.height * gy) / 12;
+          total += 1;
+          for (const r of rects) {
+            const cx = r.left + r.width / 2;
+            const cy = r.top + r.height / 2;
+            const rr = Math.min(r.width, r.height) / 2;
+            if ((px - cx) ** 2 + (py - cy) ** 2 <= rr * rr) {
+              covered += 1;
+              break;
             }
           }
-          for (const child of Array.from(node.childNodes)) {
-            checkTextNodes(child);
-          }
         }
+      }
 
-        for (const child of children) {
-          checkTextNodes(child);
-        }
+      const first = bubbles[0];
+      const firstRect = first ? first.getBoundingClientRect() : null;
+      return {
+        count: bubbles.length,
+        coveragePct: Math.round((covered / total) * 100),
+        // Real content: a recipient name and a message on every bubble.
+        withName: bubbles.filter((b) => (b.querySelector('.recipient')?.textContent ?? '').trim().length > 0).length,
+        withMessage: bubbles.filter((b) => (b.querySelector('.message')?.textContent ?? '').trim().length > 0).length,
+        borderRadius: first ? getComputedStyle(first).borderRadius : null,
+        square: firstRect ? Math.abs(firstRect.width - firstRect.height) < 1 : false,
+      };
+    });
 
-        return {
-          count: children.length,
-          textNodes,
-        };
-      });
-
-      expect(result.count).toBe(24);
-      expect(result.textNodes).toHaveLength(0);
-
-      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2200));
-    }
+    expect(m).not.toBeNull();
+    expect(m!.count, '48 bubbles, the count at which they tile the stage').toBe(48);
+    expect(m!.coveragePct, 'every sampled point on the stage is covered').toBe(100);
+    expect(m!.withName, 'every bubble carries a real recipient').toBe(48);
+    expect(m!.withMessage, 'every bubble carries real words').toBe(48);
+    // Still circular, like every other bubble on this display.
+    expect(m!.borderRadius).toBe('50%');
+    expect(m!.square).toBe(true);
   });
 
-  test('8. onLeave fires exactly once per scene departure at all three sites and throwing onLeave logs scene_onleave_error', async ({
+  test('8b. building and animating the vortex stays affordable at 3840', async ({ page }) => {
+    test.setTimeout(120000);
+    // The risk the coordinator named when Anthony asked for real recognitions:
+    // 48 real recognition cards created at the start of every transition is 48
+    // layout passes, which would be a visible hitch on the TV. Measured rather
+    // than assumed, so a future change that makes it expensive fails here.
+    await page.setViewportSize({ width: 3840, height: 2160 });
+    const frame = await loadRenderer(page, { scene: 1 });
+    const timings = await frame.evaluate(() => {
+      const rt = (window as any).colorPolishRuntime;
+      const samples: number[] = [];
+      const t0 = performance.now();
+      rt.setScene(2);
+      rt.step(20);
+      const buildMs = performance.now() - t0;
+      for (let i = 0; i < 40; i++) {
+        const s0 = performance.now();
+        rt.step(20);
+        samples.push(performance.now() - s0);
+      }
+      samples.sort((a, b) => a - b);
+      return {
+        buildMs,
+        p90: samples[Math.floor(samples.length * 0.9)],
+      };
+    });
+    expect(timings.buildMs, 'building 48 real recognition bubbles').toBeLessThan(120);
+    expect(timings.p90, 'per-frame cost during the vortex at 3840').toBeLessThan(40);
+  });
+
+test('8. onLeave fires exactly once per scene departure at all three sites and throwing onLeave logs scene_onleave_error', async ({
     page,
   }) => {
     const frame = await loadRenderer(page);
@@ -382,7 +434,9 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(site3Final.scene).toBe(5);
   });
 
-  test('9. all four styles render with no console error at 1920 and at 3840', async ({ page }) => {
+  test('9. four consecutive transitions draw all four styles with no console error at 1920 and at 3840', async ({
+    page,
+  }) => {
     for (const width of [1920, 3840]) {
       await page.setViewportSize({ width, height: width === 3840 ? 2160 : 1080 });
       const consoleErrors: string[] = [];
@@ -395,18 +449,14 @@ test.describe('Section B: Theatrical transitions', () => {
 
       const frame = await loadRenderer(page);
 
-      const styles = ['flood', 'tide', 'vortex', 'storm'];
-      for (let i = 0; i < styles.length; i++) {
-        const styleId = styles[i];
-        const nextScene = [2, 4, 5, 8][i];
-
-        await frame.evaluate(
-          ({ styleId, nextScene }) => {
-            (window as any).TRANSITION_BAG = [styleId];
-            (window as any).colorPolishRuntime.setScene(nextScene);
-          },
-          { styleId, nextScene },
+      const observedStyles: string[] = [];
+      const scenes = [2, 4, 5, 8];
+      for (const nextScene of scenes) {
+        await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), nextScene);
+        const style = await frame.evaluate(
+          () => (window as any).colorPolishRuntime.getState().transition?.style,
         );
+        if (style) observedStyles.push(style);
 
         await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
 
@@ -414,7 +464,114 @@ test.describe('Section B: Theatrical transitions', () => {
         expect(currentScene).toBe(nextScene);
       }
 
+      const logs: Array<{ type: string; style?: string }> = await frame.evaluate(
+        () => (window as any).colorPolishRuntime.getState().log,
+      );
+      const startLogs = logs.filter((l) => l.type === 'scene_transition_start');
+      const logStyles = startLogs.map((l) => l.style);
+
+      const expectedStyles = new Set(['flood', 'tide', 'vortex', 'storm']);
+      expect(new Set(observedStyles)).toEqual(expectedStyles);
+      expect(new Set(logStyles)).toEqual(expectedStyles);
       expect(consoleErrors).toHaveLength(0);
+    }
+  });
+
+  test('10. separate bag refills at different clock times produce different style permutations', async ({
+    page,
+  }) => {
+    const frame = await loadRenderer(page);
+
+    // Drive 4 transitions to exhaust refill 1 (drawn at S.t = 0).
+    const batch1 = [2, 4, 5, 8];
+    for (const sceneId of batch1) {
+      await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+    }
+
+    // Drive 4 more transitions to trigger refill 2 (drawn at S.t >= 10.4) and exhaust it.
+    const batch2 = [6, 7, 9, 10];
+    for (const sceneId of batch2) {
+      await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+    }
+
+    const logs: Array<{ type: string; style?: string }> = await frame.evaluate(
+      () => (window as any).colorPolishRuntime.getState().log,
+    );
+    const startLogs = logs.filter((l) => l.type === 'scene_transition_start');
+    expect(startLogs.length).toBe(8);
+
+    const allStyles = startLogs.map((l) => l.style as string);
+    const refill1 = allStyles.slice(0, 4);
+    const refill2 = allStyles.slice(4, 8);
+
+    const expectedStyles = new Set(['flood', 'tide', 'vortex', 'storm']);
+    expect(new Set(refill1)).toEqual(expectedStyles);
+    expect(new Set(refill2)).toEqual(expectedStyles);
+
+    // Assert that two separate bag refills at different S.t values do not produce the same style order.
+    expect(refill1).not.toEqual(refill2);
+
+    // The no-immediate-repeat guarantee holds across refills and throughout the sequence.
+    for (let i = 1; i < allStyles.length; i++) {
+      expect(allStyles[i]).not.toBe(allStyles[i - 1]);
+    }
+  });
+
+  test('the wash fully occludes the stage at the swap, for every style', async ({ page }) => {
+    test.setTimeout(120000);
+    // Anthony rejected the first implementation on the TV because the cover
+    // phase left the background fully visible: 24 decorative bubbles spaced
+    // 275 px apart cannot cover an 1812 by 636 stage. Coverage is now a single
+    // full-bleed .transition-wash element that sweeps in, and this is the
+    // assertion that keeps it that way.
+    const frame = await loadRenderer(page, { scene: 1 });
+    const seen: Record<string, { covers: boolean; opacity: number; bg: string; bubbles: number }> = {};
+
+    for (let n = 0; n < 8; n++) {
+      await frame.evaluate(() => {
+        const rt = (window as any).colorPolishRuntime;
+        rt.setScene((rt.getState().scene % 11) + 1);
+      });
+      // Step to the end of the cover phase, which is where the swap sits.
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(880));
+
+      const m = await frame.evaluate(() => {
+        const st = (window as any).colorPolishRuntime.getState();
+        const layer = document.getElementById('transition-layer');
+        const stage = document.getElementById('stage');
+        const wash = layer?.querySelector('.transition-wash') as HTMLElement | null;
+        if (!wash || !stage || !st.transition) return null;
+        const w = wash.getBoundingClientRect();
+        const sr = stage.getBoundingClientRect();
+        const cs = getComputedStyle(wash);
+        return {
+          style: String(st.transition.style),
+          covers:
+            w.left <= sr.left + 0.5 &&
+            w.top <= sr.top + 0.5 &&
+            w.right >= sr.right - 0.5 &&
+            w.bottom >= sr.bottom - 0.5,
+          opacity: parseFloat(cs.opacity),
+          bg: cs.backgroundColor,
+          bubbles: layer!.querySelectorAll(
+            '.transition-bubble, .transition-heart, .transition-petal',
+          ).length,
+        };
+      });
+      if (m) seen[m.style] = { covers: m.covers, opacity: m.opacity, bg: m.bg, bubbles: m.bubbles };
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2600));
+    }
+
+    const styles = Object.keys(seen);
+    expect(styles.length).toBeGreaterThanOrEqual(3);
+    for (const key of styles) {
+      const m = seen[key];
+      expect(m.covers, `style ${key} wash covers the whole stage at the swap`).toBe(true);
+      expect(m.opacity, `style ${key} wash is fully opaque at the swap`).toBeGreaterThanOrEqual(0.99);
+      expect(m.bg, `style ${key} wash colour has no alpha`).not.toContain('rgba');
+      expect(m.bubbles, `style ${key} carries the full crowd of recognition bubbles`).toBe(48);
     }
   });
 });
