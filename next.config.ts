@@ -20,6 +20,24 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    // Preview uses the public TV read endpoints without database credentials.
+    if (process.env.VERCEL_ENV !== "preview") return [];
+    return {
+      beforeFiles: [
+        {
+          source: "/api/display/color-polish",
+          destination: "https://mothers-love.vercel.app/api/display/color-polish",
+        },
+        {
+          source: "/api/reactions",
+          destination: "https://mothers-love.vercel.app/api/reactions",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
 };
 
 export default nextConfig;
