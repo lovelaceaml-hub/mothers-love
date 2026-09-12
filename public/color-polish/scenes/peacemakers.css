@@ -27,12 +27,6 @@
   animation: peacemakers-globe-sweep 12s ease-in-out infinite;
 }
 
-#tv .scene[data-scene="8"] .orb-slot.thread-hit::before {
-  opacity: 1;
-  box-shadow: 0 0 38px var(--tint, #f3e7c6), 0 0 16px #ffffff;
-  transition: opacity 200ms ease-out, box-shadow 200ms ease-out;
-}
-
 @keyframes peacemakers-globe-float {
   0%, 100% {
     transform: translateY(-6px);
@@ -51,26 +45,269 @@
   }
 }
 
-#tv.still .scene[data-scene="8"] img.art,
-#tv.still .scene[data-scene="8"] .globe-light,
-#tv.still .scene[data-scene="8"] .globe-light::after {
-  animation: none !important;
-  transform: none !important;
+#tv .scene[data-scene="8"] .peacemakers-hold-zone {
+  position: absolute;
+  left: 750px;
+  top: 168px;
+  width: 300px;
+  height: 300px;
+  pointer-events: none;
+  z-index: 30;
 }
 
-#tv.still .scene[data-scene="8"] .orb-slot.thread-hit::before {
-  transition: none !important;
+#tv .scene[data-scene="8"] .puzzle-card {
+  position: absolute;
+  border-radius: 18px;
+  border: 2px solid #ffffff;
+  background: linear-gradient(135deg, #fffffffa 0%, #fffbf2f7 50%, var(--tint, #f8e7b9) 120%);
+  box-shadow: 0 12px 32px rgba(90, 75, 50, 0.16), 0 2px 8px rgba(90, 75, 50, 0.08);
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink, #34463f);
+  z-index: 40;
+}
+
+#tv .scene[data-scene="8"] .puzzle-card.face-on {
+  left: 750px;
+  top: 168px;
+  width: 300px;
+  height: 300px;
+  padding: 18px 20px;
+}
+
+#tv .scene[data-scene="8"] .puzzle-card-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#tv .scene[data-scene="8"] .puzzle-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#tv .scene[data-scene="8"] .puzzle-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 20%, #ffffff, var(--tint, #f8e7b9));
+  border: 1.5px solid #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+#tv .scene[data-scene="8"] .puzzle-badge img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+#tv .scene[data-scene="8"] .puzzle-recipient-block {
+  min-width: 0;
+  flex: 1;
+}
+
+#tv .scene[data-scene="8"] .puzzle-thanks {
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  font-weight: 700;
+  color: #8d7d6c;
+}
+
+#tv .scene[data-scene="8"] .puzzle-recipient {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.15;
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#tv .scene[data-scene="8"] .puzzle-card .puzzle-message {
+  display: none;
+  font-size: 18px;
+  line-height: 1.32;
+  margin: 10px 0;
+  color: #455149;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#tv .scene[data-scene="8"] .puzzle-card.face-on .puzzle-message {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+}
+
+#tv .scene[data-scene="8"] .peacemakers-globe-stage {
+  position: absolute;
+  left: 1110px;
+  top: 28px;
+  width: 580px;
+  height: 580px;
+  perspective: 1400px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+#tv .scene[data-scene="8"] .peacemakers-globe-sphere {
+  position: absolute;
+  left: 290px;
+  top: 290px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  animation: peacemakers-globe-rotate 48s linear infinite;
+}
+
+@keyframes peacemakers-globe-rotate {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+#tv .scene[data-scene="8"] .globe-slot {
+  position: absolute;
+  left: -48px;
+  top: -48px;
+  width: 96px;
+  height: 96px;
+  transform-origin: 48px 48px 0;
+  transform-style: preserve-3d;
+}
+
+#tv .scene[data-scene="8"] .globe-card {
+  position: absolute;
+  inset: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
+  border: 1.5px solid #ffffff;
+  background: radial-gradient(circle at 28% 18%, #ffffff, #fffdf8f0 45%, var(--tint, #f8e7b9) 110%);
+  box-shadow: 0 6px 16px rgba(90, 75, 50, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  color: var(--ink, #34463f);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+#tv .scene[data-scene="8"] .globe-card.dissolving {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+#tv .scene[data-scene="8"] .globe-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 30% 20%, #ffffff, var(--tint, #f8e7b9));
+  border: 1px solid #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 5px;
+}
+
+#tv .scene[data-scene="8"] .globe-badge img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+#tv .scene[data-scene="8"] .globe-recipient {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 84px;
+}
+
+#tv .scene[data-scene="8"] .speech-bubble {
+  position: absolute;
+  width: 200px;
+  height: 92px;
+  max-width: 200px;
+  max-height: 92px;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.25;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  transform: none !important;
+  z-index: 50;
+}
+
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(1) {
+  left: 382px !important;
+  top: 262px !important;
+}
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(1)::after {
+  left: 12px;
+}
+
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(2) {
+  left: 516px !important;
+  top: 296px !important;
+}
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(2)::after {
+  left: 20px;
+}
+
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(3) {
+  left: 638px !important;
+  top: 298px !important;
+}
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(3)::after {
+  left: 25px;
+}
+
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(4) {
+  left: 690px !important;
+  top: 224px !important;
+}
+#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(4)::after {
+  left: 63px;
+}
+
+#tv.still .scene[data-scene="8"] img.art,
+#tv.still .scene[data-scene="8"] .globe-light,
+#tv.still .scene[data-scene="8"] .globe-light::after,
+#tv.still .scene[data-scene="8"] .peacemakers-globe-sphere {
+  animation: none !important;
+  transform: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
   #tv .scene[data-scene="8"] img.art,
   #tv .scene[data-scene="8"] .globe-light,
-  #tv .scene[data-scene="8"] .globe-light::after {
+  #tv .scene[data-scene="8"] .globe-light::after,
+  #tv .scene[data-scene="8"] .peacemakers-globe-sphere {
     animation: none !important;
     transform: none !important;
   }
-  #tv .scene[data-scene="8"] .orb-slot.thread-hit::before {
-    transition: none !important;
-  }
 }
-
