@@ -250,7 +250,7 @@ test.describe('Section B: Theatrical transitions', () => {
     expect(arrivalState.active).not.toBeNull();
   });
 
-  test('7. the cover is 48 real recognition bubbles that tile the stage completely', async ({
+  test('7. the cover is 48 real recognition bubbles that tile the entire screen, header and feed included', async ({
     page,
   }) => {
     test.setTimeout(120000);
@@ -267,20 +267,22 @@ test.describe('Section B: Theatrical transitions', () => {
 
     const m = await frame.evaluate(() => {
       const layer = document.getElementById('transition-layer');
-      const stage = document.getElementById('stage');
-      if (!layer || !stage) return null;
+      // The WHOLE TV, not the stage. Anthony, 2026-09-12: "it needs to cover
+      // the ENTIRE screen. even the title and the live feed."
+      const tv = document.getElementById('tv');
+      if (!layer || !tv) return null;
       const bubbles = Array.from(layer.querySelectorAll<HTMLElement>('.transition-bubble'));
-      const sr = stage.getBoundingClientRect();
+      const sr = tv.getBoundingClientRect();
       const rects = bubbles.map((b) => b.getBoundingClientRect());
 
       // Coverage is sampled rather than argued: every point on a 25 by 13 grid
       // over the stage must fall inside some bubble's circle.
       let covered = 0;
       let total = 0;
-      for (let gx = 0; gx <= 24; gx++) {
-        for (let gy = 0; gy <= 12; gy++) {
-          const px = sr.left + (sr.width * gx) / 24;
-          const py = sr.top + (sr.height * gy) / 12;
+      for (let gx = 0; gx <= 32; gx++) {
+        for (let gy = 0; gy <= 18; gy++) {
+          const px = sr.left + (sr.width * gx) / 32;
+          const py = sr.top + (sr.height * gy) / 18;
           total += 1;
           for (const r of rects) {
             const cx = r.left + r.width / 2;
@@ -304,12 +306,21 @@ test.describe('Section B: Theatrical transitions', () => {
         withMessage: bubbles.filter((b) => (b.querySelector('.message')?.textContent ?? '').trim().length > 0).length,
         borderRadius: first ? getComputedStyle(first).borderRadius : null,
         square: firstRect ? Math.abs(firstRect.width - firstRect.height) < 1 : false,
+        // The layer must sit above the header, the footer and feed rail, and the
+        // countdown, or the title and the live feed stay visible through it.
+        layerZ: Number(getComputedStyle(layer).zIndex),
+        headerZ: Number(getComputedStyle(document.querySelector('.tv-header') as HTMLElement).zIndex) || 0,
+        footerZ: Number(getComputedStyle(document.querySelector('.footer') as HTMLElement).zIndex) || 0,
+        countdownHidden: (document.getElementById('scene-countdown') as HTMLElement | null)?.hidden === true,
       };
     });
 
     expect(m).not.toBeNull();
     expect(m!.count, '48 bubbles, the count at which they tile the stage').toBe(48);
-    expect(m!.coveragePct, 'every sampled point on the stage is covered').toBe(100);
+    expect(m!.coveragePct, 'every sampled point on the whole screen is covered').toBe(100);
+    expect(m!.layerZ, 'the vortex is above the header').toBeGreaterThan(m!.headerZ);
+    expect(m!.layerZ, 'the vortex is above the footer and feed rail').toBeGreaterThan(m!.footerZ);
+    expect(m!.countdownHidden, 'the countdown ring is hidden during a transition').toBe(true);
     expect(m!.withName, 'every bubble carries a real recipient').toBe(48);
     expect(m!.withMessage, 'every bubble carries real words').toBe(48);
     // Still circular, like every other bubble on this display.
