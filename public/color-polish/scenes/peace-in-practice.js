@@ -2,24 +2,370 @@
 'use strict';
 
 const PIP_LAYERS = {
- far: { scale: 0.85, blur: 0.8, pace: 0.75, z: 40 },
- mid: { scale: 0.93, blur: 0.3, pace: 0.9, z: 60 },
- near: { scale: 1, blur: 0, pace: 1.1, z: 80 }
+  far: { scale: 0.85, blur: 0.8, pace: 0.75, z: 40 },
+  mid: { scale: 0.93, blur: 0.3, pace: 0.9, z: 60 },
+  near: { scale: 1, blur: 0, pace: 1.1, z: 80 }
 };
 
 function hexToRgbaPIP(hex, a) {
- const n = parseInt(hex.slice(1), 16);
- return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
 
-function peace_in_practice_hexToRgba(hex, a) {
- return hexToRgbaPIP(hex, a);
+function pipHeartSVG(color = '#d7263d', idSuffix = '') {
+  const cleanColor = color.startsWith('#') ? color.slice(1) : color;
+  const gradId = 'pip-hg-' + cleanColor + (idSuffix ? '-' + idSuffix : '');
+  return `<svg viewBox="0 0 100 94" aria-hidden="true" style="width:100%;height:100%;display:block"><defs><radialGradient id="${gradId}" cx=".3" cy=".25" r=".85"><stop offset="0%" stop-color="#ff8a95"/><stop offset="45%" stop-color="${color}"/><stop offset="100%" stop-color="#8a0f22"/></radialGradient></defs><path d="M50 84C42 76 9 57 8 32C7 11 30 3 43 18C46 21 49 27 50 30C52 25 55 20 59 16C76 2 95 16 92 35C89 59 58 78 50 84Z" fill="url(#${gradId})" stroke="#ff8a95" stroke-width="1.2" stroke-opacity="0.6"/><path d="M21 28Q25 15 36 23" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
 }
 
-function peaceScene(){return `<div style="position:absolute;left:12px;top:36px;width:861px"><div class="eyebrow">Peace in practice</div><h1 style="font-size:61px;letter-spacing:-2px;line-height:1.1;margin:23px 0">May Mother’s ${shimmer('love')}<br>bring ${shimmer('peace')} to the world!</h1><p class="subheading">Love expressed through words and actions.</p></div>${art('hands_banner','left:20px;top:393px;width:823px;height:238px;opacity:.8;mask-image:linear-gradient(transparent,#000 20%,#000 85%,transparent)')}<div class="heart-host" id="heart-host" style="left:198px;top:232px;width:390px;height:363px"></div><div id="heart-field"></div>${rightBubbles()}`}
+const PIP_CARD_SLOTS = [
+  { id: 'pip-slot-a', left: 872, top: 150, width: 300, height: 300, phaseOffset: 0.0 },
+  { id: 'pip-slot-b', left: 1196, top: 40, width: 300, height: 300, phaseOffset: 3.5 },
+  { id: 'pip-slot-c', left: 1510, top: 190, width: 290, height: 290, phaseOffset: 7.0 }
+];
 
-function mountHearts(){const root=$('heart-field');if(!root)return;hearts=[];for(let i=0;i<14;i++){const el=document.createElement('div');el.className='floating-heart';const size=27+i%4*13;el.style.width=size+'px';el.style.height=size+'px';el.innerHTML=heartSVG(i%3===0?'#d6bbc9':'#e9b1b9');root.append(el);hearts.push({el,x:24+i%7*106,y:276+Math.floor(i/7)*135,phase:i,size})}}
-function tickHearts(dt){if(S.still)return;hearts.forEach((h,i)=>{const y=250+((h.y-250-S.t*(3+i%3))%330+330)%330;h.el.style.transform=`translate(${h.x+Math.sin(S.t/10+i)*22}px,${y}px) rotate(${Math.sin(S.t/14+i)*12}deg) scale(${1+Math.sin(S.t/3+i)*.025})`})}
+let pipCards = [];
+let pipActiveTimers = [];
+
+function peaceScene() {
+  return `<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true"><defs><clipPath id="pip-heart-clip" clipPathUnits="objectBoundingBox"><path d="M 0.5,0.894 C 0.42,0.809 0.09,0.606 0.08,0.34 C 0.07,0.117 0.30,0.032 0.43,0.191 C 0.46,0.223 0.49,0.287 0.5,0.319 C 0.52,0.266 0.55,0.213 0.59,0.17 C 0.76,0.021 0.95,0.17 0.92,0.372 C 0.89,0.628 0.58,0.83 0.5,0.894 Z"/></clipPath></defs></svg><div style="position:absolute;left:12px;top:36px;width:861px"><div class="eyebrow">Peace in practice</div><h1 style="font-size:61px;letter-spacing:-2px;line-height:1.1;margin:23px 0">May Mother’s ${shimmer('love')}<br>bring ${shimmer('peace')} to the world!</h1><p class="subheading">Love expressed through words and actions.</p></div>${art('hands_banner', 'left:20px;top:393px;width:823px;height:238px;opacity:.8;mask-image:linear-gradient(transparent,#000 20%,#000 85%,transparent)')}<div class="heart-host" id="heart-host" style="left:198px;top:232px;width:390px;height:363px"></div><div id="heart-field"></div><div id="heart-cards"></div>`;
+}
+
+function mountHearts() {
+  const root = $('heart-field');
+  if (!root) return;
+  hearts = [];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'floating-heart';
+    const size = 27 + (i % 4) * 13;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    const color = i % 3 === 0 ? '#d7263d' : '#ff8a95';
+    el.innerHTML = pipHeartSVG(color, 'amb-' + i);
+    root.append(el);
+    const x = 24 + (i % 7) * 106;
+    const y = 276 + Math.floor(i / 7) * 135;
+    el.style.transform = `translate(${x}px, ${y}px)`;
+    hearts.push({
+      el,
+      x,
+      y,
+      vx: Math.sin(i * 1.7) * 4,
+      vy: -(2 + (i % 3) * 2),
+      phase: i * 0.9,
+      size,
+      born: V.clock || 0,
+      fading: false,
+      fadeStart: 0
+    });
+  }
+}
+
+function tickHearts(dt) {
+  if (S.still) return;
+  const now = V.clock;
+  for (let i = hearts.length - 1; i >= 0; i--) {
+    const h = hearts[i];
+    if (h.fading) {
+      const fadeAge = now - h.fadeStart;
+      if (fadeAge >= 0.6) {
+        h.el.remove();
+        hearts.splice(i, 1);
+        continue;
+      }
+      h.el.style.opacity = String(Math.max(0, 1 - fadeAge / 0.6));
+    }
+    h.vx *= Math.pow(0.85, dt * 25);
+    h.vy *= Math.pow(0.85, dt * 25);
+    h.x += h.vx * dt;
+    h.y += (h.vy - 6) * dt;
+    const driftX = Math.sin(now * 0.4 + h.phase) * 14;
+    const driftY = Math.cos(now * 0.35 + h.phase * 1.3) * 10;
+    if (h.y < -50) h.y = 650;
+    if (h.x < -30) h.x = 1820;
+    if (h.x > 1830) h.x = -20;
+    const rot = Math.sin(now * 0.5 + h.phase) * 14;
+    const pulse = 1 + Math.sin(now * 1.8 + h.phase) * 0.04;
+    h.el.style.transform = `translate(${(h.x + driftX).toFixed(1)}px, ${(h.y + driftY).toFixed(1)}px) rotate(${rot.toFixed(1)}deg) scale(${pulse.toFixed(3)})`;
+  }
+}
+
+function pipSpawnExplosionHearts(cx, cy, count, cardRecordId) {
+  const root = $('heart-field');
+  if (!root) return;
+  log('heart_explosion', { count, scene: 9, id: cardRecordId });
+
+  const nonFading = hearts.filter((h) => !h.fading);
+  if (nonFading.length + count > 160) {
+    const excess = (nonFading.length + count) - 160;
+    let marked = 0;
+    for (let i = 0; i < hearts.length && marked < excess; i++) {
+      if (!hearts[i].fading) {
+        hearts[i].fading = true;
+        hearts[i].fadeStart = V.clock || 0;
+        hearts[i].el.classList.add('pip-fading');
+        marked++;
+      }
+    }
+  }
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'floating-heart';
+    const size = 20 + ((i * 7) % 24);
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    const color = i % 2 === 0 ? '#d7263d' : '#ff8a95';
+    el.innerHTML = pipHeartSVG(color, 'exp-' + Math.floor((V.clock || 0) * 100) + '-' + i);
+    root.append(el);
+
+    const angle = (i / count) * TAU + ((i % 5) - 2) * 0.12;
+    const speed = 65 + ((i * 13) % 85);
+    const vx = Math.cos(angle) * speed;
+    const vy = Math.sin(angle) * speed - 20;
+
+    el.style.transform = `translate(${cx}px, ${cy}px)`;
+    hearts.push({
+      el,
+      x: cx,
+      y: cy,
+      vx,
+      vy,
+      phase: i * 0.7,
+      size,
+      born: V.clock || 0,
+      fading: false,
+      fadeStart: 0
+    });
+  }
+}
+
+function pipPaginateMessage(message) {
+  if (message.length <= 85) {
+    return [message];
+  }
+  const words = message.match(/\S+\s*|\s+/g) || [message];
+  const pages = [];
+  let buffer = '';
+  for (const word of words) {
+    if ((buffer + word).length > 85 && buffer.length > 0) {
+      pages.push(buffer);
+      buffer = word;
+    } else {
+      buffer += word;
+    }
+  }
+  if (buffer) {
+    pages.push(buffer);
+  }
+  return pages.length ? pages : [message];
+}
+
+function pipActiveRecordIds() {
+  const ids = [];
+  for (const slot of pipCards) {
+    if (slot.card && slot.card.record && slot.card.record.id) {
+      ids.push(slot.card.record.id);
+    }
+  }
+  return ids;
+}
+
+function pipCreateCardElement(def, record, slotIdx) {
+  const cardId = 'pip-card-' + slotIdx + '-' + (++V.serial);
+  const isStill = Boolean(S.still);
+  const pages = pipPaginateMessage(record.message);
+  const holdDuration = Math.max(9, record.message.length / 14);
+
+  const el = document.createElement('div');
+  el.className = 'heart-card' + (isStill ? ' is-still' : '');
+  el.id = cardId;
+  el.dataset.recordId = record.id;
+  el.dataset.fullMessage = record.message;
+  el.dataset.joinedPages = pages.join('');
+  el.style.left = def.left + 'px';
+  el.style.top = def.top + 'px';
+  el.style.width = def.width + 'px';
+  el.style.height = def.height + 'px';
+
+  const primaryExpr = record.ids && record.ids.length ? record.ids[0] : 1;
+  const pageIndicator = (!isStill && pages.length > 1)
+    ? `<div class="pip-card-page" style="margin-top:3px;font-size:11px;opacity:0.85;letter-spacing:1px">01 / ${String(pages.length).padStart(2, '0')}</div>`
+    : '';
+
+  const nameLen = record.name ? record.name.length : 0;
+  let nameFontSize = 19;
+  if (nameLen > 50) {
+    nameFontSize = 13;
+  } else if (nameLen > 30) {
+    nameFontSize = 15;
+  } else if (nameLen > 18) {
+    nameFontSize = 17;
+  }
+
+  const displayMessage = isStill ? record.message : pages[0];
+
+  el.innerHTML = `<div class="heart-card-bg" aria-hidden="true">${pipHeartSVG('#d7263d', cardId)}</div><div class="heart-card-content"><div class="pip-card-icon">${icon(primaryExpr, 'pip-icon')}</div><h3 class="pip-card-name" style="font-size:${nameFontSize}px">${esc(record.name)}</h3><p class="pip-card-message" data-full-message="${esc(record.message)}" style="font-size:18px">${esc(displayMessage)}</p><span class="pip-joined-pages" hidden>${esc(pages.join(''))}</span>${pageIndicator}</div>`;
+
+  return {
+    el,
+    record,
+    holdDuration,
+    pages,
+    pageIndex: 0,
+    pageTimer: 0
+  };
+}
+
+function pipMountCards(root) {
+  pipCards = [];
+  const container = $('heart-cards');
+  if (!container) return;
+  container.replaceChildren();
+
+  const chosenIds = [];
+  for (let i = 0; i < PIP_CARD_SLOTS.length; i++) {
+    const def = PIP_CARD_SLOTS[i];
+    const rec = chooseRandom(chosenIds) || {
+      id: 'pip-fallback-' + i,
+      name: 'Kindness Friend',
+      message: 'Peace begins with warm words and gentle understanding.',
+      ids: [i + 1]
+    };
+    chosenIds.push(rec.id);
+    markShown(rec.id);
+
+    const card = pipCreateCardElement(def, rec, i);
+    container.append(card.el);
+
+    if (S.still) {
+      card.el.style.transform = 'scale(1)';
+      card.el.style.opacity = '1';
+      pipCards.push({
+        def,
+        slotIndex: i,
+        state: 'hold',
+        age: 0,
+        gapAge: 0,
+        card
+      });
+    } else {
+      const initialAge = def.phaseOffset;
+      if (initialAge <= 1.0) {
+        const p = initialAge / 1.0;
+        const scale = 0.14 + 0.86 * (1 - Math.pow(1 - p, 3));
+        const opacity = 0.2 + 0.8 * p;
+        card.el.style.transform = `scale(${scale.toFixed(4)})`;
+        card.el.style.opacity = opacity.toFixed(3);
+        pipCards.push({
+          def,
+          slotIndex: i,
+          state: 'grow',
+          age: initialAge,
+          gapAge: 0,
+          card
+        });
+      } else {
+        card.el.style.transform = 'scale(1)';
+        card.el.style.opacity = '1';
+        pipCards.push({
+          def,
+          slotIndex: i,
+          state: 'hold',
+          age: initialAge,
+          gapAge: 0,
+          card
+        });
+      }
+    }
+  }
+}
+
+function pipTickAge(dt) {
+  if (S.still) return;
+  const container = $('heart-cards');
+  if (!container) return;
+
+  for (let i = 0; i < pipCards.length; i++) {
+    const slot = pipCards[i];
+    if (slot.state === 'gap') {
+      slot.gapAge += dt;
+      if (slot.gapAge >= 0.4) {
+        const exclude = pipActiveRecordIds();
+        const rec = chooseRandom(exclude) || {
+          id: 'pip-card-next-' + slot.slotIndex + '-' + Math.floor(V.clock),
+          name: 'Peace Partner',
+          message: 'Warm words nurture peace every day.',
+          ids: [(slot.slotIndex % 9) + 1]
+        };
+        markShown(rec.id);
+        const newCard = pipCreateCardElement(slot.def, rec, slot.slotIndex);
+        container.append(newCard.el);
+        newCard.el.style.transform = 'scale(0.14)';
+        newCard.el.style.opacity = '0.2';
+        slot.card = newCard;
+        slot.state = 'grow';
+        slot.age = 0;
+        slot.gapAge = 0;
+      }
+      continue;
+    }
+
+    const card = slot.card;
+    if (!card) continue;
+    slot.age += dt;
+
+    if (slot.state === 'grow') {
+      if (slot.age >= 1.0) {
+        slot.state = 'hold';
+        card.el.style.transform = 'scale(1)';
+        card.el.style.opacity = '1';
+      } else {
+        const p = slot.age / 1.0;
+        const scale = 0.14 + 0.86 * (1 - Math.pow(1 - p, 3));
+        const opacity = 0.2 + 0.8 * p;
+        card.el.style.transform = `scale(${scale.toFixed(4)})`;
+        card.el.style.opacity = opacity.toFixed(3);
+      }
+    } else if (slot.state === 'hold') {
+      if (card.pages.length > 1) {
+        card.pageTimer += dt;
+        const pageDuration = card.holdDuration / card.pages.length;
+        const nextIdx = Math.min(card.pages.length - 1, Math.floor((slot.age - 1.0) / pageDuration));
+        if (nextIdx !== card.pageIndex) {
+          card.pageIndex = nextIdx;
+          const msgEl = card.el.querySelector('.pip-card-message');
+          if (msgEl) msgEl.textContent = card.pages[card.pageIndex];
+          const pageEl = card.el.querySelector('.pip-card-page');
+          if (pageEl) pageEl.textContent = `${String(card.pageIndex + 1).padStart(2, '0')} / ${String(card.pages.length).padStart(2, '0')}`;
+        }
+      }
+
+      if (slot.age >= 1.0 + card.holdDuration) {
+        const cx = slot.def.left + slot.def.width * 0.5;
+        const cy = slot.def.top + slot.def.height * 0.5;
+        const pieces = 12 + ((slot.slotIndex + Math.floor(V.clock || 0)) % 3);
+        pipSpawnExplosionHearts(cx, cy, pieces, card.record.id);
+
+        card.el.remove();
+        slot.card = null;
+        slot.state = 'gap';
+        slot.gapAge = 0;
+      }
+    }
+  }
+}
+
+function pipOnLeave(root) {
+  for (const timer of pipActiveTimers) {
+    clearTimeout(timer);
+    clearInterval(timer);
+  }
+  pipActiveTimers = [];
+  pipCards = [];
+}
+
 const PIP_HEART_N = 56;
 const PIP_HEART_M = 18;
 const PIP_HEART_TOTAL_VERTS = (PIP_HEART_M + 1) * PIP_HEART_N + 2;
@@ -98,6 +444,7 @@ function pipInitHeartMesh() {
   const v1 = new Int16Array(totalQuads);
   const v2 = new Int16Array(totalQuads);
   const v3 = new Int16Array(totalQuads);
+
   const cx = new Float32Array(totalQuads);
   const cy = new Float32Array(totalQuads);
   const cz = new Float32Array(totalQuads);
@@ -147,44 +494,50 @@ function pipInitHeartMesh() {
     cx[k] = (vx[a] + vx[b] + vx[c] + vx[d]) * 0.25;
     cy[k] = (vy[a] + vy[b] + vy[c] + vy[d]) * 0.25;
     cz[k] = (vz[a] + vz[b] + vz[c] + vz[d]) * 0.25;
+  }
 
-    const d1x = vx[c] - vx[a];
-    const d1y = vy[c] - vy[a];
-    const d1z = vz[c] - vz[a];
+  // Smooth per-vertex normals accumulated from face normals
+  const vnx = new Float32Array(totalVerts);
+  const vny = new Float32Array(totalVerts);
+  const vnz = new Float32Array(totalVerts);
 
-    const d2x = vx[d] - vx[b];
-    const d2y = vy[d] - vy[b];
-    const d2z = vz[d] - vz[b];
-
+  for (let k = 0; k < totalQuads; k++) {
+    const a = v0[k], b = v1[k], c = v2[k], d = v3[k];
+    const d1x = vx[c] - vx[a], d1y = vy[c] - vy[a], d1z = vz[c] - vz[a];
+    const d2x = vx[d] - vx[b], d2y = vy[d] - vy[b], d2z = vz[d] - vz[b];
     const normX = d1y * d2z - d1z * d2y;
     const normY = d1z * d2x - d1x * d2z;
     const normZ = d1x * d2y - d1y * d2x;
-    let len = Math.hypot(normX, normY, normZ);
+    vnx[a] += normX; vny[a] += normY; vnz[a] += normZ;
+    vnx[b] += normX; vny[b] += normY; vnz[b] += normZ;
+    vnx[c] += normX; vny[c] += normY; vnz[c] += normZ;
+    vnx[d] += normX; vny[d] += normY; vnz[d] += normZ;
+  }
 
+  for (let v = 0; v < totalVerts; v++) {
+    const len = Math.hypot(vnx[v], vny[v], vnz[v]);
     if (len > 1e-6) {
-      nx[k] = normX / len;
-      ny[k] = normY / len;
-      nz[k] = normZ / len;
+      vnx[v] /= len;
+      vny[v] /= len;
+      vnz[v] /= len;
+    }
+  }
+
+  // Average 4 corner vertex normals per quad for smooth shading
+  for (let k = 0; k < totalQuads; k++) {
+    const a = v0[k], b = v1[k], c = v2[k], d = v3[k];
+    let avgX = (vnx[a] + vnx[b] + vnx[c] + vnx[d]) * 0.25;
+    let avgY = (vny[a] + vny[b] + vny[c] + vny[d]) * 0.25;
+    let avgZ = (vnz[a] + vnz[b] + vnz[c] + vnz[d]) * 0.25;
+    let len = Math.hypot(avgX, avgY, avgZ);
+    if (len > 1e-6) {
+      nx[k] = avgX / len;
+      ny[k] = avgY / len;
+      nz[k] = avgZ / len;
     } else {
-      if (k < M * N) {
-        nx[k] = cx[k];
-        ny[k] = cy[k];
-        nz[k] = cz[k];
-        len = Math.hypot(nx[k], ny[k], nz[k]);
-        if (len > 1e-6) {
-          nx[k] /= len;
-          ny[k] /= len;
-          nz[k] /= len;
-        }
-      } else if (k < (M + 1) * N) {
-        nx[k] = 0;
-        ny[k] = 0;
-        nz[k] = 1;
-      } else {
-        nx[k] = 0;
-        ny[k] = 0;
-        nz[k] = -1;
-      }
+      nx[k] = 0;
+      ny[k] = 0;
+      nz[k] = 1;
     }
   }
 
@@ -207,7 +560,7 @@ function pipInitHeartSparks() {
     const tilt = 0.3 + ((i * 5) % 9) * 0.14;
     const speed = 0.5 + ((i * 3) % 7) * 0.12;
     const size = 1.5 + (i % 4) * 0.5;
-    const color = i % 2 === 0 ? '#fff0e9' : '#ffe8dc';
+    const color = i % 3 === 0 ? '#ffd166' : i % 3 === 1 ? '#ff8a95' : '#ffccd5';
     sparks.push({ phi, radius, tilt, speed, size, color });
   }
   PIP_HEART_SPARKS_DATA = sparks;
@@ -238,19 +591,19 @@ function pipInitHeartColorTable() {
     const intensity = (b + 0.5) / 32;
     let baseR, baseG, baseB;
     if (intensity < 0.5) {
-      const tCol = intensity / 0.5;
-      baseR = 190 + 37 * tCol;
-      baseG = 110 + 45 * tCol;
-      baseB = 133 + 37 * tCol;
+      const t = intensity / 0.5;
+      baseR = 138 + (215 - 138) * t;
+      baseG = 15 + (38 - 15) * t;
+      baseB = 34 + (61 - 34) * t;
     } else {
-      const tCol = (intensity - 0.5) / 0.5;
-      baseR = 227 + 28 * tCol;
-      baseG = 155 + 85 * tCol;
-      baseB = 170 + 63 * tCol;
+      const t = (intensity - 0.5) / 0.5;
+      baseR = 215 + (255 - 215) * t;
+      baseG = 38 + (155 - 38) * t;
+      baseB = 61 + (165 - 61) * t;
     }
 
     for (let r = 0; r < 8; r++) {
-      const rimVal = r === 0 ? 0 : (r / 7) * 0.5;
+      const rimVal = r === 0 ? 0 : (r / 7) * 0.45;
       for (let s = 0; s < 8; s++) {
         const specVal = s === 0 ? 0 : (s / 7) * 0.85;
 
@@ -259,15 +612,15 @@ function pipInitHeartColorTable() {
         let blue = baseB;
 
         if (rimVal > 0) {
-          red += (255 - red) * rimVal * 0.6;
-          green += (232 - green) * rimVal * 0.6;
-          blue += (220 - blue) * rimVal * 0.6;
+          red += (255 - red) * rimVal * 0.4;
+          green += (155 - green) * rimVal * 0.4;
+          blue += (165 - blue) * rimVal * 0.4;
         }
 
         if (specVal > 0) {
           red += (255 - red) * specVal;
           green += (240 - green) * specVal;
-          blue += (233 - blue) * specVal;
+          blue += (245 - blue) * specVal;
         }
 
         const cr = Math.min(255, Math.max(0, Math.round(red)));
@@ -428,7 +781,7 @@ function pipRenderHeartFrame(ctx, canvas, t) {
   const visSlice = visible.subarray(0, visibleCount);
   visSlice.sort((a, b) => qDepth[a] - qDepth[b]);
 
-  ctx.fillStyle = '#c6748230';
+  ctx.fillStyle = '#8a0f2230';
   ctx.beginPath();
   ctx.ellipse(cx, cy + 285 * scale, 115 * scale, 18 * scale, 0, 0, TAU);
   ctx.fill();
@@ -504,170 +857,49 @@ function pipRenderHeartFrame(ctx, canvas, t) {
   ctx.globalAlpha = 1;
 }
 
-function mountHeart(){
- const host=$('heart-host');
- if(!host)return;
- if(!heartRenderer)heartRenderer=createHeart();
- if(!host.contains(heartRenderer.canvas))host.append(heartRenderer.canvas);
- heartRenderer.draw(S.t);
+function mountHeart() {
+  const host = $('heart-host');
+  if (!host) return;
+  if (!heartRenderer) heartRenderer = createHeart();
+  if (!host.contains(heartRenderer.canvas)) host.append(heartRenderer.canvas);
+  heartRenderer.draw(S.t);
 }
 
-function createHeart(){
- const canvas=document.createElement('canvas');
- canvas.width=780;
- canvas.height=726;
- canvas.style.cssText='width:100%;height:100%;display:block;';
- canvas.setAttribute('role','img');
- canvas.setAttribute('aria-label','Sculpted rotating heart');
- pipInitHeartMesh();
- pipInitHeartSparks();
- pipInitHeartBuffers();
- pipInitHeartColorTable();
- const ctx=canvas.getContext('2d');
- return{
-  canvas,
-  draw:t=>{
-   if(!canvas.isConnected)return;
-   pipRenderHeartFrame(ctx,canvas,t);
-  }
- };
+function createHeart() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 780;
+  canvas.height = 726;
+  canvas.style.cssText = 'width:100%;height:100%;display:block;';
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Sculpted rotating heart');
+  pipInitHeartMesh();
+  pipInitHeartSparks();
+  pipInitHeartBuffers();
+  pipInitHeartColorTable();
+  const ctx = canvas.getContext('2d');
+  return {
+    canvas,
+    draw: (t) => {
+      if (!canvas.isConnected) return;
+      pipRenderHeartFrame(ctx, canvas, t);
+    }
+  };
 }
 
-registerScene(9,{
- markup:peaceScene,
- mount(root){
-  mountHeart();
-  mountHearts();
-  V.peaceFx = [];
-  V.actors.forEach((a, i) => {
-   if (a.large) {
-    a.layer = 'near';
-    if (a.el) a.el.dataset.depth = 'near';
-    return;
-   }
-   const layer = i === 3 ? 'near' : ['far', 'mid', 'near'][i % 3];
-   a.layer = layer;
-   a.pace *= PIP_LAYERS[layer].pace;
-   if (a.el) a.el.dataset.depth = layer;
-  });
- },
- floaters:true,
- fxCanvas:true,
- keepOut:()=>[{x:0,y:10,w:870,h:276}],
- replaceMode:'hearts',
- integrate(a, dt) {
-  return false;
- },
- place(a) {
-  const layerName = a.layer || 'near';
-  const L = PIP_LAYERS[layerName] || PIP_LAYERS.near;
-  const scale = a.screenScale * L.scale;
-  const x = a.screenX;
-  const y = a.screenY;
-  const op = a.opacity;
-  a.el.style.left = 0;
-  a.el.style.top = 0;
-  a.el.style.transform = `translate(${(x - a.d / 2).toFixed(2)}px,${(y - a.d / 2).toFixed(2)}px) scale(${scale.toFixed(4)})`;
-  a.el.style.opacity = op.toFixed(3);
-  a.el.style.zIndex = String(L.z + Math.round(scale * 100));
-  const baseBlur = scale < 0.93 ? (0.93 - scale) * 3 : 0;
-  const blur = Math.min(.9, Math.max(baseBlur, L.blur));
-  a.el.style.filter = blur > 0 ? `blur(${blur.toFixed(2)}px)` : 'none';
-  if (a.el.dataset.depth !== layerName) a.el.dataset.depth = layerName;
-  const b = slots.find(b => b.key === a.key);
-  if (b) {
-   b.x = x - a.d / 2;
-   b.y = y - a.d / 2;
-   b.phase = a.life;
-  }
-  return true;
- },
- onRetire(a) {
-  if (!V.peaceFx) V.peaceFx = [];
-  const rng = a.rng || Math.random;
-  for (let i = 0; i < 12; i++) {
-   const angle = rng() * TAU;
-   const speed = 30 + rng() * 80;
-   V.peaceFx.push({
-    kind: 'peace',
-    x: a.screenX,
-    y: a.screenY,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed - 40,
-    r: 7 + rng() * 4,
-    phase: rng() * TAU,
-    start: V.clock,
-    life: 2.4 + rng() * 1.2,
-    color: i % 2 === 0 ? '#E8C777' : '#EABB89'
-   });
-  }
-  for (let i = 0; i < 8; i++) {
-   const angle = rng() * TAU;
-   const speed = 30 + rng() * 80;
-   V.peaceFx.push({
-    kind: 'glow',
-    x: a.screenX,
-    y: a.screenY,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed - 40,
-    r: 9 + rng() * 7,
-    phase: rng() * TAU,
-    start: V.clock,
-    life: 2.4 + rng() * 1.2,
-    color: '#FFF4BA'
-   });
-  }
-  if (V.peaceFx.length > 80) {
-   V.peaceFx.splice(0, V.peaceFx.length - 80);
-  }
- },
- prime(dt) {
-  if (V.canvas) V.canvas.dataset.peaceFx = String(V.peaceFx ? V.peaceFx.length : 0);
- },
- draw(dt) {
-  const c = V.canvas?.getContext('2d');
-  if (!c) return;
-  if (V.peaceFx) {
-   V.peaceFx = V.peaceFx.filter(p => (V.clock - p.start) < p.life);
-  } else {
-   V.peaceFx = [];
-  }
-  if (V.canvas) V.canvas.dataset.peaceFx = String(V.peaceFx.length);
-  const sin60 = Math.sin(Math.PI / 3);
-  const cos60 = Math.cos(Math.PI / 3);
-  for (const p of V.peaceFx) {
-   const age = V.clock - p.start;
-   const q = clamp(age / p.life, 0, 1);
-   const x = p.x + p.vx * age * 0.55 + Math.sin(age * 1.7 + p.phase) * age * 11;
-   const y = p.y + p.vy * age * 0.5 + age * age * 8;
-   const alpha = Math.sin(Math.PI * q) * 0.85;
-   c.save();
-   c.globalAlpha = clamp(alpha, 0, 1);
-   if (p.kind === 'peace') {
-    c.translate(x, y);
-    c.rotate(age * 0.5 + p.phase);
-    c.strokeStyle = p.color;
-    c.lineWidth = 1.6;
-    c.beginPath();
-    c.arc(0, 0, p.r, 0, TAU);
-    c.moveTo(0, 0);
-    c.lineTo(0, p.r);
-    c.moveTo(0, 0);
-    c.lineTo(-p.r * sin60, p.r * cos60);
-    c.moveTo(0, 0);
-    c.lineTo(p.r * sin60, p.r * cos60);
-    c.stroke();
-   } else if (p.kind === 'glow') {
-    const grad = c.createRadialGradient(x, y, 0, x, y, p.r);
-    grad.addColorStop(0, hexToRgbaPIP(p.color, 0.55));
-    grad.addColorStop(1, hexToRgbaPIP(p.color, 0));
-    c.fillStyle = grad;
-    c.beginPath();
-    c.arc(x, y, p.r, 0, TAU);
-    c.fill();
-   }
-   c.restore();
-  }
- }
+registerScene(9, {
+  markup: peaceScene,
+  mount(root) {
+    mountHeart();
+    mountHearts();
+    pipMountCards(root);
+  },
+  tickAge(dt) {
+    pipTickAge(dt);
+  },
+  onLeave(root) {
+    pipOnLeave(root);
+  },
+  floaters: true,
+  fxCanvas: false,
+  keepOut: () => [{ x: 0, y: 10, w: 870, h: 276 }]
 });
-

@@ -27,13 +27,13 @@
 
   function welcomeBubbles() {
     const chosen = [];
+    const pool = records();
     for (let i = 0; i < 6; i++) {
-      const r = choose(chosen.map((a) => a.id));
+      const exclude = pool.length && chosen.length >= pool.length ? [] : chosen.map((a) => a.id);
+      const r = chooseRandom(exclude) || (pool.length ? pool[i % pool.length] : undefined);
       if (r) chosen.push(r);
     }
-    const long = chosen.find((r) => !smallFits(r));
-    if (long) return readerSlot(long, 861, 37, 925, 586);
-    return chosen.map((r, i) => addOrb(r, ...WELCOME_POSITIONS[i])).join('');
+    return drawSlots(chosen, WELCOME_POSITIONS, { readerBounds: { maxW: 1780, maxH: 625 } });
   }
 
   function welcome() {
@@ -50,22 +50,42 @@
 
       const isOdd = i % 2 === 1;
       if (a.el) {
-        a.el.style.setProperty('--welcome-ring-delay', `${(i * 1.5).toFixed(1)}s`);
+        a.el.style.setProperty('--welcome-ring-delay', `${(-i * 1.5).toFixed(1)}s`);
         a.el.classList.toggle('spin-reverse', isOdd);
       }
 
-      if (a.large) {
-        a.layer = 'near';
-        if (a.el) a.el.dataset.depth = 'near';
-        a.retireAt = Infinity;
-        return;
-      }
       a.retireAt = 9 + i * 4.6;
       const layer = i === 3 ? 'near' : ['far', 'mid', 'near'][i % 3];
       a.layer = layer;
       const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
       a.pace *= L.pace;
       if (a.el) a.el.dataset.depth = layer;
+    });
+  }
+
+  function primeWelcome() {
+    if (!V.speech || !V.speech.length) return;
+    const delays = [0, 2.5, 5.0];
+    V.speech.forEach((b, i) => {
+      if (b.el) {
+        b.el.dataset.speaker = String(i);
+      }
+      if (!S.still) {
+        if (i === 0) {
+          b.phase = 'showing';
+          b.age = 0;
+          b.duration = 6.0;
+        } else {
+          const delay = delays[i] || 2.5;
+          b.phase = 'fading_out';
+          b.fadeAge = 0.5 - delay;
+          if (b.el) b.el.classList.add('fading');
+        }
+      } else {
+        b.phase = 'showing';
+        b.age = 0;
+        if (b.el) b.el.classList.remove('fading');
+      }
     });
   }
 
@@ -81,17 +101,17 @@
 
     if (isExitBlocked) {
       for (const act of V.actors) {
-        if (!act.large && act.life === 'steady' && act.retireAt <= V.clock) {
+        if (act.life === 'steady' && act.retireAt <= V.clock) {
           act.retireAt = V.clock + 0.5;
         }
       }
     }
 
-    if (a.born > 0 && a.life === 'steady' && !a.large && a.retireAt - a.born > 22) {
+    if (a.born > 0 && a.life === 'steady' && a.retireAt - a.born > 22) {
       a.retireAt = a.born + 14 + a.rng() * 6;
     }
 
-    if (a.life === 'steady' && !a.large && V.clock >= a.nextTurn) {
+    if (a.life === 'steady' && V.clock >= a.nextTurn) {
       const sign = a.rng() > 0.5 ? 1 : -1;
       const deg = sign * (25 + a.rng() * 45);
       const rad = (deg * Math.PI) / 180;
@@ -141,13 +161,11 @@
 
     if (a.el) {
       if (a.el.dataset.depth !== layer) a.el.dataset.depth = layer;
-      a.el.style.left = 0;
-      a.el.style.top = 0;
-      const rad = Math.abs(R) * Math.PI / 180;
-      const spread = Math.abs(Math.cos(rad)) + Math.abs(Math.sin(rad));
-      const half = (a.d / 2) * scale * spread;
+      a.el.style.left = '0px';
+      a.el.style.top = '0px';
+      const half = (a.d / 2) * scale;
       const minX = half + 8;
-      const maxX = 1812 - half - 8;
+      const maxX = 1812 - half - 30;
       const minY = half + 8;
       const maxY = 636 - half - 8;
       const renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
@@ -236,12 +254,23 @@
     }
   }
 
+  function leaveWelcome(root) {
+    // Scene descriptor onLeave hook. No active timers in Welcome.
+  }
+
   registerScene(1, {
     markup: welcome,
     mount: mountWelcome,
+    prime: primeWelcome,
     integrate: integrateWelcome,
     place: placeWelcome,
     draw: drawWelcome,
+    onLeave: leaveWelcome,
+    speakers: [
+      { x: 509, y: 361 },
+      { x: 628, y: 422 },
+      { x: 702, y: 408 }
+    ],
     floaters: true,
     fxCanvas: true,
     keepOut: () => [{ x: 0, y: 10, w: 855, h: 347 }],

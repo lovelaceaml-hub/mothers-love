@@ -1,11 +1,9 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
-import { buildActiveDisplayFixture } from './helpers';
-import { readFile, stat } from 'node:fs/promises';
+import { buildActiveDisplayFixture, circularity, loadRenderer } from './helpers';
+import { mkdir, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
-
-const publicFolder = resolve(process.cwd(), 'public');
 
 type ArrivalRecord = {
   id: string;
@@ -31,122 +29,25 @@ type ArrivalSnapshot = Omit<ReturnType<typeof buildActiveDisplayFixture>, 'recog
   sync?: string;
 };
 
-async function setupArrivalHarness(page: Page): Promise<{
-  frame: Frame;
-  snapshot: ArrivalSnapshot;
-  dummyQr: string;
-  reactionCounts: Record<string, number>;
-}> {
-  await page.addInitScript(() => {
-    let seed = 7301;
-    Math.random = () => {
-      seed = (seed * 1664525 + 1013904223) >>> 0;
-      return seed / 4294967296;
-    };
-    window.requestAnimationFrame = () => 0;
-  });
-
-  await page.route('**/*', async (route) => {
-    const url = new URL(route.request().url());
-    if (url.pathname === '/probe') {
-      return route.fulfill({
-        contentType: 'text/html',
-        body: '<html><body style="margin:0"><iframe title="Probe" sandbox="allow-scripts" referrerpolicy="no-referrer" src="/color-polish/renderer.html" style="width:100vw;height:100vh;border:0"></iframe></body></html>',
-      });
-    }
-    if (!url.pathname.startsWith('/color-polish/') || url.pathname.includes('..')) {
-      return route.abort();
-    }
-    const file = resolve(publicFolder, '.' + url.pathname);
-    const type = file.endsWith('.js')
-      ? 'text/javascript'
-      : file.endsWith('.css')
-      ? 'text/css'
-      : file.endsWith('.html')
-      ? 'text/html'
-      : file.endsWith('.svg')
-      ? 'image/svg+xml'
-      : 'image/png';
-    try {
-      const body = await readFile(file);
-      await route.fulfill({ contentType: type, body });
-    } catch {
-      await route.abort();
-    }
-  });
-
-  await page.goto('/probe');
-  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
-  const dummyQr =
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
-  const reactionCounts: Record<string, number> = { [snapshot.recognitions[0].id]: 0 };
-
-  await page.evaluate(
-    async ({ snapshot, qr, reactionCounts }) => {
-      const frame = document.querySelector('iframe');
-      if (!frame || !frame.contentWindow) throw new Error('iframe not found');
-      const channel = new MessageChannel();
-      const nonce = crypto.randomUUID();
-      await new Promise<void>((resolve) => {
-        channel.port1.onmessage = (event) => {
-          if (event.data.type === 'color-polish:ready') resolve();
-        };
-        channel.port1.start();
-        frame.contentWindow!.postMessage(
-          { version: 'color-polish-v6', type: 'color-polish:bootstrap', nonce, sequence: 0 },
-          '*',
-          [channel.port2],
-        );
-      });
-      (window as any).probePort = channel.port1;
-      (window as any).probeNonce = nonce;
-      channel.port1.postMessage({
-        version: 'color-polish-v6',
-        type: 'color-polish:update',
-        nonce,
-        sequence: 1,
-        snapshot,
-        control: {
-          nowMs: Date.parse(snapshot.serverTime),
-          status: 'ready',
-          source: 'sample',
-          playing: true,
-          scene: 'welcome',
-          reactionCounts,
-          qrDataUrl: qr,
-          submissionUrl: snapshot.submissionUrl,
-        },
-      });
-    },
-    { snapshot, qr: dummyQr, reactionCounts },
-  );
-
-  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
-  if (!frame) throw new Error('renderer frame not found');
-  await frame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
-
-  return { frame, snapshot, dummyQr, reactionCounts };
-}
-
 async function pushArrivalWave(
   page: Page,
   frame: Frame,
   snapshot: ArrivalSnapshot,
-  dummyQr: string,
-  reactionCounts: Record<string, number>,
   wave: number,
   sequence: number,
+  options?: { idPrefix?: string; expressionIds?: number[]; message?: string },
 ) {
   const count = wave < 6 ? 1 : 10;
+  const prefix = options?.idPrefix || `arrival-w${wave}-s${sequence}`;
   const records: ArrivalRecord[] = Array.from({ length: count }, (_, index) => ({
     ...snapshot.recognitions[0],
-    id: `arrival-${wave}-${index}`,
+    id: `${prefix}-${index}`,
     recipient: `Sample ${wave + 1}.${index + 1}`,
-    message: 'Thank you for helping today.',
+    message: options?.message || 'Thank you for helping today.',
     createdAt: snapshot.serverTime,
     firstPublishedAt: snapshot.serverTime,
     expiresAt: new Date(Date.parse(snapshot.serverTime) + 86_400_000).toISOString(),
-    expressionIds: [2],
+    expressionIds: options?.expressionIds || [2],
   }));
   snapshot.recognitions.push(...records);
   snapshot.revision++;
@@ -156,6 +57,10 @@ async function pushArrivalWave(
     recognitionId: record.id,
     publishedAt: snapshot.serverTime,
   }));
+
+  const dummyQr =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  const reactionCounts: Record<string, number> = { [snapshot.recognitions[0].id]: 0 };
 
   await page.evaluate(
     ({ snapshot, qr, reactionCounts, sequence }) => {
@@ -186,9 +91,10 @@ async function pushArrivalWave(
   );
 }
 
-test('single and group entrance styles cycle in the recorded order', async ({ page }) => {
+test('single and group entrance styles cycle in the recorded order, and four frame styles are declared', async ({ page }) => {
   test.setTimeout(60_000);
-  const { frame, snapshot, dummyQr, reactionCounts } = await setupArrivalHarness(page);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
 
   const expectedSequence = [
     { kind: 'single', style: 1 },
@@ -209,7 +115,7 @@ test('single and group entrance styles cycle in the recorded order', async ({ pa
 
   for (let wave = 0; wave < 11; wave++) {
     seq++;
-    await pushArrivalWave(page, frame, snapshot, dummyQr, reactionCounts, wave, seq);
+    await pushArrivalWave(page, frame, snapshot, wave, seq);
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
 
     const activeState = await frame.evaluate(() => {
@@ -221,23 +127,37 @@ test('single and group entrance styles cycle in the recorded order', async ({ pa
     recordedSequence.push(activeState!);
 
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
-    await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active === null);
+    await frame.waitForFunction(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
   }
 
   expect(recordedSequence).toEqual(expectedSequence);
+
+  // Assert four frame styles recorded in log over the first four single arrivals
+  const logFrames = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs
+      .filter((l: any) => l.type === 'entrance_start')
+      .slice(0, 4)
+      .map((l: any) => l.frame);
+  });
+  const expectedFrames = ['Light beam', 'Petal curtain', 'Aurora', 'Constellation gather'];
+  expect(new Set(logFrames)).toEqual(new Set(expectedFrames));
+  expect(logFrames).toHaveLength(4);
 });
 
 test('the four reworked entrances start deep and resolve flat', async ({ page }) => {
   test.setTimeout(60_000);
-  const { frame, snapshot, dummyQr, reactionCounts } = await setupArrivalHarness(page);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
 
-  // Direct trajectory function depth checks in renderer frame
   const s2z = await frame.evaluate(() => (window as any).singleTrajectory(2, 0.15).z);
   const s5z = await frame.evaluate(() => (window as any).singleTrajectory(5, 0.15).z);
   expect(s2z).toBeLessThan(-450);
   expect(s5z).toBeLessThan(-450);
 
-  // Group style 0 constellation: rank 9 starts at least 400 deeper than rank 0
   const g0zRank0 = await frame.evaluate(
     () => (window as any).groupTrajectory(0, 0, 0.15, { x: 906, y: 307 }).z,
   );
@@ -246,7 +166,6 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   );
   expect(g0zRank0 - g0zRank9).toBeGreaterThanOrEqual(400);
 
-  // Group style 4 ripple of kindness: per-source zStart differences
   const [g4z0, g4z1, g4z2] = await frame.evaluate(() => {
     const b = { x: 906, y: 307 };
     return [
@@ -273,7 +192,6 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   expect(Math.abs(normZ0 - normZ2)).toBeGreaterThanOrEqual(100);
   expect(Math.abs(normZ1 - normZ2)).toBeGreaterThanOrEqual(100);
 
-  // Trajectory resolution flat checks at entrance end (p = 1)
   const settled = await frame.evaluate(() => {
     const b = { x: 906, y: 307 };
     return {
@@ -295,12 +213,9 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   let seq = 1;
   for (let wave = 0; wave < 11; wave++) {
     seq++;
-    await pushArrivalWave(page, frame, snapshot, dummyQr, reactionCounts, wave, seq);
-
-    // Queue gap: step 650 ms first
+    await pushArrivalWave(page, frame, snapshot, wave, seq);
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
 
-    // Sample at resolved time: entrance duration plus 100 ms
     const entranceDuration = wave < 6 ? 3600 : 4700;
     await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), entranceDuration + 100);
 
@@ -329,70 +244,293 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   }
 });
 
-test('every arriving orb stays circular mid-entrance', async ({ page }) => {
+test('circularity holds on .event-orb at entrance midpoint, hold midpoint, and exit midpoint', async ({ page }) => {
   test.setTimeout(60_000);
-  const { frame, snapshot, dummyQr, reactionCounts } = await setupArrivalHarness(page);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+
+  // 1. Entrance midpoint (~1800 ms)
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1800));
+  const entranceCirc = await circularity(frame);
+  expect(entranceCirc.failures).toHaveLength(0);
+  expect(entranceCirc.count).toBeGreaterThan(0);
+
+  // 2. Hold midpoint (~1800 ms + 4000 ms = hold phase)
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(4000));
+  const holdCirc = await circularity(frame);
+  expect(holdCirc.failures).toHaveLength(0);
+  expect(holdCirc.count).toBeGreaterThan(0);
+
+  // 3. Exit midpoint (~675 ms into exit)
+  await frame.evaluate(() => {
+    const active = (window as any).active;
+    const remainingHold = Math.max(0, (active?.hold || 8) - (active?.localTime || 0));
+    (window as any).colorPolishRuntime.step(remainingHold * 1000 + 10);
+    (window as any).colorPolishRuntime.step(675);
+  });
+  const exitCirc = await circularity(frame);
+  expect(exitCirc.failures).toHaveLength(0);
+  expect(exitCirc.count).toBeGreaterThan(0);
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active === null);
+});
+
+test('arrival ring carries 3D rotation while orb and ancestors carry none', async ({ page }) => {
+  test.setTimeout(60_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+
+  const transformAudit = await frame.evaluate(() => {
+    const rings = Array.from(document.querySelectorAll<HTMLElement>('.arrival-ring'));
+    const orbs = Array.from(document.querySelectorAll<HTMLElement>('.event-orb'));
+    return {
+      rings: rings.map((r) => ({
+        inline: r.style.transform || '',
+        computed: window.getComputedStyle(r).transform,
+        preserve3d: window.getComputedStyle(r).transformStyle,
+      })),
+      orbs: orbs.map((o) => {
+        const inline = o.style.transform || '';
+        const computed = window.getComputedStyle(o).transform;
+        const ancestors: Array<{ tag: string; id: string; className: string; transform: string; computed: string }> = [];
+        let p = o.parentElement;
+        while (p && p.id !== 'tv') {
+          ancestors.push({
+            tag: p.tagName,
+            id: p.id,
+            className: p.className,
+            transform: p.style.transform || '',
+            computed: window.getComputedStyle(p).transform,
+          });
+          p = p.parentElement;
+        }
+        return { inline, computed, ancestors };
+      }),
+    };
+  });
+
+  expect(transformAudit.rings.length).toBeGreaterThan(0);
+  for (const r of transformAudit.rings) {
+    const hasRotate = r.inline.includes('rotate') || r.computed.startsWith('matrix3d');
+    expect(hasRotate).toBe(true);
+    expect(r.preserve3d).toBe('preserve-3d');
+  }
+
+  expect(transformAudit.orbs.length).toBeGreaterThan(0);
+  for (const o of transformAudit.orbs) {
+    expect(o.inline).not.toContain('rotate');
+    expect(o.computed.startsWith('matrix3d')).toBe(false);
+    for (const a of o.ancestors) {
+      expect(a.transform).not.toContain('rotate');
+      expect(a.computed.startsWith('matrix3d')).toBe(false);
+    }
+  }
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active === null);
+});
+
+test('reduced motion displays bubble within one frame without assembly or burst', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+
+  // Confirm queue and mode state in reduced motion
+  const initial = await frame.evaluate(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return { queueLength: st.queueLength, mode: st.mode, still: st.still };
+  });
+  expect(initial.queueLength).toBeGreaterThanOrEqual(1);
+  expect(initial.mode).toBe('normal');
+  expect(initial.still).toBe(true);
+
+  // Advance past 650 ms queue gap so the queued arrival begins
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(700));
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active !== null);
+
+  const stillCheck = await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    const orbs = Array.from(document.querySelectorAll<HTMLElement>('.event-orb'));
+    const bursts = document.querySelectorAll('.arrival-burst-item');
+    const eventStage = document.getElementById('event');
+    const hasBackdrop = !!eventStage && window.getComputedStyle(eventStage, '::before').content !== 'none';
+    return {
+      still: state.still,
+      active: state.active !== null,
+      orbCount: orbs.length,
+      firstOrbOpacity: orbs[0] ? parseFloat(orbs[0].style.opacity || '1') : 0,
+      burstCount: bursts.length,
+      hasBackdrop,
+    };
+  });
+
+  expect(stillCheck.still).toBe(true);
+  expect(stillCheck.active).toBe(true);
+  expect(stillCheck.orbCount).toBe(1);
+  expect(stillCheck.firstOrbOpacity).toBe(1);
+  expect(stillCheck.burstCount).toBe(0);
+  expect(stillCheck.hasBackdrop).toBe(true);
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+});
+
+test('G3 computed-style stage dim and near-black backdrop assertions hold at hold midpoint', async ({ page }) => {
+  test.setTimeout(60_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+  // Step past gap and entrance to hold midpoint (entrance 3.6 s + 4 s hold)
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(5600));
+
+  // Allow real wall-clock time past 900 ms for CSS transition on #stage to settle
+  await page.waitForTimeout(1000);
+
+  const styles = await frame.evaluate(() => {
+    const stage = document.getElementById('stage');
+    const eventStage = document.getElementById('event');
+    if (!stage || !eventStage) return null;
+    const stageStyle = window.getComputedStyle(stage);
+    const backdropStyle = window.getComputedStyle(eventStage, '::before');
+    return {
+      stageDimmed: stage.classList.contains('dimmed'),
+      stageOpacity: parseFloat(stageStyle.opacity),
+      stageFilter: stageStyle.filter,
+      backdropBg: backdropStyle.backgroundColor,
+    };
+  });
+
+  expect(styles).not.toBeNull();
+  expect(styles!.stageDimmed).toBe(true);
+  expect(styles!.stageOpacity).toBeLessThanOrEqual(0.23);
+  expect(styles!.stageFilter).toContain('blur(');
+
+  const alphaMatch = styles!.backdropBg.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([\d.]+)\s*\)/);
+  const alpha = alphaMatch ? parseFloat(alphaMatch[1]) : (styles!.backdropBg.startsWith('rgb(') ? 1 : 0);
+  expect(alpha).toBeGreaterThanOrEqual(0.88);
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+});
+
+test('four frame styles are logged with no immediate repeat and vary independently from path styles', async ({ page }) => {
+  test.setTimeout(60_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await frame.evaluate(() => (window as any).arrivalResetFrameBag?.());
 
   let seq = 1;
-  for (let wave = 0; wave < 11; wave++) {
+  for (let wave = 0; wave < 4; wave++) {
     seq++;
-    await pushArrivalWave(page, frame, snapshot, dummyQr, reactionCounts, wave, seq);
-
-    // Step 650 ms queue gap first, then advance to mid-entrance
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
-    const midEntranceMs = wave < 6 ? 1800 : 2350;
-    await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), midEntranceMs);
-
-    const orbShapes = await frame.evaluate(() => {
-      const elements = Array.from(document.querySelectorAll<HTMLElement>('.event-orb'));
-      return elements.map((el) => {
-        const rect = el.getBoundingClientRect();
-        const style = window.getComputedStyle(el);
-        const beforeStyle = window.getComputedStyle(el, '::before');
-        const inner = el.querySelector<HTMLElement>('.orb');
-        const innerStyle = inner ? window.getComputedStyle(inner) : null;
-        return {
-          width: rect.width,
-          height: rect.height,
-          radius: style.borderRadius,
-          beforeRadius: beforeStyle.borderRadius,
-          innerRadius: innerStyle?.borderRadius || '',
-        };
-      });
-    });
-
-    expect(orbShapes.length).toBeGreaterThan(0);
-    for (const orb of orbShapes) {
-      expect(Math.abs(orb.width - orb.height)).toBeLessThanOrEqual(1);
-      const is50Percent =
-        orb.radius.includes('50%') ||
-        orb.beforeRadius.includes('50%') ||
-        orb.innerRadius.includes('50%');
-      const halfWidth = orb.width / 2;
-      const isNumericHalf =
-        halfWidth > 0 &&
-        [orb.radius, orb.beforeRadius, orb.innerRadius].some((r) => {
-          const parts = r.split(/\s+/).map(parseFloat).filter((n) => !isNaN(n));
-          return parts.length > 0 && parts.every((p) => Math.abs(p - halfWidth) <= 1);
-        });
-      expect(is50Percent || isNumericHalf).toBe(true);
-    }
-
+    await pushArrivalWave(page, frame, snapshot, wave, seq);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
-    await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active === null);
+    await frame.waitForFunction(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
+  }
+
+  const logEntries = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs.filter((l: any) => l.type === 'entrance_start');
+  });
+
+  expect(logEntries.length).toBeGreaterThanOrEqual(4);
+  const frames = logEntries.slice(0, 4).map((l: any) => l.frame);
+  const styles = logEntries.slice(0, 4).map((l: any) => l.style);
+
+  // Four different frame names logged over four consecutive single arrivals
+  const uniqueFrames = new Set(frames);
+  expect(uniqueFrames.size).toBe(4);
+
+  // No immediate repeat
+  for (let i = 0; i < frames.length - 1; i++) {
+    expect(frames[i]).not.toBe(frames[i + 1]);
+  }
+
+  // Frame and path vary independently: logged pair differs in at least one component every time
+  for (let i = 0; i < frames.length - 1; i++) {
+    const samePair = frames[i] === frames[i + 1] && styles[i] === styles[i + 1];
+    expect(samePair).toBe(false);
   }
 });
 
-test('a screenshot per style at the entrance midpoint', async ({ page }) => {
+test('feed rail and returnScene behavior are unchanged after arrival chain', async ({ page }) => {
   test.setTimeout(60_000);
-  const { frame, snapshot, dummyQr, reactionCounts } = await setupArrivalHarness(page);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  const beforeState = await frame.evaluate(() => {
+    const feed = document.getElementById('feed-columns');
+    const items = Array.from(feed?.querySelectorAll<HTMLElement>('.chat-item') || []);
+    const feedIds = items.map((el) => el.dataset.feedId || '').filter(Boolean);
+    return {
+      scene: (window as any).colorPolishRuntime.getState().scene,
+      chatItemCount: items.length,
+      feedIds,
+    };
+  });
+
+  // Run single arrival
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+
+  const afterState = await frame.evaluate(() => {
+    const feed = document.getElementById('feed-columns');
+    const items = Array.from(feed?.querySelectorAll<HTMLElement>('.chat-item') || []);
+    const feedIds = items.map((el) => el.dataset.feedId || '').filter(Boolean);
+    return {
+      scene: (window as any).colorPolishRuntime.getState().scene,
+      chatItemCount: items.length,
+      feedIds,
+    };
+  });
+
+  expect(afterState.scene).toBe(beforeState.scene);
+  expect(afterState.chatItemCount).toBe(beforeState.chatItemCount);
+  expect(afterState.feedIds).toEqual(beforeState.feedIds);
+});
+
+test('screenshots for frame styles at assembly midpoint and path styles at entrance midpoint', async ({ page }) => {
+  test.setTimeout(180_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  const outputFolder = resolve(process.cwd(), 'docs/runs/2026-09-12-tv-next-level/logs/arrival');
+  await mkdir(outputFolder, { recursive: true });
 
   const screenshotPaths: string[] = [];
   let seq = 1;
 
   for (let wave = 0; wave < 11; wave++) {
     seq++;
-    await pushArrivalWave(page, frame, snapshot, dummyQr, reactionCounts, wave, seq);
+    await pushArrivalWave(page, frame, snapshot, wave, seq);
 
     // Step 650 ms queue gap first, then advance to mid-entrance
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
@@ -406,7 +544,7 @@ test('a screenshot per style at the entrance midpoint', async ({ page }) => {
 
     expect(activeInfo).not.toBeNull();
     const filename = `${activeInfo!.kind}-${activeInfo!.style}.png`;
-    const outputPath = test.info().outputPath(filename);
+    const outputPath = resolve(outputFolder, filename);
 
     await frame.evaluate(async () => {
       await document.fonts.ready;
@@ -417,7 +555,10 @@ test('a screenshot per style at the entrance midpoint', async ({ page }) => {
     screenshotPaths.push(outputPath);
 
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
-    await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().active === null);
+    await frame.waitForFunction(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
   }
 
   expect(screenshotPaths).toHaveLength(11);
@@ -425,4 +566,106 @@ test('a screenshot per style at the entrance midpoint', async ({ page }) => {
     const fileStat = await stat(p);
     expect(fileStat.size).toBeGreaterThan(0);
   }
+
+  // Also capture screenshots of the 4 frame styles at assembly midpoint
+  await frame.evaluate(() => (window as any).arrivalResetFrameBag?.());
+  for (let f = 0; f < 4; f++) {
+    seq++;
+    await pushArrivalWave(page, frame, snapshot, f, seq, { idPrefix: `frame-shot-${f}` });
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1800));
+
+    const frameFile = `frame-${f}.png`;
+    const framePath = resolve(outputFolder, frameFile);
+
+    await frame.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all([...document.images].map((img) => img.decode().catch(() => {})));
+    });
+
+    await page.screenshot({ path: framePath });
+    const frameStat = await stat(framePath);
+    expect(frameStat.size).toBeGreaterThan(0);
+
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(50000));
+    await frame.waitForFunction(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
+  }
 });
+
+test('arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave', async ({ page }) => {
+  test.setTimeout(120_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  // 1. Single arrival: exactly one arrival_record_shown entry exists for that record's id
+  let seq = 2;
+  const singlePrefix = 'arrival-single-log';
+  await pushArrivalWave(page, frame, snapshot, 0, seq, { idPrefix: singlePrefix });
+  const singleRecordId = `${singlePrefix}-0`;
+
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(25000));
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+
+  const singleShownLogs = await frame.evaluate((id: string) => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs.filter((l: any) => l.type === 'arrival_record_shown' && l.id === id);
+  }, singleRecordId);
+  expect(singleShownLogs).toHaveLength(1);
+
+  // 2. Full oversize group wave of ten: each of the ten ids has exactly one entry, not more
+  seq++;
+  const groupPrefix = 'arrival-group-oversize-log';
+  const longMessage =
+    'This is an extended appreciation message designed to test the full oversize group reading flow across all five circular pair pages on the display. Thank you for your continued support and kindness.';
+  await pushArrivalWave(page, frame, snapshot, 6, seq, {
+    idPrefix: groupPrefix,
+    message: longMessage,
+  });
+
+  const expectedGroupIds = Array.from({ length: 10 }, (_, i) => `${groupPrefix}-${i}`);
+
+  // Step through all 5 buildGroupPage pages and exit to completion
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  for (let step = 0; step < 25; step++) {
+    const isDone = await frame.evaluate(() => {
+      const st = (window as any).colorPolishRuntime.getState();
+      return st.active === null && st.queueLength === 0;
+    });
+    if (isDone) break;
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(8000));
+  }
+
+  await frame.waitForFunction(() => {
+    const st = (window as any).colorPolishRuntime.getState();
+    return st.active === null && st.queueLength === 0;
+  });
+
+  // Verify all 5 pages (0 through 4) executed
+  const pagesLogged = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs
+      .filter((l: any) => l.type === 'reading_start' && l.kind === 'group')
+      .map((l: any) => l.page);
+  });
+  expect(pagesLogged).toEqual(expect.arrayContaining([0, 1, 2, 3, 4]));
+
+  // Verify each of the ten record ids has exactly one arrival_record_shown entry
+  const allShownLogs = await frame.evaluate(() => {
+    const logs = (window as any).colorPolishRuntime.getState().log || [];
+    return logs.filter((l: any) => l.type === 'arrival_record_shown');
+  });
+
+  for (const id of expectedGroupIds) {
+    const idLogs = allShownLogs.filter((l: any) => l.id === id);
+    expect(idLogs).toHaveLength(1);
+  }
+});
+
+

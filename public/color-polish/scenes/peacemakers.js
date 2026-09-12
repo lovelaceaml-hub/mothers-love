@@ -1,244 +1,534 @@
-// Scene 8: We Are Peacemakers.
+// Scene 8: We Are Peacemakers, the puzzle world.
 'use strict';
 
-function peacemakers(){
- PEACEMAKERS_BEADS=[];
- return `<div style="position:absolute;left:12px;top:33px;width:829px"><div class="eyebrow">Mother’s Love in our community</div><h1 style="font-size:71px;letter-spacing:-2.2px;line-height:1.02;margin:22px 0">We Are<br>${shimmer('Peace')}<span class="violet">makers</span></h1><p class="subheading" style="font-size:26px">Recognize the kindness<br>you see around you.</p></div>${art('globe','left:271px;top:134px;width:604px;height:482px')}<div class="globe-light"></div>${peacemakersBubbles()}`;
-}
+const PEACEMAKERS_TOTAL_SLOTS = 24;
+const PEACEMAKERS_LATITUDES = [-42, -14, 14, 42];
+const PEACEMAKERS_LONGITUDES = [0, 60, 120, 180, 240, 300];
+const PEACEMAKERS_GLOBE_RADIUS = 290;
 
-const PEACEMAKERS_LAYERS={
- far:{scale:.84,blur:.9,pace:.75,z:40},
- mid:{scale:.93,blur:.35,pace:.9,z:60},
- near:{scale:1,blur:0,pace:1.1,z:80}
-};
+// Scale factors mapping from 744x691 source image to the rendered 604x482 box:
+const PEACEMAKERS_SCALE_X = 604 / 744; // 0.8118279569892473
+const PEACEMAKERS_SCALE_Y = 482 / 691; // 0.6975397973950796
 
-const PEACEMAKERS_POSITIONS=[
- [880,18,296],
- [1250,12,284],
- [1545,70,262],
- [905,340,262],
- [1215,326,290],
- [1560,350,244]
+// Measured source sockets on the 744x691 globe art:
+const PEACEMAKERS_SOURCE_SOCKETS = [
+  { sx: 565, sy: 180 }, // upper right lifting piece
+  { sx: 372, sy: 220 }, // center upper piece
+  { sx: 460, sy: 310 }, // right mid piece
+  { sx: 310, sy: 270 }  // left mid piece
 ];
 
-const PEACEMAKERS_PETAL_COLORS=['#e7b2bc','#e8c575','#d1b8d2','#bad19c'];
+let peacemakers_root = null;
+let peacemakers_activePieceEl = null;
+let peacemakers_activeRecord = null;
+let peacemakers_phase = 'idle';
+let peacemakers_phaseAge = 0;
+let peacemakers_holdDuration = 3;
+let peacemakers_reading = null;
+let peacemakers_currentSocket = null;
+let peacemakers_joined = [];
+let peacemakers_nextSlot = 0;
+let peacemakers_targetSlot = 0;
+let peacemakers_shownIds = [];
+let peacemakers_totalJoins = 0;
+let peacemakers_timers = [];
 
-let PEACEMAKERS_BEADS=[];
-
-function peacemakersBubbles(){
- const chosen=[];
- for(let i=0;i<6;i++){
-  const r=choose(chosen.map(a=>a.id));
-  if(r)chosen.push(r);
- }
- const long=chosen.find(r=>!smallFits(r));
- if(long)return readerSlot(long,861,37,925,586);
- return chosen.map((r,i)=>addOrb(r,...PEACEMAKERS_POSITIONS[i])).join('');
+function peacemakers() {
+  return '<div style="position:absolute;left:12px;top:33px;width:829px">' +
+    '<div class="eyebrow">Mother\u2019s Love in our community</div>' +
+    '<h1 style="font-size:71px;letter-spacing:-2.2px;line-height:1.02;margin:22px 0">We Are<br>' + shimmer('Peace') + '<span class="violet">makers</span></h1>' +
+    '<p class="subheading" style="font-size:26px">Recognize the kindness<br>you see around you.</p>' +
+    '</div>' +
+    art('globe', 'left:271px;top:134px;width:604px;height:482px') +
+    '<div class="peacemakers-world-sockets" id="peacemakers-world-sockets"></div>' +
+    '<div class="globe-light"></div>' +
+    '<div class="peacemakers-hold-zone" id="peacemakers-hold-zone"></div>' +
+    '<div class="peacemakers-globe-stage" id="peacemakers-globe-stage">' +
+    '<div class="peacemakers-globe-sphere" id="peacemakers-globe-sphere"></div>' +
+    '</div>';
 }
 
-function mountPEACEMAKERS(root){
- PEACEMAKERS_BEADS=[];
- V.peacemakersLastExit=-999;
- V.actors.forEach((a,i)=>{
-  a._peacemakersSeenLife=a.life;
-  if(a.large){
-   a.layer='near';
-   a.retireAt=Infinity;
-   if(a.el)a.el.dataset.depth='near';
-   return;
+function peacemakersSlotTransform(slotIndex) {
+  const band = Math.floor(slotIndex / 6);
+  const lonIndex = slotIndex % 6;
+  const lat = PEACEMAKERS_LATITUDES[band] || 0;
+  const lon = PEACEMAKERS_LONGITUDES[lonIndex] || 0;
+  return `rotateY(${lon}deg) rotateX(${lat}deg) translateZ(${PEACEMAKERS_GLOBE_RADIUS}px)`;
+}
+
+function peacemakersCreateSlotElement(slotIndex) {
+  const slot = document.createElement('div');
+  slot.className = 'globe-slot';
+  slot.dataset.slotIndex = String(slotIndex);
+  slot.style.position = 'absolute';
+  slot.style.left = '-48px';
+  slot.style.top = '-48px';
+  slot.style.width = '96px';
+  slot.style.height = '96px';
+  slot.style.transformOrigin = '48px 48px 0';
+  slot.style.transform = peacemakersSlotTransform(slotIndex);
+  slot.style.transformStyle = 'preserve-3d';
+  return slot;
+}
+
+function peacemakersFitCard(card, r, isStill) {
+  const content = card.querySelector('.puzzle-card-inner');
+  const msg = card.querySelector('.puzzle-message');
+  const indicator = card.querySelector('.puzzle-page-indicator');
+  if (!content || !msg) {
+    return { pages: [r.message], index: 0, duration: peacemakers_holdDuration };
   }
-  a.retireAt=9+i*4.6;
-  const layer=['far','mid','near'][i%3];
-  a.layer=layer;
-  const L=PEACEMAKERS_LAYERS[layer]||PEACEMAKERS_LAYERS.near;
-  a.pace*=L.pace;
-  if(a.el)a.el.dataset.depth=layer;
- });
-}
-function peacemakersMount(root){return mountPEACEMAKERS(root)}
 
-function peacemakersEmitPetals(a){
- if(!V.fx||S.still)return;
- const x=a.screenX||a.x, y=a.screenY||a.y;
- const rnd=a.rng||Math.random;
- for(let i=0;i<10;i++){
-  const angle=rnd()*Math.PI*2, speed=25+rnd()*65;
-  V.fx.push({
-   kind:'petal',
-   x,
-   y,
-   vx:Math.cos(angle)*speed,
-   vy:Math.sin(angle)*speed-18,
-   r:3.5+rnd()*4.5,
-   phase:rnd()*Math.PI*2,
-   start:V.clock,
-   life:1.8+rnd()*1.5,
-   color:PEACEMAKERS_PETAL_COLORS[i%4]
+  const fontFloor = 18;
+  let font = 20;
+  msg.style.fontSize = font + 'px';
+  msg.style.lineHeight = '1.28';
+  msg.textContent = r.message;
+
+  // Measure the message element itself, not .puzzle-card-inner. The inner is
+  // height:100% flex, so its scrollHeight is always about its own height and a
+  // fixed limit of 224 was exceeded before any text was laid out at all: a 500
+  // character message paginated into 74 pages of roughly seven characters
+  // each, which is unreadable and made the still-mode path meaningless. The
+  // message's own clientHeight is the space flex has actually given it, so
+  // scrollHeight against clientHeight is the real overflow test.
+  // Fit with slack. Measuring exactly against clientHeight let a page fill the
+  // box to the last pixel, and once that page was wrapped in its own block for
+  // still mode the box reported 5 px of overflow, which means the final line
+  // could be clipped by the message box's overflow:hidden. Six pixels of slack
+  // costs a few characters per page and guarantees every page actually fits.
+  const FIT_SLACK = 6;
+  const overflows = () => msg.scrollHeight > msg.clientHeight - FIT_SLACK;
+
+  while (overflows() && font > fontFloor) {
+    font -= 0.5;
+    msg.style.fontSize = font + 'px';
+  }
+
+  if (!overflows()) {
+    if (indicator) indicator.hidden = true;
+    return { pages: [r.message], index: 0, duration: peacemakers_holdDuration };
+  }
+
+  const pages = [];
+  const words = r.message.match(/\S+\s*|\s+/g) || [r.message];
+  let buffer = '';
+
+  for (const word of words) {
+    msg.textContent = buffer + word;
+    if (overflows() && buffer) {
+      pages.push(buffer);
+      buffer = word;
+    } else {
+      buffer += word;
+    }
+  }
+  if (buffer) pages.push(buffer);
+
+  log('circular_pagination', {
+    id: r.id,
+    pages: pages.length,
+    diameter: 260,
+    verbatim: pages.join('') === r.message
   });
- }
- if(V.fx.length>250)V.fx.splice(0,V.fx.length-250);
+
+  if (isStill) {
+    // Still mode cannot cycle pages, because the page advance lives in the
+    // scene tick and that tick does not run while S.still is true. Stacking
+    // every page inside the message box is not an answer either: the box is
+    // about 110 px tall and a 500 character message needs roughly 550 px at
+    // the 18 px floor, so the extra pages would be clipped by overflow while
+    // the DOM claimed they were rendered. That is truncation wearing a
+    // disguise, and a reviewer rightly called the same pattern out elsewhere.
+    //
+    // So be honest on screen: show page one at the floor size, say how many
+    // pages there are, and carry the remaining pages in explicitly hidden
+    // elements so nothing is lost and a test can prove the text is verbatim.
+    msg.innerHTML = '';
+    pages.forEach((pageText, idx) => {
+      const span = document.createElement('span');
+      span.className = 'puzzle-message-page';
+      span.dataset.pageIndex = String(idx);
+      span.textContent = pageText;
+      if (idx > 0) span.hidden = true;
+      msg.appendChild(span);
+    });
+    if (indicator) {
+      indicator.hidden = false;
+      indicator.textContent = '01 / ' + String(pages.length).padStart(2, '0') + ' \u00B7 PAUSED';
+    }
+    return { pages, index: 0, duration: peacemakers_holdDuration };
+  }
+
+  msg.textContent = pages[0];
+  if (indicator) {
+    indicator.hidden = false;
+    indicator.textContent = '01 / ' + String(pages.length).padStart(2, '0') + ' \u00B7 CONTINUED';
+  }
+
+  return { pages, index: 0, duration: peacemakers_holdDuration };
 }
 
-function integratePEACEMAKERS(a,dt){
- if(S.still)return false;
- if(a.life==='exiting'&&a._peacemakersSeenLife!=='exiting'){
-  V.peacemakersLastExit=V.clock;
-  peacemakersEmitPetals(a);
- }
- a._peacemakersSeenLife=a.life;
- if(a.life==='steady'&&!a.large){
-  if(a.retireAt-a.born>22){
-   a.retireAt=a.born+14+(a.rng?a.rng():Math.random())*6;
-  }
- }
- const lastExit=V.peacemakersLastExit??-999;
- const anyExitingOrAbsent=V.actors.some(x=>x.life==='exiting'||x.life==='absent');
- const inCooldown=(V.clock-lastExit)<4.6;
- if(anyExitingOrAbsent||inCooldown){
-  for(const x of V.actors){
-   if(x.life==='steady'&&!x.large&&x.retireAt<=V.clock){
-    x.retireAt=V.clock+0.5;
-   }
-  }
- }
- return false;
-}
-function peacemakersIntegrate(a,dt){return integratePEACEMAKERS(a,dt)}
+function peacemakersBuildCard(r, isFaceOn, bgPos) {
+  const card = document.createElement('div');
+  const exprId = (r.ids && r.ids[0]) || 1;
+  const expr = catalog[exprId - 1] || catalog[0];
+  const color = expr.color || '#FFD05F';
 
-function placePEACEMAKERS(a){
- const L=PEACEMAKERS_LAYERS[a.layer]||PEACEMAKERS_LAYERS.near, scale=a.screenScale*L.scale, x=a.screenX, y=a.screenY, op=a.opacity;
- if(a.el.dataset.depth!==a.layer)a.el.dataset.depth=a.layer;
- a.el.style.left=0;a.el.style.top=0;a.el.style.transform=`translate(${(x-a.d/2).toFixed(2)}px,${(y-a.d/2).toFixed(2)}px) scale(${scale.toFixed(4)})`;
- a.el.style.opacity=op.toFixed(3);a.el.style.zIndex=String(L.z+Math.round(scale*100));
- const baseBlur=scale<.93?(.93-scale)*3:0, blur=Math.min(.9, Math.max(baseBlur, L.blur));
- a.el.style.filter=blur>0?`blur(${blur.toFixed(2)}px)`:'none';
- const b=slots.find(b=>b.key===a.key);if(b){b.x=x-a.d/2;b.y=y-a.d/2;b.phase=a.life}
- return true;
-}
-function peacemakersPlace(a){return placePEACEMAKERS(a)}
-
-function peacemakersBezier(p0,p1,p2,u){
- const inv=1-u;
- return inv*inv*p0+2*inv*u*p1+u*u*p2;
-}
-
-function peacemakersDraw(dt){
- if(S.still)return;
- const c=V.canvas?.getContext('2d');
- if(!c)return;
- const t=V.clock;
-
- const haloCycle=(t*Math.PI*2)/6;
- const haloAlpha1=0.06+0.10*(0.5+0.5*Math.sin(haloCycle));
- const haloAlpha2=0.06+0.10*(0.5+0.5*Math.sin(haloCycle+1.2));
-
- c.save();
- c.lineWidth=1.2;
-
- c.strokeStyle='#e8c777';
- c.globalAlpha=haloAlpha1;
- c.beginPath();
- c.arc(573,375,252,0,Math.PI*2);
- c.stroke();
-
- c.strokeStyle='#ffffff';
- c.globalAlpha=haloAlpha2;
- c.beginPath();
- c.arc(573,375,268,0,Math.PI*2);
- c.stroke();
- c.restore();
-
- for(const a of V.actors){
-  if(a._peacemakersHitUntil&&t>=a._peacemakersHitUntil){
-   a._peacemakersHitUntil=0;
-   if(a.el)a.el.classList.remove('thread-hit');
-  }
- }
-
- const steady=V.actors.filter(a=>a.life==='steady').slice(0,6);
-
- steady.forEach(a=>{
-  const L=PEACEMAKERS_LAYERS[a.layer]||PEACEMAKERS_LAYERS.near;
-  const scale=(a.screenScale||1)*L.scale;
-  const bx=a.screenX, by=a.screenY, br=(a.d/2)*scale;
-  const dx=bx-573, dy=by-375, dist=Math.hypot(dx,dy);
-  if(dist<1)return;
-  const ux=dx/dist, uy=dy/dist;
-  const sx=573+ux*240, sy=375+uy*240;
-  const ex=bx-ux*br, ey=by-uy*br;
-
-  if(!a._peacemakersBow){
-   const rnd=a.rng?a.rng():Math.random();
-   a._peacemakersBow=60+rnd*60;
+  if (bgPos) {
+    card.style.setProperty('--bg-pos', bgPos);
   }
 
-  const mx=(sx+ex)/2, my=(sy+ey)/2;
-  const cpx=mx, cpy=my-a._peacemakersBow;
+  if (isFaceOn) {
+    card.className = 'puzzle-card face-on held-card';
+    card.id = 'peacemakers-held-card';
+    card.dataset.recordId = r.id;
+    card.style.setProperty('--tint', color);
+    card.style.setProperty('--tint-alpha', color + '2b');
 
-  a._peacemakersThread={sx,sy,cpx,cpy,ex,ey};
+    card.innerHTML =
+      '<div class="puzzle-card-inner">' +
+      '<div class="puzzle-card-header">' +
+      '<div class="puzzle-badge" style="--tint:' + color + '">' + icon(exprId) + '</div>' +
+      '<div class="puzzle-recipient-block">' +
+      '<div class="puzzle-thanks">THANK YOU,</div>' +
+      '<h3 class="puzzle-recipient">' + esc(r.name) + '</h3>' +
+      '</div>' +
+      '</div>' +
+      '<p class="puzzle-message" data-full-message="' + esc(r.id) + '">' + esc(r.message) + '</p>' +
+      chips(r.ids) +
+      reactionMarkup(r) +
+      '<div class="puzzle-page-indicator" hidden></div>' +
+      '</div>';
+  } else {
+    card.className = 'puzzle-card globe-card joined-card';
+    card.dataset.recordId = r.id;
+    card.style.setProperty('--tint', color);
+    card.style.setProperty('--tint-alpha', color + '2b');
 
-  c.save();
-  c.strokeStyle='#e8c777';
-  c.globalAlpha=0.22;
-  c.lineWidth=1.2;
-  c.beginPath();
-  c.moveTo(sx,sy);
-  c.quadraticCurveTo(cpx,cpy,ex,ey);
-  c.stroke();
-  c.restore();
-
-  if(!a._peacemakersNextBead){
-   const r0=a.rng?a.rng():Math.random();
-   a._peacemakersNextBead=t+r0*2.0;
+    card.innerHTML =
+      '<div class="globe-card-inner">' +
+      '<div class="globe-badge" style="--tint:' + color + '">' + icon(exprId) + '</div>' +
+      '<div class="globe-recipient">' + esc(r.name) + '</div>' +
+      '<p class="puzzle-message" style="display:none" data-full-message="' + esc(r.id) + '">' + esc(r.message) + '</p>' +
+      '</div>';
   }
-  if(t>=a._peacemakersNextBead){
-   const r1=a.rng?a.rng():Math.random();
-   a._peacemakersNextBead=t+2.5+r1*1.5;
-   if(PEACEMAKERS_BEADS.length<12){
-    PEACEMAKERS_BEADS.push({a,start:t,duration:1.2,hit:false});
-   }
-  }
- });
-
- for(const bead of PEACEMAKERS_BEADS){
-  const a=bead.a;
-  if(!a||a.life!=='steady'||!a._peacemakersThread)continue;
-  const u=(t-bead.start)/bead.duration;
-  if(u<0)continue;
-  if(u>=1&&!bead.hit){
-   bead.hit=true;
-   a._peacemakersHitUntil=t+0.6;
-   if(a.el)a.el.classList.add('thread-hit');
-  }
-  if(u<=1.05){
-   const {sx,sy,cpx,cpy,ex,ey}=a._peacemakersThread;
-   const headAlpha=0.9*Math.min(1,u/0.08);
-   for(let k=5;k>=0;k--){
-    const sampleU=u-k*0.025;
-    if(sampleU<0||sampleU>1)continue;
-    const x=peacemakersBezier(sx,cpx,ex,sampleU);
-    const y=peacemakersBezier(sy,cpy,ey,sampleU);
-    const sampleAlpha=headAlpha*(1-k/6);
-    const sampleR=4.2*(1-k*0.08);
-    drawSpark(c,x,y,sampleR,sampleAlpha,'#fff');
-   }
-  }
- }
-
- PEACEMAKERS_BEADS=PEACEMAKERS_BEADS.filter(b=>(t-b.start)<b.duration+0.1);
- if(PEACEMAKERS_BEADS.length>12)PEACEMAKERS_BEADS.splice(0,PEACEMAKERS_BEADS.length-12);
+  return card;
 }
 
-registerScene(8,{
- markup:peacemakers,
- floaters:true,
- fxCanvas:true,
- keepOut:()=>[{x:0,y:8,w:700,h:296}],
- replaceMode:'drift',
- mount:mountPEACEMAKERS,
- integrate:integratePEACEMAKERS,
- place:placePEACEMAKERS,
- draw:peacemakersDraw
+function peacemakersJoinCard(r, slotIndex, bgPos) {
+  const sphere = document.getElementById('peacemakers-globe-sphere');
+  if (!sphere) return;
+
+  if (peacemakers_joined.length >= PEACEMAKERS_TOTAL_SLOTS) {
+    const oldest = peacemakers_joined.shift();
+    if (oldest && oldest.cardEl) {
+      const oldCard = oldest.cardEl;
+      oldCard.classList.add('dissolving');
+      const removeTimer = setTimeout(() => {
+        oldCard.remove();
+      }, 500);
+      peacemakers_timers.push(removeTimer);
+    }
+  }
+
+  let slotEl = sphere.querySelector(`.globe-slot[data-slot-index="${slotIndex}"]`);
+  if (!slotEl) {
+    slotEl = peacemakersCreateSlotElement(slotIndex);
+    sphere.appendChild(slotEl);
+  }
+
+  const staleCards = slotEl.querySelectorAll('.globe-card:not(.dissolving)');
+  staleCards.forEach((c) => c.remove());
+
+  const card = peacemakersBuildCard(r, false, bgPos);
+  slotEl.appendChild(card);
+
+  peacemakers_totalJoins++;
+  peacemakers_joined.push({
+    id: r.id,
+    record: r,
+    slotIndex,
+    slotEl,
+    cardEl: card
+  });
+
+  log('peacemakers_piece_joined', {
+    id: r.id,
+    count: peacemakers_joined.length,
+    totalJoins: peacemakers_totalJoins,
+    slot: slotIndex
+  });
+}
+
+function peacemakersStartNextPiece() {
+  const holdZone = document.getElementById('peacemakers-hold-zone');
+  if (!holdZone) return;
+
+  const r = chooseRandom(peacemakers_shownIds) || records()[0];
+  if (!r) return;
+
+  markShown(r.id);
+  peacemakers_shownIds.push(r.id);
+  if (peacemakers_shownIds.length > 50) peacemakers_shownIds.shift();
+
+  const socketIdx = peacemakers_totalJoins % PEACEMAKERS_SOURCE_SOCKETS.length;
+  const srcSocket = PEACEMAKERS_SOURCE_SOCKETS[socketIdx];
+  const relX = Math.round(srcSocket.sx * PEACEMAKERS_SCALE_X);
+  const relY = Math.round(srcSocket.sy * PEACEMAKERS_SCALE_Y);
+  const startStageX = 271 + relX;
+  const startStageY = 134 + relY;
+  const bgPos = `-${relX}px -${relY}px`;
+
+  const socketContainer = document.getElementById('peacemakers-world-sockets');
+  if (socketContainer) {
+    const socketEl = document.createElement('div');
+    socketEl.className = 'peacemakers-socket';
+    socketEl.style.left = relX + 'px';
+    socketEl.style.top = relY + 'px';
+    socketContainer.appendChild(socketEl);
+    while (socketContainer.children.length > 4) {
+      socketContainer.firstElementChild.remove();
+    }
+  }
+
+  peacemakers_activeRecord = r;
+  peacemakers_holdDuration = 3 + r.message.length / 40;
+  peacemakers_phase = 'detaching';
+  peacemakers_phaseAge = 0;
+  peacemakers_currentSocket = { relX, relY, startX: startStageX, startY: startStageY, bgPos };
+
+  holdZone.replaceChildren();
+
+  const card = peacemakersBuildCard(r, true, bgPos);
+  card.classList.add('flying');
+
+  card.style.position = 'absolute';
+  card.style.left = '0px';
+  card.style.top = '0px';
+  card.style.width = '260px';
+  card.style.height = '260px';
+  card.style.transformOrigin = '0 0';
+
+  const initDx = startStageX - 900;
+  const initDy = startStageY - 188;
+  const initScale = 96 / 260;
+  card.style.transform = `translate3d(${initDx.toFixed(1)}px, ${initDy.toFixed(1)}px, 0) scale(${initScale.toFixed(4)})`;
+  card.style.opacity = '0.8';
+
+  holdZone.appendChild(card);
+  peacemakers_activePieceEl = card;
+  peacemakers_reading = peacemakersFitCard(card, r, false);
+}
+
+function peacemakersInitStill(root) {
+  peacemakers_phase = 'idle';
+  peacemakers_phaseAge = 0;
+  peacemakers_joined = [];
+  peacemakers_totalJoins = 0;
+
+  const holdZone = root.querySelector('#peacemakers-hold-zone');
+  const pool = records();
+  const heldRec = pool[0] || normalizedRecord({
+    id: 'rec-still-hold',
+    recipient: 'Kind Neighbor',
+    message: 'Thank you for your warmth and peaceful consideration.',
+    expressionIds: [2],
+    createdAt: '2026-09-08T08:00:00.000Z',
+    firstPublishedAt: '2026-09-08T08:00:00.000Z',
+    expiresAt: '2026-09-15T08:00:00.000Z',
+    status: 'published'
+  }, {});
+
+  if (holdZone && heldRec) {
+    holdZone.replaceChildren();
+    const s = PEACEMAKERS_SOURCE_SOCKETS[0];
+    const rx = Math.round(s.sx * PEACEMAKERS_SCALE_X);
+    const ry = Math.round(s.sy * PEACEMAKERS_SCALE_Y);
+    const bgPos = `-${rx}px -${ry}px`;
+
+    const heldCard = peacemakersBuildCard(heldRec, true, bgPos);
+    heldCard.style.position = 'absolute';
+    heldCard.style.left = '0px';
+    heldCard.style.top = '0px';
+    heldCard.style.width = '260px';
+    heldCard.style.height = '260px';
+    heldCard.style.transform = 'translate3d(0px, 0px, 0) scale(1)';
+    holdZone.appendChild(heldCard);
+    peacemakers_activePieceEl = heldCard;
+    peacemakers_reading = peacemakersFitCard(heldCard, heldRec, true);
+  }
+
+  for (let i = 0; i < 8; i++) {
+    const rec = pool[(i + 1) % pool.length] || pool[0] || heldRec;
+    const s = PEACEMAKERS_SOURCE_SOCKETS[i % PEACEMAKERS_SOURCE_SOCKETS.length];
+    const rx = Math.round(s.sx * PEACEMAKERS_SCALE_X);
+    const ry = Math.round(s.sy * PEACEMAKERS_SCALE_Y);
+    if (rec) peacemakersJoinCard(rec, i, `-${rx}px -${ry}px`);
+  }
+}
+
+function peacemakersInitActive(root) {
+  peacemakers_joined = [];
+  peacemakers_totalJoins = 0;
+  peacemakers_nextSlot = 0;
+  peacemakersStartNextPiece();
+}
+
+function peacemakersMount(root) {
+  peacemakers_root = root;
+  peacemakers_timers = [];
+  peacemakers_shownIds = [];
+
+  if (S.still) {
+    peacemakersInitStill(root);
+  } else {
+    peacemakersInitActive(root);
+  }
+}
+
+function peacemakersPrime(checkpoint) {
+  if (Array.isArray(V.speech) && V.speech.length >= 4) {
+    const offsets = [0, 2.2, 4.4, 6.6];
+    V.speech.forEach((sp, i) => {
+      sp.age = 0;
+      sp.fadeAge = 0;
+      const offset = offsets[i] || 0;
+      if (S.still) {
+        sp.phase = 'showing';
+        if (sp.el) sp.el.classList.remove('fading');
+      } else if (offset > 0) {
+        sp.phase = 'fading_out';
+        sp.fadeAge = -(offset - 0.5);
+        if (sp.el) sp.el.classList.add('fading');
+      } else {
+        sp.phase = 'showing';
+        if (sp.el) sp.el.classList.remove('fading');
+      }
+    });
+  }
+}
+
+function peacemakersTickAge(dt) {
+  if (S.still || !peacemakers_activePieceEl) return;
+
+  peacemakers_phaseAge += dt;
+
+  if (peacemakers_phase === 'detaching') {
+    const p = clamp(peacemakers_phaseAge / 1.1, 0, 1);
+    const eased = ease(p);
+    const curDx = lerp(peacemakers_currentSocket.startX - 900, 0, eased);
+    const curDy = lerp(peacemakers_currentSocket.startY - 188, 0, eased);
+    const curScale = lerp(96 / 260, 1.0, eased);
+    const curOp = lerp(0.8, 1.0, eased);
+
+    peacemakers_activePieceEl.style.transform = `translate3d(${curDx.toFixed(1)}px, ${curDy.toFixed(1)}px, 0) scale(${curScale.toFixed(4)})`;
+    peacemakers_activePieceEl.style.opacity = curOp.toFixed(3);
+
+    if (p >= 1) {
+      peacemakers_phase = 'holding';
+      peacemakers_phaseAge = 0;
+      peacemakers_activePieceEl.classList.remove('flying');
+      peacemakers_activePieceEl.style.transform = 'translate3d(0px, 0px, 0) scale(1)';
+      peacemakers_activePieceEl.style.opacity = '1';
+    }
+  } else if (peacemakers_phase === 'holding') {
+    if (peacemakers_reading && peacemakers_reading.pages.length > 1) {
+      const pageDur = peacemakers_holdDuration / peacemakers_reading.pages.length;
+      const targetIdx = Math.min(peacemakers_reading.pages.length - 1, Math.floor(peacemakers_phaseAge / pageDur));
+      if (targetIdx !== peacemakers_reading.index) {
+        peacemakers_reading.index = targetIdx;
+        const msgEl = peacemakers_activePieceEl.querySelector('.puzzle-message');
+        const indEl = peacemakers_activePieceEl.querySelector('.puzzle-page-indicator');
+        if (msgEl) msgEl.textContent = peacemakers_reading.pages[targetIdx];
+        if (indEl) {
+          const isLast = (targetIdx === peacemakers_reading.pages.length - 1);
+          indEl.textContent = `${String(targetIdx + 1).padStart(2, '0')} / ${String(peacemakers_reading.pages.length).padStart(2, '0')} \u00B7 ${isLast ? 'COMPLETE' : 'CONTINUED'}`;
+        }
+      }
+    }
+
+    if (peacemakers_phaseAge >= peacemakers_holdDuration) {
+      log('peacemakers_piece_hold', {
+        id: peacemakers_activeRecord ? peacemakers_activeRecord.id : '',
+        duration: +peacemakers_phaseAge.toFixed(3),
+        expected: +peacemakers_holdDuration.toFixed(3),
+        msgLen: peacemakers_activeRecord ? peacemakers_activeRecord.message.length : 0
+      });
+
+      peacemakers_phase = 'snapping';
+      peacemakers_phaseAge = 0;
+      peacemakers_targetSlot = peacemakers_nextSlot % PEACEMAKERS_TOTAL_SLOTS;
+      peacemakers_nextSlot++;
+
+      peacemakers_activePieceEl.classList.add('snapping');
+      peacemakers_activePieceEl.classList.remove('face-on');
+    }
+  } else if (peacemakers_phase === 'snapping') {
+    const p = clamp(peacemakers_phaseAge / 0.9, 0, 1);
+    const eased = ease(p);
+
+    const band = Math.floor(peacemakers_targetSlot / 6);
+    const lonIndex = peacemakers_targetSlot % 6;
+    const lat = PEACEMAKERS_LATITUDES[band] || 0;
+    const lon = PEACEMAKERS_LONGITUDES[lonIndex] || 0;
+    const latRad = (lat * Math.PI) / 180;
+    const lonRad = (lon * Math.PI) / 180;
+    const targetStageX = 1510 + PEACEMAKERS_GLOBE_RADIUS * Math.cos(latRad) * Math.sin(lonRad) - 48;
+    const targetStageY = 318 - PEACEMAKERS_GLOBE_RADIUS * Math.sin(latRad) - 48;
+
+    const curDx = lerp(0, targetStageX - 900, eased);
+    const curDy = lerp(0, targetStageY - 188, eased);
+    const curScale = lerp(1.0, 96 / 260, eased);
+    const curOp = lerp(1.0, 0.85, eased);
+
+    peacemakers_activePieceEl.style.transform = `translate3d(${curDx.toFixed(1)}px, ${curDy.toFixed(1)}px, 0) scale(${curScale.toFixed(4)})`;
+    peacemakers_activePieceEl.style.opacity = curOp.toFixed(3);
+
+    if (p >= 1) {
+      peacemakersJoinCard(peacemakers_activeRecord, peacemakers_targetSlot, peacemakers_currentSocket.bgPos);
+      peacemakers_activePieceEl.remove();
+      peacemakers_activePieceEl = null;
+      peacemakersStartNextPiece();
+    }
+  }
+}
+
+function peacemakersOnLeave() {
+  for (const t of peacemakers_timers) {
+    clearTimeout(t);
+  }
+  peacemakers_timers = [];
+  peacemakers_phase = 'idle';
+  peacemakers_activePieceEl = null;
+  peacemakers_reading = null;
+  peacemakers_joined = [];
+}
+
+registerScene(8, {
+  markup: peacemakers,
+  floaters: false,
+  fxCanvas: true,
+  // Speech bubble anchors. core/speech.js positions each bubble AT its anchor
+  // (it sets inline left and top from these values), so these are the bubble
+  // boxes themselves, not the figures' heads. The four sit in a 2 by 2 block
+  // over the world art, below the title copy and clear of the hold zone:
+  // each box is at most 200 by 92, so the block spans x 300 to 710 and y 320
+  // to 522. The title copy ends near y 302, the hold zone starts at x 900,
+  // and the art runs to y 616, so nothing collides. An earlier round tried to
+  // reposition these from CSS with .speech-bubble:nth-of-type(n); that never
+  // matched, because mountSpeech appends the bubbles after the scene's other
+  // div children so their type indices are not 1 to 4, which left every
+  // bubble sitting on a figure's head and bubble four overlapping the hold
+  // zone. Position them here instead, where the scene owns the data.
+  speakers: [
+    { x: 300, y: 320 },
+    { x: 300, y: 430 },
+    { x: 510, y: 430 },
+    { x: 510, y: 320 }
+  ],
+  mount: peacemakersMount,
+  prime: peacemakersPrime,
+  tickAge: peacemakersTickAge,
+  onLeave: peacemakersOnLeave
 });
-
-
