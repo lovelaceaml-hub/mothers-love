@@ -1,2 +1,275 @@
 /* Scene 10, Expression Orbit. Every rule in this file is scoped to #tv .scene[data-scene="10"]. Colors stay as shipped in renderer.css. */
 
+#tv .scene[data-scene="10"] .orbit-universe {
+  position: absolute;
+  left: 0;
+  top: 84px;
+  width: 1812px;
+  height: 552px;
+  perspective: 1200px;
+  perspective-origin: 50% 258px;
+  transform-style: preserve-3d;
+  isolation: isolate;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun {
+  position: absolute;
+  left: 696px;
+  top: 48px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  padding: 32px;
+  animation: orbitSunIdleSway 14s ease-in-out infinite;
+}
+
+@keyframes orbitSunIdleSway {
+  0%, 100% {
+    transform: rotateY(-3deg) rotateX(2deg);
+  }
+  50% {
+    transform: rotateY(3deg) rotateX(-2deg);
+  }
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 446px;
+  height: 446px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 240, 166, 0.22) 0%, rgba(229, 182, 72, 0.12) 60%, transparent 72%);
+  border: 1px dashed rgba(255, 230, 143, 0.45);
+  box-shadow: 0 0 50px rgba(255, 240, 151, 0.3);
+  animation: orbitSunHaloRotate 28s linear infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes orbitSunHaloRotate {
+  0% {
+    transform: translate(-50%, -50%) rotateY(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateY(360deg);
+  }
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: orbitSunRaysSpin 48s linear infinite;
+}
+
+@keyframes orbitSunRaysSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ray {
+  position: absolute;
+  left: -2px;
+  top: -240px;
+  width: 4px;
+  height: 480px;
+  background: linear-gradient(180deg, transparent, rgba(255, 248, 220, 0.35) 25%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 248, 220, 0.35) 75%, transparent);
+  border-radius: 2px;
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ray.ray-0 { transform: rotate(0deg); }
+#tv .scene[data-scene="10"] .orbit-sun-ray.ray-1 { transform: rotate(45deg); }
+#tv .scene[data-scene="10"] .orbit-sun-ray.ray-2 { transform: rotate(90deg); }
+#tv .scene[data-scene="10"] .orbit-sun-ray.ray-3 { transform: rotate(135deg); }
+
+#tv .scene[data-scene="10"] .orbit-sun-particles {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, #ffd05f);
+  box-shadow: 0 0 8px #ffe599;
+  pointer-events: none;
+  animation: orbitSparkFloat 7s ease-in-out infinite alternate;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-0 { left: 24%; top: 30%; animation-delay: 0s; }
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-1 { left: 72%; top: 26%; animation-delay: 1.2s; }
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-2 { left: 80%; top: 65%; animation-delay: 2.5s; }
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-3 { left: 30%; top: 75%; animation-delay: 3.8s; }
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-4 { left: 52%; top: 18%; animation-delay: 4.6s; }
+#tv .scene[data-scene="10"] .orbit-sun-spark.spark-5 { left: 48%; top: 82%; animation-delay: 5.4s; }
+
+@keyframes orbitSparkFloat {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0.4; }
+  50% { transform: translate(4px, -6px) scale(1.2); opacity: 0.95; }
+  100% { transform: translate(-3px, 5px) scale(0.9); opacity: 0.5; }
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ring.ring-0 {
+  width: 420px;
+  height: 420px;
+  transform: translate(-50%, -50%) translateZ(0px);
+  border: 2px solid rgba(255, 244, 202, 0.65);
+  box-shadow: 0 0 32px rgba(255, 240, 151, 0.35);
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ring.ring-1 {
+  width: 384px;
+  height: 384px;
+  transform: translate(-50%, -50%) translateZ(26px);
+  border: 1.5px solid rgba(229, 182, 72, 0.55);
+  box-shadow: inset 0 0 20px rgba(255, 248, 213, 0.3);
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ring.ring-2 {
+  width: 348px;
+  height: 348px;
+  transform: translate(-50%, -50%) translateZ(52px);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 16px rgba(229, 182, 72, 0.3);
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-ring.ring-3 {
+  width: 312px;
+  height: 312px;
+  transform: translate(-50%, -50%) translateZ(78px);
+  border: 1px solid rgba(218, 175, 89, 0.7);
+}
+
+#tv .scene[data-scene="10"] .orbit-sun-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 350px;
+  transform-style: preserve-3d;
+  transform: translateZ(78px);
+}
+
+#tv .scene[data-scene="10"] .orbit-sun .medallion {
+  width: 72px;
+  height: 72px;
+  margin: 0 0 8px;
+  flex-shrink: 0;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun h2,
+#tv .scene[data-scene="10"] .orbit-sun .orbit-sun-name {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #655e38;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun p,
+#tv .scene[data-scene="10"] .orbit-sun .orbit-sun-phrase {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #34463f;
+  margin: 0 0 10px;
+  font-family: Georgia, serif;
+}
+
+#tv .scene[data-scene="10"] .orbit-sun .sun-principle {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #655e38;
+  margin-top: 0;
+  max-width: 320px;
+}
+
+#tv .scene[data-scene="10"] .planet-system {
+  width: var(--d, 227px);
+  height: var(--d, 227px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 50%;
+}
+
+#tv .scene[data-scene="10"] .planet-system .orb-slot {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+}
+
+#tv.still .scene[data-scene="10"] .orbit-sun,
+#tv.still .scene[data-scene="10"] .orbit-sun-halo,
+#tv.still .scene[data-scene="10"] .orbit-sun-rays,
+#tv.still .scene[data-scene="10"] .orbit-sun-spark,
+#tv.still .scene[data-scene="10"] .orbit-sun-ring {
+  animation: none !important;
+  transition: none !important;
+}
+
+#tv.still .scene[data-scene="10"] .orbit-sun {
+  transform: none !important;
+}
+
+#tv.still .scene[data-scene="10"] .orbit-sun-halo {
+  transform: translate(-50%, -50%) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tv .scene[data-scene="10"] .orbit-sun,
+  #tv .scene[data-scene="10"] .orbit-sun-halo,
+  #tv .scene[data-scene="10"] .orbit-sun-rays,
+  #tv .scene[data-scene="10"] .orbit-sun-spark,
+  #tv .scene[data-scene="10"] .orbit-sun-ring {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  #tv .scene[data-scene="10"] .orbit-sun {
+    transform: none !important;
+  }
+
+  #tv .scene[data-scene="10"] .orbit-sun-halo {
+    transform: translate(-50%, -50%) !important;
+  }
+}
