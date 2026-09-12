@@ -10,15 +10,18 @@ function beginEvent(){
  const items=S.queue.splice(0,S.queue.length>=10?10:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===10;
  if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed')}
  const style=nextStyle(group?'group':'single');
- active={items,kind:group?'group':'single',style,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:group&&items.some(r=>!smallFits(r)),elements:[],localTime:0};
+ const frameStyle=nextArrivalFrame();
+ active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:group&&items.some(r=>!smallFits(r)),elements:[],localTime:0,exitPos:null};
  buildEvent();
- log('entrance_start',{kind:active.kind,style:group?GROUP_STYLES[style]:SINGLE_STYLES[style],ids:items.map(x=>x.id)});renderQueue();
+ log('entrance_start',{kind:active.kind,style:group?GROUP_STYLES[style]:SINGLE_STYLES[style],frame:ARRIVAL_FRAME_STYLES[frameStyle],ids:items.map(x=>x.id)});renderQueue();
 }
 
 function buildEvent(){
  const a=active;if(!a)return;const group=a.kind==='group';
- const root=$('event');root.className='event-stage active';root.dataset.style=(group?'group-':'single-')+a.style;
- root.innerHTML=`<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF TEN</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · full message</div>`}<canvas class="event-sparkles" id="event-canvas" width="1812" height="615" aria-hidden="true"></canvas><div id="event-items"></div>`;
+ const root=$('event');root.className='event-stage active'+(S.still?' still':'');root.dataset.style=(group?'group-':'single-')+a.style;
+ root.dataset.frame=String(a.frameStyle);root.dataset.frameName=ARRIVAL_FRAME_STYLES[a.frameStyle];
+ const frameMarkup=arrivalBuildFrameMarkup(a.frameStyle,a.kind);
+ root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF TEN</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · ${esc(ARRIVAL_FRAME_STYLES[a.frameStyle])}</div>`}<canvas class="event-sparkles" id="event-canvas" width="1812" height="615" aria-hidden="true"></canvas><div id="event-items"></div>`;
  a.elements=[];
  if(a.oversize){buildGroupPage(0);log('extended_group_reading',{reason:'Long messages are shown in circular pairs with content-aware reading time.'})}
  else{
@@ -56,11 +59,46 @@ function tickEvent(dt){
   a.elements.forEach((b,i)=>{tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
   if(elapsed>=a.hold){
    if(a.oversize&&a.page<4){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
-   else{a.phase='exit';a.phaseAt=S.t;log('reading_end',{kind:a.kind,ids:a.items.map(r=>r.id)})}
+   else{
+    a.phase='exit';a.phaseAt=S.t;
+    const feed=$('feed-columns'), targetEl=feed?.firstElementChild||feed;
+    const stageEl=$('event');
+    let exitPos=null;
+    if(targetEl&&stageEl){
+     const tr=targetEl.getBoundingClientRect(), sr=stageEl.getBoundingClientRect();
+     if(tr.width>0&&tr.height>0&&sr.width>0){
+      const scaleFactor=sr.width/1812;
+      exitPos={
+       x:(tr.left+tr.width/2-sr.left)/scaleFactor,
+       y:(tr.top+tr.height/2-sr.top)/scaleFactor
+      };
+     }
+    }
+    a.exitPos=exitPos;
+    log('reading_end',{kind:a.kind,ids:a.items.map(r=>r.id)});
+    arrivalSpawnExitBurst(a);
+   }
   }
  }else if(a.phase==='exit'){
   const p=S.still?1:smooth(elapsed/a.exit);
-  a.elements.forEach((b,i)=>positionEvent(b,{x:b.x+(a.kind==='group'?(i%2?180:-180):110)*p,y:b.y-100*p,z:-p*200,k:1-.25*p,alpha:1-p}));
+  a.elements.forEach((b,i)=>{
+   let tx, ty, tk;
+   if(a.exitPos){
+    tx=a.exitPos.x;
+    ty=a.exitPos.y;
+    tk=Math.min(0.2, 52/b.d);
+   }else{
+    tx=b.x+(a.kind==='group'?(i%2?180:-180):110);
+    ty=b.y-100;
+    tk=0.75;
+   }
+   const curX=mix(b.x,tx,p);
+   const curY=mix(b.y,ty,p);
+   const curK=mix(1,tk,p);
+   const curZ=-p*200;
+   const curAlpha=1-p;
+   positionEvent(b,{x:curX,y:curY,z:curZ,k:curK,alpha:curAlpha});
+  });
   if(p>=1){log('presentation_complete',{kind:a.kind,ids:a.items.map(r=>r.id),hold:a.hold});if(S.queue.length){active={...a,phase:'gap',phaseAt:S.t};$('event-items').replaceChildren()}else{active=null;endChain()}}
  }
  renderQueue();
@@ -114,13 +152,23 @@ function nextStyle(kind){
 }
 
 function eventElement(r,d,x,y,index,group){
+ const ringEl=document.createElement('div');ringEl.className='arrival-ring';
+ ringEl.style.cssText=`width:${d}px;height:${d}px;opacity:0;--tint:${catalog[r.ids[0]-1].color};`;
+ $('event-items').append(ringEl);
  const el=document.createElement('div');el.className='event-orb '+(group?'grouped':'');el.dataset.eventId=r.id;el.style.cssText=`left:0;top:0;width:${d}px;height:${d}px;opacity:0;--tint:${catalog[r.ids[0]-1].color}`;
  el.innerHTML=completeOrb(r,d,{event:true,group});$('event-items').append(el);bindNumbers(el);
- const b={el,r,d,x,y,index,trail:[],reading:null,screenX:x,screenY:y};b.reading=fitCircle(el,r,d,0);return b;
+ markShown(r.id);
+ const b={el,ringEl,r,d,x,y,index,trail:[],reading:null,screenX:x,screenY:y};b.reading=fitCircle(el,r,d,0);return b;
 }
 
 function positionEvent(b,pos){
  b.el.style.transform=`translate(${(pos.x-b.d/2).toFixed(2)}px,${(pos.y-b.d/2).toFixed(2)}px) scale(${pos.k.toFixed(4)})`;
  b.el.style.opacity=clamp(pos.alpha,0,1);b.el.style.zIndex=String(600+Math.round(clamp(pos.z,-500,450)));
  b.screenX=pos.x;b.screenY=pos.y;b.scale=pos.k;b.opacity=pos.alpha;
+ if(b.ringEl){
+  const rot=S.still?'rotateY(0deg) rotateX(20deg)':`rotateY(${((S.t*60+b.index*35)%360).toFixed(1)}deg) rotateX(20deg)`;
+  b.ringEl.style.transform=`translate(${(pos.x-b.d/2).toFixed(2)}px,${(pos.y-b.d/2).toFixed(2)}px) ${rot}`;
+  b.ringEl.style.opacity=clamp(pos.alpha,0,1);
+  b.ringEl.style.zIndex=String(590+Math.round(clamp(pos.z,-500,450)));
+ }
 }
