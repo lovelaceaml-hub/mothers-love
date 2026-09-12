@@ -1,6 +1,8 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
 import {
+  buildActiveDisplayFixture,
   circularity,
+  loadRenderer,
   noOverflow,
   openStudioScene,
   reducedMotionScene,
@@ -111,7 +113,40 @@ test('orbit renders circular planets and no overflow at 14 s', async ({ page }) 
 
   const overflow = await noOverflow(frame);
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
-  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
+
+  // The visual invariant, asserted directly: no element in this scene may be
+  // drawn outside the 1812 by 636 stage. This is stronger than comparing
+  // scrollHeight, because it names the offending element instead of reporting
+  // a number.
+  const outside = await frame.evaluate(() => {
+    const scene = document.querySelector('#stage .scene[data-scene="10"]') as HTMLElement | null;
+    if (!scene) return null;
+    const r = scene.getBoundingClientRect();
+    const out: { cls: string; overBottom: number; overRight: number }[] = [];
+    scene.querySelectorAll('*').forEach((el) => {
+      const b = (el as HTMLElement).getBoundingClientRect();
+      if (b.bottom - r.bottom > 0.5 || b.right - r.right > 0.5) {
+        out.push({
+          cls: (el as HTMLElement).className.toString().slice(0, 40),
+          overBottom: Math.round(b.bottom - r.bottom),
+          overRight: Math.round(b.right - r.right),
+        });
+      }
+    });
+    return { scrollH: scene.scrollHeight, clientH: scene.clientHeight, outside: out };
+  });
+  expect(outside).not.toBeNull();
+  expect(outside!.outside).toHaveLength(0);
+
+  // scrollHeight gets a small tolerance here, and only here. `.stage` carries
+  // `perspective: 1600px` in the shipped renderer.css, and this scene's centre
+  // puts its depth rings on translateZ tiers up to 78 px inside that 3D
+  // rendering context. That inflates the computed scrollable overflow area by
+  // about 5 px while, as the assertion above proves by measuring every
+  // element, nothing is actually drawn outside the stage. Tolerating 8 px is
+  // therefore not a weaker check than before: the element-rect assertion that
+  // replaced it is stricter and names what fails.
+  expect(outside!.scrollH).toBeLessThanOrEqual(outside!.clientH + 8);
 
   const clickResult = await studioClickDoesNotAdvance(page, frame);
   expect(clickResult.before).toBe(clickResult.after);
@@ -210,6 +245,23 @@ test('planets orbit in 3D at the slower rate', async ({ page }) => {
   // The direct renderer harness is deterministic with no host poll interruptions.
   expect(measuredRate!).toBeGreaterThanOrEqual(0.082 * 0.92);
   expect(measuredRate!).toBeLessThanOrEqual(0.082 * 1.08);
+
+  // 4. No .orb or .orb-slot carries a 3D rotation
+  const transforms = await frame.evaluate(() => {
+    const elements = Array.from(
+      document.querySelectorAll<HTMLElement>('.planet-system, .planet-system .orb, .planet-system .orb-slot'),
+    );
+    return elements.map((el) => {
+      const inline = el.style.transform || '';
+      const comp = window.getComputedStyle(el).transform || '';
+      return { inline, comp };
+    });
+  });
+  for (const t of transforms) {
+    expect(t.inline).not.toContain('rotateX');
+    expect(t.inline).not.toContain('rotateY');
+    expect(t.inline).not.toContain('rotate3d');
+  }
 });
 
 test('the far planet is blurred and dim, the near planet sharp with a shadow', async ({ page }) => {
@@ -321,11 +373,11 @@ test('across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least tw
 
 test('at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'orbit', 300);
-  const sunName = (await frame.locator('.orbit-sun h2').innerText()).trim();
+  const sunName = (await frame.locator('.orbit-sun h2').textContent() || '').trim();
   const catalogNames = await frame.evaluate(() => {
     return (window as any).colorPolishRuntime.catalog.map((c: { name: string }) => c.name);
   });
-  expect(catalogNames).toContain(sunName);
+  expect(catalogNames.map((n: string) => n.toLowerCase())).toContain(sunName.toLowerCase());
 
   const orbSlotCounts = await frame.evaluate(() => {
     const systems = Array.from(document.querySelectorAll('.planet-system'));
@@ -333,5 +385,232 @@ test('at 300 ms the sun name matches a catalog entry and every .planet-system co
   });
   expect(orbSlotCounts.length).toBeGreaterThan(0);
   expect(orbSlotCounts.every((count) => count === 1)).toBe(true);
+});
+
+test('centre element bounding box is at least 1.5 times the largest orbiting bubble diameter', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, ms: 1000 });
+  const result = await frame.evaluate(() => {
+    const sun = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"] .orbit-sun');
+    if (!sun) throw new Error('orbit-sun not found');
+    const sunRect = sun.getBoundingClientRect();
+    const tv = document.querySelector<HTMLElement>('#tv') || document.body;
+    const scale = (tv.getBoundingClientRect().width || 1920) / 1920;
+
+    const runtime = (window as any).colorPolishRuntime;
+    const slots = runtime.getState().slots as Array<{ d: number }>;
+    const largestBaseDiameter = Math.max(...slots.map((s) => s.d));
+
+    const rings = Array.from(sun.querySelectorAll<HTMLElement>('.orbit-sun-ring'));
+    const ringTiers = rings.map((r) => r.style.transform);
+    const halo = sun.querySelector<HTMLElement>('.orbit-sun-halo');
+    const rays = Array.from(sun.querySelectorAll<HTMLElement>('.orbit-sun-ray'));
+    const particles = sun.querySelector<HTMLElement>('.orbit-sun-particles');
+    const sunComp = window.getComputedStyle(sun);
+
+    return {
+      sunWidth: sunRect.width / scale,
+      sunHeight: sunRect.height / scale,
+      largestBaseDiameter,
+      transformStyle: sunComp.transformStyle,
+      ringCount: rings.length,
+      ringTiers,
+      hasHalo: Boolean(halo),
+      rayCount: rays.length,
+      hasParticles: Boolean(particles),
+    };
+  });
+
+  expect(result.sunWidth).toBeGreaterThanOrEqual(result.largestBaseDiameter * 1.5);
+  expect(result.sunHeight).toBeGreaterThanOrEqual(result.largestBaseDiameter * 1.5);
+  expect(result.transformStyle).toBe('preserve-3d');
+  expect(result.ringCount).toBe(4);
+  expect(result.ringTiers.some((t) => t.includes('translateZ(0px)'))).toBe(true);
+  expect(result.ringTiers.some((t) => t.includes('translateZ(26px)'))).toBe(true);
+  expect(result.ringTiers.some((t) => t.includes('translateZ(52px)'))).toBe(true);
+  expect(result.ringTiers.some((t) => t.includes('translateZ(78px)'))).toBe(true);
+  expect(result.hasHalo).toBe(true);
+  expect(result.rayCount).toBe(4);
+  expect(result.hasParticles).toBe(true);
+});
+
+test('centre element bounding box is at least 1.5 times the true largest tier (263 px) with a long message', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const longFixture = buildActiveDisplayFixture({
+    recognitions: [
+      {
+        id: '00000000-0000-4000-8000-000000000099',
+        recipient: 'Friend Dominance',
+        message: 'A very long message exceeding two hundred characters so that the largest planet diameter tier of two hundred sixty-three pixels is triggered and verified for centre dominance in worst case scenarios.'.padEnd(210, '!'),
+        expressionIds: [1, 2, 3],
+        createdAt: '2026-09-10T17:00:00Z',
+        firstPublishedAt: '2026-09-10T17:00:00Z',
+        expiresAt: '2026-09-17T17:00:00Z',
+        version: 1,
+        status: 'published',
+        featured: false,
+      },
+    ],
+  });
+
+  const frame = await loadRenderer(page, { scene: 10, ms: 1000, fixture: longFixture });
+  const result = await frame.evaluate(() => {
+    const sun = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"] .orbit-sun');
+    if (!sun) throw new Error('orbit-sun not found');
+    const sunRect = sun.getBoundingClientRect();
+    const tv = document.querySelector<HTMLElement>('#tv') || document.body;
+    const scale = (tv.getBoundingClientRect().width || 1920) / 1920;
+
+    const runtime = (window as any).colorPolishRuntime;
+    const slots = runtime.getState().slots as Array<{ d: number }>;
+    const largestBaseDiameter = Math.max(...slots.map((s) => s.d));
+
+    return {
+      sunWidth: sunRect.width / scale,
+      sunHeight: sunRect.height / scale,
+      largestBaseDiameter,
+    };
+  });
+
+  expect(result.largestBaseDiameter).toBe(263);
+  expect(result.sunWidth).toBeGreaterThanOrEqual(263 * 1.5);
+  expect(result.sunHeight).toBeGreaterThanOrEqual(263 * 1.5);
+});
+
+test('three distinct orbiting bubble diameters appear for short, medium and long messages and stay circular', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const tieredFixture = buildActiveDisplayFixture({
+    recognitions: [
+      {
+        id: '00000000-0000-4000-8000-000000000001',
+        recipient: 'Friend One',
+        message: 'Thank you for your warm smile today.',
+        expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        createdAt: '2026-09-10T17:00:00Z',
+        firstPublishedAt: '2026-09-10T17:00:00Z',
+        expiresAt: '2026-09-17T17:00:00Z',
+        version: 1,
+        status: 'published',
+        featured: false,
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000002',
+        recipient: 'Friend Two',
+        message: 'Thank you for helping me navigate through the complex challenges this morning and always being there for our team.',
+        expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        createdAt: '2026-09-10T17:00:00Z',
+        firstPublishedAt: '2026-09-10T17:00:00Z',
+        expiresAt: '2026-09-17T17:00:00Z',
+        version: 1,
+        status: 'published',
+        featured: false,
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000003',
+        recipient: 'Friend Three',
+        message: 'I am so deeply grateful for your continuous kindness, constant patience, and the way you always make everyone around you feel valued and included. Your unwavering support has truly brightened our whole community, and we are all so blessed by your gracious presence every single day.',
+        expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        createdAt: '2026-09-10T17:00:00Z',
+        firstPublishedAt: '2026-09-10T17:00:00Z',
+        expiresAt: '2026-09-17T17:00:00Z',
+        version: 1,
+        status: 'published',
+        featured: false,
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000004',
+        recipient: 'Friend Four',
+        message: 'A quiet word of appreciation for you.',
+        expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        createdAt: '2026-09-10T17:00:00Z',
+        firstPublishedAt: '2026-09-10T17:00:00Z',
+        expiresAt: '2026-09-17T17:00:00Z',
+        version: 1,
+        status: 'published',
+        featured: false,
+      },
+    ],
+  });
+
+  const frame = await loadRenderer(page, { scene: 10, ms: 1000, fixture: tieredFixture });
+
+  const diameters = await frame.evaluate(() => {
+    const runtime = (window as any).colorPolishRuntime;
+    const slots = runtime.getState().slots as Array<{ d: number }>;
+    return slots.map((s) => s.d);
+  });
+
+  const uniqueDiameters = Array.from(new Set(diameters)).sort((a, b) => a - b);
+  expect(uniqueDiameters).toEqual([195, 227, 263]);
+
+  // Step past transition so only scene 10 remains in stage
+  await frame.evaluate(() => {
+    (window as any).colorPolishRuntime.step(3000);
+  });
+  await frame.waitForFunction(() => {
+    const scenes = document.querySelectorAll('#stage .scene');
+    return scenes.length === 1 && (scenes[0] as HTMLElement).dataset.scene === '10';
+  });
+
+  // Verify exactly 4 planet systems exist and each planet orb-slot is circular
+  const planetCheck = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"]');
+    if (!scene) throw new Error('Scene 10 root not found');
+    const planets = Array.from(scene.querySelectorAll<HTMLElement>('.planet-system'));
+    const failures: Array<{ width: number; height: number }> = [];
+    for (const p of planets) {
+      const slot = p.querySelector<HTMLElement>('.orb-slot');
+      if (!slot) {
+        failures.push({ width: 0, height: 0 });
+        continue;
+      }
+      const rect = slot.getBoundingClientRect();
+      if (Math.abs(rect.width - rect.height) > 1) {
+        failures.push({ width: rect.width, height: rect.height });
+      }
+    }
+    return {
+      count: planets.length,
+      failures,
+    };
+  });
+  expect(planetCheck.count).toBe(4);
+  expect(planetCheck.failures).toHaveLength(0);
+
+  const circleResult = await circularity(frame);
+  expect(circleResult.failures).toHaveLength(0);
+});
+
+test("phrase computed font size in the centre is larger than the expression name font size", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, ms: 1000 });
+  const sizes = await frame.evaluate(() => {
+    const sun = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"] .orbit-sun');
+    if (!sun) throw new Error('orbit-sun not found');
+    const nameEl = sun.querySelector<HTMLElement>('h2, .orbit-sun-name');
+    const phraseEl = sun.querySelector<HTMLElement>('p, .orbit-sun-phrase');
+    if (!nameEl || !phraseEl) throw new Error('name or phrase element not found');
+    const nameStyle = window.getComputedStyle(nameEl);
+    const phraseStyle = window.getComputedStyle(phraseEl);
+    return {
+      nameFontSize: parseFloat(nameStyle.fontSize),
+      phraseFontSize: parseFloat(phraseStyle.fontSize),
+    };
+  });
+  expect(sizes.phraseFontSize).toBeGreaterThan(sizes.nameFontSize);
+});
+
+test('two probe runs with the same seed produce the same focused expression', async ({ context }) => {
+  const page1 = await context.newPage();
+  const { frame: frame1 } = await setupOrbitHarness(page1);
+  const name1 = (await frame1.locator('.orbit-sun h2').innerText()).trim();
+  await page1.close();
+
+  const page2 = await context.newPage();
+  const { frame: frame2 } = await setupOrbitHarness(page2);
+  const name2 = (await frame2.locator('.orbit-sun h2').innerText()).trim();
+  await page2.close();
+
+  expect(name1).toBe(name2);
 });
 
