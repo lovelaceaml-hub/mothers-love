@@ -1,197 +1,272 @@
 import { expect, test } from '@playwright/test';
 import {
+  cardShape,
   circularity,
+  loadRenderer,
   noOverflow,
-  openStudioScene,
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
 
-test('peace in practice renders circular bubbles and no overflow at 14 s', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'peace-in-practice', 14000);
+test('peace in practice renders heart cards and no circular orbs at 14 s', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 14000 });
 
   const circleResult = await circularity(frame);
-  expect(circleResult.count).toBeGreaterThan(0);
+  expect(circleResult.count).toBe(0);
   expect(circleResult.failures).toHaveLength(0);
+
+  const shapeResult = await cardShape(frame, '.heart-card', 'heart');
+  expect(shapeResult.count).toBeGreaterThanOrEqual(2);
+  expect(shapeResult.failures).toHaveLength(0);
 
   const overflow = await noOverflow(frame);
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
-
-  const maxBottom = await frame.evaluate(() => {
-    const scenes = document.querySelectorAll('#stage .scene');
-    const sceneRoot = scenes[scenes.length - 1] as HTMLElement | undefined;
-    if (!sceneRoot) return 0;
-    const rootRect = sceneRoot.getBoundingClientRect();
-    const heartField = sceneRoot.querySelector('#heart-field');
-    const isExcluded = (el: Element) => el === heartField || Boolean(heartField?.contains(el));
-    const candidates = new Set<HTMLElement>([
-      ...(Array.from(sceneRoot.children) as HTMLElement[]),
-      ...Array.from(sceneRoot.querySelectorAll<HTMLElement>('*')),
-    ]);
-    let max = 0;
-    for (const el of candidates) {
-      if (isExcluded(el)) continue;
-      const rect = el.getBoundingClientRect();
-      const bottom = rect.bottom - rootRect.top;
-      if (bottom > max) max = bottom;
-    }
-    return max;
-  });
-  expect(maxBottom).toBeLessThanOrEqual(overflow.clientHeight);
+  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
 
   const clickResult = await studioClickDoesNotAdvance(page, frame);
   expect(clickResult.before).toBe(clickResult.after);
 });
 
-test('a bubble pops into hearts, peace signs and glow within 60 s', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'peace-in-practice', 2000);
+test('background heart count strictly increases at each explosion and never exceeds 160 over 40 s', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 1000 });
 
-  type Sample = {
-    ms: number;
-    actorsLength: number;
-    burstLogged: boolean;
-    peaceFxCount: number;
-    visualFx: number;
-  };
+  let prevExplosionCount = 0;
+  let prevHeartCount = 14;
 
-  const samples: Sample[] = [];
-  let burstSampleIndex = -1;
+  for (let t = 2000; t <= 40000; t += 2000) {
+    await frame.evaluate((stepMs) => {
+      (window as any).colorPolishRuntime.step(stepMs);
+    }, 2000);
 
-  for (let ms = 2000; ms <= 62000; ms += 2000) {
-    if (ms > 2000) {
-      await frame.evaluate((stepMs) => {
-        (window as any).colorPolishRuntime.step(stepMs);
-        document.getAnimations().forEach((animation) => {
-          animation.pause();
-        });
-      }, 2000);
-    }
-
-    const sample = await frame.evaluate((checkpointMs) => {
+    const data = await frame.evaluate(() => {
       const runtime = (window as any).colorPolishRuntime;
       const state = runtime?.getState();
-      const visual = runtime?.visualState();
-      const canvas = document.querySelector('.scene-fx') as HTMLElement | null;
-      const burstEntries = (state?.log || []).filter((e: any) => e.type === 'bubble_burst');
-      const peaceCount = canvas?.dataset.peaceFx ? parseInt(canvas.dataset.peaceFx, 10) : 0;
+      const explosions = (state?.log || []).filter((e: any) => e.type === 'heart_explosion');
+      const heartsCount = document.querySelectorAll('#heart-field .floating-heart').length;
       return {
-        ms: checkpointMs,
-        actorsLength: visual?.actors?.length || 0,
-        burstLogged: burstEntries.length > 0,
-        peaceFxCount: peaceCount,
-        visualFx: visual?.fx || 0,
+        explosions,
+        heartsCount,
       };
-    }, ms);
+    });
 
-    samples.push(sample);
+    expect(data.heartsCount).toBeLessThanOrEqual(160);
 
-    if (burstSampleIndex === -1 && sample.burstLogged) {
-      burstSampleIndex = samples.length - 1;
+    if (data.explosions.length > prevExplosionCount) {
+      expect(data.heartsCount).toBeGreaterThan(prevHeartCount);
+      for (let i = prevExplosionCount; i < data.explosions.length; i++) {
+        const exp = data.explosions[i];
+        expect(exp.count).toBeGreaterThanOrEqual(12);
+        expect(exp.count).toBeLessThanOrEqual(20);
+      }
+      prevExplosionCount = data.explosions.length;
+      prevHeartCount = data.heartsCount;
     }
   }
 
-  // actors length is always 4
-  for (const s of samples) {
-    expect(s.actorsLength).toBe(4);
+  expect(prevExplosionCount).toBeGreaterThanOrEqual(5);
+});
+
+test('three card slots are disjoint in measured rects and at least two cards visible over 40 s', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 1000 });
+
+  const rects = await frame.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('#heart-cards .heart-card'));
+    return cards.map((c) => {
+      const r = c.getBoundingClientRect();
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+    });
+  });
+
+  expect(rects.length).toBeGreaterThanOrEqual(2);
+  for (let i = 0; i < rects.length; i++) {
+    for (let j = i + 1; j < rects.length; j++) {
+      const a = rects[i];
+      const b = rects[j];
+      const overlap = !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+      expect(overlap).toBe(false);
+    }
   }
 
-  // the runtime log gains at least one bubble_burst entry
-  expect(burstSampleIndex).toBeGreaterThan(-1);
-
-  // at the first sample after a burst the .scene-fx canvas data-peace-fx count is above 0 and visualState fx is above 0
-  const firstBurstSample = samples[burstSampleIndex];
-  expect(firstBurstSample.peaceFxCount).toBeGreaterThan(0);
-  expect(firstBurstSample.visualFx).toBeGreaterThan(0);
-
-  // three samples later the data-peace-fx count is lower (they expire)
-  expect(samples.length).toBeGreaterThan(burstSampleIndex + 3);
-  const laterSample = samples[burstSampleIndex + 3];
-  expect(laterSample.peaceFxCount).toBeLessThan(firstBurstSample.peaceFxCount);
-});
-
-type VisualActor = {
-  id: string;
-  x: number;
-  y: number;
-  d: number;
-  scale: number;
-  opacity: number;
-  vx: number;
-  vy: number;
-  life: string;
-  readingPages: number;
-  z: number;
-  depth: number;
-  screenScale: number;
-  blur: string;
-};
-
-test('bubbles span two depth layers', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'peace-in-practice', 14000);
-
-  const distinctDepths = await frame.evaluate(() => {
-    const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
-    const depths = slots.map((s) => s.dataset.depth).filter(Boolean);
-    return Array.from(new Set(depths));
-  });
-
-  // data-depth has at least two distinct values
-  expect(distinctDepths.length).toBeGreaterThanOrEqual(2);
-
-  const visual = (await frame.evaluate(() => (window as any).colorPolishRuntime.visualState())) as {
-    actors: VisualActor[];
-    fx: number;
-    flowers: number;
-  };
-
-  const parseBlur = (blur?: string): number => {
-    if (!blur || blur === 'none') return 0;
-    const match = blur.match(/blur\(([\d.]+)px\)/);
-    return match ? parseFloat(match[1]) : 0;
-  };
-
-  // one actor blurred above .3 px
-  const hasBlurred = visual.actors.some((b: VisualActor) => {
-    const match = (b.blur || '').match(/blur\(([\d.]+)px\)/);
-    return match ? parseFloat(match[1]) > 0.3 : false;
-  });
-  expect(hasBlurred).toBe(true);
-
-  // one sharp
-  const hasSharp = visual.actors.some((a: VisualActor) => parseBlur(a.blur) < 0.15);
-  expect(hasSharp).toBe(true);
-});
-
-test('bubbles stay circular through swell and burst', async ({ page }) => {
-  const checkpoints = [300, 6000, 14000, 17500, 20000];
-  const { frame } = await openStudioScene(page, 'peace-in-practice', checkpoints[0]);
-  let currentMs = checkpoints[0];
-
-  const firstResult = await circularity(frame);
-  expect(firstResult.count).toBeGreaterThan(0);
-  expect(firstResult.failures).toHaveLength(0);
-
-  for (let i = 1; i < checkpoints.length; i++) {
-    const nextMs = checkpoints[i];
-    const deltaMs = nextMs - currentMs;
-    currentMs = nextMs;
-
-    await frame.evaluate(({ delta, target }) => {
-      (window as any).colorPolishRuntime.step(delta);
-      document.getAnimations().forEach((animation) => {
-        animation.pause();
-        animation.currentTime = target;
+  for (let s = 1; s <= 40; s++) {
+    if (s > 1) {
+      await frame.evaluate(() => {
+        (window as any).colorPolishRuntime.step(1000);
       });
-    }, { delta: deltaMs, target: nextMs });
+    }
 
-    const result = await circularity(frame);
-    expect(result.count).toBeGreaterThan(0);
-    expect(result.failures).toHaveLength(0);
+    const visibleCount = await frame.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('#heart-cards .heart-card'));
+      return cards.filter((c) => {
+        const style = window.getComputedStyle(c);
+        const opacity = parseFloat(style.opacity || '1');
+        return style.display !== 'none' && style.visibility !== 'hidden' && opacity > 0.05;
+      }).length;
+    });
+
+    expect(visibleCount).toBeGreaterThanOrEqual(2);
   }
+});
+
+test('heart canvas dominant hue is red with saturation above 60 percent at hold midpoint', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 25000 });
+
+  const samples = await frame.evaluate(() => {
+    const canvas = document.querySelector('#heart-host canvas') as HTMLCanvasElement | null;
+    if (!canvas) return null;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    const points = [
+      { fx: 0.50, fy: 0.35 },
+      { fx: 0.35, fy: 0.55 },
+      { fx: 0.65, fy: 0.55 },
+    ];
+
+    const rgbToHsl = (r: number, g: number, b: number) => {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0;
+      let s = 0;
+      const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break;
+          case g: h = ((b - r) / d + 2) * 60; break;
+          case b: h = ((r - g) / d + 4) * 60; break;
+        }
+      }
+      return { h, s: s * 100, l: l * 100 };
+    };
+
+    return points.map((p) => {
+      const x = Math.round(p.fx * canvas.width);
+      const y = Math.round(p.fy * canvas.height);
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const hsl = rgbToHsl(pixel[0], pixel[1], pixel[2]);
+      return { x, y, r: pixel[0], g: pixel[1], b: pixel[2], a: pixel[3], ...hsl };
+    });
+  });
+
+  expect(samples).not.toBeNull();
+  expect(samples!.length).toBe(3);
+
+  for (const s of samples!) {
+    expect(s.a).toBeGreaterThan(50);
+    const hueOk = (s.h >= 345 && s.h <= 360) || (s.h >= 0 && s.h <= 10);
+    expect(hueOk).toBe(true);
+    expect(s.s).toBeGreaterThan(60);
+  }
+});
+
+test('every card message is present in full in the DOM and font size is at or above 18 px', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 5000 });
+
+  const cardData = await frame.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('#heart-cards .heart-card'));
+    return cards.map((c) => {
+      const msg = c.querySelector('.pip-card-message') as HTMLElement | null;
+      const joinedPages = c.querySelector('.pip-joined-pages')?.textContent;
+      const style = msg ? window.getComputedStyle(msg) : null;
+      const fontSize = style ? parseFloat(style.fontSize) : 0;
+      return {
+        cardId: c.id,
+        text: msg?.textContent || '',
+        joinedPages: joinedPages || c.dataset.joinedPages || null,
+        fullMessage: c.dataset.fullMessage || null,
+        fontSize,
+      };
+    });
+  });
+
+  expect(cardData.length).toBeGreaterThan(0);
+  for (const c of cardData) {
+    expect(c.fontSize).toBeGreaterThanOrEqual(18);
+    expect(c.text.length).toBeGreaterThan(0);
+    if (c.fullMessage) {
+      const textMatches = c.text === c.fullMessage || c.joinedPages === c.fullMessage;
+      expect(textMatches).toBe(true);
+    }
+  }
+});
+
+test('noOverflow holds on scene root with 160 background hearts present', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 45000 });
+
+  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart').length);
+  expect(heartCount).toBe(160);
+
+  const overflow = await noOverflow(frame);
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
+});
+
+test('frame time sampled at 3840 stays under 40 ms per frame with 160 background hearts', async ({ page }) => {
+  await page.setViewportSize({ width: 3840, height: 2160 });
+  const frame = await loadRenderer(page, { scene: 9, ms: 45000 });
+
+  const heartCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart').length);
+  expect(heartCount).toBe(160);
+
+  const frameDurationMs = await frame.evaluate(() => {
+    const start = performance.now();
+    (window as any).colorPolishRuntime.step(40);
+    return performance.now() - start;
+  });
+
+  expect(frameDurationMs).toBeLessThan(40);
+});
+
+test('reduced motion renders the scene still with 3 static cards and 14 ambient hearts', async ({ page }) => {
+  const { frame, still } = await reducedMotionScene(page, 'peace-in-practice');
+  expect(still).toBe(true);
+
+  const circleResult = await circularity(frame);
+  expect(circleResult.count).toBe(0);
+  expect(circleResult.failures).toHaveLength(0);
+
+  const shapeResult = await cardShape(frame, '.heart-card', 'heart');
+  expect(shapeResult.count).toBe(3);
+  expect(shapeResult.failures).toHaveLength(0);
+
+  const heartsCount = await frame.evaluate(() => document.querySelectorAll('#heart-field .floating-heart').length);
+  expect(heartsCount).toBe(14);
+
+  const hasCanvas = await frame.evaluate(() => {
+    const host = document.querySelector('#heart-host');
+    return Boolean(host?.querySelector('canvas'));
+  });
+  expect(hasCanvas).toBe(true);
+});
+
+test('no timer survives onLeave on forced scene change', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 9, ms: 3000 });
+
+  await frame.evaluate(() => {
+    (window as any).colorPolishRuntime.setScene(1);
+    (window as any).colorPolishRuntime.step(2000);
+  });
+
+  const state = await frame.evaluate(() => {
+    const runtime = (window as any).colorPolishRuntime;
+    const errors = (runtime?.getState().log || []).filter((e: any) => e.type === 'scene_onleave_error');
+    const oldScene = document.querySelector('#stage .scene[data-scene="9"]');
+    return {
+      errors,
+      hasOldScene: Boolean(oldScene),
+    };
+  });
+
+  expect(state.errors).toHaveLength(0);
+  expect(state.hasOldScene).toBe(false);
 });
 
 test('sculpted rotating heart is a real canvas that turns over time', async ({ page }) => {
-  const { frame: frame2000 } = await openStudioScene(page, 'peace-in-practice', 2000);
+  const frame2000 = await loadRenderer(page, { scene: 9, ms: 2000 });
 
   const check2000 = await frame2000.evaluate(() => {
     const host = document.querySelector('#heart-host');
@@ -212,7 +287,7 @@ test('sculpted rotating heart is a real canvas that turns over time', async ({ p
   expect(check2000.ariaLabel).toBe('Sculpted rotating heart');
   expect(check2000.dataUrl).toBeTruthy();
 
-  const { frame: frame4000 } = await openStudioScene(page, 'peace-in-practice', 4000);
+  const frame4000 = await loadRenderer(page, { scene: 9, ms: 4000 });
 
   const check4000 = await frame4000.evaluate(() => {
     const canvas = document.querySelector('#heart-host canvas') as HTMLCanvasElement | null;
@@ -224,7 +299,7 @@ test('sculpted rotating heart is a real canvas that turns over time', async ({ p
 });
 
 test('heart canvas displays distinct luminance shading bands', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'peace-in-practice', 2000);
+  const frame = await loadRenderer(page, { scene: 9, ms: 2000 });
 
   const bands = await frame.evaluate(() => {
     const canvas = document.querySelector('#heart-host canvas') as HTMLCanvasElement | null;
@@ -262,20 +337,4 @@ test('heart canvas displays distinct luminance shading bands', async ({ page }) 
   expect(bands.base).toBeGreaterThan(200);
   expect(bands.highlight).toBeGreaterThan(200);
   expect(bands.nonHighlightRatio).toBeGreaterThanOrEqual(0.4);
-});
-
-test('reduced motion renders the scene still', async ({ page }) => {
-  const { frame, still } = await reducedMotionScene(page, 'peace-in-practice');
-  expect(still).toBe(true);
-
-  const circleResult = await circularity(frame);
-  expect(circleResult.count).toBeGreaterThan(0);
-  expect(circleResult.failures).toHaveLength(0);
-
-  const hasCanvas = await frame.evaluate(() => {
-    const host = document.querySelector('#heart-host');
-    const canvas = host?.querySelector('canvas');
-    return Boolean(canvas);
-  });
-  expect(hasCanvas).toBe(true);
 });
