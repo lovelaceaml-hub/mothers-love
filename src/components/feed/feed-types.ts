@@ -1,5 +1,6 @@
 import { expressionById } from '@/lib/catalog';
 import { countGraphemes } from '@/lib/name-validation';
+import { MAX_STORED_MESSAGE_GRAPHEMES } from '@/lib/contracts';
 
 export type PublicFeedItem = {
   id: string;
@@ -43,7 +44,8 @@ function decodeItem(value: unknown): PublicFeedItem | null {
     countGraphemes(recipient) > 80 ||
     typeof message !== 'string' ||
     message.length === 0 ||
-    countGraphemes(message) > 500 ||
+    // Read guard: the stored bound, not the submission bound. See contracts.ts.
+    countGraphemes(message) > MAX_STORED_MESSAGE_GRAPHEMES ||
     !Array.isArray(expressionIds) ||
     expressionIds.length === 0 ||
     expressionIds.length > 9 ||

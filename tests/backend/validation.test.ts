@@ -3,13 +3,17 @@ import { screenRecognition } from "@/lib/server/filter";
 import { addVectors, expressionTotal, vectorDiff, vectorForExpressions, zeroVector } from "@/lib/server/vectors";
 import { graphemeLength, startOfLosAngelesWeek } from "@/lib/server/time";
 import { validateEditablePatch, validateRecognitionInput } from "@/lib/server/validation";
+import { MAX_MESSAGE_GRAPHEMES } from "@/lib/contracts";
 
 describe("backend input validation", () => {
   const base = { submittedName: "Sender A.", recipient: "Friend M.", message: "Thank you for your kindness.", expressionIds: [2, 6, 8], requestKey: "request-1234" };
 
-  it("accepts the 500 grapheme boundary and rejects 501", () => {
-    expect(validateRecognitionInput({ ...base, message: "🙂".repeat(500) }).issues).toHaveLength(0);
-    expect(validateRecognitionInput({ ...base, message: "🙂".repeat(501) }).issues.some((issue) => issue.field === "message")).toBe(true);
+  it("accepts the message grapheme boundary and rejects one past it", () => {
+    // Bound by the shared constant rather than a literal, so the boundary test
+    // follows the limit instead of pinning it. Anthony set it to the longest
+    // recognition actually sent on 2026-09-11.
+    expect(validateRecognitionInput({ ...base, message: "🙂".repeat(MAX_MESSAGE_GRAPHEMES) }).issues).toHaveLength(0);
+    expect(validateRecognitionInput({ ...base, message: "🙂".repeat(MAX_MESSAGE_GRAPHEMES + 1) }).issues.some((issue) => issue.field === "message")).toBe(true);
   });
 
   it("counts combining and emoji text by grapheme", () => {

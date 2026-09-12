@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { countGraphemes, getValidationErrors, hasVisibleNameContent } from '@/components/submission/SubmissionForm';
+import { MAX_MESSAGE_GRAPHEMES } from '@/lib/contracts';
 
 describe('submission validation', () => {
   it('counts grapheme clusters instead of UTF-16 code units', () => {
@@ -86,7 +87,7 @@ describe('submission validation', () => {
   });
 
   it('returns field level errors without shortening the draft', () => {
-    const message = 'a'.repeat(500);
+    const message = 'a'.repeat(MAX_MESSAGE_GRAPHEMES);
     const errors = getValidationErrors({
       submitter: 'Maya R.',
       recipient: 'Michelle R.',
@@ -95,18 +96,18 @@ describe('submission validation', () => {
     });
 
     expect(errors).toEqual({});
-    expect(message).toHaveLength(500);
+    expect(message).toHaveLength(MAX_MESSAGE_GRAPHEMES);
   });
 
   it('rejects an over-limit message and missing expression', () => {
     const errors = getValidationErrors({
       submitter: 'Maya R.',
       recipient: 'Michelle R.',
-      message: 'a'.repeat(501),
+      message: 'a'.repeat(MAX_MESSAGE_GRAPHEMES + 1),
       expressionIds: [],
     });
 
-    expect(errors.message).toContain('500');
+    expect(errors.message).toContain(String(MAX_MESSAGE_GRAPHEMES));
     expect(errors.expressions).toBe('Select at least one expression.');
   });
 });

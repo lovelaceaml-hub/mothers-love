@@ -11,6 +11,7 @@ import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib
 import baseStyles from './SubmissionForm.module.css';
 import experienceStyles from './SubmissionExperience.module.css';
 import { ExpressionDrift } from '@/components/campaign/ExpressionDrift';
+import { MAX_MESSAGE_GRAPHEMES as SHARED_MAX_MESSAGE_GRAPHEMES } from "@/lib/contracts";
 
 // Retain existing bouquet and receipt animation classes.
 const styles = { ...baseStyles, ...experienceStyles };
@@ -42,7 +43,7 @@ type ApiLikeError = Error & {
   status?: number;
 };
 
-const MAX_MESSAGE_GRAPHEMES = 500;
+const MAX_MESSAGE_GRAPHEMES = SHARED_MAX_MESSAGE_GRAPHEMES;
 
 function makeRequestKey() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {

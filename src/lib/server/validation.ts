@@ -9,6 +9,7 @@ import {
   type DisplaySound,
 } from "@/lib/contracts";
 import type { EditableRecognitionFields, MutationAction, RecognitionInput } from "./types";
+import { MAX_MESSAGE_GRAPHEMES } from "@/lib/contracts";
 
 const REQUEST_KEY_RE = /^[A-Za-z0-9._:-]{8,128}$/;
 const REASONS = new Set(["privacy", "recipient_request", "spam", "duplicate", "test", "safety", "correction", "other"]);
@@ -68,7 +69,7 @@ export function validateRecognitionInput(input: unknown): ValidationResult<Recog
   if (!recipient || !hasVisibleNameContent(recipient)) issues.push({ field: "recipient", code: "required" });
   else if (countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
   if (!message) issues.push({ field: "message", code: "required" });
-  else if (graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });
+  else if (graphemeLength(message) > MAX_MESSAGE_GRAPHEMES) issues.push({ field: "message", code: "too_long" });
   if (!expressionIds || expressionIds.length < 1 || expressionIds.length > 9 || expressionIds.some((id) => id < 1 || id > 9)) issues.push({ field: "expressionIds", code: "invalid" });
   if (!requestKey || !REQUEST_KEY_RE.test(requestKey)) issues.push({ field: "requestKey", code: "invalid" });
   const encoded = new TextEncoder().encode(JSON.stringify(body)).byteLength;
@@ -119,7 +120,7 @@ export function validateEditablePatch(input: unknown): ValidationResult<Partial<
   if (recipient === null || (recipient !== undefined && !hasVisibleNameContent(recipient))) issues.push({ field: "recipient", code: "required" });
   else if (recipient !== undefined && countGraphemes(recipient) > MAX_NAME_GRAPHEMES) issues.push({ field: "recipient", code: "too_long" });
   if (message === null || message === "") issues.push({ field: "message", code: "required" });
-  else if (message !== undefined && graphemeLength(message) > 500) issues.push({ field: "message", code: "too_long" });
+  else if (message !== undefined && graphemeLength(message) > MAX_MESSAGE_GRAPHEMES) issues.push({ field: "message", code: "too_long" });
   if (expressionIds !== undefined && (!expressionIds || expressionIds.length < 1 || expressionIds.length > 9 || expressionIds.some((id) => id < 1 || id > 9))) issues.push({ field: "expressionIds", code: "invalid" });
   if (submittedName === undefined && recipient === undefined && message === undefined && expressionIds === undefined) issues.push({ field: "fields", code: "required" });
   const encoded = new TextEncoder().encode(JSON.stringify(body)).byteLength;

@@ -12,6 +12,7 @@ import {
 import { hasVisibleNameContent } from "@/lib/name-validation";
 import { isIsoDate, graphemeLength } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
+import { MAX_STORED_MESSAGE_GRAPHEMES } from "@/lib/contracts";
 
 export type PublicDisplayQuery = {
   data: unknown;
@@ -240,7 +241,10 @@ function projectRecognition(value: unknown, serverTime: number): Recognition | n
   const recognition = value as Record<string, unknown>;
   if (typeof recognition.id !== "string" || !UUID_PATTERN.test(recognition.id)) return null;
   if (typeof recognition.recipient !== "string" || !hasVisibleNameContent(recognition.recipient) || graphemeLength(recognition.recipient) > 80) return null;
-  if (typeof recognition.message !== "string" || recognition.message.length === 0 || graphemeLength(recognition.message) > 500) return null;
+  // Read guard: deliberately the stored bound, not the submission bound. See
+  // MAX_MESSAGE_GRAPHEMES in src/lib/contracts.ts. Lowering this would make an
+  // already published long recognition vanish from the TV.
+  if (typeof recognition.message !== "string" || recognition.message.length === 0 || graphemeLength(recognition.message) > MAX_STORED_MESSAGE_GRAPHEMES) return null;
   if (!Array.isArray(recognition.expressionIds) || recognition.expressionIds.length < 1 || recognition.expressionIds.length > 9) return null;
   if (!recognition.expressionIds.every((id): id is number => isSafeInteger(id, 1) && id <= 9)) return null;
   if (recognition.expressionIds.some((id, index, ids) => index > 0 && id <= ids[index - 1])) return null;

@@ -186,3 +186,30 @@ export interface ApiClientOptions extends RequestInit {
   token?: string | null;
   bearerToken?: string | null;
 }
+
+/**
+ * Maximum graphemes a member may submit in one recognition message.
+ *
+ * Anthony's instruction, September 11 2026: set the limit to the longest
+ * recognition actually sent that day. Measured against the live pool at
+ * 2026-09-12T05:26Z: seven recognitions were created that day at 249, 185,
+ * 173, 169, 123, 88 and 58 code points, and nothing in the whole seven-day
+ * pool exceeded 249. The longest one contains an emoji, so it is 249 code
+ * points but 248 graphemes, and this 249-grapheme cap keeps it valid.
+ *
+ * This governs what may be SUBMITTED or EDITED. It deliberately does not
+ * govern what the display and the public feed accept when READING a record:
+ * those guards stay at 500, because lowering them would make any already
+ * published message longer than this cap vanish from the TV and the feed
+ * rather than simply being long. Nothing in the pool is over 249 today, but
+ * that is luck, not a guarantee, and silently dropping a real recognition is
+ * far worse than showing a long one.
+ */
+export const MAX_MESSAGE_GRAPHEMES = 249;
+
+/**
+ * Upper bound used when validating a record that already exists. Kept at the
+ * historical 500 so no published recognition is ever rejected on read. See
+ * MAX_MESSAGE_GRAPHEMES above for why the two numbers differ.
+ */
+export const MAX_STORED_MESSAGE_GRAPHEMES = 500;

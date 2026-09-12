@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AdminRecognition, DisplaySettings } from '@/lib/contracts';
+import { MAX_MESSAGE_GRAPHEMES } from '@/lib/contracts';
 import {
   actionExplanation,
   capabilitiesFor,
@@ -47,11 +48,11 @@ describe('admin editor safety helpers', () => {
     expect(isExpired(expiresAt, Date.parse('2026-09-07T10:00:01.000Z'))).toBe(true);
   });
 
-  it('counts graphemes at the 500 boundary instead of UTF-16 code units', () => {
-    const message = '🙂'.repeat(500);
-    expect(graphemeLength(message)).toBe(500);
+  it('counts graphemes at the message boundary instead of UTF-16 code units', () => {
+    const message = '🙂'.repeat(MAX_MESSAGE_GRAPHEMES);
+    expect(graphemeLength(message)).toBe(MAX_MESSAGE_GRAPHEMES);
     expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message, expressionIds: [1] })).toEqual([]);
-    expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message: `${message}a`, expressionIds: [1] })).toContain('Messages must be 500 characters or fewer.');
+    expect(validateEditorDraft({ recipient: 'Mina K.', submittedName: 'Synthetic Sender', message: `${message}a`, expressionIds: [1] })).toContain(`Messages must be ${MAX_MESSAGE_GRAPHEMES} characters or fewer.`);
   });
 
   it('requires a deliberate reconcile decision when another admin advances the version', () => {

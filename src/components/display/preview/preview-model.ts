@@ -1,4 +1,5 @@
 import { durationFor } from '@/lib/display/coordinator';
+import { MAX_STORED_MESSAGE_GRAPHEMES } from '@/lib/contracts';
 import {
   DEFAULT_DISPLAY_EFFECTS,
   DEFAULT_DISPLAY_PLAYLIST,
@@ -227,7 +228,8 @@ function parseRecognition(value: unknown, serverTimeMs: number): Recognition | n
   if (Object.prototype.hasOwnProperty.call(value, 'submittedName') || Object.prototype.hasOwnProperty.call(value, 'reason')) return null;
   if (typeof value.id !== 'string' || value.id.length === 0 || value.id.length > 128 || !UUID_PATTERN.test(value.id)) return null;
   if (typeof value.recipient !== 'string' || value.recipient.trim().length === 0 || graphemeCount(value.recipient) > 80) return null;
-  if (typeof value.message !== 'string' || value.message.length === 0 || graphemeCount(value.message) > 500) return null;
+  // Read guard: the stored bound, not the submission bound. See contracts.ts.
+  if (typeof value.message !== 'string' || value.message.length === 0 || graphemeCount(value.message) > MAX_STORED_MESSAGE_GRAPHEMES) return null;
   if (!Array.isArray(value.expressionIds) || value.expressionIds.length < 1 || value.expressionIds.length > 9) return null;
   if (!value.expressionIds.every((id): id is number => isSafeInteger(id, 1) && id <= 9)) return null;
   if (value.expressionIds.some((id, index, ids) => index > 0 && id <= ids[index - 1])) return null;

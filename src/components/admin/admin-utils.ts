@@ -1,4 +1,5 @@
 import type { AdminRecognition, DisplaySettings } from '@/lib/contracts';
+import { MAX_MESSAGE_GRAPHEMES } from "@/lib/contracts";
 
 export type AdminRole = 'owner' | 'moderator';
 
@@ -137,7 +138,7 @@ export const validateEditorDraft = (draft: {
   if (!draft.recipient.trim()) errors.push('Add a recipient name.');
   if (!draft.submittedName.trim()) errors.push('Add the submitted name.');
   if (!draft.expressionIds.length) errors.push('Choose at least one expression.');
-  if (graphemeLength(draft.message) > 500) errors.push('Messages must be 500 characters or fewer.');
+  if (graphemeLength(draft.message) > MAX_MESSAGE_GRAPHEMES) errors.push(`Messages must be ${MAX_MESSAGE_GRAPHEMES} characters or fewer.`);
   if (draft.message.trim().length === 0) errors.push('Add a message.');
   return errors;
 };
