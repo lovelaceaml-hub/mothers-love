@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   agentRules: false,
+  env: {
+    COLOR_POLISH_PREVIEW_BUILD: process.env.VERCEL_ENV === "preview" ? "true" : "false",
+  },
   outputFileTracingIncludes: {
     "/api/tv-v6": ["./prototypes/tv-v6/Mothers_Love_TV_Prototype_v6.html"],
   },

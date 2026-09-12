@@ -22,6 +22,7 @@ export type { ColorPolishRendererProps, ColorPolishSnapshot } from '@/lib/color-
 
 const RENDERER_URL = '/color-polish/renderer.html';
 const RECOGNIZE_URL = 'https://mothers-love.vercel.app/recognize';
+const PREVIEW_BUILD = process.env.COLOR_POLISH_PREVIEW_BUILD === 'true';
 const MAX_RECOGNITIONS = 1_000;
 const MAX_ARRIVALS = 1_000;
 const MAX_TEXT = 4_000;
@@ -379,7 +380,8 @@ export function ColorPolishRenderer({
       }
     };
     const onWindowMessage = (messageEvent: MessageEvent) => {
-      if (messageEvent.source !== iframe.contentWindow || messageEvent.origin !== 'null') return;
+      const expectedOrigin = PREVIEW_BUILD ? window.location.origin : 'null';
+      if (messageEvent.source !== iframe.contentWindow || messageEvent.origin !== expectedOrigin) return;
       markReady(messageEvent.data);
     };
     window.addEventListener('message', onWindowMessage);
@@ -399,12 +401,12 @@ export function ColorPolishRenderer({
       ref={iframeRef}
       title="Mother's Love color polish display"
       src={RENDERER_URL}
-      sandbox="allow-scripts"
       referrerPolicy="no-referrer"
       loading="eager"
       aria-label="Mother's Love color polish display"
       className={className}
       onLoad={handleLoad}
+      sandbox={PREVIEW_BUILD ? 'allow-scripts allow-same-origin' : 'allow-scripts'}
       style={{ width: '100%', height: '100%', border: 0, display: 'block', background: '#fff9ed' }}
     />
   );
