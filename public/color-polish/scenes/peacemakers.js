@@ -2,8 +2,14 @@
 'use strict';
 
 const PEACEMAKERS_TOTAL_SLOTS = 24;
-const PEACEMAKERS_LATITUDES = [-42, -14, 14, 42];
-const PEACEMAKERS_LONGITUDES = [0, 60, 120, 180, 240, 300];
+// Fill the near-equator bands first so the opening recognitions land in the
+// visible face of the globe. The four latitude bands remain evenly spaced,
+// with the polar rows filling after the center.
+const PEACEMAKERS_LATITUDES = [-14, 14, -42, 42];
+// Start the first two recognition slots on the near side of the rotating
+// sphere. The globe keeps its six evenly spaced longitudes while the initial
+// pair enters through the visible side.
+const PEACEMAKERS_LONGITUDES = [240, 300, 0, 60, 120, 180];
 const PEACEMAKERS_GLOBE_RADIUS = 290;
 
 // Scale factors mapping from 744x691 source image to the rendered 604x482 box:
@@ -32,6 +38,7 @@ let peacemakers_targetSlot = 0;
 let peacemakers_shownIds = [];
 let peacemakers_totalJoins = 0;
 let peacemakers_timers = [];
+let peacemakers_globeStartedAt = 0;
 
 function peacemakers() {
   return '<div style="position:absolute;left:12px;top:33px;width:829px">' +
@@ -86,19 +93,10 @@ function peacemakersFitCard(card, r, isStill) {
   msg.textContent = r.message;
 
   // Measure the message element itself, not .puzzle-card-inner. The inner is
-  // height:100% flex, so its scrollHeight is always about its own height and a
-  // fixed limit of 224 was exceeded before any text was laid out at all: a 500
-  // character message paginated into 74 pages of roughly seven characters
-  // each, which is unreadable and made the still-mode path meaningless. The
-  // message's own clientHeight is the space flex has actually given it, so
-  // scrollHeight against clientHeight is the real overflow test.
-  // Fit with slack. Measuring exactly against clientHeight let a page fill the
-  // box to the last pixel, and once that page was wrapped in its own block for
-  // still mode the box reported 5 px of overflow, which means the final line
-  // could be clipped by the message box's overflow:hidden. Six pixels of slack
-  // costs a few characters per page and guarantees every page actually fits.
-  const FIT_SLACK = 6;
-  const overflows = () => msg.scrollHeight > msg.clientHeight - FIT_SLACK;
+  // height:100% flex, so a message that fits naturally reports scrollHeight
+  // equal to clientHeight. Only an extra pixel of scroll height indicates
+  // actual overflow and should trigger pagination.
+  const overflows = () => msg.scrollHeight > msg.clientHeight + 1;
 
   while (overflows() && font > fontFloor) {
     font -= 0.5;
@@ -128,7 +126,7 @@ function peacemakersFitCard(card, r, isStill) {
   log('circular_pagination', {
     id: r.id,
     pages: pages.length,
-    diameter: 260,
+    diameter: 280,
     verbatim: pages.join('') === r.message
   });
 
@@ -141,9 +139,8 @@ function peacemakersFitCard(card, r, isStill) {
     // the DOM claimed they were rendered. That is truncation wearing a
     // disguise, and a reviewer rightly called the same pattern out elsewhere.
     //
-    // So be honest on screen: show page one at the floor size, say how many
-    // pages there are, and carry the remaining pages in explicitly hidden
-    // elements so nothing is lost and a test can prove the text is verbatim.
+    // Show page one at the floor size, state the page count, and carry the
+    // remaining pages in explicitly hidden elements so no source text is lost.
     msg.innerHTML = '';
     pages.forEach((pageText, idx) => {
       const span = document.createElement('span');
@@ -242,6 +239,13 @@ function peacemakersJoinCard(r, slotIndex, bgPos) {
   staleCards.forEach((c) => c.remove());
 
   const card = peacemakersBuildCard(r, false, bgPos);
+  const band = Math.floor(slotIndex / 6);
+  const lat = PEACEMAKERS_LATITUDES[band] || 0;
+  const lon = PEACEMAKERS_LONGITUDES[slotIndex % 6] || 0;
+  card.style.setProperty('--face-lat', `${-lat}deg`);
+  card.style.setProperty('--face-lon', `${-lon}deg`);
+  const globeAge = Math.max(0, (performance.now() - peacemakers_globeStartedAt) / 1000);
+  card.style.setProperty('--globe-animation-delay', `${-globeAge}s`);
   slotEl.appendChild(card);
 
   peacemakers_totalJoins++;
@@ -306,13 +310,13 @@ function peacemakersStartNextPiece() {
   card.style.position = 'absolute';
   card.style.left = '0px';
   card.style.top = '0px';
-  card.style.width = '260px';
-  card.style.height = '260px';
+  card.style.width = '280px';
+  card.style.height = '360px';
   card.style.transformOrigin = '0 0';
 
   const initDx = startStageX - 900;
   const initDy = startStageY - 188;
-  const initScale = 96 / 260;
+  const initScale = 96 / 280;
   card.style.transform = `translate3d(${initDx.toFixed(1)}px, ${initDy.toFixed(1)}px, 0) scale(${initScale.toFixed(4)})`;
   card.style.opacity = '0.8';
 
@@ -351,8 +355,8 @@ function peacemakersInitStill(root) {
     heldCard.style.position = 'absolute';
     heldCard.style.left = '0px';
     heldCard.style.top = '0px';
-    heldCard.style.width = '260px';
-    heldCard.style.height = '260px';
+    heldCard.style.width = '280px';
+    heldCard.style.height = '360px';
     heldCard.style.transform = 'translate3d(0px, 0px, 0) scale(1)';
     holdZone.appendChild(heldCard);
     peacemakers_activePieceEl = heldCard;
@@ -379,6 +383,7 @@ function peacemakersMount(root) {
   peacemakers_root = root;
   peacemakers_timers = [];
   peacemakers_shownIds = [];
+  peacemakers_globeStartedAt = performance.now();
 
   if (S.still) {
     peacemakersInitStill(root);
@@ -419,7 +424,7 @@ function peacemakersTickAge(dt) {
     const eased = ease(p);
     const curDx = lerp(peacemakers_currentSocket.startX - 900, 0, eased);
     const curDy = lerp(peacemakers_currentSocket.startY - 188, 0, eased);
-    const curScale = lerp(96 / 260, 1.0, eased);
+    const curScale = lerp(96 / 280, 1.0, eased);
     const curOp = lerp(0.8, 1.0, eased);
 
     peacemakers_activePieceEl.style.transform = `translate3d(${curDx.toFixed(1)}px, ${curDy.toFixed(1)}px, 0) scale(${curScale.toFixed(4)})`;
@@ -479,7 +484,7 @@ function peacemakersTickAge(dt) {
 
     const curDx = lerp(0, targetStageX - 900, eased);
     const curDy = lerp(0, targetStageY - 188, eased);
-    const curScale = lerp(1.0, 96 / 260, eased);
+    const curScale = lerp(1.0, 96 / 280, eased);
     const curOp = lerp(1.0, 0.85, eased);
 
     peacemakers_activePieceEl.style.transform = `translate3d(${curDx.toFixed(1)}px, ${curDy.toFixed(1)}px, 0) scale(${curScale.toFixed(4)})`;
@@ -503,6 +508,7 @@ function peacemakersOnLeave() {
   peacemakers_activePieceEl = null;
   peacemakers_reading = null;
   peacemakers_joined = [];
+  peacemakers_globeStartedAt = 0;
 }
 
 registerScene(8, {

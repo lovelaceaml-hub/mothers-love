@@ -37,11 +37,11 @@ function nineScene(){
 
 function tickEducation(){
  if(S.s !== 7 || !eduCards.length) return;
- const focusAge = Math.max(0, S.eduAge - EXPRESSIONS_FOCUS_START);
- const cycle = S.still ? 0 : Math.floor(focusAge / EXPRESSIONS_FOCUS_CYCLE);
+ const focusAge = S.eduAge - EXPRESSIONS_FOCUS_START;
+ const cycle = S.still ? 0 : Math.max(0, Math.floor(focusAge / EXPRESSIONS_FOCUS_CYCLE));
  const chosen = ((S.bloomIndex - 1 + cycle) % catalog.length) + 1;
- const cycleAge = S.still ? EXPRESSIONS_FOCUS_RAMP : focusAge % EXPRESSIONS_FOCUS_CYCLE;
- const p = S.still ? 1 : ease(clamp(cycleAge / EXPRESSIONS_FOCUS_RAMP, 0.02, 1));
+ const cycleAge = S.still ? EXPRESSIONS_FOCUS_RAMP : focusAge < 0 ? 0 : focusAge % EXPRESSIONS_FOCUS_CYCLE;
+ const p = S.still ? 1 : focusAge < 0 ? 0 : ease(clamp(cycleAge / EXPRESSIONS_FOCUS_RAMP, 0.02, 1));
  let other = 0;
 
  eduCards.forEach((el, i) => {

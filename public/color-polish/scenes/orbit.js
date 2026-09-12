@@ -5,7 +5,7 @@ let ORBIT_BAG = [];
 let ORBIT_LAST = 0;
 let ORBIT_PASS_TOKEN = 0;
 let ORBIT_REFILL_COUNT = 0;
-const ORBIT_SESSION_SALT = Math.floor(Math.random() * 0x100000000);
+let ORBIT_SESSION_SALT = null;
 
 const ORBIT_BASE_DIAMETER = 227;
 const ORBIT_CENTER_DIAMETER = 420;
@@ -25,6 +25,9 @@ function orbitNextId() {
     // Keep fresh opens varied while preserving fixed-seed direct renderer runs.
     // The harness controls Math.random before scripts load, so this salt is
     // stable for a seeded run and naturally varies between live page opens.
+    if (ORBIT_SESSION_SALT === null) {
+      ORBIT_SESSION_SALT = Math.floor(Math.random() * 0x100000000);
+    }
     const rng = randSeed(
       3301 + (S.idCounter || 0) * 41 + Math.floor(S.t) + (ORBIT_REFILL_COUNT++) * 17 + ORBIT_SESSION_SALT,
     );

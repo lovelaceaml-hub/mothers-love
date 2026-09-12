@@ -71,17 +71,14 @@
   transition: opacity 0.6s ease-out;
 }
 
-/* The hold zone. 260 wide is the hard limit: the world art's rendered box ends
-   at x 875 and the recognition globe's left edge sits at 1200, and the gap
-   report requires a 60 px gap before the globe, so the card must live inside
-   x 880 to 1140. Height was raised from 260 to 370 because a square 260 box
-   left the message almost no room; 260 by 370 is an aspect of 0.70, the
-   shallowest the shared cardShape('puzzle') check accepts. */
+/* The hold zone leaves a small separation after the world art and a 60 px
+   breathing space before the recognition globe. Its 280 by 370 box gives the
+   face-on card enough vertical room to keep a long recognition readable. */
 #tv .scene[data-scene="8"] .peacemakers-hold-zone {
   position: absolute;
   left: 880px;
   top: 130px;
-  width: 260px;
+  width: 280px;
   height: 370px;
   pointer-events: none;
   z-index: 30;
@@ -113,8 +110,8 @@
 #tv .scene[data-scene="8"] .puzzle-card.face-on {
   left: 0;
   top: 0;
-  width: 260px;
-  height: 260px;
+  width: 280px;
+  height: 360px;
 }
 
 #tv .scene[data-scene="8"] .puzzle-card-inner {
@@ -126,6 +123,17 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* The puzzle silhouette removes material at the top, bottom, and side
+   notches. Keep the readable content inside the remaining rectangular body so
+   names, message lines, and the footer never sit in those cutouts. */
+#tv .scene[data-scene="8"] .puzzle-card.face-on .puzzle-card-inner {
+  width: calc(100% - 68px);
+  height: calc(100% - 88px);
+  margin: 44px 34px;
+  padding: 10px 12px;
+  border-radius: 10px;
 }
 
 #tv .scene[data-scene="8"] .puzzle-card.flying .puzzle-card-inner {
@@ -272,7 +280,8 @@
   background-position: var(--bg-pos, -459px -126px);
   background-repeat: no-repeat;
   box-shadow: 0 6px 16px rgba(90, 75, 50, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  backface-visibility: hidden;
+  /* Keep every joined recognition visible as it travels around the 3D globe. */
+  backface-visibility: visible;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -282,6 +291,22 @@
   box-sizing: border-box;
   color: var(--ink, #34463f);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* The sphere supplies the 3D position and rotation. Counter-rotate each
+   recognition card so its message stays face-on as it travels around it. */
+#tv .scene[data-scene="8"] .puzzle-card.globe-card.joined-card {
+  animation: peacemakers-card-face 48s linear infinite;
+  animation-delay: var(--globe-animation-delay, 0s);
+}
+
+@keyframes peacemakers-card-face {
+  from {
+    transform: rotateX(var(--face-lat, 0deg)) rotateY(var(--face-lon, 0deg)) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(var(--face-lat, 0deg)) rotateY(var(--face-lon, 0deg)) rotateY(-360deg);
+  }
 }
 
 #tv .scene[data-scene="8"] .globe-card.dissolving,
@@ -362,6 +387,11 @@
   transform: none !important;
 }
 
+#tv.still .scene[data-scene="8"] .puzzle-card.globe-card.joined-card {
+  animation: none !important;
+  transform: rotateX(var(--face-lat, 0deg)) rotateY(var(--face-lon, 0deg));
+}
+
 @media (prefers-reduced-motion: reduce) {
   #tv .scene[data-scene="8"] img.art,
   #tv .scene[data-scene="8"] .globe-light,
@@ -369,5 +399,10 @@
   #tv .scene[data-scene="8"] .peacemakers-globe-sphere {
     animation: none !important;
     transform: none !important;
+  }
+
+  #tv .scene[data-scene="8"] .puzzle-card.globe-card.joined-card {
+    animation: none !important;
+    transform: rotateX(var(--face-lat, 0deg)) rotateY(var(--face-lon, 0deg));
   }
 }

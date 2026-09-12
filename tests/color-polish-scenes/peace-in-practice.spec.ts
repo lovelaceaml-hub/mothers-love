@@ -30,7 +30,7 @@ test('peace in practice renders heart cards and no circular orbs at 14 s', async
   expect(clickResult.before).toBe(clickResult.after);
 });
 
-test('background heart count strictly increases at each explosion and never exceeds 160 over 40 s', async ({ page }) => {
+test('background heart count increases at each explosion until the 160-heart cap over 40 s', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 9, ms: 1000 });
 
   let prevExplosionCount = 0;
@@ -55,7 +55,11 @@ test('background heart count strictly increases at each explosion and never exce
     expect(data.heartsCount).toBeLessThanOrEqual(160);
 
     if (data.explosions.length > prevExplosionCount) {
-      expect(data.heartsCount).toBeGreaterThan(prevHeartCount);
+      if (prevHeartCount < 160) {
+        expect(data.heartsCount).toBeGreaterThan(prevHeartCount);
+      } else {
+        expect(data.heartsCount).toBe(160);
+      }
       for (let i = prevExplosionCount; i < data.explosions.length; i++) {
         const exp = data.explosions[i];
         expect(exp.count).toBeGreaterThanOrEqual(12);
