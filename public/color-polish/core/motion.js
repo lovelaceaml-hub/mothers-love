@@ -6,7 +6,7 @@ function swapSlot(b){
  const otherIds=slots.map(x=>x.id);const r=choose(otherIds,b.expression);if(!r){b.born=S.t;return}
  const d=sceneDescriptor();
  if(d.entrance==='sprout'&&!smallFits(r)){// Preserve the full message by using the measured large-bubble layout.
-  S.lastShown.set(r.id,-100000);renderNow(S.s,{keepAge:true});S.replenishAt=S.sceneAge+10;log('large_bubble_selected',{id:r.id});return
+  S.forceId=r.id;renderNow(S.s,{keepAge:true});S.replenishAt=S.sceneAge+10;log('large_bubble_selected',{id:r.id});return
  }
  b.next=r.id;b.phase='pop';b.since=S.t;b.el?.querySelector('.orb-life')?.classList.add('orb-pop');emit(b.x+b.d/2,b.y+b.d/2,16,catalog[r.ids[0]-1].color);log('bubble_pop',{scene:S.s,id:b.id,age:S.t-b.born})
 }

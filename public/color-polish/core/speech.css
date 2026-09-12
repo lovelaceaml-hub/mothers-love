@@ -1,0 +1,36 @@
+/* Speech bubbles: rounded rectangle with tail, border-radius 16px, never 50%. */
+.speech-bubble {
+  position: absolute;
+  border-radius: 16px;
+  background: #fffffffa;
+  border: 1.5px solid #e5dcce;
+  box-shadow: 0 8px 24px #6f5f3e1a, 0 2px 6px #6f5f3e0f;
+  color: #3e4a3f;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  line-height: 1.35;
+  padding: 14px 20px;
+  max-width: 320px;
+  text-align: center;
+  z-index: 850;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #fffffffa;
+  filter: drop-shadow(0 2px 1px #e5dcce);
+}
+.speech-bubble.fading {
+  opacity: 0;
+}

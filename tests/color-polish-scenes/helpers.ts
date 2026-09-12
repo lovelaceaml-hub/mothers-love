@@ -1,5 +1,8 @@
 import { expect, type Frame, type Page, type Route } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
+const publicFolder = resolve(process.cwd(), 'public');
 const syntheticToken = 'synthetic-access-token';
 
 /**
@@ -331,72 +334,281 @@ export type CircularityResult = {
   failures: CircularityFailure[];
 };
 
+export const CIRCULARITY_EXEMPT: Partial<Record<SceneSlug, string[]>> = {
+  peacemakers: ['.puzzle-card'],
+  'peace-in-practice': ['.heart-card'],
+};
+
 /**
  * Evaluates width/height equality and border-radius 50% for orbs in frame.
+ * Exempt selectors for the current scene are skipped.
  * Called by all color polish scene specs.
  */
 export async function circularity(frame: Frame): Promise<CircularityResult> {
-  return await frame.evaluate(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot, .orb, .event-orb'));
-    let count = 0;
-    let hidden = 0;
-    const failures: Array<{ selector: string; width: number; height: number; radius: string }> = [];
-
-    for (const el of elements) {
-      const rect = el.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-
-      if (width === 0 || height === 0) {
-        hidden++;
-        continue;
+  return await frame.evaluate(
+    ({ exemptMap, sceneIds }) => {
+      const runtime = (window as any).colorPolishRuntime;
+      const sceneId = runtime?.getState()?.scene;
+      let currentSlug: string | null = null;
+      for (const [slug, id] of Object.entries(sceneIds)) {
+        if (id === sceneId) {
+          currentSlug = slug;
+          break;
+        }
       }
+      const exemptSelectors: string[] = (currentSlug && (exemptMap as any)[currentSlug]) || [];
 
-      count++;
-      const widthHeightOk = Math.abs(width - height) <= 1;
+      const elements = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot, .orb, .event-orb'));
+      let count = 0;
+      let hidden = 0;
+      const failures: Array<{ selector: string; width: number; height: number; radius: string }> = [];
 
-      const style = window.getComputedStyle(el);
-      let radius = style.borderRadius;
-      if ((!radius || radius === '0px') && el.matches('.orb-slot, .event-orb')) {
-        const beforeRadius = window.getComputedStyle(el, '::before').borderRadius;
-        const inner = el.querySelector<HTMLElement>('.orb, .orb-life, .orb-breath');
-        const innerRadius = inner ? window.getComputedStyle(inner).borderRadius : '';
-        if (beforeRadius && beforeRadius !== '0px') {
-          radius = beforeRadius;
-        } else if (innerRadius && innerRadius !== '0px') {
-          radius = innerRadius;
+      for (const el of elements) {
+        if (exemptSelectors.some((sel) => el.matches(sel))) {
+          continue;
+        }
+
+        const rect = el.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+
+        if (width === 0 || height === 0) {
+          hidden++;
+          continue;
+        }
+
+        count++;
+        const widthHeightOk = Math.abs(width - height) <= 1;
+
+        const style = window.getComputedStyle(el);
+        let radius = style.borderRadius;
+        if ((!radius || radius === '0px') && el.matches('.orb-slot, .event-orb')) {
+          const beforeRadius = window.getComputedStyle(el, '::before').borderRadius;
+          const inner = el.querySelector<HTMLElement>('.orb, .orb-life, .orb-breath');
+          const innerRadius = inner ? window.getComputedStyle(inner).borderRadius : '';
+          if (beforeRadius && beforeRadius !== '0px') {
+            radius = beforeRadius;
+          } else if (innerRadius && innerRadius !== '0px') {
+            radius = innerRadius;
+          }
+        }
+
+        const halfWidth = width / 2;
+        const isPercent = radius.includes('50%');
+        const numericParts = radius
+          .split(/\s+/)
+          .map((p) => parseFloat(p))
+          .filter((p) => !isNaN(p));
+        const isNumericHalf = numericParts.length > 0 && numericParts.every((p) => Math.abs(p - halfWidth) <= 1);
+        const topLeft = parseFloat(style.borderTopLeftRadius);
+        const isTopLeftHalf = !isNaN(topLeft) && Math.abs(topLeft - halfWidth) <= 1;
+
+        const radiusOk = isPercent || isNumericHalf || isTopLeftHalf;
+
+        if (!widthHeightOk || !radiusOk) {
+          const selector = el.id
+            ? '#' + el.id
+            : el.className
+            ? '.' + el.className.trim().split(/\s+/).join('.')
+            : el.tagName.toLowerCase();
+          failures.push({
+            selector,
+            width,
+            height,
+            radius,
+          });
         }
       }
 
-      const halfWidth = width / 2;
-      const isPercent = radius.includes('50%');
-      const numericParts = radius
-        .split(/\s+/)
-        .map((p) => parseFloat(p))
-        .filter((p) => !isNaN(p));
-      const isNumericHalf = numericParts.length > 0 && numericParts.every((p) => Math.abs(p - halfWidth) <= 1);
-      const topLeft = parseFloat(style.borderTopLeftRadius);
-      const isTopLeftHalf = !isNaN(topLeft) && Math.abs(topLeft - halfWidth) <= 1;
+      return { count, hidden, failures };
+    },
+    { exemptMap: CIRCULARITY_EXEMPT, sceneIds: SCENE_IDS },
+  );
+}
 
-      const radiusOk = isPercent || isNumericHalf || isTopLeftHalf;
+/**
+ * Asserts card shape rules for non-circular card elements.
+ * Called by peacemakers and peace-in-practice specs.
+ */
+export async function cardShape(
+  frame: Frame,
+  selector: string,
+  kind: 'puzzle' | 'heart',
+): Promise<CircularityResult> {
+  return await frame.evaluate(
+    ({ sel, cardKind }) => {
+      const elements = Array.from(document.querySelectorAll<HTMLElement>(sel));
+      let count = 0;
+      let hidden = 0;
+      const failures: Array<{ selector: string; width: number; height: number; radius: string }> = [];
 
-      if (!widthHeightOk || !radiusOk) {
-        const selector = el.id
+      for (const el of elements) {
+        count++;
+        const rect = el.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const style = window.getComputedStyle(el);
+        const radius = style.borderRadius || '';
+
+        const selectorStr = el.id
           ? '#' + el.id
           : el.className
           ? '.' + el.className.trim().split(/\s+/).join('.')
           : el.tagName.toLowerCase();
-        failures.push({
-          selector,
-          width,
-          height,
-          radius,
-        });
-      }
-    }
 
-    return { count, hidden, failures };
+        if (width === 0 || height === 0) {
+          failures.push({ selector: selectorStr, width, height, radius });
+          continue;
+        }
+
+        if (radius.includes('50%')) {
+          failures.push({ selector: selectorStr, width, height, radius });
+          continue;
+        }
+
+        const sceneRoot = el.closest<HTMLElement>('.scene') || document.querySelector<HTMLElement>('#stage .scene');
+        if (sceneRoot) {
+          const rootRect = sceneRoot.getBoundingClientRect();
+          const inside =
+            rect.left >= rootRect.left - 1 &&
+            rect.right <= rootRect.right + 1 &&
+            rect.top >= rootRect.top - 1 &&
+            rect.bottom <= rootRect.bottom + 1;
+          if (!inside) {
+            failures.push({ selector: selectorStr, width, height, radius });
+            continue;
+          }
+        }
+
+        const ratio = width / height;
+        const ratioOk = cardKind === 'heart' ? ratio >= 0.8 && ratio <= 1.25 : ratio >= 0.7 && ratio <= 1.4;
+
+        if (!ratioOk) {
+          failures.push({ selector: selectorStr, width, height, radius });
+        }
+      }
+
+      return { count, hidden, failures };
+    },
+    { sel: selector, cardKind: kind },
+  );
+}
+
+/**
+ * Direct-renderer harness for color-polish tests.
+ * Called by scene specs to test the renderer directly through /probe.
+ */
+export async function loadRenderer(
+  page: Page,
+  options?: { ms?: number; scene?: number; fixture?: Record<string, unknown> },
+): Promise<Frame> {
+  await page.addInitScript(() => {
+    let seed = 7301;
+    Math.random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    window.requestAnimationFrame = () => 0;
   });
+
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === '/probe') {
+      return route.fulfill({
+        contentType: 'text/html',
+        body: '<html><body style="margin:0"><iframe title="Probe" sandbox="allow-scripts" referrerpolicy="no-referrer" src="/color-polish/renderer.html" style="width:100vw;height:100vh;border:0"></iframe></body></html>',
+      });
+    }
+    if (!url.pathname.startsWith('/color-polish/') || url.pathname.includes('..')) {
+      return route.abort();
+    }
+    const file = resolve(publicFolder, '.' + url.pathname);
+    const type = file.endsWith('.js')
+      ? 'text/javascript'
+      : file.endsWith('.css')
+      ? 'text/css'
+      : file.endsWith('.html')
+      ? 'text/html'
+      : file.endsWith('.svg')
+      ? 'image/svg+xml'
+      : 'image/png';
+    try {
+      const body = await readFile(file);
+      await route.fulfill({ contentType: type, body });
+    } catch {
+      await route.abort();
+    }
+  });
+
+  await page.goto('/probe');
+  const snapshot = (options?.fixture ?? buildActiveDisplayFixture()) as any;
+  const dummyQr =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  const reactionCounts: Record<string, number> = snapshot.recognitions?.[0]?.id
+    ? { [snapshot.recognitions[0].id]: 0 }
+    : {};
+
+  await page.evaluate(
+    async ({ snapshot, qr, reactionCounts }) => {
+      const frame = document.querySelector('iframe');
+      if (!frame || !frame.contentWindow) throw new Error('iframe not found');
+      const channel = new MessageChannel();
+      const nonce = crypto.randomUUID();
+      await new Promise<void>((resolve) => {
+        channel.port1.onmessage = (event) => {
+          if (event.data.type === 'color-polish:ready') resolve();
+        };
+        channel.port1.start();
+        frame.contentWindow!.postMessage(
+          { version: 'color-polish-v6', type: 'color-polish:bootstrap', nonce, sequence: 0 },
+          '*',
+          [channel.port2],
+        );
+      });
+      (window as any).probePort = channel.port1;
+      (window as any).probeNonce = nonce;
+      channel.port1.postMessage({
+        version: 'color-polish-v6',
+        type: 'color-polish:update',
+        nonce,
+        sequence: 1,
+        snapshot,
+        control: {
+          nowMs: Date.parse(snapshot.serverTime),
+          status: 'ready',
+          source: 'sample',
+          playing: true,
+          scene: 'welcome',
+          reactionCounts,
+          qrDataUrl: qr,
+          submissionUrl: snapshot.submissionUrl,
+        },
+      });
+    },
+    { snapshot, qr: dummyQr, reactionCounts },
+  );
+
+  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+  if (!frame) throw new Error('color-polish renderer frame not found');
+
+  await frame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
+
+  if (options?.scene !== undefined) {
+    await frame.evaluate((s) => (window as any).colorPolishRuntime.setScene(s), options.scene);
+    await frame.waitForFunction((s) => (window as any).colorPolishRuntime?.getState().scene === s, options.scene);
+  }
+
+  if (options?.ms && options.ms > 0) {
+    await frame.evaluate((checkpointMs) => {
+      (window as any).colorPolishRuntime.step(checkpointMs);
+      document.getAnimations().forEach((animation) => {
+        animation.pause();
+        animation.currentTime = checkpointMs;
+      });
+    }, options.ms);
+  }
+
+  return frame;
 }
 
 /**

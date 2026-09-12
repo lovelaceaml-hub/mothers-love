@@ -56,7 +56,7 @@ function fullDateLabel(aggregate,day){const key=monthKey(aggregate),parsed=Date.
 function daysInMonth(aggregate){const key=monthKey(aggregate),parts=key.split('-').map(Number);return parts.length===2&&parts.every(Number.isInteger)?new Date(Date.UTC(parts[0],parts[1],0)).getUTCDate():31}
 const sum=a=>a.reduce((n,v)=>n+v,0);
 const EMPTY_AGGREGATE={rec:0,expr:Array(9).fill(0),periodStart:'',periodEnd:''};
-const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
+const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),shownCount:new Map(),forceId:null,replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,speechBag:[],speechLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
 let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false, reducedMotionPreferred=false, lastManualAdvanceAt=-Infinity;
 function motionStill(motion,forced){return forced||motion==='still'||(reducedMotionPreferred&&motion!=='lively')}
 const qaLog=[];function log(type,data={}){qaLog.push({at:+S.t.toFixed(3),type,...data});if(qaLog.length>1400)qaLog.shift()}
@@ -127,7 +127,28 @@ function num(key,cls='number'){const n=numCache.get(key)?.value??0;return `<span
 function bindNumbers(root=document){root.querySelectorAll('[data-number]').forEach(el=>{let key=el.dataset.number,to=numberValue(key),c=numCache.get(key);if(!c){c={value:S.still?to:0,from:0,target:to,start:S.t,duration:1.45};numCache.set(key,c)}else if(c.target!==to){c.from=c.value;c.target=to;c.start=S.t}numberNodes.push(el);el.textContent=fmt(c.value)});numberNodes=numberNodes.filter((n,i,a)=>n.isConnected&&a.indexOf(n)===i)}
 function refreshNumbers(){for(const [k,c] of numCache){const to=numberValue(k);if(to!==c.target){c.from=c.value;c.target=to;c.start=S.t;c.duration=1.45}}updateGoalDOM();}
 function tickNumbers(){numCache.forEach(c=>{const p=S.still?1:clamp((S.t-c.start)/c.duration,0,1);c.value=lerp(c.from,c.target,1-Math.pow(1-p,3))});numberNodes=numberNodes.filter(el=>el.isConnected);numberNodes.forEach(el=>{const c=numCache.get(el.dataset.number);if(c){el.textContent=fmt(c.value);el.classList.toggle('counting',Math.abs(c.value-c.target)>.15)}})}
+function markShown(id){
+ if(!id)return;
+ S.shownCount.set(id,(S.shownCount.get(id)||0)+1);
+}
 function choose(exclude=[],expressionId=null){const p=records().filter(r=>!exclude.includes(r.id)&&(!expressionId||r.ids.includes(expressionId)));p.sort((a,b)=>(S.lastShown.get(a.id)??-10000)-(S.lastShown.get(b.id)??-10000)||b.createdAt-a.createdAt||a.id.localeCompare(b.id));return p[0]}
+function chooseRandom(exclude=[],expressionId=null){
+ const pool=records().filter(r=>!exclude.includes(r.id)&&(!expressionId||r.ids.includes(expressionId)));
+ if(!pool.length)return undefined;
+ const stable=pool.map(r=>r.id).join(',');
+ const salt=Math.floor(S.t);
+ const seed=((hashText(stable)^salt)>>>0)||1;
+ const rng=randSeed(seed);
+ let total=0;
+ for(const r of pool)total+=1/(1+(S.shownCount.get(r.id)??0));
+ let roll=rng()*total;
+ for(const r of pool){
+  const w=1/(1+(S.shownCount.get(r.id)??0));
+  if(roll<w)return r;
+  roll-=w;
+ }
+ return pool[pool.length-1];
+}
 function recordsChanged(previous,next){if(previous.length!==next.length)return true;const before=new Map(previous.map(r=>[r.id,r]));return next.some(r=>{const old=before.get(r.id);return !old||old.name!==r.name||old.message!==r.message||old.expiresAt!==r.expiresAt||old.ids.join(',')!==r.ids.join(',')})}
 function captureMilestone(threshold){S.milestoneValue=Math.max(0,Math.floor(Number(threshold)||0));S.milestoneContributors=[];}
 let V={root:null,clock:0,actors:[],fx:[],garden:null,planets:[],stream:null,status:[],next:14,serial:0};

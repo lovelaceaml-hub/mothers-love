@@ -2,11 +2,15 @@
 'use strict';
 
 const SCENES=Object.create(null);
-function registerScene(id,descriptor){SCENES[id]=Object.assign({markup:()=>'',mount:null,tick:null,draw:null,prime:null,tickAge:null,floaters:false,fxCanvas:false,archOpacity:'.52',topMargin:7,pace:null,replaceEvery:null,replaceMode:null,entrance:'entering',burst:'hearts',keepOut:()=>[],integrate:null,place:null,onRetire:null},descriptor)}
+function registerScene(id,descriptor){SCENES[id]=Object.assign({markup:()=>'',mount:null,tick:null,draw:null,prime:null,tickAge:null,floaters:false,fxCanvas:false,archOpacity:'.52',topMargin:7,pace:null,replaceEvery:null,replaceMode:null,entrance:'entering',burst:'hearts',keepOut:()=>[],integrate:null,place:null,onRetire:null,onLeave:null,speakers:null},descriptor)}
 function sceneDescriptor(id=S.s){return SCENES[id]||SCENES[0]}
 registerScene(0,{});
 
 function renderNow(id,{keepAge=false}={}){
+ const oldRoot=sceneRoot,prev=S.s;
+ if(prev!==0&&oldRoot){
+  try{sceneDescriptor(prev).onLeave?.(oldRoot)}catch(e){log('scene_onleave_error',{scene:prev})}
+ }
  S.s=id;slots=[];eduCards=[];hearts=[];tributes=[];
  const el=document.createElement('div');el.className='scene';el.dataset.scene=id;sceneRoot=el;
  el.innerHTML=['offline','neutral'].includes(S.mode)?safeScene():S.mode==='empty'?emptyPanel():sceneDescriptor(id).markup();
@@ -16,7 +20,7 @@ function renderNow(id,{keepAge=false}={}){
 }
 function postRender(){
  slots.forEach(b=>b.el=$(b.key));
- V={root:sceneRoot,clock:0,actors:[],fx:[],garden:null,planets:[],stream:null,status:[],next:sceneDescriptor().replaceEvery??12,serial:0};
+ V={root:sceneRoot,clock:0,actors:[],fx:[],garden:null,planets:[],stream:null,status:[],speech:null,next:sceneDescriptor().replaceEvery??12,serial:0};
  $('arch')?.style.setProperty('opacity',sceneDescriptor().archOpacity);
  document.querySelectorAll('.scene-nav').forEach(el=>el.classList.toggle('active',+el.dataset.scene===S.s));
  bindNumbers(sceneRoot);
@@ -24,6 +28,7 @@ function postRender(){
  sceneRoot.querySelectorAll(':scope > div[style*="position:absolute"]').forEach(el=>{if(!el.classList.contains('orb-slot')&&el.querySelector('h1'))el.classList.add('scene-copy')});
  if(sceneDescriptor().floaters)mountFloaters();
  sceneDescriptor().mount?.(sceneRoot);
+ if(Array.isArray(sceneDescriptor().speakers)&&sceneDescriptor().speakers.length)mountSpeech(sceneRoot,sceneDescriptor().speakers);
  checkFullFits();
  if(sceneDescriptor().fxCanvas){const canvas=document.createElement('canvas');canvas.className='scene-fx';canvas.width=1812;canvas.height=636;canvas.setAttribute('aria-hidden','true');sceneRoot.append(canvas);V.canvas=canvas;renderFloaters();drawSceneFX(0)}
  sceneDescriptor().prime?.(0);
@@ -38,7 +43,13 @@ function requestScene(id,{force=false}={}){
  const el=document.createElement('div');el.className='scene';el.dataset.scene=id;sceneRoot=el;
  el.innerHTML=['offline','neutral'].includes(S.mode)?safeScene():S.mode==='empty'?emptyPanel():sceneDescriptor(id).markup();
  $('stage').append(el);postRender();log('scene_transition_start',{from:prev,to:id});
- if(S.still){old?.remove();return}el.style.opacity=0;transition={old,next:el,age:0,duration:1.15};
+ if(S.still){
+  if(prev!==0&&old){
+   try{sceneDescriptor(prev).onLeave?.(old)}catch(e){log('scene_onleave_error',{scene:prev})}
+  }
+  old?.remove();return
+ }
+ el.style.opacity=0;transition={old,prev,next:el,age:0,duration:1.15};
 }
 function nextPlaylistEntry(){
  const list=S.playlist;if(!list?.length)return null;
@@ -61,7 +72,7 @@ function manualAdvanceKey(event){
   event.preventDefault();manualAdvance();
  }
 }
-function tickTransition(dt){if(!transition)return;transition.age+=dt;const p=ease(transition.age/transition.duration);transition.old.style.opacity=1-p;transition.old.style.transform=`translateX(${-15*p}px) scale(${1-.004*p})`;transition.next.style.opacity=p;transition.next.style.transform=`translateX(${20*(1-p)}px) scale(${.997+.003*p})`;if(p>=1){transition.old.remove();transition.next.style.opacity='';transition.next.style.transform='';transition=null;log('scene_transition_end',{scene:S.s});if(S.pendingScene&&!active){const n=S.pendingScene;S.pendingScene=null;requestScene(n)}}}
+function tickTransition(dt){if(!transition)return;transition.age+=dt;const p=ease(transition.age/transition.duration);transition.old.style.opacity=1-p;transition.old.style.transform=`translateX(${-15*p}px) scale(${1-.004*p})`;transition.next.style.opacity=p;transition.next.style.transform=`translateX(${20*(1-p)}px) scale(${.997+.003*p})`;if(p>=1){if(transition.prev!==0&&transition.old){try{sceneDescriptor(transition.prev).onLeave?.(transition.old)}catch(e){log('scene_onleave_error',{scene:transition.prev})}}transition.old.remove();transition.next.style.opacity='';transition.next.style.transform='';transition=null;log('scene_transition_end',{scene:S.s});if(S.pendingScene&&!active){const n=S.pendingScene;S.pendingScene=null;requestScene(n)}}}
 
 function changeWeek(){}
 function coordinator(dt){
@@ -73,7 +84,7 @@ function coordinator(dt){
  else if(!active&&S.queue.length&&S.t>=(S.queueStart??0)&&!['offline','neutral','empty'].includes(S.mode))beginEvent();
  if(active)tickEvent(dt);
  else if(!transition){
-  if(!S.still){S.sceneAge+=dt;sceneDescriptor().tickAge?.(dt);tickSlots(dt);tickTributes(dt);tickHearts(dt);}
+  if(!S.still){S.sceneAge+=dt;sceneDescriptor().tickAge?.(dt);tickSlots(dt);tickSpeech(dt);tickTributes(dt);tickHearts(dt);}
  }
  if(!active&&!transition&&!S.still&&!S.sceneControlled&&!S.pauseRotation&&S.playlist?.length){const duration=S.dwell?.[S.s]??DWELL[S.s]??30;if(S.sceneAge>=duration){const next=nextPlaylistEntry();if(next)requestScene(next.id)}}
  if(!active&&!transition&&S.milestonePending&&!S.queue.length&&S.sceneAge>=10){captureMilestone(S.milestonePending);S.milestonePending=null;requestScene(11)}
