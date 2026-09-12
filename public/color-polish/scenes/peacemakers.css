@@ -45,12 +45,44 @@
   }
 }
 
+#tv .scene[data-scene="8"] .peacemakers-world-sockets {
+  position: absolute;
+  left: 271px;
+  top: 134px;
+  width: 604px;
+  height: 482px;
+  pointer-events: none;
+  z-index: 15;
+}
+
+#tv .scene[data-scene="8"] .peacemakers-socket {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 20, 0.78) 0%, rgba(25, 35, 30, 0.6) 55%, transparent 95%);
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.5);
+  border: 1.5px dashed rgba(255, 255, 255, 0.25);
+  clip-path: polygon(
+    0% 12%, 36% 12%, 39% 0%, 61% 0%, 64% 12%, 100% 12%,
+    100% 36%, 90% 39%, 90% 61%, 100% 64%, 100% 88%,
+    64% 88%, 61% 100%, 39% 100%, 36% 88%, 0% 88%,
+    0% 64%, 10% 61%, 10% 39%, 0% 36%
+  );
+  transition: opacity 0.6s ease-out;
+}
+
+/* The hold zone. 260 wide is the hard limit: the world art's rendered box ends
+   at x 875 and the recognition globe's left edge sits at 1200, and the gap
+   report requires a 60 px gap before the globe, so the card must live inside
+   x 880 to 1140. Height was raised from 260 to 370 because a square 260 box
+   left the message almost no room; 260 by 370 is an aspect of 0.70, the
+   shallowest the shared cardShape('puzzle') check accepts. */
 #tv .scene[data-scene="8"] .peacemakers-hold-zone {
   position: absolute;
-  left: 750px;
-  top: 168px;
-  width: 300px;
-  height: 300px;
+  left: 880px;
+  top: 130px;
+  width: 260px;
+  height: 370px;
   pointer-events: none;
   z-index: 30;
 }
@@ -59,8 +91,17 @@
   position: absolute;
   border-radius: 18px;
   border: 2px solid #ffffff;
-  background: linear-gradient(135deg, #fffffffa 0%, #fffbf2f7 50%, var(--tint, #f8e7b9) 120%);
+  background-image: url(/color-polish/assets/globe.png);
+  background-size: 604px 482px;
+  background-position: var(--bg-pos, -459px -126px);
+  background-repeat: no-repeat;
   box-shadow: 0 12px 32px rgba(90, 75, 50, 0.16), 0 2px 8px rgba(90, 75, 50, 0.08);
+  clip-path: polygon(
+    0% 12%, 36% 12%, 39% 0%, 61% 0%, 64% 12%, 100% 12%,
+    100% 36%, 90% 39%, 90% 61%, 100% 64%, 100% 88%,
+    64% 88%, 61% 100%, 39% 100%, 36% 88%, 0% 88%,
+    0% 64%, 10% 61%, 10% 39%, 0% 36%
+  );
   overflow: hidden;
   box-sizing: border-box;
   display: flex;
@@ -70,31 +111,37 @@
 }
 
 #tv .scene[data-scene="8"] .puzzle-card.face-on {
-  left: 750px;
-  top: 168px;
-  width: 300px;
-  height: 300px;
-  padding: 18px 20px;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 260px;
 }
 
 #tv .scene[data-scene="8"] .puzzle-card-inner {
   width: 100%;
   height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 251, 242, 0.94) 55%, var(--tint-alpha, rgba(248, 231, 185, 0.90)) 100%);
+  padding: 14px 16px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
+#tv .scene[data-scene="8"] .puzzle-card.flying .puzzle-card-inner {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 #tv .scene[data-scene="8"] .puzzle-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 #tv .scene[data-scene="8"] .puzzle-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   background: radial-gradient(circle at 30% 20%, #ffffff, var(--tint, #f8e7b9));
   border: 1.5px solid #ffffff;
   display: grid;
@@ -104,8 +151,8 @@
 }
 
 #tv .scene[data-scene="8"] .puzzle-badge img {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
 }
 
@@ -122,7 +169,7 @@
 }
 
 #tv .scene[data-scene="8"] .puzzle-recipient {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.4px;
   line-height: 1.15;
@@ -134,23 +181,48 @@
 
 #tv .scene[data-scene="8"] .puzzle-card .puzzle-message {
   display: none;
-  font-size: 18px;
-  line-height: 1.32;
-  margin: 10px 0;
-  color: #455149;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 18px;
+  line-height: 1.28;
+  margin: 6px 0;
+  color: #455149;
+  word-break: break-word;
 }
 
 #tv .scene[data-scene="8"] .puzzle-card.face-on .puzzle-message {
-  display: -webkit-box;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
+  display: block;
+}
+
+/* No bottom margin. The pagination loop measures page one as raw text in the
+   message box; wrapping it in a block span with a 4 px bottom margin made it
+   4 px taller than the box it was just fitted to, so the one visible page
+   reported as overflowing in still mode. */
+#tv .scene[data-scene="8"] .puzzle-message .puzzle-message-page {
+  display: block;
+  margin-bottom: 0;
+}
+
+/* `display: block` above beats the [hidden] attribute's UA rule, so a page
+   marked hidden in still mode stayed laid out and kept overflowing the message
+   box. Restore hidden's meaning explicitly. */
+#tv .scene[data-scene="8"] .puzzle-message .puzzle-message-page[hidden] {
+  display: none;
+}
+
+#tv .scene[data-scene="8"] .puzzle-page-indicator {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #8d7d6c;
+  margin-top: 4px;
+  text-transform: uppercase;
 }
 
 #tv .scene[data-scene="8"] .peacemakers-globe-stage {
   position: absolute;
-  left: 1110px;
+  left: 1220px;
   top: 28px;
   width: 580px;
   height: 580px;
@@ -188,14 +260,17 @@
   transform-style: preserve-3d;
 }
 
-#tv .scene[data-scene="8"] .globe-card {
+#tv .scene[data-scene="8"] .puzzle-card.globe-card {
   position: absolute;
   inset: 0;
   width: 96px;
   height: 96px;
   border-radius: 14px;
   border: 1.5px solid #ffffff;
-  background: radial-gradient(circle at 28% 18%, #ffffff, #fffdf8f0 45%, var(--tint, #f8e7b9) 110%);
+  background-image: url(/color-polish/assets/globe.png);
+  background-size: 604px 482px;
+  background-position: var(--bg-pos, -459px -126px);
+  background-repeat: no-repeat;
   box-shadow: 0 6px 16px rgba(90, 75, 50, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   backface-visibility: hidden;
   display: flex;
@@ -203,32 +278,45 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 8px 6px;
+  padding: 0;
   box-sizing: border-box;
   color: var(--ink, #34463f);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
-#tv .scene[data-scene="8"] .globe-card.dissolving {
+#tv .scene[data-scene="8"] .globe-card.dissolving,
+#tv .scene[data-scene="8"] .globe-slot.dissolving {
   opacity: 0;
   transform: scale(0.8);
 }
 
+#tv .scene[data-scene="8"] .globe-card-inner {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.90), rgba(255, 253, 248, 0.84) 45%, var(--tint-alpha, rgba(248, 231, 185, 0.80)) 110%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  box-sizing: border-box;
+}
+
 #tv .scene[data-scene="8"] .globe-badge {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: radial-gradient(circle at 30% 20%, #ffffff, var(--tint, #f8e7b9));
   border: 1px solid #ffffff;
   display: grid;
   place-items: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 #tv .scene[data-scene="8"] .globe-badge img {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -262,37 +350,9 @@
   z-index: 50;
 }
 
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(1) {
-  left: 382px !important;
-  top: 262px !important;
-}
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(1)::after {
-  left: 12px;
-}
 
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(2) {
-  left: 516px !important;
-  top: 296px !important;
-}
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(2)::after {
-  left: 20px;
-}
 
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(3) {
-  left: 638px !important;
-  top: 298px !important;
-}
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(3)::after {
-  left: 25px;
-}
 
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(4) {
-  left: 690px !important;
-  top: 224px !important;
-}
-#tv .scene[data-scene="8"] .speech-bubble:nth-of-type(4)::after {
-  left: 63px;
-}
 
 #tv.still .scene[data-scene="8"] img.art,
 #tv.still .scene[data-scene="8"] .globe-light,
