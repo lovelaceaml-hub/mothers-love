@@ -23,6 +23,7 @@ All nine gap reports are written (gaps/), one per scene lane plus Section C; Sec
 
 All eleven code lanes are committed and every one passes its own spec suite with zero failures. tv15/pick at 363ab40 merges all of them onto tv15/base with no conflicts.
 
+- B2 The Turning Nave (transition rebuild): **running, not reviewed**. Design complete and committed at 014d429; spec carried into tv15/base at 906a1cc; plan Section B2 added at 83a9e94; dispatched to gpt-5.6-luna xhigh. Lane record: lanes/B2.md. This supersedes the round-11 transition that Section B landed.
 - Lane 0 critique: landed and dispositioned. 14 objections, 4 blocking; 11 accepted, 2 rejected on evidence, 1 accepted in part. decisions/2026-09-12T00-15Z-coordinator-lane0-disposition.md
 - A base (shared primitives): committed, tv15/base 3e89529. Landing review waived by Anthony.
 - B transitions: committed 6c522c1 plus rounds 3 to 5. Reviewed. **Anthony rejected the first version on the TV** because 24 decorative bubbles left the background fully visible; the coordinator had capped it at 24 on a performance objection and that was the wrong call. Rebuilt with a single full-bleed opaque wash that sweeps in, fully occludes at the swap and completes off the opposite edge, bubbles back to 40 as texture. Occlusion is measured and asserted for all four styles.
