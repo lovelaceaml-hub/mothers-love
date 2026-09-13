@@ -20,6 +20,14 @@ Open follow-ups: pixel parity, advanced preview drafts and preset editing (defer
 
 # Handoff
 
+## September 12: latest 100 recognition feed
+
+The public home feed at https://mothers-love.vercel.app now shows the latest 100 published, unexpired recognitions instead of stopping at 50. The browser accepts all 100 and loads heart counts in safe batches of no more than 30 IDs. The recognition form remains at https://mothers-love.vercel.app/recognize.
+
+Production migration 013 and release commit `42115bd045db40d7e2a05b18c70671ba52dd1200` are live as Vercel deployment `dpl_tCHujonmSdnsNDqi5vTTj81MNEAo`, Ready. The database function reports a limit of 100 while execute permission remains limited to `mothers_love_runtime`. Anonymous and authenticated roles remain denied.
+
+Verification passed: typecheck, 222 tests, production build, focused lint, 9 feed browser journeys, and an isolated PostgreSQL 16 migration and fixture run. The final canonical-site check returned and rendered all 57 currently eligible records, which exceeds the former 50-record cutoff, with no load error. See [Plan 16](PLAN-16-feed-100.md) and the [run record](runs/2026-09-12-feed-100/INDEX.md).
+
 ## Interview completion update
 
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 09](PLAN-09-interview-completion.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
