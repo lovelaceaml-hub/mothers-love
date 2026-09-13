@@ -71,6 +71,7 @@ const PublicFeedContext = createContext<PublicFeedContextValue>(defaultContext);
 
 const DEFAULT_RETRY_AFTER_MS = 60_000;
 const MAX_RETRY_AFTER_MS = 5 * 60_000;
+const REACTION_BATCH_SIZE = 30;
 
 function parseRetryAfterMs(value: string | null) {
   if (!value) return undefined;
@@ -148,7 +149,7 @@ function decodeReactionItem(value: unknown): ReactionItem | null {
 }
 
 export async function fetchReactionCounts(ids: readonly string[], signal?: AbortSignal) {
-  const boundedIds = [...new Set(ids)].slice(0, 30);
+  const boundedIds = [...new Set(ids)].slice(0, REACTION_BATCH_SIZE);
   if (boundedIds.length === 0) return new Map<string, ReactionItem>();
   const response = await fetch(`/api/reactions?ids=${encodeURIComponent(boundedIds.join(','))}`, {
     cache: 'no-store',
@@ -289,7 +290,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     reactionControllerRef.current?.abort();
     const serial = reactionSerialRef.current + 1;
     reactionSerialRef.current = serial;
-    const ids = items.map((item) => item.id).slice(0, 30);
+    const ids = items.map((item) => item.id);
     if (ids.length === 0) {
       commitReactions({});
       return;
@@ -346,7 +347,14 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     reactionControllerRef.current = controller;
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     try {
-      const payloadById = await fetchReactionCounts(ids, controller.signal);
+      const batches = Array.from(
+        { length: Math.ceil(ids.length / REACTION_BATCH_SIZE) },
+        (_, index) => ids.slice(index * REACTION_BATCH_SIZE, (index + 1) * REACTION_BATCH_SIZE),
+      );
+      const batchResults = await Promise.all(
+        batches.map((batch) => fetchReactionCounts(batch, controller.signal)),
+      );
+      const payloadById = new Map(batchResults.flatMap((batch) => [...batch.entries()]));
       if (serial !== reactionSerialRef.current || generation !== feedGenerationRef.current) return;
 
       const next = Object.fromEntries(ids.map((id) => {

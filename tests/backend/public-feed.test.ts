@@ -68,7 +68,13 @@ describe("public feed projection", () => {
       expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient }] })).toBeNull();
     }
     expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [{ ...item, recipient: "🙂".repeat(81) }] })).toBeNull();
-    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: Array.from({ length: 51 }, () => item) })).toBeNull();
+    const uniqueItems = Array.from({ length: 100 }, (_, index) => ({
+      ...item,
+      id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      firstPublishedAt: new Date(Date.parse(item.firstPublishedAt) - index).toISOString(),
+    }));
+    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: uniqueItems })).not.toBeNull();
+    expect(projectPublicFeed({ serverTime: snapshot.serverTime, items: [...uniqueItems, item] })).toBeNull();
     expect(projectPublicFeed({
       serverTime: snapshot.serverTime,
       items: [item, { ...item, firstPublishedAt: item.firstPublishedAt }],
