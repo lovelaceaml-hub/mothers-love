@@ -214,19 +214,27 @@ test('ignores a stale response after a visibility refresh', async ({ page }) => 
   await expect(page.getByText('Stale R.')).toHaveCount(0);
 });
 
-test('bounds home to 30 items and keeps the list keyboard-scrollable', async ({ page }) => {
-  const items = Array.from({ length: 35 }, (_, index) => item({
+test('shows the latest 100 items, batches heart counts, and keeps the list keyboard-scrollable', async ({ page }) => {
+  const reactionRequests: string[][] = [];
+  const items = Array.from({ length: 100 }, (_, index) => item({
     id: `recognition-${index}`,
     recipient: `Recipient ${index} R.`,
-    firstPublishedAt: `2030-01-01T11:${String(59 - Math.floor(index / 60)).padStart(2, '0')}:${String(59 - (index % 60)).padStart(2, '0')}.000Z`,
+    firstPublishedAt: new Date(Date.parse(serverTime) - index * 1_000).toISOString(),
   }));
   await routeFeed(page, snapshot(items));
-  await routeReactions(page);
+  await page.route('**/api/reactions**', async (route) => {
+    const ids = new URL(route.request().url()).searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
+    reactionRequests.push(ids);
+    await route.fulfill({ json: { items: ids.map((id) => ({ id, count: 2, liked: false })) } });
+  });
 
   await page.goto('/');
   const viewport = page.getByRole('region', { name: 'Recent recognitions' });
   await expect(viewport).toHaveAttribute('tabindex', '0');
-  await expect(page.getByRole('article')).toHaveCount(30);
+  await expect(page.getByRole('article')).toHaveCount(100);
+  await expect.poll(() => reactionRequests.length).toBe(4);
+  expect(reactionRequests.every((ids) => ids.length <= 30)).toBe(true);
+  expect(reactionRequests.flat()).toHaveLength(100);
 });
 
 test('shows the form only on the recognize page, with no live campaign feed', async ({ page }) => {
