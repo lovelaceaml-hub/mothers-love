@@ -540,3 +540,484 @@ test('no .orb exists in expressions scene', async ({ page }) => {
 
   expect(orbCount).toBe(0);
 });
+
+// --- Plan 17 Lane 2: edges, fit, title and footnote, and motion preservation -------------------
+//
+// Anthony's TV photos (September 18) show this scene's grid and in-focus view cut off at the sides.
+// The TV cuts at the scene box, not the screen: `.scene` has overflow:hidden and at 1920 wide spans
+// x 54 to 1866 and y 126 to 762, so anything past it, box or glow, ends in a hard edge. These specs
+// drive the renderer directly through loadRenderer (a long timeline needs the direct harness, and
+// the admin Studio needs backend settings this lane's dev server does not have).
+
+const EXPRESSIONS_EDGE_CASES = [
+  { width: 1920, height: 1080, floor: 16 },
+  { width: 3840, height: 2160, floor: 32 },
+] as const;
+
+// The scene's full 30 s dwell: 30 evenly spaced samples (every second, 0 to 29 s), plus every
+// 200 ms through each 2.4 s focus ramp (at 6, 16 and 26 s), where cards move while still tilted.
+const EXPRESSIONS_DWELL_SAMPLES_MS = (() => {
+  const times = new Set<number>();
+  for (let i = 0; i < 30; i++) times.add(i * 1000);
+  for (const rampStart of [6000, 16000, 26000]) {
+    for (let t = rampStart; t <= rampStart + 2400; t += 200) times.add(t);
+  }
+  return [...times].sort((a, b) => a - b);
+})();
+
+// Nine visits: each entry to the scene advances S.bloomIndex by one and each visit focuses three
+// cards, so nine visits put every card in focus in every cycle position and every card through
+// every compact slot it can reach.
+const EXPRESSIONS_VISITS = 9;
+
+async function enterExpressionsVisit(frame: Frame, visit: number) {
+  if (visit === 0) return;
+  await settleOnScene(frame, 1);
+  await settleOnScene(frame, 7);
+}
+
+// Every card's painted reach against the scene box and the viewport: its rendered rect (which
+// already includes tilt and depth) widened by its computed box-shadow, which is scaled by the
+// same depth. Finished transitions (currentTime past their end) mean a card that has just gained
+// focus is measured with its full glow.
+async function measureExpressionReach(frame: Frame, floor: number) {
+  return await frame.evaluate((floor) => {
+    document.getAnimations().forEach((animation) => {
+      animation.pause();
+      animation.currentTime = 1e7;
+    });
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]');
+    if (!scene) throw new Error('scene 7 is not on stage');
+    const box = scene.getBoundingClientRect();
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
+    const shadowReach = (value: string) => {
+      const reach = { left: 0, right: 0, top: 0, bottom: 0 };
+      if (!value || value === 'none') return reach;
+      for (const layer of value.split(/,(?![^(]*\))/)) {
+        if (/\binset\b/.test(layer)) continue;
+        const numbers = (layer.replace(/[a-z-]+\([^)]*\)/gi, '').match(/-?[\d.]+px/g) || []).map(parseFloat);
+        const [x = 0, y = 0, blur = 0, spread = 0] = numbers;
+        reach.left = Math.max(reach.left, blur + spread - x);
+        reach.right = Math.max(reach.right, blur + spread + x);
+        reach.top = Math.max(reach.top, blur + spread - y);
+        reach.bottom = Math.max(reach.bottom, blur + spread + y);
+      }
+      return reach;
+    };
+    const failures: string[] = [];
+    let cardCount = 0;
+    let focusedGlow = 0;
+    scene.querySelectorAll<HTMLElement>('.edu-card').forEach((card) => {
+      cardCount++;
+      const rect = card.getBoundingClientRect();
+      const scale = Math.max(rect.width / card.offsetWidth, rect.height / card.offsetHeight);
+      const reach = shadowReach(getComputedStyle(card).boxShadow);
+      if (card.classList.contains('focused')) focusedGlow = reach.left * scale;
+      const painted = {
+        left: rect.left - reach.left * scale,
+        right: rect.right + reach.right * scale,
+        top: rect.top - reach.top * scale,
+        bottom: rect.bottom + reach.bottom * scale,
+      };
+      const label = `card ${card.dataset.expressionId} (${card.className.trim()})`;
+      const checks: Array<[string, number]> = [
+        ['scene left', painted.left - box.left],
+        ['scene right', box.right - painted.right],
+        ['scene top', painted.top - box.top],
+        ['scene bottom', box.bottom - painted.bottom],
+        ['viewport left', painted.left],
+        ['viewport right', viewWidth - painted.right],
+        ['viewport top', painted.top],
+        ['viewport bottom', viewHeight - painted.bottom],
+      ];
+      for (const [side, margin] of checks) {
+        if (margin < floor) failures.push(`${label} ${side} margin ${margin.toFixed(1)}px < ${floor}px`);
+      }
+    });
+    return { cardCount, focusedGlow, failures };
+  }, floor);
+}
+
+for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
+  test(`every card, border and glow stays ${floor}px inside the scene box and the ${width}x${height} screen for nine full visits`, async ({
+    page,
+  }) => {
+    test.setTimeout(240000);
+    await page.setViewportSize({ width, height });
+    const frame = await loadRenderer(page, { scene: 7 });
+    const failures: string[] = [];
+    let focusedSamples = 0;
+
+    for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
+      await enterExpressionsVisit(frame, visit);
+      let at = 0;
+      for (const t of EXPRESSIONS_DWELL_SAMPLES_MS) {
+        if (t > at) {
+          await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), t - at);
+          at = t;
+        }
+        const state = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+        expect(state, `visit ${visit + 1} t=${t}ms still on scene 7`).toBe(7);
+        const result = await measureExpressionReach(frame, floor);
+        expect(result.cardCount).toBe(9);
+        if (result.focusedGlow > 0) focusedSamples++;
+        for (const failure of result.failures) failures.push(`visit ${visit + 1} t=${t}ms ${failure}`);
+      }
+    }
+
+    // The glow was really measured (55px blur plus 3px ring, times depth), not skipped.
+    expect(focusedSamples).toBeGreaterThan(0);
+    expect(failures.slice(0, 40), `${failures.length} edge failures`).toEqual([]);
+  });
+}
+
+for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
+  test(`at ${width}x${height} every card's words fit, the title and footnote sit clear, and nothing is shrunk`, async ({
+    page,
+  }) => {
+    test.setTimeout(180000);
+    await page.setViewportSize({ width, height });
+    const frame = await loadRenderer(page, { scene: 7 });
+    const k = width / 1920;
+    const focusedIds = new Set<number>();
+
+    for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
+      await enterExpressionsVisit(frame, visit);
+      for (const phase of ['grid', 'hold'] as const) {
+        if (phase === 'hold') await frame.evaluate(() => (window as any).colorPolishRuntime.step(14000));
+        const r = await frame.evaluate(() => {
+          document.getAnimations().forEach((animation) => {
+            animation.pause();
+            animation.currentTime = 1e7;
+          });
+          const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+          const box = scene.getBoundingClientRect();
+          const title = scene.querySelector<HTMLElement>('h1.heading')!.getBoundingClientRect();
+          const captionEl = scene.querySelector<HTMLElement>('.edu-caption')!;
+          const caption = captionEl.getBoundingClientRect();
+          const overlaps = (a: DOMRect, b: DOMRect) =>
+            a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+          const cards = [...scene.querySelectorAll<HTMLElement>('.edu-card')].map((card) => {
+            const rect = card.getBoundingClientRect();
+            const scale = rect.height / card.offsetHeight;
+            const front = card.querySelector<HTMLElement>('.edu-front')!;
+            const detail = card.querySelector<HTMLElement>('.edu-detail')!;
+            const explanation = detail.querySelector<HTMLElement>('.edu-explanation')!.getBoundingClientRect();
+            const source = detail.querySelector<HTMLElement>('.edu-source')!.getBoundingClientRect();
+            const texts = [...detail.querySelectorAll<HTMLElement>('.edu-phrase, .edu-principle, .edu-explanation')];
+            return {
+              id: Number(card.dataset.expressionId),
+              state: card.classList.contains('focused') ? 'focused' : card.classList.contains('compact') ? 'compact' : 'grid',
+              left: rect.left,
+              right: rect.right,
+              top: rect.top,
+              frontFits: front.scrollHeight <= card.clientHeight && front.scrollWidth <= card.clientWidth,
+              phraseSlack: rect.bottom - front.querySelector<HTMLElement>('.edu-phrase')!.getBoundingClientRect().bottom,
+              detailFits: detail.scrollHeight <= card.clientHeight && detail.scrollWidth <= card.clientWidth,
+              fill: ((explanation.bottom - rect.top) / rect.height) * 100,
+              sourceBelow: source.top >= explanation.bottom,
+              smallestTextPx: Math.min(...texts.map((el) => parseFloat(getComputedStyle(el).fontSize) * scale)),
+              coversCaption: overlaps(rect, caption),
+            };
+          });
+          return {
+            titleBottom: title.bottom,
+            // The footnote is positioned against the scene, not derived from it, so this can fail:
+            // it must sit inside the scene box (where the TV cuts) with none of its words clipped.
+            captionInside:
+              caption.left >= box.left &&
+              caption.right <= box.right &&
+              caption.top >= box.top &&
+              caption.bottom <= box.bottom &&
+              captionEl.scrollWidth <= captionEl.clientWidth &&
+              captionEl.scrollHeight <= captionEl.clientHeight,
+            cards,
+          };
+        });
+
+        const label = `visit ${visit + 1} ${phase}`;
+        expect(r.captionInside, `${label}: footnote inside the scene box, unclipped`).toBe(true);
+        for (const card of r.cards) {
+          expect(card.coversCaption, `${label} card ${card.id}: footnote uncovered`).toBe(false);
+        }
+        if (phase === 'grid') {
+          for (const card of r.cards) {
+            expect(card.state, `${label} card ${card.id}`).toBe('grid');
+            expect(card.frontFits, `${label} card ${card.id} words fit`).toBe(true);
+            expect(card.phraseSlack, `${label} card ${card.id} phrase slack`).toBeGreaterThanOrEqual(12 * k);
+          }
+          // The title sits clear above the top row (its outer cards tilt their top edge upward).
+          const topRow = Math.min(...r.cards.map((card) => card.top));
+          expect(topRow - r.titleBottom, `${label} title clearance above the grid`).toBeGreaterThanOrEqual(floor);
+          continue;
+        }
+        const focused = r.cards.filter((card) => card.state === 'focused');
+        const compact = r.cards.filter((card) => card.state === 'compact');
+        expect(focused).toHaveLength(1);
+        expect(compact).toHaveLength(8);
+        const panel = focused[0];
+        focusedIds.add(panel.id);
+        expect(panel.detailFits, `${label} focus ${panel.id} words fit`).toBe(true);
+        expect(panel.fill, `${label} focus ${panel.id} explanation fill`).toBeGreaterThanOrEqual(70);
+        expect(panel.fill, `${label} focus ${panel.id} explanation fill`).toBeLessThanOrEqual(92);
+        expect(panel.sourceBelow, `${label} focus ${panel.id} source below explanation`).toBe(true);
+        expect(panel.smallestTextPx, `${label} focus ${panel.id} text floor`).toBeGreaterThanOrEqual(18 * k);
+        // The title sits clear above the focused panel's top border.
+        expect(panel.top - r.titleBottom, `${label} title clearance`).toBeGreaterThanOrEqual(floor);
+        for (const card of compact) {
+          expect(card.frontFits, `${label} compact ${card.id} words fit`).toBe(true);
+          expect(card.phraseSlack, `${label} compact ${card.id} phrase slack`).toBeGreaterThanOrEqual(12 * k);
+          expect(card.left - panel.right, `${label} compact ${card.id} clear of the panel`).toBeGreaterThanOrEqual(floor);
+        }
+      }
+    }
+    expect(focusedIds.size).toBe(9);
+  });
+}
+
+// The focused panel's text is set in Georgia, which most TV browsers lack, so the TV's fallback
+// serif can run wider than Chrome's here. Widen every letter inside the panel by a fraction of its
+// own font size (stricter than one inherited absolute value on .edu-detail) and require that each of
+// the nine panels still keeps its explanation above the source note with nothing clipped.
+for (const letterSpacing of [0.03, 0.05]) {
+  for (const { width, height } of EXPRESSIONS_EDGE_CASES) {
+    test(`at ${width}x${height} with ${letterSpacing}em wider letters every focused panel still fits above its source note`, async ({
+      page,
+    }) => {
+      test.setTimeout(180000);
+      await page.setViewportSize({ width, height });
+      const frame = await loadRenderer(page, { scene: 7 });
+      const k = width / 1920;
+      const focusedIds = new Set<number>();
+
+      for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
+        await enterExpressionsVisit(frame, visit);
+        await frame.evaluate((em) => {
+          let style = document.getElementById('tv17-wider-letters');
+          if (!style) {
+            style = document.createElement('style');
+            style.id = 'tv17-wider-letters';
+            document.head.appendChild(style);
+          }
+          style.textContent = `#stage .scene[data-scene="7"] .edu-detail, #stage .scene[data-scene="7"] .edu-detail * { letter-spacing: ${em}em !important; }`;
+        }, letterSpacing);
+        await frame.evaluate(() => (window as any).colorPolishRuntime.step(14000));
+        const panel = await frame.evaluate(() => {
+          document.getAnimations().forEach((animation) => {
+            animation.pause();
+            animation.currentTime = 1e7;
+          });
+          const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+          const box = scene.getBoundingClientRect();
+          const card = scene.querySelector<HTMLElement>('.edu-card.focused');
+          if (!card) throw new Error('no focused card');
+          const rect = card.getBoundingClientRect();
+          const scale = rect.height / card.offsetHeight;
+          const detail = card.querySelector<HTMLElement>('.edu-detail')!;
+          const explanationEl = detail.querySelector<HTMLElement>('.edu-explanation')!;
+          const explanation = explanationEl.getBoundingClientRect();
+          const source = detail.querySelector<HTMLElement>('.edu-source')!.getBoundingClientRect();
+          const texts = [...detail.querySelectorAll<HTMLElement>('.eyebrow, h2, .edu-phrase, .edu-principle, .edu-explanation, .edu-source')];
+          const inside = (r: DOMRect, outer: DOMRect) =>
+            r.left >= outer.left - 0.5 && r.right <= outer.right + 0.5 && r.top >= outer.top - 0.5 && r.bottom <= outer.bottom + 0.5;
+          // The card is the clip box (overflow hidden), so measure each text's rendered extent (its
+          // content range, which includes any inline overflow of its own box) against the card.
+          const textRange = (el: HTMLElement) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            return range.getBoundingClientRect();
+          };
+          const explanationStyle = getComputedStyle(explanationEl);
+          return {
+            id: Number(card.dataset.expressionId),
+            fontPx: parseFloat(explanationStyle.fontSize),
+            spacingPx: parseFloat(explanationStyle.letterSpacing),
+            sourceGap: (source.top - explanation.bottom) / scale,
+            fill: ((explanation.bottom - rect.top) / rect.height) * 100,
+            detailFits: detail.scrollHeight <= card.clientHeight && detail.scrollWidth <= card.clientWidth,
+            textsInsideCard: texts.every((el) => inside(el.getBoundingClientRect(), rect) && inside(textRange(el), rect)),
+            cardInsideScene: inside(rect, box),
+            smallestTextPx: Math.min(
+              ...texts
+                .filter((el) => !el.matches('.eyebrow, .edu-source'))
+                .map((el) => parseFloat(getComputedStyle(el).fontSize) * scale),
+            ),
+          };
+        });
+        const label = `visit ${visit + 1} focus ${panel.id} at ${letterSpacing}em`;
+        focusedIds.add(panel.id);
+        // The wider letters really apply to the panel's text (em of the element's own font size).
+        expect(panel.spacingPx / panel.fontPx, `${label} letter spacing applied`).toBeCloseTo(letterSpacing, 3);
+        expect(panel.sourceGap, `${label} source note below the explanation`).toBeGreaterThanOrEqual(0);
+        expect(panel.detailFits, `${label} words fit`).toBe(true);
+        expect(panel.textsInsideCard, `${label} every text block and its rendered words inside the panel`).toBe(true);
+        expect(panel.cardInsideScene, `${label} panel inside the scene box`).toBe(true);
+        expect(panel.fill, `${label} explanation fill`).toBeGreaterThanOrEqual(70);
+        expect(panel.fill, `${label} explanation fill`).toBeLessThanOrEqual(92);
+        expect(panel.smallestTextPx, `${label} text floor`).toBeGreaterThanOrEqual(18 * k);
+      }
+      expect(focusedIds.size).toBe(9);
+    });
+  }
+}
+
+// When focus moves on, the card that had it jumps to its compact slot. Its glow must not fade out
+// there over the 700 ms transition, because the compact slots sit closer to the scene edge than the
+// glow reaches: sample the first 300 ms after every leave (t = 16 s and 26 s of each visit, so every
+// card leaves focus twice) with the transitions paused at that time, and require the leaving card's
+// painted reach to stay inside the scene box.
+for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
+  test(`at ${width}x${height} a card leaving focus keeps its glow ${floor}px inside the scene box`, async ({ page }) => {
+    test.setTimeout(180000);
+    await page.setViewportSize({ width, height });
+    const frame = await loadRenderer(page, { scene: 7 });
+    const failures: string[] = [];
+    const leftIds = new Set<number>();
+
+    for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
+      await enterExpressionsVisit(frame, visit);
+      let at = 0;
+      for (const leaveAt of [16000, 26000]) {
+        await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), leaveAt - 2000 - at);
+        at = leaveAt - 2000;
+        const leaving = await frame.evaluate(
+          () => Number(document.querySelector<HTMLElement>('#stage .scene[data-scene="7"] .edu-card.focused')?.dataset.expressionId),
+        );
+        expect(leaving, `visit ${visit + 1} a card is in focus before ${leaveAt}ms`).toBeGreaterThan(0);
+        await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 2000);
+        at = leaveAt;
+        for (const ms of [0, 50, 100, 150, 200, 250, 300]) {
+          const r = await frame.evaluate(
+            ({ id, ms }) => {
+              document.getAnimations().forEach((animation: any) => {
+                animation.pause();
+                animation.currentTime = animation.transitionProperty ? ms : 1e7;
+              });
+              const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+              const box = scene.getBoundingClientRect();
+              const card = scene.querySelector<HTMLElement>(`.edu-card[data-expression-id="${id}"]`)!;
+              const rect = card.getBoundingClientRect();
+              const scale = Math.max(rect.width / card.offsetWidth, rect.height / card.offsetHeight);
+              const reach = { left: 0, right: 0, top: 0, bottom: 0 };
+              for (const layer of getComputedStyle(card).boxShadow.split(/,(?![^(]*\))/)) {
+                if (/\binset\b/.test(layer)) continue;
+                const [x = 0, y = 0, blur = 0, spread = 0] = (layer.replace(/[a-z-]+\([^)]*\)/gi, '').match(/-?[\d.]+px/g) || []).map(parseFloat);
+                reach.left = Math.max(reach.left, blur + spread - x);
+                reach.right = Math.max(reach.right, blur + spread + x);
+                reach.top = Math.max(reach.top, blur + spread - y);
+                reach.bottom = Math.max(reach.bottom, blur + spread + y);
+              }
+              return {
+                compact: card.classList.contains('compact'),
+                margins: {
+                  left: rect.left - reach.left * scale - box.left,
+                  right: box.right - (rect.right + reach.right * scale),
+                  top: rect.top - reach.top * scale - box.top,
+                  bottom: box.bottom - (rect.bottom + reach.bottom * scale),
+                },
+              };
+            },
+            { id: leaving, ms },
+          );
+          expect(r.compact, `visit ${visit + 1} card ${leaving} is compact after leaving focus at ${leaveAt}ms`).toBe(true);
+          for (const [side, margin] of Object.entries(r.margins)) {
+            if (margin < floor) failures.push(`visit ${visit + 1} t=${leaveAt}+${ms}ms card ${leaving} ${side} margin ${margin.toFixed(1)}px < ${floor}px`);
+          }
+        }
+        leftIds.add(leaving);
+        // Let the sampled transitions finish so later samples start clean.
+        await frame.evaluate(() => document.getAnimations().forEach((animation) => { animation.currentTime = 1e7; }));
+      }
+    }
+    expect(leftIds.size).toBe(9);
+    expect(failures.slice(0, 40), `${failures.length} leaving-focus glow failures`).toEqual([]);
+  });
+}
+
+// Captured from tv17/base (5a24f0b), the Plan 15 renderer, on the first visit: each card's
+// [translateZ px, rotateY deg] at these scene ages. The card tilt and drift are driven from script
+// each frame, so this is the behavior-level record of the motion; it holds whatever the layout is.
+const EXPRESSIONS_BASE_MOTION: Record<number, Array<[number, number]>> = {
+  0: [[-40,7],[-40,0],[-40,-7],[0,7],[0,0],[0,-7],[-40,7],[-40,0],[-40,-7]],
+  6000: [[-39.833,6.991],[-39.949,0],[-39.949,-6.991],[0,6.991],[0,0],[0,-6.991],[-39.949,6.991],[-39.949,0],[-39.949,-6.991]],
+  6600: [[-16.558,5.738],[-32.787,0],[-32.787,-5.738],[0,5.738],[0,0],[0,-5.738],[-32.787,5.738],[-32.787,0],[-32.787,-5.738]],
+  7200: [[29.06,3.281],[-18.751,0],[-18.751,-3.281],[0,3.281],[0,0],[0,-3.281],[-18.751,3.281],[-18.751,0],[-18.751,-3.281]],
+  7800: [[72.647,0.934],[-5.339,0],[-5.339,-0.934],[0,0.934],[0,0],[0,-0.934],[-5.339,0.934],[-5.339,0],[-5.339,-0.934]],
+  8400: [[90,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]],
+  14000: [[90,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]],
+  16600: [[-32.787,5.738],[-16.558,0],[-32.787,-5.738],[0,5.738],[0,0],[0,-5.738],[-32.787,5.738],[-32.787,0],[-32.787,-5.738]],
+};
+
+// Captured from tv17/base (5a24f0b): the timing and keyframes of every CSS animation running
+// inside scene 7 (document.getAnimations()). Every grid and focused card also keeps the 700 ms ease
+// box-shadow transition (the glow fades in on gaining focus); Plan 17 drops it to 0 s on compact
+// cards only, so a card leaving focus loses its glow at once instead of fading it past the edge.
+const EXPRESSIONS_BASE_ANIMATIONS: Record<string, unknown> = {
+  wordSpark: {"duration": 18000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 0.46, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 0.53, "easing": "ease-in-out", "opacity": "0.93", "transform": "scale(1) rotate(35deg)"}, {"offset": 0.61, "easing": "ease-in-out", "opacity": "0.93", "transform": "scale(1) rotate(35deg)"}, {"offset": 0.72, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 1, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}]},
+  wordSheen: {"duration": 19000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "ease-in-out", "backgroundPositionX": "160%", "backgroundPositionY": "0px"}, {"offset": 0.45, "easing": "ease-in-out", "backgroundPositionX": "160%", "backgroundPositionY": "0px"}, {"offset": 0.68, "easing": "ease-in-out", "backgroundPositionX": "-160%", "backgroundPositionY": "0px"}, {"offset": 1, "easing": "ease-in-out", "backgroundPositionX": "-160%", "backgroundPositionY": "0px"}]},
+  decorOrbit: {"duration": 36000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "linear", "transform": "none"}, {"offset": 1, "easing": "linear", "transform": "rotate(360deg)"}]},
+  iconLift: {"duration": 17000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "ease-in-out", "transform": "translateY(0px) rotate(0deg)"}, {"offset": 0.68, "easing": "ease-in-out", "transform": "translateY(0px) rotate(0deg)"}, {"offset": 0.75, "easing": "ease-in-out", "transform": "translateY(-5px) rotate(-2deg)"}, {"offset": 0.82, "easing": "ease-in-out", "transform": "translateY(0px) rotate(0deg)"}, {"offset": 1, "easing": "ease-in-out", "transform": "translateY(0px) rotate(0deg)"}]},
+};
+
+test('tilt, drift, timing and keyframes are exactly the Plan 15 values', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 7 });
+  let at = 0;
+  for (const t of Object.keys(EXPRESSIONS_BASE_MOTION).map(Number).sort((a, b) => a - b)) {
+    if (t > at) {
+      await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), t - at);
+      at = t;
+    }
+    const motion = await frame.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="7"] .edu-card')].map((card) => {
+        const m = card.style.transform.match(/translate3d\(0px,\s*0px,\s*(-?[\d.e-]+)px\)\s*rotateY\((-?[\d.e-]+)deg\)/);
+        return m ? [Number(m[1]), Number(m[2])] : [NaN, NaN];
+      }),
+    );
+    const expected = EXPRESSIONS_BASE_MOTION[t];
+    expect(motion).toHaveLength(9);
+    motion.forEach(([z, rotY], i) => {
+      expect(z, `t=${t}ms card ${i + 1} translateZ`).toBeCloseTo(expected[i][0], 2);
+      expect(rotY, `t=${t}ms card ${i + 1} rotateY`).toBeCloseTo(expected[i][1], 2);
+    });
+  }
+
+  const animations = await frame.evaluate(() => {
+    const byName: Record<string, unknown> = {};
+    for (const animation of document.getAnimations() as any[]) {
+      const target = animation.effect?.target as Element | undefined;
+      if (!target?.closest?.('#stage .scene[data-scene="7"]')) continue;
+      const timing = animation.effect.getTiming();
+      if (animation.transitionProperty) continue;
+      if (byName[animation.animationName]) continue;
+      byName[animation.animationName] = {
+        duration: timing.duration,
+        easing: timing.easing,
+        iterations: timing.iterations === Infinity ? 'infinite' : timing.iterations,
+        keyframes: animation.effect.getKeyframes().map((frame: Record<string, unknown>) => {
+          const { composite, computedOffset, ...rest } = frame;
+          return rest;
+        }),
+      };
+    }
+    const transitions = [...document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="7"] .edu-card')].map(
+      (card) => {
+        const style = getComputedStyle(card);
+        return {
+          compact: card.classList.contains('compact'),
+          property: style.transitionProperty,
+          duration: style.transitionDuration,
+          easing: style.transitionTimingFunction,
+        };
+      },
+    );
+    return { byName, transitions };
+  });
+  expect(animations.byName).toEqual(EXPRESSIONS_BASE_ANIMATIONS);
+  expect(animations.transitions).toHaveLength(9);
+  // Sampled at 16.6 s: one card in focus, eight compact.
+  expect(animations.transitions.filter((transition) => transition.compact)).toHaveLength(8);
+  for (const { compact, ...transition } of animations.transitions) {
+    expect(transition).toEqual({ property: 'box-shadow', duration: compact ? '0s' : '0.7s', easing: 'ease' });
+  }
+});

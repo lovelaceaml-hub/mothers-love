@@ -1,11 +1,47 @@
 // Scene 7: The Nine Expressions.
 'use strict';
 
+// Tilt (rotateY) and drift (translateZ) values below are the approved Plan 15 motion and are
+// never changed by Plan 17. Only static layout numbers (position and size) move inward here.
+//
+// Inset budget (Plan 17 review round 1). The TV cuts at the scene box, not the screen: the scene
+// has overflow:hidden and is 1812 x 636 inside a 1920 x 1080 frame, so every number here is in
+// scene coordinates and every painted edge must stay at least 16px (1920) / 32px (3840) inside
+// that box. Each card's reach is its own left/top/width/height, plus what the motion adds (the
+// side that tilts toward the viewer grows under the 1600px perspective, and translateZ 90 scales
+// the focused panel by 1600 / 1510, about 1.06, around the scene centre 906, 318), plus its
+// box-shadow: 7px at the sides and 20px below for every card, and for the focused panel a 3px ring
+// inside a 55px glow on every side and a drop shadow reaching 56px below, all times that 1.06.
+// The focused panel's x of 124 is therefore the smallest left that keeps the glow 16px clear of
+// the scene's left edge (124 - 906 = -782, times 1.06 = -829 from centre = 77 local, minus 58
+// glow = 19). Its top keeps the title 16px clear and its bottom keeps the drop shadow 16px clear.
 const expressions_ROW_Z = [-40, 0, -40];
 const expressions_COL_ROTY = [7, 0, -7];
 const EXPRESSIONS_FOCUS_START = 6;
 const EXPRESSIONS_FOCUS_CYCLE = 10;
 const EXPRESSIONS_FOCUS_RAMP = 2.4;
+
+// Grid layout: the outer columns tilt their outside edge toward the viewer, so they sit 44px in
+// from each side (Plan 15 used 0 and a 590px width, which put the tilted edge past the scene box).
+// The top row starts at 96 so the outer cards' tilted top corners stay 16px below the title's line
+// box (91 left 11.7px). Rows are 158px on a 171px step so the bottom row's contact shadow still ends
+// clear above the scene edge.
+const EXPRESSIONS_GRID_COL_X = [44, 626, 1208];
+const EXPRESSIONS_GRID_COL_W = 560;
+const EXPRESSIONS_GRID_ROW_Y = [96, 267, 438];
+const EXPRESSIONS_GRID_ROW_H = 158;
+
+// Focused-panel target (see the budget above): left clear of the glow, top 16px below the title,
+// right edge clear of the compact column.
+const EXPRESSIONS_FOCUS_TARGET = { x: 124, y: 110, w: 916, h: 437, z: 90, rotY: 0, opacity: 1, zIndex: 9 };
+// Compact-card target: the right column ends at 1776 so a middle-row, right-column card, which
+// starts its move still tilted -7 degrees with its right edge toward the viewer, keeps its edge
+// and side shadow 16px inside the scene; four rows end at 598 so the bottom shadow clears too.
+const EXPRESSIONS_COMPACT_X = [1068, 1430];
+const EXPRESSIONS_COMPACT_ROW_STEP = 129;
+const EXPRESSIONS_COMPACT_W = 346;
+const EXPRESSIONS_COMPACT_H = 121;
+const EXPRESSIONS_COMPACT_Y = 90;
 
 function nineScene(){
  let h = heading('The Nine Expressions', 'Words that bring peace.');
@@ -13,11 +49,11 @@ function nineScene(){
  catalog.forEach((e, i) => {
   const col = i % 3;
   const row = Math.floor(i / 3);
-  const x = col * 611;
-  const y = 91 + row * 177;
+  const x = EXPRESSIONS_GRID_COL_X[col];
+  const y = EXPRESSIONS_GRID_ROW_Y[row];
   const rotY = expressions_COL_ROTY[col];
   const tz = expressions_ROW_Z[row];
-  h += `<article class="edu-card" id="edu-${e.id}" data-expression-id="${e.id}" data-col="${col}" data-row="${row}" style="left:${x}px;top:${y}px;width:590px;height:167px;--tint:${e.color};transform:translate3d(0px,0px,${tz}px) rotateY(${rotY}deg)">`
+  h += `<article class="edu-card" id="edu-${e.id}" data-expression-id="${e.id}" data-col="${col}" data-row="${row}" style="left:${x}px;top:${y}px;width:${EXPRESSIONS_GRID_COL_W}px;height:${EXPRESSIONS_GRID_ROW_H}px;--tint:${e.color};transform:translate3d(0px,0px,${tz}px) rotateY(${rotY}deg)">`
      + `<div class="edu-front">`
      + `<div class="edu-header">${medallion(e.id)}<div><div class="edu-category">${esc(e.name)}</div><span class="edu-number">${String(e.id).padStart(2, '0')} / 09</span></div></div>`
      + `<p class="edu-phrase">“${esc(e.phrase)}”</p>`
@@ -52,12 +88,12 @@ function tickEducation(){
   const baseTz = expressions_ROW_Z[row];
 
   if(p <= 0){
-   const x = col * 611;
-   const y = 91 + row * 177;
+   const x = EXPRESSIONS_GRID_COL_X[col];
+   const y = EXPRESSIONS_GRID_ROW_Y[row];
    el.style.left = x + 'px';
    el.style.top = y + 'px';
-   el.style.width = '590px';
-   el.style.height = '167px';
+   el.style.width = EXPRESSIONS_GRID_COL_W + 'px';
+   el.style.height = EXPRESSIONS_GRID_ROW_H + 'px';
    el.style.transform = `translate3d(0px, 0px, ${baseTz}px) rotateY(${baseRotY}deg)`;
    el.style.opacity = '1';
    el.style.zIndex = '1';
@@ -67,8 +103,8 @@ function tickEducation(){
   } else {
    const k = sel ? 0 : other++;
    const end = sel
-    ? { x: 8, y: 90, w: 950, h: 530, z: 90, rotY: 0, opacity: 1, zIndex: 9 }
-    : { x: 985 + (k % 2) * 419, y: 90 + Math.floor(k / 2) * 136, w: 403, h: 126, z: 0, rotY: 0, opacity: 0.7, zIndex: 1 };
+    ? EXPRESSIONS_FOCUS_TARGET
+    : { x: EXPRESSIONS_COMPACT_X[k % 2], y: EXPRESSIONS_COMPACT_Y + Math.floor(k / 2) * EXPRESSIONS_COMPACT_ROW_STEP, w: EXPRESSIONS_COMPACT_W, h: EXPRESSIONS_COMPACT_H, z: 0, rotY: 0, opacity: 0.7, zIndex: 1 };
 
    el.style.left = end.x + 'px';
    el.style.top = end.y + 'px';
