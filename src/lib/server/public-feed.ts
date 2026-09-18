@@ -10,6 +10,7 @@ export type PublicFeedQuery = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_TIMESTAMP_LENGTH = 64;
+const MAX_PUBLIC_FEED_ITEMS = 100;
 
 function parseTimestamp(value: unknown): number | null {
   if (typeof value !== "string" || value.length === 0 || value.length > MAX_TIMESTAMP_LENGTH) return null;
@@ -44,7 +45,7 @@ export function projectPublicFeed(value: unknown): PublicFeedSnapshot | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
   const serverTime = parseTimestamp(record.serverTime);
-  if (serverTime === null || !Array.isArray(record.items) || record.items.length > 50) return null;
+  if (serverTime === null || !Array.isArray(record.items) || record.items.length > MAX_PUBLIC_FEED_ITEMS) return null;
 
   const items: PublicFeedItem[] = [];
   const ids = new Set<string>();

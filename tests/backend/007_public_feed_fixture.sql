@@ -67,9 +67,9 @@ DECLARE
   recognition_id uuid;
   published_at timestamptz;
 BEGIN
-  FOR index_value IN 1..55 LOOP
+  FOR index_value IN 1..105 LOOP
     recognition_id := format('00000000-0000-4000-8000-%s', lpad(to_hex(1000 + index_value), 12, '0'))::uuid;
-    published_at := clock_timestamp() - ((55 - index_value) * interval '1 second');
+    published_at := clock_timestamp() - ((105 - index_value) * interval '1 second');
     INSERT INTO mothers_love.recognitions (id, submitted_name, recipient, message, status, created_at, first_published_at, expires_at)
     VALUES (recognition_id, format('Synthetic Sender %s.', index_value), format('Synthetic Recipient %s.', index_value), format('Synthetic limit item %s.', index_value), 'published', published_at, published_at, clock_timestamp() + interval '1 hour');
     INSERT INTO mothers_love.recognition_expressions (recognition_id, expression_id) VALUES (recognition_id, 1), (recognition_id, 8);
@@ -89,10 +89,10 @@ BEGIN
   result := public.ml_public_feed();
   IF result->>'ok' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'healthy feed failed: %', result; END IF;
   IF result ? 'status' OR result ? 'error' THEN RAISE EXCEPTION 'successful feed leaked error fields: %', result; END IF;
-  IF jsonb_array_length(result->'items') IS DISTINCT FROM 50 THEN RAISE EXCEPTION 'feed was not limited to 50: %', result; END IF;
+  IF jsonb_array_length(result->'items') IS DISTINCT FROM 100 THEN RAISE EXCEPTION 'feed was not limited to 100: %', result; END IF;
 
-  FOR index_value IN 0..49 LOOP
-    expected_id := format('00000000-0000-4000-8000-%s', lpad(to_hex(1000 + 55 - index_value), 12, '0'));
+  FOR index_value IN 0..99 LOOP
+    expected_id := format('00000000-0000-4000-8000-%s', lpad(to_hex(1000 + 105 - index_value), 12, '0'));
     IF result->'items'->index_value->>'id' IS DISTINCT FROM expected_id THEN RAISE EXCEPTION 'feed order mismatch at %: %', index_value, result->'items'->index_value; END IF;
     IF result->'items'->index_value->'expressionIds' IS DISTINCT FROM '[1, 8]'::jsonb THEN RAISE EXCEPTION 'expression ordering mismatch: %', result->'items'->index_value; END IF;
   END LOOP;

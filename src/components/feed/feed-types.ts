@@ -20,7 +20,7 @@ export type VerifiedFeedSnapshot = PublicFeedSnapshot & {
   verifiedMonotonicMs: number;
 };
 
-export const MAX_PUBLIC_FEED_ITEMS = 30;
+export const MAX_PUBLIC_FEED_ITEMS = 100;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -75,7 +75,7 @@ function decodeItem(value: unknown): PublicFeedItem | null {
 
 export function decodeFeedSnapshot(value: unknown): PublicFeedSnapshot | null {
   if (!isRecord(value) || !isIsoDate(value.serverTime) || !Array.isArray(value.items)) return null;
-  if (value.items.length > 50) return null;
+  if (value.items.length > MAX_PUBLIC_FEED_ITEMS) return null;
 
   const items: PublicFeedItem[] = [];
   const ids = new Set<string>();

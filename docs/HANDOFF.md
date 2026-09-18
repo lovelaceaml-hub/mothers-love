@@ -1,3 +1,7 @@
+## September 18: TV QR code opens the home page
+
+The QR code on the TV display at https://mothers-love.vercel.app/display now opens the home page, https://mothers-love.vercel.app/, instead of the recognition form, and its printed caption reads mothers-love.vercel.app. Anthony's request. Changed files: src/components/display/color-polish/renderer.tsx (QR payload), src/components/display/V6DisplayExperience.tsx (fallback TV QR) and public/color-polish/renderer.html (caption). The snapshot submissionUrl contract and database setting are unchanged. Verified: typecheck, 222 of 222 unit tests, production build, and the live QR decoded from a headless screenshot as https://mothers-love.vercel.app/. Branch change/tv-qr-home, deployed as dpl_DEwMhtevRw9uf1WyuSFPUGotNm27 (full replace). Rollback runs npx vercel rollback to dpl_2DvTW5WVmD2Up52XYBZZ25FGQf1t, commit 45d7277.
+
 ## September 12: Plan 15 preview, production held
 
 [TV test preview](https://mothers-love-d4ve0196a-lvzion.vercel.app/display) runs code commit `b865073` on `codex/tv15-full-preview`, in `/Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview`. All ten TV scenes are integrated with the original 1.15 second live crossfade. Anthony deferred the Turning Nave; its prior version remains at `64f5365`. Production remains `1532068` and has not been pushed or promoted. [Current verification and remaining TV approval](runs/2026-09-12-tv-next-level/lanes/astra-full-pass.md). Preview access needs a Vercel session or temporary share link.
@@ -23,6 +27,14 @@ Rollback: docs/runs/2026-09-10-color-polish/research/rollback.sql runs a version
 Open follow-ups: pixel parity, advanced preview drafts and preset editing (deferred by Anthony), an admin route for activate and rollback (SQL only today), full lint cleanup, and the physical TV, audio chime and phone camera QR checks. Ledger rows for migrations 010 and 011 are tracked only in Supabase migration history.
 
 # Handoff
+
+## September 12: latest 100 recognition feed
+
+The public home feed at https://mothers-love.vercel.app now shows the latest 100 published, unexpired recognitions instead of stopping at 50. The browser accepts all 100 and loads heart counts in safe batches of no more than 30 IDs. The recognition form remains at https://mothers-love.vercel.app/recognize.
+
+Production migration 013 and release commit `42115bd045db40d7e2a05b18c70671ba52dd1200` are live as Vercel deployment `dpl_tCHujonmSdnsNDqi5vTTj81MNEAo`, Ready. The database function reports a limit of 100 while execute permission remains limited to `mothers_love_runtime`. Anonymous and authenticated roles remain denied.
+
+Verification passed: typecheck, 222 tests, production build, focused lint, 9 feed browser journeys, and an isolated PostgreSQL 16 migration and fixture run. The final canonical-site check returned and rendered all 57 currently eligible records, which exceeds the former 50-record cutoff, with no load error. See [Plan 16](PLAN-16-feed-100.md) and the [run record](runs/2026-09-12-feed-100/INDEX.md).
 
 ## Interview completion update
 
