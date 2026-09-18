@@ -2,6 +2,18 @@ import { expect, test } from '@playwright/test';
 
 import { buildActiveDisplayFixture, loadRenderer } from './helpers';
 
+// Mirrors the live renderer's smoothstep ease exactly (core/state.js: t*t*(3-2t)),
+// so the test can compute the expected frame independently of the app code.
+function ease(t: number): number {
+  const clamped = Math.max(0, Math.min(1, t));
+  return clamped * clamped * (3 - 2 * clamped);
+}
+
+// Whole class tokens only (a CSS class selector like .storm already matches the "storm" token,
+// not a substring, so it will not false-fire on an unrelated class like "brainstorm" from
+// another lane's work), plus a bare data-transition-style attribute of any value.
+const RETIRED_STYLE_SELECTOR = '.flood, .tide, .vortex, .storm, [data-transition-style]';
+
 async function finishTransition(frame: Awaited<ReturnType<typeof loadRenderer>>) {
   let elapsed = 0;
   while (elapsed < 3000) {
@@ -15,25 +27,53 @@ async function finishTransition(frame: Awaited<ReturnType<typeof loadRenderer>>)
   throw new Error('transition did not finish within 3 seconds');
 }
 
+// Scoped to the only two places a retired transition style could ever have left a trace: the
+// (always-empty-today) #transition-layer subtree, and the #stage > .scene roots' own class list
+// and data attributes (not their descendants, which may legitimately carry unrelated classes).
+async function retiredStyleArtifactCount(frame: Awaited<ReturnType<typeof loadRenderer>>) {
+  return frame.evaluate((selector) => {
+    const layer = document.getElementById('transition-layer');
+    const layerMatches = layer ? layer.querySelectorAll(selector).length : 0;
+    const sceneRootMatches = Array.from(document.querySelectorAll('#stage > .scene')).filter((el) =>
+      el.matches(selector),
+    ).length;
+    return layerMatches + sceneRootMatches;
+  }, RETIRED_STYLE_SELECTOR);
+}
+
 test.describe('Section B: scene transitions', () => {
-  test('all ten playlist scene changes complete with one scene and no transition artifacts', async ({ page }) => {
+  test('all ten playlist scene changes complete with one scene, the live fade, and no flood, tide, vortex or storm artifact', async ({ page }) => {
     const frame = await loadRenderer(page);
     const scenes = [2, 4, 5, 8, 6, 7, 9, 10, 11, 1];
 
     for (const sceneId of scenes) {
       await frame.evaluate((id) => (window as any).colorPolishRuntime.setScene(id), sceneId);
-      const during = await frame.evaluate(() => {
+      const atStart = await frame.evaluate(() => {
         const layer = document.getElementById('transition-layer');
         return {
           sceneCount: document.querySelectorAll('#stage > .scene').length,
           transition: (window as any).colorPolishRuntime.getState().transition,
-          transitionArtifacts: layer?.querySelectorAll('canvas, .transition-bubble, [class*="nave"], [class*="vault"]').length ?? 0,
+          layerChildren: layer?.children.length ?? 0,
         };
       });
+      expect(atStart.transition).not.toBeNull();
+      expect(atStart.transition.duration).toBeCloseTo(1.15, 2);
+      expect(atStart.sceneCount).toBe(2);
+      expect(atStart.layerChildren).toBe(0);
+      expect(await retiredStyleArtifactCount(frame)).toBe(0);
 
-      expect(during.transition).not.toBeNull();
-      expect(during.sceneCount).toBe(2);
-      expect(during.transitionArtifacts).toBe(0);
+      // Sample mid-flight too: none of the four retired styles, and no
+      // extra scene-layer artifacts, may appear at any point in the fade.
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(400));
+      const midFlight = await frame.evaluate(() => ({
+        sceneCount: document.querySelectorAll('#stage > .scene').length,
+        transition: (window as any).colorPolishRuntime.getState().transition,
+        layerChildren: document.getElementById('transition-layer')?.children.length ?? 0,
+      }));
+      expect(midFlight.transition).not.toBeNull();
+      expect(midFlight.sceneCount).toBe(2);
+      expect(midFlight.layerChildren).toBe(0);
+      expect(await retiredStyleArtifactCount(frame)).toBe(0);
 
       await finishTransition(frame);
       const after = await frame.evaluate(() => ({
@@ -46,10 +86,11 @@ test.describe('Section B: scene transitions', () => {
       expect(after.sceneCount).toBe(1);
       expect(after.transition).toBeNull();
       expect(after.layerChildren).toBe(0);
+      expect(await retiredStyleArtifactCount(frame)).toBe(0);
     }
   });
 
-  test('uses the live gentle crossfade with slight translation and uniform scale', async ({ page }) => {
+  test('uses the live gentle crossfade with slight translation and uniform scale, matching the formula at several points', async ({ page }) => {
     const frame = await loadRenderer(page);
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
 
@@ -67,51 +108,108 @@ test.describe('Section B: scene transitions', () => {
     expect(start.oldOpacity).toBe('1');
     expect(start.nextOpacity).toBe('0');
 
-    await frame.evaluate(() => (window as any).colorPolishRuntime.step(575));
-    const middle = await frame.evaluate(() => {
-      const oldRoot = document.querySelector<HTMLElement>('#stage > .scene[data-scene="1"]');
-      const nextRoot = document.querySelector<HTMLElement>('#stage > .scene[data-scene="2"]');
-      return {
-        oldOpacity: Number(oldRoot?.style.opacity),
-        nextOpacity: Number(nextRoot?.style.opacity),
-        oldTransform: oldRoot?.style.transform ?? '',
-        nextTransform: nextRoot?.style.transform ?? '',
-      };
-    });
     const transform = (value: string) => {
       const match = value.match(/^translateX\((-?[\d.]+)px\) scale\(([\d.]+)\)$/);
       return match ? { x: Number(match[1]), scale: Number(match[2]) } : null;
     };
-    const oldTransform = transform(middle.oldTransform);
-    const nextTransform = transform(middle.nextTransform);
-    expect(middle.oldOpacity).toBeGreaterThan(0);
-    expect(middle.oldOpacity).toBeLessThan(1);
-    expect(middle.nextOpacity).toBeGreaterThan(0);
-    expect(middle.nextOpacity).toBeLessThan(1);
-    expect(oldTransform).not.toBeNull();
-    expect(nextTransform).not.toBeNull();
-    expect(Math.abs(oldTransform!.x)).toBeLessThanOrEqual(15);
-    expect(Math.abs(nextTransform!.x)).toBeLessThanOrEqual(20);
-    expect(oldTransform!.scale).toBeGreaterThan(0.99);
-    expect(oldTransform!.scale).toBeLessThanOrEqual(1);
-    expect(nextTransform!.scale).toBeGreaterThan(0.99);
-    expect(nextTransform!.scale).toBeLessThanOrEqual(1);
 
-    const elapsed = 575 + (await finishTransition(frame));
+    // Sample the fade at several points through its 1.15 s duration and check
+    // old/new opacity and transform against the production formula exactly:
+    // old: opacity 1-p, translateX(-15p) scale(1-.004p)
+    // next: opacity p, translateX(20(1-p)) scale(.997+.003p)
+    // where p = ease(age / duration).
+    const sampleMsPoints = [200, 375, 375]; // cumulative steps: 200, 575, 950 ms of age
+    let elapsedMs = 0;
+    for (const stepMs of sampleMsPoints) {
+      await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), stepMs);
+      elapsedMs += stepMs;
+      const sample = await frame.evaluate(() => {
+        const oldRoot = document.querySelector<HTMLElement>('#stage > .scene[data-scene="1"]');
+        const nextRoot = document.querySelector<HTMLElement>('#stage > .scene[data-scene="2"]');
+        return {
+          oldOpacity: Number(oldRoot?.style.opacity),
+          nextOpacity: Number(nextRoot?.style.opacity),
+          oldTransform: oldRoot?.style.transform ?? '',
+          nextTransform: nextRoot?.style.transform ?? '',
+        };
+      });
+      const p = ease(elapsedMs / 1150);
+      const oldTransform = transform(sample.oldTransform);
+      const nextTransform = transform(sample.nextTransform);
+      expect(oldTransform, `old transform at ${elapsedMs}ms`).not.toBeNull();
+      expect(nextTransform, `next transform at ${elapsedMs}ms`).not.toBeNull();
+      expect(sample.oldOpacity).toBeCloseTo(1 - p, 2);
+      expect(sample.nextOpacity).toBeCloseTo(p, 2);
+      expect(oldTransform!.x).toBeCloseTo(-15 * p, 1);
+      expect(oldTransform!.scale).toBeCloseTo(1 - 0.004 * p, 3);
+      expect(nextTransform!.x).toBeCloseTo(20 * (1 - p), 1);
+      expect(nextTransform!.scale).toBeCloseTo(0.997 + 0.003 * p, 3);
+      expect(Math.abs(oldTransform!.x)).toBeLessThanOrEqual(15);
+      expect(Math.abs(nextTransform!.x)).toBeLessThanOrEqual(20);
+      expect(oldTransform!.scale).toBeGreaterThan(0.99);
+      expect(oldTransform!.scale).toBeLessThanOrEqual(1);
+      expect(nextTransform!.scale).toBeGreaterThan(0.99);
+      expect(nextTransform!.scale).toBeLessThanOrEqual(1);
+    }
+
+    const elapsed = elapsedMs + (await finishTransition(frame));
     expect(elapsed).toBeGreaterThanOrEqual(1100);
     expect(elapsed).toBeLessThanOrEqual(1200);
   });
 
-  test('ignores clicks and queues a requested scene while a transition is active', async ({ page }) => {
-    const frame = await loadRenderer(page);
+  test('a click during a transition does not double-advance, and a requested scene queues instead', async ({ page }) => {
+    // loadRenderer's own bootstrap uses control.source: 'sample'. manualAdvance
+    // (core/stage.js) returns immediately whenever S.source !== 'live', before it ever reaches
+    // the active/transition guard this test exists to check — so a click sent against the
+    // default sample source would pass even if that guard were deleted. Go live for real first.
+    const snapshot = buildActiveDisplayFixture() as any;
+    const frame = await loadRenderer(page, { fixture: snapshot });
+    await page.evaluate((liveSnapshot) => {
+      (window as any).probePort.postMessage({
+        version: 'color-polish-v6',
+        type: 'color-polish:update',
+        nonce: (window as any).probeNonce,
+        sequence: 2,
+        snapshot: liveSnapshot,
+        control: {
+          nowMs: Date.parse(liveSnapshot.serverTime),
+          status: 'ready',
+          source: 'live',
+          playing: true,
+          reactionCounts: {},
+          qrDataUrl:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+          submissionUrl: liveSnapshot.submissionUrl,
+        },
+      });
+    }, snapshot);
+    await frame.waitForFunction(() => (window as any).colorPolishRuntime.getState().mode === 'normal');
+    const sourceCheck = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
+    expect(sourceCheck.scene).toBe(1);
+
     await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(2));
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(250));
 
-    await frame.locator('body').click();
+    // Mid-fade: a click must not double-advance the playlist.
     await frame.evaluate(() => {
       document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      (window as any).colorPolishRuntime.setScene(4);
     });
+    const duringTransition = await frame.evaluate(() => {
+      const state = (window as any).colorPolishRuntime.getState();
+      return {
+        scene: state.scene,
+        transition: state.transition,
+        starts: state.log.filter((entry: any) => entry.type === 'scene_transition_start').length,
+        manualAdvances: state.log.filter((entry: any) => entry.type === 'manual_advance').length,
+      };
+    });
+    expect(duringTransition.transition).not.toBeNull();
+    expect(duringTransition.scene).toBe(2);
+    expect(duringTransition.starts).toBe(1);
+    expect(duringTransition.manualAdvances).toBe(0);
+
+    // A genuinely requested scene still queues behind the in-flight fade instead of interrupting it.
+    await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(4));
     const queued = await frame.evaluate(() => {
       const state = (window as any).colorPolishRuntime.getState();
       return {
@@ -128,6 +226,31 @@ test.describe('Section B: scene transitions', () => {
     const next = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
     expect(next.scene).toBe(4);
     expect(next.transition).not.toBeNull();
+
+    await finishTransition(frame);
+
+    // Counter-check: once the fade is done and the real 700 ms manual-advance debounce
+    // (core/stage.js manualAdvance, keyed off performance.now(), not the simulated clock) has
+    // actually elapsed, a click does advance to the next playlist scene.
+    const settled = await frame.evaluate(() => (window as any).colorPolishRuntime.getState());
+    expect(settled.transition).toBeNull();
+    expect(settled.scene).toBe(4);
+
+    await page.waitForTimeout(750);
+    await frame.evaluate(() => {
+      document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const afterClick = await frame.evaluate(() => {
+      const state = (window as any).colorPolishRuntime.getState();
+      return {
+        scene: state.scene,
+        transition: state.transition,
+        manualAdvances: state.log.filter((entry: any) => entry.type === 'manual_advance').length,
+      };
+    });
+    expect(afterClick.manualAdvances).toBe(1);
+    expect(afterClick.scene).toBe(5);
+    expect(afterClick.transition).not.toBeNull();
   });
 
   test('holds queued arrivals until the scene transition has cleaned up', async ({ page }) => {

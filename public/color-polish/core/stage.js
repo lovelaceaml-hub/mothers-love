@@ -9,11 +9,11 @@ registerScene(0,{});
 function renderNow(id,{keepAge=false}={}){
  // When a transition is in flight, S.s and sceneRoot already point to the in-flight
  // incoming scene, while transition.prev and transition.old hold the genuinely departing scene.
- // If onLeave has not yet fired (cover phase), fire it once for transition.prev / transition.old.
- // If onLeave already fired during swap, do not fire again. Never fire onLeave for the incoming scene.
+ // The transition itself only fires onLeave when it completes naturally (tickTransition), so if
+ // it is being discarded here instead, fire onLeave once for transition.prev / transition.old.
+ // Never fire onLeave for the incoming scene.
  if(transition){
-  if(!transition.onLeaveFired&&transition.prev!==0&&transition.old){
-   transition.onLeaveFired=true;
+  if(transition.prev!==0&&transition.old){
    try{sceneDescriptor(transition.prev).onLeave?.(transition.old)}catch(e){log('scene_onleave_error',{scene:transition.prev})}
   }
   transition.old?.remove();
@@ -58,16 +58,14 @@ function requestScene(id,{force=false}={}){
  const el=document.createElement('div');el.className='scene';el.dataset.scene=id;sceneRoot=el;
  el.innerHTML=['offline','neutral'].includes(S.mode)?safeScene():S.mode==='empty'?emptyPanel():sceneDescriptor(id).markup();
  $('stage').append(el);postRender();
+ log('scene_transition_start',{from:prev,to:id});
  if(S.still){
-  log('scene_transition_start',{from:prev,to:id,style:'instant'});
   if(prev!==0&&old){
    try{sceneDescriptor(prev).onLeave?.(old)}catch(e){log('scene_onleave_error',{scene:prev})}
   }
   old?.remove();return;
  }
- const style=transitionNextStyle();
- log('scene_transition_start',{from:prev,to:id,style});
- el.style.opacity=0;transition=transitionStart(style,old,prev,el);
+ el.style.opacity=0;transition=transitionStart(old,prev,el);
 }
 function nextPlaylistEntry(){
  const list=S.playlist;if(!list?.length)return null;
@@ -93,43 +91,21 @@ function manualAdvanceKey(event){
 function tickTransition(dt){
  if(!transition)return;
  transition.age+=dt;
- const desc=transition.descriptor||transitionDescriptor(transition.style);
- const coverDur=desc?.coverDuration??0.9;
- const totalDur=desc?.duration??2.5;
-
- if(transition.phase==='cover'){
-  const p=clamp(transition.age/coverDur,0,1);
-  desc?.cover?.(transition,p);
-  if(transition.age>=coverDur){
-   transition.phase='swap';
-   if(transition.prev!==0&&transition.old){
-    try{sceneDescriptor(transition.prev).onLeave?.(transition.old)}catch(e){log('scene_onleave_error',{scene:transition.prev})}
-   }
-   transition.old?.remove();
-   transition.old=null;
-   if(transition.next){
-    transition.next.style.opacity='';
-    transition.next.style.transform='';
-   }
-   desc?.swap?.(transition);
-   transition.phase='reveal';
+ const p=transitionFrame(transition);
+ if(p>=1){
+  if(transition.prev!==0&&transition.old){
+   try{sceneDescriptor(transition.prev).onLeave?.(transition.old)}catch(e){log('scene_onleave_error',{scene:transition.prev})}
   }
- }
-
- if(transition.phase==='reveal'){
-  const revealDur=desc?.revealDuration??(totalDur-coverDur);
-  const p=clamp((transition.age-coverDur)/revealDur,0,1);
-  desc?.reveal?.(transition,p);
-  if(transition.age>=totalDur){
-   const finishedStyle=transition.style;
-   transitionCleanup();
-   transition=null;
-   log('scene_transition_end',{scene:S.s,style:finishedStyle});
-   if(S.pendingScene&&!active){
-    const n=S.pendingScene;
-    S.pendingScene=null;
-    requestScene(n);
-   }
+  transition.old.remove();
+  transition.next.style.opacity='';
+  transition.next.style.transform='';
+  transitionCleanup();
+  transition=null;
+  log('scene_transition_end',{scene:S.s});
+  if(S.pendingScene&&!active){
+   const n=S.pendingScene;
+   S.pendingScene=null;
+   requestScene(n);
   }
  }
 }
@@ -177,4 +153,4 @@ function stepRuntime(ms){
  let remaining=Math.min(120000,ms)/1000;while(remaining>0){const dt=Math.min(.02,remaining);coordinator(dt);remaining-=dt}
  S.clockControlled=wasControlled;S.playing=wasPlaying;frozen=wasFrozen;applyStill();drawAtmosphere(0);drawSceneFX(0);if(V.garden)drawGarden();if(V.stream)drawStream();
 }
-function runtimeState(){return{version:COLOR_POLISH_VERSION,initialized,scene:S.s,sceneAge:S.sceneAge,clock:S.t,playing:S.playing,still:S.still,mode:S.mode,queueLength:S.queue.length,active:active?{kind:active.kind,phase:active.phase,style:active.style,hold:active.hold,page:active.page,ids:active.items.map(r=>r.id)}:null,transition:transition?{age:transition.age,style:transition.style,phase:transition.phase,duration:transition.duration}:null,slots:slots.map(({el,...slot})=>slot),visual:visualState(),log:[...qaLog]}}
+function runtimeState(){return{version:COLOR_POLISH_VERSION,initialized,scene:S.s,sceneAge:S.sceneAge,clock:S.t,playing:S.playing,still:S.still,mode:S.mode,queueLength:S.queue.length,active:active?{kind:active.kind,phase:active.phase,style:active.style,hold:active.hold,page:active.page,ids:active.items.map(r=>r.id)}:null,transition:transition?{age:transition.age,duration:transition.duration}:null,slots:slots.map(({el,...slot})=>slot),visual:visualState(),log:[...qaLog]}}

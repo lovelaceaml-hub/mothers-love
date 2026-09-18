@@ -1,4 +1,6 @@
-/* Plan12's live scene transition animates the two scene roots directly. */
+/* The live TV's scene transition animates the two scene roots directly
+ * (see core/transitions.js); this layer stays empty and only its
+ * still-mode guard matters. */
 #tv #transition-layer {
   position: absolute;
   inset: 0;
