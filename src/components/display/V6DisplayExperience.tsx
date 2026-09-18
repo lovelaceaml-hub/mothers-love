@@ -985,7 +985,7 @@ function Shell({ children, snapshot, nowServerMs, nowMs, queueCount, arrival, fe
       <div className={styles.content}>{children}</div>
       <footer className={styles.footer}>
         <aside className={styles.qrDock}>
-          {snapshot?.submissionUrl ? <QrCode url={snapshot.submissionUrl} /> : <span className={styles.qrFallback}>QR</span>}
+          {snapshot?.submissionUrl ? <QrCode url="https://mothers-love.vercel.app/" /> : <span className={styles.qrFallback}>QR</span>}
           <div><strong>Recognize<br/>Someone</strong><p>Who encouraged<br/>you today?</p></div>
           <small>{snapshot?.submissionUrl ? 'Scan to share Mother\'s Love' : 'Recognition link unavailable'}</small>
         </aside>

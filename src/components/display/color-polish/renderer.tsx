@@ -22,6 +22,8 @@ export type { ColorPolishRendererProps, ColorPolishSnapshot } from '@/lib/color-
 
 const RENDERER_URL = '/color-polish/renderer.html';
 const RECOGNIZE_URL = 'https://mothers-love.vercel.app/recognize';
+// The TV QR code opens the home page, not the recognition form.
+const QR_TARGET_URL = 'https://mothers-love.vercel.app/';
 const MAX_RECOGNITIONS = 1_000;
 const MAX_ARRIVALS = 1_000;
 const MAX_TEXT = 4_000;
@@ -241,7 +243,7 @@ function createNonce(): string {
 
 function buildQrDataUrl(url: string): Promise<string | null> {
   if (url !== RECOGNIZE_URL) return Promise.resolve(null);
-  return QRCode.toDataURL(url, { margin: 1, width: 180, color: { dark: '#303342', light: '#fffdf6' } })
+  return QRCode.toDataURL(QR_TARGET_URL, { margin: 1, width: 180, color: { dark: '#303342', light: '#fffdf6' } })
     .then((value) => value.startsWith('data:image/png;base64,') ? value : null)
     .catch(() => null);
 }
