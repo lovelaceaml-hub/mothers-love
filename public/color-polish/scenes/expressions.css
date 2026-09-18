@@ -20,12 +20,17 @@
   overflow: hidden;
 }
 
+/* Grid cards are 560 x 158 (Plan 17 moved them in from the scene edges), so two-line phrases need
+   the room above them trimmed: top padding 14 to 10, header gap 10 to 7 and a 1.22 line height keep
+   at least 30px of slack under every phrase at 1920 (the Studio measures this at about 0.46 scale
+   against a 12px floor). Font size stays 25px. */
 #tv .scene[data-scene="7"] .edu-card:not(.focused):not(.compact) .edu-front {
-  padding: 14px 24px;
+  padding: 10px 24px 14px;
 }
 
 #tv .scene[data-scene="7"] .edu-card:not(.focused):not(.compact) .edu-phrase {
-  margin-top: 10px;
+  margin-top: 7px;
+  line-height: 1.22;
 }
 
 #tv .scene[data-scene="7"] .edu-card:not(.focused):not(.compact) .edu-detail {
@@ -105,8 +110,11 @@
   transition-duration: 0s;
 }
 
+/* Compact cards are 346 x 121, narrow enough that most phrases wrap to two lines: top padding 12 to
+   8, header gap 6 to 4 and a 1.2 line height keep at least 30px of slack under the phrase at 1920.
+   Font size stays 19px. */
 #tv .scene[data-scene="7"] .edu-card.compact .edu-front {
-  padding: 12px 16px;
+  padding: 8px 16px 12px;
 }
 
 #tv .scene[data-scene="7"] .edu-card.compact .edu-header {
@@ -128,8 +136,8 @@
 
 #tv .scene[data-scene="7"] .edu-card.compact .edu-phrase {
   font-size: 19px;
-  line-height: 1.23;
-  margin-top: 6px;
+  line-height: 1.2;
+  margin-top: 4px;
 }
 
 #tv .scene[data-scene="7"] .edu-card.compact .edu-detail {
