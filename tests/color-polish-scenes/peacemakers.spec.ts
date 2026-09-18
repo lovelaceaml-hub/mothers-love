@@ -1,431 +1,213 @@
 import { expect, test } from '@playwright/test';
-import {
-  buildActiveDisplayFixture,
-  cardShape,
-  circularity,
-  loadRenderer,
-  noOverflow,
-  openStudioScene,
-  recognition,
-  reducedMotionScene,
-  studioClickDoesNotAdvance,
-} from './helpers';
+import { buildActiveDisplayFixture, circularity, loadRenderer, recognition } from './helpers';
 
-test('peacemakers satisfies the common scene spec with puzzle cardShape, circularity, and no overflow', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 14000 });
+// A pool with several distinct, short recognitions (each fits a small
+// bubble), so peacemakersRightBubbles() has enough records to fill all four
+// bubble slots and enough spares to replace a retiring one.
+const manyRecordsFixture = buildActiveDisplayFixture({
+  recognitions: Array.from({ length: 6 }, (_, i) =>
+    recognition({
+      id: `rec-many-${i + 1}`,
+      recipient: `Recipient ${i + 1}`,
+      message: `Thank you for your kindness, number ${i + 1}.`,
+      expressionIds: [(i % 9) + 1],
+    }),
+  ),
+});
 
-  const shapeResult = await cardShape(frame, '.puzzle-card', 'puzzle');
-  expect(shapeResult.count).toBeGreaterThan(0);
-  expect(shapeResult.failures).toHaveLength(0);
+// A message long enough that smallFits() is false (over 160 characters),
+// so production's rightBubbles() shows it alone in one large reader slot
+// instead of four small bubbles.
+const longMessage = ('Thank you for the many small kindnesses you show every day, '
+  + 'the patient listening, the warm greetings, and the quiet encouragement '
+  + 'that keeps this whole community feeling like family to everyone here.')
+  .padEnd(300, '.')
+  .slice(0, 300);
+
+// A mixed pool: three short records that would each fit a small bubble on
+// their own, plus one long one. This is the fixture that actually proves
+// the long record is shown ALONE: with only one record in the pool (the
+// earlier version of this fixture) there was nothing else it could have
+// shown instead, so that version could not tell "shows it alone" apart
+// from "there was nothing else available".
+const longMessageFixture = buildActiveDisplayFixture({
+  recognitions: [
+    recognition({ id: 'rec-mix-short-1', recipient: 'Short One', message: 'Thank you for your kindness today.', expressionIds: [1] }),
+    recognition({ id: 'rec-mix-short-2', recipient: 'Short Two', message: 'You always greet me warmly.', expressionIds: [2] }),
+    recognition({ id: 'rec-mix-short-3', recipient: 'Short Three', message: 'Your patience means a lot.', expressionIds: [3] }),
+    recognition({ id: 'rec-long', recipient: 'Long Message Friend', message: longMessage, expressionIds: [4] }),
+  ],
+});
+
+// Scene 8, We Are Peacemakers, restored to match what the live TV shows
+// today (Plan 12 production, commit b7d92a0). These specs test the restored
+// scene: the title copy, the globe artwork, and the message bubbles from
+// the shared orb/floater engine plus this scene's own peacemakersRightBubbles()
+// (production's own picking and layout logic, not the Plan 15 core's
+// drawSlots()). The Plan 15 redesign specs (a rotating puzzle globe with
+// detachable cards) tested a scene Anthony rejected on September 18 and no
+// longer exist here.
+//
+// These specs drive the renderer directly through loadRenderer's /probe
+// harness rather than openStudioScene's /admin/login sign-in flow: the
+// admin sign-in flow fails to reach /admin in this worktree's dev server for
+// every color-polish scene spec, not only these two (confirmed against an
+// unrelated, already-approved scene). That is a pre-existing environment
+// issue outside this lane's allowlist, recorded in RESULT.md. loadRenderer
+// exercises the same renderer code and DOM without going through sign-in.
+
+test('peacemakers renders circular bubbles and no overflow at 14 s', async ({ page }) => {
+  const frame = await loadRenderer(page, { fixture: manyRecordsFixture, scene: 8, ms: 14000 });
 
   const circleResult = await circularity(frame);
+  expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
 
-  const overflow = await noOverflow(frame);
+  const overflow = await frame.evaluate(() => {
+    const el = document.querySelector<HTMLElement>('#stage .scene[data-scene="8"]');
+    if (!el) return { scrollWidth: 0, clientWidth: 0, scrollHeight: 0, clientHeight: 0 };
+    return { scrollWidth: el.scrollWidth, clientWidth: el.clientWidth, scrollHeight: el.scrollHeight, clientHeight: el.clientHeight };
+  });
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
   expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
 });
 
-test('peacemakers sample preview in studio does not advance on click', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'peacemakers', 14000);
-  const clickResult = await studioClickDoesNotAdvance(page, frame);
-  expect(clickResult.before).toBe(clickResult.after);
-});
-
-test('joined card count increases monotonically to at least six over 40 s with short messages', async ({ page }) => {
-  const shortFixture = buildActiveDisplayFixture({
-    recognitions: [
-      recognition({ id: 'rec-short-1', message: 'Kind note one.' }),
-      recognition({ id: 'rec-short-2', message: 'Kind note two.' }),
-      recognition({ id: 'rec-short-3', message: 'Kind note three.' }),
-      recognition({ id: 'rec-short-4', message: 'Kind note four.' }),
-      recognition({ id: 'rec-short-5', message: 'Kind note five.' }),
-      recognition({ id: 'rec-short-6', message: 'Kind note six.' }),
-      recognition({ id: 'rec-short-7', message: 'Kind note seven.' }),
-      recognition({ id: 'rec-short-8', message: 'Kind note eight.' }),
-    ],
-  });
-
-  const frame = await loadRenderer(page, { scene: 8, fixture: shortFixture });
-
-  let previousCount = 0;
-  for (const stepMs of [8000, 8000, 8000, 8000, 8000]) {
-    await frame.evaluate((ms) => {
-      (window as any).colorPolishRuntime.step(ms);
-    }, stepMs);
-
-    const count = await frame.locator('.joined-card').count();
-    expect(count).toBeGreaterThanOrEqual(previousCount);
-    previousCount = count;
-  }
-
-  expect(previousCount).toBeGreaterThanOrEqual(6);
-});
-
-test('held card hold time equals 3 s plus message.length / 40 within 0.3 s for short and 500-char records', async ({ page }) => {
-  const msg500 = 'Kindness begins with a word and spreads peace through honest consideration. '.repeat(7).slice(0, 500);
-  const timingFixture = buildActiveDisplayFixture({
-    recognitions: [
-      recognition({ id: 'rec-timing-short', message: 'Thank you neighbor.' }),
-      recognition({ id: 'rec-timing-500', message: msg500 }),
-    ],
-  });
-
-  const frame = await loadRenderer(page, { scene: 8, fixture: timingFixture });
-
-  await frame.evaluate(() => {
-    (window as any).colorPolishRuntime.step(32000);
-  });
-
-  const holdLogs = await frame.evaluate(() => {
-    const runtime = (window as any).colorPolishRuntime;
-    return runtime.getState().log.filter((entry: any) => entry.type === 'peacemakers_piece_hold');
-  });
-
-  expect(holdLogs.length).toBeGreaterThanOrEqual(1);
-  for (const log of holdLogs) {
-    const expected = 3 + log.msgLen / 40;
-    expect(Math.abs(log.duration - expected)).toBeLessThanOrEqual(0.3);
+test('bubbles stay circular at 0.3 s, 6 s, 14 s and 20 s', async ({ page }) => {
+  test.setTimeout(60000);
+  for (const ms of [300, 6000, 14000, 20000]) {
+    const frame = await loadRenderer(page, { fixture: manyRecordsFixture, scene: 8, ms });
+    const circleResult = await circularity(frame);
+    expect(circleResult.count).toBeGreaterThan(0);
+    expect(circleResult.failures).toHaveLength(0);
   }
 });
 
-test('message text is visible on the held card and absent or hidden on every joined card', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 14000 });
-
-  const heldCard = frame.locator('.puzzle-card.face-on');
-  await expect(heldCard.locator('.puzzle-message')).toBeVisible();
-
-  const joinedCards = frame.locator('.joined-card');
-  const joinedCount = await joinedCards.count();
-  expect(joinedCount).toBeGreaterThan(0);
-
-  for (let i = 0; i < joinedCount; i++) {
-    await expect(joinedCards.nth(i).locator('.puzzle-message')).toBeHidden();
-  }
-
-  const farFacingCheck = await frame.evaluate(() => {
-    const joined = Array.from(document.querySelectorAll<HTMLElement>('.joined-card'));
-    return joined.every((card) => {
-      const msg = card.querySelector<HTMLElement>('.puzzle-message');
-      return !msg || window.getComputedStyle(msg).display === 'none';
-    });
-  });
-  expect(farFacingCheck).toBe(true);
-});
-
-test('noOverflow holds and no speech bubble box overlaps the title block text', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 9000 });
-
-  const overflow = await noOverflow(frame);
-  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
-  expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
-
-  const overlapResult = await frame.evaluate(() => {
-    const title = document.querySelector<HTMLElement>('#stage .scene[data-scene="8"] > div[style*="left:12px"]');
-    const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="8"] .speech-bubble'));
-    if (!title || !bubbles.length) return { checked: false, overlaps: [] };
-
-    const titleRect = title.getBoundingClientRect();
-    const overlaps: string[] = [];
-
-    for (const b of bubbles) {
-      const bRect = b.getBoundingClientRect();
-      const overlapX = Math.min(titleRect.right, bRect.right) - Math.max(titleRect.left, bRect.left);
-      const overlapY = Math.min(titleRect.bottom, bRect.bottom) - Math.max(titleRect.top, bRect.top);
-      if (overlapX > 0 && overlapY > 0) {
-        overlaps.push(`speech bubble at (${bRect.left}, ${bRect.top}) overlaps title (${titleRect.left}, ${titleRect.top}, ${titleRect.right}, ${titleRect.bottom})`);
-      }
-    }
-    return { checked: true, overlaps };
-  });
-
-  expect(overlapResult.checked).toBe(true);
-  expect(overlapResult.overlaps).toHaveLength(0);
-});
-
-test('hold zone box is strictly disjoint from the world image rect and all four speech bubble boxes', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 9000 });
-
-  const disjointCheck = await frame.evaluate(() => {
-    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="8"]');
-    if (!scene) return { checked: false, error: 'scene not found' };
-
-    const worldArt = scene.querySelector<HTMLElement>('img.art');
-    const holdZone = scene.querySelector<HTMLElement>('#peacemakers-hold-zone');
-    const globeStage = scene.querySelector<HTMLElement>('#peacemakers-globe-stage');
-    const bubbles = Array.from(scene.querySelectorAll<HTMLElement>('.speech-bubble'));
-
-    if (!worldArt || !holdZone || !globeStage) {
-      return { checked: false, error: 'missing key elements' };
-    }
-
-    const sceneRect = scene.getBoundingClientRect();
-    // The host scales the fixed 1812 px stage to fit, so screen pixels are not
-    // stage pixels. Anything compared against a value from the gap report has
-    // to be converted with this factor first.
-    const stageScale = 1812 / sceneRect.width;
-    const toRel = (r: DOMRect) => ({
-      left: r.left - sceneRect.left,
-      top: r.top - sceneRect.top,
-      right: r.right - sceneRect.left,
-      bottom: r.bottom - sceneRect.top,
-      width: r.width,
-      height: r.height,
-    });
-
-    const worldRel = toRel(worldArt.getBoundingClientRect());
-    const holdRel = toRel(holdZone.getBoundingClientRect());
-    const globeRel = toRel(globeStage.getBoundingClientRect());
-    const bubbleRels = bubbles.map((b) => toRel(b.getBoundingClientRect()));
-
-    const checkOverlap = (a: { left: number; top: number; right: number; bottom: number }, b: { left: number; top: number; right: number; bottom: number }) => {
-      const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);
-      const overlapY = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-      return overlapX > 0 && overlapY > 0;
-    };
-
-    const collisions: string[] = [];
-    if (checkOverlap(holdRel, worldRel)) {
-      collisions.push(`holdZone overlaps worldArt: hold [${holdRel.left}, ${holdRel.right}] world [${worldRel.left}, ${worldRel.right}]`);
-    }
-
-    bubbleRels.forEach((bRel, i) => {
-      if (checkOverlap(holdRel, bRel)) {
-        collisions.push(`holdZone overlaps speech bubble ${i + 1}: hold [${holdRel.left}, ${holdRel.right}] bubble [${bRel.left}, ${bRel.right}]`);
-      }
-    });
-
-    const gapToGlobe = globeRel.left - holdRel.right;
-
-    return {
-      checked: true,
-      collisions,
-      worldRel,
-      holdRel,
-      globeRel,
-      gapToGlobe,
-      gapToGlobeStage: gapToGlobe * stageScale,
-      bubblesCount: bubbleRels.length,
-    };
-  });
-
-  expect(disjointCheck.checked).toBe(true);
-  expect(disjointCheck.collisions).toHaveLength(0);
-  // gapToGlobe is measured in screen pixels, but the 60 px gap the gap report
-  // requires is in stage units, and the host scales the 1812 px stage down to
-  // fit. Convert before comparing: at the runner's scale this read 53.3 screen
-  // pixels, which is 80 stage pixels and comfortably over the requirement,
-  // while a bare comparison against 59.5 failed on the unit mismatch alone.
-  expect(disjointCheck.gapToGlobeStage).toBeGreaterThanOrEqual(59.5);
-});
-
-test('globe container transform-style is preserve-3d, transform contains rotate, and no .orb exists', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 6000 });
-
-  const globeStyles = await frame.evaluate(() => {
-    const sphere = document.querySelector<HTMLElement>('.peacemakers-globe-sphere');
-    if (!sphere) return null;
-    const style = window.getComputedStyle(sphere);
-    return {
-      transformStyle: style.transformStyle,
-      transform: style.transform,
-      animationName: style.animationName,
-    };
-  });
-
-  expect(globeStyles).not.toBeNull();
-  expect(globeStyles!.transformStyle).toBe('preserve-3d');
-  expect(globeStyles!.transform).toMatch(/matrix3d|rotate/);
-
-  const orbCount = await frame.locator('#stage .scene[data-scene="8"] .orb').count();
-  expect(orbCount).toBe(0);
-});
-
-test('four speech bubbles are present by 9 s with border-radius 16 px and no immediate phrase repeat over 12 draws', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 9000 });
-
-  const bubbles = frame.locator('#stage .scene[data-scene="8"] .speech-bubble');
-  expect(await bubbles.count()).toBe(4);
-
-  const radii = await frame.evaluate(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="8"] .speech-bubble'));
-    return els.map((el) => window.getComputedStyle(el).borderRadius);
-  });
-  for (const radius of radii) {
-    expect(radius).toBe('16px');
-  }
-
-  const drawnPhrases = await frame.evaluate(() => {
-    const phrases: string[] = [];
-    for (let i = 0; i < 12; i++) {
-      phrases.push((window as any).nextSpeechPhrase());
-    }
-    return phrases;
-  });
-  expect(drawnPhrases).toHaveLength(12);
-  for (let i = 1; i < drawnPhrases.length; i++) {
-    expect(drawnPhrases[i]).not.toBe(drawnPhrases[i - 1]);
-  }
-});
-
-test('joined card count never exceeds 24, oldest card is removed after 25th join, and live count remains exactly 24 across subsequent joins', async ({ page }) => {
-  test.setTimeout(120000);
-  const shortFixture = buildActiveDisplayFixture({
-    recognitions: Array.from({ length: 40 }, (_, i) =>
-      recognition({ id: `rec-batch-${i + 1}`, message: `Short recognition message ${i + 1}.` })
-    ),
-  });
-
-  const frame = await loadRenderer(page, { scene: 8, fixture: shortFixture });
-
-  // Each short piece costs about 5.7 s: 1.1 s detach, then a hold of
-  // 3 + message.length / 40 which is about 3.7 s for these 28-character
-  // messages, then 0.9 s to snap. 140 s therefore yields 24 joins, one short
-  // of the 25 this test needs, which is exactly how it failed before. Drive
-  // 240 s for roughly 42 joins so the assertion has real margin. stepRuntime
-  // clamps a single call to 120 s, so this must be several calls.
-  await frame.evaluate(() => {
-    const rt = (window as any).colorPolishRuntime;
-    for (let i = 0; i < 4; i++) rt.step(60000);
-  });
-
-  const joinLogs = await frame.evaluate(() => {
-    const runtime = (window as any).colorPolishRuntime;
-    return runtime.getState().log.filter((l: any) => l.type === 'peacemakers_piece_joined');
-  });
-  expect(joinLogs.length).toBeGreaterThanOrEqual(25);
-
-  // Now drive 6 more individual joins and verify joined card count stays exactly 24 at each step
-  for (let step = 0; step < 6; step++) {
-    await frame.evaluate(() => {
-      (window as any).colorPolishRuntime.step(6000);
-    });
-
-    const liveCount = await frame.locator('.joined-card:not(.dissolving)').count();
-    expect(liveCount).toBe(24);
-  }
-
-  const firstJoinedId = joinLogs[0]?.id;
-  const isFirstStillPresent = await frame.evaluate((id) => {
-    return Boolean(document.querySelector(`.joined-card[data-record-id="${id}"]`));
-  }, firstJoinedId);
-  expect(isFirstStillPresent).toBe(false);
-});
-
-test('detaching piece carries globe art pixels, negative offset background, and leaves a darkened socket on the world', async ({ page }) => {
-  const frame = await loadRenderer(page, { scene: 8, ms: 500 });
-
-  const pieceInfo = await frame.evaluate(() => {
-    const card = document.querySelector<HTMLElement>('#peacemakers-hold-zone .puzzle-card');
-    const socket = document.querySelector<HTMLElement>('#peacemakers-world-sockets .peacemakers-socket');
-    if (!card) return null;
-
-    const cardStyle = window.getComputedStyle(card);
-    return {
-      backgroundImage: cardStyle.backgroundImage,
-      backgroundSize: cardStyle.backgroundSize,
-      clipPath: cardStyle.clipPath,
-      hasSocket: Boolean(socket),
-    };
-  });
-
-  expect(pieceInfo).not.toBeNull();
-  expect(pieceInfo!.backgroundImage).toContain('globe.png');
-  expect(pieceInfo!.backgroundSize).toBe('604px 482px');
-  expect(pieceInfo!.clipPath).toMatch(/polygon|path/);
-  expect(pieceInfo!.hasSocket).toBe(true);
-});
-
-test('in still mode a 500-char held record keeps every page verbatim, shows page one legibly, and clips nothing it claims to render', async ({ page }) => {
-  const msg500 = 'Kindness begins with a word and spreads peace through honest consideration. '.repeat(7).slice(0, 500);
-  const stillFixture = buildActiveDisplayFixture({
-    recognitions: [
-      recognition({ id: 'rec-still-500', message: msg500 }),
-    ],
-  });
-
-  // Still mode must be in force BEFORE the card is built: peacemakersFitCard
-  // takes isStill at build time, so toggling stillness after loadRenderer
-  // leaves an already-built playing-mode card in the DOM.
+test('reduced motion renders peacemakers still, with circular bubbles', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  const frame = await loadRenderer(page, { scene: 8, fixture: stillFixture, ms: 14000 });
-
-  const m = await frame.evaluate(() => {
-    const scene = document.querySelector('#stage .scene[data-scene="8"]');
-    const card = scene?.querySelector('.puzzle-card.held-card');
-    if (!card) return null;
-    const msg = card.querySelector<HTMLElement>('.puzzle-message');
-    const pages = Array.from(card.querySelectorAll<HTMLElement>('.puzzle-message-page'));
-    const indicator = card.querySelector<HTMLElement>('.puzzle-page-indicator');
-    const visible = pages.filter((el) => !el.hidden);
-    return {
-      pageCount: pages.length,
-      // textContent, not innerText: innerText trims and collapses whitespace,
-      // which drops the spaces between pages and breaks a correct compare.
-      verbatim: pages.map((el) => el.textContent ?? '').join(''),
-      visibleCount: visible.length,
-      visibleText: visible.map((el) => el.textContent ?? '').join(''),
-      fontSize: msg ? parseFloat(getComputedStyle(msg).fontSize) : 0,
-      indicator: indicator && !indicator.hidden ? (indicator.textContent ?? '') : '',
-      // Nothing the DOM presents as visible may be cut off by overflow.
-      visibleOverflows: msg ? msg.scrollHeight > msg.clientHeight + 1 : false,
-      textOverflow: msg ? getComputedStyle(msg).textOverflow : '',
-    };
-  });
-
-  expect(m).not.toBeNull();
-  // Every page is present and the message survives intact, character for character.
-  expect(m!.pageCount).toBeGreaterThan(1);
-  expect(m!.verbatim).toBe(msg500);
-  // Page one is shown, at or above the readable floor, and is never ellipsised.
-  expect(m!.visibleCount).toBe(1);
-  expect(msg500.startsWith(m!.visibleText)).toBe(true);
-  expect(m!.fontSize).toBeGreaterThanOrEqual(18);
-  expect(m!.textOverflow).not.toBe('ellipsis');
-  // The page count is stated on screen rather than the rest going silently missing.
-  expect(m!.indicator).toContain(String(m!.pageCount).padStart(2, '0'));
-  // And what is presented as visible actually fits: no clipped text pretending
-  // to be rendered. A 500 character message needs about 550 px at 18 px and the
-  // box gives about 110 px, so the remaining pages are marked hidden, not clipped.
-  expect(m!.visibleOverflows).toBe(false);
-});
-
-test('frame time sampled at 3840 stays under 40 ms per frame', async ({ page }) => {
-  await page.setViewportSize({ width: 3840, height: 2160 });
-  const frame = await loadRenderer(page, { scene: 8, ms: 6000 });
-
-  const averageFrameMs = await frame.evaluate(() => {
-    const start = performance.now();
-    const frames = 40;
-    for (let i = 0; i < frames; i++) {
-      (window as any).coordinator(0.02);
-    }
-    return (performance.now() - start) / frames;
-  });
-
-  expect(averageFrameMs).toBeLessThan(40);
-});
-
-test('reduced motion renders the peacemakers scene still with eight globe cards and one held card', async ({ page }) => {
-  const { frame, still } = await reducedMotionScene(page, 'peacemakers');
+  const frame = await loadRenderer(page, { fixture: manyRecordsFixture, scene: 8 });
+  const still = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().still === true);
   expect(still).toBe(true);
 
-  const joinedCards = frame.locator('.joined-card');
-  expect(await joinedCards.count()).toBe(8);
+  const circleResult = await circularity(frame);
+  expect(circleResult.count).toBeGreaterThan(0);
+  expect(circleResult.failures).toHaveLength(0);
+});
 
-  const heldCard = frame.locator('.puzzle-card.face-on.held-card');
-  expect(await heldCard.count()).toBe(1);
-  await expect(heldCard.locator('.puzzle-message')).toBeVisible();
+test('shows the production title copy and the globe artwork', async ({ page }) => {
+  const frame = await loadRenderer(page, { scene: 8, ms: 2000 });
 
-  const animationName = await frame.evaluate(() => {
-    const sphere = document.querySelector<HTMLElement>('.peacemakers-globe-sphere');
-    return sphere ? window.getComputedStyle(sphere).animationName : '';
+  const content = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="8"]');
+    const eyebrow = scene?.querySelector<HTMLElement>('.eyebrow')?.textContent || '';
+    const heading = scene?.querySelector<HTMLElement>('h1')?.textContent || '';
+    const violet = scene?.querySelector<HTMLElement>('h1 .violet')?.textContent || '';
+    const subheading = scene?.querySelector<HTMLElement>('.subheading')?.textContent || '';
+    const art = scene?.querySelector<HTMLImageElement>('img.art');
+    return {
+      eyebrow,
+      heading,
+      violet,
+      subheading,
+      artSrc: art?.getAttribute('src') || '',
+    };
   });
-  expect(animationName).toBe('none');
 
-  const globeLight = await frame.$('.globe-light');
-  expect(globeLight).not.toBeNull();
+  expect(content.eyebrow).toContain('Mother’s Love in our community');
+  expect(content.heading).toContain('We Are');
+  expect(content.violet).toBe('makers');
+  expect(content.subheading).toContain('Recognize the kindness');
+  expect(content.artSrc).toContain('/color-polish/assets/globe.png');
+});
 
-  const fxCanvas = await frame.$('canvas.scene-fx');
-  expect(fxCanvas).not.toBeNull();
+test('with all-short records, four bubbles appear in pick order at production’s ps positions', async ({ page }) => {
+  // loadRenderer's own scene switch already skips the entrance transition by
+  // stepping the runtime forward, so a little floater drift has already run
+  // by the time this reads state; it does not step any further itself. The
+  // four ps positions are hundreds of pixels apart, so a generous tolerance
+  // still tells a correct pick-order-to-ps assignment apart from the Plan 15
+  // core's drawSlots(), which would reorder by slot size instead.
+  const frame = await loadRenderer(page, { fixture: manyRecordsFixture, scene: 8 });
+  const slots = await frame.evaluate(
+    () => (window as any).colorPolishRuntime.getState().slots.map((s: any) => ({ id: s.id, x: s.x, y: s.y, d: s.d })),
+  );
+  expect(slots.length).toBe(4);
+
+  const ps = [[885, 23, 312], [1301, 26, 320], [824, 323, 304], [1454, 330, 295]];
+  // choose() is priority-sorted, not random: with every record's lastShown
+  // and createdAt tied, it picks by ascending id, so the fixture's four
+  // records are chosen in this order.
+  const expectedOrder = ['rec-many-1', 'rec-many-2', 'rec-many-3', 'rec-many-4'];
+  expectedOrder.forEach((id, i) => {
+    const slot = slots.find((s: { id: string }) => s.id === id);
+    expect(slot, `no slot found for ${id}`).toBeTruthy();
+    expect(slot.d).toBeCloseTo(ps[i][2], 0);
+    expect(Math.abs(slot.x - ps[i][0])).toBeLessThan(180);
+    expect(Math.abs(slot.y - ps[i][1])).toBeLessThan(180);
+  });
+});
+
+test('a long message is shown alone in one large reader slot about 586 px wide, even with short records available', async ({ page }) => {
+  const frame = await loadRenderer(page, { fixture: longMessageFixture, scene: 8, ms: 2000 });
+  const slots = await frame.evaluate(
+    () => (window as any).colorPolishRuntime.getState().slots.map((s: any) => ({ id: s.id, d: s.d })),
+  );
+  // The pool has three short records too, so this proves the long record
+  // is shown ALONE (production's rule when any chosen record fails
+  // smallFits), not just that it is the only thing available.
+  expect(slots.length).toBe(1);
+  expect(slots[0].id).toBe('rec-long');
+  expect(slots[0].d).toBeCloseTo(586, 0);
+
+  // circularity() matches .orb-slot, .orb and .event-orb; a single bubble
+  // is both an .orb-slot wrapper and a nested .orb, so count is 2 here, not 1.
+  const circleResult = await circularity(frame);
+  expect(circleResult.count).toBeGreaterThan(0);
+  expect(circleResult.failures).toHaveLength(0);
+});
+
+test('a steady bubble retires by drifting out, then a new bubble arrives', async ({ page }) => {
+  test.setTimeout(60000);
+  // The first-mounted floater's retireAt is 17 s; step just past it.
+  const frame = await loadRenderer(page, { fixture: manyRecordsFixture, scene: 8, ms: 18000 });
+
+  const exitLogs = await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    return (state.log || []).filter((e: any) => e.type === 'bubble_exit_start' && e.scene === 8);
+  });
+  expect(exitLogs.length).toBeGreaterThan(0);
+  expect(exitLogs[0].kind).toBe('drift');
+
+  // Exiting takes 3.8 s before the slot installs its replacement, so step
+  // comfortably past retireAt (17 s) + 3.8 s.
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(6000));
+
+  const newLogs = await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    return (state.log || []).filter((e: any) => e.type === 'bubble_new' && e.scene === 8);
+  });
+  expect(newLogs.length).toBeGreaterThan(0);
+});
+
+test('the scene 8 keep-out box matches production’s forbidden() rule', async ({ page }) => {
+  // With this fixture's ps-positioned bubbles starting at x >= 824, none of
+  // them ever drift into or near scene 8's keep-out box (x 0-700, y 8-296)
+  // within any reasonable test time; the box sits in the title copy's
+  // corner, far from where the bubbles start and roam. So a dynamic check
+  // (step time, then look for a bubble too close to the box) cannot tell a
+  // working keepOut apart from a deleted one here, the box is simply never
+  // exercised either way. What can be checked directly, and what actually
+  // catches keepOut being deleted or changed, is the scene's own declared
+  // keep-out box, which core/motion.js's forbidden() reads via
+  // sceneDescriptor(id).keepOut() every physics tick.
+  const frame = await loadRenderer(page, { scene: 8, ms: 2000 });
+  const box = await frame.evaluate(() => (window as any).sceneDescriptor(8).keepOut());
+  expect(box).toEqual([{ x: 0, y: 8, w: 700, h: 296 }]);
+});
+
+test('no recognition data is fetched from a live network endpoint', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', (request) => requests.push(request.url()));
+  await loadRenderer(page, { scene: 8, ms: 6000 });
+  const live = requests.filter((url) => /supabase|recognitions|display\/color-polish/.test(url));
+  expect(live).toHaveLength(0);
 });
