@@ -1,5 +1,7 @@
 # Plan 15 run record: TV next-level pass
 
+> Current resume note, 2026-09-12: The requested test preview implementation is complete at commit `b8650739a4a35cbe490e941580c2827a4109d35e` on `codex/tv15-full-preview`. Preview: [mothers-love-d4ve0196a-lvzion.vercel.app/display](https://mothers-love-d4ve0196a-lvzion.vercel.app/display), deployment `dpl_4ZvXooEY66gys1MziS5qACqMeDmf`, READY with a passing build. The exact live Plan 12 transition is restored from commit `15320682a90747267e420d369c441e6938603499`, with a 1.15-second crossfade, tiny translate, uniform scale, and no Nave overlay. The Nave version remains preserved at commit `64f5365` for later. All seven new live-transition tests pass. All current 145 scene test titles have passing evidence across the initial run and focused reruns, with no single clean 145-test invocation; every known initial failure is resolved. Six usable tests pass, 222 Vitest tests pass, globals are clean at 258 declarations, typecheck passes, and lint remains at the 18-problem baseline. Final probes at 1920 and 3840 pass for all 10 scenes, 6 single arrival styles, and 5 group arrival styles with zero issues. Featured's two last failures now pass with lazy orbit, Expressions 5 pass, Welcome 14 pass, and Peacemakers 13 pass plus one gap-fix retest. The preview record rewrites exactly two public GET endpoints and uses preview-only iframe same-origin compatibility, with no database credentials. Final deployed click smoke passed with matching source, normal mode, Welcome to Garden, zero page errors, and zero failed requests. Physical TV approval still gates production promotion. Production remains unchanged at commit `15320682a90747267e420d369c441e6938603499` and deployment `dpl_GZdeMyoZDVtKB9gJSwDNeSxrp3LR`.
+
 Plan: /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md
 Runner: coordinator (Opus 5 · high in a fresh chat, Anthony's ruling; Fable advisor only). Mode: Parallel.
 Base: tv/pick 463ce8d. Branches: tv15/base, tv15/arrivals, tv15/scene-<slug>, tv15/pick.
@@ -19,7 +21,7 @@ All nine gap reports are written (gaps/), one per scene lane plus Section C; Sec
 - gaps/expressions.md G1: the plan says the bloom "rotates through all nine over the dwell as today", but the shipped code blooms one card per visit (S.bloomIndex, advanced in requestScene). The code is followed and the plan sentence is recorded as a correction for Section Z.
 - gaps/peace-in-practice.md G7: the plan's optional mesh-resolution raise is declined outright; the frame budget goes to the 160 background hearts instead.
 
-## Lane states
+## Earlier lane states (historical)
 
 All eleven code lanes are committed and every one passes its own spec suite with zero failures. tv15/pick at 363ab40 merges all of them onto tv15/base with no conflicts.
 

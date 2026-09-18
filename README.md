@@ -1,5 +1,9 @@
 # The Words of Mother's Love
 
+## September 12: Plan 15 test preview
+
+[Open the TV test preview](https://mothers-love-d4ve0196a-lvzion.vercel.app/display). The full TV scene pass is integrated on `codex/tv15-full-preview` at `b865073`, with the original live transition restored at Anthony's request. Production remains on Plan 12 at `1532068`. [Plan 15](docs/PLAN-15-tv-next-level.md) and [verification record](docs/runs/2026-09-12-tv-next-level/lanes/astra-full-pass.md). The Vercel preview requires an authorized session or a temporary share link.
+
 ## Interview completion update
 
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 13](docs/PLAN-13-tv-scene-refactor.md), scene-by-scene TV refactor; previous: [Plan 12](docs/PLAN-12-tv-stability-countdown-and-home-action.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
