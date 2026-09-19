@@ -185,11 +185,11 @@ test('reduced motion renders the welcome scene still', async ({ page }) => {
   expect(secondReading).toEqual(firstReading);
 });
 
-test('at 2000 ms actors count is exactly 6', async ({ page }) => {
+test('at 2000 ms actors count is exactly 4 (the reserved bubble and three regular ones)', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'welcome', 2000);
   const state = await frame.evaluate(() => (window as any).colorPolishRuntime.visualState());
   const actors = state.actors;
-  expect(actors.length).toBe(6);
+  expect(actors.length).toBe(4);
 });
 
 test('scene replaces at least one bubble within 30 s', async ({ page }) => {
@@ -343,16 +343,16 @@ function buildMostlyLongFixture() {
 }
 
 // Plan 17 round 5 ("one reserved long bubble", Anthony, September 19). Welcome
-// draws six fixed bubbles: the reserved one at 334 drawn px and five regular
-// ones of 254 to 314 drawn px. A message that does not fit a regular bubble
-// whole at the floor is long, and only ever appears in the reserved bubble.
-// These four of this fixture's six messages are 175 to 240 characters, too
-// long for any regular bubble, so only the two short ones and one long one in
-// the reserved bubble are on screen.
+// draws four fixed bubbles: the reserved one of up to 480 drawn px and three
+// regular ones of up to 308, 316 and 320 drawn px. A message that does not fit
+// a regular bubble whole at the floor is long, and only ever appears in the
+// reserved bubble. This fixture has two short messages and four of 175 to 240
+// characters; the regular bubbles hold the ones that fit them whole, and the
+// reserved bubble holds the longest one on screen.
 const MOSTLY_SHORT_IDS = ['synth-rec-5', 'synth-rec-6'];
 const MOSTLY_LONG_ONLY_IDS = ['synth-rec-1', 'synth-rec-2', 'synth-rec-3', 'synth-rec-4'];
 
-test('three bubbles (two short plus the reserved bubble) at 0 s, 6 s and 14 s with mostly-long fixture and no readerSlot collapse', async ({ page }) => {
+test('four whole bubbles at 0 s, 6 s and 14 s with mostly-long fixture, none paging, and no readerSlot collapse', async ({ page }) => {
   const fixture = buildMostlyLongFixture();
   for (const ms of [0, 6000, 14000]) {
     const testPage = await page.context().newPage();
@@ -365,18 +365,16 @@ test('three bubbles (two short plus the reserved bubble) at 0 s, 6 s and 14 s wi
 
     const orbCount = await frame.locator('#stage .scene[data-scene="1"] .orb').count();
     const slotCount = await frame.locator('#stage .scene[data-scene="1"] .orb-slot').count();
-    expect(slotCount, `six fixed bubbles minus the ones with no fitting message, at ${ms} ms`).toBe(3);
+    expect(slotCount, `the reserved bubble and three regular bubbles, at ${ms} ms`).toBe(4);
     expect(orbCount).toBe(slotCount);
 
     const readings = await bubbleReadings(frame, WELCOME_ROOT);
-    const longOnScreen = readings.filter((r) => MOSTLY_LONG_ONLY_IDS.includes(r.id));
-    expect(longOnScreen.length, `one long message at a time, at ${ms} ms`).toBe(1);
-    expect(longOnScreen[0].drawn, 'the long message is in the reserved bubble').toBeGreaterThanOrEqual(RESERVED_DRAWN - 1);
-    const shortOnScreen = readings.filter((r) => MOSTLY_SHORT_IDS.includes(r.id));
-    expect(shortOnScreen.length, `both short messages are on screen, at ${ms} ms`).toBe(2);
-    for (const short of shortOnScreen) {
-      expect(short.drawn, `${short.id} is a regular bubble`).toBeLessThanOrEqual(LARGEST_REGULAR_DRAWN + 1);
+    expect(readings.filter((r) => r.drawn >= RESERVED_DRAWN - 1).length, `one reserved bubble, at ${ms} ms`).toBe(1);
+    for (const r of readings) {
+      expect(r.pages, `${r.id} shows whole, at ${ms} ms`).toBe(1);
+      if (r.drawn < RESERVED_DRAWN - 1) expect(r.drawn, `${r.id} is a regular bubble`).toBeLessThanOrEqual(LARGEST_REGULAR_DRAWN + 1);
     }
+    expect(readings.filter((r) => [...MOSTLY_SHORT_IDS, ...MOSTLY_LONG_ONLY_IDS].includes(r.id)).length).toBe(4);
     await testPage.close();
   }
 });
@@ -397,17 +395,27 @@ test('speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with b
 
   const page9 = await page.context().newPage();
   const frame9 = await loadRenderer(page9, { ms: 9000, scene: 1 });
-  await frame9.evaluate(() => {
-    (window as any).colorPolishRuntime.step(1500);
-  });
-  const visibleAt9 = await frame9.evaluate(() => {
-    const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
-    return bubbles.filter((el) => {
-      const cs = window.getComputedStyle(el);
-      return !el.classList.contains('fading') && cs.opacity !== '0' && cs.visibility !== 'hidden';
-    }).length;
-  });
-  expect(visibleAt9).toBe(3);
+  // All three people have spoken by 9 s. Each speech bubble then swaps its
+  // phrase every 6 to 9 s with a half second fade, and a single instant can
+  // land inside one of those swaps (10.5 s did, which is why this test used to
+  // read 2 on the untouched base). So the count is read every quarter second
+  // from 9 s to 10.5 s: all three must be showing together at some moment, and
+  // never fewer than two at any moment.
+  const counts: number[] = [];
+  for (let step = 0; step <= 6; step++) {
+    if (step) await frame9.evaluate(() => (window as any).colorPolishRuntime.step(250));
+    counts.push(
+      await frame9.evaluate(() => {
+        const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
+        return bubbles.filter((el) => {
+          const cs = window.getComputedStyle(el);
+          return !el.classList.contains('fading') && cs.opacity !== '0' && cs.visibility !== 'hidden';
+        }).length;
+      }),
+    );
+  }
+  expect(Math.max(...counts), `speech bubbles showing, 9 s to 10.5 s: ${counts.join(', ')}`).toBe(3);
+  expect(Math.min(...counts), `speech bubbles showing, 9 s to 10.5 s: ${counts.join(', ')}`).toBeGreaterThanOrEqual(2);
 
   const radii = await frame9.evaluate(() => {
     const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
@@ -486,7 +494,7 @@ test('circularity and noOverflow pass with speech bubbles present', async ({ pag
   // circularity() measures .orb-slot, .orb and .event-orb. Each welcome slot
   // contains one .orb, so the bubbles are twice as many measured elements.
   const slotCount = await frame.locator('#stage .scene[data-scene="1"] .orb-slot').count();
-  expect(slotCount).toBe(3);
+  expect(slotCount).toBe(4);
   expect(circleResult.count).toBe(slotCount * 2);
   expect(circleResult.failures).toHaveLength(0);
 
@@ -601,7 +609,7 @@ test('no speech bubble rect intersects another, the serif couplet, the h1 title,
   });
 
   expect(check.bubblesCount).toBe(3);
-  expect(check.slotsCount).toBe(6);
+  expect(check.slotsCount).toBe(4);
   expect(check.conflicts).toHaveLength(0);
   expect(check.boundViolations).toHaveLength(0);
 });
@@ -649,7 +657,7 @@ test('every message renders at or above 18 px floor, fitting messages on one pag
     });
   });
 
-  expect(messageCheck.length).toBe(3);
+  expect(messageCheck.length).toBe(4);
   let hasSinglePageFit = false;
 
   for (const check of messageCheck) {
@@ -672,10 +680,9 @@ test('every message renders at or above 18 px floor, fitting messages on one pag
   }
 
   expect(hasSinglePageFit).toBe(true);
-  // The two short messages show whole in regular bubbles. The long one in the
-  // reserved bubble shows whole when it is inside the roughly 206 graphemes
-  // that bubble holds and pages when it is not, and it is the only bubble
-  // that ever pages.
+  // Regular bubbles show their messages whole. The reserved bubble holds about
+  // 500 graphemes whole, so nothing in this fixture needs to page; if anything
+  // ever does, it is the reserved bubble.
   const paging = messageCheck.filter((c) => !c.singlePage);
   expect(paging.length, `at most one bubble pages: ${paging.map((c) => c.id).join(', ')}`).toBeLessThanOrEqual(1);
   if (paging.length) {
@@ -716,9 +723,10 @@ test('reduced motion displays static speech bubbles without rotation or fading',
 // ---------------------------------------------------------------------------
 // Plan 17 round 5: one reserved long bubble (Anthony, September 19)
 //
-// Welcome draws six bubbles at six fixed homes: the reserved bubble at 334
-// drawn px and five regular bubbles of 254 to 314 drawn px. A message that
-// does not fit a regular bubble whole at the floor is long; a long message
+// Welcome draws four bubbles at four fixed homes: the reserved bubble, 420 to
+// 480 drawn px (sized so a 500 grapheme message shows whole at the 18 px
+// floor), and three regular bubbles of at most 308, 316 and 320 drawn px. A
+// message that does not fit a regular bubble whole at the floor is long; a long message
 // only ever appears in the reserved bubble, and only the reserved bubble ever
 // pages. Every assertion below reads the DOM or this file's own fit probe
 // (fitsWhole in text-fits.ts), never a size welcome.js wrote.
@@ -728,24 +736,50 @@ const TV_SIZES = [
   { width: 3840, height: 2160 },
 ];
 const WELCOME_ROOT = '#stage .scene[data-scene="1"]';
-/** The reserved bubble's fixed drawn diameter, in stage px at 1920 wide. */
-const RESERVED_DRAWN = 334;
-/** The largest regular bubble (the near layer one), in the same units. */
-const LARGEST_REGULAR_DRAWN = 314;
+/** The reserved bubble's smallest drawn diameter, in stage px at 1920 wide: any bubble this big is the reserved one. */
+const RESERVED_DRAWN = 420;
+/** The reserved bubble's largest drawn diameter. */
+const RESERVED_MAX_DRAWN = 480;
+/** The largest regular bubble, in the same units. */
+const LARGEST_REGULAR_DRAWN = 320;
+/** Bubbles on screen when every home has a message that fits it. */
+const FULL_SCREEN = 4;
 /**
- * A message that fits 314 px with 20 px words certainly fits a regular
+ * A message that fits 296 px with 20 px words certainly fits a regular
  * bubble, so this probe is used only to name messages that must never page.
- * It is not the boundary: a far or mid bubble is laid out larger than it is
- * drawn, and a message too long to drift is laid out at 18 rather than 20, so
- * some messages this probe rejects still fit a regular bubble whole. Whether
- * a bubble really holds its whole message is read off the screen instead
- * (showsWholeMessage). The reserved bubble is probed at 334 px with 18 px
- * words, which is exactly how it is drawn.
+ * It is not the boundary: a regular bubble that holds still is laid out up to
+ * 320 px with 18 px words, so some messages this probe rejects still fit a
+ * regular bubble whole. Whether a bubble really holds its whole message is
+ * read off the screen instead (showsWholeMessage). The reserved bubble is
+ * probed at 480 px with 18 px words and core's usual name and chips, which
+ * hold less than the compact ones welcome.js uses at that size, so a message
+ * the probe fits must never page.
  */
-const REGULAR_PROBE = { diameter: LARGEST_REGULAR_DRAWN, font: 20 };
+const REGULAR_PROBE = { diameter: 296, font: 20 };
 
-function lengthPool(lengths: number[], dwell: number) {
-  const recognitionsList = lengths.map((n, i) =>
+/**
+ * A record that cannot show whole even in the 480 px reserved bubble: 500
+ * graphemes of wide capitals, nine expression chips and a long name. Real
+ * messages of 500 graphemes fit whole; this is the last resort case.
+ */
+const HARD_ID = 'hard-500';
+function hardRecord() {
+  let message = '';
+  while (graphemeCount(message) < 500) message += 'WARM WELCOME MOMMY ';
+  message = message.slice(0, 500).trimEnd();
+  return recognition({
+    id: HARD_ID,
+    recipient: 'Grandmother Wilhelmina of the Morning Kitchen Team',
+    message,
+    expressionIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    createdAt: '2026-09-10T17:30:00Z',
+    firstPublishedAt: '2026-09-10T17:30:00Z',
+    expiresAt: '2026-09-17T16:00:00Z',
+  });
+}
+
+function lengthPool(lengths: number[], dwell: number, extra: Array<ReturnType<typeof recognition>> = []) {
+  const recognitionsList = [...extra, ...lengths.map((n, i) =>
     recognition({
       id: `len-${n}-${i}`,
       recipient: 'Kind Friend',
@@ -755,7 +789,7 @@ function lengthPool(lengths: number[], dwell: number) {
       firstPublishedAt: `2026-09-10T16:${String(i).padStart(2, '0')}:00Z`,
       expiresAt: '2026-09-17T16:00:00Z',
     }),
-  );
+  )];
   return buildActiveDisplayFixture({
     recognitions: recognitionsList,
     presentation: {
@@ -775,7 +809,30 @@ async function welcomeSample(frame: Frame) {
     const tv = document.getElementById('tv')!;
     const tvScale = tv.getBoundingClientRect().width / 1920;
     const slots = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .orb-slot')).filter((s) => !s.closest('[data-welcome-measure]'));
+    const actors = (0, eval)('V').actors as Array<{ key: string; life: string }>;
+    const sceneBox = document.querySelector<HTMLElement>('#stage .scene[data-scene="1"]')!.getBoundingClientRect();
+    const toStage = 1812 / sceneBox.width;
+    const stageRect = (q: DOMRect) => ({ left: (q.left - sceneBox.left) * toStage, top: (q.top - sceneBox.top) * toStage, right: (q.right - sceneBox.left) * toStage, bottom: (q.bottom - sceneBox.top) * toStage });
+    // What a bubble must never cover: the title words, the couplet, the
+    // eyebrow (each line of text, not its wide block box), the community art
+    // and the three speech bubbles. In stage px.
+    const obstacles: Array<{ name: string; left: number; top: number; right: number; bottom: number }> = [];
+    document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] h1, #stage .scene[data-scene="1"] p.serif, #stage .scene[data-scene="1"] .eyebrow').forEach((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      for (const q of Array.from(range.getClientRects())) if (q.width > 0) obstacles.push({ name: el.tagName.toLowerCase(), ...stageRect(q) });
+    });
+    document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble').forEach((el) => obstacles.push({ name: 'speech bubble', ...stageRect(el.getBoundingClientRect()) }));
+    const artEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="1"] .art');
+    if (artEl) {
+      // object-fit: contain draws the 1600 by 536 picture centred in its box.
+      const q = stageRect(artEl.getBoundingClientRect());
+      const w = Math.min(q.right - q.left, ((q.bottom - q.top) * 1600) / 536);
+      const mid = (q.left + q.right) / 2;
+      obstacles.push({ name: 'community art', left: mid - w / 2, top: q.top, right: mid + w / 2, bottom: q.bottom });
+    }
     const bubbles = slots.map((slot) => {
+      const box = stageRect(slot.getBoundingClientRect());
       const k = slot.offsetWidth ? slot.getBoundingClientRect().width / slot.offsetWidth : tvScale;
       const msg = slot.querySelector<HTMLElement>('.message')!;
       const indicator = slot.querySelector<HTMLElement>('.orb-page-indicator');
@@ -785,6 +842,11 @@ async function welcomeSample(frame: Frame) {
       const record = ((0, eval)('S.pool') as Array<{ id: string; message: string }>).find((r) => r.id === id);
       return {
         id,
+        life: actors.find((x) => x.key === slot.id)?.life ?? '',
+        reservedMark: slot.dataset.welcomeReserved === 'true',
+        cx: (box.left + box.right) / 2,
+        cy: (box.top + box.bottom) / 2,
+        radius: (box.right - box.left) / 2,
         drawn: slot.getBoundingClientRect().width / tvScale,
         drawnFont: (parseFloat(getComputedStyle(msg).fontSize) * k) / tvScale,
         pages: m ? parseInt(m[1], 10) : 1,
@@ -797,8 +859,45 @@ async function welcomeSample(frame: Frame) {
         readingIndex: (reading?.index ?? 0) as number,
       };
     });
-    return { scene: state.scene as number, sceneAge: state.sceneAge as number, dwell: state.visual.dwell[1] as number, bubbles };
+    return { scene: state.scene as number, sceneAge: state.sceneAge as number, dwell: state.visual.dwell[1] as number, bubbles, obstacles };
   });
+}
+
+/**
+ * Settled bubbles never touch each other, the title words, the speech
+ * bubbles, the community art or the stage edge (a bubble flying in or out is
+ * motion, and is not judged here). Returns what is wrong, in stage px.
+ */
+function layoutProblems(s: Awaited<ReturnType<typeof welcomeSample>>): string[] {
+  const problems: string[] = [];
+  const settled = s.bubbles.filter((b) => b.life === 'steady' && b.opacity > 0.9);
+  for (let i = 0; i < settled.length; i++) {
+    const a = settled[i];
+    if (a.cx - a.radius < -0.5 || a.cy - a.radius < -0.5 || a.cx + a.radius > 1812.5 || a.cy + a.radius > 636.5) problems.push(`${s.sceneAge.toFixed(1)} s: ${a.id} leaves the stage`);
+    for (const o of s.obstacles) {
+      const px = Math.max(o.left, Math.min(a.cx, o.right)), py = Math.max(o.top, Math.min(a.cy, o.bottom));
+      const into = a.radius - Math.hypot(px - a.cx, py - a.cy);
+      if (into > 0.5) problems.push(`${s.sceneAge.toFixed(1)} s: ${a.id} covers the ${o.name} by ${into.toFixed(1)} px`);
+    }
+    for (const b of settled.slice(i + 1)) {
+      const into = a.radius + b.radius - Math.hypot(a.cx - b.cx, a.cy - b.cy);
+      if (into > 0.5) problems.push(`${s.sceneAge.toFixed(1)} s: ${a.id} and ${b.id} overlap by ${into.toFixed(1)} px`);
+    }
+  }
+  // A bubble flying in or out may cross a neighbour's rim, but never the
+  // title words and never the middle of a settled bubble, where its words are
+  // (the words sit inside 80 percent of the diameter).
+  for (const f of s.bubbles.filter((b) => b.life !== 'steady' && b.opacity > 0.3)) {
+    for (const o of s.obstacles.filter((x) => ['h1', 'p', 'div'].includes(x.name))) {
+      const px = Math.max(o.left, Math.min(f.cx, o.right)), py = Math.max(o.top, Math.min(f.cy, o.bottom));
+      if (f.radius - Math.hypot(px - f.cx, py - f.cy) > 0.5) problems.push(`${s.sceneAge.toFixed(1)} s: ${f.id} flies over the title (${o.name})`);
+    }
+    for (const b of settled) {
+      const into = f.radius + 0.8 * b.radius - Math.hypot(f.cx - b.cx, f.cy - b.cy);
+      if (into > 0.5) problems.push(`${s.sceneAge.toFixed(1)} s: ${f.id} flies over the words of ${b.id} by ${into.toFixed(1)} px`);
+    }
+  }
+  return problems;
 }
 
 /**
@@ -810,13 +909,13 @@ async function welcomeSample(frame: Frame) {
  * at a size the fixed layout does not have, and any pages finish before the
  * scene changes.
  */
-async function runPool(page: Page, opts: { lengths: number[]; dwell: number; width?: number; name: string }) {
+async function runPool(page: Page, opts: { lengths: number[]; dwell: number; width?: number; name: string; hard?: boolean }) {
   const width = opts.width ?? 1920;
   await page.setViewportSize({ width, height: Math.round((width * 9) / 16) });
-  const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool(opts.lengths, opts.dwell) });
+  const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool(opts.lengths, opts.dwell, opts.hard ? [hardRecord()] : []) });
   const reservedFits = new Map<string, boolean>();
   const fitsReservedWhole = async (id: string) => {
-    if (!reservedFits.has(id)) reservedFits.set(id, await fitsWhole(frame, id, RESERVED_DRAWN, 18));
+    if (!reservedFits.has(id)) reservedFits.set(id, await fitsWhole(frame, id, RESERVED_MAX_DRAWN, 18));
     return reservedFits.get(id)!;
   };
   const problems: string[] = [];
@@ -840,9 +939,12 @@ async function runPool(page: Page, opts: { lengths: number[]; dwell: number; wid
     if (reserved.length > 1) problems.push(`${s.sceneAge.toFixed(1)} s: ${reserved.length} bubbles at the reserved size`);
     const paging = visible.filter((b) => b.pages > 1);
     if (paging.length > 1) problems.push(`${s.sceneAge.toFixed(1)} s: ${paging.length} bubbles page at once`);
+    problems.push(...layoutProblems(s));
     for (const b of visible) {
       if (!seenIn.has(b.id)) seenIn.set(b.id, new Set());
       const isReserved = b.drawn >= RESERVED_DRAWN - 1;
+      if (isReserved !== b.reservedMark) problems.push(`${s.sceneAge.toFixed(1)} s: ${b.id} at ${b.drawn.toFixed(0)} px is ${b.reservedMark ? '' : 'not '}marked reserved`);
+      if (b.drawn > RESERVED_MAX_DRAWN + 1) problems.push(`${s.sceneAge.toFixed(1)} s: ${b.id} drawn at ${b.drawn.toFixed(0)} px, past the reserved maximum`);
       seenIn.get(b.id)!.add(isReserved ? 'reserved' : 'regular');
       if (b.drawnFont < 18 - 0.05) problems.push(`${s.sceneAge.toFixed(1)} s: ${b.id} drawn at ${b.drawnFont.toFixed(2)} px`);
       if (b.drawn > LARGEST_REGULAR_DRAWN + 1 && !isReserved) {
@@ -875,33 +977,48 @@ async function runPool(page: Page, opts: { lengths: number[]; dwell: number; wid
   return { problems, counts, pagesSeen, seenIn, frame };
 }
 
-const ROUND5_POOLS: Array<{ name: string; lengths: number[]; dwell: number; six?: boolean; width?: number }> = [
-  { name: 'eight short at 60 s', lengths: [40, 55, 70, 85, 100, 130, 45, 60], dwell: 60, six: true },
-  { name: 'eight short at 30 s', lengths: [40, 55, 70, 85, 100, 130, 45, 60], dwell: 30, six: true },
-  { name: 'eight short at 40 s', lengths: [40, 55, 70, 85, 100, 130, 45, 60], dwell: 40, six: true },
-  { name: 'eight short at 60 s, 3840 wide', lengths: [40, 55, 70, 85, 100, 130, 45, 60], dwell: 60, six: true, width: 3840 },
-  { name: 'one 250, one 400, one 500 with five short at 60 s', lengths: [250, 400, 500, 60, 70, 80, 90, 100], dwell: 60, six: true },
-  { name: 'one 250, one 400, one 500 with five short at 40 s', lengths: [250, 400, 500, 60, 70, 80, 90, 100], dwell: 40, six: true },
-  { name: 'one 250, one 400, one 500 with five short at 30 s', lengths: [250, 400, 500, 60, 70, 80, 90, 100], dwell: 30, six: true },
-  { name: 'one 250, one 400, one 500 with five short at 60 s, 3840 wide', lengths: [250, 400, 500, 60, 70, 80, 90, 100], dwell: 60, six: true, width: 3840 },
-  { name: 'three long only at 60 s', lengths: [250, 400, 500], dwell: 60 },
-  { name: 'mostly long at 60 s', lengths: [53, 63, 130, 250, 400, 500], dwell: 60 },
-  { name: 'every message long at 60 s', lengths: [180, 200, 240, 300, 360, 420], dwell: 60 },
+const SHORT8 = [40, 55, 70, 85, 100, 130, 45, 60];
+const MIXED8 = [250, 400, 500, 60, 70, 80, 90, 100];
+const ROUND5_POOLS: Array<{ name: string; lengths: number[]; dwell: number; min: number; width?: number; hard?: boolean; noPaging?: boolean }> = [
+  { name: 'eight short at 60 s', lengths: SHORT8, dwell: 60, min: FULL_SCREEN, noPaging: true },
+  { name: 'eight short at 30 s', lengths: SHORT8, dwell: 30, min: FULL_SCREEN, noPaging: true },
+  { name: 'eight short at 40 s', lengths: SHORT8, dwell: 40, min: FULL_SCREEN, noPaging: true },
+  { name: 'eight short at 60 s, 3840 wide', lengths: SHORT8, dwell: 60, min: FULL_SCREEN, width: 3840, noPaging: true },
+  { name: 'one 250, one 400, one 500 with five short at 60 s', lengths: MIXED8, dwell: 60, min: FULL_SCREEN, noPaging: true },
+  { name: 'one 250, one 400, one 500 with five short at 40 s', lengths: MIXED8, dwell: 40, min: FULL_SCREEN, noPaging: true },
+  { name: 'one 250, one 400, one 500 with five short at 30 s', lengths: MIXED8, dwell: 30, min: FULL_SCREEN, noPaging: true },
+  { name: 'one 250, one 400, one 500 with five short at 60 s, 3840 wide', lengths: MIXED8, dwell: 60, min: FULL_SCREEN, width: 3840, noPaging: true },
+  // Only long messages: they take turns in the one reserved bubble and the
+  // regular bubbles stay empty, because the pool has nothing that fits them.
+  { name: 'three long only at 60 s', lengths: [250, 400, 500], dwell: 60, min: 1, noPaging: true },
+  { name: 'mostly long at 60 s', lengths: [53, 63, 130, 250, 400, 500], dwell: 60, min: FULL_SCREEN, noPaging: true },
+  // Every message 180 to 420 graphemes. Geometry: beside the 480 px reserved
+  // bubble the regular homes hold at most about 180 graphemes, so this pool
+  // fills the reserved bubble and the regular bubbles its shortest messages
+  // fit; the count is printed and must be at least two.
+  { name: 'every message 180 to 420 at 60 s', lengths: [180, 200, 240, 300, 360, 420], dwell: 60, min: 2, noPaging: true },
+  // The last resort: a record that cannot show whole even at 480 px.
+  { name: 'five short and one that cannot fit 480 px at 60 s', lengths: [60, 70, 80, 90, 100], dwell: 60, min: FULL_SCREEN, hard: true },
+  { name: 'five short and one that cannot fit 480 px at 30 s', lengths: [60, 70, 80, 90, 100], dwell: 30, min: FULL_SCREEN, hard: true },
 ];
 
 for (const c of ROUND5_POOLS) {
   test(`round 5 pool, ${c.name}: long messages only in the reserved bubble, nothing else pages, floor kept`, async ({ page }) => {
-    test.setTimeout(300000);
+    test.setTimeout(600000);
     const { problems, counts, pagesSeen, seenIn } = await runPool(page, c);
     const minCount = counts.length ? Math.min(...counts) : 0;
     const maxCount = counts.length ? Math.max(...counts) : 0;
-    console.log(`welcome round 5 pool ${c.name}: bubbles ${minCount} to ${maxCount}, paging ${JSON.stringify(Object.fromEntries(pagesSeen))}`);
+    console.log(`welcome round 5 pool ${c.name}: bubbles ${minCount} to ${maxCount}, paging ${JSON.stringify(Object.fromEntries(pagesSeen))}, reserved held ${[...seenIn].filter(([, v]) => v.has('reserved')).map(([k]) => k).join(', ')}`);
     expect(problems, `${c.name}: ${problems.slice(0, 8).join(' | ')}`).toHaveLength(0);
-    expect(maxCount, `${c.name}: never more than six bubbles`).toBeLessThanOrEqual(6);
-    if (c.six) expect(minCount, `${c.name}: six bubbles whenever six messages fit whole`).toBe(6);
-    // Whatever the pool, the reserved bubble is never empty.
-    expect(minCount, `${c.name}: the reserved bubble always holds a message`).toBeGreaterThanOrEqual(1);
+    expect(maxCount, `${c.name}: never more than ${FULL_SCREEN} bubbles`).toBeLessThanOrEqual(FULL_SCREEN);
+    expect(minCount, `${c.name}: at least ${c.min} bubbles at every moment`).toBeGreaterThanOrEqual(c.min);
+    if (c.noPaging) expect([...pagesSeen.keys()], `${c.name}: every message up to 500 graphemes shows whole, nothing pages`).toHaveLength(0);
     expect([...seenIn.keys()].length, `${c.name}: the pool actually reached the screen`).toBeGreaterThan(0);
+    // No long message (250 graphemes and up) is ever seen in a regular bubble.
+    for (const [id, where] of seenIn) {
+      const n = Number(id.split('-')[1]);
+      if (id === HARD_ID || n >= 250) expect([...where], `${id} only ever in the reserved bubble`).toEqual(['reserved']);
+    }
   });
 }
 
@@ -965,8 +1082,8 @@ test('with no long message in the pool the reserved bubble still shows a message
     for (const other of s.bubbles.filter((b) => b !== reserved[0])) {
       expect(other.drawn, `${other.id} is smaller than the reserved bubble`).toBeLessThan(reserved[0].drawn);
     }
-    // Every message in this pool fits a regular bubble, so all six show.
-    expect(s.bubbles.length, `six bubbles at ${ms} ms`).toBe(6);
+    // Every message in this pool fits a regular bubble, so every home is full.
+    expect(s.bubbles.length, `${FULL_SCREEN} bubbles at ${ms} ms`).toBe(FULL_SCREEN);
   }
 });
 
@@ -1008,8 +1125,10 @@ test('mostly-long fixture: every word fits its bubble, drawn at the floor or lar
 
 test('a paging bubble is the reserved bubble, holds a message that cannot show whole even there, and its pages fit the dwell', async ({ page }) => {
   test.setTimeout(240000);
-  // At a 60 s dwell the 500 grapheme message (about 36 s of reading) may page.
-  const fixture = buildTextFitsFixture({
+  // The only record here that may page is the one that cannot fit 480 px.
+  const base = buildTextFitsFixture() as { recognitions: Array<Record<string, unknown>> };
+  const fixture = buildActiveDisplayFixture({
+    recognitions: [hardRecord(), ...base.recognitions],
     presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'welcome', enabled: true, durationSeconds: 60 }, { id: 'garden', enabled: true, durationSeconds: 60 }] },
   });
   for (const size of TV_SIZES) {
@@ -1019,12 +1138,13 @@ test('a paging bubble is the reserved bubble, holds a message that cannot show w
     const where = `${size.width} wide`;
     const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
     const paging = readings.filter((r) => r.pages > 1);
-    expect(paging.length, `one long record pages at the 60 s dwell, ${where}: ${JSON.stringify(readings)}`).toBe(1);
+    expect(paging.length, `one record pages at the 60 s dwell, ${where}: ${JSON.stringify(readings)}`).toBe(1);
     const big = paging[0];
-    expect(big.drawn, `${big.id} pages in the reserved bubble, ${where}`).toBeGreaterThanOrEqual(RESERVED_DRAWN - 1);
+    expect(big.id, `only the record that cannot fit pages, ${where}`).toBe(HARD_ID);
+    expect(big.drawn, `${big.id} pages in the reserved bubble at its full size, ${where}`).toBeGreaterThanOrEqual(RESERVED_MAX_DRAWN - 1);
     // Its message really cannot show whole in the reserved bubble at the floor
     // (judged by this file's own probe, not by anything welcome.js wrote).
-    expect(await fitsWhole(frame, big.id, RESERVED_DRAWN, 18), `${big.id} does not fit whole at ${RESERVED_DRAWN} px, ${where}`).toBe(false);
+    expect(await fitsWhole(frame, big.id, RESERVED_MAX_DRAWN, 18), `${big.id} does not fit whole at ${RESERVED_MAX_DRAWN} px, ${where}`).toBe(false);
     // And no other bubble is anywhere near the reserved size.
     for (const other of readings.filter((r) => r !== big)) {
       expect(other.drawn, `${other.id} is a regular bubble, ${where}`).toBeLessThanOrEqual(LARGEST_REGULAR_DRAWN + 1);
@@ -1036,27 +1156,34 @@ test('a paging bubble is the reserved bubble, holds a message that cannot show w
   }
 });
 
-// The same pool of one 500 grapheme message plus five short ones, at the
-// three dwells Anthony has used. At 60 s its three pages are all read before
+// A record that cannot show whole even at 480 px, plus five short ones, at
+// the three dwells Anthony has used. At 60 s its pages are all read before
 // the scene changes, so the reserved bubble shows it; at 30 s they are not,
-// so it waits and the reserved bubble shows a short message instead. Nothing
-// is ever cut to make it fit.
-for (const [dwell, shown] of [[30, false], [40, true], [60, true]] as Array<[number, boolean]>) {
-  test(`at a ${dwell} s dwell the 500 grapheme message ${shown ? 'pages in the reserved bubble inside the time left' : 'waits instead of being paged or cut'}`, async ({ page }) => {
+// so it waits and the reserved bubble shows another message instead. At 40 s
+// either is right, as long as the pages it shows finish in time. Nothing is
+// ever cut to make it fit. An ordinary 500 grapheme message never pages.
+for (const [dwell, shown] of [[30, false], [40, null], [60, true]] as Array<[number, boolean | null]>) {
+  test(`at a ${dwell} s dwell the record that cannot fit 480 px ${shown === null ? 'pages only if its pages finish in time' : shown ? 'pages in the reserved bubble inside the time left' : 'waits instead of being paged or cut'}`, async ({ page }) => {
     test.setTimeout(120000);
     await page.setViewportSize({ width: 1920, height: 1080 });
-    const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool([500, 60, 70, 80, 90, 100], dwell) });
+    const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool([500, 60, 70, 80, 90, 100], dwell, [hardRecord()]) });
     expect(await frame.evaluate(() => (window as any).colorPolishRuntime.getState().visual.dwell[1])).toBe(dwell);
     const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
     const ids = readings.map((r) => r.id);
-    expect(await fitsWhole(frame, 'len-500-0', RESERVED_DRAWN, 18), 'the 500 grapheme message cannot show whole even in the reserved bubble').toBe(false);
-    if (shown) {
-      expect(ids, `the 500 grapheme message is shown at ${dwell} s`).toContain('len-500-0');
-    } else {
-      expect(ids, `the 500 grapheme message is not shown at ${dwell} s`).not.toContain('len-500-0');
+    expect(await fitsWhole(frame, HARD_ID, RESERVED_MAX_DRAWN, 18), 'the hard record cannot show whole even in the reserved bubble').toBe(false);
+    expect(readings.length, 'every home is full').toBe(FULL_SCREEN);
+    if (shown === true) {
+      expect(ids, `the hard record is shown at ${dwell} s`).toContain(HARD_ID);
+    } else if (shown === false) {
+      expect(ids, `the hard record is not shown at ${dwell} s`).not.toContain(HARD_ID);
       const waited = await frame.evaluate(() => ((window as any).colorPolishRuntime.getState().log as Array<{ type: string; id?: string }>).filter((e) => e.type === 'welcome_long_waits').map((e) => e.id));
-      expect(waited, 'it is logged as waiting for a later pass').toContain('len-500-0');
+      expect(waited, 'it is logged as waiting for a later pass').toContain(HARD_ID);
       expect(readings.filter((r) => r.pages > 1), 'nothing else pages in its place').toHaveLength(0);
+      // The ordinary 500 grapheme message takes the reserved bubble, whole.
+      const big = readings.find((r) => r.id === 'len-500-0');
+      expect(big, 'the 500 grapheme message is on screen').toBeDefined();
+      expect(big!.pages, 'and shows whole').toBe(1);
+      expect(big!.drawn, 'in the reserved bubble').toBeGreaterThanOrEqual(RESERVED_DRAWN - 1);
     }
     for (const r of readings) {
       if (r.pages > 1) {
@@ -1095,8 +1222,7 @@ test('medium messages (120 to 220 characters) either show whole in the reserved 
       expect(failures, `${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
       // The four short records fill regular bubbles, the medium records that
       // fit one join them, and the rest take turns in the reserved bubble.
-      expect(readings.length, `bubbles on screen, ${where}`).toBeGreaterThanOrEqual(4);
-      expect(readings.length, `never more than six bubbles, ${where}`).toBeLessThanOrEqual(6);
+      expect(readings.length, `every home is full, ${where}`).toBe(FULL_SCREEN);
       expect(readings.filter((r) => MEDIUM_IDS.includes(r.id)).length, `a medium record is on screen, ${where}`).toBeGreaterThanOrEqual(1);
       expect(readings.filter((r) => r.drawn >= RESERVED_DRAWN - 1).length, `exactly one reserved bubble, ${where}`).toBe(1);
       for (const reading of readings) {
@@ -1304,11 +1430,22 @@ test('the fit checks can fail: a message forced past its rim is reported', async
   const dirty = await textFits(frame, WELCOME_ROOT, {});
   expect(dirty.length, 'the fit check reports the spilled words').toBeGreaterThan(0);
 
+  // The layout check can fail too: a bubble moved over its neighbour, the
+  // title or the art is reported, and the untouched layout is not.
+  const sample = await welcomeSample(frame);
+  expect(sample.obstacles.map((o) => o.name), 'the title, the art and the speech bubbles are all measured').toEqual(expect.arrayContaining(['h1', 'community art', 'speech bubble']));
+  expect(sample.bubbles.filter((b) => b.life === 'steady').length, 'settled bubbles are judged').toBe(FULL_SCREEN);
+  expect(layoutProblems(sample), 'the untouched layout is clean').toHaveLength(0);
+  const moved = (dx: number, dy: number) => ({ ...sample, bubbles: sample.bubbles.map((b, i) => (i === 0 ? { ...b, cx: b.cx + dx, cy: b.cy + dy } : b)) });
+  expect(layoutProblems(moved(-300, 0)).join(' '), 'over the title').toContain('covers the h1');
+  expect(layoutProblems(moved(0, 120)).join(' '), 'over the art or a speech bubble').toMatch(/covers the (community art|speech bubble)/);
+  expect(layoutProblems(moved(330, 200)).join(' '), 'over a neighbour').toContain('overlap');
+
   // And the single-page rule can fail too: claiming a paging record shows
   // whole is reported.
-  const paged = await loadRenderer(await page.context().newPage(), { scene: 1, ms: 0, fixture: lengthPool([500, 60, 70, 80, 90, 100], 60) });
+  const paged = await loadRenderer(await page.context().newPage(), { scene: 1, ms: 0, fixture: lengthPool([60, 70, 80, 90, 100], 60, [hardRecord()]) });
   const readings = (await bubbleReadings(paged, WELCOME_ROOT)).filter((r) => r.visible && r.pages > 1);
-  expect(readings.length, 'the 500 grapheme record pages in the reserved bubble').toBe(1);
+  expect(readings.length, 'the record that cannot fit 480 px pages in the reserved bubble').toBe(1);
   const wrong = await textFits(paged, WELCOME_ROOT, { singlePageIds: [readings[0].id] });
   expect(wrong.some((f) => f.reason === 'paginated a message that must show whole'), JSON.stringify(wrong)).toBe(true);
 });
@@ -1319,5 +1456,14 @@ test('the long message probe agrees with the grapheme counts it is given', async
   expect(graphemeCount(buildGraphemeMessage(500))).toBe(500);
   expect(await fitsWhole(frame, 'len-60-0', REGULAR_PROBE.diameter, REGULAR_PROBE.font), 'a 60 grapheme message fits a regular bubble').toBe(true);
   expect(await fitsWhole(frame, 'len-500-1', REGULAR_PROBE.diameter, REGULAR_PROBE.font), 'a 500 grapheme message does not').toBe(false);
-  expect(await fitsWhole(frame, 'len-500-1', RESERVED_DRAWN, 18), 'a 500 grapheme message does not fit the reserved bubble whole either').toBe(false);
+  // The 500 grapheme message is on screen whole, in the reserved bubble, at the
+  // floor or larger: that is what the reserved bubble is sized for.
+  const s = await welcomeSample(frame);
+  const big = s.bubbles.find((b) => b.id === 'len-500-1');
+  expect(big, 'the 500 grapheme message is on screen').toBeDefined();
+  expect(big!.showsWholeMessage, 'whole').toBe(true);
+  expect(big!.pages, 'on one page').toBe(1);
+  expect(big!.drawn, 'in the reserved bubble').toBeGreaterThanOrEqual(RESERVED_DRAWN - 1);
+  expect(big!.drawn, 'no larger than 480 px').toBeLessThanOrEqual(RESERVED_MAX_DRAWN + 1);
+  expect(big!.drawnFont, 'words at the floor or larger').toBeGreaterThanOrEqual(18 - 0.05);
 });

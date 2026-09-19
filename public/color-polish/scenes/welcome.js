@@ -17,91 +17,91 @@
   };
 
   // Plan 17 round 5, "one reserved long bubble" (Anthony, September 19, after
-  // watching round 4 on the church TV).
+  // watching round 4 on the church TV; sizes corrected in the round 5 review).
   //
-  // One reserved large bubble. Welcome draws six bubbles at six fixed homes
-  // of fixed size: five regular bubbles and one reserved bubble of 334 drawn
-  // px, the largest circle the free area holds beside the other five. The
-  // reserved bubble is the only place a message too long for a regular bubble
-  // ever appears, and the only bubble that ever turns pages. Every other
-  // bubble only ever holds a message that fits it whole, so a long message
-  // can never take, shrink, move or page another bubble: the homes and the
-  // diameters are constants, and nothing in the layout depends on which
-  // messages are drawn. The round 3 and round 4 cascade (the welcomeChooseSet
-  // shrink fallback and the room-for-<id> deferral) is gone.
+  // One reserved LARGE bubble. Welcome draws four bubbles at four fixed homes:
+  // the reserved bubble, up to 480 drawn px, and three regular bubbles of up
+  // to 308, 316 and 320 drawn px. The reserved bubble is sized so that a 500
+  // grapheme message shows whole with its words at the 18 px floor (measured:
+  // about 470 px with the compact name and chips). It is the only place a
+  // message too long for a regular bubble ever appears, and the only bubble
+  // that ever turns pages, which is now rare. Every other bubble only ever
+  // holds a message that fits it whole, so a long message can never take,
+  // shrink, move or page another bubble: every home and every maximum is a
+  // constant, and nothing in the layout depends on which messages are drawn.
   //
   // Sizes come from the message's grapheme count (Intl.Segmenter), not its
-  // UTF-16 length: a regular bubble grows through WELCOME_SIZE_STEPS up to
-  // its own diameter while its words step down from 22 to 20 drawn px; the
-  // reserved bubble keeps its 334 px size (so it is never a gap) and its
-  // words step from 24 down to 18. Each step is then checked against the
-  // text as the browser actually lays it out, so a message with long words,
-  // many expression chips or a long name steps its words down further, and,
-  // if even the floor does not hold it, is simply not put in that bubble.
-  // Nothing is ever truncated, clipped or ellipsized.
+  // UTF-16 length. A regular bubble grows through WELCOME_REGULAR_STEPS (276
+  // and 296 px, words from 24 down) and then to its home's maximum, where it
+  // holds still with words down to the floor. The reserved bubble grows
+  // through WELCOME_RESERVED_STEPS (420, 448, 480 px) while its words step
+  // from 28 px toward the floor. Each step is then checked against the text
+  // as the browser actually lays it out, so a message with long words, many
+  // expression chips or a long name steps its words down further, grows to
+  // the next size, or, in a regular bubble, is simply not put there. Nothing
+  // is ever truncated, clipped or ellipsized.
   //
   // Floors. Drawn words never go below 18 px at 1920 wide (36 px at 3840).
   // Core breathes a drifting bubble between 0.9 and 0.996 of its size, so a
   // drifting bubble is laid out with 20 drawn px words that dip to 18 at the
-  // bottom of the breath; the reserved bubble and any other bubble that does
-  // not drift are laid out at 18 exactly. A bubble in the far or mid depth
-  // layer is laid out at drawn / layer scale px and drawn back down by the
-  // layer's scale, so its words are drawn at the size its message asks for
-  // whatever depth it sits at, and the layers keep their blur, pace and
-  // z-order. The near bubbles are the biggest and sharpest, the far ones the
-  // smallest and softest, as Plan 15 drew them.
+  // bottom of the breath; a bubble that holds still is laid out at 18 or
+  // more. A bubble in the far or mid depth layer is laid out at drawn / layer
+  // scale px and drawn back down by the layer's scale.
   //
-  // Homes. The six homes sit in the free area right of the title block and
-  // the three speech bubbles (x 869 to 1782, y 8 to 628 of the 1812 by 636
-  // stage, which is exactly what placeWelcome's clamps allow): three across
-  // the top, the reserved bubble at the bottom left with its rim clear of the
-  // community art (which ends at x 890), two at the bottom right. No two home
-  // circles come within 10 px of each other.
+  // Homes. The reserved bubble sits at the left of the area right of the
+  // community art (its rim 4 px clear of the art, which ends at x 890). Two
+  // regular bubbles stack to its right and one floats in the open band above
+  // the art, right of the title words (which end near x 490; this bubble's
+  // rim never comes left of x 642). Each home owns a free disc (`cell`) that
+  // touches no other disc, the art, the speech bubbles or the stage edge, and
+  // a drifting bubble is kept on a leash inside its own disc, so no bubble
+  // ever covers another bubble's words.
   //
   // Paging is the last resort. Only the reserved bubble pages, only for a
-  // message too long to fit it whole, always at the floor so the pages are as
-  // few as possible, and only when every page is read (core shows a page for
-  // max(9, characters / 14) seconds) inside the time left in the scene. The
-  // dwell is read from S.dwell[1] every time it is needed.
+  // message too long to fit it whole at 480 px, always at the floor so the
+  // pages are as few as possible, and only when every page is read (core
+  // shows a page for max(9, characters / 14) seconds) inside the time left in
+  // the scene. The dwell is read from S.dwell[1] every time it is needed.
   const WELCOME_FONT_FLOOR = 18;
   const WELCOME_DEPTH_MIN = 0.9;
   const WELCOME_RIM_MARGIN = 0.03;
   const WELCOME_RIM_MARGIN_MIN = 12;
   const WELCOME_CONTENT_WIDTHS = [80, 74, 68];
-  const WELCOME_RESERVED_DRAWN = 334;
+  const WELCOME_RESERVED_DRAWN = 480;
+  // A drifting bubble needs at least this much leash, or it holds still.
+  const WELCOME_MIN_LEASH = 5;
 
-  // Fixed homes and drawn diameters, in stage px. Array order is DOM order.
+  // Fixed homes, maximum drawn diameters and free discs, in stage px. Array
+  // order is DOM order. `flight` is the way a bubble flies in from and out
+  // to, always away from the reserved bubble, the title and the art: the top
+  // bubbles rise, the bottom right one leaves to the right, and the reserved
+  // bubble turns and fades almost in place, so a 480 px bubble never sweeps
+  // across its neighbours' words.
   const WELCOME_SLOTS = [
-    { name: 'TL', layer: 'far', drawn: 274, cx: 1006, cy: 145, reserved: false },
-    { name: 'TC', layer: 'mid', drawn: 294, cx: 1306, cy: 155, reserved: false },
-    { name: 'TR', layer: 'near', drawn: 314, cx: 1625, cy: 165, reserved: false },
-    { name: 'R', layer: 'near', drawn: WELCOME_RESERVED_DRAWN, cx: 1057, cy: 461, reserved: true },
-    { name: 'BC', layer: 'far', drawn: 254, cx: 1365, cy: 501, reserved: false },
-    { name: 'BR', layer: 'far', drawn: 274, cx: 1645, cy: 491, reserved: false }
+    { name: 'T1', layer: 'mid', drawn: 308, cell: 312, cx: 796, cy: 164, reserved: false, from: 'top', flight: [-1, -1] },
+    { name: 'R', layer: 'near', drawn: WELCOME_RESERVED_DRAWN, cell: WELCOME_RESERVED_DRAWN, cx: 1134, cy: 384, reserved: true, from: 'place', flight: [0, -0.04] },
+    { name: 'R1', layer: 'far', drawn: 316, cell: 320, cx: 1478, cy: 168, reserved: false, from: 'top', flight: [1, -1] },
+    { name: 'R2', layer: 'near', drawn: 320, cell: 324, cx: 1618, cy: 464, reserved: false, from: 'right', flight: [1, 0] }
   ];
   const WELCOME_RESERVED_SLOT = WELCOME_SLOTS.find((s) => s.reserved);
   // The regular bubbles are filled smallest room first, so the fussiest
   // bubble gets first pick of the pool and the roomiest takes what is left.
-  const WELCOME_FILL_ORDER = ['BC', 'TL', 'BR', 'TC', 'TR'].map((name) => WELCOME_SLOTS.find((s) => s.name === name));
+  const WELCOME_FILL_ORDER = ['T1', 'R1', 'R2'].map((name) => WELCOME_SLOTS.find((s) => s.name === name));
 
   // Size steps, in drawn px on the 1920 wide TV. A message of at most
-  // `graphemes` grapheme clusters is drawn in a bubble of `diameter` with its
-  // words at `font`: the bubble grows and the words step smaller as the
-  // message grows. The 334 px rows belong to the reserved bubble, which keeps
-  // that size and only steps its words. The grapheme numbers come from
-  // measuring the real bubble markup with a two chip, fourteen character name
-  // record (see the round 5 result file); they choose the step, and the
-  // rendered text then has the last word.
-  const WELCOME_SIZE_STEPS = [
-    { graphemes: 36, diameter: 254, font: 22 },
-    { graphemes: 56, diameter: 264, font: 21 },
-    { graphemes: 80, diameter: 274, font: 20 },
-    { graphemes: 114, diameter: 294, font: 20 },
-    { graphemes: 136, diameter: 314, font: 20 },
-    { graphemes: 100, diameter: WELCOME_RESERVED_DRAWN, font: 24 },
-    { graphemes: 134, diameter: WELCOME_RESERVED_DRAWN, font: 22 },
-    { graphemes: 158, diameter: WELCOME_RESERVED_DRAWN, font: 20 },
-    { graphemes: 206, diameter: WELCOME_RESERVED_DRAWN, font: 18 }
+  // `graphemes` grapheme clusters starts in a bubble of `diameter` with its
+  // words at `font`; the rendered text then has the last word. Measured with
+  // a two chip, sixteen character name record: 40 graphemes need 253 px at 20
+  // px words, 80 need 282, 100 need 297; at 18 px, 140 need 302, 160 need 305,
+  // 250 need 355, 400 need 425 and 500 need 470 (compact name and chips).
+  const WELCOME_REGULAR_STEPS = [
+    { graphemes: 50, diameter: 276, font: 24 },
+    { graphemes: 100, diameter: 296, font: 22 }
+  ];
+  const WELCOME_RESERVED_STEPS = [
+    { graphemes: 140, diameter: 420, font: 28 },
+    { graphemes: 280, diameter: 448, font: 24 },
+    { graphemes: Infinity, diameter: WELCOME_RESERVED_DRAWN, font: 22 }
   ];
 
   // How far down the rotation Welcome measures records when it lays out.
@@ -154,12 +154,12 @@
 
   // A bubble that drifts breathes down to 0.9 of its size, so its words are
   // laid out at 20 drawn px to stay at or above the 18 px floor at every
-  // moment; a bubble that does not drift uses the floor itself.
-  function welcomeStatic(slot, r) {
-    return !!slot.reserved || !smallFits(r);
-  }
-  function welcomeFloorDrawn(slot, r) {
-    return welcomeStatic(slot, r) ? WELCOME_FONT_FLOOR : Math.ceil((WELCOME_FONT_FLOOR / WELCOME_DEPTH_MIN) * 10) / 10;
+  // moment; a bubble that holds still uses the floor itself.
+  const WELCOME_DRIFT_FLOOR = Math.ceil((WELCOME_FONT_FLOOR / WELCOME_DEPTH_MIN) * 10) / 10;
+  // How far a bubble of this drawn size may wander from its home and still
+  // stay inside the home's free disc.
+  function welcomeLeash(slot, drawn) {
+    return (slot.cell - drawn) / 2 - 1;
   }
   // Layout px for a drawn size in a depth layer: the element is that many px
   // wide and core draws it back down by the layer's scale.
@@ -185,7 +185,7 @@
 
   // The same inline styling core fitCircle applies for diameter d, plus the
   // content column width and message size this fit chose.
-  function welcomeStyleOrb(el, r, d, width, font) {
+  function welcomeStyleOrb(el, r, d, width, font, compact) {
     const content = el.querySelector('.orb-content'), msg = el.querySelector('.message');
     const title = el.querySelector('.recipient'), chipBox = el.querySelector('.chips');
     if (!content || !msg) return false;
@@ -197,8 +197,14 @@
         x.style.padding = '2px 4px';
       });
     }
-    if (d < 335) {
-      if (title) title.style.fontSize = '26px';
+    if (d < 335 || compact) {
+      // The compact name and chips core uses for small bubbles, also used for
+      // any bubble whose message needs the room.
+      el.querySelector('.orb')?.classList.remove('orb-large');
+      if (title) {
+        title.style.fontSize = (r.name.length > 16 ? 23 : 26) + 'px';
+        title.style.marginBottom = '7px';
+      }
       if (chipBox) {
         chipBox.querySelectorAll('.chip').forEach((x) => {
           x.style.fontSize = '10.5px';
@@ -246,15 +252,15 @@
   // The content column width at which the whole message fits inside a bubble
   // of layout diameter d with its words at `font` layout px, or null when it
   // does not fit at any of them.
-  function welcomeMeasure(host, r, d, font) {
-    const key = `${welcomeRecordKey(r)}|${d}|${font}`;
+  function welcomeMeasure(host, r, d, font, compact) {
+    const key = `${welcomeRecordKey(r)}|${d}|${font}|${compact ? 'c' : 's'}`;
     if (WELCOME_MEASURE_CACHE.has(key)) return WELCOME_MEASURE_CACHE.get(key);
     let out = null;
     if (host) {
       const el = welcomeProbe(host, r, d);
       const msg = el.querySelector('.message');
       for (const width of WELCOME_CONTENT_WIDTHS) {
-        if (!welcomeStyleOrb(el, r, d, width, font)) break;
+        if (!welcomeStyleOrb(el, r, d, width, font, compact)) break;
         msg.textContent = r.message;
         if (welcomeInside(el, d)) {
           out = width;
@@ -271,59 +277,65 @@
   // whose whole message fits a bubble of layout diameter d, or null when even
   // the floor does not hold it. Smaller words fit more, so this walks the
   // ladder by halving; the size it returns was measured, never inferred.
-  function welcomeFontThatFits(host, r, d, start, floor) {
+  function welcomeFontThatFits(host, r, d, start, floor, compact) {
     const steps = Math.max(0, Math.round((start - floor) * 2));
     const at = (i) => Math.round((floor + i * 0.5) * 10) / 10;
-    const floorWidth = welcomeMeasure(host, r, d, at(0));
+    const floorWidth = welcomeMeasure(host, r, d, at(0), compact);
     if (floorWidth === null) return null;
     let lo = 0, hi = steps;
     while (lo < hi) {
       const mid = Math.ceil((lo + hi) / 2);
-      if (welcomeMeasure(host, r, d, at(mid)) !== null) lo = mid;
+      if (welcomeMeasure(host, r, d, at(mid), compact) !== null) lo = mid;
       else hi = mid - 1;
     }
-    return { font: at(lo), width: welcomeMeasure(host, r, d, at(lo)) };
-  }
-
-  // The steps a slot can use. A regular bubble grows up to its own diameter;
-  // the reserved bubble always keeps its own diameter, so a short message
-  // there is drawn large rather than leaving a gap.
-  function welcomeStepsFor(slot) {
-    return WELCOME_SIZE_STEPS.filter((row) => (slot.reserved ? row.diameter === slot.drawn : row.diameter <= slot.drawn));
+    return { font: at(lo), width: welcomeMeasure(host, r, d, at(lo), compact) };
   }
 
   // How record r shows whole in this slot: the layout diameter, the layout
-  // message size and the content width, or null when its whole message
+  // message size, the content width, whether the compact name and chips are
+  // used and whether the bubble holds still, or null when its whole message
   // cannot be drawn there at the floor. Never pages.
   function welcomeFit(host, r, slot) {
-    const key = `${welcomeRecordKey(r)}|${slot.reserved ? 'R' : 'x'}|${slot.drawn}|${slot.layer}`;
+    const key = `${welcomeRecordKey(r)}|${slot.name}`;
     if (WELCOME_FIT_CACHE.has(key)) return WELCOME_FIT_CACHE.get(key);
     const fit = welcomeFitRaw(host, r, slot);
     if (host) WELCOME_FIT_CACHE.set(key, fit);
     return fit;
   }
 
+  function welcomeTry(host, r, slot, drawn, startFont, still, compact) {
+    const d = welcomeLayoutPx(drawn, slot.layer);
+    const floor = welcomeLayoutFont(still ? WELCOME_FONT_FLOOR : WELCOME_DRIFT_FLOOR, slot.layer);
+    const start = Math.max(floor, welcomeLayoutFont(startFont, slot.layer));
+    const hit = welcomeFontThatFits(host, r, d, start, floor, compact);
+    return hit ? { d, drawn, font: hit.font, width: hit.width, compact, still, graphemes: welcomeGraphemes(r.message), pages: [r.message] } : null;
+  }
+
   function welcomeFitRaw(host, r, slot) {
     if (!host) return null;
-    const rows = welcomeStepsFor(slot);
-    if (!rows.length) return null;
     const graphemes = welcomeGraphemes(r.message);
-    const floor = welcomeLayoutFont(welcomeFloorDrawn(slot, r), slot.layer);
-    const tryRow = (row) => {
-      const drawn = slot.reserved ? slot.drawn : Math.min(row.diameter, slot.drawn);
-      const d = welcomeLayoutPx(drawn, slot.layer);
-      const start = Math.max(floor, welcomeLayoutFont(row.font, slot.layer));
-      const hit = welcomeFontThatFits(host, r, d, start, floor);
-      return hit ? { d, drawn, font: hit.font, width: hit.width, graphemes, step: row.graphemes, pages: [r.message] } : null;
-    };
-    for (const row of rows) {
-      if (row.graphemes < graphemes) continue;
-      const fit = tryRow(row);
+    if (slot.reserved) {
+      // The reserved bubble holds still. It grows 420, 448, 480 with the
+      // message; the compact name and chips are used when the usual ones do
+      // not leave the words enough room, and always at 480.
+      for (const row of WELCOME_RESERVED_STEPS) {
+        if (row.graphemes < graphemes) continue;
+        for (const compact of row.diameter >= 450 ? [true] : [false, true]) {
+          const fit = welcomeTry(host, r, slot, row.diameter, row.font, true, compact);
+          if (fit) return fit;
+        }
+      }
+      return null;
+    }
+    // A regular bubble drifts on its leash while its message fits one of the
+    // steps with 20 px words; past that it takes its home's full size and
+    // holds still, words down to the floor.
+    for (const row of WELCOME_REGULAR_STEPS) {
+      if (row.graphemes < graphemes || welcomeLeash(slot, row.diameter) < WELCOME_MIN_LEASH) continue;
+      const fit = welcomeTry(host, r, slot, row.diameter, row.font, false, true);
       if (fit) return fit;
     }
-    // Past the last step for this slot (or a message the steps overrated):
-    // the biggest bubble the slot gives, words down to the floor.
-    return tryRow(rows[rows.length - 1]);
+    return welcomeTry(host, r, slot, slot.drawn, 20, true, true);
   }
 
   // Whether a record is long: its whole message fits no regular bubble at the
@@ -356,17 +368,17 @@
     if (!host) return null;
     const slot = WELCOME_RESERVED_SLOT;
     const d = welcomeLayoutPx(slot.drawn, slot.layer);
-    const font = welcomeLayoutFont(welcomeFloorDrawn(slot, r), slot.layer);
+    const font = welcomeLayoutFont(WELCOME_FONT_FLOOR, slot.layer);
     const el = welcomeProbe(host, r, d);
     const msg = el.querySelector('.message'), page = el.querySelector('.orb-page-indicator');
     if (!msg || !page) return null;
     page.hidden = false;
     let best = null;
     for (const width of WELCOME_CONTENT_WIDTHS) {
-      if (!welcomeStyleOrb(el, r, d, width, font)) break;
+      if (!welcomeStyleOrb(el, r, d, width, font, true)) break;
       page.textContent = '00 / 00 · CONTINUED';
       const pages = welcomePaginate(el, d, msg, r.message);
-      if (!best || pages.length < best.pages.length) best = { d, drawn: slot.drawn, font, width, graphemes: welcomeGraphemes(r.message), step: 0, pages };
+      if (!best || pages.length < best.pages.length) best = { d, drawn: slot.drawn, font, width, compact: true, still: true, graphemes: welcomeGraphemes(r.message), pages };
     }
     return best;
   }
@@ -512,7 +524,7 @@
     if (b) b.d = d;
     el.innerHTML = `<div class="orb-life">${completeOrb(r, d)}</div>`;
     bindNumbers(el);
-    welcomeStyleOrb(el, r, d, fit.width, fit.font);
+    welcomeStyleOrb(el, r, d, fit.width, fit.font, fit.compact);
     const msg = el.querySelector('.message'), page = el.querySelector('.orb-page-indicator');
     msg.textContent = fit.pages[0];
     page.hidden = fit.pages.length < 2;
@@ -523,6 +535,14 @@
     if (b) b.reading = reading;
     a._welcomeFitId = r.id;
     a._welcomeFitBorn = a.born;
+    // Holds still at its home's full size, drifts on a leash below it.
+    a.large = !!fit.still;
+    if (b) b.large = a.large;
+    a._welcomeLeash = fit.still || !slot ? 0 : Math.max(0, welcomeLeash(slot, fit.drawn));
+    if (slot) {
+      el.dataset.welcomeSlot = slot.name;
+      el.dataset.welcomeReserved = String(!!slot.reserved);
+    }
     log('welcome_bubble_fit', {
       id: r.id,
       slot: slot ? slot.name : '',
@@ -531,6 +551,7 @@
       drawn: fit.drawn,
       graphemes: fit.graphemes,
       font: fit.font,
+      still: !!fit.still,
       drawnFont: Math.round(fit.font * welcomeLayerScale(slot ? slot.layer : 'near') * 100) / 100,
       pages: fit.pages.length,
       verbatim: fit.pages.join('') === r.message
@@ -568,7 +589,7 @@
       for (const p of placements) {
         const d = p.fit ? p.fit.d : welcomeLayoutPx(p.slot.drawn, p.slot.layer);
         const x = Math.round(p.slot.cx - d / 2), y = Math.round(p.slot.cy - d / 2);
-        html += addOrb(p.r, x, y, d, { growMax: d, large: welcomeStatic(p.slot, p.r) });
+        html += addOrb(p.r, x, y, d, { growMax: d, large: p.fit ? !!p.fit.still : true });
         WELCOME_SLOT_LIMITS.set('slot-' + S.slotCounter, p.slot);
       }
       log('welcome_layout', {
@@ -707,6 +728,14 @@
   function integrateWelcome(a, dt) {
     if (a.life === 'exiting' && a._welcomeSeenLife !== 'exiting') {
       V.welcomeLastExit = V.clock;
+      // A bubble leaves away from the title and the art: the ones on the
+      // right fly off to the right as before, the others rise.
+      const slot = WELCOME_SLOT_LIMITS.get(a.key);
+      if (slot) {
+        a.exitDX = slot.flight[0] * 60 * a.rng();
+        a.exitDY = slot.flight[1] * (a.d + 200);
+        if (slot.from === 'right') a.exitDX = a.d + 350;
+      }
     }
     a._welcomeSeenLife = a.life;
     // Core has just chosen this bubble's next record: vet it once per exit.
@@ -757,6 +786,17 @@
       if (slot && a.life === 'entering') {
         a.homeX = slot.cx;
         a.homeY = slot.cy;
+        a.x = slot.cx;
+        a.y = slot.cy;
+        // It flies in from above, or from the right for the bottom right
+        // bubble, never across the title, the speech bubbles or the art.
+        if (slot.from === 'right') {
+          a.originX = 1812 + a.d;
+          a.originY = slot.cy + a.rng() * 40;
+        } else {
+          a.originX = slot.cx + slot.flight[0] * 60 * a.rng();
+          a.originY = slot.cy + slot.flight[1] * (slot.cy + a.d);
+        }
       }
       welcomeWithHost((host) => welcomeFitActor(a, host));
     }
@@ -807,21 +847,28 @@
       const maxY = 636 - half - 8;
       let renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
       let renderY = minY <= maxY ? clamp(y, minY, maxY) : (minY + maxY) / 2;
-      // A drifting bubble never rests over a large still bubble's words: it
-      // is drawn clear of every large steady bubble (by 2 px), then kept
-      // inside the stage.
-      if (!a.large && a.life === 'steady' && !S.still) {
-        for (const o of V.actors) {
-          if (o === a || !o.large || o.life !== 'steady' || o._welcomeRX === undefined) continue;
-          const dx = renderX - o._welcomeRX, dy = renderY - o._welcomeRY;
-          const dist = Math.hypot(dx, dy) || 1;
-          const min = half + o._welcomeRR + 2;
-          if (dist >= min) continue;
-          renderX += (dx / dist) * (min - dist);
-          renderY += (dy / dist) * (min - dist);
+      // A steady bubble stays inside its home's free disc: a still bubble
+      // sits on its home, a drifting one wanders on a leash. The discs touch
+      // nothing, so no bubble ever covers another bubble's words, the art,
+      // the speech bubbles or the title. The drift itself is pulled back too,
+      // so the bubble turns round at the end of its leash rather than stick.
+      const slot = WELCOME_SLOT_LIMITS.get(a.key);
+      if (slot && a.life === 'steady') {
+        const leash = S.still || a.large ? 0 : a._welcomeLeash || 0;
+        const dx = a.x - slot.cx, dy = a.y - slot.cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist > leash) {
+          const nx = dist ? dx / dist : 0, ny = dist ? dy / dist : 0;
+          a.x = slot.cx + nx * leash;
+          a.y = slot.cy + ny * leash;
+          const out = a.vx * nx + a.vy * ny;
+          if (out > 0) {
+            a.vx -= 1.6 * out * nx;
+            a.vy -= 1.6 * out * ny;
+          }
         }
-        if (minX <= maxX) renderX = clamp(renderX, minX, maxX);
-        if (minY <= maxY) renderY = clamp(renderY, minY, maxY);
+        renderX = a.x;
+        renderY = a.y;
       }
       a._welcomeRX = renderX;
       a._welcomeRY = renderY;
@@ -907,8 +954,8 @@
       const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
       const rimR = (a.d * a.screenScale) / 2;
       const angle = (V.clock * 1.6 * L.pace + (a.phase || 0)) % TAU;
-      const gx = a.screenX + Math.cos(angle) * rimR;
-      const gy = a.screenY + Math.sin(angle) * rimR;
+      const gx = (a._welcomeRX ?? a.screenX) + Math.cos(angle) * rimR;
+      const gy = (a._welcomeRY ?? a.screenY) + Math.sin(angle) * rimR;
       const sparkR = 2.4 * a.screenScale;
       const sparkOp = 0.85 * a.opacity;
       drawSpark(c, gx, gy, sparkR, sparkOp, '#fff9');
@@ -935,10 +982,14 @@
     ],
     floaters: true,
     fxCanvas: true,
-    // Height extended from 347 to 512 (Plan 17): the three fixed speech
-    // bubbles reach down to y 516, past the title block this keepOut box
-    // originally covered, so a drifting bubble could wander into them.
-    keepOut: () => [{ x: 0, y: 10, w: 855, h: 512 }],
+    // Round 5 review: two boxes, the title words and the speech bubbles with
+    // the community art, so the bubble that floats in the open band above
+    // the art is not steered out of its home. Each bubble's leash, not this
+    // steering, is what keeps it clear of them.
+    keepOut: () => [
+      { x: 0, y: 10, w: 600, h: 330 },
+      { x: 0, y: 345, w: 890, h: 291 }
+    ],
     replaceMode: 'drift'
   });
 })();
