@@ -18,7 +18,7 @@ const ARRIVAL_SINGLE={x:1300,y:486,layout:540,drawn:760};
 // clear gap between neighbours and keeps every ring clear of the title, the
 // caption, the waiting pill and the frame edge. They are laid out at 300 and
 // drawn at 400, so the words are drawn a third larger than they are measured.
-const ARRIVAL_GROUP={cx:906,cy:500,layout:300,drawn:400,slots:[[286,340],[906,340],[1526,340],[596,660],[1216,660]]};
+const ARRIVAL_GROUP={cx:906,cy:500,layout:300,drawn:400,show:21,slots:[[286,340],[906,340],[1526,340],[596,660],[1216,660]]};
 const ARRIVAL_PAIR={layout:518,drawn:720,x:[506,1306],y:490};
 
 let ARRIVAL_FRAME_BAG=[];

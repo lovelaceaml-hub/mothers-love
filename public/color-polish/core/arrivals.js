@@ -38,7 +38,8 @@ function buildEvent(){
   // A multi page bubble cycles its pages at the reader's own floor of 9 seconds,
   // so the hold counts the same floor or the last page never comes up.
   const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(b.reading.pages.length>1?9:8,s.length/14),0)));
-  a.hold=group?Math.max(30,longest):Math.max(8,longest);
+  // A group wave reads for ARRIVAL_GROUP.show seconds in all; a long message splits that time evenly across its pages.
+  a.hold=group?ARRIVAL_GROUP.show:Math.max(8,longest);
  }
  $('qr-zone').classList.add('qr-active');
  drawEventParticles(0);
@@ -68,7 +69,7 @@ function tickEvent(dt){
   if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
  }else if(a.phase==='reading'){
   a.localTime=elapsed;
-  a.elements.forEach((b,i)=>{tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
+  a.elements.forEach((b,i)=>{if(a.kind==='group')b.reading.duration=Math.min(b.reading.duration,a.hold/b.reading.pages.length);if(elapsed<a.hold)tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
   if(elapsed>=a.hold){
    if(a.oversize&&a.page<groupPageCount(a)-1){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
    else{
