@@ -15,6 +15,18 @@
   }
 }
 
+/* The field the four bubbles live in. A bubble flying in or out travels its
+   whole flight, which carries it past the edge of the stage, and a box drawn
+   past the right or the bottom edge of the scene would widen the scene's
+   scroll box. `overflow: clip` with no clip margin keeps that out of the
+   scroll box without making the field a scroll container. Steady bubbles sit
+   at least 8 px inside the field, so their 6 px rings are never cut. */
+#tv .scene[data-scene="1"] .welcome-field {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+}
+
 #tv .scene[data-scene="1"] .orb-slot {
   border-radius: 50%;
   isolation: isolate;

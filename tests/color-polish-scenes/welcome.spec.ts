@@ -218,42 +218,157 @@ test('scene replaces at least one bubble within 30 s', async ({ page }) => {
   expect(hasTransitioningActor || hasDifferentId).toBe(true);
 });
 
-// Plan 17: the enter and exit spin turns the words (.orb-content, via the
-// rotate property) inside the circle, so a spinning bubble at the stage edge
-// never widens the scene's scroll box with the corners of a rotated square.
-test('entering bubble has non-zero rotate angle on its words', async ({ page }) => {
-  let foundEntering = false;
-  for (const checkpoint of [13500, 14000, 15000]) {
-    const testPage = await page.context().newPage();
-    const { frame } = await openStudioScene(testPage, 'welcome', checkpoint);
-    const enteringSlots = await frame.evaluate(() => {
-      const runtime = (window as any).colorPolishRuntime;
-      const state = runtime.visualState();
-      const enteringActors = state.actors.filter((a: any) => a.life === 'entering');
-      if (!enteringActors.length) return [];
-      const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
-      return enteringActors.map((actor: any) => {
-        const el = slots.find((s) => s.dataset.recordId === actor.id);
-        const words = el?.querySelector<HTMLElement>('.orb-content');
-        return words ? words.style.rotate : '';
-      }).filter(Boolean);
-    });
-    await testPage.close();
+// Plan 17 round 6, Anthony after watching round 5 on the church TV: "the
+// bubbles leaving and entering needs to be fixed. only the text in the
+// bubbles roll away. it looks weird. they need to be together and leave
+// together." A bubble flying in or out is one object now. The whole scene
+// clock is walked in fifth of a second steps, and every moment a bubble is in
+// flight is judged on three things at once:
+//   1. its words carry no turn of their own, so they can never roll away from
+//      their circle;
+//   2. while the bubble is drawn at all it sits exactly where its flight puts
+//      it, so the circle travels with the words instead of being pinned on
+//      its home by the steady clamp;
+//   3. the scene gains no scroll box while a bubble crosses the stage edge.
+// All three fail against the round 5 code, where the words carried a rotate
+// property of their own and the circle was clamped inside the stage.
+test('a bubble flying in or out travels as one object: its words never turn, the whole bubble follows its flight, and the scene gains no scroll box', async ({ page }) => {
+  test.setTimeout(240000);
+  // Eight short messages at a 60 s dwell: every bubble is replaced while the
+  // scene is still Welcome, so the walk below sees whole flights in and out.
+  const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool([40, 55, 70, 85, 100, 130, 45, 60], 60) });
 
-    if (enteringSlots.length > 0) {
-      foundEntering = true;
-      for (const rotate of enteringSlots) {
-        const match = rotate.match(/^([-0-9.]+)deg$/);
-        expect(match, `rotate property on the words: ${rotate}`).not.toBeNull();
-        const angle = parseFloat(match![1]);
-        expect(Math.abs(angle)).toBeGreaterThan(0);
-      }
-      break;
+  const sample = async () =>
+    await frame.evaluate(() => {
+      const state = (window as any).colorPolishRuntime.visualState();
+      const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="1"]')!;
+      const sceneRect = scene.getBoundingClientRect();
+      const toStage = 1812 / sceneRect.width;
+      const slots = Array.from(
+        document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .orb-slot'),
+      ).filter((s) => !s.closest('[data-welcome-measure]'));
+      const flying = state.actors
+        .filter((actor: any) => actor.life === 'entering' || actor.life === 'exiting')
+        .map((actor: any) => {
+          const el = slots.find((s) => s.dataset.recordId === actor.id);
+          if (!el) return null;
+          const words = el.querySelector<HTMLElement>('.orb-content');
+          const rect = el.getBoundingClientRect();
+          const style = words ? window.getComputedStyle(words) : null;
+          return {
+            id: actor.id as string,
+            life: actor.life as string,
+            reserved: el.dataset.welcomeReserved === 'true',
+            opacity: parseFloat(window.getComputedStyle(el).opacity),
+            rotate: style ? style.rotate : 'none',
+            wordsTransform: style ? style.transform : 'none',
+            drawnCx: (rect.left + rect.width / 2 - sceneRect.left) * toStage,
+            drawnCy: (rect.top + rect.height / 2 - sceneRect.top) * toStage,
+            flightX: actor.x as number,
+            flightY: actor.y as number,
+          };
+        })
+        .filter(Boolean);
+      return {
+        clock: state.clock as number,
+        scroll: {
+          scrollWidth: scene.scrollWidth,
+          clientWidth: scene.clientWidth,
+          scrollHeight: scene.scrollHeight,
+          clientHeight: scene.clientHeight,
+        },
+        flying: flying as Array<{
+          id: string;
+          life: string;
+          reserved: boolean;
+          opacity: number;
+          rotate: string;
+          wordsTransform: string;
+          drawnCx: number;
+          drawnCy: number;
+          flightX: number;
+          flightY: number;
+        }>,
+      };
+    });
+
+  // A rotation of the words would show up either as the rotate property or as
+  // the b and c terms of their transform matrix. Both are read from the
+  // computed style, not from anything welcome.js wrote.
+  const turned = (rotate: string, transform: string): boolean => {
+    if (rotate && rotate !== 'none' && !/^0(deg|rad|grad|turn)?$/.test(rotate.trim())) return true;
+    const parts = transform.match(/^matrix\(([^)]*)\)$/);
+    if (!parts) return false;
+    const n = parts[1].split(',').map((v) => parseFloat(v));
+    return Math.abs(n[1]) > 1e-4 || Math.abs(n[2]) > 1e-4;
+  };
+
+  const problems: string[] = [];
+  // Distance covered by each flight, keyed while the same bubble stays in the
+  // same phase. A phase that is cut off by the end of the walk is dropped.
+  type Flight = { id: string; life: string; reserved: boolean; travel: number; steps: number; cx: number; cy: number };
+  let open = new Map<string, Flight>();
+  const finished: Flight[] = [];
+  let sawFlight = 0;
+
+  for (let step = 0; step <= 130; step++) {
+    if (step) await frame.evaluate(() => (window as any).colorPolishRuntime.step(200));
+    const s = await sample();
+    const at = `${s.clock.toFixed(1)} s`;
+
+    if (s.scroll.scrollWidth > s.scroll.clientWidth) {
+      problems.push(`${at}: scene scroll width ${s.scroll.scrollWidth} over client width ${s.scroll.clientWidth}`);
     }
+    if (s.scroll.scrollHeight > s.scroll.clientHeight) {
+      problems.push(`${at}: scene scroll height ${s.scroll.scrollHeight} over client height ${s.scroll.clientHeight}`);
+    }
+
+    const next = new Map<string, Flight>();
+    for (const f of s.flying) {
+      sawFlight++;
+      const key = `${f.id}|${f.life}`;
+      if (turned(f.rotate, f.wordsTransform)) {
+        problems.push(`${at}: the words of ${f.id} turn on their own while ${f.life} (rotate ${f.rotate}, transform ${f.wordsTransform})`);
+      }
+      // Where the bubble is drawn against where its flight says it is. Only
+      // while it is drawn: once it has faded out nothing is on screen to
+      // judge.
+      if (f.opacity > 0.1) {
+        const off = Math.hypot(f.drawnCx - f.flightX, f.drawnCy - f.flightY);
+        if (off > 1.5) {
+          problems.push(
+            `${at}: ${f.id} is drawn at ${f.drawnCx.toFixed(1)},${f.drawnCy.toFixed(1)} while ${f.life}, ` +
+              `${off.toFixed(1)} px from its flight at ${f.flightX.toFixed(1)},${f.flightY.toFixed(1)}`,
+          );
+        }
+      }
+      const was = open.get(key);
+      next.set(key, {
+        id: f.id,
+        life: f.life,
+        reserved: f.reserved,
+        travel: was ? was.travel + Math.hypot(f.drawnCx - was.cx, f.drawnCy - was.cy) : 0,
+        steps: was ? was.steps + 1 : 1,
+        cx: f.drawnCx,
+        cy: f.drawnCy,
+      });
+    }
+    for (const [key, flight] of open) if (!next.has(key)) finished.push(flight);
+    open = next;
   }
 
-  if (!foundEntering) {
-    console.log('No actor in entering state was sampled at checkpoints; test passed vacuously.');
+  expect(sawFlight, 'the walk saw bubbles in flight').toBeGreaterThan(10);
+  expect(problems, `flight problems: ${problems.slice(0, 6).join(' | ')}`).toHaveLength(0);
+
+  // The reserved bubble is the one the layout deliberately drifts and fades
+  // almost in place, so the travel is read from the three regular bubbles.
+  const regular = finished.filter((f) => !f.reserved && f.steps >= 8);
+  expect(regular.length, `whole flights of a regular bubble seen: ${JSON.stringify(finished)}`).toBeGreaterThanOrEqual(2);
+  for (const f of regular) {
+    expect(
+      f.travel,
+      `${f.id} covers ground while ${f.life} (it must fly, not hold its place): ${f.travel.toFixed(1)} px over ${f.steps} steps`,
+    ).toBeGreaterThan(150);
   }
 });
 
