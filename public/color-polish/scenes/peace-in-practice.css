@@ -5,8 +5,10 @@
 
    Every class the scene's markup uses (.eyebrow, .subheading, .heart-host,
    .floating-heart, .orb-slot, .orb, ...) already ships in renderer.css, so the
-   only rule needed here is the one for the heart canvas that replaced the flat
-   heart image. Every selector is scoped to this scene's root.
+   only rules needed here are the one for the heart canvas that replaced the
+   flat heart image, and the soft change of words inside the reserved bubble,
+   which stays in its place while one message hands over to the next. Every
+   selector is scoped to this scene's root.
 */
 
 #tv .scene[data-scene='9'] .pip-heart {
@@ -21,5 +23,25 @@
   #tv .scene[data-scene='9'] .pip-heart {
     animation: none;
     transition: none;
+  }
+}
+
+/* The reserved bubble's words fade out, and the next message's words fade in. */
+#tv .scene[data-scene='9'] .orb-slot.pip-words-out .orb-content {
+  animation: pip-words-out 0.6s ease both;
+}
+#tv .scene[data-scene='9'] .orb-slot.pip-words-in .orb-content {
+  animation: pip-words-in 0.9s ease both;
+}
+@keyframes pip-words-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pip-words-in { from { opacity: 0; } to { opacity: 1; } }
+#tv.still .scene[data-scene='9'] .orb-slot .orb-content {
+  animation: none;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  #tv .scene[data-scene='9'] .orb-slot .orb-content {
+    animation: none;
+    opacity: 1;
   }
 }

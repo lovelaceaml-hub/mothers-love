@@ -12,6 +12,11 @@ import { buildActiveDisplayFixture, circularity, loadRenderer } from './helpers'
 //      and the reserved bubble is never empty.
 //   2. The big turning heart is a real solid with thickness, not a flat image
 //      that thinned to a card edge as it span.
+// The Lane 10 review then brought the reserved bubble to the same behaviour as
+// the one on We Are Peacemakers (it changes its message where it stands, a
+// message stays at least 18 seconds, and the next one is only taken if there
+// is time left to read it), and redrew the heart as a smooth, glossy solid a
+// little under half as thick as it is wide.
 //
 // These specs drive the renderer through loadRenderer's /probe harness rather
 // than openStudioScene's /admin/login sign-in flow, which fails to reach
@@ -65,6 +70,28 @@ const short = (n: number, extra: Partial<{ expressionIds: number[] }> = {}) =>
 // Pool A: every record fits a regular bubble whole.
 const allShortFixture = buildActiveDisplayFixture({
   recognitions: [1, 2, 3, 4, 5, 6].map((n) => short(n)),
+});
+
+// A pool with this scene's seconds set in the saved playlist, which is where
+// the TV reads the dwell from.
+const playlistFixture = (records: unknown[], seconds = 60) => buildActiveDisplayFixture({
+  recognitions: records,
+  presentation: {
+    version: 'color-polish-v6',
+    enabled: true,
+    playlist: [
+      ['welcome', 60],
+      ['garden', 180],
+      ['featured', 60],
+      ['calendar', 60],
+      ['peacemakers', 60],
+      ['status', 60],
+      ['expressions', 60],
+      ['peace-in-practice', seconds],
+      ['orbit', 60],
+      ['milestone', 60],
+    ].map(([id, durationSeconds]) => ({ id, enabled: true, durationSeconds })),
+  },
 });
 
 // Pool B: three short records plus one 250, one 400 and one 500 grapheme
@@ -147,6 +174,45 @@ function messagesOf(fixture: Record<string, unknown>) {
   return map;
 }
 
+const RESERVED_CENTRE = { x: 1500, y: 332 };
+// The illustration (turning heart, raised hands, flowers) and the title copy,
+// in stage pixels: the scene's own two keep out boxes.
+const ARTWORK = { x: 0, y: 250, w: 700, h: 386 };
+const TITLE = { x: 0, y: 10, w: 870, h: 276 };
+
+type Actor = { key: string; id: string; life: string; x: number; y: number; d: number; opacity: number; reserved: boolean };
+
+// Every bubble as the TV is drawing it this frame (screen position, so a
+// bubble that is flying in is measured where it is, not where it will rest).
+async function actorsNow(frame: Frame): Promise<Actor[]> {
+  return await frame.evaluate(() => {
+    const key = (window as any).pipReservedSlotKey();
+    const visual = (0, eval)('V');
+    return visual.actors.map((actor: any) => ({
+      key: actor.key,
+      id: actor.id,
+      life: actor.life,
+      x: actor.screenX ?? actor.x,
+      y: actor.screenY ?? actor.y,
+      d: actor.d,
+      opacity: actor.opacity ?? 1,
+      reserved: actor.key === key,
+    }));
+  });
+}
+
+// How far a circle reaches into a box, in pixels (negative when it is clear).
+function reachInto(actor: { x: number; y: number; d: number }, box: { x: number; y: number; w: number; h: number }) {
+  const nearestX = Math.min(Math.max(actor.x, box.x), box.x + box.w);
+  const nearestY = Math.min(Math.max(actor.y, box.y), box.y + box.h);
+  return actor.d / 2 - Math.hypot(actor.x - nearestX, actor.y - nearestY);
+}
+
+async function reservedReports(frame: Frame) {
+  return await frame.evaluate(() => ((window as any).colorPolishRuntime.getState().log || [])
+    .filter((entry: any) => entry.type === 'pip_reserved'));
+}
+
 // Bounding box of the painted pixels of the heart canvas, in canvas pixels.
 // Reading the canvas back is what makes the flat card case fail: a flat image
 // turned ninety degrees has almost no width, a solid keeps most of it.
@@ -166,10 +232,14 @@ async function heartSilhouette(frame: Frame) {
     let minY = Infinity;
     let maxY = -Infinity;
     let painted = 0;
+    const rowWidth = new Array(canvas.height).fill(0);
+    const columnTop = new Array(canvas.width).fill(-1);
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
         if (data[(y * canvas.width + x) * 4 + 3] > 16) {
           painted++;
+          rowWidth[y]++;
+          if (columnTop[x] < 0) columnTop[x] = y;
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
@@ -177,11 +247,23 @@ async function heartSilhouette(frame: Frame) {
         }
       }
     }
-    if (!painted) return { width: 0, height: 0, painted: 0, canvasWidth: canvas.width, drawnWidth: canvas.getBoundingClientRect().width };
+    if (!painted) return { width: 0, height: 0, painted: 0, upperWidth: 0, lowerWidth: 0, widestAt: 0, cleft: 0, canvasWidth: canvas.width, drawnWidth: canvas.getBoundingClientRect().width };
+    const height = maxY - minY + 1;
+    let widest = 0;
+    let widestRow = minY;
+    for (let y = minY; y <= maxY; y++) if (rowWidth[y] > widest) { widest = rowWidth[y]; widestRow = y; }
     return {
       width: maxX - minX + 1,
-      height: maxY - minY + 1,
+      height,
       painted,
+      // Painted width a quarter of the way down and four fifths of the way
+      // down, and how far down the widest row sits (0 top, 1 bottom).
+      upperWidth: rowWidth[Math.round(minY + height * 0.25)],
+      lowerWidth: rowWidth[Math.round(minY + height * 0.8)],
+      widestAt: (widestRow - minY) / height,
+      // How far the dip between the two lobes drops below the lobe tops, as a
+      // share of the height, on the middle column.
+      cleft: (columnTop[Math.round((minX + maxX) / 2)] - minY) / height,
       canvasWidth: canvas.width,
       drawnWidth: canvas.getBoundingClientRect().width,
     };
@@ -290,6 +372,140 @@ test('several very long recognitions take turns in the reserved bubble and leave
   expect(seen.size, `the reserved bubble should show more than one of the very long records, saw ${[...seen].join(', ')}`).toBeGreaterThan(1);
 });
 
+test('with no very long recognition waiting, the reserved bubble still refreshes, in place and never empty', async ({ page }) => {
+  test.setTimeout(180000);
+  const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9, ms: 1000 });
+  const seen = new Set<string>();
+  const texts = messagesOf(allShortFixture);
+
+  for (let second = 0; second < 58; second++) {
+    const actors = await actorsNow(frame);
+    const reserved = actors.find((actor) => actor.reserved);
+    // Never empty, never moved, never burst or flown off, at any moment.
+    expect(reserved, `no reserved bubble at ${second} s`).toBeTruthy();
+    expect(reserved!.id).toBeTruthy();
+    expect(reserved!.life).toBe('steady');
+    expect(reserved!.opacity).toBe(1);
+    expect(Math.abs(reserved!.x - RESERVED_CENTRE.x)).toBeLessThan(1);
+    expect(Math.abs(reserved!.y - RESERVED_CENTRE.y)).toBeLessThan(1);
+    seen.add(reserved!.id);
+    // No message is on screen twice, and every settled bubble shows its whole message.
+    expect(new Set(actors.map((actor) => actor.id)).size).toBe(actors.length);
+    for (const bubble of await bubbles(frame)) {
+      expect(bubble.pages).toBe(1);
+      expect(bubble.text).toBe(texts.get(bubble.id));
+    }
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+  }
+
+  // Over a 60 second showing the biggest bubble shows more than one message,
+  // and each one stays at least 18 seconds.
+  expect(seen.size).toBeGreaterThanOrEqual(2);
+  const reports = await reservedReports(frame);
+  expect(reports.length).toBeGreaterThanOrEqual(2);
+  for (let i = 1; i < reports.length; i++) {
+    expect(reports[i].at - reports[i - 1].at).toBeGreaterThanOrEqual(18);
+  }
+});
+
+test('on the live playlist, the reserved bubble only takes a message there is still time to read', async ({ page }) => {
+  test.setTimeout(180000);
+  const frame = await loadRenderer(page, { fixture: playlistFixture(threeLongFixture.recognitions as unknown[]), scene: 9 });
+  // The probe harness pins the scene, which the church TV does not. Unpin it
+  // so the scene runs on its playlist dwell, as it does on the TV.
+  await frame.evaluate(() => { (0, eval)('S').sceneControlled = false; });
+
+  for (let step = 0; step < 31; step++) {
+    const scene = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+    if (scene !== 9) break;
+    const reserved = (await bubbles(frame)).find((bubble) => bubble.large);
+    expect(reserved?.pages).toBe(1);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
+
+  const reports = await reservedReports(frame);
+  expect(reports.length).toBeGreaterThanOrEqual(2);
+  expect(reports[0].veryLong).toBe(true);
+  for (const report of reports) {
+    expect(report.pages).toBe(1);
+    expect(report.dwell).toBe(60);
+    expect(report.sceneAge + report.readSeconds, `${report.id} arrived too late to be read`).toBeLessThanOrEqual(report.dwell);
+  }
+});
+
+test('the scene reads its dwell from the saved playlist, not from a constant', async ({ page }) => {
+  const frame = await loadRenderer(page, { fixture: playlistFixture(allShortFixture.recognitions as unknown[], 45), scene: 9 });
+  const reports = await reservedReports(frame);
+  expect(reports[0].dwell).toBe(45);
+});
+
+test('the reserved bubble eases to the size the next message needs, and its words are whole at every size', async ({ page }) => {
+  test.setTimeout(180000);
+  const pool = [
+    short(1), short(2), short(3),
+    record({ id: 'pip-grow-250', recipient: 'Grow Friend A', message: message(250), expressionIds: [4] }),
+    record({ id: 'pip-grow-500', recipient: 'Grow Friend B', message: message(500), expressionIds: [6] }),
+  ];
+  const fixture = buildActiveDisplayFixture({ recognitions: pool });
+  const frame = await loadRenderer(page, { fixture, scene: 9 });
+  const texts = messagesOf(fixture);
+  const sizes = new Map<string, number>();
+  const fonts = new Map<string, number>();
+  let between = 0;
+  for (let step = 0; step < 300; step++) {
+    const reserved = (await bubbles(frame)).find((bubble) => bubble.large)!;
+    if ([456, 504, 552].includes(reserved.d)) {
+      sizes.set(reserved.id, reserved.d);
+      fonts.set(reserved.id, reserved.fontPx);
+      expect(reserved.text).toBe(texts.get(reserved.id));
+      expect(reserved.pages).toBe(1);
+      expect(reserved.fontPx).toBeGreaterThanOrEqual(18);
+    } else {
+      between++;
+    }
+    expect(Math.round(reserved.x + reserved.d / 2)).toBe(RESERVED_CENTRE.x);
+    expect(Math.round(reserved.y + reserved.d / 2)).toBe(RESERVED_CENTRE.y);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(250));
+  }
+  // The longer the message, the larger the circle and the smaller the words.
+  expect(sizes.get('pip-grow-250')).toBe(504);
+  expect(sizes.get('pip-grow-500')).toBe(552);
+  expect(fonts.get('pip-grow-500')!).toBeLessThan(fonts.get('pip-grow-250')!);
+  // The change of size was eased, not a jump: some frames were in between.
+  expect(between).toBeGreaterThan(0);
+});
+
+test('across a 60 second showing no bubble covers the heading, the artwork or the reserved bubble', async ({ page }) => {
+  test.setTimeout(180000);
+  const frame = await loadRenderer(page, { fixture: mixedFixture, scene: 9 });
+  let steady = 0;
+  let flying = 0;
+  for (let step = 0; step < 120; step++) {
+    const actors = await actorsNow(frame);
+    const reserved = actors.find((actor) => actor.reserved)!;
+    expect(reserved).toBeTruthy();
+    for (const actor of actors) {
+      if (actor.reserved || actor.opacity < 0.05) continue;
+      const intoReserved = actor.d / 2 + reserved.d / 2 - Math.hypot(actor.x - reserved.x, actor.y - reserved.y);
+      if (actor.life === 'steady') {
+        steady++;
+        expect(reachInto(actor, ARTWORK), `${actor.id} sits over the artwork at step ${step}`).toBeLessThan(24);
+        expect(reachInto(actor, TITLE), `${actor.id} sits over the heading at step ${step}`).toBeLessThan(24);
+        expect(intoReserved, `${actor.id} sits over the reserved bubble at step ${step}`).toBeLessThan(36);
+      } else {
+        // A bubble on its way in rises from below its resting place, so it
+        // never slides under the reserved bubble or across the heading.
+        flying++;
+        expect(intoReserved, `${actor.id} flies under the reserved bubble at step ${step}`).toBeLessThan(70);
+        expect(reachInto(actor, TITLE), `${actor.id} flies across the heading at step ${step}`).toBeLessThan(24);
+      }
+    }
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(500));
+  }
+  expect(steady).toBeGreaterThan(100);
+  expect(flying).toBeGreaterThan(4);
+});
+
 test('the reserved bubble clears the heading, the heart artwork and the other bubbles', async ({ page }) => {
   const frame = await loadRenderer(page, { fixture: mixedFixture, scene: 9, ms: 2000 });
   const drawn = await bubbles(frame);
@@ -364,8 +580,8 @@ test('no message text drops below the 18 px floor, and the TV is drawn at double
   expect(scale).toBeCloseTo(2, 1);
 });
 
-test('the turning heart keeps most of its width edge on at 1920 and at 3840', async ({ page }) => {
-  test.setTimeout(120000);
+test('the turning heart is a solid a little under half as thick as it is wide, at 1920 and at 3840', async ({ page }) => {
+  test.setTimeout(240000);
   for (const width of [1920, 3840]) {
     const frame = await loadAt(page, width, { fixture: allShortFixture, scene: 9 });
 
@@ -374,22 +590,96 @@ test('the turning heart keeps most of its width edge on at 1920 and at 3840', as
     const face = await heartSilhouette(frame);
     expect(face, `no heart canvas at ${width}`).toBeTruthy();
     expect(face!.painted).toBeGreaterThan(10000);
+    // Face on it is a heart: about as wide as it is tall, with a dip between
+    // the two lobes. The live artwork is 278 px wide in the 390 px box.
+    expect(face!.width / face!.height).toBeGreaterThan(0.95);
+    expect(face!.width / face!.height).toBeLessThan(1.08);
+    expect(face!.cleft, 'no dip between the lobes').toBeGreaterThan(0.06);
+    expect(face!.width / face!.canvasWidth).toBeGreaterThan(0.69);
+    expect(face!.width / face!.canvasWidth).toBeLessThan(0.74);
 
     const edgeAngle = await stepToAngle(frame, 270);
     expect(Math.abs(edgeAngle - 270)).toBeLessThan(1);
     const edge = await heartSilhouette(frame);
 
-    // A flat card turned edge on has a width near zero. A solid keeps its
-    // thickness: this heart is 21 model units thick against 32 wide.
-    expect(
-      edge!.width / face!.width,
-      `edge on width ${edge!.width} against face on width ${face!.width} at ${width}`,
-    ).toBeGreaterThan(0.5);
-    expect(edge!.height).toBeGreaterThan(face!.height * 0.9);
-    // The canvas holds 780 pixels across a 390 px box, so it is one canvas
-    // pixel per device pixel on the 3840 wide TV and supersampled at 1920.
-    expect(edge!.canvasWidth).toBe(780);
-    expect(edge!.drawnWidth).toBeCloseTo(width === 3840 ? 780 : 390, 0);
+    // A flat card turned edge on has a width near zero (the live image
+    // measured 0.03). A puffed balloon heart is 40 to 50 percent as thick as
+    // it is wide; the first solid drawn for this lane was 0.66 and read as an
+    // egg. Both must fail here.
+    const thickness = edge!.width / face!.width;
+    expect(thickness, `edge on width ${edge!.width} against face on width ${face!.width} at ${width}`).toBeGreaterThan(0.4);
+    expect(thickness, `edge on width ${edge!.width} against face on width ${face!.width} at ${width}`).toBeLessThan(0.5);
+    expect(edge!.height).toBeGreaterThan(face!.height * 0.95);
+    // Edge on it still hints at a heart: fuller behind the lobes, tapering to
+    // the point. An egg is widest in the middle and as wide below as above.
+    expect(edge!.widestAt, 'the widest part should be in the upper half').toBeLessThan(0.45);
+    expect(edge!.upperWidth / edge!.lowerWidth, 'edge on, the heart should taper toward the point').toBeGreaterThan(1.6);
+
+    // One canvas pixel per TV pixel: 390 across at 1920, 780 across at 3840.
+    expect(edge!.canvasWidth).toBe(width === 3840 ? 780 : 390);
+    expect(edge!.drawnWidth).toBeCloseTo(edge!.canvasWidth, 0);
+  }
+});
+
+test('the heart surface is smooth: no bands, streaks or seam, at 1920 and at 3840', async ({ page }) => {
+  test.setTimeout(240000);
+  for (const width of [1920, 3840]) {
+    const frame = await loadAt(page, width, { fixture: allShortFixture, scene: 9 });
+    await stepToAngle(frame, 180);
+    const surface = await frame.evaluate(() => {
+      const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas')!;
+      const copy = document.createElement('canvas');
+      copy.width = canvas.width;
+      copy.height = canvas.height;
+      const context = copy.getContext('2d')!;
+      context.drawImage(canvas, 0, 0);
+      const W = canvas.width;
+      const H = canvas.height;
+      const data = context.getImageData(0, 0, W, H).data;
+      const scale = W / 390;
+      const margin = Math.round(4 * scale);
+      const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < W && y < H && data[(y * W + x) * 4 + 3] === 255;
+      const light = (x: number, y: number) => {
+        const k = (y * W + x) * 4;
+        return 0.2126 * data[k] + 0.7152 * data[k + 1] + 0.0722 * data[k + 2];
+      };
+      // Interior pixels only: a few pixels in from the outline.
+      const inside = (x: number, y: number) => solid(x, y) && solid(x - margin, y) && solid(x + margin, y) && solid(x, y - margin) && solid(x, y + margin);
+      let largestStep = 0;
+      let largestBend = 0;
+      let seam = 0;
+      let measured = 0;
+      const middle = Math.round(W / 2);
+      for (let y = 1; y < H - 1; y++) {
+        for (let x = 2; x < W - 2; x++) {
+          if (!inside(x, y) || !inside(x + 1, y) || !inside(x - 1, y) || !inside(x, y + 1) || !inside(x, y - 1)) continue;
+          measured++;
+          const here = light(x, y);
+          const across = Math.abs(light(x + 1, y) - here);
+          const down = Math.abs(light(x, y + 1) - here);
+          if (across > largestStep) largestStep = across;
+          if (down > largestStep) largestStep = down;
+          // A band, a streak or a seam is a line where the shade changes
+          // direction sharply; a smooth surface bends only gently.
+          const bendAcross = Math.abs(light(x + 1, y) - 2 * here + light(x - 1, y));
+          const bendDown = Math.abs(light(x, y + 1) - 2 * here + light(x, y - 1));
+          if (bendAcross > largestBend) largestBend = bendAcross;
+          if (bendDown > largestBend) largestBend = bendDown;
+        }
+      }
+      // A seam down the middle shows as a jump in shade from just left of the
+      // centre line to just right of it, over the lower two thirds.
+      for (let y = Math.round(H * 0.4); y < Math.round(H * 0.8); y++) {
+        const gap = Math.round(3 * scale);
+        if (!inside(middle - gap, y) || !inside(middle + gap, y)) continue;
+        seam = Math.max(seam, Math.abs(light(middle - gap, y) - light(middle + gap, y)));
+      }
+      return { largestStep, largestBend, seam, measured, scale };
+    });
+    expect(surface.measured).toBeGreaterThan(20000);
+    expect(surface.largestStep, `a hard step in shade at ${width}`).toBeLessThan(9);
+    expect(surface.largestBend, `a band or streak at ${width}`).toBeLessThan(5);
+    expect(surface.seam, `a seam down the middle at ${width}`).toBeLessThan(8);
   }
 });
 
@@ -431,10 +721,11 @@ test('reduced motion renders the scene still, with the heart held at a three qua
 
   const before = await heartSilhouette(frame);
   expect(before!.painted).toBeGreaterThan(10000);
-  // Three quarters on, so clearly narrower than face on and clearly wider than
-  // nothing: the still frame is a shaded solid, not an edge.
-  expect(before!.width).toBeGreaterThan(before!.height * 0.7);
-  expect(before!.width).toBeLessThan(before!.height * 1.15);
+  // Three quarters on, so clearly narrower than face on (1.02 of the height)
+  // and clearly wider than edge on (0.47 of the height): the still frame is a
+  // shaded solid seen at an angle.
+  expect(before!.width).toBeGreaterThan(before!.height * 0.75);
+  expect(before!.width).toBeLessThan(before!.height * 0.95);
 
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(9000));
   const after = await heartSilhouette(frame);
