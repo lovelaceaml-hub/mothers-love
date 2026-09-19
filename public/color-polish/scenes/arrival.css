@@ -1,6 +1,86 @@
-/* Scene 3, Recognition Arrival. Every rule in this file is scoped to #tv .event-stage or to the
-   arrival's own #tv .arrival-sky backdrop, which is on screen only while an arrival is running.
+/* Scene 3, Recognition Arrival. Every rule in this file is scoped to #tv .event-stage, to the
+   arrival's own #tv .arrival-sky backdrop, or to the waiting pill while an arrival is running.
    Colors stay as shipped in renderer.css. */
+
+/* Full screen composition (Plan 17 Lane 14). The arrival frame is the whole TV surface inside
+   even 54 px margins: TV 54,54 to 1866,1026, centred top to bottom, instead of the old
+   recognition box (TV y 148 to 763). renderer.css keeps its own rule; this one outranks it.
+   The numbers match ARRIVAL_W and ARRIVAL_H in arrival.js. */
+#tv .event-stage {
+  top: 54px;
+  left: 54px;
+  width: 1812px;
+  height: 972px;
+  border-radius: 40px;
+}
+
+#tv .event-stage .event-sparkles {
+  width: 1812px;
+  height: 972px;
+}
+
+/* Single entrance words, grown with the canvas and centred top to bottom. */
+#tv .event-stage .event-kicker {
+  left: 48px;
+  top: 30px;
+  font-size: 20px;
+  letter-spacing: 3.2px;
+}
+
+#tv .event-stage .event-title {
+  left: 100px;
+  top: 50%;
+  width: 690px;
+  transform: translateY(-50%);
+}
+
+#tv .event-stage .event-title .eyebrow {
+  font-size: 21px;
+  letter-spacing: 4px;
+}
+
+#tv .event-stage .event-title h2 {
+  font-size: 74px;
+  line-height: 1.08;
+  letter-spacing: -1.8px;
+  margin: 18px 0 30px;
+}
+
+#tv .event-stage .event-title p {
+  font-size: 32px;
+  line-height: 1.4;
+}
+
+#tv .event-stage .countdown-caption {
+  left: 48px;
+  bottom: 30px;
+  font-size: 20px;
+}
+
+/* Group entrance words. The style caption moves to the bottom left, like the single
+   entrance's caption, so the top right corner is free for the waiting pill. */
+#tv .event-stage .group-title {
+  left: 48px;
+  top: 28px;
+  font-size: 42px;
+  letter-spacing: -.9px;
+}
+
+#tv .event-stage .group-kind {
+  left: 48px;
+  right: auto;
+  top: auto;
+  bottom: 30px;
+  font-size: 18px;
+  letter-spacing: 1.4px;
+  z-index: 4;
+}
+
+/* The waiting pill sits in the top right corner of the arrival frame, clear of every orb. */
+#tv:has(.event-stage.active) .queue-dock {
+  top: 72px;
+  right: 78px;
+}
 
 #tv .event-stage .event-orb {
   border-radius: 50%;
@@ -174,9 +254,9 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 1070px;
+  left: 1300px;
   transform: translateX(-50%);
-  width: 520px;
+  width: 750px;
   background: radial-gradient(ellipse at 50% 50%, rgba(255, 248, 225, 0.45) 0%, rgba(246, 214, 138, 0.22) 42%, transparent 72%);
   animation: arrivalBeamOpen 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: none;
@@ -288,8 +368,8 @@
 
 #tv .event-stage .arrival-frame-petal-curtain .arrival-curtain-petal {
   position: absolute;
-  width: 65px;
-  height: 92px;
+  width: 88px;
+  height: 124px;
   border-radius: 80% 30% 70% 35%;
   background: linear-gradient(135deg, rgba(255, 250, 245, 0.92), rgba(246, 208, 218, 0.85) 60%, rgba(242, 196, 178, 0.78));
   box-shadow: 0 4px 16px rgba(186, 132, 146, 0.22);
