@@ -1,0 +1,4 @@
+# 2026-09-18T19:22Z L1 gemini gate unmet all lanes, sonnet relaunch
+
+What happened: L1, L2 and L3 on Gemini 3.8 Flash (High) via agy all ended with no edits and the same message: "a tool required the "command" permission that headless mode cannot prompt for, so it was auto-denied." L3 ended 19:18:43Z; L1 and L2 ended before 19:21Z. Raw output in each worktree's .tv17/agy.out. The first Sonnet 5 spill helpers for L0 and L3 were cut off when the background session stopped at about 19:20Z, before writing anything.
+Ruling: gate unmet for every agy lane. Spill chain (Gemini High, Gemini Medium, Sonnet 5): Gemini Medium runs through the same permission gate, so it is skipped for the same reason, not tried. L0 to L3 relaunched at 19:21Z as Claude Sonnet 5 helpers, same worktrees, branches and orders. Not taken: --dangerously-skip-permissions or widening the agy allow-list (would broaden a permission without Anthony's say).

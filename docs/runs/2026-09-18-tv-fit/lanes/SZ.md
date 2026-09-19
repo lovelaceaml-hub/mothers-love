@@ -1,13 +1,13 @@
 ---
 lane: SZ
 title: Integration, preview, release
-state: planned
-model: pending
-runner: pending
-worktree: pending
-review: pending
-depends_on: pending
-updated: 2026-09-18T19:07Z
+state: blocked
+model: claude-opus-5-high
+runner: coordinator
+worktree: /Users/anthony/Projects/mothers-love-worktrees/tv17-base
+review: opus-5-high
+depends_on: L0 L1 L2 L3 L4
+updated: 2026-09-19T05:26Z
 ---
 
 # SZ: Integration, preview, release

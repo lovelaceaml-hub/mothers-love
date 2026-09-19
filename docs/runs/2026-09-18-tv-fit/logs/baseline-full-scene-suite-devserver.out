@@ -1,0 +1,2146 @@
+
+Running 145 tests using 2 workers
+
+[1A[2K[1/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:151:5 › the four reworked entrances start deep and resolve flat
+[1A[2K[2/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:94:5 › single and group entrance styles cycle in the recorded order, and four frame styles are declared
+[1A[2K[3/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:247:5 › circularity holds on .event-orb at entrance midpoint, hold midpoint, and exit midpoint
+[1A[2K[4/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:282:5 › arrival ring carries 3D rotation while orb and ancestors carry none
+[1A[2K[5/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:341:5 › reduced motion displays bubble within one frame without assembly or burst
+[1A[2K[6/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:392:5 › G3 computed-style stage dim and near-black backdrop assertions hold at hold midpoint
+[1A[2K[7/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:435:5 › four frame styles are logged with no immediate repeat and vary independently from path styles
+[1A[2K[8/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:479:5 › feed rail and returnScene behavior are unchanged after arrival chain
+[1A[2K[9/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:520:5 › screenshots for frame styles at assembly midpoint and path styles at entrance midpoint
+[1A[2K[10/145] [chromium] › tests/color-polish-scenes/arrival.spec.ts:598:5 › arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave
+[1A[2K[11/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s
+[1A[2K  1) [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:55:21
+
+    Error Context: test-results/color-polish-scenes-calend-ab51f-rbs-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[12/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count
+[1A[2K[13/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle
+[1A[2K  2) [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:72:21
+
+    Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
+
+
+[1A[2K[14/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms
+[1A[2K  3) [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:77:21
+
+    Error Context: test-results/color-polish-scenes-calend-ea969-se-once-on-entry-and-settle-chromium/error-context.md
+
+
+[1A[2K[15/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms
+[1A[2K  4) [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:132:21
+
+    Error Context: test-results/color-polish-scenes-calend-7528c-fx-canvas-render-at-6000-ms-chromium/error-context.md
+
+
+[1A[2K[16/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance
+[1A[2K  5) [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:167:21
+
+    Error Context: test-results/color-polish-scenes-calend-b84aa--the-month-panel-at-6000-ms-chromium/error-context.md
+
+
+[1A[2K[17/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:225:5 › reduced motion renders the calendar still with no pulse
+[1A[2K  6) [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:201:21
+
+    Error Context: test-results/color-polish-scenes-calend-fac4f-cene-still-does-not-advance-chromium/error-context.md
+
+
+[1A[2K[18/145] [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840
+[1A[2K  7) [chromium] › tests/color-polish-scenes/calendar.spec.ts:225:5 › reduced motion renders the calendar still with no pulse 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:226:28
+
+    Error Context: test-results/color-polish-scenes-calend-f8d75-alendar-still-with-no-pulse-chromium/error-context.md
+
+
+[1A[2K[19/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:145:5 › expressions renders with circular medallions and no overflow at 14 s
+[1A[2K  8) [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840 ────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:242:21
+
+    Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
+
+
+[1A[2K[20/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:176:5 › grid cards fit with slack
+[1A[2K  9) [chromium] › tests/color-polish-scenes/expressions.spec.ts:145:5 › expressions renders with circular medallions and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:146:21
+
+    Error Context: test-results/color-polish-scenes-expres-765ee-ons-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[21/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:188:5 › compact cards fit
+[1A[2K  10) [chromium] › tests/color-polish-scenes/expressions.spec.ts:176:5 › grid cards fit with slack ─
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:177:21
+
+    Error Context: test-results/color-polish-scenes-expressions-grid-cards-fit-with-slack-chromium/error-context.md
+
+
+[1A[2K[22/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:198:5 › the focused card is balanced
+[1A[2K  11) [chromium] › tests/color-polish-scenes/expressions.spec.ts:188:5 › compact cards fit ─────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:189:21
+
+    Error Context: test-results/color-polish-scenes-expressions-compact-cards-fit-chromium/error-context.md
+
+
+[1A[2K[23/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:207:5 › every expression can be the focused one
+[1A[2K[24/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:254:5 › reduced motion renders the scene still and matches G6
+[1A[2K  12) [chromium] › tests/color-polish-scenes/expressions.spec.ts:254:5 › reduced motion renders the scene still and matches G6 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:255:28
+
+    Error Context: test-results/color-polish-scenes-expres-b48ec--scene-still-and-matches-G6-chromium/error-context.md
+
+
+[1A[2K  13) [chromium] › tests/color-polish-scenes/expressions.spec.ts:198:5 › the focused card is balanced 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:199:21
+
+    Error Context: test-results/color-polish-scenes-expressions-the-focused-card-is-balanced-chromium/error-context.md
+
+
+[1A[2K[25/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:286:5 › the same holds at 3840
+[1A[2K[26/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:307:5 › focused card has positive translateZ and phrase rendered at least 1.6x grid phrase size
+[1A[2K  14) [chromium] › tests/color-polish-scenes/expressions.spec.ts:286:5 › the same holds at 3840 ────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:289:32
+
+    Error Context: test-results/color-polish-scenes-expressions-the-same-holds-at-3840-chromium/error-context.md
+
+
+[1A[2K  15) [chromium] › tests/color-polish-scenes/expressions.spec.ts:307:5 › focused card has positive translateZ and phrase rendered at least 1.6x grid phrase size 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:308:21
+
+    Error Context: test-results/color-polish-scenes-expres-e2f47-least-1-6x-grid-phrase-size-chromium/error-context.md
+
+
+[1A[2K[27/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:363:5 › visible layer scrollWidth and scrollHeight never exceed client size in grid and bloomed states at both widths
+[1A[2K[28/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:422:5 › eight unfocused cards computed opacity is about 0.7 while focused is 1
+[1A[2K  16) [chromium] › tests/color-polish-scenes/expressions.spec.ts:363:5 › visible layer scrollWidth and scrollHeight never exceed client size in grid and bloomed states at both widths 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:370:34
+
+    Error Context: test-results/color-polish-scenes-expres-2af07-oomed-states-at-both-widths-chromium/error-context.md
+
+
+[1A[2K  17) [chromium] › tests/color-polish-scenes/expressions.spec.ts:422:5 › eight unfocused cards computed opacity is about 0.7 while focused is 1 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:423:21
+
+    Error Context: test-results/color-polish-scenes-expres-2d301-bout-0-7-while-focused-is-1-chromium/error-context.md
+
+
+[1A[2K[29/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:447:5 › across three separate visits to scene 7 through loadRenderer, three different cards take focus matching S.bloomIndex
+[1A[2K[30/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:475:5 › three columns carry distinct rotateY values and rows carry distinct translateZ values in grid state
+[1A[2K[31/145] [chromium] › tests/color-polish-scenes/expressions.spec.ts:534:5 › no .orb exists in expressions scene
+[1A[2K  18) [chromium] › tests/color-polish-scenes/expressions.spec.ts:475:5 › three columns carry distinct rotateY values and rows carry distinct translateZ values in grid state 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:476:21
+
+    Error Context: test-results/color-polish-scenes-expres-0c7e7-slateZ-values-in-grid-state-chromium/error-context.md
+
+
+[1A[2K  19) [chromium] › tests/color-polish-scenes/expressions.spec.ts:534:5 › no .orb exists in expressions scene 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:535:21
+
+    Error Context: test-results/color-polish-scenes-expres-93c2b-exists-in-expressions-scene-chromium/error-context.md
+
+
+[1A[2K[32/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:26:5 › the scene stays populated and replaces one bubble at a time
+[1A[2K[33/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:12:5 › featured renders circular bubbles and no overflow at 14 s
+[1A[2K  20) [chromium] › tests/color-polish-scenes/featured.spec.ts:12:5 › featured renders circular bubbles and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:13:21
+
+    Error Context: test-results/color-polish-scenes-featur-aabab-les-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K  21) [chromium] › tests/color-polish-scenes/featured.spec.ts:26:5 › the scene stays populated and replaces one bubble at a time 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:30:23
+
+    Error Context: test-results/color-polish-scenes-featur-a82ff-places-one-bubble-at-a-time-chromium/error-context.md
+
+
+[1A[2K[34/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:38:5 › bubbles span two depth layers
+[1A[2K[35/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:58:5 › bubbles stay circular during an exit
+[1A[2K  22) [chromium] › tests/color-polish-scenes/featured.spec.ts:58:5 › bubbles stay circular during an exit 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:62:23
+
+    Error Context: test-results/color-polish-scenes-featur-1182c-tay-circular-during-an-exit-chromium/error-context.md
+
+
+[1A[2K  23) [chromium] › tests/color-polish-scenes/featured.spec.ts:38:5 › bubbles span two depth layers ─
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:39:21
+
+    Error Context: test-results/color-polish-scenes-featured-bubbles-span-two-depth-layers-chromium/error-context.md
+
+
+[1A[2K[36/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:69:5 › reduced motion renders the featured scene still
+[1A[2K[37/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:78:5 › expression panel displays catalog content and eight orbit icons at 2 s and 17 s
+[1A[2K  24) [chromium] › tests/color-polish-scenes/featured.spec.ts:78:5 › expression panel displays catalog content and eight orbit icons at 2 s and 17 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:91:32
+
+    Error Context: test-results/color-polish-scenes-featur-0527d-orbit-icons-at-2-s-and-17-s-chromium/error-context.md
+
+
+[1A[2K  25) [chromium] › tests/color-polish-scenes/featured.spec.ts:69:5 › reduced motion renders the featured scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:70:28
+
+    Error Context: test-results/color-polish-scenes-featur-0c83e-rs-the-featured-scene-still-chromium/error-context.md
+
+
+[1A[2K[38/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:120:5 › expression panel rotates across fresh opens
+[1A[2K[39/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:134:5 › in-pass advance flips cleanly with no error at 16 s
+[1A[2K  26) [chromium] › tests/color-polish-scenes/featured.spec.ts:120:5 › expression panel rotates across fresh opens 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:124:23
+
+    Error Context: test-results/color-polish-scenes-featur-79824--rotates-across-fresh-opens-chromium/error-context.md
+
+
+[1A[2K  27) [chromium] › tests/color-polish-scenes/featured.spec.ts:134:5 › in-pass advance flips cleanly with no error at 16 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:137:21
+
+    Error Context: test-results/color-polish-scenes-featur-218e1-eanly-with-no-error-at-16-s-chromium/error-context.md
+
+
+[1A[2K[40/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:202:5 › sweep clip wrapper exists and feature panel preserves 3d without overflow hidden
+[1A[2K[41/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:153:5 › keepAge remount preserves current expression and does not re-flip when sceneAge >= 15
+[1A[2K  28) [chromium] › tests/color-polish-scenes/featured.spec.ts:153:5 › keepAge remount preserves current expression and does not re-flip when sceneAge >= 15 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:154:21
+
+    Error Context: test-results/color-polish-scenes-featur-68f3d-ot-re-flip-when-sceneAge-15-chromium/error-context.md
+
+
+[1A[2K  29) [chromium] › tests/color-polish-scenes/featured.spec.ts:202:5 › sweep clip wrapper exists and feature panel preserves 3d without overflow hidden 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:203:21
+
+    Error Context: test-results/color-polish-scenes-featur-5b960--3d-without-overflow-hidden-chromium/error-context.md
+
+
+[1A[2K[42/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:312:5 › panel transform-style is preserve-3d, bounding box >= 1.5x bubble diameter, and orbs have no 3D rotation
+[1A[2K[43/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:224:5 › at 14 s eyebrow and bubbles match first expression, at 21 s match second, with burst between
+[1A[2K[44/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:371:5 › bubbles stay circular at flip midpoint and steady state under perspective
+[1A[2K[45/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:385:5 › forced scene change at 15.2 s leaves next scene eyebrow untouched and logs no error
+[1A[2K[46/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:417:5 › with fixture where only one record carries incoming expression, three bubbles appear and featured_sparse_expression is logged
+[1A[2K[47/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:494:5 › phrase is the panel largest text and is rendered above the expression name
+[1A[2K[48/145] [chromium] › tests/color-polish-scenes/featured.spec.ts:518:5 › panel has soft glow and particle layer inside bounds
+[1A[2K[49/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:13:5 › garden renders circular bubbles and no overflow at 14 s
+[1A[2K[50/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:29:5 › the garden fills over a minute with one replacement at a time
+[1A[2K  30) [chromium] › tests/color-polish-scenes/garden.spec.ts:29:5 › the garden fills over a minute with one replacement at a time 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:30:21
+
+    Error Context: test-results/color-polish-scenes-garden-6d378-h-one-replacement-at-a-time-chromium/error-context.md
+
+
+[1A[2K  31) [chromium] › tests/color-polish-scenes/garden.spec.ts:13:5 › garden renders circular bubbles and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:14:36
+
+    Error Context: test-results/color-polish-scenes-garden-84239-les-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[51/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:72:5 › petals are carried after a replacement, then decay to nothing
+[1A[2K[52/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:130:5 › bubbles span two depth layers
+[1A[2K[53/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:158:5 › bubbles stay circular through sprout, swell and burst
+[1A[2K  32) [chromium] › tests/color-polish-scenes/garden.spec.ts:130:5 › bubbles span two depth layers ──
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:131:21
+
+    Error Context: test-results/color-polish-scenes-garden-bubbles-span-two-depth-layers-chromium/error-context.md
+
+
+[1A[2K[54/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:167:5 › reduced motion renders the garden still
+[1A[2K  33) [chromium] › tests/color-polish-scenes/garden.spec.ts:158:5 › bubbles stay circular through sprout, swell and burst 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:160:23
+
+    Error Context: test-results/color-polish-scenes-garden-18826-ough-sprout-swell-and-burst-chromium/error-context.md
+
+
+[1A[2K[55/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:176:5 › with the mostly-long fixture, no page indicator is visible up to 320 chars and grown slots stay circular, inside root, and disjoint
+[1A[2K[56/145] [chromium] › tests/color-polish-scenes/garden.spec.ts:304:5 › a long message paginates at most twice, or not at all, and logs verbatim true when it does
+[1A[2K[57/145] [chromium] › tests/color-polish-scenes/helpers.spec.ts:14:5 › helpers open the welcome scene in the Studio and it is circular
+[1A[2K  34) [chromium] › tests/color-polish-scenes/garden.spec.ts:167:5 › reduced motion renders the garden still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:168:28
+
+    Error Context: test-results/color-polish-scenes-garden-21cf6-on-renders-the-garden-still-chromium/error-context.md
+
+
+[1A[2K[58/145] [chromium] › tests/color-polish-scenes/helpers.spec.ts:28:5 › reduced motion renders the welcome scene still
+[1A[2K  35) [chromium] › tests/color-polish-scenes/helpers.spec.ts:14:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:15:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+
+[1A[2K[59/145] [chromium] › tests/color-polish-scenes/helpers.spec.ts:36:5 › loadRenderer loads the renderer and getState().mode is normal
+[1A[2K[60/145] [chromium] › tests/color-polish-scenes/helpers.spec.ts:42:5 › cardShape passes on valid card shapes and fails on invalid ones
+[1A[2K[61/145] [chromium] › tests/color-polish-scenes/helpers.spec.ts:77:5 › with the mostly-long fixture, no two .orb-slot rectangles in scene 1 or scene 9 intersect
+[1A[2K[62/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:12:5 › milestone renders circular bubbles, studio preview, and does not overflow at 14 s
+[1A[2K  36) [chromium] › tests/color-polish-scenes/helpers.spec.ts:28:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:29:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+
+[1A[2K[63/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:53:5 › the goal expression heading or phrase is the largest computed font size, strictly larger than threshold
+[1A[2K  37) [chromium] › tests/color-polish-scenes/milestone.spec.ts:12:5 › milestone renders circular bubbles, studio preview, and does not overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:13:21
+
+    Error Context: test-results/color-polish-scenes-milest-41e3e-d-does-not-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K  38) [chromium] › tests/color-polish-scenes/milestone.spec.ts:53:5 › the goal expression heading or phrase is the largest computed font size, strictly larger than threshold 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:54:21
+
+    Error Context: test-results/color-polish-scenes-milest-a0186-ictly-larger-than-threshold-chromium/error-context.md
+
+
+[1A[2K[64/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:144:5 › every pearl shows catalog phrase and name without THANK YOU, using goal expression or first expression
+[1A[2K[65/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:214:5 › with 48-record sample at least 12 distinct record ids pass through in 30 s including outside current week
+[1A[2K[66/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:250:5 › milestone contributors are present in the stream at 0 s and markShown is called for all pearls
+[1A[2K[67/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:287:5 › records including goal expression carry data-weekly="true" and gold rim
+[1A[2K[68/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:345:5 › the stream is dense, continuous and individual
+[1A[2K[69/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:410:5 › extreme depth
+[1A[2K  39) [chromium] › tests/color-polish-scenes/milestone.spec.ts:410:5 › extreme depth ───────────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:411:21
+
+    Error Context: test-results/color-polish-scenes-milestone-extreme-depth-chromium/error-context.md
+
+
+[1A[2K  40) [chromium] › tests/color-polish-scenes/milestone.spec.ts:345:5 › the stream is dense, continuous and individual 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:346:21
+
+    Error Context: test-results/color-polish-scenes-milest-e5e53-e-continuous-and-individual-chromium/error-context.md
+
+
+[1A[2K[70/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:474:5 › reduced motion renders the milestone still
+[1A[2K[71/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:484:5 › left copy is removed and rail is widened without overflow at 2000 ms
+[1A[2K[72/145] [chromium] › tests/color-polish-scenes/milestone.spec.ts:546:5 › noOverflow holds and no phrase is truncated at any pearl size
+[1A[2K[73/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:107:5 › orbit renders circular planets and no overflow at 14 s
+[1A[2K  41) [chromium] › tests/color-polish-scenes/milestone.spec.ts:474:5 › reduced motion renders the milestone still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:475:28
+
+    Error Context: test-results/color-polish-scenes-milest-4db81-renders-the-milestone-still-chromium/error-context.md
+
+
+[1A[2K[74/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:155:5 › planets orbit in 3D at the slower rate
+[1A[2K  42) [chromium] › tests/color-polish-scenes/orbit.spec.ts:107:5 › orbit renders circular planets and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:108:21
+
+    Error Context: test-results/color-polish-scenes-orbit--90fb7-ets-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[75/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:267:5 › the far planet is blurred and dim, the near planet sharp with a shadow
+[1A[2K[76/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:330:5 › planets stay circular through the orbit
+[1A[2K  43) [chromium] › tests/color-polish-scenes/orbit.spec.ts:267:5 › the far planet is blurred and dim, the near planet sharp with a shadow 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:268:21
+
+    Error Context: test-results/color-polish-scenes-orbit--10719--planet-sharp-with-a-shadow-chromium/error-context.md
+
+
+[1A[2K  44) [chromium] › tests/color-polish-scenes/orbit.spec.ts:330:5 › planets stay circular through the orbit 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:331:21
+
+    Error Context: test-results/color-polish-scenes-orbit--97d53--circular-through-the-orbit-chromium/error-context.md
+
+
+[1A[2K[77/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:352:5 › reduced motion renders the orbit still
+[1A[2K[78/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:361:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names
+[1A[2K  45) [chromium] › tests/color-polish-scenes/orbit.spec.ts:361:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:366:23
+
+    Error Context: test-results/color-polish-scenes-orbit--c9586--two-distinct-catalog-names-chromium/error-context.md
+
+
+[1A[2K  46) [chromium] › tests/color-polish-scenes/orbit.spec.ts:352:5 › reduced motion renders the orbit still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:353:28
+
+    Error Context: test-results/color-polish-scenes-orbit--9c3be-ion-renders-the-orbit-still-chromium/error-context.md
+
+
+[1A[2K[79/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:374:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot
+[1A[2K[80/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:390:5 › centre element bounding box is at least 1.5 times the largest orbiting bubble diameter
+[1A[2K[81/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:437:5 › centre element bounding box is at least 1.5 times the true largest tier (263 px) with a long message
+[1A[2K[82/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:480:5 › three distinct orbiting bubble diameters appear for short, medium and long messages and stay circular
+[1A[2K[83/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:584:5 › phrase computed font size in the centre is larger than the expression name font size
+[1A[2K[84/145] [chromium] › tests/color-polish-scenes/orbit.spec.ts:603:5 › two probe runs with the same seed produce the same focused expression
+[1A[2K[85/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:14:5 › peace in practice renders heart cards and no circular orbs at 14 s
+[1A[2K[86/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:33:5 › background heart count increases at each explosion until the 160-heart cap over 40 s
+[1A[2K[87/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:76:5 › three card slots are disjoint in measured rects and at least two cards visible over 40 s
+[1A[2K  47) [chromium] › tests/color-polish-scenes/orbit.spec.ts:374:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:375:21
+
+    Error Context: test-results/color-polish-scenes-orbit--67dd2-ystem-contains-one-orb-slot-chromium/error-context.md
+
+
+[1A[2K[88/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:173:5 › every card message is present in full in the DOM and font size is at or above 18 px
+[1A[2K[89/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:117:5 › heart canvas dominant hue is red with saturation above 60 percent at hold midpoint
+[1A[2K[90/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:204:5 › noOverflow holds on scene root with 160 background hearts present
+[1A[2K[91/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:215:5 › frame time sampled at 3840 stays under 40 ms per frame with 160 background hearts
+[1A[2K  48) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:117:5 › heart canvas dominant hue is red with saturation above 60 percent at hold midpoint 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m50[39m
+    Received:   [31m0[39m
+
+      164 |
+      165 |   for (const s of samples!) {
+    > 166 |     expect(s.a).toBeGreaterThan(50);
+          |                 ^
+      167 |     const hueOk = (s.h >= 345 && s.h <= 360) || (s.h >= 0 && s.h <= 10);
+      168 |     expect(hueOk).toBe(true);
+      169 |     expect(s.s).toBeGreaterThan(60);
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:166:17
+
+    Error Context: test-results/color-polish-scenes-peace--555ea-60-percent-at-hold-midpoint-chromium/error-context.md
+
+
+[1A[2K[92/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:231:5 › reduced motion renders the scene still with 3 static cards and 14 ambient hearts
+[1A[2K[93/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:253:5 › no timer survives onLeave on forced scene change
+[1A[2K[94/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:277:5 › sculpted rotating heart is a real canvas that turns over time
+[1A[2K[95/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:310:5 › heart canvas displays distinct luminance shading bands
+[1A[2K[96/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:351:5 › still mode renders full 500-character message on card without truncation or paging stalls
+[1A[2K[97/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:391:5 › after cap is reached, excess hearts enter fading state for at least one frame before DOM removal
+[1A[2K  49) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:231:5 › reduced motion renders the scene still with 3 static cards and 14 ambient hearts 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:232:28
+
+    Error Context: test-results/color-polish-scenes-peace--2e958-cards-and-14-ambient-hearts-chromium/error-context.md
+
+
+[1A[2K[98/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:14:5 › peacemakers satisfies the common scene spec with puzzle cardShape, circularity, and no overflow
+[1A[2K[99/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:29:5 › peacemakers sample preview in studio does not advance on click
+[1A[2K[100/145] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:465:5 › card with an 80-character recipient name renders the full name without ellipsis or horizontal overflow
+[1A[2K  50) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:29:5 › peacemakers sample preview in studio does not advance on click 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:30:21
+
+    Error Context: test-results/color-polish-scenes-peacem-da21e-o-does-not-advance-on-click-chromium/error-context.md
+
+
+[1A[2K[101/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:65:5 › held card hold time equals 3 s plus message.length / 40 within 0.3 s for short and 500-char records
+[1A[2K[102/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:92:5 › message text is visible on the held card and absent or hidden on every joined card
+[1A[2K[103/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:35:5 › joined card count increases monotonically to at least six over 40 s with short messages
+[1A[2K[104/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:116:5 › noOverflow holds and no speech bubble box overlaps the title block text
+[1A[2K[105/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:146:5 › hold zone box is strictly disjoint from the world image rect and all four speech bubble boxes
+[1A[2K[106/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:222:5 › globe container transform-style is preserve-3d, transform contains rotate, and no .orb exists
+[1A[2K[107/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:244:5 › four speech bubbles are present by 9 s with border-radius 16 px and no immediate phrase repeat over 12 draws
+[1A[2K[108/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:271:5 › joined card count never exceeds 24, oldest card is removed after 25th join, and live count remains exactly 24 across subsequent joins
+[1A[2K[109/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:315:5 › detaching piece carries globe art pixels, negative offset background, and leaves a darkened socket on the world
+[1A[2K[110/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:339:5 › in still mode a 500-char held record keeps every page verbatim, shows page one legibly, and clips nothing it claims to render
+[1A[2K[111/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:393:5 › frame time sampled at 3840 stays under 40 ms per frame
+[1A[2K[112/145] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:409:5 › reduced motion renders the peacemakers scene still with eight globe cards and one held card
+[1A[2K[113/145] [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s
+[1A[2K  51) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:409:5 › reduced motion renders the peacemakers scene still with eight globe cards and one held card 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:410:28
+
+    Error Context: test-results/color-polish-scenes-peacem-b5d75-obe-cards-and-one-held-card-chromium/error-context.md
+
+
+[1A[2K  52) [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:111:21
+
+    Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[114/145] [chromium] › tests/color-polish-scenes/status.spec.ts:137:5 › the nine medallions carry at least three motion vocabularies
+[1A[2K[115/145] [chromium] › tests/color-polish-scenes/status.spec.ts:152:5 › icon transforms differ pairwise and follow different waveforms
+[1A[2K  53) [chromium] › tests/color-polish-scenes/status.spec.ts:137:5 › the nine medallions carry at least three motion vocabularies 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:138:21
+
+    Error Context: test-results/color-polish-scenes-status-8a161-t-three-motion-vocabularies-chromium/error-context.md
+
+
+[1A[2K  54) [chromium] › tests/color-polish-scenes/status.spec.ts:152:5 › icon transforms differ pairwise and follow different waveforms 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:153:21
+
+    Error Context: test-results/color-polish-scenes-status-9643b--follow-different-waveforms-chromium/error-context.md
+
+
+[1A[2K[116/145] [chromium] › tests/color-polish-scenes/status.spec.ts:243:5 › the ambient sweep runs only when motion is allowed
+[1A[2K[117/145] [chromium] › tests/color-polish-scenes/status.spec.ts:281:5 › no icon exceeds the motion envelope over 30 seconds
+[1A[2K  55) [chromium] › tests/color-polish-scenes/status.spec.ts:243:5 › the ambient sweep runs only when motion is allowed 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:244:21
+
+    Error Context: test-results/color-polish-scenes-status-bf11e-only-when-motion-is-allowed-chromium/error-context.md
+
+
+[1A[2K  56) [chromium] › tests/color-polish-scenes/status.spec.ts:281:5 › no icon exceeds the motion envelope over 30 seconds 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:288:25
+
+
+[1A[2K[118/145] [chromium] › tests/color-polish-scenes/status.spec.ts:310:5 › all nine catalog phrases are present in the DOM verbatim at 0 s
+[1A[2K[119/145] [chromium] › tests/color-polish-scenes/status.spec.ts:323:5 › at 6 s and at 14 s, at least three coins differ in flip state and reverse face shows two-digit number
+[1A[2K[120/145] [chromium] › tests/color-polish-scenes/status.spec.ts:393:5 › both today and overall counts equal fixture totals after 2 s and hold
+[1A[2K[121/145] [chromium] › tests/color-polish-scenes/status.spec.ts:417:5 › phrase computed font size is larger than expression name on every card and no phrase in coin face
+[1A[2K[122/145] [chromium] › tests/color-polish-scenes/status.spec.ts:458:5 › sweep element rect spans full width of grid and cards do not clip it
+[1A[2K[123/145] [chromium] › tests/color-polish-scenes/status.spec.ts:481:5 › no card overflows, no orb exists in scene, and no circular bubble has 3D rotation
+[1A[2K[124/145] [chromium] › tests/color-polish-scenes/status.spec.ts:519:5 › reduced motion matches G5 exactly
+[1A[2K[125/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:19:7 › Section B: scene transitions › all ten playlist scene changes complete with one scene and no transition artifacts
+[1A[2K[126/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:52:7 › Section B: scene transitions › uses the live gentle crossfade with slight translation and uniform scale
+[1A[2K[127/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:105:7 › Section B: scene transitions › ignores clicks and queues a requested scene while a transition is active
+[1A[2K[128/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:133:7 › Section B: scene transitions › holds queued arrivals until the scene transition has cleaned up
+[1A[2K[129/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:196:7 › Section B: scene transitions › calls the departing scene onLeave once and records a thrown hook
+[1A[2K[130/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:227:7 › Section B: scene transitions › switches scenes immediately and leaves no transition layer in still mode
+[1A[2K[131/145] [chromium] › tests/color-polish-scenes/transitions.spec.ts:244:7 › Section B: scene transitions › hides the countdown during transition and shows it after completion
+[1A[2K[132/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:12:5 › welcome renders circular bubbles and no overflow at 14 s
+[1A[2K  57) [chromium] › tests/color-polish-scenes/status.spec.ts:519:5 › reduced motion matches G5 exactly 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:520:28
+
+    Error Context: test-results/color-polish-scenes-status-reduced-motion-matches-G5-exactly-chromium/error-context.md
+
+
+[1A[2K[133/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:26:5 › bubbles differ in speed and span two depth layers
+[1A[2K  58) [chromium] › tests/color-polish-scenes/welcome.spec.ts:12:5 › welcome renders circular bubbles and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:13:21
+
+    Error Context: test-results/color-polish-scenes-welcom-094e0-les-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[134/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:65:5 › at least one bubble changes heading between 6 and 14 s
+[1A[2K  59) [chromium] › tests/color-polish-scenes/welcome.spec.ts:26:5 › bubbles differ in speed and span two depth layers 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:27:21
+
+    Error Context: test-results/color-polish-scenes-welcom-9013c-d-and-span-two-depth-layers-chromium/error-context.md
+
+
+[1A[2K[135/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:97:5 › bubbles stay circular through motion
+[1A[2K  60) [chromium] › tests/color-polish-scenes/welcome.spec.ts:65:5 › at least one bubble changes heading between 6 and 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:66:29
+
+    Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
+
+
+[1A[2K[136/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:133:5 › reduced motion renders the welcome scene still
+[1A[2K  61) [chromium] › tests/color-polish-scenes/welcome.spec.ts:97:5 › bubbles stay circular through motion 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:100:23
+
+
+[1A[2K[137/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:185:5 › at 2000 ms actors count is exactly 6
+[1A[2K  62) [chromium] › tests/color-polish-scenes/welcome.spec.ts:133:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:134:28
+
+    Error Context: test-results/color-polish-scenes-welcom-d5444-ers-the-welcome-scene-still-chromium/error-context.md
+
+
+[1A[2K[138/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:192:5 › scene replaces at least one bubble within 30 s
+[1A[2K  63) [chromium] › tests/color-polish-scenes/welcome.spec.ts:185:5 › at 2000 ms actors count is exactly 6 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:186:21
+
+    Error Context: test-results/color-polish-scenes-welcom-f02c1-s-actors-count-is-exactly-6-chromium/error-context.md
+
+
+[1A[2K[139/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:218:5 › entering bubble has non-zero rotate angle in slot transform
+[1A[2K  64) [chromium] › tests/color-polish-scenes/welcome.spec.ts:192:5 › scene replaces at least one bubble within 30 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:193:29
+
+    Error Context: test-results/color-polish-scenes-welcom-efea8-east-one-bubble-within-30-s-chromium/error-context.md
+
+
+[1A[2K[140/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:339:5 › six .orb elements at 0 s, 6 s and 14 s with mostly-long fixture and no readerSlot collapse
+[1A[2K  65) [chromium] › tests/color-polish-scenes/welcome.spec.ts:218:5 › entering bubble has non-zero rotate angle in slot transform 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:222:23
+
+
+[1A[2K[141/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:459:5 › circularity and noOverflow pass with speech bubbles present
+[1A[2K[142/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:486:5 › no speech bubble rect intersects another, the serif couplet, the h1 title, or any orb slot, and bubbles satisfy bounds
+[1A[2K[143/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:597:5 › every message renders at or above 18 px floor, fitting messages on one page, overflowing messages verbatim paginated without truncation
+[1A[2K[144/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:668:5 › reduced motion displays static speech bubbles without rotation or fading
+[1A[2K[145/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:370:5 › speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with border-radius 16px
+[1A[2K  66) [chromium] › tests/color-polish-scenes/welcome.spec.ts:668:5 › reduced motion displays static speech bubbles without rotation or fading 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3175/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3175/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:131
+
+      129 |   await page.getByLabel('Password').fill('synthetic-password');
+      130 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 131 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      132 | }
+      133 |
+      134 | /**
+        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:669:28
+
+    Error Context: test-results/color-polish-scenes-welcom-d4d09--without-rotation-or-fading-chromium/error-context.md
+
+
+[1A[2K  67) [chromium] › tests/color-polish-scenes/welcome.spec.ts:370:5 › speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with border-radius 16px 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m3[39m
+    Received: [31m2[39m
+
+      394 |     }).length;
+      395 |   });
+    > 396 |   expect(visibleAt9).toBe(3);
+          |                      ^
+      397 |
+      398 |   const radii = await frame9.evaluate(() => {
+      399 |     const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
+        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:396:22
+
+    Error Context: test-results/color-polish-scenes-welcom-0545d-9-s-with-border-radius-16px-chromium/error-context.md
+
+
+[1A[2K  67 failed
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:225:5 › reduced motion renders the calendar still with no pulse 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840 ─────────
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:145:5 › expressions renders with circular medallions and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:176:5 › grid cards fit with slack ───
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:188:5 › compact cards fit ───────────
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:198:5 › the focused card is balanced 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:254:5 › reduced motion renders the scene still and matches G6 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:286:5 › the same holds at 3840 ──────
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:307:5 › focused card has positive translateZ and phrase rendered at least 1.6x grid phrase size 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:363:5 › visible layer scrollWidth and scrollHeight never exceed client size in grid and bloomed states at both widths 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:422:5 › eight unfocused cards computed opacity is about 0.7 while focused is 1 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:475:5 › three columns carry distinct rotateY values and rows carry distinct translateZ values in grid state 
+    [chromium] › tests/color-polish-scenes/expressions.spec.ts:534:5 › no .orb exists in expressions scene 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:12:5 › featured renders circular bubbles and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:26:5 › the scene stays populated and replaces one bubble at a time 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:38:5 › bubbles span two depth layers ───
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:58:5 › bubbles stay circular during an exit 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:69:5 › reduced motion renders the featured scene still 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:78:5 › expression panel displays catalog content and eight orbit icons at 2 s and 17 s 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:120:5 › expression panel rotates across fresh opens 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:134:5 › in-pass advance flips cleanly with no error at 16 s 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:153:5 › keepAge remount preserves current expression and does not re-flip when sceneAge >= 15 
+    [chromium] › tests/color-polish-scenes/featured.spec.ts:202:5 › sweep clip wrapper exists and feature panel preserves 3d without overflow hidden 
+    [chromium] › tests/color-polish-scenes/garden.spec.ts:13:5 › garden renders circular bubbles and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/garden.spec.ts:29:5 › the garden fills over a minute with one replacement at a time 
+    [chromium] › tests/color-polish-scenes/garden.spec.ts:130:5 › bubbles span two depth layers ────
+    [chromium] › tests/color-polish-scenes/garden.spec.ts:158:5 › bubbles stay circular through sprout, swell and burst 
+    [chromium] › tests/color-polish-scenes/garden.spec.ts:167:5 › reduced motion renders the garden still 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:14:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:28:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:12:5 › milestone renders circular bubbles, studio preview, and does not overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:53:5 › the goal expression heading or phrase is the largest computed font size, strictly larger than threshold 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:345:5 › the stream is dense, continuous and individual 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:410:5 › extreme depth ─────────────────
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:474:5 › reduced motion renders the milestone still 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:107:5 › orbit renders circular planets and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:267:5 › the far planet is blurred and dim, the near planet sharp with a shadow 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:330:5 › planets stay circular through the orbit 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:352:5 › reduced motion renders the orbit still 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:361:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:374:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot 
+    [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:117:5 › heart canvas dominant hue is red with saturation above 60 percent at hold midpoint 
+    [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:231:5 › reduced motion renders the scene still with 3 static cards and 14 ambient hearts 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:29:5 › peacemakers sample preview in studio does not advance on click 
+    [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:409:5 › reduced motion renders the peacemakers scene still with eight globe cards and one held card 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:137:5 › the nine medallions carry at least three motion vocabularies 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:152:5 › icon transforms differ pairwise and follow different waveforms 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:243:5 › the ambient sweep runs only when motion is allowed 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:281:5 › no icon exceeds the motion envelope over 30 seconds 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:519:5 › reduced motion matches G5 exactly 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:12:5 › welcome renders circular bubbles and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:26:5 › bubbles differ in speed and span two depth layers 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:65:5 › at least one bubble changes heading between 6 and 14 s 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:97:5 › bubbles stay circular through motion 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:133:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:185:5 › at 2000 ms actors count is exactly 6 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:192:5 › scene replaces at least one bubble within 30 s 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:218:5 › entering bubble has non-zero rotate angle in slot transform 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:370:5 › speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with border-radius 16px 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:668:5 › reduced motion displays static speech bubbles without rotation or fading 
+  78 passed (7.9m)
