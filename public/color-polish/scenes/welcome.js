@@ -75,7 +75,7 @@
   // order is DOM order. `flight` is the way a bubble flies in from and out
   // to, always away from the reserved bubble, the title and the art: the top
   // bubbles rise, the bottom right one leaves to the right, and the reserved
-  // bubble turns and fades almost in place, so a 480 px bubble never sweeps
+  // bubble drifts and fades almost in place, so a 480 px bubble never sweeps
   // across its neighbours' words.
   const WELCOME_SLOTS = [
     { name: 'T1', layer: 'mid', drawn: 308, cell: 312, cx: 796, cy: 164, reserved: false, from: 'top', flight: [-1, -1] },
@@ -662,7 +662,7 @@
   }
 
   function welcome() {
-    return `<div style="position:absolute;left:15px;top:43px;width:831px"><div class="eyebrow">A living campaign of appreciation</div><h1 style="font-size:74px;letter-spacing:-2.2px;line-height:1.08;margin:20px 0 22px">The Words of<br>${shimmer('Mother’s Love')}</h1><p class="serif" style="font-size:29px;line-height:1.4;color:#89836b">Where a mother's love resides,<br>peace abides.</p></div>${art('community','left:-20px;top:325px;width:910px;height:298px')}${welcomeBubbles()}`;
+    return `<div style="position:absolute;left:15px;top:43px;width:831px"><div class="eyebrow">A living campaign of appreciation</div><h1 style="font-size:74px;letter-spacing:-2.2px;line-height:1.08;margin:20px 0 22px">The Words of<br>${shimmer('Mother’s Love')}</h1><p class="serif" style="font-size:29px;line-height:1.4;color:#89836b">Where a mother's love resides,<br>peace abides.</p></div>${art('community','left:-20px;top:325px;width:910px;height:298px')}<div class="welcome-field">${welcomeBubbles()}</div>`;
   }
 
   function mountWelcome(root) {
@@ -671,8 +671,6 @@
     V.actors.forEach((a, i) => {
       a._welcomeSeenLife = a.life;
       a.trail = [];
-      a.enterLifeAt = -1;
-      a.exitLifeAt = -1;
 
       const isOdd = i % 2 === 1;
       if (a.el) {
@@ -775,6 +773,39 @@
     return false;
   }
 
+  // Half the box the words fill inside a bubble, in layout px. Read from the
+  // bubble itself, once per record: it is what decides when a bubble in
+  // flight has faded out, so it has to cover the whole message rather than
+  // the circle drawn around it.
+  function welcomeWordHalf(a) {
+    if (a._welcomeWordFor !== a.id || !a._welcomeWordW) {
+      const content = a.el && a.el.querySelector('.orb-content');
+      if (!content || !content.offsetWidth) return false;
+      a._welcomeWordFor = a.id;
+      a._welcomeWordW = content.offsetWidth / 2;
+      a._welcomeWordH = content.offsetHeight / 2;
+    }
+    return true;
+  }
+
+  // How much of a bubble in flight is drawn. A bubble flying in or out now
+  // travels its whole flight, which carries it past the edge of the stage, so
+  // it fades out as its words reach that edge and fades in as they come back
+  // inside: the circle and its message always arrive and leave together, and
+  // no word is ever drawn outside the scene. The fade is measured against the
+  // room the same bubble has at its own home, so a bubble that has arrived is
+  // drawn at full strength and a bubble holding still is never touched.
+  function welcomeFlightFade(a, rx, ry, scale) {
+    const slot = WELCOME_SLOT_LIMITS.get(a.key);
+    if (!slot || !welcomeWordHalf(a)) return 1;
+    const wx = a._welcomeWordW * scale;
+    const wy = a._welcomeWordH * scale;
+    const room = (px, py) => Math.min(px - wx, 1812 - px - wx, py - wy, 636 - py - wy);
+    const home = room(slot.cx, slot.cy);
+    if (home <= 0) return 1;
+    return clamp(room(rx, ry) / home, 0, 1);
+  }
+
   function placeWelcome(a) {
     // Core installNext has just put a new record into this bubble (drift
     // replacement): size and lay it out for its own message before it shows,
@@ -805,81 +836,76 @@
     // Drawn size comes from the depth layer and core's drift breathing only.
     // Core's entering grow (from 0.75) and exiting shrink (to 0.88) are not
     // applied to the size, so the words never dip below the drawn floor
-    // while a bubble flies in or out; the fly, spin and fade remain.
+    // while a bubble flies in or out; the fly and the fade remain.
     const scale = (a.large ? 1 : a.depth || 1) * L.scale;
     const x = a.screenX;
     const y = a.screenY;
-    const op = a.opacity;
-
-    let R = 0;
-    if (!S.still) {
-      if (a.life === 'entering') {
-        if (a.enterLifeAt !== a.lifeAt) {
-          a.enterLifeAt = a.lifeAt;
-          const sign = a.rng() > 0.5 ? 1 : -1;
-          a.enterAngle = sign * (200 + a.rng() * 120);
-        }
-        const p = Math.max(0, V.clock - a.lifeAt);
-        const q = clamp(p / 3.8, 0, 1);
-        const easeOut = outCubic(q);
-        R = a.enterAngle * (1 - easeOut);
-      } else if (a.life === 'exiting') {
-        if (a.exitLifeAt !== a.lifeAt) {
-          a.exitLifeAt = a.lifeAt;
-          const sign = a.rng() > 0.5 ? 1 : -1;
-          a.exitAngle = sign * 160;
-        }
-        const p = Math.max(0, V.clock - a.lifeAt);
-        const q = clamp(p / 3.8, 0, 1);
-        const easeIn = q * q * q;
-        R = a.exitAngle * easeIn;
-      }
-    }
+    // Anthony, September 19, after watching round 5 on the church TV: "the
+    // bubbles leaving and entering needs to be fixed. only the text in the
+    // bubbles roll away. it looks weird. they need to be together and leave
+    // together." A bubble in flight is one object now: nothing turns inside
+    // the circle, and the whole bubble is drawn where its flight puts it
+    // instead of being held on its home by the steady clamp.
+    const flying = a.life === 'entering' || a.life === 'exiting';
+    let op = a.opacity;
 
     if (a.el) {
       if (a.el.dataset.depth !== layer) a.el.dataset.depth = layer;
       a.el.style.left = '0px';
       a.el.style.top = '0px';
       const half = (a.d / 2) * scale;
-      const minX = half + 8;
-      const maxX = 1812 - half - 30;
-      const minY = half + 8;
-      const maxY = 636 - half - 8;
-      let renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
-      let renderY = minY <= maxY ? clamp(y, minY, maxY) : (minY + maxY) / 2;
-      // A steady bubble stays inside its home's free disc: a still bubble
-      // sits on its home, a drifting one wanders on a leash. The discs touch
-      // nothing, so no bubble ever covers another bubble's words, the art,
-      // the speech bubbles or the title. The drift itself is pulled back too,
-      // so the bubble turns round at the end of its leash rather than stick.
       const slot = WELCOME_SLOT_LIMITS.get(a.key);
-      if (slot && a.life === 'steady') {
-        const leash = S.still || a.large ? 0 : a._welcomeLeash || 0;
-        const dx = a.x - slot.cx, dy = a.y - slot.cy;
-        const dist = Math.hypot(dx, dy);
-        if (dist > leash) {
-          const nx = dist ? dx / dist : 0, ny = dist ? dy / dist : 0;
-          a.x = slot.cx + nx * leash;
-          a.y = slot.cy + ny * leash;
-          const out = a.vx * nx + a.vy * ny;
-          if (out > 0) {
-            a.vx -= 1.6 * out * nx;
-            a.vy -= 1.6 * out * ny;
+      let renderX, renderY;
+      if (flying) {
+        // The flight, exactly where core put it, so the circle and its words
+        // travel together. The bubble field in welcome.css clips at the same
+        // place the stage does, so a bubble carried past the stage edge never
+        // widens the scene's scroll box.
+        renderX = x;
+        renderY = y;
+        op *= welcomeFlightFade(a, renderX, renderY, scale);
+      } else {
+        const minX = half + 8;
+        const maxX = 1812 - half - 30;
+        const minY = half + 8;
+        const maxY = 636 - half - 8;
+        renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
+        renderY = minY <= maxY ? clamp(y, minY, maxY) : (minY + maxY) / 2;
+        // A steady bubble stays inside its home's free disc: a still bubble
+        // sits on its home, a drifting one wanders on a leash. The discs touch
+        // nothing, so no bubble ever covers another bubble's words, the art,
+        // the speech bubbles or the title. The drift itself is pulled back too,
+        // so the bubble turns round at the end of its leash rather than stick.
+        if (slot && a.life === 'steady') {
+          const leash = S.still || a.large ? 0 : a._welcomeLeash || 0;
+          const dx = a.x - slot.cx, dy = a.y - slot.cy;
+          const dist = Math.hypot(dx, dy);
+          if (dist > leash) {
+            const nx = dist ? dx / dist : 0, ny = dist ? dy / dist : 0;
+            a.x = slot.cx + nx * leash;
+            a.y = slot.cy + ny * leash;
+            const out = a.vx * nx + a.vy * ny;
+            if (out > 0) {
+              a.vx -= 1.6 * out * nx;
+              a.vy -= 1.6 * out * ny;
+            }
           }
+          renderX = a.x;
+          renderY = a.y;
         }
-        renderX = a.x;
-        renderY = a.y;
       }
       a._welcomeRX = renderX;
       a._welcomeRY = renderY;
       a._welcomeRR = half;
+      a._welcomeOpacity = op;
       a.el.style.transform = `translate(${(renderX - a.d / 2).toFixed(2)}px,${(renderY - a.d / 2).toFixed(2)}px) scale(${scale.toFixed(4)})`;
-      // The enter and exit spin turns the words (.orb-content) inside the
-      // circle, which clips its overflow, so the slot's own box stays inside
-      // the stage and a spinning bubble at the stage edge never widens the
-      // scene's scroll box with the corners of a rotated square.
+      // The words never turn on their own any more: they stay upright and
+      // fixed to their circle, so a bubble and its message always move as one
+      // object. Nothing in the scene is rotated, so no bubble at the stage
+      // edge can widen the scene's scroll box with the corners of a rotated
+      // square either.
       const content = a.el.querySelector('.orb-content');
-      if (content) content.style.rotate = R ? `${R.toFixed(2)}deg` : '';
+      if (content && content.style.rotate) content.style.rotate = '';
       a.el.style.opacity = op.toFixed(3);
       a.el.style.zIndex = String(L.z + Math.round(scale * 100));
       const baseBlur = scale < 0.93 ? (0.93 - scale) * 3 : 0;
@@ -902,12 +928,16 @@
 
     let sparksDrawn = 0;
 
-    // (a) Soft ground shadow ellipse under every visible bubble
+    // (a) Soft ground shadow ellipse under every visible bubble. A bubble in
+    // flight fades out as it reaches the stage edge, so the shadow and the
+    // sparkle trail below follow the opacity the bubble is drawn at rather
+    // than core's, and a bubble that has faded leaves nothing behind.
     for (const a of V.actors) {
-      if (a.life === 'absent' || a.opacity <= 0.01) continue;
+      const drawnOp = a._welcomeOpacity ?? a.opacity;
+      if (a.life === 'absent' || drawnOp <= 0.01) continue;
       const layer = a.layer || 'near';
       const baseAlpha = layer === 'near' ? 0.10 : layer === 'mid' ? 0.06 : 0.03;
-      const alpha = baseAlpha * a.opacity;
+      const alpha = baseAlpha * drawnOp;
       const scale = a.screenScale;
       const width = 0.8 * a.d * scale;
       const rx = width / 2;
@@ -935,7 +965,7 @@
           if (sparksDrawn >= 120) break;
           const pt = a.trail[j];
           const progress = (j + 1) / len;
-          const opacity = progress * 0.85 * a.opacity;
+          const opacity = progress * 0.85 * (a._welcomeOpacity ?? a.opacity);
           const r = 1.2 + progress * 2.2;
           const color = j % 2 === 0 ? '#e8c777' : '#fff9';
           drawSpark(c, pt.x, pt.y, r, opacity, color);
