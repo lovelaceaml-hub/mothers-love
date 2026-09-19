@@ -25,7 +25,7 @@
 const LIVE_FEED = Object.freeze({
   columns: 2,
   gap: 9, // px between cards, drawn at 1920; must equal .lf-track's gap in live-feed.css
-  speeds: [8, 8], // px per second per column, drawn at 1920; Anthony asked for slightly faster than the rail's 5.5 (2026-09-19)
+  speeds: [8, 9], // px per second per column, drawn at 1920; Anthony's numbers (2026-09-19): faster than the rail's 5.5, second column 9
   buffer: 260, // px of cards kept ready below the visible part of a column
   fadeMs: 600, // page fade in reduced motion
   overlap: 90, // px repeated when one card is taller than a column (paged mode)

@@ -415,17 +415,18 @@ test('same records and order as the rail, newest first, and every one of 100 get
   expect(seen.size).toBe(100);
 });
 
-test('scrolls continuously at 8 px per second and never while an arrival or a pause holds the screen', async ({ page }) => {
+test('scrolls continuously at 8 and 9 px per second and never while an arrival or a pause holds the screen', async ({ page }) => {
   const frame = await openLiveFeed(page, pool(60));
   const before = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
   await step(frame, 4000);
   const after = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
-  // Anthony asked for slightly faster than the rail (2026-09-19): 8 px per second,
-  // so four seconds are 32 px.
+  // Anthony's speeds (2026-09-19): 8 px per second in the first column and 9 in the
+  // second, so four seconds are 32 px and 36 px.
   after.forEach((value, index) => {
     const moved = value - before[index];
-    expect(moved).toBeGreaterThan(30);
-    expect(moved).toBeLessThan(34);
+    const want = [8, 9][index] * 4;
+    expect(moved).toBeGreaterThan(want - 2);
+    expect(moved).toBeLessThan(want + 2);
   });
   // Pause (the Studio's Pause button): the frame holds exactly where it is.
   await frame.evaluate(() => (window as any).colorPolishRuntime.setPlaying(false));
