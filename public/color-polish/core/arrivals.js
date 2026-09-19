@@ -1,14 +1,14 @@
 // Core recognition arrival event state machine and presentation.
 'use strict';
 
-function cancelActiveEvent(){active=null;transition=null;S.chain=false;$('event')?.replaceChildren();$('event')?.classList.remove('active');$('stage')?.classList.remove('dimmed');$('qr-zone')?.classList.remove('qr-active');renderQueue()}
+function cancelActiveEvent(){active=null;transition=null;S.chain=false;$('event')?.replaceChildren();$('event')?.classList.remove('active');$('stage')?.classList.remove('dimmed');$('qr-zone')?.classList.remove('qr-active');arrivalRemoveSky();renderQueue()}
 
 function beginEvent(){
  if(active&&active.phase!=='gap')return;
  S.queue=S.queue.filter(id=>eligible(S.pool.find(r=>r.id===id)));
  if(!S.queue.length){endChain();return}
  const items=S.queue.splice(0,S.queue.length>=10?10:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===10;
- if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed')}
+ if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed');arrivalMountSky()}
  const style=nextStyle(group?'group':'single');
  const frameStyle=nextArrivalFrame();
  active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:group&&items.some(r=>!smallFits(r)),elements:[],localTime:0,exitPos:null};
@@ -104,7 +104,7 @@ function tickEvent(dt){
  renderQueue();
 }
 
-function endChain(){if(active&&active.phase!=='gap')return;active=null;S.chain=false;$('event').className='event-stage';$('event').replaceChildren();$('stage').classList.remove('dimmed');$('qr-zone').classList.remove('qr-active');renderQueue();if(S.pendingScene){const id=S.pendingScene;S.pendingScene=null;requestScene(id)}else if(S.milestonePending){const v=S.milestonePending;S.milestonePending=null;captureMilestone(v);requestScene(11)}log('queue_drained',{resumeScene:S.s})}
+function endChain(){if(active&&active.phase!=='gap')return;active=null;S.chain=false;$('event').className='event-stage';$('event').replaceChildren();$('stage').classList.remove('dimmed');$('qr-zone').classList.remove('qr-active');arrivalClearSky();renderQueue();if(S.pendingScene){const id=S.pendingScene;S.pendingScene=null;requestScene(id)}else if(S.milestonePending){const v=S.milestonePending;S.milestonePending=null;captureMilestone(v);requestScene(11)}log('queue_drained',{resumeScene:S.s})}
 
 function drawEventParticles(p){
  const a=active,can=$('event-canvas'),c=can?.getContext('2d');if(!c||!a)return;c.clearRect(0,0,1812,615);if(S.still)return;
