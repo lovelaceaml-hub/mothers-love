@@ -6,8 +6,16 @@
 /* The recognition area runs edge to edge: scene glows and shadows paint out to the real
    screen edges left and right, up to the header rule (y 102) and down to the feed rail (y 787),
    instead of being sliced at the stage box (54,126 to 1866,762). Scene layout is untouched. */
-.stage { overflow:visible; clip-path:inset(-24px -54px -25px -54px); isolation:isolate; perspective:none; }
-.scene { overflow:clip; overflow-clip-margin:60px; isolation:isolate; }
+.stage { overflow:visible; -webkit-clip-path:inset(-24px -54px -25px -54px); clip-path:inset(-24px -54px -25px -54px); isolation:isolate; perspective:none; }
+/* The scene itself never clips: the stage's clip above is the only paint limit. A browser that
+   does not know clip-path paints scenes uncut, and the header (z-index 30) and the feed rail
+   (z-index 32) still sit above the stage (z-index 3), so they are never painted over. */
+.scene { overflow:visible; isolation:isolate; }
+/* Scene 12, Live Recognitions full screen: its panel is the feed rail grown to the full height
+   (TV y 118 to 1055) and the rail is hidden while it shows, so the stage's paint limit runs down
+   to the bottom of the screen (762 + 318 = 1080) while scene 12 is in the stage. The top limit
+   stays at the header rule, and the rail still sits above the stage while it fades. */
+#tv:has(#stage > .scene[data-scene='12'] .lf-panel) .stage { -webkit-clip-path:inset(-24px -54px -318px -54px); clip-path:inset(-24px -54px -318px -54px); }
 .event-stage { overflow:hidden; isolation:isolate; border-radius:36px; }
 /* Geometry belongs to the shell, never to the content's intrinsic dimensions. */
 .orb-slot,.event-orb { aspect-ratio:1; flex:none; transform-origin:50% 50%; }
