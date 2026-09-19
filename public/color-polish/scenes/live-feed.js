@@ -25,7 +25,7 @@
 const LIVE_FEED = Object.freeze({
   columns: 2,
   gap: 9, // px between cards, drawn at 1920; must equal .lf-track's gap in live-feed.css
-  speeds: [5.5, 5.5], // px per second per column, drawn at 1920; the rail's own speed
+  speeds: [8, 8], // px per second per column, drawn at 1920; Anthony asked for slightly faster than the rail's 5.5 (2026-09-19)
   buffer: 260, // px of cards kept ready below the visible part of a column
   fadeMs: 600, // page fade in reduced motion
   overlap: 90, // px repeated when one card is taller than a column (paged mode)
@@ -149,6 +149,9 @@ function liveFeedStartScroll(lane) {
     liveFeedFill(lane);
     const first = lane.track.firstElementChild;
     if (first && lane.offset >= liveFeedHeight(first) + LIVE_FEED.gap) lane.offset = 0;
+    // Staggered columns (Anthony, 2026-09-19): on a first visit every second column
+    // starts half a card down, so the cards in the two columns never line up in rows.
+    if (at < 0 && first && lane.index % 2 === 1) lane.offset = Math.round(liveFeedHeight(first) / 2);
   }
   lane.firstEl = null;
   lane.track.style.transform = `translate3d(0,${(-lane.offset).toFixed(2)}px,0)`;

@@ -402,7 +402,7 @@ test('same records and order as the rail, newest first, and every one of 100 get
   expect(first.lanes.map((lane) => lane.cards[1].id)).toEqual([records[2].id, records[3].id]);
   const seen = new Set<string>();
   const known = new Set(records.map((r) => r.id));
-  // At the rail's own 5.5 px per second a column of 50 cards takes about 1000
+  // At 8 px per second a column of 50 cards takes about 1000
   // seconds to come round, so the clock is stepped a long way here.
   for (let i = 0; i < 42; i++) {
     const m = await measure(frame);
@@ -415,17 +415,17 @@ test('same records and order as the rail, newest first, and every one of 100 get
   expect(seen.size).toBe(100);
 });
 
-test('scrolls continuously at the rail\'s own pace and never while an arrival or a pause holds the screen', async ({ page }) => {
+test('scrolls continuously at 8 px per second and never while an arrival or a pause holds the screen', async ({ page }) => {
   const frame = await openLiveFeed(page, pool(60));
   const before = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
   await step(frame, 4000);
   const after = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
-  // The rail moves 5.5 px per second (tickFeeds in core/chrome.js), so four seconds
-  // are 22 px here too: the two screens drift at the same speed.
+  // Anthony asked for slightly faster than the rail (2026-09-19): 8 px per second,
+  // so four seconds are 32 px.
   after.forEach((value, index) => {
     const moved = value - before[index];
-    expect(moved).toBeGreaterThan(20);
-    expect(moved).toBeLessThan(24);
+    expect(moved).toBeGreaterThan(30);
+    expect(moved).toBeLessThan(34);
   });
   // Pause (the Studio's Pause button): the frame holds exactly where it is.
   await frame.evaluate(() => (window as any).colorPolishRuntime.setPlaying(false));
