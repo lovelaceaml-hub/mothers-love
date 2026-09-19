@@ -23,6 +23,9 @@ export type { ColorPolishRendererProps, ColorPolishSnapshot } from '@/lib/color-
 const RENDERER_URL = '/color-polish/renderer.html';
 const RECOGNIZE_URL = 'https://mothers-love.vercel.app/recognize';
 const PREVIEW_BUILD = process.env.COLOR_POLISH_PREVIEW_BUILD === 'true';
+// The single preview-build gate. Exported so the display host can read the same
+// value instead of testing the environment variable a second time.
+export const COLOR_POLISH_PREVIEW_BUILD = PREVIEW_BUILD;
 // The TV QR code opens the home page, not the recognition form.
 const QR_TARGET_URL = 'https://mothers-love.vercel.app/';
 const MAX_RECOGNITIONS = 1_000;
@@ -249,6 +252,15 @@ function buildQrDataUrl(url: string): Promise<string | null> {
     .catch(() => null);
 }
 
+/**
+ * holdInput is a preview-build only affordance for the one screen preview links
+ * (/display?scene=...). When it is on, the iframe stops receiving pointer events
+ * and leaves the tab order, so the click, tap, ArrowRight and Space handlers that
+ * live inside the renderer document never fire and the held screen stays put.
+ * It is ignored on production builds, where the gate below is false.
+ */
+export type ColorPolishRendererHostProps = ColorPolishRendererProps & { holdInput?: boolean };
+
 export function ColorPolishRenderer({
   snapshot,
   nowMs,
@@ -261,7 +273,9 @@ export function ColorPolishRenderer({
   reactionCounts = {},
   className,
   onReady,
-}: ColorPolishRendererProps) {
+  holdInput = false,
+}: ColorPolishRendererHostProps) {
+  const inputHeld = PREVIEW_BUILD && holdInput === true;
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const channelRef = useRef<BridgeChannel | null>(null);
   const readyCallbackRef = useRef(onReady);
@@ -409,7 +423,8 @@ export function ColorPolishRenderer({
       className={className}
       onLoad={handleLoad}
       sandbox={PREVIEW_BUILD ? 'allow-scripts allow-same-origin' : 'allow-scripts'}
-      style={{ width: '100%', height: '100%', border: 0, display: 'block', background: '#fff9ed' }}
+      {...(inputHeld ? { tabIndex: -1 } : {})}
+      style={{ width: '100%', height: '100%', border: 0, display: 'block', background: '#fff9ed', ...(inputHeld ? { pointerEvents: 'none' as const } : {}) }}
     />
   );
 }
