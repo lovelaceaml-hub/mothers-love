@@ -255,6 +255,23 @@
   inset: 0;
 }
 
+/* Plan 17 Lane 6 (Anthony, September 19, item 8): the medallions must
+   revolve around their recognition, passing in front of it on the near half
+   of their ring and behind it on the far half. renderer.css lifts a bubble
+   holding a long message to z-index 940, which is above every medallion, so
+   inside a planet the bubble stays on its own layer (2) between the far
+   medallion (1) and the near one (4). Scoped to this scene, so the drifting
+   bubbles of Welcome and Garden keep their own layering. */
+#tv .scene[data-scene="10"] .planet-system .orb-slot[data-long='true'] {
+  z-index: 2 !important;
+}
+
+/* The ring runs outside the rim, so a medallion is drawn past the planet's
+   own box; nothing in this scene may clip it. */
+#tv .scene[data-scene="10"] .planet-system {
+  overflow: visible;
+}
+
 #tv.still .scene[data-scene="10"] .orbit-sun,
 #tv.still .scene[data-scene="10"] .orbit-sun-halo,
 #tv.still .scene[data-scene="10"] .orbit-sun-rays,

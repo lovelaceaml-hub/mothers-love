@@ -7,16 +7,20 @@ let ORBIT_PASS_TOKEN = 0;
 let ORBIT_REFILL_COUNT = 0;
 let ORBIT_SESSION_SALT = null;
 
-const ORBIT_BASE_DIAMETER = 227;
-const ORBIT_CENTER_DIAMETER = 420;
 const ORBIT_RADIUS_X = 648;
 const ORBIT_RADIUS_Y = 48;
 
+// Plan 17 Lane 6 (Anthony's TV watch, September 19, item 8): "the orbiting
+// bubbles need to be smaller", with the gold centre circle staying the
+// dominant element. The Plan 15 starting tiers scale down with the layout
+// font floor below (19.5 px instead of 23.1 px, the same words drawn at the
+// same 18 px), so a planet starts smaller and still grows only as much as
+// its own message needs.
 function orbitPlanetDiameter(message) {
   const len = (message || '').length;
-  if (len < 80) return 195;
-  if (len < 200) return 227;
-  return 263;
+  if (len < 80) return 165;
+  if (len < 200) return 192;
+  return 222;
 }
 
 // Plan 17 bubble fit ("pages, long only", Anthony, September 18), the same
@@ -25,21 +29,41 @@ function orbitPlanetDiameter(message) {
 // and page indicator inside a concentric circle max(3 percent of the
 // diameter, 12 px) in from the rim. Only a message that cannot fit whole
 // even at ORBIT_MAX_DIAMETER flips through pages, at that size and at the
-// floor.
+// floor. Sizes are measured on a hidden, unscaled copy of the planet, then
+// applied to the live planet.
 //
-// The orbit projection draws a planet at ORBIT_K_MIN (0.782) of its layout
-// size at the back and up to 1.385 at the front. The words must be drawn at
-// 18 px or larger at every moment (36 px at 3840), so the layout font floor
-// is 18 / ORBIT_K_MIN. The drawn planet never exceeds ORBIT_DRAWN_CAP: the
-// room between the scene title (bottom at y 80, plus an 8 px gap) and the
-// bottom of the 636 px stage (4 px in), so the front pass never rises over
-// the title. A planet whose front pass would exceed the cap is drawn at
-// min(k, cap / d) instead, still never smaller than k at the back. The
-// largest planet, ORBIT_MAX_DIAMETER = cap / ORBIT_K_MIN, is drawn at the
-// cap all the way round and holds a 500 grapheme message whole.
-// Sizes are measured on a hidden, unscaled copy of the planet, then applied
-// to the live planet.
-const ORBIT_K_MIN = 1420 / 1815;
+// Plan 17 Lane 6 (Anthony, September 19, item 8), "the orbiting bubbles need
+// to be smaller". Two things set how large a planet is drawn:
+//
+// 1. The projection. It magnified a planet from 0.782 of its layout size at
+//    the back of the ring to 1.385 at the front, so a planet on the near
+//    pass was drawn nearly as wide as the 480 px gold centre. The drawn
+//    scale is now softened to ORBIT_SCALE_SOFTEN of that swing. Depth is
+//    untouched: position, z order, blur and tone still come from the raw
+//    projection, only the size swing is gentler.
+// 2. The layout font floor. Words must be drawn at 18 px or larger at every
+//    moment (36 px at 3840), so the layout floor is 18 / ORBIT_K_MIN. With
+//    the softened swing that is 19.5 px instead of 23.1 px, and a message
+//    needs a smaller circle to hold it at the floor, so every measured
+//    diameter comes down with it.
+//
+// ORBIT_SOFT_CAP is the size at which the gold centre stays the dominant
+// element: 70 percent of its diameter. A planet that fits inside it is drawn
+// no wider than it, however near the viewer it comes. A planet whose own
+// message cannot show whole any smaller than that is the one exception, and
+// then it is never magnified either: it is drawn at ORBIT_K_MIN of its
+// layout size all the way round, the smallest circle that still shows those
+// words at 18 px. ORBIT_MAX_DIAMETER keeps even that inside
+// ORBIT_DRAWN_CAP, the room between the scene title (bottom at y 80, plus an
+// 8 px gap) and the bottom of the 636 px stage (4 px in), so no planet ever
+// rises over the title, and the largest planet holds a 500 grapheme message
+// whole.
+const ORBIT_SUN_DIAMETER = 480;
+const ORBIT_SOFT_CAP = Math.round(ORBIT_SUN_DIAMETER * 0.7);
+const ORBIT_SCALE_SOFTEN = 0.35;
+const ORBIT_K_RAW_MIN = 1420 / 1815;
+const orbitDrawScale = (k) => 1 + (k - 1) * ORBIT_SCALE_SOFTEN;
+const ORBIT_K_MIN = orbitDrawScale(ORBIT_K_RAW_MIN);
 const ORBIT_TITLE_BOTTOM = 80;
 const ORBIT_TITLE_GAP = 8;
 const ORBIT_DRAWN_CAP = 636 - 4 - (ORBIT_TITLE_BOTTOM + ORBIT_TITLE_GAP);
@@ -48,6 +72,18 @@ const ORBIT_FONT_FLOOR = Math.ceil((18 / ORBIT_K_MIN) * 10) / 10;
 const ORBIT_RIM_MARGIN = 0.03;
 const ORBIT_RIM_MARGIN_MIN = 12;
 const ORBIT_CONTENT_WIDTHS = [80, 74, 68];
+
+// Plan 17 Lane 6 (Anthony, September 19, item 8), "the expression symbols and
+// images need to revolve around the recognition; right now they go behind
+// it". A medallion now travels a tilted ring outside the bubble's rim
+// (ORBIT_MOON_GAP px of clearance before its own 21.5 px radius) instead of
+// a flat 50 px path that crossed the words, and it passes in front of the
+// bubble on the near half of that ring and behind it on the far half.
+const ORBIT_MOON_RADIUS = 21.5;
+const ORBIT_MOON_GAP = 26;
+const ORBIT_MOON_TILT = 0.94;
+const ORBIT_MOON_DEPTH = 52;
+const ORBIT_MOON_K_MAX = 600 / (600 - ORBIT_MOON_DEPTH);
 let ORBIT_FIT_CACHE = new Map();
 
 function orbitWithHost(fn) {
@@ -250,7 +286,7 @@ function orbitApplyFit(p, r, d, fit) {
   if (!page.hidden) page.textContent = `01 / ${String(fit.pages.length).padStart(2, '0')} · CONTINUED`;
   el.dataset.long = String(!smallFits(r));
   b.reading = { pages: fit.pages, index: 0, at: V.clock, duration: Math.max(9, fit.pages[0].length / 14) };
-  log('orbit_bubble_fit', { id: r.id, diameter: d, cap: ORBIT_MAX_DIAMETER, pages: fit.pages.length, font: fit.font, verbatim: fit.pages.join('') === r.message });
+  log('orbit_bubble_fit', { id: r.id, diameter: d, cap: ORBIT_MAX_DIAMETER, softCap: ORBIT_SOFT_CAP, drawnCap: ORBIT_DRAWN_CAP, pages: fit.pages.length, font: fit.font, verbatim: fit.pages.join('') === r.message });
   // Core's own fit pass may already have logged this record's pagination
   // at this moment; log it only once.
   if (fit.pages.length > 1 && !qaLog.some((e) => e.type === 'circular_pagination' && e.id === r.id && e.at === +S.t.toFixed(3))) log('circular_pagination', { id: r.id, pages: fit.pages.length, diameter: d, verbatim: fit.pages.join('') === r.message });
@@ -422,22 +458,33 @@ function tickOrbit(dt) {
   V.planets.forEach((p) => {
     const theta = p.phase + V.clock * 0.082, pos = projectOrbit(theta), b = p.b;
     p.z = pos.z;
-    // A grown planet never draws larger than ORBIT_DRAWN_CAP (see the note
-    // above): its front-pass magnification is reduced, its back pass is not.
-    const k = Math.min(pos.k, ORBIT_DRAWN_CAP / b.d);
+    // The softened draw scale (see the note above), then the cap. A planet
+    // that fits inside the soft cap is held to it as it comes round the near
+    // side. A planet whose own message needs a wider circle than that is
+    // held to its own back-pass size instead, b.d * ORBIT_K_MIN, which is
+    // the smallest circle that still shows those words at 18 px, and which
+    // ORBIT_MAX_DIAMETER keeps inside the hard cap. Either way only the
+    // front pass is reduced; the back pass, which the floor rests on, is not.
+    const cap = Math.max(ORBIT_SOFT_CAP, b.d * ORBIT_K_MIN);
+    const k = Math.min(orbitDrawScale(pos.k), cap / b.d);
     p.scale = k;
     // Clamp the drawn planet so it never leaves the stage. The scene root is
     // 636 tall, the .orbit-universe layer starts 84 px down it, and a planet
     // scales by k about its own centre, so its drawn box is d * k around
-    // (x, y). Horizontally the moons reach about 60 px past the rim. A planet
+    // (x, y). Its medallions ride outside that box on their own ring, so the
+    // reach used here is the wider of the two, in both directions. A planet
     // whose drawn box overlaps the scene title's words (x below
     // V.orbitTitleRight) keeps its top below the title.
     const half = (b.d * k) / 2;
-    const reach = (b.d / 2 + 60) * k;
-    const cxDrawn = clamp(pos.x, reach, 1812 - reach);
-    const overTitle = cxDrawn - half < (V.orbitTitleRight || 900);
+    const moonRx = b.d / 2 + ORBIT_MOON_GAP;
+    const moonReachX = moonRx * ORBIT_MOON_K_MAX + ORBIT_MOON_RADIUS;
+    const moonReachY = moonRx * ORBIT_MOON_TILT * ORBIT_MOON_K_MAX + ORBIT_MOON_RADIUS;
+    const reachX = Math.max(b.d / 2, moonReachX) * k;
+    const reachY = Math.max(b.d / 2, moonReachY) * k;
+    const cxDrawn = clamp(pos.x, reachX, 1812 - reachX);
+    const overTitle = cxDrawn - reachX < (V.orbitTitleRight || 900);
     const topLimit = overTitle ? ORBIT_TITLE_BOTTOM + ORBIT_TITLE_GAP : 4;
-    const cyDrawn = clamp(pos.y, half - 84 + topLimit, 552 - half - 4);
+    const cyDrawn = clamp(pos.y, reachY - 84 + topLimit, 552 - reachY - 4);
     const left = cxDrawn - b.d / 2;
     const top = cyDrawn - b.d / 2;
     p.el.style.transform = `translate(${left}px,${top}px) scale(${k})`;
@@ -455,10 +502,15 @@ function tickOrbit(dt) {
     if (b.reading) tickCirclePages(b, V.clock);
     const cx = b.d / 2;
     const cy = b.d / 2;
-    const rMoon = cx + 15;
+    // The medallions revolve on a ring outside the rim: near half in front
+    // of the bubble (z index above the .orb-slot's 2), far half behind it,
+    // so they pass around the recognition instead of across its words.
     p.moons.forEach((moon, j) => {
-      const a = V.clock * (0.33 + j * 0.04) + j * Math.PI + p.phase, mz = Math.sin(a) * 52, k = 600 / (600 - mz);
-      moon.style.transform = `translate(${cx + Math.cos(a) * rMoon * k - 21.5}px,${cy + Math.sin(a) * 50 * k - 21.5}px) scale(${k})`;
+      const a = V.clock * (0.33 + j * 0.04) + j * Math.PI + p.phase;
+      const mz = Math.sin(a) * ORBIT_MOON_DEPTH, mk = 600 / (600 - mz);
+      const mx = cx + Math.cos(a) * moonRx * mk - ORBIT_MOON_RADIUS;
+      const my = cy + Math.sin(a) * moonRx * ORBIT_MOON_TILT * mk - ORBIT_MOON_RADIUS;
+      moon.style.transform = `translate(${mx}px,${my}px) scale(${mk})`;
       moon.style.zIndex = mz > 0 ? '4' : '1';
       moon.style.opacity = mz > 0 ? '1' : '.8';
     });

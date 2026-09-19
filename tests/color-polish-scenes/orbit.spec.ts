@@ -12,7 +12,7 @@ import {
 import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildLongOnlyFixture, buildMediumFixture, buildMostlyLongFixture, textFits } from './text-fits';
+import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildLongOnlyFixture, buildMediumFixture, buildMostlyLongFixture, fitsWhole, textFits } from './text-fits';
 
 const publicFolder = resolve(process.cwd(), 'public');
 
@@ -765,7 +765,7 @@ test('over a full orbit every planet keeps its words at the drawn floor, never r
   }
 });
 
-test('long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 500 grapheme planet is drawn as large as the room under the title allows', async ({ page }) => {
+test('long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 500 grapheme planet is drawn at the smallest circle its words fit', async ({ page }) => {
   test.setTimeout(120000);
   for (const size of ORBIT_SIZES) {
     const testPage = await page.context().newPage();
@@ -782,7 +782,19 @@ test('long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 5
     const readings = await bubbleReadings(frame, ORBIT_ROOT);
     expect(new Set(readings.map((r) => r.id))).toEqual(new Set(['mostly-250', 'mostly-400', 'mostly-500', 'mostly-emoji']));
     for (const r of readings) expect(r.pages, `${r.id} shows whole`).toBe(1);
-    expect(largest, `the 500 grapheme planet reaches the room under the title (${room.cap.toFixed(0)} px)`).toBeGreaterThanOrEqual(room.cap - 3);
+    // Plan 17 Lane 6 (Anthony, September 19, item 8): the product maximum
+    // is the one message that cannot show whole inside the soft cap, so it
+    // is the one planet allowed past it, and even then it is never
+    // magnified: it is drawn at its layout size times the back-pass scale,
+    // the smallest circle that still shows those words at the 18 px floor,
+    // and it stays inside the room under the title.
+    const five = readings.find((r) => r.id === 'mostly-500')!;
+    expect(largest, `the 500 grapheme planet stays inside the room under the title (${room.cap.toFixed(0)} px)`).toBeLessThanOrEqual(room.cap + 1);
+    expect(largest, 'the 500 grapheme planet needs more room than the soft cap').toBeGreaterThan(ORBIT_SOFT_CAP);
+    expect(
+      Math.abs(largest - five.diameter * ORBIT_K_MIN),
+      `the 500 grapheme planet is never magnified: drawn ${largest.toFixed(1)} px against ${five.diameter} px of layout`,
+    ).toBeLessThanOrEqual(3);
     console.log(`orbit ${size.width} wide: ${JSON.stringify(readings.map((r) => ({ id: r.id, diameter: r.diameter, pages: r.pages, font: r.font })))}`);
     await testPage.close();
   }
@@ -890,3 +902,300 @@ test('orbit bubble sizing re-measures once a still-loading document.fonts.ready 
   expect(fitCallCount).toBeGreaterThanOrEqual(2);
 });
 
+
+// ---------------------------------------------------------------------------
+// Plan 17 Lane 6. Anthony's church TV watch, September 19, item 8:
+// "Expression Orbit: the orbiting bubbles need to be smaller. The expression
+// symbols and images need to revolve around the recognition; right now they
+// go behind it."
+// ---------------------------------------------------------------------------
+
+/** The gold centre circle, the size orbit.css gives it. */
+const ORBIT_SUN_DIAMETER = 480;
+/** The soft cap orbit.js states: 70 percent of the centre circle, so the centre stays the dominant element. */
+const ORBIT_SOFT_CAP = Math.round(ORBIT_SUN_DIAMETER * 0.7);
+/** The hard cap orbit.js states: the room between the scene title and the bottom of the 636 px stage. */
+const ORBIT_ROOM_CAP = 636 - 4 - 88;
+/** The softened draw scale at the back of the ring, and the layout font floor that rests on it. */
+const ORBIT_K_MIN = 1 + (1420 / 1815 - 1) * 0.35;
+const ORBIT_FONT_FLOOR = Math.ceil((18 / ORBIT_K_MIN) * 10) / 10;
+/** The largest layout diameter that is still drawn inside the soft cap. */
+const ORBIT_SOFT_CAP_LAYOUT = Math.floor(ORBIT_SOFT_CAP / ORBIT_K_MIN);
+
+/**
+ * The layout font floor of tv17/fit 71bf3f8, the build Anthony watched on
+ * the church TV: it drew a planet at 0.782 of its layout size at the back of
+ * the ring, so its words needed 18 / 0.782 = 23.1 layout px, and every
+ * planet had to be large enough to hold its message at that size. A planet
+ * that cannot hold its own message at 23.1 px today is therefore strictly
+ * smaller than the same record's planet in that build.
+ */
+const ORBIT_OLD_FONT_FLOOR = 23.1;
+/**
+ * Measured on tv17/fit 71bf3f8 with the sample snapshot (messages of 53 to
+ * 90 characters) at 1920 and 3840 wide and at 0, 6, 14 and 21 s: planets
+ * were 261 to 291 layout px and were drawn up to 399 px wide against the
+ * 480 px centre circle.
+ */
+const ORBIT_OLD_MAX_DRAWN = 399;
+
+type OrbitPlanetReading = {
+  /** Position of this planet in the scene, stable for the whole showing even as records move between planets. */
+  index: number;
+  id: string;
+  layout: number;
+  drawn: number;
+  long: boolean;
+  slotZ: number;
+  centre: { x: number; y: number };
+  textRects: Array<{ left: number; top: number; right: number; bottom: number }>;
+  moons: Array<{
+    zIndex: number;
+    rect: { left: number; top: number; right: number; bottom: number };
+    /** Centre distance from the planet's centre, in stage layout px. */
+    distance: number;
+  }>;
+};
+
+/**
+ * Per planet: its layout and drawn diameter (stage layout px), whether the
+ * renderer marked it long, the computed z-index of its bubble, the rendered
+ * rectangles of the recipient name and message lines, and every medallion's
+ * rectangle, computed z-index and distance from the planet's centre.
+ * Everything is read from the DOM, never from what orbit.js recorded.
+ */
+async function orbitPlanetReadings(frame: Frame): Promise<OrbitPlanetReading[]> {
+  return await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"]');
+    if (!scene) return [];
+    const sceneRect = scene.getBoundingClientRect();
+    const s = sceneRect.width / 1812;
+    const box = (r: DOMRect) => ({ left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+    return Array.from(scene.querySelectorAll<HTMLElement>('.planet-system')).map((planet, index) => {
+      const slot = planet.querySelector<HTMLElement>('.orb-slot')!;
+      const rect = slot.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const textRects: Array<{ left: number; top: number; right: number; bottom: number }> = [];
+      slot.querySelectorAll<HTMLElement>('.recipient, .message').forEach((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        for (const r of Array.from(range.getClientRects())) if (r.width > 0 && r.height > 0) textRects.push(box(r));
+      });
+      const moons = Array.from(planet.querySelectorAll<HTMLElement>('.orbit-moon')).map((moon) => {
+        const r = moon.getBoundingClientRect();
+        return {
+          zIndex: parseInt(window.getComputedStyle(moon).zIndex || '0', 10),
+          rect: box(r),
+          distance: Math.hypot((r.left + r.right) / 2 - cx, (r.top + r.bottom) / 2 - cy) / s,
+        };
+      });
+      return {
+        index,
+        id: slot.dataset.recordId || '',
+        layout: slot.offsetWidth,
+        drawn: rect.width / s,
+        long: slot.dataset.long === 'true',
+        slotZ: parseInt(window.getComputedStyle(slot).zIndex || '0', 10),
+        centre: { x: cx, y: cy },
+        textRects,
+        moons,
+      };
+    });
+  });
+}
+
+const rectsOverlap = (
+  a: { left: number; top: number; right: number; bottom: number },
+  b: { left: number; top: number; right: number; bottom: number },
+  tolerance = 0.5,
+) => a.left < b.right - tolerance && a.right > b.left + tolerance && a.top < b.bottom - tolerance && a.bottom > b.top + tolerance;
+
+test('the orbiting bubbles are smaller than the build Anthony watched and the gold centre stays the dominant circle', async ({ page }) => {
+  test.setTimeout(180000);
+  const sample = buildColorPolishSampleSnapshot() as unknown as Record<string, unknown>;
+  for (const size of ORBIT_SIZES) {
+    for (const ms of [0, 6000, 14000, 21000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize(size);
+      const frame = await loadRenderer(testPage, { scene: 10, ms, fixture: sample });
+      const where = `${size.width} wide at ${ms} ms`;
+      const planets = await orbitPlanetReadings(frame);
+      expect(planets, where).toHaveLength(4);
+      for (const planet of planets) {
+        expect(planet.drawn, `${planet.id} stays inside the soft cap, ${where}`).toBeLessThanOrEqual(ORBIT_SOFT_CAP + 1);
+        expect(planet.drawn, `${planet.id} drawn well below the old ${ORBIT_OLD_MAX_DRAWN} px peak, ${where}`).toBeLessThanOrEqual(ORBIT_OLD_MAX_DRAWN * 0.85);
+        expect(planet.drawn, `${planet.id} against the ${ORBIT_SUN_DIAMETER} px centre, ${where}`).toBeLessThan(ORBIT_SUN_DIAMETER);
+        // Strictly smaller than the same record's planet in the build
+        // Anthony watched: its message does not fit this circle at the old
+        // 23.1 px layout floor, so that build had to draw it larger.
+        expect(
+          await fitsWhole(frame, planet.id, planet.layout, ORBIT_OLD_FONT_FLOOR),
+          `${planet.id} at ${planet.layout} px is smaller than the old build's planet for the same record, ${where}`,
+        ).toBe(false);
+      }
+      // Every message still shows whole, at the drawn floor or larger.
+      const failures = await textFits(frame, ORBIT_ROOT);
+      expect(failures, `orbit text-fit failures at ${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+      for (const reading of await bubbleReadings(frame, ORBIT_ROOT)) {
+        expect(reading.pages, `${reading.id} shows whole, ${where}`).toBe(1);
+        expect(reading.drawnFont, `${reading.id} drawn size, ${where}`).toBeGreaterThanOrEqual(18 * (size.width / 1920) - 0.05);
+      }
+      await testPage.close();
+    }
+  }
+});
+
+test('a planet is drawn wider than the soft cap only when its own message cannot show whole any smaller', async ({ page }) => {
+  test.setTimeout(180000);
+  for (const fixture of [buildMostlyLongFixture(), buildLongOnlyFixture(), buildMediumFixture()]) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(testPage, { scene: 10, ms: 0, fixture });
+    for (let t = 0; t < 30; t++) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+      for (const planet of await orbitPlanetReadings(frame)) {
+        expect(planet.drawn, `${planet.id} stays inside the room under the title at ${t * 2} s`).toBeLessThanOrEqual(ORBIT_ROOM_CAP + 1);
+        if (planet.drawn <= ORBIT_SOFT_CAP + 1) continue;
+        // Judged by text-fits.ts's own geometry, not by anything orbit.js
+        // wrote: this record really could not have shown whole inside the
+        // soft cap at the layout font floor.
+        const couldFit = await fitsWhole(frame, planet.id, ORBIT_SOFT_CAP_LAYOUT, ORBIT_FONT_FLOOR);
+        expect(
+          couldFit,
+          `${planet.id} is drawn ${planet.drawn.toFixed(0)} px, past the ${ORBIT_SOFT_CAP} px soft cap, at ${t * 2} s, so its message must not fit whole at ${ORBIT_SOFT_CAP_LAYOUT} px`,
+        ).toBe(false);
+      }
+    }
+    await testPage.close();
+  }
+});
+
+test('orbit.js states the soft cap and the hard cap it measures against', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, ms: 1000, fixture: buildMostlyLongFixture() });
+  const fits = await frame.evaluate(() =>
+    ((window as any).colorPolishRuntime.getState().log as Array<Record<string, unknown>>).filter((e) => e.type === 'orbit_bubble_fit'),
+  );
+  expect(fits.length).toBeGreaterThan(0);
+  for (const entry of fits) {
+    expect(entry.softCap, 'stated soft cap').toBe(ORBIT_SOFT_CAP);
+    expect(entry.drawnCap, 'stated hard cap').toBe(ORBIT_ROOM_CAP);
+    expect(entry.font as number, 'layout font floor or larger').toBeGreaterThanOrEqual(ORBIT_FONT_FLOOR);
+    expect(entry.verbatim, `${entry.id} keeps every word`).toBe(true);
+  }
+});
+
+test('the expression medallions revolve around their recognition: in front on the near half, behind on the far half, never over the name or the message', async ({ page }) => {
+  test.setTimeout(300000);
+  // The mostly-long fixture puts a record too long for smallFits() on screen,
+  // so the data-long layer that used to bury every medallion is exercised.
+  for (const fixture of [buildMostlyLongFixture()]) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(testPage, { scene: 10, ms: 0, fixture });
+    const front = new Map<string, boolean>();
+    const behind = new Map<string, boolean>();
+    let sawLongPlanet = false;
+    let moonSamples = 0;
+
+    // A medallion completes its ring in 9 to 19 s, so 30 one-second steps
+    // carry every one of them all the way round at least once.
+    for (let t = 0; t < 30; t++) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+      for (const planet of await orbitPlanetReadings(frame)) {
+        // renderer.css lifts a bubble holding a long message to z-index 940,
+        // which would bury every medallion behind it; inside a planet the
+        // bubble must stay on layer 2, between the far and near medallion.
+        expect(planet.slotZ, `${planet.id} bubble layer at ${t} s`).toBe(2);
+        if (planet.long) sawLongPlanet = true;
+        expect(planet.moons.length, `${planet.id} has medallions`).toBeGreaterThan(0);
+        planet.moons.forEach((moon, index) => {
+          // Keyed by the planet's position, not by the record it happens to
+          // hold: a far-side replacement moves records between planets.
+          const key = `planet ${planet.index} medallion ${index}`;
+          moonSamples++;
+          if (moon.zIndex > planet.slotZ) {
+            front.set(key, true);
+            // A medallion painted in front of the bubble must pass around
+            // its rim, never across the recipient name or the message.
+            expect(
+              moon.distance,
+              `${key} passes outside the rim while in front at ${t} s (${moon.distance.toFixed(1)} vs radius ${(planet.drawn / 2).toFixed(1)})`,
+            ).toBeGreaterThanOrEqual(planet.drawn / 2 - 1);
+            for (const textRect of planet.textRects) {
+              expect(
+                rectsOverlap(moon.rect, textRect),
+                `${key} covers words of ${planet.id} at ${t} s`,
+              ).toBe(false);
+            }
+          } else if (moon.zIndex < planet.slotZ) {
+            behind.set(key, true);
+          }
+        });
+      }
+    }
+
+    expect(moonSamples, 'medallions were sampled').toBeGreaterThan(0);
+    expect(sawLongPlanet, 'a planet holding a long message was on screen').toBe(true);
+    const keys = new Set([...front.keys(), ...behind.keys()]);
+    expect(keys.size, 'medallions seen').toBeGreaterThan(0);
+    for (const key of keys) {
+      expect(front.get(key) === true, `${key} passed in front of its bubble`).toBe(true);
+      expect(behind.get(key) === true, `${key} passed behind its bubble`).toBe(true);
+    }
+    await testPage.close();
+  }
+});
+
+test('orbit holds through a full showing at both the 30 and the 60 second dwell', async ({ page }) => {
+  test.setTimeout(240000);
+  for (const dwell of [30, 60]) {
+    const fixture = buildMostlyLongFixture({
+      presentation: {
+        version: 'color-polish-v6',
+        enabled: true,
+        playlist: [{ id: 'orbit', enabled: true, durationSeconds: dwell }],
+      },
+    });
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(testPage, { scene: 10, ms: 0, fixture });
+    const runtimeDwell = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().visual.dwell[10] as number);
+    expect(runtimeDwell, 'the scene reads its dwell from the snapshot').toBe(dwell);
+
+    const positions: Array<{ second: number; planets: Array<{ x: number; y: number }>; moons: Array<{ x: number; y: number }> }> = [];
+    for (let second = 0; second <= dwell; second += 5) {
+      const where = `dwell ${dwell} s at ${second} s`;
+      const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: ORBIT_MOSTLY_IDS });
+      expect(failures, `${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+      const planets = await orbitPlanetReadings(frame);
+      expect(planets, `${where}: four planets`).toHaveLength(4);
+      for (const planet of planets) {
+        expect(planet.id, `${where}: every planet still holds a record`).not.toBe('');
+        expect(planet.drawn, `${where}: ${planet.id} inside the room under the title`).toBeLessThanOrEqual(ORBIT_ROOM_CAP + 1);
+      }
+      positions.push({
+        second,
+        planets: planets.map((p) => p.centre),
+        moons: planets.flatMap((p) => p.moons.map((m) => ({ x: (m.rect.left + m.rect.right) / 2, y: (m.rect.top + m.rect.bottom) / 2 }))),
+      });
+      for (const reading of await bubbleReadings(frame, ORBIT_ROOT)) {
+        expect(reading.drawnFont, `${where}: ${reading.id} drawn size`).toBeGreaterThanOrEqual(18 - 0.05);
+      }
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(5000));
+    }
+
+    // Nothing stops partway through the showing: both the planets and their
+    // medallions are still travelling in the last third of the dwell.
+    const late = positions.filter((p) => p.second >= Math.floor(dwell * 0.6));
+    expect(late.length, `dwell ${dwell} s: samples in the last third`).toBeGreaterThanOrEqual(2);
+    const first = late[0];
+    const last = late[late.length - 1];
+    const planetTravel = Math.max(...first.planets.map((p, i) => Math.hypot(p.x - last.planets[i].x, p.y - last.planets[i].y)));
+    const moonTravel = Math.max(...first.moons.map((m, i) => Math.hypot(m.x - last.moons[i].x, m.y - last.moons[i].y)));
+    expect(planetTravel, `dwell ${dwell} s: planets still moving between ${first.second} s and ${last.second} s`).toBeGreaterThan(20);
+    expect(moonTravel, `dwell ${dwell} s: medallions still revolving between ${first.second} s and ${last.second} s`).toBeGreaterThan(20);
+    await testPage.close();
+  }
+});
