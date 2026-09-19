@@ -10,6 +10,6 @@ Integration branch tv17/pick 2a75745 in /Users/anthony/Projects/mothers-love-wor
 - [Weekly Goal](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/milestone.md) (lane L8)
 - [Live Recognitions (new eleventh screen)](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/live-feed.md) (lane L13)
 - [Entrance, single](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/arrival.md) (lane L11 and L14)
-- [Entrance, group of ten](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/arrival-group.md) (lane L11 and L14)
+- [Entrance, group of five](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/arrival-group.md) (lane L11 and L14)
 - [Screen edges (every screen, check on Featured)](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/stage-edges.md) (lane L5)
 - [Preview only per-screen links](/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/scene-links.md) (lane L12)

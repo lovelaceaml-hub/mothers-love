@@ -3,11 +3,11 @@
 Plan goal line (outranks this handoff): "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
 
 ## Where this screen stands (2026-09-19)
-- Built in lane L13, merged into tv17/pick 2a75745 (/Users/anthony/Projects/mothers-love-worktrees/tv17-base).
-- State: Panel fills y 118 to 1055 in three columns, 26 px messages, QR inside, rail hidden only on this screen, 60 seconds, last in rotation. database/014 is WRITTEN BUT NOT RUN; it needs a trial on a throwaway local Postgres and Anthony's approval before it touches the shared production database. Rollback order is in rollback-live-feed.sql.
+- Built in lane L13, merged into tv17/pick fd1268e (/Users/anthony/Projects/mothers-love-worktrees/tv17-base).
+- State: Panel fills y 118 to 1055 in two columns, rail text sizes (18 px messages), QR inside, rail hidden only on this screen, 60 seconds, last in rotation. database/014 is WRITTEN BUT NOT RUN; it needs a trial on a throwaway local Postgres and Anthony's approval before it touches the shared production database. Rollback order is in rollback-live-feed.sql.
 - Checks on tv17/pick 2a75745: typecheck clean, 255 of 255 unit tests, build clean, 274 of 274 scene tests against a production build with synthetic config.
-- Anthony's TV link for this screen (Vercel preview, needs his Vercel session): https://mothers-love-1vgu7sp37-lvzion.vercel.app/display?scene=live-feed
-- NOT done: Anthony has not yet approved this screen on the church TV. Nothing is released.
+- Anthony's TV link for this screen (Vercel preview, needs his Vercel session): https://mothers-love-3nt3siq75-lvzion.vercel.app/display?scene=live-feed
+- Anthony approved this screen on 2026-09-19 (this screen only). Nothing is released; full suite, typecheck and build must be rerun on fd1268e before release.
 
 ## Anthony's rulings that bind any further work
 - Writers are Opus 5 (smaller tasks) or Fable 5.1 (bigger tasks), never Sonnet. An Opus change gets exactly one Fable review and the reviewer fixes what it finds; Fable work is not reviewed.

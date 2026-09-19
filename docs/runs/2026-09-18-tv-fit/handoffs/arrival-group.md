@@ -1,10 +1,10 @@
-# Plan 17 handoff: Entrance, group of ten
+# Plan 17 handoff: Entrance, group of five
 
 Plan goal line (outranks this handoff): "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
 
 ## Where this screen stands (2026-09-19)
 - Built in lane L11 and L14, merged into tv17/pick 2a75745 (/Users/anthony/Projects/mothers-love-worktrees/tv17-base).
-- State: Same files as the single entrance (one writer at a time across both handoffs). Group orbs 300 px in two rows over the full height; the preview link needs at least 10 current recognitions.
+- State: Same files as the single entrance (one writer at a time across both handoffs). As of 2026-09-19 (merged into tv17/pick 07c1b70): a wave is five, all five always show together, orbs 400 px in a 3 over 2 stagger, long messages page inside their own bubble, the wave reads for 21 seconds; the preview link needs at least 5 current recognitions. Tests still expecting ten, 240 px, pair pages or 30 seconds are owed an update before release (see /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/lanes/H-arrival-group.md).
 - Checks on tv17/pick 2a75745: typecheck clean, 255 of 255 unit tests, build clean, 274 of 274 scene tests against a production build with synthetic config.
 - Anthony's TV link for this screen (Vercel preview, needs his Vercel session): https://mothers-love-1vgu7sp37-lvzion.vercel.app/display?scene=arrival-group
 - NOT done: Anthony has not yet approved this screen on the church TV. Nothing is released.
@@ -26,7 +26,7 @@ Plan goal line (outranks this handoff): "every word on the approved Plan 15 TV s
 - /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/L14-writer-result.md
 
 ## Execution envelope
-- Project / unit: Plan 17: TV text fit and Plan 15 release, Lane L11 and L14: Entrance, group of ten
+- Project / unit: Plan 17: TV text fit and Plan 15 release, Lane L11 and L14: Entrance, group of five
 - Lane: Claude (Opus 5 writer plus one Fable 5.1 review, or Fable 5.1 writer with no review, per Anthony's ruling)
 - Read first: the three files above, plan first
 - In scope: only what Anthony asks to change on this screen after watching it on the TV; this screen's own files (allowlist below)
@@ -49,7 +49,7 @@ Worktree for any change: create it with `git -C /Users/anthony/Projects/mothers-
 
 ## Copy-paste kickoff for a fresh chat
 ```text
-Run the The Words of Mother's Love Plan 17 lane L11 and L14: Entrance, group of ten at /Users/anthony/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md
+Run the The Words of Mother's Love Plan 17 lane L11 and L14: Entrance, group of five at /Users/anthony/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md
 
 Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md (including its Build log) and /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/INDEX.md, then /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/handoffs/arrival-group.md (this screen's state, rulings, envelope and allowlist).
 

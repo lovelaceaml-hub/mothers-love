@@ -7,7 +7,8 @@ Plan goal line (outranks this handoff): "every word on the approved Plan 15 TV s
 - State: 52 pearls: 24 reading pearls in one rising helix, 28 soft depth pearls; about 21 drawn at once; near words 18 px or more; a record at most twice, never adjacent.
 - Checks on tv17/pick 2a75745: typecheck clean, 255 of 255 unit tests, build clean, 274 of 274 scene tests against a production build with synthetic config.
 - Anthony's TV link for this screen (Vercel preview, needs his Vercel session): https://mothers-love-1vgu7sp37-lvzion.vercel.app/display?scene=milestone
-- NOT done: Anthony has not yet approved this screen on the church TV. Nothing is released.
+- 2026-09-19 update: funnel vortex with many bubble sizes and the three caption removals merged into tv17/pick 9f8d56b (branch tv17/h-milestone b7bc183). Anthony saw preview https://mothers-love-ofay8zu1p-lvzion.vercel.app/display?scene=milestone and said "looks right." Details: lanes/L8.md. The all-screens test folder was not rerun after this merge.
+- NOT done: nothing is released.
 
 ## Anthony's rulings that bind any further work
 - Writers are Opus 5 (smaller tasks) or Fable 5.1 (bigger tasks), never Sonnet. An Opus change gets exactly one Fable review and the reviewer fixes what it finds; Fable work is not reviewed.
