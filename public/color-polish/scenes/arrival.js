@@ -83,15 +83,21 @@ function arrivalFocus(kind,oversize){
  return{x:ARRIVAL_SINGLE.x,y:ARRIVAL_SINGLE.y,s:1,quiet:{x0:80,x1:820,y0:290,y1:690}};
 }
 
+// Flowers bloom around the bubble in two counter-turning wreaths.
+function arrivalFlower(x,y,size,turn,tone,delay){
+ const petal=['#f4b6c8','#f8dc9a','#e3c6ee','#fbcdb2'][tone%4],heart=['#e0a93c','#d98aa2','#e0a93c','#d98a5e'][tone%4];
+ let petals='';
+ for(let k=0;k<6;k++)petals+=`<ellipse cx="0" cy="${(-size*.6).toFixed(1)}" rx="${(size*.34).toFixed(1)}" ry="${(size*.6).toFixed(1)}" transform="rotate(${k*60})" fill="${petal}" stroke="#fffaf0" stroke-width="1"/>`;
+ return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${turn.toFixed(0)})"><g class="flower" style="--bloom-delay:${delay.toFixed(2)}s">${petals}<circle r="${(size*.26).toFixed(1)}" fill="${heart}" stroke="none"/></g></g>`;
+}
+
 function arrivalRosette(layer){
  let shapes='';
  if(layer===0){
-  for(let i=0;i<30;i++){const t=i*TAU/30;shapes+=`<circle cx="${(Math.cos(t)*300).toFixed(1)}" cy="${(Math.sin(t)*300).toFixed(1)}" r="300"/>`}
-  shapes+='<circle r="600"/><circle r="592"/>';
+  for(let i=0;i<16;i++){const t=i*TAU/16+.2;shapes+=arrivalFlower(Math.cos(t)*545,Math.sin(t)*545,i%2?24:32,i*37,i,.5+i*.07)}
  }else{
-  for(let i=0;i<18;i++){const t=i*TAU/18;shapes+=`<circle class="rose" cx="${(Math.cos(t)*330).toFixed(1)}" cy="${(Math.sin(t)*330).toFixed(1)}" r="200"/>`}
-  shapes+='<circle r="404"/><circle r="436"/><circle class="ticks" r="420"/>';
-  for(let i=0;i<12;i++){const t=i*TAU/12,x=Math.cos(t)*486,y=Math.sin(t)*486;shapes+=`<path class="gem" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(i*30).toFixed(0)})" d="M0-13Q2-2 13 0Q2 2 0 13Q-2 2-13 0Q-2-2 0-13Z"/>`}
+  for(let i=0;i<12;i++){const t=i*TAU/12;shapes+=arrivalFlower(Math.cos(t)*440,Math.sin(t)*440,i%2?38:28,i*53,i+1,.15+i*.08)}
+  for(let i=0;i<12;i++){const t=(i+.5)*TAU/12;shapes+=arrivalFlower(Math.cos(t)*492,Math.sin(t)*492,15,i*29,i+2,.7+i*.06)}
  }
  return `<svg class="arrival-rosette arrival-rosette-${layer}" viewBox="-620 -620 1240 1240" width="1240" height="1240" aria-hidden="true">${shapes}</svg>`;
 }
