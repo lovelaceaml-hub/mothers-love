@@ -151,6 +151,11 @@
      the icon row to sit max(3 percent, 12 px) inside the pearl's rim. */
   width: 236px;
   height: 236px;
+  /* Lane 8 review: the pearl's soft shadow is a box shadow on the round node
+     (it scales with the pearl) instead of a per-frame drop-shadow filter, so
+     a near pearl carries no filter at all. Same offset, spread and colour. */
+  border-radius: 50%;
+  box-shadow: -7px 13px 12px #99846925;
 }
 
 #tv .scene[data-scene="11"] .stream-pearl {

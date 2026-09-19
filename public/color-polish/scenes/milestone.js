@@ -29,35 +29,49 @@ function tributeContent(a,r){
 
 // Plan 17 Lane 8 (Anthony on the church TV, September 19): "the swirling
 // recognitions need to be fuller, with more bubbles". STREAM_TARGET pearls
-// ride the swirl instead of 26, and they are spread across three radius
-// bands so they fill the panel's width instead of crowding one column in
-// the middle. STREAM_MAX_COPIES lets a small pool still fill the panel: a
-// record may take more than one pearl at a time, in separate passes over
-// the pool, so its copies sit far apart. With a pool of STREAM_TARGET or
-// more records every pearl holds a different record, as before.
+// ride the swirl instead of 26. Lane 8 review: 52 pearls that all take the
+// full turn pile up in the middle of the panel, because every pearl is at
+// its largest exactly where it crosses the centre line, and the words of the
+// near pearls sat more than half covered. So the swirl has two layers.
+// Reading pearls (STREAM_FRONT_SHARE of them) take the full turn as one
+// even helix: the same rise and turn, a golden angle apart, so the pearls
+// that are near at the same moment are spread across the panel instead of
+// stacked, and their words draw at 18 px or more whenever they are on the
+// near half (depth 0 or more, scale 1 or more). Depth pearls stay behind
+// them the whole way round, small and soft, and fill the panel out to its
+// sides; they can never cover a reading pearl on its near half.
 const STREAM_TARGET=52;
+const STREAM_FRONT_SHARE=24/52;
+// A record may hold two pearls when the pool is smaller than the swirl, and
+// three only when the pool is tiny.
 const STREAM_MAX_COPIES=3;
+const STREAM_TINY_POOL=3;
+// Two pearls of one layer only share a record when no other record is left.
+const STREAM_SAME_LAYER=10000;
 // Pearls enter STREAM_EDGE px below the panel and are recycled STREAM_EDGE px
 // above it, so the travel every pearl shares is the panel plus both margins.
 const STREAM_EDGE=180;
 // Pearls and the light currents turn around the panel's centre line.
 const STREAM_CENTRE=.5;
 const STREAM_GOLDEN_ANGLE=TAU*.381966;
-// Turning radius, 150 to 405 px. 405 is the widest radius at which a pearl's
-// own drawn edge (its radius times the depth scale) plus its wobble still
-// stays inside the panel's half width of 581 px at every angle and depth:
-// the worst case measures 566 px from the centre line.
-const STREAM_RADIUS_MIN=150;
-const STREAM_RADIUS_MAX=405;
+// Reading pearls: depth swings 300 to 340 either side of 0, so the scale
+// runs from about .75 to 1.51 and is 1 or more on the whole near half.
+// Radius 330 to 360 px keeps the widest drawn edge 58 px inside the panel.
+// Depth pearls: depth -620 to -150 (scale .62 to .87, words 11.1 to 15.7 px,
+// never below the 10.7 px the far pearls drew before this lane), radius 150
+// to 520 px, drawn from the square root of a flat number so they spread
+// evenly over the turning area.
+const STREAM_BACK_RADIUS_MIN=150;
+const STREAM_BACK_RADIUS_MAX=520;
 
-/**
- * How many pearls one record may hold at the same time: one whenever the
- * pool is at least as large as the swirl, and otherwise just enough passes
- * over the pool to fill `count` pearls, capped at STREAM_MAX_COPIES.
- */
+/** How many pearls one record may hold at the same time. */
 function streamCopyCap(poolSize,count){
  if(poolSize<=0)return 1;
- return clamp(Math.ceil(count/poolSize),1,STREAM_MAX_COPIES);
+ return clamp(Math.ceil(count/poolSize),1,poolSize<=STREAM_TINY_POOL?STREAM_MAX_COPIES:2);
+}
+
+function streamCount(poolSize){
+ return Math.min(STREAM_TARGET,poolSize*(poolSize<=STREAM_TINY_POOL?STREAM_MAX_COPIES:2));
 }
 
 /**
@@ -87,26 +101,91 @@ function streamAssignments(pool,count){
  return assigned;
 }
 
+/**
+ * How far apart in height pearl `a` would be from the nearest pearl already
+ * holding a record, measured round the loop (a pearl leaving the top comes
+ * back in at the bottom). Every pearl rises at nearly the same speed, so
+ * this distance holds while both pearls cross the panel. A holder in the
+ * pearl's own layer counts as no distance at all.
+ */
+function streamGap(a,holders,span){
+ return Math.min(...holders.map(h=>{const d=Math.abs(h.y-a.y)%span;return Math.min(d,span-d)-(h.front===a.front?STREAM_SAME_LAYER:0)}));
+}
+
+/**
+ * The record for pearl `a` when every record is already on screen: the one
+ * under its copy cap whose nearest holder is furthest away in height, and
+ * never one the pearl's own layer holds while another choice exists. So two
+ * copies of a record are never side by side, and two reading pearls never
+ * carry the same record unless the pool is smaller than the reading layer.
+ */
+function streamRepeat(a,others,pool,span,total){
+ const cap=streamCopyCap(pool.length,total);
+ let best,bestGap=-Infinity;
+ for(const r of pool){
+  const holders=others.filter(x=>x.id===r.id);
+  if(holders.length>=cap)continue;
+  const gap=holders.length?streamGap(a,holders,span):span;
+  if(gap>bestGap){bestGap=gap;best=r}
+ }
+ return best;
+}
+
+/** The record for a pearl re-entering at the bottom: one nobody holds, else a repeat. */
+function streamNextRecord(a,nodes,span){
+ const pool=records();if(!pool.length)return undefined;
+ const others=nodes.filter(x=>x!==a);
+ return chooseRandom(others.map(x=>x.id))||streamRepeat(a,others,pool,span,nodes.length)||chooseRandom([]);
+}
+
+/**
+ * Gives every mounted pearl its record. Reading pearls take the first
+ * records (the milestone contributors). Depth pearls that must repeat a
+ * record are matched to the reading pearl furthest from them in height,
+ * widest gaps first; the rest take the records nobody holds yet.
+ */
+function streamSpreadCopies(nodes,assigned,span){
+ const pool=[...new Map(assigned.map(r=>[r.id,r])).values()];
+ const fresh=[...pool],placed=[];
+ const give=(a,r)=>{tributeContent(a,r);placed.push(a);const i=fresh.indexOf(r);if(i>=0)fresh.splice(i,1)};
+ const front=nodes.filter(a=>a.front),back=nodes.filter(a=>!a.front);
+ for(const a of front)give(a,fresh[0]||streamRepeat(a,placed,pool,span,nodes.length)||assigned[0]);
+ const pairs=[];
+ for(const a of back)for(const h of front)pairs.push({a,h,gap:streamGap(a,[h],span)});
+ pairs.sort((x,y)=>y.gap-x.gap);
+ let repeats=Math.max(0,back.length-fresh.length);
+ const used=new Set();
+ for(const {a,h} of pairs){
+  if(!repeats)break;
+  if(placed.includes(a)||used.has(h.id))continue;
+  if(placed.filter(x=>x.id===h.id).length>=streamCopyCap(pool.length,nodes.length))continue;
+  used.add(h.id);give(a,pool.find(r=>r.id===h.id));repeats--;
+ }
+ for(const a of back)if(!placed.includes(a))give(a,fresh[0]||streamRepeat(a,placed,pool,span,nodes.length)||assigned[0]);
+}
+
 function mountTributes(){
  const root=$('tribute-stream');if(!root)return;
  const pool=contributorPool();V.stream={el:root,width:root.clientWidth,height:root.clientHeight,nodes:[],icons:[],canvas:$('stream-canvas')};
  if(!pool.length){const p=document.createElement('p');p.className='subheading';p.style='padding:180px 90px';p.textContent='The milestone remains. No current personal recognitions are available to replay.';root.append(p);return}
- const N=Math.min(STREAM_TARGET,pool.length*STREAM_MAX_COPIES),rng=randSeed(189391);
+ const N=streamCount(pool.length),rng=randSeed(189391);
  const assignedRecords=streamAssignments(pool,N);
+ const total=assignedRecords.length,backCount=Math.min(total-Math.round(total*STREAM_FRONT_SHARE),pool.length),frontCount=total-backCount;
  const span=V.stream.height+STREAM_EDGE*2;
 
- for(let i=0;i<assignedRecords.length;i++){
-  const r=assignedRecords[i],el=document.createElement('div');el.className='stream-node';root.append(el);
-  // Even phases (the golden angle, plus a little jitter) instead of random
-  // ones: twice as many pearls drawn from a random phase clumped into one
-  // crowd in the middle of the panel and left both sides of it empty. The
-  // radius is drawn from the square root of a flat number so the pearls
-  // spread evenly over the whole turning area: a flat radius would put the
-  // same count in the small middle ring as in the wide outer one, which is
-  // what left the sides of the panel bare.
-  const spread=Math.sqrt(STREAM_RADIUS_MIN*STREAM_RADIUS_MIN+rng()*(STREAM_RADIUS_MAX*STREAM_RADIUS_MAX-STREAM_RADIUS_MIN*STREAM_RADIUS_MIN));
-  const a={el,id:r.id,y:span*(i+.5)/assignedRecords.length-STREAM_EDGE,phase:(i*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,radius:spread,rise:16+rng()*28,turn:.13+rng()*.15,depth:360+rng()*160,offset:-110-rng()*65,wobble:rng()*TAU,rng,cycles:0};tributeContent(a,r);V.stream.nodes.push(a);
+ // Reading pearls take the first records (the milestone contributors), so
+ // while the pool is at least as large as the reading layer every reading
+ // pearl starts on a different record.
+ for(let i=0;i<total;i++){
+  const el=document.createElement('div');el.className='stream-node';root.append(el);
+  const front=i<frontCount,j=front?i:i-frontCount;
+  el.dataset.layer=front?'front':'back';
+  const a=front
+   ?{el,front,id:'',y:span*(j+.5)/frontCount-STREAM_EDGE,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.2)%TAU,radius:330+rng()*30,rise:23+rng()*1.5,turn:.2+rng()*.01,depth:300+rng()*40,offset:0,sway:.1,wobble:rng()*TAU,rng,cycles:0}
+   :{el,front,id:'',y:span*(j+.5)/backCount-STREAM_EDGE,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,radius:Math.sqrt(STREAM_BACK_RADIUS_MIN*STREAM_BACK_RADIUS_MIN+rng()*(STREAM_BACK_RADIUS_MAX*STREAM_BACK_RADIUS_MAX-STREAM_BACK_RADIUS_MIN*STREAM_BACK_RADIUS_MIN)),rise:23+rng()*1.5,turn:.13+rng()*.15,depth:200+rng()*35,offset:-385,sway:.17,wobble:rng()*TAU,rng,cycles:0};
+  V.stream.nodes.push(a);
  }
+ streamSpreadCopies(V.stream.nodes,assignedRecords,span);
  for(let i=0;i<14;i++){const el=document.createElement('img');el.className='stream-icon';el.src=ASSETS['icon'+(1+i%9)];el.alt='';root.append(el);V.stream.icons.push({el,y:740*(i/14),phase:rng()*TAU,radius:240+rng()*145,rise:14+rng()*20,turn:.15+rng()*.16})}
 }
 
@@ -128,27 +207,28 @@ function tickTributes(dt){
   if(a.y< -STREAM_EDGE){
    a.y=H+STREAM_EDGE;
    a.cycles++;
-   const cap=streamCopyCap(records().length,v.nodes.length);
-   const counts=new Map();
-   for(const x of v.nodes)if(x!==a)counts.set(x.id,(counts.get(x.id)||0)+1);
-   // A record only comes back while fewer than `cap` of the other pearls
-   // already carry it, so the swirl never doubles a record beyond the
-   // number of passes the pool actually needs.
-   const full=[...counts].filter(entry=>entry[1]>=cap).map(entry=>entry[0]);
-   const nextRecord=chooseRandom(full)||chooseRandom([]);
+   const nextRecord=streamNextRecord(a,v.nodes,H+STREAM_EDGE*2);
    if(nextRecord)tributeContent(a,nextRecord);
   }
-  const angle=a.phase+t*a.turn+Math.sin(t*.13+a.wobble)*.17,z=Math.sin(angle)*a.depth+a.offset,k=1000/(1000-z);
+  const angle=a.phase+t*a.turn+Math.sin(t*.13+a.wobble)*a.sway,z=Math.sin(angle)*a.depth+a.offset,k=1000/(1000-z);
   const x=W*STREAM_CENTRE+Math.cos(angle)*a.radius*k+Math.sin(t*.23+a.wobble)*12,y=a.y-(k-.75)*27;
   const half=STREAM_PEARL_HALF*k;
   const opacity=smooth((y-half)/STREAM_FADE_BAND)*smooth((H-y-half)/STREAM_FADE_BAND);
   const depthTone=z< -220?Math.max(.45,.45+.35*(z+630)/410):1;
   a.el.style.transform=`translate(${x-STREAM_PEARL_HALF}px,${y-STREAM_PEARL_HALF}px) scale(${k})`;a.el.style.opacity=clamp(opacity,0,1);a.el.style.zIndex=String(1000+Math.round(z));
-  // With twice as many pearls the filter string is the costly part of the
-  // frame, so it is only rewritten when the depth it draws actually
-  // changes: blur to a fortieth of a px and the tone to a thousandth.
-  const filter=`blur(${Math.min(2,Math.max(0,(-z-120)/260)).toFixed(2)}px) contrast(${(.55+.45*depthTone).toFixed(3)}) brightness(${(1+.3*(1-depthTone)).toFixed(3)}) drop-shadow(${(-7*k).toFixed(1)}px ${(13*k).toFixed(1)}px ${(12*k).toFixed(1)}px #99846925)`;
-  if(a.filter!==filter){a.filter=filter;a.el.style.filter=filter}
+  // Frame cost (Lane 8 review). More than half of the pearls are outside the
+  // panel and fully faded at any moment: those are hidden outright so the
+  // browser paints and filters nothing for them. For every pearl the filter is
+  // stepped (blur to a quarter px, tone to a twentieth, shadow to a tenth of
+  // the scale) and only written when the stepped value changes, which is a
+  // few times a second per pearl instead of every frame.
+  const shown=opacity>0;
+  if(a.shown!==shown){a.shown=shown;a.el.style.visibility=shown?'visible':'hidden'}
+  {
+   const blur=Math.round(Math.min(2,Math.max(0,(-z-120)/260))*4)/4,tone=Math.round(depthTone*20)/20;
+   const filter=`${blur?`blur(${blur}px) `:''}${tone<1?`contrast(${(.55+.45*tone).toFixed(3)}) brightness(${(1+.3*(1-tone)).toFixed(3)})`:''}`||'none';
+   if(a.filter!==filter){a.filter=filter;a.el.style.filter=filter}
+  }
   a.x=x;a.z=z;a.scale=k;a.screenY=y;
  }
  for(const a of v.icons){a.y-=dt*a.rise;if(a.y< -80)a.y=H+80;const angle=a.phase+t*a.turn,z=Math.sin(angle)*370-120,k=950/(950-z),x=W*STREAM_CENTRE+Math.cos(angle)*a.radius*k;a.el.style.transform=`translate(${x}px,${a.y}px) scale(${k}) rotate(${Math.sin(t*.33+a.phase)*17}deg)`;a.el.style.opacity=.72*smooth((a.y+45)/80)*smooth((H+40-a.y)/80);a.el.style.zIndex=String(1000+Math.round(z));}

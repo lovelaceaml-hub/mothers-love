@@ -607,8 +607,8 @@ test('noOverflow holds and no phrase is truncated at any pearl size', async ({ p
 
 test('mostly-long fixture: the goal card, milestone card and tribute pearl text all fit their panels and rims at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
   // Plan 17 Lane 8 stepped the budget up from 120 s: the swirl now carries
-  // three pearls per record instead of one, so every checkpoint measures
-  // three times the text. The assertions are unchanged.
+  // two pearls per record instead of one, so every checkpoint measures
+  // twice the text. The assertions are unchanged.
   test.setTimeout(240000);
   const fixture = buildMostlyLongFixture();
   const widths: Array<{ width: number; height: number }> = [
@@ -669,7 +669,7 @@ test('the goal card and milestone card sit clear of the panel top and bottom edg
 
 test('tribute pearls are fully opaque inside the panel and fade out only at its edges, never crossing it while visible', async ({ page }) => {
   // 240 s rather than 120: the same 100 quarter-second steps now move 52
-  // pearls on the sample and 18 on the mostly-long fixture, where they
+  // pearls on the sample and 12 on the mostly-long fixture, where they
   // moved 26 and 6. The assertions are unchanged.
   test.setTimeout(240000);
   for (const fixture of [buildMostlyLongFixture(), buildColorPolishSampleSnapshot()]) {
@@ -724,15 +724,28 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
  * with a mean of 20.4, where the same measurement on the previous scene ran
  * between 5 and 15 with a mean of 10.4. Every assertion below therefore
  * fails on the previous scene.
+ *
+ * Lane 8 review: the first 52 pearl swirl piled up in the middle, with the
+ * words of its near pearls half covered on average (0.50) and copies of one
+ * record touching. The reviewed swirl runs between 19 and 24 drawn with a
+ * mean of 21.0, its near pearls' words are 0.07 covered on average, and no
+ * record is ever drawn twice at once on the 48 record sample. The readable
+ * and copy assertions below fail on that first swirl.
  */
 const MIN_MOUNTED_PEARLS = 52;
-const MIN_DRAWN_PEARLS = 11;
+const MIN_DRAWN_PEARLS = 16;
 const MIN_MEAN_DRAWN_PEARLS = 18;
-/** The same numbers for a pool of only six records. */
-const MIN_MOUNTED_PEARLS_SMALL_POOL = 18;
-const MIN_DRAWN_PEARLS_SMALL_POOL = 5;
+/** The same numbers for a pool of only six records: two pearls a record. */
+const MIN_MOUNTED_PEARLS_SMALL_POOL = 12;
+const MIN_DRAWN_PEARLS_SMALL_POOL = 4;
 /** No record may hold more pearls than this at the same moment. */
-const MAX_PEARLS_PER_RECORD = 3;
+const MAX_PEARLS_PER_RECORD = 2;
+/** Words on a near pearl (reading layer, scale 1 or more) draw at this many px at 1920, doubled at 3840. */
+const MIN_NEAR_WORDS_PX = 18;
+/** No pearl's words draw smaller than the far pearls drew before Lane 8. */
+const MIN_FAR_WORDS_PX = 11;
+/** Share of a near pearl's words that nearer pearls may cover, averaged over a showing. */
+const MAX_MEAN_COVERED_SHARE = 0.2;
 
 /** The 48 record sample with the milestone scene's dwell set to `seconds`. */
 function milestoneSnapshotWithDwell(seconds: number) {
@@ -752,6 +765,16 @@ type SwirlSample = {
   drawn: number;
   crossing: string[];
   maxCopies: number;
+  /** Smallest drawn phrase size, in px at 1920, on near pearls and on all the others. */
+  minNearPx: number;
+  minFarPx: number;
+  /** Near pearls fully faded in, how many have at most a tenth of their words covered, and each one's covered share. */
+  near: number;
+  readable: number;
+  covered: number[];
+  /** Pairs of drawn pearls holding one record whose circles touch, or that are both near. */
+  copiesTouching: number;
+  copiesBothNear: number;
   nodes: Array<{ key: string; id: string; x: number; y: number }>;
 };
 
@@ -768,7 +791,14 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
     const stream = ((window as any).colorPolishRuntime.visualState().stream || []) as Array<{
       id: string; x: number; y: number; rise: number; radius: number; turn: number;
     }>;
-    const out: SwirlSample = { drawn: 0, crossing: [], maxCopies: 0, nodes: [] };
+    const out: SwirlSample = {
+      drawn: 0, crossing: [], maxCopies: 0, nodes: [],
+      minNearPx: Infinity, minFarPx: Infinity, near: 0, readable: 0, covered: [], copiesTouching: 0, copiesBothNear: 0,
+    };
+    const to1920 = 1162 / panel.width;
+    const pearls: Array<{
+      id: string; near: boolean; opacity: number; z: number; cx: number; cy: number; r: number; texts: DOMRect[];
+    }> = [];
     const copies = new Map<string, number>();
     const elements = Array.from(scene.querySelectorAll<HTMLElement>('.stream-node'));
     elements.forEach((node, index) => {
@@ -785,6 +815,23 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
           `${id} box ${box.left.toFixed(0)},${box.top.toFixed(0)},${box.right.toFixed(0)},${box.bottom.toFixed(0)} panel ${panel.left.toFixed(0)},${panel.top.toFixed(0)},${panel.right.toFixed(0)},${panel.bottom.toFixed(0)}`,
         );
       }
+      const motionScale = (stream[index] as unknown as { scale: number } | undefined)?.scale ?? 0;
+      const phrase = node.querySelector<HTMLElement>('.stream-phrase')!;
+      const drawnPx =
+        parseFloat(window.getComputedStyle(phrase).fontSize) * (box.width / node.offsetWidth) * to1920;
+      const near = node.dataset.layer === 'front' && motionScale >= 1;
+      if (near) out.minNearPx = Math.min(out.minNearPx, drawnPx);
+      else out.minFarPx = Math.min(out.minFarPx, drawnPx);
+      pearls.push({
+        id,
+        near,
+        opacity: parseFloat(window.getComputedStyle(node).opacity),
+        z: Number(window.getComputedStyle(node).zIndex),
+        cx: box.left + box.width / 2,
+        cy: box.top + box.height / 2,
+        r: box.width / 2,
+        texts: [phrase, node.querySelector<HTMLElement>('b')!].map((el) => el.getBoundingClientRect()),
+      });
       const motion = stream[index];
       out.nodes.push({
         key: motion ? `${motion.rise},${motion.radius},${motion.turn}` : `element-${index}`,
@@ -794,11 +841,38 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
       });
     });
     for (const n of copies.values()) out.maxCopies = Math.max(out.maxCopies, n);
+    for (let i = 0; i < pearls.length; i++) {
+      for (let j = i + 1; j < pearls.length; j++) {
+        const a = pearls[i], b = pearls[j];
+        if (a.id !== b.id) continue;
+        if (Math.hypot(a.cx - b.cx, a.cy - b.cy) < a.r + b.r) out.copiesTouching += 1;
+        if (a.near && b.near) out.copiesBothNear += 1;
+      }
+    }
+    // How much of each near pearl's words (phrase and name boxes, sampled on
+    // a grid) lies under a pearl drawn in front of it.
+    for (const p of pearls) {
+      if (!p.near || p.opacity < 0.9) continue;
+      out.near += 1;
+      let points = 0, hidden = 0;
+      for (const t of p.texts) {
+        for (let gx = 0; gx <= 8; gx++) {
+          for (let gy = 0; gy <= 3; gy++) {
+            points += 1;
+            const x = t.left + (t.width * gx) / 8, y = t.top + (t.height * gy) / 3;
+            if (pearls.some((q) => q !== p && q.z > p.z && q.opacity > 0.5 && Math.hypot(x - q.cx, y - q.cy) < q.r)) hidden += 1;
+          }
+        }
+      }
+      const share = hidden / points;
+      out.covered.push(share);
+      if (share <= 0.1) out.readable += 1;
+    }
     return out;
   });
 }
 
-test('the swirl is full: at least 11 pearls drawn inside the panel, none cut at its edges, for a whole 60 second showing', async ({ page }) => {
+test('the swirl is full: at least 16 pearls drawn inside the panel, none cut at its edges, for a whole 60 second showing', async ({ page }) => {
   test.setTimeout(300000);
   const requestedDwell = 60;
 
@@ -852,6 +926,21 @@ test('the swirl is full: at least 11 pearls drawn inside the panel, none cut at 
 
     const mostCopies = Math.max(...samples.map((s) => s.maxCopies));
     expect(mostCopies, 'pearls holding the same record at once').toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+    expect(samples.reduce((n, s) => n + s.copiesTouching, 0), 'copies of one record drawn touching').toBe(0);
+    expect(samples.reduce((n, s) => n + s.copiesBothNear, 0), 'copies of one record near the front together').toBe(0);
+
+    // Readable, not a pile: near words at 18 px or more, no words below the
+    // old far size, at least one near pearl with its words clear at every
+    // second, and near words mostly uncovered over the showing.
+    expect(Math.min(...samples.map((s) => s.minNearPx)), 'smallest near pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_NEAR_WORDS_PX - 0.01);
+    expect(Math.min(...samples.map((s) => s.minFarPx)), 'smallest far pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_FAR_WORDS_PX);
+    expect(
+      Math.min(...samples.map((s) => s.readable)),
+      `near pearls with clear words, per second: ${JSON.stringify(samples.map((s) => s.readable))}`,
+    ).toBeGreaterThanOrEqual(1);
+    const covered = samples.flatMap((s) => s.covered);
+    const meanCovered = covered.reduce((n, v) => n + v, 0) / covered.length;
+    expect(meanCovered, `mean covered share of near words: ${meanCovered.toFixed(2)}`).toBeLessThanOrEqual(MAX_MEAN_COVERED_SHARE);
 
     // Lively for the whole showing: between one second and the next, every
     // drawn pearl that is still drawn has moved, and records keep arriving.
@@ -894,6 +983,10 @@ test('at 3840 the swirl carries the same pearls, drawn inside the panel with the
     expect(sample.drawn, `pearls drawn at 3840, ${ms} ms`).toBeGreaterThanOrEqual(MIN_DRAWN_PEARLS);
     expect(sample.crossing.slice(0, 4).join(' | '), `pearls past the panel edge at ${ms} ms`).toBe('');
     expect(sample.maxCopies).toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+    expect(sample.copiesTouching, `copies touching at 3840, ${ms} ms`).toBe(0);
+    // swirlSample reports px at 1920, so 18 here is 36 drawn at 3840.
+    expect(sample.minNearPx, `near words at 3840, ${ms} ms`).toBeGreaterThanOrEqual(MIN_NEAR_WORDS_PX - 0.01);
+    expect(sample.minFarPx, `far words at 3840, ${ms} ms`).toBeGreaterThanOrEqual(MIN_FAR_WORDS_PX);
     const failures = await textFits(frame, '#stage .scene[data-scene="11"]', { dwellSeconds: dwell });
     expect(failures, `milestone text-fit failures at 3840, ${ms} ms: ${JSON.stringify(failures)}`).toHaveLength(0);
   }
@@ -903,7 +996,9 @@ test('a pool smaller than the swirl still fills the panel, and a record never ta
   test.setTimeout(180000);
   await page.setViewportSize({ width: 1920, height: 1080 });
   // Six records, the mostly-long fixture: before this lane the scene mounted
-  // one pearl per record and drew between 1 and 3 of them at a time.
+  // one pearl per record and drew between 1 and 3 of them at a time. Now each
+  // record holds two pearls, one in each layer and half the loop apart, so
+  // its copies are never side by side.
   const frame = await loadRenderer(page, { scene: 11, fixture: buildMostlyLongFixture() });
 
   const mounted = await frame.evaluate(
@@ -923,6 +1018,8 @@ test('a pool smaller than the swirl still fills the panel, and a record never ta
   );
   expect(samples.flatMap((s) => s.crossing).slice(0, 4).join(' | ')).toBe('');
   expect(Math.max(...samples.map((s) => s.maxCopies))).toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+  expect(samples.reduce((n, s) => n + s.copiesTouching, 0), 'copies of one record drawn touching').toBe(0);
+  expect(samples.reduce((n, s) => n + s.copiesBothNear, 0), 'copies of one record near the front together').toBe(0);
 
   const failures = await textFits(frame, '#stage .scene[data-scene="11"]');
   expect(failures, JSON.stringify(failures)).toHaveLength(0);
