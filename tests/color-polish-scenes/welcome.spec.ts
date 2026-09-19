@@ -10,7 +10,7 @@ import {
   studioClickDoesNotAdvance,
 } from './helpers';
 import type { Frame } from '@playwright/test';
-import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildMediumFixture, buildMostlyLongFixture as buildTextFitsFixture, fitsWhole, textFits, welcomeLargestFreeCircle } from './text-fits';
+import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildGraphemeMessage, buildMediumFixture, buildMostlyLongFixture as buildTextFitsFixture, fitsWhole, textFits, welcomeLargestFreeCircle } from './text-fits';
 
 test('welcome renders circular bubbles and no overflow at 14 s', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'welcome', 14000);
@@ -342,7 +342,7 @@ function buildMostlyLongFixture() {
   });
 }
 
-test('six .orb elements at 0 s, 6 s and 14 s with mostly-long fixture and no readerSlot collapse', async ({ page }) => {
+test('four .orb elements (fewer, whole) at 0 s, 6 s and 14 s with mostly-long fixture and no readerSlot collapse', async ({ page }) => {
   const fixture = buildMostlyLongFixture();
   for (const ms of [0, 6000, 14000]) {
     const testPage = await page.context().newPage();
@@ -353,11 +353,15 @@ test('six .orb elements at 0 s, 6 s and 14 s with mostly-long fixture and no rea
     const sceneCount = await frame.evaluate(() => document.querySelectorAll('#stage .scene').length);
     expect(sceneCount).toBe(1);
 
+    // Plan 17 "fewer, whole" (Anthony, September 18): this fixture's six
+    // messages of about 200 characters cannot all fit whole in six bubbles
+    // (each needs about 320 px), so Welcome shows as many as fit whole with
+    // no two bubbles overlapping: four.
     const orbCount = await frame.locator('#stage .scene[data-scene="1"] .orb').count();
-    expect(orbCount).toBe(6);
+    expect(orbCount).toBe(4);
 
     const slotCount = await frame.locator('#stage .scene[data-scene="1"] .orb-slot').count();
-    expect(slotCount).toBe(6);
+    expect(slotCount).toBe(4);
 
     const check = await frame.evaluate(() => {
       const orbs = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .orb'));
@@ -367,8 +371,8 @@ test('six .orb elements at 0 s, 6 s and 14 s with mostly-long fixture and no rea
         slotCount: slots.length,
       };
     });
-    expect(check.orbCount).toBe(6);
-    expect(check.slotCount).toBe(6);
+    expect(check.orbCount).toBe(4);
+    expect(check.slotCount).toBe(4);
     await testPage.close();
   }
 });
@@ -480,8 +484,11 @@ test('circularity and noOverflow pass with speech bubbles present', async ({ pag
   // elements, not six. What matters is that there are six slots and that
   // nothing fails the circularity rule.
   const slotCount = await frame.locator('#stage .scene[data-scene="1"] .orb-slot').count();
-  expect(slotCount).toBe(6);
-  expect(circleResult.count).toBe(12);
+  // Plan 17 "fewer, whole": four of this fixture's six 200 character
+  // messages fit whole without overlapping, so four slots (eight measured
+  // elements).
+  expect(slotCount).toBe(4);
+  expect(circleResult.count).toBe(8);
   expect(circleResult.failures).toHaveLength(0);
 
   const overflow = await noOverflow(frame);
@@ -672,11 +679,9 @@ test('every message renders at or above 18 px floor, fitting messages on one pag
   }
 
   expect(hasSinglePageFit).toBe(true);
-  // Plan 17: these four 200 character messages now fit whole in bubbles
-  // grown to hold them, so pagination is no longer expected here; any bubble
-  // that does page was checked verbatim above, and the paging rule itself is
-  // covered by the "paging bubble" test below.
-  expect(hasPaginatedVerbatim || hasSinglePageFit).toBe(true);
+  // Plan 17: every message in this fixture fits whole in a bubble grown to
+  // hold it (none needs more than the largest bubble), so none may page.
+  expect(hasPaginatedVerbatim, `no bubble pages: ${JSON.stringify(messageCheck.map((c) => ({ id: c.id, single: c.singlePage })))}`).toBe(false);
 });
 
 test('reduced motion displays static speech bubbles without rotation or fading', async ({ page }) => {
@@ -784,9 +789,11 @@ test('a paging bubble is the largest circle the stage can give beside the other 
     expect(['mostly-400', 'mostly-500']).toContain(big.id);
     // The largest circle that fits beside the other bubbles at their homes,
     // computed from the DOM: the paging bubble must be that large (the scene
-    // packs on a 4 px grid with a 5 px gap on each side).
+    // packs on a 4 px grid, keeps 2 px clear of each neighbour and lets boxes
+    // cross by 18 px where this probe allows 20, and drifting neighbours
+    // breathe a few px smaller than their packed size).
     const free = await welcomeLargestFreeCircle(frame, big.id);
-    expect(big.drawn, `${big.id} drawn ${big.drawn} px is the largest achievable (${free.diameter.toFixed(0)} px), ${where}`).toBeGreaterThanOrEqual(free.diameter - 16);
+    expect(big.drawn, `${big.id} drawn ${big.drawn} px is the largest achievable (${free.diameter.toFixed(0)} px), ${where}`).toBeGreaterThanOrEqual(free.diameter - 20);
     // And the message truly cannot show whole at that size at the 18 px floor.
     expect(await fitsWhole(frame, big.id, free.diameter, 18), `${big.id} does not fit whole at ${free.diameter.toFixed(0)} px, ${where}`).toBe(false);
     // Page counts, for the record: 500 graphemes in the largest bubble.
@@ -807,7 +814,9 @@ test('at the default 30 s dwell a message whose pages cannot all be read in time
   expect(ids, 'the 500 grapheme record needs 35.7 s of reading and is not shown at 30 s').not.toContain('mostly-500');
   const deferred = state.log.filter((e) => e.type === 'welcome_record_deferred' && e.id === 'mostly-500');
   expect(deferred.length).toBeGreaterThan(0);
-  expect(deferred[0].reason).toBe('b-dwell');
+  // Round 4: left out either as a second long record (one long record at a
+  // time) or because its pages do not finish in the time left.
+  expect(['one-long', 'b-time', 'others', 'b-room']).toContain(deferred[0].reason);
   for (const r of readings) {
     if (r.pages > 1) {
       expect(r.id).toBe('mostly-400');
@@ -939,3 +948,219 @@ test('welcome bubble sizing re-measures once a still-loading document.fonts.read
 
   expect(fitCallCount).toBeGreaterThanOrEqual(1);
 });
+
+// Plan 17 round 4 ("fewer, whole", Anthony, September 18). Pools of
+// fictional messages of given grapheme lengths, run through the whole scene
+// at the given Welcome dwell. Asserted from the DOM and core's page timing:
+// a normal message (one that fits whole in a 380 px bubble at the 18 px
+// floor, judged by this file's own probe) never pages; at most one bubble
+// pages, it is the largest on screen, and its pages finish before the
+// scene's dwell runs out; words drawn at the floor or larger; six bubbles
+// whenever six fit whole, otherwise as many as fit whole.
+function lengthPool(lengths: number[], dwell: number) {
+  const recognitionsList = lengths.map((n, i) =>
+    recognition({
+      id: `len-${n}-${i}`,
+      recipient: 'Kind Friend',
+      message: buildGraphemeMessage(n).trimEnd(),
+      expressionIds: [(i % 9) + 1, ((i + 3) % 9) + 1],
+      createdAt: `2026-09-10T16:${String(i).padStart(2, '0')}:00Z`,
+      firstPublishedAt: `2026-09-10T16:${String(i).padStart(2, '0')}:00Z`,
+      expiresAt: '2026-09-17T16:00:00Z',
+    }),
+  );
+  return buildActiveDisplayFixture({
+    recognitions: recognitionsList,
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'welcome', enabled: true, durationSeconds: dwell }, { id: 'garden', enabled: true, durationSeconds: 30 }] },
+  });
+}
+
+const LARGEST_NORMAL_BUBBLE = 380;
+
+async function welcomeSample(frame: Frame) {
+  return await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    const tv = document.getElementById('tv')!;
+    const tvScale = tv.getBoundingClientRect().width / 1920;
+    const slots = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .orb-slot')).filter((s) => !s.closest('[data-welcome-measure]'));
+    const bubbles = slots.map((slot) => {
+      const k = slot.offsetWidth ? slot.getBoundingClientRect().width / slot.offsetWidth : tvScale;
+      const msg = slot.querySelector<HTMLElement>('.message')!;
+      const indicator = slot.querySelector<HTMLElement>('.orb-page-indicator');
+      const m = indicator && !indicator.hidden ? (indicator.textContent || '').match(/\/\s*(\d+)/) : null;
+      const id = slot.dataset.recordId || '';
+      const reading = (state.slots || []).find((x: any) => x.key === slot.id)?.reading;
+      return {
+        id,
+        drawn: (slot.getBoundingClientRect().width / tvScale),
+        drawnFont: (parseFloat(getComputedStyle(msg).fontSize) * k) / tvScale,
+        pages: m ? parseInt(m[1], 10) : 1,
+        opacity: parseFloat(getComputedStyle(slot).opacity),
+        readingPages: (reading?.pages || []) as string[],
+        readingIndex: (reading?.index ?? 0) as number,
+      };
+    });
+    return { scene: state.scene as number, sceneAge: state.sceneAge as number, dwell: state.visual.dwell[1] as number, bubbles };
+  });
+}
+
+type PoolCase = { name: string; lengths: number[]; dwell: number; six?: boolean; atLeast?: number; width?: number };
+
+async function checkPool(page: import('@playwright/test').Page, c: PoolCase) {
+  const width = c.width ?? 1920;
+  await page.setViewportSize({ width, height: (width * 9) / 16 });
+  const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool(c.lengths, c.dwell) });
+  const normal = new Map<string, boolean>();
+  const isNormal = async (id: string) => {
+    if (!normal.has(id)) normal.set(id, await fitsWhole(frame, id, LARGEST_NORMAL_BUBBLE, 18));
+    return normal.get(id)!;
+  };
+  const firstPaging = new Map<string, number>();
+  const problems: string[] = [];
+  const counts: number[] = [];
+  const pagesSeen = new Map<string, number>();
+  const lastIndex = new Map<string, number>();
+  const cycled = new Set<string>();
+  for (let t = 0; ; t += 500) {
+    if (t) await frame.evaluate(() => (window as any).colorPolishRuntime.step(500));
+    const s = await welcomeSample(frame);
+    if (t === 0) expect(s.dwell).toBe(c.dwell);
+    if (s.scene !== 1 || s.sceneAge >= c.dwell || t > (c.dwell + 1) * 1000) break;
+    if (t >= 1000) counts.push(s.bubbles.length);
+    const visible = s.bubbles.filter((b) => b.opacity > 0.1);
+    const paging = visible.filter((b) => b.pages > 1);
+    if (paging.length > 1) problems.push(`${s.sceneAge.toFixed(1)} s: ${paging.length} bubbles page at once`);
+    for (const b of visible) {
+      if (b.drawnFont < 18 - 0.05) problems.push(`${s.sceneAge.toFixed(1)} s: ${b.id} drawn at ${b.drawnFont.toFixed(2)} px`);
+      if (b.pages < 2) continue;
+      pagesSeen.set(b.id, Math.max(pagesSeen.get(b.id) ?? 1, b.pages));
+      if (await isNormal(b.id)) problems.push(`${s.sceneAge.toFixed(1)} s: normal ${b.id} pages (${b.pages})`);
+      const largest = Math.max(...visible.map((x) => x.drawn));
+      if (b.drawn < largest - 2) problems.push(`${s.sceneAge.toFixed(1)} s: paging ${b.id} (${b.drawn.toFixed(0)} px) is not the largest (${largest.toFixed(0)} px)`);
+      // Core reads a page for max(9, characters / 14) seconds: the pages
+      // still to come must finish inside the dwell.
+      const later = b.readingPages.slice(b.readingIndex + 1).reduce((n, p) => n + Math.max(9, p.length / 14), 0);
+      if (!firstPaging.has(b.id)) {
+        firstPaging.set(b.id, s.sceneAge);
+        const total = b.readingPages.reduce((n, p) => n + Math.max(9, p.length / 14), 0);
+        if (s.sceneAge + total > c.dwell + 0.6) problems.push(`${b.id} starts paging at ${s.sceneAge.toFixed(1)} s with ${total.toFixed(1)} s of pages, past the ${c.dwell} s dwell`);
+      }
+      // Core starts the pages again once all have been read; only the first
+      // pass must finish inside the dwell.
+      if (b.readingIndex < (lastIndex.get(b.id) ?? 0)) cycled.add(b.id);
+      lastIndex.set(b.id, b.readingIndex);
+      if (!cycled.has(b.id) && s.sceneAge + later > c.dwell + 0.6) problems.push(`${s.sceneAge.toFixed(1)} s: ${b.id} has ${later.toFixed(1)} s of pages still to come`);
+    }
+  }
+  const minCount = Math.min(...counts);
+  console.log(`welcome pool ${c.name} (${width} wide, ${c.dwell} s): bubbles ${minCount} to ${Math.max(...counts)}, paging ${JSON.stringify(Object.fromEntries(pagesSeen))}`);
+  expect(problems, `${c.name}: ${problems.slice(0, 8).join(' | ')}`).toHaveLength(0);
+  if (c.six) expect(minCount, `${c.name}: six bubbles fit whole`).toBe(6);
+  if (c.atLeast) expect(minCount, `${c.name}: as many bubbles as fit whole`).toBeGreaterThanOrEqual(c.atLeast);
+  expect(Math.max(...counts), `${c.name}: never more than six bubbles`).toBeLessThanOrEqual(6);
+}
+
+const ROUND4_POOLS: PoolCase[] = [
+  { name: 'round 2 lengths at 30 s', lengths: [80, 120, 170, 200, 220, 250, 400, 500], dwell: 30, atLeast: 4 },
+  { name: 'round 2 lengths at 40 s', lengths: [80, 120, 170, 200, 220, 250, 400, 500], dwell: 40, atLeast: 4 },
+  { name: 'round 2 lengths at 40 s, 3840 wide', lengths: [80, 120, 170, 200, 220, 250, 400, 500], dwell: 40, atLeast: 4, width: 3840 },
+  { name: 'twelve of 40 to 300', lengths: [40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 250, 300], dwell: 30, six: true },
+  { name: 'six of 170 to 220', lengths: [170, 180, 190, 200, 210, 220], dwell: 30, atLeast: 4 },
+  { name: 'seven of 150 to 250', lengths: [150, 170, 190, 210, 230, 240, 250], dwell: 30, atLeast: 3 },
+  { name: 'six of 80 to 500 at 40 s', lengths: [80, 120, 200, 250, 400, 500], dwell: 40, atLeast: 4 },
+  { name: 'six of 300 to 500 at 40 s', lengths: [300, 340, 380, 420, 460, 500], dwell: 40, atLeast: 2 },
+  { name: 'ten of 60 to 90 plus seven of 300 to 500 at 30 s', lengths: [60, 70, 90, 60, 70, 90, 60, 70, 90, 60, 300, 340, 380, 420, 460, 480, 500], dwell: 30, six: true },
+  { name: 'ten of 60 to 90 plus seven of 300 to 500 at 40 s', lengths: [60, 70, 90, 60, 70, 90, 60, 70, 90, 60, 300, 340, 380, 420, 460, 480, 500], dwell: 40, six: true },
+  { name: 'six short plus 400, late replacement at 30 s', lengths: [60, 70, 80, 90, 100, 110, 400], dwell: 30, six: true },
+  { name: 'six short plus 400, late replacement at 40 s', lengths: [60, 70, 80, 90, 100, 110, 400], dwell: 40, six: true },
+  { name: 'six short plus 500, late replacement at 40 s', lengths: [60, 70, 80, 90, 100, 110, 500], dwell: 40, six: true },
+  { name: 'mostly long lengths at 40 s', lengths: [53, 63, 130, 250, 400, 500], dwell: 40, atLeast: 4 },
+];
+
+for (const c of ROUND4_POOLS) {
+  test(`round 4 pool, ${c.name}: no normal message pages, one paging bubble at most (the largest, finishing in time), floor kept, bubble count`, async ({ page }) => {
+    test.setTimeout(300000);
+    await checkPool(page, c);
+  });
+}
+
+// Round 4, finding 5: a drifting bubble never rests over the words of a
+// large still bubble (one whose message is too long to drift).
+for (const [name, build] of [
+  ['mostly-long fixture', () => buildTextFitsFixture()],
+  ['medium fixture', () => buildMediumFixture()],
+  ['six short plus 400', () => lengthPool([60, 70, 80, 90, 100, 110, 400], 30)],
+  ['twelve of 40 to 300', () => lengthPool([40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 250, 300], 30)],
+] as Array<[string, () => Record<string, unknown>]>) {
+  test(`round 4, ${name}: no steady drifting bubble covers the words of a large still bubble`, async ({ page }) => {
+    test.setTimeout(300000);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: build() });
+    const covered: string[] = [];
+    for (let t = 0; t <= 30000; t += 250) {
+      if (t) await frame.evaluate(() => (window as any).colorPolishRuntime.step(250));
+      const found = await frame.evaluate(() => {
+        const actors = (0, eval)('V').actors as Array<{ key: string; life: string; large: boolean }>;
+        const tv = document.getElementById('tv')!;
+        const tvScale = tv.getBoundingClientRect().width / 1920;
+        const slots = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .orb-slot')).filter((s) => !s.closest('[data-welcome-measure]'));
+        const info = slots.map((s) => {
+          const r = s.getBoundingClientRect();
+          const a = actors.find((x) => x.key === s.id);
+          const rects: DOMRect[] = [];
+          const w = document.createTreeWalker(s, NodeFilter.SHOW_TEXT);
+          for (let n = w.nextNode(); n; n = w.nextNode()) {
+            if (!(n.nodeValue || '').trim() || (n.parentElement as HTMLElement).closest('[hidden]')) continue;
+            const rg = document.createRange();
+            rg.selectNodeContents(n);
+            for (const q of Array.from(rg.getClientRects())) if (q.width > 0) rects.push(q);
+          }
+          return { id: s.dataset.recordId, life: a?.life, large: !!a?.large, cx: r.left + r.width / 2, cy: r.top + r.height / 2, R: r.width / 2, rects };
+        });
+        const out: string[] = [];
+        for (const big of info.filter((x) => x.large && x.life === 'steady')) {
+          for (const d of info.filter((x) => !x.large && x.life === 'steady')) {
+            let worst = 0;
+            for (const q of big.rects) {
+              const px = Math.max(q.left, Math.min(d.cx, q.right)), py = Math.max(q.top, Math.min(d.cy, q.bottom));
+              worst = Math.max(worst, d.R - Math.hypot(px - d.cx, py - d.cy));
+            }
+            if (worst > 0.5) out.push(`${d.id} over ${big.id} words by ${(worst / tvScale).toFixed(1)} px`);
+          }
+        }
+        return out;
+      });
+      found.forEach((f) => covered.push(`${t / 1000} s: ${f}`));
+    }
+    expect(covered, covered.slice(0, 6).join(' | ')).toHaveLength(0);
+  });
+}
+
+// Round 4, finding 6: a leaving bubble comes back with a different record
+// whenever another eligible record fits whole in the free space it leaves.
+// With only short records waiting, that is every exit; with longer ones
+// waiting (140 to 300 characters) the free space often cannot hold them
+// whole, and then the bubble shows its own record again rather than page.
+for (const [name, lengths, maxSameShare] of [
+  ['twelve short records', [40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150], 0],
+  ['twelve of 40 to 300', [40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 250, 300], 0.4],
+] as Array<[string, number[], number]>) {
+  test(`round 4, ${name}: drift replacement brings a different record back when one fits`, async ({ page }) => {
+    test.setTimeout(300000);
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: lengthPool(lengths, 60) });
+    for (let t = 0; t < 60; t++) await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    const events = await frame.evaluate(() => ((window as any).colorPolishRuntime.getState().log as Array<{ type: string; id?: string }>).filter((e) => e.type === 'bubble_exit_start' || e.type === 'bubble_new').map((e) => [e.type, e.id || ''] as [string, string]));
+    const pending: string[] = [];
+    const same: string[] = [];
+    let exits = 0;
+    for (const [type, id] of events) {
+      if (type === 'bubble_exit_start') {
+        exits++;
+        pending.push(id);
+      } else if (pending.length && pending.shift() === id) same.push(id);
+    }
+    expect(exits, 'bubbles leave during a 60 s dwell').toBeGreaterThanOrEqual(6);
+    expect(same.length, `records shown again straight after leaving: ${same.join(', ')} of ${exits} exits`).toBeLessThanOrEqual(Math.floor(exits * maxSameShare));
+  });
+}

@@ -37,13 +37,15 @@
   // about 300 px when they are 100 to 120 characters). Six bubbles cannot
   // all be wide: three across the box is 913 px and two down it is 620 px.
   //
-  // Records. Every record on screen either fits whole, or is long (needs more
-  // than B) and pages in B at the font floor. A long record pages only when
-  // every page gets its full reading time inside the Welcome dwell (core
-  // shows a page for max(9, characters / 14) seconds); otherwise Welcome
-  // leaves it to the other scenes and draws another record. When the six
-  // records drawn cannot all fit whole, a larger one is swapped for a shorter
-  // record from the pool; a record that fits whole is never paged.
+  // Records ("fewer, whole", Anthony, September 18). Every record on screen
+  // either fits whole, or is long (needs more than WELCOME_NORMAL_CAP) and
+  // pages in B, the largest bubble, at the font floor, only when every page
+  // gets its full reading time (core shows a page for max(9, characters /
+  // 14) seconds) inside the time left in the scene; otherwise Welcome leaves
+  // it to the other scenes. When the records drawn cannot all fit whole, a
+  // larger one is swapped for a smaller one from the pool; six bubbles show
+  // whenever six records fit whole, otherwise as many as fit whole. A normal
+  // record is never paged.
   //
   // Drift replacement keeps the same rule: a bubble that retires is refilled
   // with the next record in core's rotation that fits its position whole.
@@ -80,7 +82,6 @@
   // about 130 characters at the floor. Larger records wait for B or another
   // pass rather than page.
   const WELCOME_OTHER_ROOM = 300;
-  const WELCOME_SWAP_LIMIT = 12;
   // Overlap between two packed bubbles, in px, that the layout tolerates
   // (their boxes then cross by under 20 px, the Plan 15 limit); the drift
   // physics resolves it. Beyond it the set does not fit.
@@ -246,6 +247,14 @@
   // Layout at layout diameter d: one page at the largest font that fits, or,
   // when the message cannot fit whole at d, the fewest floor-size pages.
   function welcomeFitAt(host, r, d, floor) {
+    const key = `${welcomeRecordKey(r)}|${d}|${floor}`;
+    if (WELCOME_FIT_CACHE.has(key)) return WELCOME_FIT_CACHE.get(key);
+    const fit = welcomeFitAtRaw(host, r, d, floor);
+    if (fit) WELCOME_FIT_CACHE.set(key, fit);
+    return fit;
+  }
+
+  function welcomeFitAtRaw(host, r, d, floor) {
     const el = welcomeProbe(host, r, d);
     const msg = el.querySelector('.message'), page = el.querySelector('.orb-page-indicator');
     if (!msg || !page) return null;
@@ -282,24 +291,34 @@
     return S.dwell?.[1] ?? DWELL[1] ?? 30;
   }
 
-  // Pages only when every page gets its full reading time inside the dwell.
-  function welcomePagesFitDwell(pages) {
-    return pages.length < 2 || welcomePageSeconds(pages) <= welcomeDwell();
+  // Time left in the scene for a bubble that starts now: the dwell minus
+  // the scene's age, less the 3.8 s entry flight.
+  const WELCOME_ENTRY_SECONDS = 3.8;
+  // A drift replacement is chosen as the old bubble starts to leave, so it
+  // also waits for the 3.8 s exit before it enters.
+  function welcomeTimeLeft(wait = 0) {
+    return welcomeDwell() - (S.sceneAge || 0) - WELCOME_ENTRY_SECONDS - wait;
+  }
+
+  // Pages only when every page gets its full reading time inside the time
+  // left in the scene.
+  function welcomePagesFitTime(pages, wait = 0) {
+    return pages.length < 2 || welcomePageSeconds(pages) <= welcomeTimeLeft(wait);
   }
 
   // The largest circle inside the region that touches none of the given
   // circles ({cx, cy, r}). A 4 px grid search over centres.
-  function welcomeLargestFree(circles) {
+  function welcomeLargestFree(circles, step = 4) {
     const R = WELCOME_REGION;
     let best = { cx: R.left, cy: R.top, r: 0 };
-    for (let cy = R.top + 40; cy <= R.bottom - 40; cy += 4) {
-      for (let cx = R.left + 40; cx <= R.right - 40; cx += 4) {
+    for (let cy = R.top + 40; cy <= R.bottom - 40; cy += step) {
+      for (let cx = R.left + 40; cx <= R.right - 40; cx += step) {
         let r = Math.min(cx - R.left, R.right - cx, cy - R.top, R.bottom - cy);
         if (r <= best.r) continue;
         for (const c of circles) {
           // Clear of the circle, and of its square too (bubbles keep the
-          // Plan 15 grid feel: their boxes overlap by at most 16 px).
-          r = Math.min(r, Math.hypot(cx - c.cx, cy - c.cy) - c.r - WELCOME_GAP / 2, Math.max(Math.abs(cx - c.cx), Math.abs(cy - c.cy)) - c.r + 16);
+          // Plan 15 grid feel: their boxes overlap by at most 18 px).
+          r = Math.min(r, Math.hypot(cx - c.cx, cy - c.cy) - c.r - 2, Math.max(Math.abs(cx - c.cx), Math.abs(cy - c.cy)) - c.r + 18);
           if (r <= best.r) break;
         }
         if (r > best.r) best = { cx, cy, r };
@@ -361,8 +380,12 @@
     for (let i = 0; i < names.length; i++) {
       for (let j = i + 1; j < names.length; j++) {
         const a = homes[names[i]], b = homes[names[j]];
-        // A residual overlap deeper than the tolerance means the set does not fit.
-        if (Math.hypot(b.cx - a.cx, b.cy - a.cy) < a.r + b.r - WELCOME_OVERLAP_TOLERANCE) overflow = true;
+        // Circles that still overlap, or boxes that cross by more than the
+        // tolerance on both axes (the Plan 15 no-crossing rule), mean the set
+        // does not fit.
+        const boxX = Math.min(a.cx + a.r, b.cx + b.r) - Math.max(a.cx - a.r, b.cx - b.r);
+        const boxY = Math.min(a.cy + a.r, b.cy + b.r) - Math.max(a.cy - a.r, b.cy - b.r);
+        if (Math.hypot(b.cx - a.cx, b.cy - a.cy) < a.r + b.r || (boxX > WELCOME_OVERLAP_TOLERANCE && boxY > WELCOME_OVERLAP_TOLERANCE)) overflow = true;
       }
     }
     return { homes, overflow };
@@ -380,90 +403,77 @@
     return { scales, floor, layout, drawn: layout === null ? null : layout * scales.max };
   }
 
-  // Lays out a set of six records: returns per-slot placements or null.
-  // With shrink below 1 (the pool has nothing shorter and the six do not
-  // fit whole), the five packed positions are scaled down together and a
-  // record that no longer fits its position pages there: Anthony chose six
-  // bubbles with pages over fewer bubbles.
-  function welcomeLayoutSet(host, set, shrink = 1) {
-    const byLength = [...set].sort((a, b) => b.message.length - a.message.length || b.name.length - a.name.length || a.id.localeCompare(b.id));
-    const b = byLength[0];
-    const others = byLength.slice(1);
-    // Largest of the five to the near corner slot, the two next to the mid
-    // slots, the two shortest to the far slots.
-    const order = ['TR', 'TM', 'BR', 'TL', 'BM'];
+  // Lays out a set of up to six records: per-slot placements. The record
+  // with the greatest need takes B (the largest circle the box leaves beside
+  // the others); the rest take the packed slots, largest first. Every record
+  // is placed at the diameter its whole message needs; only a long B (one
+  // that needs more than WELCOME_NORMAL_CAP) takes B's cap and pages there.
+  // Orders in which the packed slots take the other records (largest need
+  // first): every arrangement of the five slots, so the layout that fits
+  // the most records whole can be found.
+  const WELCOME_ORDERS = (() => {
+    const names = ['TR', 'TM', 'BR', 'TL', 'BM'];
+    const out = [];
+    const walk = (prefix, rest) => {
+      if (!rest.length) return out.push(prefix);
+      rest.forEach((n, i) => walk([...prefix, n], [...rest.slice(0, i), ...rest.slice(i + 1)]));
+    };
+    walk([], names);
+    return out;
+  })();
+
+  // Tries every slot arrangement for the set and keeps the best: one that
+  // shows every record whole (or a long B inside the time left) with the
+  // largest room for B; the plain arrangement when none does.
+  function welcomeLayoutSet(host, set) {
+    let best = null, bestScore = -Infinity;
+    const seenKeys = new Set();
+    for (const order of WELCOME_ORDERS) {
+      const used = order.slice(0, Math.max(0, set.length - 1));
+      const key = used.join(',');
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      const layout = welcomeLayoutOrder(host, set, used, 8);
+      if (!layout) continue;
+      const score = (welcomeSetProblem(layout) ? 0 : 1e6) + layout.placements.B.capDrawn;
+      if (score > bestScore) {
+        bestScore = score;
+        best = used;
+      }
+    }
+    return welcomeLayoutOrder(host, set, best || WELCOME_ORDERS[0].slice(0, Math.max(0, set.length - 1)), 4);
+  }
+
+  function welcomeLayoutOrder(host, set, order, step) {
+    const nearNeed = (r) => {
+      const n = welcomeSlotNeed(host, r, 'near', welcomeIsStatic(r));
+      return n.drawn === null ? Infinity : n.drawn;
+    };
+    const byNeed = [...set].sort((a, b) => nearNeed(b) - nearNeed(a) || b.message.length - a.message.length || a.id.localeCompare(b.id));
+    const b = byNeed[0];
+    const others = byNeed.slice(1);
     const placements = {};
     const drawn = {};
-    const bSlot0 = WELCOME_SLOTS[0];
-    const bNeed0 = welcomeSlotNeed(host, b, bSlot0.layer, welcomeIsStatic(b));
-    // B's room for the row and column sums: its need when normal; a long B
-    // reserves nothing and takes what is left (the dwell rule decides).
-    const bRoom = bNeed0.drawn !== null && bNeed0.drawn <= WELCOME_NORMAL_CAP ? bNeed0.drawn : 0;
-    const needs = {};
     others.forEach((r, i) => {
       const slot = WELCOME_SLOTS.find((s) => s.name === order[i]);
       const need = welcomeSlotNeed(host, r, slot.layer, welcomeIsStatic(r));
       const layout = need.layout === null ? WELCOME_MAX_DIAMETER : need.layout;
-      needs[slot.name] = { slot, r, need, layout, drawn: layout * need.scales.max };
+      placements[slot.name] = { slot, r, layout, drawn: layout * need.scales.max, floor: need.floor, scales: need.scales, whole: need.layout !== null };
+      drawn[slot.name] = placements[slot.name].drawn;
     });
-    // Fallback only (shrink below 1: the pool has nothing shorter and the six
-    // do not fit whole). Each row and column of the pack has a limit; a
-    // group over its limit by more than WELCOME_OVERLAP_TOLERANCE lowers its
-    // largest bubbles first, levelling them down just enough to fit, so a
-    // short message is never touched. A lowered bubble pages its message
-    // (Anthony chose six bubbles with pages over fewer bubbles).
-    const target = {};
-    for (const name of Object.keys(needs)) target[name] = needs[name].drawn;
-    if (shrink < 1) {
-      const W = WELCOME_REGION.right - WELCOME_REGION.left, H = WELCOME_REGION.bottom - WELCOME_REGION.top, g = WELCOME_GAP;
-      const groups = [
-        { names: ['TL', 'TM', 'TR'], limit: W - 2 * g },
-        { names: ['TR', 'BR'], limit: H - g },
-        { names: ['TM', 'BM'], limit: H - g },
-        { names: ['TL'], limit: H - g - bRoom },
-        { names: ['TM'], limit: H - g - bRoom },
-        { names: ['BM', 'BR'], limit: W - 2 * g - bRoom }
-      ];
-      for (let pass = 0; pass < 3; pass++) {
-        for (const grp of groups) {
-          const names = grp.names.filter((name) => needs[name]);
-          let excess = names.reduce((n, name) => n + target[name], 0) - grp.limit;
-          if (names.length === 0 || excess <= WELCOME_OVERLAP_TOLERANCE) continue;
-          // Level the largest members down towards the next largest.
-          for (let guard = 0; guard < 12 && excess > 0; guard++) {
-            const sorted = [...names].sort((x, y) => target[y] - target[x]);
-            const top = target[sorted[0]];
-            const tops = sorted.filter((name) => target[name] >= top - 0.5);
-            const next = sorted.find((name) => target[name] < top - 0.5);
-            const room = next ? top - target[next] : top - WELCOME_MIN_DIAMETER;
-            const cut = Math.min(room, excess / tops.length);
-            if (cut <= 0) break;
-            for (const name of tops) target[name] = Math.max(WELCOME_MIN_DIAMETER, target[name] - cut);
-            excess -= cut * tops.length;
-          }
-        }
-      }
-    }
-    for (const name of Object.keys(needs)) {
-      const n = needs[name];
-      let layout = n.layout;
-      if (target[name] < n.drawn - 0.5) layout = Math.max(WELCOME_MIN_DIAMETER, Math.floor(target[name] / n.need.scales.max));
-      placements[name] = { slot: n.slot, r: n.r, layout, drawn: layout * n.need.scales.max, floor: n.need.floor, scales: n.need.scales, whole: n.need.layout !== null && layout >= n.need.layout, shrunk: layout < n.layout };
-      drawn[name] = placements[name].drawn;
-    }
     const pack = welcomePackFive(drawn);
     const present = order.filter((name) => placements[name]);
     for (const name of present) placements[name].home = pack.homes[name];
-    const free = welcomeLargestFree(present.map((name) => pack.homes[name]));
+    const free = welcomeLargestFree(present.map((name) => pack.homes[name]), step);
     const bSlot = WELCOME_SLOTS[0];
     const bNeed = welcomeSlotNeed(host, b, bSlot.layer, welcomeIsStatic(b));
     const bCapDrawn = free.r * 2;
     const bCapLayout = Math.floor(bCapDrawn / bNeed.scales.max);
-    // Normal: fits whole in a bubble the layout can give when its neighbours
-    // are short (WELCOME_NORMAL_CAP drawn). Long: needs more than that.
+    // Normal: fits whole in the largest bubble the layout gives when its
+    // neighbours are short (WELCOME_NORMAL_CAP drawn). Long: needs more.
     const bNormal = bNeed.drawn !== null && bNeed.drawn <= WELCOME_NORMAL_CAP;
     const bWhole = bNeed.layout !== null && bNeed.layout <= bCapLayout;
-    let bLayout = bWhole || bNormal ? bNeed.layout : bCapLayout;
+    const bLayout = bWhole || bNormal ? bNeed.layout : bCapLayout;
     let bPages = null;
     if (!bWhole && !bNormal) {
       const fit = welcomeFitAt(host, b, bLayout, bNeed.floor);
@@ -472,118 +482,108 @@
     const bDrawn = bLayout * bNeed.scales.max;
     const R = WELCOME_REGION;
     const home = { cx: clamp(free.cx, R.left + bDrawn / 2, R.right - bDrawn / 2), cy: clamp(free.cy, R.top + bDrawn / 2, R.bottom - bDrawn / 2), r: bDrawn / 2 };
-    const largestOtherDrawn = present.reduce((n, name) => Math.max(n, placements[name].drawn), 0);
-    placements.B = { slot: bSlot, r: b, layout: bLayout, drawn: bDrawn, floor: bNeed.floor, scales: bNeed.scales, whole: bWhole, normal: bNormal, capLayout: bCapLayout, capDrawn: bCapDrawn, need: bNeed.layout, pages: bPages, home, largest: bDrawn >= largestOtherDrawn - 1 };
-    return { placements, overflow: pack.overflow, b, others, shrink };
+    placements.B = { slot: bSlot, r: b, layout: bLayout, drawn: bDrawn, floor: bNeed.floor, scales: bNeed.scales, whole: bWhole, normal: bNormal, capLayout: bCapLayout, capDrawn: bCapDrawn, need: bNeed.layout, pages: bPages, home };
+    return { placements, overflow: pack.overflow, b, others };
   }
 
-  // Draws records for Welcome in core's rotation order, then repairs the set
-  // so that every record fits whole, or is long and pages inside the dwell.
+  // Why a laid-out set does not show every record whole (or a long B inside
+  // the time left), or null when it does.
+  function welcomeSetProblem(layout) {
+    const B = layout.placements.B;
+    if (!B.whole && !B.normal && !welcomePagesFitTime(B.pages)) return 'b-time';
+    if (!B.whole && B.normal && B.need * B.scales.max - B.capDrawn > WELCOME_OVERLAP_TOLERANCE) return 'b-room';
+    if (layout.overflow || Object.values(layout.placements).some((p) => p.slot.name !== 'B' && !p.whole)) return 'others';
+    return null;
+  }
+
+  // Chooses the records for Welcome ("fewer, whole", Anthony, September 18).
+  // Starts from the first six records in core's rotation order and repairs
+  // the set: a record that does not fit is traded for a record with a
+  // smaller need, next in rotation order; at most one long record, which
+  // pages in B only when its pages finish inside the time left in the scene.
+  // Six bubbles show whenever six records of the pool fit whole; only when
+  // even the six smallest do not fit does Welcome show fewer bubbles, as
+  // many as fit whole. A normal record is never paged.
   function welcomeChooseSet(host) {
     const pool = records();
-    const drawnIds = new Set();
-    const candidates = [];
-    const drawNext = () => {
-      if (!pool.length) return null;
-      if (candidates.length >= pool.length) return null;
-      const exclude = candidates.map((r) => r.id);
-      const r = chooseRandom(exclude) || pool.find((x) => !drawnIds.has(x.id));
-      if (!r || drawnIds.has(r.id)) return null;
-      drawnIds.add(r.id);
-      candidates.push(r);
-      return r;
-    };
-    // Six distinct records. A pool smaller than six fills the remaining
-    // bubbles with repeats, as the Plan 15 layout did, but only of records
-    // that show whole (a long record is never repeated to page twice).
-    const set = [];
-    for (let i = 0; i < 6; i++) {
-      const r = drawNext();
-      if (r) set.push(r);
+    if (!pool.length) return { set: [], layout: null };
+    // Core's rotation order over the whole pool.
+    const order = [];
+    const seen = new Set();
+    while (order.length < pool.length) {
+      const r = chooseRandom(order.map((x) => x.id)) || pool.find((x) => !seen.has(x.id));
+      if (!r || seen.has(r.id)) break;
+      seen.add(r.id);
+      order.push(r);
     }
-    if (!set.length) return { set: [], layout: null };
-    if (!host) return { set, layout: null };
+    if (!host) return { set: order.slice(0, 6), layout: null };
+    const need = (r) => {
+      const n = welcomeSlotNeed(host, r, 'near', welcomeIsStatic(r));
+      return n.drawn === null ? Infinity : n.drawn;
+    };
+    const isLong = (r) => need(r) > WELCOME_NORMAL_CAP;
+    const excluded = new Set();
+    let set = [];
+    // First six in rotation order, with at most one long record (the first
+    // drawn); a second long record gives way to the next normal one.
+    for (const r of order) {
+      if (set.length >= 6) break;
+      if (isLong(r) && set.some(isLong)) {
+        log('welcome_record_deferred', { id: r.id, reason: 'one-long' });
+        continue;
+      }
+      set.push(r);
+    }
+    // A pool of fewer than six fills the remaining bubbles with repeats of
+    // normal records, as the Plan 15 layout did.
     if (pool.length < 6) {
-      const repeatable = pool.filter((r) => {
-        const need = welcomeSlotNeed(host, r, 'near', welcomeIsStatic(r));
-        return need.drawn !== null && need.drawn <= WELCOME_NORMAL_CAP;
-      });
+      const repeatable = order.filter((r) => !isLong(r));
       for (let i = 0; set.length < 6 && repeatable.length; i++) set.push(repeatable[i % repeatable.length]);
     }
-    let used = new Set(set.map((r) => r.id));
-    const deferred = new Set();
-    const spare = () => candidates.filter((r) => !used.has(r.id) && !deferred.has(r.id));
-    const shorterThan = (r) => {
-      let pick = spare().find((x) => x.message.length < r.message.length);
-      while (!pick) {
-        const next = drawNext();
-        if (!next) return null;
-        if (next.message.length < r.message.length) pick = next;
-      }
-      return pick;
-    };
-    const swap = (out, inn) => {
-      set.splice(set.indexOf(out), 1, inn);
-      used = new Set(set.map((r) => r.id));
-    };
+    const inSet = (r) => set.some((x) => x.id === r.id);
+    // The next record in rotation order, not on screen, not excluded, normal,
+    // whose need is below `than`.
+    const smaller = (than, len) => order.find((r) => !inSet(r) && !excluded.has(r.id) && r.message.length <= len && !isLong(r) && need(r) < than - 0.5);
     let layout = welcomeLayoutSet(host, set);
-    let shrunk = false;
-    for (let iter = 0; iter < WELCOME_SWAP_LIMIT * 2; iter++) {
-      const B = layout.placements.B;
-      const largestOther = layout.others[0];
-      let problem = null;
-      if (!B.whole && !B.normal && !welcomePagesFitDwell(B.pages)) problem = 'b-dwell';
-      else if (!B.whole && B.normal && B.need * B.scales.max - B.capDrawn > WELCOME_OVERLAP_TOLERANCE) problem = 'b-normal';
-      else if (layout.overflow || Object.values(layout.placements).some((p) => p.slot.name !== 'B' && !p.whole)) problem = 'others';
+    const limit = pool.length * 2 + 24;
+    for (let iter = 0; iter < limit; iter++) {
+      const problem = welcomeSetProblem(layout);
       if (!problem) break;
-      // Free room by trading the largest of the other bubbles for a shorter
-      // record. A set of normal records that still overflows keeps its sizes
-      // (bubbles may touch) rather than page or lose a word.
-      const shorter = largestOther ? shorterThan(largestOther) : null;
-      if (shorter) {
-        swap(largestOther, shorter);
-        layout = welcomeLayoutSet(host, set);
-        continue;
-      }
-      if ((problem === 'others' || problem === 'b-normal') && !shrunk) {
-        // Nothing shorter in the pool and the six do not fit whole (or B's
-        // record has no room): keep six bubbles and scale the five packed
-        // positions down together, a step at a time, until they fit and B
-        // has its room. A record that no longer fits its smaller position
-        // pages there, at the floor, with as few pages as possible.
-        shrunk = true;
-        layout = welcomeLayoutSet(host, set, 0.5);
-        log('welcome_layout_shrunk', { paging: Object.values(layout.placements).filter((p) => !p.whole).map((p) => p.r.id) });
-        continue;
-      }
-      if (problem === 'b-dwell') {
-        // No shorter record left in the pool. Either the long record or its
-        // largest neighbour must wait for a later pass: the one drawn later
-        // in core's rotation waits. When the long record waits, Welcome
-        // leaves it to the other scenes this pass and shows the next record
-        // instead (or one bubble fewer when the pool has nothing else).
-        const bIndex = candidates.indexOf(B.r), otherIndex = largestOther ? candidates.indexOf(largestOther) : -1;
-        if (largestOther && otherIndex > bIndex && set.length > 4) {
-          log('welcome_record_deferred', { id: largestOther.id, reason: 'room-for-' + B.r.id, dwell: welcomeDwell() });
-          deferred.add(largestOther.id);
-          set.splice(set.indexOf(largestOther), 1);
-          used = new Set(set.map((r) => r.id));
-          layout = welcomeLayoutSet(host, set);
-          continue;
+      const long = set.find(isLong);
+      // Trade the member with the largest need that has a smaller-need
+      // record waiting (a long B keeps its place while its neighbours can
+      // shrink; it gives way below when they cannot).
+      const members = [...set].filter((r) => r !== long).sort((a, b) => need(b) - need(a));
+      let traded = false;
+      for (const m of members) {
+        const s = smaller(need(m), m.message.length);
+        if (s) {
+          set.splice(set.indexOf(m), 1, s);
+          traded = true;
+          break;
         }
-        log('welcome_record_deferred', { id: B.r.id, reason: problem, pages: B.pages ? B.pages.length : 0, seconds: B.pages ? +welcomePageSeconds(B.pages).toFixed(1) : 0, dwell: welcomeDwell(), diameter: Math.round(B.drawn), cap: Math.round(B.capDrawn) });
-        deferred.add(B.r.id);
-        const replacement = shorterThan(B.r) || spare()[0] || null;
-        if (replacement) swap(B.r, replacement);
-        else {
-          set.splice(set.indexOf(B.r), 1);
-          used = new Set(set.map((r) => r.id));
-        }
-        if (!set.length) break;
-        layout = welcomeLayoutSet(host, set);
-        continue;
       }
-      break;
+      if (!traded && long) {
+        // The long record cannot show inside the time left (or its
+        // neighbours cannot make room): it waits for a later pass and the
+        // next normal record in rotation order takes its place.
+        log('welcome_record_deferred', { id: long.id, reason: problem, pages: layout.placements.B.pages ? layout.placements.B.pages.length : 0, timeLeft: +welcomeTimeLeft().toFixed(1) });
+        excluded.add(long.id);
+        const next = order.find((r) => !inSet(r) && !excluded.has(r.id) && !isLong(r));
+        if (next) set.splice(set.indexOf(long), 1, next);
+        else set.splice(set.indexOf(long), 1);
+        traded = true;
+      }
+      if (!traded) {
+        // Even the smallest records left do not fit six whole: one bubble
+        // fewer, dropping the record with the greatest need.
+        if (set.length <= 1) break;
+        const drop = members[0];
+        log('welcome_fewer_bubbles', { id: drop.id, count: set.length - 1 });
+        set.splice(set.lastIndexOf(drop), 1);
+      }
+      if (!set.length) break;
+      layout = welcomeLayoutSet(host, set);
     }
     return { set, layout };
   }
@@ -675,52 +675,77 @@
         html += addOrb(p.r, x, y, d, { growMax: d, large: !smallFits(p.r) });
         WELCOME_SLOT_LIMITS.set('slot-' + S.slotCounter, { name: slot.name, layer: slot.layer, floor: p.floor, scales: p.scales, capDrawn: slot.name === 'B' ? p.capDrawn : p.drawn, layoutDrawn: p.drawn });
       }
-      log('welcome_layout', { b: layout.placements.B.r.id, bDrawn: Math.round(layout.placements.B.drawn), bCap: Math.round(layout.placements.B.capDrawn), others: layout.others.map((r) => r.id) });
+      log('welcome_layout', { count: set.length, b: layout.placements.B.r.id, bDrawn: Math.round(layout.placements.B.drawn), bCap: Math.round(layout.placements.B.capDrawn), others: layout.others.map((r) => r.id) });
       return html;
     });
+  }
+
+  // The largest free circle (drawn px) in the region beside every other
+  // bubble that stays on screen (leaving ones excluded; entering ones at
+  // the home they fly to).
+  function welcomeFreeNow(a) {
+    const circles = [];
+    for (const o of V.actors) {
+      if (o === a || o.life === 'exiting' || o.life === 'absent') continue;
+      const L = WELCOME_LAYERS[o.layer] || WELCOME_LAYERS.near;
+      const entering = o.life === 'entering';
+      circles.push({ cx: entering ? o.homeX : o.x, cy: entering ? o.homeY : o.y, r: (o.d * L.scale) / 2 });
+    }
+    return welcomeLargestFree(circles, 8);
   }
 
   // Drift replacement: core's replaceActor has just chosen the next record
   // for a retiring bubble. Keep that choice when the record fits the freed
   // position whole; otherwise take the next record in core's rotation that
-  // does, or, for B, a long record whose pages fit the dwell. When nothing
-  // fits, the bubble shows its current record again rather than page one.
+  // does, or, for B, a long record whose pages finish inside the time left
+  // in the scene. A record other than the one leaving is preferred; when no
+  // other record fits whole, the bubble shows its current record again
+  // rather than page a normal one.
   function welcomeVetReplacement(a) {
     const limits = WELCOME_SLOT_LIMITS.get(a.key);
     if (!limits || !a.nextId) return;
     const scales = welcomeScales(limits.layer, !!a.large);
     const floor = welcomeFloorFor(scales);
-    // Room for a whole replacement: B takes any normal record (up to
-    // WELCOME_NORMAL_CAP drawn); another position takes a record up to
-    // WELCOME_OTHER_ROOM drawn or its current size, whichever is larger.
-    // Only a long record in B may page, at B's measured cap.
-    const roomDrawn = limits.name === 'B' ? Math.max(limits.capDrawn, WELCOME_NORMAL_CAP) : Math.max(limits.capDrawn, WELCOME_OTHER_ROOM);
+    // Room for a whole replacement: the position's own room, the largest
+    // circle free beside the bubbles that stay on screen, and, outside B, WELCOME_OTHER_ROOM (drift
+    // physics eases a slightly larger bubble clear of its neighbours).
+    const free = welcomeFreeNow(a);
+    const here = free.r * 2;
+    const roomDrawn = Math.max(limits.capDrawn, here, limits.name === 'B' ? 0 : WELCOME_OTHER_ROOM);
     const capLayout = Math.floor(roomDrawn / scales.max);
-    const pageLayout = Math.floor(limits.capDrawn / scales.max);
+    const pageLayout = Math.floor(Math.max(limits.capDrawn, here) / scales.max);
     const onScreen = new Set([...V.actors.map((x) => x.id), ...V.actors.filter((x) => x !== a).map((x) => x.nextId).filter(Boolean)]);
     const first = S.pool.find((r) => r.id === a.nextId);
     const rest = records().filter((r) => !onScreen.has(r.id) && r.id !== a.nextId);
     rest.sort((x, y) => (S.lastShown.get(x.id) ?? -10000) - (S.lastShown.get(y.id) ?? -10000) || y.createdAt - x.createdAt || x.id.localeCompare(y.id));
-    const candidates = first && eligible(first) ? [first, ...rest] : rest;
+    const candidates = (first && eligible(first) ? [first, ...rest] : rest).filter((r) => r.id !== a.id);
     welcomeWithHost((host) => {
       if (!host) return;
-      for (const r of candidates.slice(0, 24)) {
+      for (const r of candidates.slice(0, 60)) {
         const need = welcomeNeed(host, r, floor);
         if (need !== null && need <= capLayout) {
-          if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(limits.capDrawn) });
+          if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(roomDrawn) });
           a.nextId = r.id;
+          // A record larger than the position's own room takes the free
+          // space beside the other bubbles.
+          a._welcomeHome = need * scales.max > Math.max(limits.capDrawn, limits.name === 'B' ? 0 : WELCOME_OTHER_ROOM) ? { x: free.cx, y: free.cy } : null;
           return;
         }
-        if (limits.name === 'B' && (need === null || need > capLayout)) {
+        // Only a long record pages, only in B, and only when every page is
+        // read before the scene changes.
+        const long = need === null || need * scales.max > WELCOME_NORMAL_CAP;
+        if (limits.name === 'B' && long) {
           const fit = welcomeFitAt(host, r, pageLayout, floor);
-          if (fit && welcomePagesFitDwell(fit.pages)) {
-            if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(limits.capDrawn) });
+          if (fit && welcomePagesFitTime(fit.pages, WELCOME_ENTRY_SECONDS)) {
+            a._welcomeHome = here > limits.capDrawn ? { x: free.cx, y: free.cy } : null;
+            limits.capDrawn = Math.max(limits.capDrawn, here);
+            if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(roomDrawn), pages: fit.pages.length, timeLeft: +welcomeTimeLeft(WELCOME_ENTRY_SECONDS).toFixed(1) });
             a.nextId = r.id;
             return;
           }
         }
       }
-      log('welcome_replacement_kept', { slot: limits.name, was: a.nextId, id: a.id });
+      log('welcome_replacement_kept', { slot: limits.name, was: a.nextId, id: a.id, room: Math.round(roomDrawn), tried: candidates.length });
       a.nextId = a.id;
     });
   }
@@ -738,24 +763,7 @@
     document.fonts.ready.then(() => {
       if (S.s !== 1 || V.welcomeFontToken !== token) return;
       WELCOME_NEED_CACHE.clear();
-      checkFullFits();
-      welcomeFitAll(true);
-    });
-  }
-
-
-  // A slow font load on the real TV must not leave bubbles sized against
-  // fallback-font metrics: once the real fonts are ready, run core's fit pass
-  // again and then measure every bubble again. Registers only while fonts
-  // are genuinely still loading, and is guarded by scene id and a per-mount
-  // token so a callback from a scene the viewer has since left never touches
-  // a torn-down or reused DOM.
-  function refitWelcomeWhenFontsReady() {
-    if (typeof document === 'undefined' || !document.fonts || typeof document.fonts.ready?.then !== 'function') return;
-    if (document.fonts.status === 'loaded') return;
-    const token = (V.welcomeFontToken = (V.welcomeFontToken || 0) + 1);
-    document.fonts.ready.then(() => {
-      if (S.s !== 1 || V.welcomeFontToken !== token) return;
+      WELCOME_FIT_CACHE = new Map();
       checkFullFits();
       welcomeFitAll(true);
     });
@@ -865,7 +873,16 @@
   function placeWelcome(a) {
     // Core installNext has just put a new record into this bubble (drift
     // replacement): size and lay it out for its own message before it shows.
-    if (a._welcomeFitId && a.el && (a.id !== a._welcomeFitId || a.born !== a._welcomeFitBorn)) welcomeWithHost((host) => welcomeFitActor(a, host, true));
+    // (Only on a new record: settling after the entry flight also resets
+    // core's born time, and must not restart the pages.)
+    if (a._welcomeFitId && a.el && (a.id !== a._welcomeFitId || (a.born !== a._welcomeFitBorn && a.life === 'entering'))) {
+      if (a._welcomeHome && a.life === 'entering') {
+        a.homeX = a._welcomeHome.x;
+        a.homeY = a._welcomeHome.y;
+      }
+      a._welcomeHome = null;
+      welcomeWithHost((host) => welcomeFitActor(a, host, true));
+    }
     const layer = a.layer || 'near';
     const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
     // Drawn size comes from the depth layer and core's drift breathing only.
@@ -911,8 +928,27 @@
       const maxX = 1812 - half - 30;
       const minY = half + 8;
       const maxY = 636 - half - 8;
-      const renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
-      const renderY = minY <= maxY ? clamp(y, minY, maxY) : (minY + maxY) / 2;
+      let renderX = minX <= maxX ? clamp(x, minX, maxX) : (minX + maxX) / 2;
+      let renderY = minY <= maxY ? clamp(y, minY, maxY) : (minY + maxY) / 2;
+      // A drifting bubble never rests over a large still bubble's words: it
+      // is drawn clear of every large steady bubble (by 2 px), then kept
+      // inside the stage.
+      if (!a.large && a.life === 'steady' && !S.still) {
+        for (const o of V.actors) {
+          if (o === a || !o.large || o.life !== 'steady' || o._welcomeRX === undefined) continue;
+          const dx = renderX - o._welcomeRX, dy = renderY - o._welcomeRY;
+          const dist = Math.hypot(dx, dy) || 1;
+          const min = half + o._welcomeRR + 2;
+          if (dist >= min) continue;
+          renderX += (dx / dist) * (min - dist);
+          renderY += (dy / dist) * (min - dist);
+        }
+        if (minX <= maxX) renderX = clamp(renderX, minX, maxX);
+        if (minY <= maxY) renderY = clamp(renderY, minY, maxY);
+      }
+      a._welcomeRX = renderX;
+      a._welcomeRY = renderY;
+      a._welcomeRR = half;
       a.el.style.transform = `translate(${(renderX - a.d / 2).toFixed(2)}px,${(renderY - a.d / 2).toFixed(2)}px) scale(${scale.toFixed(4)})`;
       // The enter and exit spin turns the words (.orb-content) inside the
       // circle, which clips its overflow, so the slot's own box stays inside
