@@ -1,3 +1,11 @@
+## September 19: Plan 17 TV screens and Live Recognitions are live
+
+Live at https://mothers-love.vercel.app/display as commit `011a9ed` on `codex/mothers-love` and `tv17/pick` (Vercel production mothers-love-hoymiyv55-lvzion.vercel.app, deployed by Anthony). The release holds every Plan 17 screen change, the receipt feed and steady hearts release, and the new eleventh screen, Live Recognitions (https://mothers-love.vercel.app/display?scene=live-feed): the recognition strip grown to fill the screen, at the strip's own text sizes, two columns scrolling at 8 and 9 px per second, the second column starting half a card down. Anthony approved it on the church TV.
+
+Verified: `tests/color-polish-scenes/live-feed.spec.ts` 18 of 18 on the final code, and a live smoke check (/, /recognize, /display return 200, the live script carries the new speeds). Before the receipt feed merge the build passed typecheck, 255 of 255 unit tests, the build, and 275 of 276 scene tests (`status.spec.ts:110` timed out loading the Studio page and was not rerun). No test ran on the merged build, at Anthony's request for speed.
+
+Open: `database/014_color_polish_live_feed.sql` is NOT RUN and is not needed (the screen uses its default: enabled, 60 seconds, last). Its number collides with the applied `database/014_recognition_archive.sql`, so renumber it before it is ever run. The live saved playlist keeps its old durations; the change to 60 seconds waits for Anthony. Worktree cleanup is not done. Full history: [Plan 17](PLAN-17-tv-fit-and-release.md) Build log, kept in /Users/anthony/Projects/mothers-love/docs/.
+
 ## September 19: receipt feed, steady hearts, and nothing is deleted any more
 
 Live at https://mothers-love.vercel.app as commit `326e649` on `codex/mothers-love` (Vercel deployment dpl_7ar3DU5LmpEpWwQJG1B1JDUFUnHr, READY). After a recognition is sent, the receipt screen (the one offering Recognize Someone Else) now shows the same Recent recognitions list as the home page; the form itself still shows no feed. Hearts no longer flash: the 10 second feed refresh used to reset every heart to a grey loading state, and a tap waited for the server before changing. Now confirmed hearts hold steady through a refresh, and a tap fills at once, then takes the server count, rolling back on failure.
