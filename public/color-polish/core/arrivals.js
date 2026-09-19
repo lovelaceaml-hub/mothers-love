@@ -7,11 +7,11 @@ function beginEvent(){
  if(active&&active.phase!=='gap')return;
  S.queue=S.queue.filter(id=>eligible(S.pool.find(r=>r.id===id)));
  if(!S.queue.length){endChain();return}
- const items=S.queue.splice(0,S.queue.length>=10?10:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===10;
+ const items=S.queue.splice(0,S.queue.length>=5?5:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===5;
  if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed');arrivalMountSky()}
  const style=nextStyle(group?'group':'single');
  const frameStyle=nextArrivalFrame();
- active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:group&&items.some(r=>!smallFits(r)),elements:[],localTime:0,exitPos:null};
+ active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:false,elements:[],localTime:0,exitPos:null};
  buildEvent();
  log('entrance_start',{kind:active.kind,style:group?GROUP_STYLES[style]:SINGLE_STYLES[style],frame:ARRIVAL_FRAME_STYLES[frameStyle],ids:items.map(x=>x.id)});renderQueue();
 }
@@ -21,30 +21,38 @@ function buildEvent(){
  const root=$('event');root.className='event-stage active'+(S.still?' still':'');root.dataset.style=(group?'group-':'single-')+a.style;
  root.dataset.frame=String(a.frameStyle);root.dataset.frameName=ARRIVAL_FRAME_STYLES[a.frameStyle];
  const frameMarkup=arrivalBuildFrameMarkup(a.frameStyle,a.kind);
- root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${arrivalStageMarkup(a.kind)}${group?`<h2 class="group-title">${arrivalWord(shimmer(GROUP_TITLES[a.style]))}</h2><span class="group-kind">${arrivalWord(esc(GROUP_STYLES[a.style].toUpperCase())+' · A WAVE OF TEN')}</span>`:`<div class="event-kicker">${arrivalWord('A NEW RECOGNITION HAS ARRIVED')}</div><div class="event-title"><div class="eyebrow">${arrivalWord('Mother’s Love, shared')}</div><h2>${arrivalWord(shimmer('Kindness'))}<br>${arrivalWord('comes')} ${arrivalWord('full')} ${arrivalWord('circle.')}</h2><p>${arrivalWord('A moment of appreciation')}<br>${arrivalWord('for you.')}</p></div><div class="countdown-caption">${arrivalWord(esc(SINGLE_STYLES[a.style])+' · '+esc(ARRIVAL_FRAME_STYLES[a.frameStyle]))}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
+ root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${arrivalStageMarkup(a.kind)}${group?`<h2 class="group-title">${arrivalWord(shimmer(GROUP_TITLES[a.style]))}</h2><span class="group-kind">${arrivalWord(esc(GROUP_STYLES[a.style].toUpperCase())+' · A WAVE OF FIVE')}</span>`:`<div class="event-kicker">${arrivalWord('A NEW RECOGNITION HAS ARRIVED')}</div><div class="event-title"><div class="eyebrow">${arrivalWord('Mother’s Love, shared')}</div><h2>${arrivalWord(shimmer('Kindness'))}<br>${arrivalWord('comes')} ${arrivalWord('full')} ${arrivalWord('circle.')}</h2><p>${arrivalWord('A moment of appreciation')}<br>${arrivalWord('for you.')}</p></div><div class="countdown-caption">${arrivalWord(esc(SINGLE_STYLES[a.style])+' · '+esc(ARRIVAL_FRAME_STYLES[a.frameStyle]))}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
  a.elements=[];
+ // A group wave always shows all five bubbles together; a long message flips
+ // through its own reading pages inside its own bubble, so the two at a time
+ // pair pages below are no longer reached.
  if(a.oversize){buildGroupPage(0);log('extended_group_reading',{reason:'Long messages are shown in circular pairs with content-aware reading time.'})}
  else{
   a.items.forEach((r,i)=>{
    // Laid out at the long standing size, drawn larger for the full screen box.
    const g=ARRIVAL_GROUP,o=ARRIVAL_SINGLE;
-   const d=group?g.layout:o.layout,drawn=group?g.drawn:o.drawn,x=group?g.x0+i%5*g.pitch:o.x,y=group?g.rowY[Math.floor(i/5)]:o.y;
+   const slot=group?g.slots[i%g.slots.length]:null;
+   const d=group?g.layout:o.layout,drawn=group?g.drawn:o.drawn,x=group?slot[0]:o.x,y=group?slot[1]:o.y;
    a.elements.push(eventElement(r,d,x,y,i,group,drawn));
   });
-  const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(8,s.length/14),0)));
   // A single bubble shows for ARRIVAL_SHOW seconds, once for each page of its message.
-  a.hold=group?Math.max(30,longest):ARRIVAL_SHOW*Math.max(1,...a.elements.map(b=>b.reading.pages.length));
+  // A group wave reads for ARRIVAL_GROUP.show seconds in all; a long message splits that time evenly across its pages.
+  a.hold=group?ARRIVAL_GROUP.show:ARRIVAL_SHOW*Math.max(1,...a.elements.map(b=>b.reading.pages.length));
  }
  $('qr-zone').classList.add('qr-active');
  arrivalStageBind(a);
  drawEventParticles(0);
 }
 
+// Oversize group reading shows two full messages per page, so a wave of five
+// reads over three pages: two, two, then the last one on its own.
+function groupPageCount(a){return Math.max(1,Math.ceil((a?.items?.length||0)/2))}
+
 function buildGroupPage(page){
  const a=active;if(!a)return;a.page=page;$('event-items').replaceChildren();a.elements=[];
  a.items.slice(page*2,page*2+2).forEach((r,i)=>a.elements.push(eventElement(r,ARRIVAL_PAIR.layout,ARRIVAL_PAIR.x[i],ARRIVAL_PAIR.y,i,false,ARRIVAL_PAIR.drawn)));
  a.hold=Math.max(10,...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(9,s.length/14),0)));
- const cap=document.querySelector('.group-kind');if(cap)cap.textContent=`CIRCULAR FULL-MESSAGE PAIRS · ${page+1}/5 · EXTENDED READING`;
+ const cap=document.querySelector('.group-kind');if(cap)cap.textContent=`CIRCULAR FULL-MESSAGE PAIRS · ${page+1}/${groupPageCount(a)} · EXTENDED READING`;
 }
 
 function tickEvent(dt){
@@ -54,17 +62,17 @@ function tickEvent(dt){
  if(a.phase==='entrance'){
   const p=S.still?1:clamp(elapsed/a.entrance,0,1);
   a.elements.forEach((b,i)=>{
-   let pos=a.kind==='group'?groupTrajectory(a.style,a.oversize?i*5:i,p,b):singleTrajectory(a.style,p);
+   let pos=a.kind==='group'?groupTrajectory(a.style,a.oversize?i*2:i,p,b):singleTrajectory(a.style,p);
    if(a.oversize)pos={...pos,x:mix(pos.x,b.x,smooth(p)),y:mix(pos.y,b.y,smooth(p))};
    if(S.still)pos={x:b.x,y:b.y,z:0,k:1,alpha:1};positionEvent(b,pos);
   });drawEventParticles(p);
   if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;if(a.fx&&a.fx.landedAt===null)a.fx.landedAt=S.t;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
  }else if(a.phase==='reading'){
   a.localTime=elapsed;
-  a.elements.forEach((b,i)=>{if(a.kind==='single')b.reading.duration=Math.min(b.reading.duration,ARRIVAL_SHOW);if(elapsed<a.hold)tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
+  a.elements.forEach((b,i)=>{if(a.kind==='single')b.reading.duration=Math.min(b.reading.duration,ARRIVAL_SHOW);if(a.kind==='group')b.reading.duration=Math.min(b.reading.duration,a.hold/b.reading.pages.length);if(elapsed<a.hold)tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
   drawArrivalAmbient(a,elapsed);
   if(elapsed>=a.hold){
-   if(a.oversize&&a.page<4){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
+   if(a.oversize&&a.page<groupPageCount(a)-1){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
    else{
     a.phase='exit';a.phaseAt=S.t;
     const feed=$('feed-columns'), targetEl=feed?.firstElementChild||feed;
@@ -131,7 +139,7 @@ function drawEventParticles(p){
  if((!group&&[1,4].includes(style))||(group&&[1,2,3].includes(style))){
   a.elements.forEach((b,j)=>{
    c.save();c.lineWidth=group?2.5:5;c.lineCap='round';c.strokeStyle=group?'#d3b7aa68':'#dfbb7688';c.shadowColor='#edcc8a';c.shadowBlur=15;c.beginPath();
-   for(let i=0;i<22;i++){const q=Math.max(0,p-i*.008),pos=group?groupTrajectory(style,a.oversize?j*5:j,q,b):singleTrajectory(style,q);i?c.lineTo(pos.x,pos.y):c.moveTo(pos.x,pos.y)}c.stroke();c.restore();
+   for(let i=0;i<22;i++){const q=Math.max(0,p-i*.008),pos=group?groupTrajectory(style,a.oversize?j*2:j,q,b):singleTrajectory(style,q);i?c.lineTo(pos.x,pos.y):c.moveTo(pos.x,pos.y)}c.stroke();c.restore();
   });
  }
  drawArrivalWake(c,a,p);

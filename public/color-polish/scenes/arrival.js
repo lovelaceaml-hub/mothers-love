@@ -3,7 +3,7 @@
 
 const SINGLE_STYLES=['Through the light','Comet sweep','A thousand kind sparks','Pearl spring','Spiral bloom','Petals into pearl'];
 const GROUP_STYLES=['Cascading constellation','Two tides, one wave','Spiral constellation','Petal fountains','Ripple of kindness'];
-const GROUP_TITLES=['A new wave of Mother’s Love.','Kindness is being shared.','A constellation of kind words.','A garden of appreciation blooms.','Ten expressions. One shared moment.'];
+const GROUP_TITLES=['A new wave of Mother’s Love.','Kindness is being shared.','A constellation of kind words.','A garden of appreciation blooms.','Five expressions. One shared moment.'];
 const ARRIVAL_FRAME_STYLES=['Light beam','Petal curtain','Aurora','Constellation gather'];
 
 // Full screen composition (Plan 17 Lane 14). The arrival frame is the whole TV
@@ -13,7 +13,12 @@ const ARRIVAL_FRAME_STYLES=['Light beam','Petal curtain','Aurora','Constellation
 // through a scale factor, so every word grows with the orb.
 const ARRIVAL_W=1812, ARRIVAL_H=972;
 const ARRIVAL_SINGLE={x:1300,y:486,layout:540,drawn:760};
-const ARRIVAL_GROUP={cx:906,cy:490,layout:258,drawn:300,x0:186,pitch:360,rowY:[296,684]};
+// A wave is five, always shown together. The five orbs sit in a balanced 3 over
+// 2 stagger around the group centre at the largest diameter that still leaves a
+// clear gap between neighbours and keeps every ring clear of the title, the
+// caption, the waiting pill and the frame edge. They are laid out at 300 and
+// drawn at 400, so the words are drawn a third larger than they are measured.
+const ARRIVAL_GROUP={cx:906,cy:500,layout:300,drawn:400,show:21,slots:[[286,340],[906,340],[1526,340],[596,660],[1216,660]]};
 const ARRIVAL_PAIR={layout:518,drawn:720,x:[506,1306],y:490};
 // Anthony, 2026-09-19: the bubble stays on screen for 7 seconds (each page of a long
 // message gets its own 7 seconds, so no message is ever cut short).
@@ -252,7 +257,7 @@ function arrivalSpawnExitBurst(a){
 }
 
 function arrivalScene(){
- const r=records()[0];return r?`<div class="scene-copy" style="position:absolute;left:32px;top:78px;width:510px"><div class="eyebrow">Recognition arrival</div><h1 style="font-size:57px;line-height:1.1;margin:24px 0">A little kindness,<br>${shimmer('a moment for you.')}</h1><p class="subheading">Six individual entrances.<br>Five choreographed waves of ten.</p></div>${addOrb(r,943,49,534,{motion:false})}`:emptyPanel();
+ const r=records()[0];return r?`<div class="scene-copy" style="position:absolute;left:32px;top:78px;width:510px"><div class="eyebrow">Recognition arrival</div><h1 style="font-size:57px;line-height:1.1;margin:24px 0">A little kindness,<br>${shimmer('a moment for you.')}</h1><p class="subheading">Six individual entrances.<br>Five choreographed waves of five.</p></div>${addOrb(r,943,49,534,{motion:false})}`:emptyPanel();
 }
 
 function singleTrajectory(style,p){
@@ -283,7 +288,8 @@ function singleTrajectory(style,p){
 }
 
 function groupTrajectory(style,index,p,b){
- const orders=[[0,4,7,1,8,2,6,3,5,9],[0,9,1,8,2,7,3,6,4,5],[4,0,9,5,3,1,8,6,2,7],[0,5,2,7,4,9,1,3,6,8],[2,7,1,3,6,8,0,4,5,9]];
+ // Arrival order for the five slots, one ordering per group style.
+ const orders=[[0,3,1,4,2],[0,4,1,3,2],[2,0,4,1,3],[0,2,4,1,3],[0,3,4,2,1]];
  const rank=orders[style].indexOf(index),delay=rank*(style===3?.034:.032),duration=style===3?.69:.71;
  const u=clamp((p-delay)/duration,0,1),q=outCubic(u),tx=b.x,ty=b.y;
  let x=tx,y=ty,z=0,scale=1,alpha=smooth(u/.14);
@@ -298,7 +304,7 @@ function groupTrajectory(style,index,p,b){
  case 3:
   {const source=[300,906,1512][index%3];x=mix(source,tx,q);y=curve(1100,-470,ty-200,ty,q);z=curve(-400,280,170,0,q);scale=.22+.78*q}break;
  case 4:
-  {const source=[430,906,1382][index%3],zStart=[-900,-500,-700][index%3];x=mix(source,tx,q);y=mix(ARRIVAL_GROUP.cy,ty,q)+Math.sin(Math.PI*u)*(index<5?-100:100)*(1+(index%3)*.35);z=zStart*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
+  {const source=[430,906,1382][index%3],zStart=[-900,-500,-700][index%3];x=mix(source,tx,q);y=mix(ARRIVAL_GROUP.cy,ty,q)+Math.sin(Math.PI*u)*(index%2?100:-100)*(1+(index%3)*.35);z=zStart*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
  }
  const k=1100/(1100-z)*scale;
  return{x:906+(x-906)*(1100/(1100-z)),y:ARRIVAL_GROUP.cy+(y-ARRIVAL_GROUP.cy)*(1100/(1100-z)),z,k,alpha};

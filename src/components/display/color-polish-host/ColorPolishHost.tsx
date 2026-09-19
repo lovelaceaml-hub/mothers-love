@@ -39,8 +39,8 @@ type Clock = { serverMs: number; performanceMs: number };
 export const ARRIVAL_PREVIEW_SLUG = 'arrival';
 export const ARRIVAL_GROUP_PREVIEW_SLUG = 'arrival-group';
 // beginEvent in public/color-polish/core/arrivals.js builds a group entrance
-// only when ten arrivals are queued at once, so the group link sends ten.
-export const ARRIVAL_GROUP_SIZE = 10;
+// only when five arrivals are queued at once, so the group link sends five.
+export const ARRIVAL_GROUP_SIZE = 5;
 export const ARRIVAL_PREVIEW_PERIOD_MS = 20_000;
 // Well above any real event id in the public snapshot, so a replayed preview
 // entrance can never collide with one the server actually sent.
