@@ -17,11 +17,18 @@
 
 // The reserved bubble is the largest circle the layout allows: it clears the
 // title copy (which ends at x 841), the globe artwork (which ends at x 875),
-// the three regular bubbles, and the countdown ring in the stage's bottom
-// right corner (stage x 1756 to 1792), keeping a 32 px top and bottom margin.
+// the regular bubbles, and the countdown ring in the stage's bottom right
+// corner (stage x 1756 to 1792), keeping a 32 px top and bottom margin.
 const PEACEMAKERS_RESERVED = [1168, 32, 572];
 // The other bubbles keep production's diameters and drift as they do today.
-const PEACEMAKERS_REGULAR = [[860, 14, 312], [860, 326, 304], [528, 320, 295]];
+// There are two of them: with the reserved bubble on the right, a third one
+// has nowhere to live except on top of the globe and the children holding
+// hands, and the artwork stays as the live TV shows it.
+const PEACEMAKERS_REGULAR = [[860, 14, 312], [860, 326, 304]];
+// The part of the globe artwork people look at (the globe, the children and
+// the puzzle piece), in stage pixels. Drifting bubbles are steered off it the
+// same way production steers them off the title copy.
+const PEACEMAKERS_GLOBE_FOCUS = { x: 346, y: 213, w: 415, h: 423 };
 // A message that does not fit the largest regular bubble whole fits none of
 // them, so this is the diameter that decides "very long".
 const PEACEMAKERS_REGULAR_MAX = 312;
@@ -31,6 +38,12 @@ const PEACEMAKERS_FLOOR = 18;
 const PEACEMAKERS_SCAN = 24;
 // Seconds a bubble waits before trying again, when nothing may replace it.
 const PEACEMAKERS_RETRY = 12;
+// Seconds a message stays in the reserved bubble before another may take its
+// turn; a long message stays for its whole reading time if that is longer.
+const PEACEMAKERS_RESERVED_HOLD = 18;
+// Seconds the reserved bubble's words take to fade out before the next
+// message fades in. The bubble itself never leaves its place.
+const PEACEMAKERS_FADE = .6;
 
 let peacemakersReservedKey = null;
 let peacemakersSegmenter = null;
@@ -141,20 +154,79 @@ function peacemakersTaken(actor) {
   return taken;
 }
 
-// What this bubble may show next, or null to keep the one it has.
-//
-// The reserved bubble turns over only for another very long recognition, so
-// several of them take turns in it. It never trades one regular message for
-// another: this is the biggest thing on the screen, and the live drift
-// replacement carries a bubble right off the stage and back, which would leave
-// a hole where the reserved bubble belongs for no gain. The pool only changes
-// when a new snapshot re-renders the scene, so holding never hides a very long
-// recognition that has just arrived.
+// Seconds left in this showing of the scene, read from state. When the scene
+// is held (rotation paused, or a scene chosen by the operator) it does not
+// end, so there is no limit.
+function peacemakersTimeLeft() {
+  if (S.pauseRotation || S.sceneControlled || !S.playlist?.length) return Infinity;
+  return (S.dwell?.[S.s] ?? DWELL[S.s] ?? 0) - S.sceneAge;
+}
+
+// core/motion.js tickSlots()'s own reading time for a message.
+function peacemakersReadSeconds(record) {
+  return Math.max(9, record.message.length / 14);
+}
+
+// What a regular bubble may show next, or null to keep the one it has: only
+// a message that fits this bubble whole.
 function peacemakersCandidate(actor) {
   const taken = peacemakersTaken(actor);
   taken.push(actor.id);
-  if (actor.key === peacemakersReservedKey) return peacemakersPick(taken, peacemakersVeryLong);
   return peacemakersPick(taken, (record) => peacemakersFitsWhole(record, actor.d));
+}
+
+// What the reserved bubble may show next, or null to keep the one it has.
+// Another very long recognition comes first, so several of them take turns.
+// When none is waiting, a regular message takes a turn, so the biggest bubble
+// on the screen does not show the same words for the whole scene. Either way
+// the next message must have time to be read before the scene ends.
+function peacemakersReservedCandidate(actor) {
+  const taken = peacemakersTaken(actor);
+  taken.push(actor.id);
+  const room = peacemakersTimeLeft() - PEACEMAKERS_FADE;
+  const readable = (record) => peacemakersReadSeconds(record) <= room;
+  return peacemakersPick(taken, (record) => peacemakersVeryLong(record) && readable(record))
+    || peacemakersPick(taken, (record) => !peacemakersVeryLong(record) && readable(record));
+}
+
+// The reserved bubble changes its message where it stands: the words fade
+// out, the next message is installed by core/motion.js installNext() (so it is
+// measured and fitted exactly like every other bubble), and the words fade
+// in. It never drifts off the stage, so its place is never empty.
+function peacemakersTurnReserved(actor) {
+  if (actor.life !== 'steady') return;
+  // The core's drift replacement never takes this bubble.
+  actor.retireAt = Infinity;
+  if (actor.peacemakersNext) {
+    if (V.clock - actor.peacemakersFadeAt < PEACEMAKERS_FADE) return;
+    const next = actor.peacemakersNext;
+    actor.peacemakersNext = null;
+    actor.nextId = next;
+    installNext(actor);
+    // installNext() starts the core's fly-in; this bubble stays where it is.
+    actor.nextId = null;
+    actor.life = 'steady';
+    actor.lifeAt = V.clock;
+    actor.born = V.clock;
+    actor.retireAt = Infinity;
+    actor.homeX = actor.x = PEACEMAKERS_RESERVED[0] + PEACEMAKERS_RESERVED[2] / 2;
+    actor.homeY = actor.y = PEACEMAKERS_RESERVED[1] + PEACEMAKERS_RESERVED[2] / 2;
+    actor.el.classList.remove('peacemakers-fade-out');
+    actor.el.classList.add('peacemakers-fade-in');
+    if (actor.id === next) peacemakersReport('turn');
+    return;
+  }
+  const read = (actor.reading?.pages || []).reduce((total, page) => total + Math.max(9, page.length / 14), 0);
+  if (V.clock < actor.born + Math.max(read, PEACEMAKERS_RESERVED_HOLD)) return;
+  if (V.clock - (actor.peacemakersProbedAt || 0) < .75) return;
+  actor.peacemakersProbedAt = V.clock;
+  const pick = peacemakersReservedCandidate(actor);
+  if (!pick) return;
+  actor.peacemakersNext = pick.id;
+  actor.peacemakersFadeAt = V.clock;
+  actor.el.classList.remove('peacemakers-fade-in');
+  actor.el.classList.add('peacemakers-fade-out');
+  log('peacemakers_replacement', { key: actor.key, reserved: true, id: pick.id });
 }
 
 // Runs for every bubble on every physics frame, before core/motion.js moves
@@ -163,6 +235,10 @@ function peacemakersCandidate(actor) {
 // record a bubble is about to take.
 function peacemakersIntegrate(actor) {
   if (!V.actors || !V.actors.length) return false;
+  if (actor.key === peacemakersReservedKey) {
+    peacemakersTurnReserved(actor);
+    return false;
+  }
   if (actor.nextId && actor.peacemakersFor !== actor.nextId) {
     // replaceActor() picked by recency alone, which can put a very long
     // recognition in a regular bubble. Re-pick under this scene's rule.
@@ -170,7 +246,7 @@ function peacemakersIntegrate(actor) {
     const next = pick ? pick.id : actor.id;
     actor.nextId = next;
     actor.peacemakersFor = next;
-    log('peacemakers_replacement', { key: actor.key, reserved: actor.key === peacemakersReservedKey, id: next });
+    log('peacemakers_replacement', { key: actor.key, reserved: false, id: next });
   }
   if (!actor.nextId) actor.peacemakersFor = null;
   if (actor.life === 'steady' && !actor.nextId
@@ -181,7 +257,7 @@ function peacemakersIntegrate(actor) {
     // place; an empty bubble is never an option.
     if (!peacemakersCandidate(actor)) {
       actor.retireAt = V.clock + PEACEMAKERS_RETRY;
-      log('peacemakers_hold', { key: actor.key, reserved: actor.key === peacemakersReservedKey });
+      log('peacemakers_hold', { key: actor.key, reserved: false });
     }
   }
   return false;
@@ -221,12 +297,19 @@ function peacemakers() {
 // that holds still; every other bubble drifts exactly as the live TV shows,
 // whatever the length of the message it fits whole.
 function peacemakersMount() {
-  V.actors.forEach((actor) => { actor.large = actor.key === peacemakersReservedKey });
+  V.actors.forEach((actor) => {
+    actor.large = actor.key === peacemakersReservedKey;
+    if (actor.large) actor.retireAt = Infinity;
+  });
 }
 
 // Runs after core/stage.js checkFullFits() has measured every bubble, so these
 // are the numbers the TV is actually drawing.
 function peacemakersPrime() {
+  peacemakersReport('first');
+}
+
+function peacemakersReport(when) {
   const reserved = slots.find((slot) => slot.key === peacemakersReservedKey);
   if (!reserved) return;
   const record = S.pool.find((item) => item.id === reserved.id);
@@ -235,6 +318,7 @@ function peacemakersPrime() {
   const read = (reserved.reading?.pages || [record.message]).reduce((total, page) => total + Math.max(9, page.length / 14), 0);
   const size = reserved.el?.querySelector('.message')?.style.fontSize || '';
   log('peacemakers_reserved', {
+    when,
     id: record.id,
     graphemes: peacemakersGraphemes(record.message),
     diameter: reserved.d,
@@ -242,6 +326,7 @@ function peacemakersPrime() {
     pages,
     readSeconds: +read.toFixed(2),
     dwell: S.dwell?.[S.s] ?? DWELL[S.s] ?? 0,
+    sceneAge: +S.sceneAge.toFixed(2),
     veryLong: peacemakersVeryLong(record)
   });
 }
@@ -257,7 +342,9 @@ registerScene(8, {
   // 'drift', so 'drift' for scene 8): steady bubbles drift off screen and
   // are replaced, same as scenes 4 and 8 in production.
   replaceMode: 'drift',
-  // Matches production's forbidden() box for scene 8: keep floating bubbles
-  // clear of the title copy over the top-left of the stage.
-  keepOut: () => [{ x: 0, y: 8, w: 700, h: 296 }]
+  // Production's forbidden() box for scene 8 keeps floating bubbles clear of
+  // the title copy over the top-left of the stage. The second box is new: the
+  // reserved bubble takes the right side, so the drifting bubbles would
+  // otherwise settle on top of the globe and the children.
+  keepOut: () => [{ x: 0, y: 8, w: 700, h: 296 }, PEACEMAKERS_GLOBE_FOCUS]
 });

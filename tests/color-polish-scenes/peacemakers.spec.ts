@@ -14,7 +14,9 @@ import { buildActiveDisplayFixture, circularity, loadRenderer, noOverflow, recog
 
 // The scene's own geometry, restated here so a silent change to it fails.
 const RESERVED = { x: 1168, y: 32, d: 572 };
-const REGULAR = [[860, 14, 312], [860, 326, 304], [528, 320, 295]];
+const REGULAR = [[860, 14, 312], [860, 326, 304]];
+// The part of the globe artwork people look at, which drifting bubbles avoid.
+const GLOBE_FOCUS = { x: 346, y: 213, w: 415, h: 423 };
 const FLOOR = 18;
 
 const filler = ('thank you for the quiet patience and the warm greeting you offered when the '
@@ -134,11 +136,11 @@ async function reservedReport(frame: Frame) {
   });
 }
 
-test('with an all-short pool, one reserved bubble and three regular bubbles appear at the scene’s positions', async ({ page }) => {
+test('with an all-short pool, one reserved bubble and two regular bubbles appear at the scene’s positions', async ({ page }) => {
   const frame = await loadRenderer(page, { fixture: poolFixture(allShortPool), scene: 8 });
   const drawn = await bubbles(frame);
 
-  expect(drawn).toHaveLength(4);
+  expect(drawn).toHaveLength(3);
   const reserved = drawn.filter((bubble) => bubble.reserved);
   expect(reserved).toHaveLength(1);
   expect(reserved[0].diameter).toBe(RESERVED.d);
@@ -161,7 +163,7 @@ test('with an all-short pool, one reserved bubble and three regular bubbles appe
   });
 
   const ids = drawn.map((bubble) => bubble.id);
-  expect(new Set(ids).size).toBe(4);
+  expect(new Set(ids).size).toBe(3);
 });
 
 test('a very long recognition appears only in the reserved bubble, and the others fit whole', async ({ page }) => {
@@ -259,26 +261,99 @@ test('with three very long recognitions at once, they take turns in the reserved
   for (const id of seenInReserved) expect(['long-a', 'long-b', 'long-c']).toContain(id);
 });
 
-test('with no very long recognition waiting, the reserved bubble keeps the message it has', async ({ page }) => {
+test('with no very long recognition waiting, the reserved bubble still refreshes, in place and never empty', async ({ page }) => {
   test.setTimeout(150000);
   const frame = await loadRenderer(page, { fixture: poolFixture(allShortPool), scene: 8, ms: 2000 });
-  const first = (await bubbles(frame)).find((bubble) => bubble.reserved);
-  expect(first).toBeTruthy();
+  const seen = new Set<string>();
 
-  await frame.evaluate(() => (window as any).colorPolishRuntime.step(40000));
-  const later = (await bubbles(frame)).find((bubble) => bubble.reserved);
-  expect(later?.id).toBe(first?.id);
-  expect(later?.whole).toBe(true);
+  for (let step = 0; step < 28; step++) {
+    const drawn = await bubbles(frame);
+    const reserved = drawn.find((bubble) => bubble.reserved);
+    // Never empty, never moved, never a clipped message, at any moment.
+    expect(reserved, `no reserved bubble at step ${step}`).toBeTruthy();
+    expect(reserved?.id).toBeTruthy();
+    expect(reserved?.whole).toBe(true);
+    expect(reserved?.veryLong).toBe(false);
+    expect(Math.abs((reserved as Bubble).x - RESERVED.x)).toBeLessThan(1);
+    expect(Math.abs((reserved as Bubble).y - RESERVED.y)).toBeLessThan(1);
+    const opacity = await frame.evaluate(() => {
+      const key = (window as any).peacemakersReservedSlotKey();
+      return parseFloat((document.getElementById(key) as HTMLElement).style.opacity || '1');
+    });
+    expect(opacity).toBe(1);
+    seen.add((reserved as Bubble).id);
+    // No message is on screen twice.
+    expect(new Set(drawn.map((bubble) => bubble.id)).size).toBe(drawn.length);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
 
-  // The live drift replacement carries a bubble off the stage and back, which
-  // would leave the biggest bubble's place empty for several seconds.
-  const exits = await frame.evaluate(() => {
-    const reservedKey = (window as any).peacemakersReservedSlotKey();
+  // Over a 60 second showing the biggest bubble shows more than one message.
+  expect(seen.size).toBeGreaterThanOrEqual(2);
+
+  // It changes where it stands: the live drift replacement, which carries a
+  // bubble off the stage and back, never takes the reserved bubble.
+  const exits = await frame.evaluate((ids) => {
     const state = (window as any).colorPolishRuntime.getState();
-    const reservedId = state.slots.find((slot: any) => slot.key === reservedKey)?.id;
-    return (state.log || []).filter((entry: any) => entry.type === 'bubble_exit_start' && entry.id === reservedId).length;
-  });
+    return (state.log || []).filter((entry: any) => entry.type === 'bubble_exit_start' && ids.includes(entry.id)
+      && (state.log || []).some((turn: any) => turn.type === 'peacemakers_reserved' && turn.id === entry.id && turn.at <= entry.at
+        && !(state.log || []).some((later: any) => later.type === 'peacemakers_reserved' && later.at > turn.at && later.at <= entry.at))).length;
+  }, [...seen]);
   expect(exits).toBe(0);
+});
+
+test('on the live playlist, the reserved bubble only takes a message there is still time to read', async ({ page }) => {
+  test.setTimeout(150000);
+  const frame = await loadRenderer(page, { fixture: poolFixture(threeLongPool), scene: 8 });
+  // The probe harness pins the scene, which the church TV does not. Unpin it
+  // so the scene runs on its playlist dwell, as it does on the TV.
+  await frame.evaluate(() => { (0, eval)('S').sceneControlled = false; });
+
+  for (let step = 0; step < 28; step++) {
+    const state = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
+    if (state !== 8) break;
+    const reserved = (await bubbles(frame)).find((bubble) => bubble.reserved);
+    expect(reserved?.whole).toBe(true);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
+
+  const reports = await frame.evaluate(() => ((window as any).colorPolishRuntime.getState().log || [])
+    .filter((entry: any) => entry.type === 'peacemakers_reserved'));
+  expect(reports.length).toBeGreaterThanOrEqual(2);
+  expect(reports[0].veryLong).toBe(true);
+  for (const report of reports) {
+    expect(report.pages).toBe(1);
+    expect(report.dwell).toBe(60);
+    expect(report.sceneAge + report.readSeconds, `${report.id} arrived too late to be read`).toBeLessThanOrEqual(report.dwell);
+  }
+});
+
+test('across a 60 second showing the drifting bubbles stay off the globe and the reserved bubble', async ({ page }) => {
+  test.setTimeout(150000);
+  const frame = await loadRenderer(page, { fixture: poolFixture(mixedLongPool), scene: 8 });
+  let samples = 0;
+  for (let step = 0; step < 30; step++) {
+    const actors = await frame.evaluate(() => {
+      const key = (window as any).peacemakersReservedSlotKey();
+      const state = (window as any).colorPolishRuntime.getState();
+      // The floaters are built from the slots, in the same order.
+      return state.visual.actors.map((actor: any, index: number) => ({ ...actor, reserved: state.slots[index]?.key === key }));
+    });
+    const reserved = actors.find((actor: any) => actor.reserved);
+    expect(reserved).toBeTruthy();
+    for (const actor of actors) {
+      if (actor.reserved || actor.life !== 'steady') continue;
+      samples++;
+      const radius = actor.d / 2;
+      const nearestX = Math.min(Math.max(actor.x, GLOBE_FOCUS.x), GLOBE_FOCUS.x + GLOBE_FOCUS.w);
+      const nearestY = Math.min(Math.max(actor.y, GLOBE_FOCUS.y), GLOBE_FOCUS.y + GLOBE_FOCUS.h);
+      const intoGlobe = radius - Math.hypot(actor.x - nearestX, actor.y - nearestY);
+      expect(intoGlobe, `a bubble sits ${intoGlobe.toFixed(0)} px over the globe at step ${step}`).toBeLessThan(24);
+      const intoReserved = radius + reserved.d / 2 - Math.hypot(actor.x - reserved.x, actor.y - reserved.y);
+      expect(intoReserved, `a bubble sits ${intoReserved.toFixed(0)} px over the reserved bubble at step ${step}`).toBeLessThan(24);
+    }
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
+  expect(samples).toBeGreaterThan(30);
 });
 
 test('the reserved bubble holds still while the other bubbles drift', async ({ page }) => {
@@ -359,6 +434,18 @@ test('reduced motion renders peacemakers still, with circular bubbles', async ({
   const frame = await loadRenderer(page, { fixture: poolFixture(mixedLongPool), scene: 8 });
   const still = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().still === true);
   expect(still).toBe(true);
+
+  // Still means still: no bubble moves and no message changes, and the very
+  // long recognition is whole in the reserved bubble from the first frame.
+  const before = await bubbles(frame);
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(40000));
+  const after = await bubbles(frame);
+  expect(after.map((bubble) => [bubble.id, Math.round(bubble.x), Math.round(bubble.y)]))
+    .toEqual(before.map((bubble) => [bubble.id, Math.round(bubble.x), Math.round(bubble.y)]));
+  const reserved = after.find((bubble) => bubble.reserved);
+  expect(reserved?.veryLong).toBe(true);
+  expect(reserved?.whole).toBe(true);
+  expect(reserved?.pages).toBe(1);
 
   const circleResult = await circularity(frame);
   expect(circleResult.count).toBeGreaterThan(0);
@@ -444,10 +531,12 @@ test('a steady bubble retires by drifting out, then a new bubble arrives', async
   expect(newLogs.length).toBeGreaterThan(0);
 });
 
-test('the scene 8 keep-out box matches production’s forbidden() rule', async ({ page }) => {
+test('the scene 8 keep-out boxes are production’s title box and the globe’s focal area', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 8, ms: 2000 });
   const box = await frame.evaluate(() => (window as any).sceneDescriptor(8).keepOut());
-  expect(box).toEqual([{ x: 0, y: 8, w: 700, h: 296 }]);
+  // Production's title box, then the globe's focal area, which is new: with
+  // the reserved bubble on the right the drifting bubbles would settle on it.
+  expect(box).toEqual([{ x: 0, y: 8, w: 700, h: 296 }, GLOBE_FOCUS]);
 });
 
 test('no recognition data is fetched from a live network endpoint', async ({ page }) => {
