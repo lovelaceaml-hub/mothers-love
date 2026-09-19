@@ -13,10 +13,12 @@ const ARRIVAL_FRAME_STYLES=['Light beam','Petal curtain','Aurora','Constellation
 // through a scale factor, so every word grows with the orb.
 const ARRIVAL_W=1812, ARRIVAL_H=972;
 const ARRIVAL_SINGLE={x:1300,y:486,layout:540,drawn:760};
-// A wave is five. The five orbs sit in a balanced 3 over 2 stagger around the
-// group centre, drawn at the size they are laid out at, so the bubble and every
-// word inside it are smaller than the earlier wave of ten.
-const ARRIVAL_GROUP={cx:906,cy:490,layout:240,drawn:240,slots:[[386,264],[906,264],[1426,264],[646,716],[1166,716]]};
+// A wave is five, always shown together. The five orbs sit in a balanced 3 over
+// 2 stagger around the group centre at the largest diameter that still leaves a
+// clear gap between neighbours and keeps every ring clear of the title, the
+// caption, the waiting pill and the frame edge. They are laid out at 300 and
+// drawn at 400, so the words are drawn a third larger than they are measured.
+const ARRIVAL_GROUP={cx:906,cy:500,layout:300,drawn:400,slots:[[286,340],[906,340],[1526,340],[596,660],[1216,660]]};
 const ARRIVAL_PAIR={layout:518,drawn:720,x:[506,1306],y:490};
 
 let ARRIVAL_FRAME_BAG=[];

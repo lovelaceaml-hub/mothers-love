@@ -11,7 +11,7 @@ function beginEvent(){
  if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed');arrivalMountSky()}
  const style=nextStyle(group?'group':'single');
  const frameStyle=nextArrivalFrame();
- active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:group&&items.some(r=>!smallFits(r)),elements:[],localTime:0,exitPos:null};
+ active={items,kind:group?'group':'single',style,frameStyle,phase:'entrance',phaseAt:S.t,hold:group?30:8,entrance:S.still?0:group?4.7:3.6,exit:S.still?0:1.35,page:0,oversize:false,elements:[],localTime:0,exitPos:null};
  buildEvent();
  log('entrance_start',{kind:active.kind,style:group?GROUP_STYLES[style]:SINGLE_STYLES[style],frame:ARRIVAL_FRAME_STYLES[frameStyle],ids:items.map(x=>x.id)});renderQueue();
 }
@@ -23,6 +23,9 @@ function buildEvent(){
  const frameMarkup=arrivalBuildFrameMarkup(a.frameStyle,a.kind);
  root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF FIVE</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · ${esc(ARRIVAL_FRAME_STYLES[a.frameStyle])}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
  a.elements=[];
+ // A group wave always shows all five bubbles together; a long message flips
+ // through its own reading pages inside its own bubble, so the two at a time
+ // pair pages below are no longer reached.
  if(a.oversize){buildGroupPage(0);log('extended_group_reading',{reason:'Long messages are shown in circular pairs with content-aware reading time.'})}
  else{
   a.items.forEach((r,i)=>{
@@ -32,7 +35,9 @@ function buildEvent(){
    const d=group?g.layout:o.layout,drawn=group?g.drawn:o.drawn,x=group?slot[0]:o.x,y=group?slot[1]:o.y;
    a.elements.push(eventElement(r,d,x,y,i,group,drawn));
   });
-  const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(8,s.length/14),0)));
+  // A multi page bubble cycles its pages at the reader's own floor of 9 seconds,
+  // so the hold counts the same floor or the last page never comes up.
+  const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(b.reading.pages.length>1?9:8,s.length/14),0)));
   a.hold=group?Math.max(30,longest):Math.max(8,longest);
  }
  $('qr-zone').classList.add('qr-active');
