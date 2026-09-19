@@ -1,5 +1,6 @@
 import { expect, test, type Frame } from '@playwright/test';
 import {
+  buildActiveDisplayFixture,
   circularity,
   loadRenderer,
   noOverflow,
@@ -205,7 +206,7 @@ test('the focused card is balanced', async ({ page }) => {
 });
 
 test('every expression can be the focused one', async ({ page }) => {
-  test.setTimeout(180000);
+  test.setTimeout(600000);
   // Through loadRenderer, not the Studio. This loop drives eighteen scene
   // visits, and Plan 13's own runner lesson (carried into Plan 15's common
   // scene spec) is that any multi-sample timeline longer than a few seconds
@@ -556,12 +557,22 @@ const EXPRESSIONS_EDGE_CASES = [
 
 // The scene's full 30 s dwell: 30 evenly spaced samples (every second, 0 to 29 s), plus every
 // 200 ms through each 2.4 s focus ramp (at 6, 16 and 26 s), where cards move while still tilted.
+//
+// Plan 17 Lane 7 made every change of view a 1.1 s glide (grid to focus at 6 s, focus to the next
+// focus at 16 s, focus back to the grid at 26 s on a 30 s dwell), so each glide is also sampled at
+// 30 evenly spaced points from its first moving frame to its landing.
+const EXPRESSIONS_MOVE_MS = 1100;
+const EXPRESSIONS_MOVE_STARTS_MS = [6000, 16000, 26000];
+const EXPRESSIONS_MOVE_SAMPLES_MS = EXPRESSIONS_MOVE_STARTS_MS.flatMap((start) =>
+  Array.from({ length: 30 }, (_, i) => start + Math.round(((i + 1) * EXPRESSIONS_MOVE_MS) / 30)),
+);
 const EXPRESSIONS_DWELL_SAMPLES_MS = (() => {
   const times = new Set<number>();
   for (let i = 0; i < 30; i++) times.add(i * 1000);
-  for (const rampStart of [6000, 16000, 26000]) {
+  for (const rampStart of EXPRESSIONS_MOVE_STARTS_MS) {
     for (let t = rampStart; t <= rampStart + 2400; t += 200) times.add(t);
   }
+  for (const t of EXPRESSIONS_MOVE_SAMPLES_MS) times.add(t);
   return [...times].sort((a, b) => a - b);
 })();
 
@@ -576,12 +587,31 @@ async function enterExpressionsVisit(frame: Frame, visit: number) {
   await settleOnScene(frame, 7);
 }
 
+// Scene age in ms. Entering the scene leaves it a little past zero (the harness settles the
+// entrance fade in whole steps), so timelines that must hit a glide exactly step to a scene age
+// rather than by a fixed amount.
+async function expressionsSceneAgeMs(frame: Frame) {
+  return await frame.evaluate(() => (window as any).colorPolishRuntime.getState().sceneAge * 1000);
+}
+
+async function stepToSceneAge(frame: Frame, targetMs: number) {
+  const now = await expressionsSceneAgeMs(frame);
+  if (targetMs - now > 0.001) await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), targetMs - now);
+}
+
 // Every card's painted reach against the scene box and the viewport: its rendered rect (which
 // already includes tilt and depth) widened by its computed box-shadow, which is scaled by the
 // same depth. Finished transitions (currentTime past their end) mean a card that has just gained
 // focus is measured with its full glow.
-async function measureExpressionReach(frame: Frame, floor: number) {
-  return await frame.evaluate((floor) => {
+async function measureExpressionReach(frame: Frame, floor: number, targetMs: number | null = null) {
+  return await frame.evaluate(({ floor, targetMs }) => {
+    // Step to the wanted scene age and measure in one round trip (the sweep takes thousands).
+    const runtime = (window as any).colorPolishRuntime;
+    if (targetMs !== null) {
+      const ahead = targetMs - runtime.getState().sceneAge * 1000;
+      if (ahead > 0.001) runtime.step(ahead);
+    }
+    const sceneId = runtime.getState().scene as number;
     document.getAnimations().forEach((animation) => {
       animation.pause();
       animation.currentTime = 1e7;
@@ -608,8 +638,11 @@ async function measureExpressionReach(frame: Frame, floor: number) {
     const failures: string[] = [];
     let cardCount = 0;
     let focusedGlow = 0;
+    let glidingCards = 0;
     scene.querySelectorAll<HTMLElement>('.edu-card').forEach((card) => {
       cardCount++;
+      // A card really in flight: the script has put a translate() scale() in front of its pose.
+      if (/^translate\([^)]*\) scale\([^)]*\) translate3d/.test(card.style.transform)) glidingCards++;
       const rect = card.getBoundingClientRect();
       const scale = Math.max(rect.width / card.offsetWidth, rect.height / card.offsetHeight);
       const reach = shadowReach(getComputedStyle(card).boxShadow);
@@ -635,36 +668,41 @@ async function measureExpressionReach(frame: Frame, floor: number) {
         if (margin < floor) failures.push(`${label} ${side} margin ${margin.toFixed(1)}px < ${floor}px`);
       }
     });
-    return { cardCount, focusedGlow, failures };
-  }, floor);
+    return { sceneId, cardCount, focusedGlow, glidingCards, failures };
+  }, { floor, targetMs });
 }
 
 for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
   test(`every card, border and glow stays ${floor}px inside the scene box and the ${width}x${height} screen for nine full visits`, async ({
     page,
   }) => {
-    test.setTimeout(240000);
+    test.setTimeout(900000);
     await page.setViewportSize({ width, height });
     const frame = await loadRenderer(page, { scene: 7 });
     const failures: string[] = [];
     let focusedSamples = 0;
+    let glidingSamples = 0;
 
     for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
       await enterExpressionsVisit(frame, visit);
-      let at = 0;
       for (const t of EXPRESSIONS_DWELL_SAMPLES_MS) {
-        if (t > at) {
-          await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), t - at);
-          at = t;
-        }
-        const state = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
-        expect(state, `visit ${visit + 1} t=${t}ms still on scene 7`).toBe(7);
-        const result = await measureExpressionReach(frame, floor);
+        const result = await measureExpressionReach(frame, floor, t);
+        expect(result.sceneId, `visit ${visit + 1} t=${t}ms still on scene 7`).toBe(7);
         expect(result.cardCount).toBe(9);
         if (result.focusedGlow > 0) focusedSamples++;
+        // Every one of the 30 points inside a glide (all but its landing point) must catch all nine
+        // cards in flight, or the sweep is not measuring the movement it claims to.
+        const insideGlide = EXPRESSIONS_MOVE_STARTS_MS.some((start) => t > start && t < start + EXPRESSIONS_MOVE_MS - 20);
+        if (insideGlide && EXPRESSIONS_MOVE_SAMPLES_MS.includes(t)) {
+          expect(result.glidingCards, `visit ${visit + 1} t=${t}ms all nine cards in flight`).toBe(9);
+          glidingSamples++;
+        }
         for (const failure of result.failures) failures.push(`visit ${visit + 1} t=${t}ms ${failure}`);
       }
     }
+
+    // 29 in-flight points for each of the three glides of each of the nine visits.
+    expect(glidingSamples).toBe(EXPRESSIONS_VISITS * EXPRESSIONS_MOVE_STARTS_MS.length * 29);
 
     // The glow was really measured (55px blur plus 3px ring, times depth), not skipped.
     expect(focusedSamples).toBeGreaterThan(0);
@@ -676,7 +714,7 @@ for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
   test(`at ${width}x${height} every card's words fit, the title and footnote sit clear, and nothing is shrunk`, async ({
     page,
   }) => {
-    test.setTimeout(180000);
+    test.setTimeout(600000);
     await page.setViewportSize({ width, height });
     const frame = await loadRenderer(page, { scene: 7 });
     const k = width / 1920;
@@ -785,7 +823,7 @@ for (const letterSpacing of [0.03, 0.05]) {
     test(`at ${width}x${height} with ${letterSpacing}em wider letters every focused panel still fits above its source note`, async ({
       page,
     }) => {
-      test.setTimeout(180000);
+      test.setTimeout(600000);
       await page.setViewportSize({ width, height });
       const frame = await loadRenderer(page, { scene: 7 });
       const k = width / 1920;
@@ -862,32 +900,36 @@ for (const letterSpacing of [0.03, 0.05]) {
   }
 }
 
-// When focus moves on, the card that had it jumps to its compact slot. Its glow must not fade out
-// there over the 700 ms transition, because the compact slots sit closer to the scene edge than the
-// glow reaches: sample the first 300 ms after every leave (t = 16 s and 26 s of each visit, so every
-// card leaves focus twice) with the transitions paused at that time, and require the leaving card's
-// painted reach to stay inside the scene box.
+// When focus moves on, the card that had it glides to its compact slot (16 s) or back to its grid
+// place (26 s on a 30 s dwell). Its glow must never be carried along or fade out on the way, because
+// those places sit closer to the scene edge than the glow reaches (Lane 2 measured up to 31.8px past
+// the edge with a 700 ms fade). Sample every 100 ms from take-off to landing with any running
+// box-shadow transition paused at the time elapsed since take-off (so a fade, if one came back,
+// is caught half-way with its full geometry), and require the leaving card's painted reach to stay
+// inside the scene box and the card to land in its new look.
 for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
   test(`at ${width}x${height} a card leaving focus keeps its glow ${floor}px inside the scene box`, async ({ page }) => {
-    test.setTimeout(180000);
+    test.setTimeout(900000);
     await page.setViewportSize({ width, height });
     const frame = await loadRenderer(page, { scene: 7 });
     const failures: string[] = [];
     const leftIds = new Set<number>();
+    const landedAs = new Set<string>();
 
     for (let visit = 0; visit < EXPRESSIONS_VISITS; visit++) {
       await enterExpressionsVisit(frame, visit);
-      let at = 0;
-      for (const leaveAt of [16000, 26000]) {
-        await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), leaveAt - 2000 - at);
-        at = leaveAt - 2000;
-        const leaving = await frame.evaluate(
-          () => Number(document.querySelector<HTMLElement>('#stage .scene[data-scene="7"] .edu-card.focused')?.dataset.expressionId),
-        );
-        expect(leaving, `visit ${visit + 1} a card is in focus before ${leaveAt}ms`).toBeGreaterThan(0);
-        await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 2000);
-        at = leaveAt;
-        for (const ms of [0, 50, 100, 150, 200, 250, 300]) {
+      for (const [leaveAt, landing] of [[16000, 'compact'], [26000, 'grid']] as const) {
+        await stepToSceneAge(frame, leaveAt - 2000);
+        const before = await frame.evaluate(() => {
+          document.getAnimations().forEach((animation) => { animation.currentTime = 1e7; });
+          const card = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"] .edu-card.focused');
+          return { id: Number(card?.dataset.expressionId), shadow: card ? getComputedStyle(card).boxShadow : 'none' };
+        });
+        expect(before.id, `visit ${visit + 1} a card is in focus before ${leaveAt}ms`).toBeGreaterThan(0);
+        // The glow is really there to lose: three shadow layers on the resting focused card.
+        expect(before.shadow.split(/,(?![^(]*\))/).length, `visit ${visit + 1} resting glow layers`).toBe(3);
+        for (let ms = 20; ms <= EXPRESSIONS_MOVE_MS + 100; ms += 100) {
+          await stepToSceneAge(frame, leaveAt + ms);
           const r = await frame.evaluate(
             ({ id, ms }) => {
               document.getAnimations().forEach((animation: any) => {
@@ -900,16 +942,20 @@ for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
               const rect = card.getBoundingClientRect();
               const scale = Math.max(rect.width / card.offsetWidth, rect.height / card.offsetHeight);
               const reach = { left: 0, right: 0, top: 0, bottom: 0 };
-              for (const layer of getComputedStyle(card).boxShadow.split(/,(?![^(]*\))/)) {
-                if (/\binset\b/.test(layer)) continue;
-                const [x = 0, y = 0, blur = 0, spread = 0] = (layer.replace(/[a-z-]+\([^)]*\)/gi, '').match(/-?[\d.]+px/g) || []).map(parseFloat);
-                reach.left = Math.max(reach.left, blur + spread - x);
-                reach.right = Math.max(reach.right, blur + spread + x);
-                reach.top = Math.max(reach.top, blur + spread - y);
-                reach.bottom = Math.max(reach.bottom, blur + spread + y);
+              const shadow = getComputedStyle(card).boxShadow;
+              if (shadow !== 'none') {
+                for (const layer of shadow.split(/,(?![^(]*\))/)) {
+                  if (/\binset\b/.test(layer)) continue;
+                  const [x = 0, y = 0, blur = 0, spread = 0] = (layer.replace(/[a-z-]+\([^)]*\)/gi, '').match(/-?[\d.]+px/g) || []).map(parseFloat);
+                  reach.left = Math.max(reach.left, blur + spread - x);
+                  reach.right = Math.max(reach.right, blur + spread + x);
+                  reach.top = Math.max(reach.top, blur + spread - y);
+                  reach.bottom = Math.max(reach.bottom, blur + spread + y);
+                }
               }
               return {
-                compact: card.classList.contains('compact'),
+                look: card.classList.contains('focused') ? 'focused' : card.classList.contains('compact') ? 'compact' : 'grid',
+                gliding: card.classList.contains('edu-moving'),
                 margins: {
                   left: rect.left - reach.left * scale - box.left,
                   right: box.right - (rect.right + reach.right * scale),
@@ -918,19 +964,25 @@ for (const { width, height, floor } of EXPRESSIONS_EDGE_CASES) {
                 },
               };
             },
-            { id: leaving, ms },
+            { id: before.id, ms },
           );
-          expect(r.compact, `visit ${visit + 1} card ${leaving} is compact after leaving focus at ${leaveAt}ms`).toBe(true);
+          if (ms < EXPRESSIONS_MOVE_MS) expect(r.gliding, `visit ${visit + 1} card ${before.id} in flight at ${leaveAt}+${ms}ms`).toBe(true);
+          else {
+            expect(r.gliding, `visit ${visit + 1} card ${before.id} landed by ${leaveAt}+${ms}ms`).toBe(false);
+            expect(r.look, `visit ${visit + 1} card ${before.id} look after leaving focus at ${leaveAt}ms`).toBe(landing);
+            landedAs.add(landing);
+          }
           for (const [side, margin] of Object.entries(r.margins)) {
-            if (margin < floor) failures.push(`visit ${visit + 1} t=${leaveAt}+${ms}ms card ${leaving} ${side} margin ${margin.toFixed(1)}px < ${floor}px`);
+            if (margin < floor) failures.push(`visit ${visit + 1} t=${leaveAt}+${ms}ms card ${before.id} ${side} margin ${margin.toFixed(1)}px < ${floor}px`);
           }
         }
-        leftIds.add(leaving);
+        leftIds.add(before.id);
         // Let the sampled transitions finish so later samples start clean.
         await frame.evaluate(() => document.getAnimations().forEach((animation) => { animation.currentTime = 1e7; }));
       }
     }
     expect(leftIds.size).toBe(9);
+    expect([...landedAs].sort()).toEqual(['compact', 'grid']);
     expect(failures.slice(0, 40), `${failures.length} leaving-focus glow failures`).toEqual([]);
   });
 }
@@ -950,9 +1002,10 @@ const EXPRESSIONS_BASE_MOTION: Record<number, Array<[number, number]>> = {
 };
 
 // Captured from tv17/base (5a24f0b): the timing and keyframes of every CSS animation running
-// inside scene 7 (document.getAnimations()). Every grid and focused card also keeps the 700 ms ease
-// box-shadow transition (the glow fades in on gaining focus); Plan 17 drops it to 0 s on compact
-// cards only, so a card leaving focus loses its glow at once instead of fading it past the edge.
+// inside scene 7 (document.getAnimations()). Every resting grid and focused card also keeps the
+// 700 ms ease box-shadow transition (the glow fades in on gaining focus); Plan 17 drops it to 0 s on
+// compact cards (Lane 2) and on any card in flight between views (Lane 7), so a card leaving focus
+// loses its glow at once instead of fading it past the edge.
 const EXPRESSIONS_BASE_ANIMATIONS: Record<string, unknown> = {
   wordSpark: {"duration": 18000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 0.46, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 0.53, "easing": "ease-in-out", "opacity": "0.93", "transform": "scale(1) rotate(35deg)"}, {"offset": 0.61, "easing": "ease-in-out", "opacity": "0.93", "transform": "scale(1) rotate(35deg)"}, {"offset": 0.72, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}, {"offset": 1, "easing": "ease-in-out", "opacity": "0", "transform": "scale(0.35) rotate(0deg)"}]},
   wordSheen: {"duration": 19000, "easing": "linear", "iterations": "infinite", "keyframes": [{"offset": 0, "easing": "ease-in-out", "backgroundPositionX": "160%", "backgroundPositionY": "0px"}, {"offset": 0.45, "easing": "ease-in-out", "backgroundPositionX": "160%", "backgroundPositionY": "0px"}, {"offset": 0.68, "easing": "ease-in-out", "backgroundPositionX": "-160%", "backgroundPositionY": "0px"}, {"offset": 1, "easing": "ease-in-out", "backgroundPositionX": "-160%", "backgroundPositionY": "0px"}]},
@@ -961,6 +1014,7 @@ const EXPRESSIONS_BASE_ANIMATIONS: Record<string, unknown> = {
 };
 
 test('tilt, drift, timing and keyframes are exactly the Plan 15 values', async ({ page }) => {
+  test.setTimeout(300000);
   const frame = await loadRenderer(page, { scene: 7 });
   let at = 0;
   for (const t of Object.keys(EXPRESSIONS_BASE_MOTION).map(Number).sort((a, b) => a - b)) {
@@ -1005,6 +1059,7 @@ test('tilt, drift, timing and keyframes are exactly the Plan 15 values', async (
         const style = getComputedStyle(card);
         return {
           compact: card.classList.contains('compact'),
+          gliding: card.classList.contains('edu-moving'),
           property: style.transitionProperty,
           duration: style.transitionDuration,
           easing: style.transitionTimingFunction,
@@ -1015,9 +1070,405 @@ test('tilt, drift, timing and keyframes are exactly the Plan 15 values', async (
   });
   expect(animations.byName).toEqual(EXPRESSIONS_BASE_ANIMATIONS);
   expect(animations.transitions).toHaveLength(9);
-  // Sampled at 16.6 s: one card in focus, eight compact.
+  // Sampled at 16.6 s, past the half-way swap of the second glide: one card in the focused look,
+  // eight compact, all nine still in flight, so none of them may fade a shadow.
   expect(animations.transitions.filter((transition) => transition.compact)).toHaveLength(8);
-  for (const { compact, ...transition } of animations.transitions) {
+  expect(animations.transitions.filter((transition) => transition.gliding)).toHaveLength(9);
+  for (const { compact, gliding, ...transition } of animations.transitions) {
+    expect(transition).toEqual({ property: 'box-shadow', duration: '0s', easing: 'ease' });
+  }
+
+  // At rest (19 s) the Plan 15 timing is back: 0.7 s on the focused card, 0 s on the compact eight.
+  await frame.evaluate((ms) => (window as any).colorPolishRuntime.step(ms), 19000 - at);
+  const resting = await frame.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="7"] .edu-card')].map((card) => {
+      const style = getComputedStyle(card);
+      return {
+        compact: card.classList.contains('compact'),
+        gliding: card.classList.contains('edu-moving'),
+        property: style.transitionProperty,
+        duration: style.transitionDuration,
+        easing: style.transitionTimingFunction,
+      };
+    }),
+  );
+  expect(resting.filter((transition) => transition.compact)).toHaveLength(8);
+  expect(resting.filter((transition) => transition.gliding)).toHaveLength(0);
+  for (const { compact, gliding, ...transition } of resting) {
     expect(transition).toEqual({ property: 'box-shadow', duration: compact ? '0s' : '0.7s', easing: 'ease' });
   }
+});
+
+// --- Plan 17 Lane 7: the view switch is a glide, not a cut ---------------------------------------
+//
+// Anthony on the church TV (September 19): the change between the all-nine grid and the
+// one-in-focus view "is not smooth and just cuts out"; the cards should smoothly move and switch
+// places when one is enlarging. These specs drive the renderer directly (loadRenderer), stepping
+// its clock, so every number below is the rendered geometry at a known scene age.
+
+function expressionsFixture(dwellSeconds: number, settingsOverrides: Record<string, unknown> = {}) {
+  const fixture = buildActiveDisplayFixture() as any;
+  for (const entry of fixture.presentation.playlist) {
+    if (entry.id === 'expressions') entry.durationSeconds = dwellSeconds;
+  }
+  fixture.settings = { ...fixture.settings, ...settingsOverrides };
+  return fixture;
+}
+
+type ExpressionsCardSample = {
+  id: number;
+  look: 'focused' | 'compact' | 'grid';
+  gliding: boolean;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  opacity: number;
+  zIndex: number;
+  box: string;
+  wordsOpacity: number;
+  wordsStretch: number;
+};
+
+// One rendered sample of the nine live cards (the reduced-motion ghost copy is excluded).
+async function sampleExpressionCards(frame: Frame): Promise<ExpressionsCardSample[]> {
+  return await frame.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="7"] .educational:not(.edu-ghost) .edu-card')].map((card) => {
+      const rect = card.getBoundingClientRect();
+      const look = card.classList.contains('focused') ? 'focused' : card.classList.contains('compact') ? 'compact' : 'grid';
+      const words = card.querySelector<HTMLElement>(look === 'focused' ? '.edu-detail' : '.edu-front')!;
+      const wordsRect = words.getBoundingClientRect();
+      // How far the words are stretched out of shape: rendered width over height against laid-out
+      // width over height. 1 means the words keep their shape while the card around them stretches.
+      const wordsStretch = (wordsRect.width / wordsRect.height) / (words.offsetWidth / words.offsetHeight);
+      return {
+        id: Number(card.dataset.expressionId),
+        look: look as 'focused' | 'compact' | 'grid',
+        gliding: card.classList.contains('edu-moving'),
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        opacity: parseFloat(getComputedStyle(card).opacity),
+        zIndex: Number(getComputedStyle(card).zIndex) || 0,
+        box: [card.style.left, card.style.top, card.style.width, card.style.height].join(' '),
+        wordsOpacity: parseFloat(getComputedStyle(words).opacity),
+        wordsStretch,
+      };
+    }),
+  );
+}
+
+for (const { width, height } of EXPRESSIONS_EDGE_CASES) {
+  test(`at ${width}x${height} no card ever jumps: every view change is a continuous, eased glide of about one second`, async ({ page }) => {
+    test.setTimeout(900000);
+    await page.setViewportSize({ width, height });
+    const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(30) });
+    const k = width / 1920;
+    await stepToSceneAge(frame, 5000);
+    let previous = await sampleExpressionCards(frame);
+    const lastMove = new Map<number, number>();
+    const jumps: string[] = [];
+    const glideFrames = new Map<number, number>();
+    let peak = 0;
+    // 20 ms steps (finer than a 60 Hz TV frame) from 5 s to 29.5 s: all three view changes.
+    for (let t = 5020; t <= 29500; t += 20) {
+      await stepToSceneAge(frame, t);
+      const cards = await sampleExpressionCards(frame);
+      expect(cards).toHaveLength(9);
+      for (let i = 0; i < 9; i++) {
+        const now = cards[i];
+        const was = previous[i];
+        const move = Math.max(Math.abs(now.left - was.left), Math.abs(now.top - was.top), Math.abs(now.right - was.right), Math.abs(now.bottom - was.bottom)) / k;
+        const before = lastMove.get(now.id) ?? 0;
+        peak = Math.max(peak, move);
+        // A cut shows up as a single step far larger than its neighbours. The old renderer moved a
+        // card up to about 1390px in one step; a glide never exceeds 60px per 20 ms here, and the
+        // step size itself changes by no more than 8px from one step to the next (eased start and
+        // stop, no lurch at the half-way swap of box and look).
+        if (move > 60) jumps.push(`t=${t}ms card ${now.id} moved ${move.toFixed(1)}px in one step`);
+        if (Math.abs(move - before) > 8) jumps.push(`t=${t}ms card ${now.id} step changed from ${before.toFixed(1)}px to ${move.toFixed(1)}px`);
+        if (Math.abs(now.opacity - was.opacity) > 0.03) jumps.push(`t=${t}ms card ${now.id} opacity ${was.opacity} to ${now.opacity}`);
+        lastMove.set(now.id, move);
+        if (now.gliding) glideFrames.set(now.id, (glideFrames.get(now.id) ?? 0) + 1);
+      }
+      previous = cards;
+    }
+    expect(jumps.slice(0, 20), `${jumps.length} jumps`).toEqual([]);
+    // The cards really travelled (this is not a still scene passing a no-jump check).
+    expect(peak).toBeGreaterThan(20);
+    // Three glides of 1.1 s each: 54 or 55 in-flight samples per glide for every card, which is the
+    // 0.8 to 1.2 s window Anthony's ruling allows (40 to 60 samples per glide).
+    for (let id = 1; id <= 9; id++) {
+      const perGlide = (glideFrames.get(id) ?? 0) / 3;
+      expect(perGlide, `card ${id} in-flight samples per glide`).toBeGreaterThanOrEqual(40);
+      expect(perGlide, `card ${id} in-flight samples per glide`).toBeLessThanOrEqual(60);
+    }
+  });
+}
+
+test('the chosen card grows from its grid place into focus while the others glide to their places, by transform and opacity only', async ({ page }) => {
+  test.setTimeout(600000);
+  const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(30) });
+  await stepToSceneAge(frame, 5900);
+  const grid = await sampleExpressionCards(frame);
+  await stepToSceneAge(frame, 9000);
+  const focus = await sampleExpressionCards(frame);
+  const hero = focus.find((card) => card.look === 'focused')!;
+  expect(hero, 'a card is in focus at 9 s').toBeTruthy();
+
+  // Replay the same glide on a fresh visit and watch it.
+  await settleOnScene(frame, 1);
+  await settleOnScene(frame, 7);
+  // The next visit focuses the next expression, so re-read the two resting states for this visit.
+  await stepToSceneAge(frame, 5900);
+  const from = await sampleExpressionCards(frame);
+  const boxes = new Map<number, Set<string>>();
+  const looks = new Map<number, Set<string>>();
+  const swapOpacity: number[] = [];
+  const stretch: number[] = [];
+  const samples: ExpressionsCardSample[][] = [];
+  let last = from;
+  for (let t = 6020; t <= 7080; t += 20) {
+    await stepToSceneAge(frame, t);
+    const cards = await sampleExpressionCards(frame);
+    samples.push(cards);
+    cards.forEach((card, i) => {
+      if (!boxes.has(card.id)) boxes.set(card.id, new Set());
+      if (!looks.has(card.id)) looks.set(card.id, new Set());
+      boxes.get(card.id)!.add(card.box);
+      looks.get(card.id)!.add(card.look);
+      // Whenever a card's laid-out box or look changes between two samples, its words must be
+      // invisible on both sides of the change: that is what hides the one reflow per glide.
+      if (card.box !== last[i].box || card.look !== last[i].look) swapOpacity.push(last[i].wordsOpacity, card.wordsOpacity);
+      if (card.wordsOpacity > 0.05) stretch.push(card.wordsStretch);
+    });
+    last = cards;
+  }
+  await stepToSceneAge(frame, 9000);
+  const to = await sampleExpressionCards(frame);
+  const chosen = to.find((card) => card.look === 'focused')!;
+  expect(chosen.id).toBe((hero.id % 9) + 1);
+
+  for (let id = 1; id <= 9; id++) {
+    // Left, top, width and height take exactly two values through the glide (the old box, then the
+    // new one): layout changes once, everything else is transform and opacity.
+    expect(boxes.get(id)!.size, `card ${id} laid-out boxes during the glide`).toBe(2);
+    expect(looks.get(id)!.size, `card ${id} looks during the glide`).toBe(2);
+  }
+  expect(swapOpacity.length).toBe(18);
+  for (const opacity of swapOpacity) expect(opacity).toBeLessThanOrEqual(0.02);
+  // While words are visible they keep their shape to within 5 percent (the resting 7 degree tilt
+  // and its perspective already account for about 3); without the counter-scale the words would be
+  // stretched by up to 70 percent on the way.
+  expect(stretch.length).toBeGreaterThan(200);
+  expect(Math.min(...stretch)).toBeGreaterThan(0.95);
+  expect(Math.max(...stretch)).toBeLessThan(1.05);
+
+  // Half-way through, every card is strictly between where it started and where it lands.
+  const mid = samples[Math.floor(samples.length / 2)];
+  const start = from;
+  for (let i = 0; i < 9; i++) {
+    const a = start[i];
+    const b = to[i];
+    const m = mid[i];
+    const centre = (card: ExpressionsCardSample) => ({ x: (card.left + card.right) / 2, y: (card.top + card.bottom) / 2 });
+    const travelled = Math.hypot(centre(m).x - centre(a).x, centre(m).y - centre(a).y);
+    const remaining = Math.hypot(centre(b).x - centre(m).x, centre(b).y - centre(m).y);
+    const whole = Math.hypot(centre(b).x - centre(a).x, centre(b).y - centre(a).y);
+    if (whole > 40) {
+      expect(travelled, `card ${m.id} has left its grid place by half-way`).toBeGreaterThan(whole * 0.2);
+      expect(remaining, `card ${m.id} has not landed by half-way`).toBeGreaterThan(whole * 0.2);
+      // On the straight line between the two places (no detour past a screen edge).
+      expect(travelled + remaining, `card ${m.id} path`).toBeLessThan(whole * 1.02 + 2);
+    }
+  }
+  const heroMid = mid.find((card) => card.id === chosen.id)!;
+  const heroFrom = start.find((card) => card.id === chosen.id)!;
+  expect(heroMid.right - heroMid.left, 'the chosen card is growing').toBeGreaterThan((heroFrom.right - heroFrom.left) * 1.15);
+  expect(heroMid.right - heroMid.left, 'the chosen card is not yet full size').toBeLessThan((chosen.right - chosen.left) * 0.9);
+  // The unused first-visit samples pin that the grid and focus states of this scene exist at all.
+  expect(grid.every((card) => card.look === 'grid')).toBe(true);
+});
+
+test('when focus moves on, the two cards switch places in view and the one gaining focus stays on top', async ({ page }) => {
+  test.setTimeout(600000);
+  const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(30) });
+  await stepToSceneAge(frame, 15900);
+  const before = await sampleExpressionCards(frame);
+  const leaving = before.find((card) => card.look === 'focused')!;
+  const gainingId = (leaving.id % 9) + 1;
+  const gainingBefore = before.find((card) => card.id === gainingId)!;
+  let overlapSamples = 0;
+  for (let t = 16040; t <= 17080; t += 40) {
+    await stepToSceneAge(frame, t);
+    const onTop = await frame.evaluate(
+      ({ a, b }) => {
+        const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+        const A = scene.querySelector<HTMLElement>(`.edu-card[data-expression-id="${a}"]`)!.getBoundingClientRect();
+        const B = scene.querySelector<HTMLElement>(`.edu-card[data-expression-id="${b}"]`)!.getBoundingClientRect();
+        const left = Math.max(A.left, B.left), right = Math.min(A.right, B.right);
+        const top = Math.max(A.top, B.top), bottom = Math.min(A.bottom, B.bottom);
+        if (right - left < 40 || bottom - top < 40) return null;
+        const hit = document.elementFromPoint((left + right) / 2, (top + bottom) / 2);
+        return Number(hit?.closest<HTMLElement>('.edu-card')?.dataset.expressionId);
+      },
+      { a: leaving.id, b: gainingId },
+    );
+    if (onTop === null) continue;
+    overlapSamples++;
+    expect(onTop, `t=${t}ms the card gaining focus is painted over the one leaving`).toBe(gainingId);
+  }
+  // They really cross each other on the way (a swap in view, not two separate fades).
+  expect(overlapSamples).toBeGreaterThan(3);
+
+  await stepToSceneAge(frame, 19000);
+  const after = await sampleExpressionCards(frame);
+  const gainingAfter = after.find((card) => card.id === gainingId)!;
+  const leavingAfter = after.find((card) => card.id === leaving.id)!;
+  expect(gainingAfter.look).toBe('focused');
+  expect(leavingAfter.look).toBe('compact');
+  // The card that left focus now rests where the card that gained it rested, and the reverse.
+  expect(Math.abs(leavingAfter.left - gainingBefore.left)).toBeLessThan(1);
+  expect(Math.abs(leavingAfter.top - gainingBefore.top)).toBeLessThan(1);
+  expect(Math.abs(gainingAfter.left - leaving.left)).toBeLessThan(1);
+  expect(Math.abs(gainingAfter.top - leaving.top)).toBeLessThan(1);
+  // The seven cards that keep their slot do not drift away from it.
+  for (const card of after) {
+    if (card.id === leaving.id || card.id === gainingId) continue;
+    const was = before.find((other) => other.id === card.id)!;
+    expect(Math.abs(card.left - was.left), `card ${card.id} kept its slot`).toBeLessThan(1);
+    expect(Math.abs(card.top - was.top), `card ${card.id} kept its slot`).toBeLessThan(1);
+  }
+});
+
+// The dwell is read from state. 30 s and 60 s are the two values the TV uses; 40 s proves the plan
+// follows the number rather than matching two hardcoded cases.
+for (const { dwell, focusAt, gridFrom } of [
+  { dwell: 30, focusAt: [10000, 20000], gridFrom: 26000 },
+  { dwell: 40, focusAt: [10000, 20000, 30000], gridFrom: 36000 },
+  { dwell: 60, focusAt: [10000, 20000, 30000, 40000, 50000], gridFrom: 56000 },
+]) {
+  test(`a ${dwell} s dwell shows ${focusAt.length} whole focuses and glides back to the grid at ${gridFrom / 1000} s`, async ({ page }) => {
+    test.setTimeout(600000);
+    const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(dwell) });
+    const dwellInState = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().visual.dwell[7]);
+    expect(dwellInState).toBe(dwell);
+    await stepToSceneAge(frame, 3000);
+    const grid = await sampleExpressionCards(frame);
+    expect(grid.every((card) => card.look === 'grid')).toBe(true);
+
+    const focusedIds: number[] = [];
+    for (const t of focusAt) {
+      await stepToSceneAge(frame, t);
+      const cards = await sampleExpressionCards(frame);
+      const focused = cards.filter((card) => card.look === 'focused');
+      expect(focused, `one card in focus at ${t}ms`).toHaveLength(1);
+      expect(cards.filter((card) => card.look === 'compact')).toHaveLength(8);
+      expect(cards.some((card) => card.gliding), `at rest at ${t}ms`).toBe(false);
+      focusedIds.push(focused[0].id);
+    }
+    // Consecutive expressions, each held for the full 10 s cycle.
+    for (let i = 1; i < focusedIds.length; i++) expect(focusedIds[i]).toBe((focusedIds[i - 1] % 9) + 1);
+    // The last focus is still fully held just before the return.
+    await stepToSceneAge(frame, gridFrom - 200);
+    const held = await sampleExpressionCards(frame);
+    expect(held.find((card) => card.look === 'focused')?.id).toBe(focusedIds[focusedIds.length - 1]);
+    expect(held.some((card) => card.gliding)).toBe(false);
+
+    // The reverse glide: in flight half a second after the return starts.
+    await stepToSceneAge(frame, gridFrom + 550);
+    const returning = await sampleExpressionCards(frame);
+    expect(returning.filter((card) => card.gliding)).toHaveLength(9);
+    const label = await frame.evaluate(() => document.querySelector('#stage .scene[data-scene="7"] #edu-step')?.textContent);
+    expect(label).toBe('01-09 · THE COMPLETE PHRASES');
+
+    // Back on the all-nine grid, every card exactly where it began, before the dwell ends.
+    await stepToSceneAge(frame, gridFrom + 2600);
+    expect(gridFrom + 2600).toBeLessThan(dwell * 1000);
+    const back = await sampleExpressionCards(frame);
+    for (let i = 0; i < 9; i++) {
+      expect(back[i].look).toBe('grid');
+      expect(back[i].gliding).toBe(false);
+      expect(back[i].opacity).toBeCloseTo(1, 2);
+      expect(Math.abs(back[i].left - grid[i].left), `card ${back[i].id} left`).toBeLessThan(0.5);
+      expect(Math.abs(back[i].top - grid[i].top), `card ${back[i].id} top`).toBeLessThan(0.5);
+      expect(Math.abs(back[i].right - grid[i].right), `card ${back[i].id} right`).toBeLessThan(0.5);
+      expect(Math.abs(back[i].bottom - grid[i].bottom), `card ${back[i].id} bottom`).toBeLessThan(0.5);
+    }
+    await stepToSceneAge(frame, dwell * 1000 - 100);
+    const end = await sampleExpressionCards(frame);
+    expect(end.every((card) => card.look === 'grid' && !card.gliding)).toBe(true);
+  });
+}
+
+test('a scene held past its dwell repeats the plan and carries on to the following expressions', async ({ page }) => {
+  test.setTimeout(600000);
+  const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(30) });
+  await stepToSceneAge(frame, 20000);
+  const second = (await sampleExpressionCards(frame)).find((card) => card.look === 'focused')!;
+  await stepToSceneAge(frame, 33000);
+  expect((await sampleExpressionCards(frame)).every((card) => card.look === 'grid')).toBe(true);
+  await stepToSceneAge(frame, 40000);
+  const third = (await sampleExpressionCards(frame)).find((card) => card.look === 'focused');
+  expect(third?.id).toBe((second.id % 9) + 1);
+});
+
+test('with reduced motion and a running scene the view change is a plain crossfade: nothing travels', async ({ page }) => {
+  test.setTimeout(600000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  // Reduced motion normally makes the scene still (covered above). It only keeps running when the
+  // owner forces lively motion, and that is where the crossfade applies.
+  const frame = await loadRenderer(page, { scene: 7, fixture: expressionsFixture(30, { motion: 'lively' }) });
+  const state = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().still);
+  expect(state).toBe(false);
+  await stepToSceneAge(frame, 5900);
+  expect(await frame.evaluate(() => document.querySelectorAll('#stage .scene[data-scene="7"] .edu-ghost').length)).toBe(0);
+  await stepToSceneAge(frame, 9000);
+  const landed = await sampleExpressionCards(frame);
+
+  await settleOnScene(frame, 1);
+  await settleOnScene(frame, 7);
+  await stepToSceneAge(frame, 5900);
+  const opacities: Array<{ ghost: number; live: number }> = [];
+  for (let t = 6100; t <= 7000; t += 100) {
+    await stepToSceneAge(frame, t);
+    const r = await frame.evaluate(() => {
+      const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+      const ghost = scene.querySelector<HTMLElement>('.educational.edu-ghost');
+      const live = scene.querySelector<HTMLElement>('.educational:not(.edu-ghost)')!;
+      return {
+        ghost: ghost ? parseFloat(getComputedStyle(ghost).opacity) : -1,
+        ghostCards: ghost ? ghost.querySelectorAll('.edu-card:not(.focused):not(.compact)').length : 0,
+        ghostIds: ghost ? ghost.querySelectorAll('[id]').length : -1,
+        live: parseFloat(getComputedStyle(live).opacity),
+        travelling: [...live.querySelectorAll<HTMLElement>('.edu-card')].filter((card) => card.classList.contains('edu-moving') || /scale\(/.test(card.style.transform)).length,
+        looks: [...live.querySelectorAll<HTMLElement>('.edu-card')].filter((card) => card.classList.contains('focused') || card.classList.contains('compact')).length,
+      };
+    });
+    // The outgoing view is a frozen copy of the all-nine grid; the incoming view is already in its
+    // final places underneath; no card carries a glide transform.
+    expect(r.ghost, `t=${t}ms ghost present`).toBeGreaterThanOrEqual(0);
+    expect(r.ghostCards).toBe(9);
+    expect(r.ghostIds).toBe(0);
+    expect(r.travelling).toBe(0);
+    expect(r.looks).toBe(9);
+    expect(r.ghost + r.live).toBeCloseTo(1, 2);
+    opacities.push({ ghost: r.ghost, live: r.live });
+  }
+  for (let i = 1; i < opacities.length; i++) {
+    expect(opacities[i].live).toBeGreaterThan(opacities[i - 1].live);
+    expect(opacities[i].ghost).toBeLessThan(opacities[i - 1].ghost);
+  }
+  await stepToSceneAge(frame, 7200);
+  const done = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="7"]')!;
+    return { ghosts: scene.querySelectorAll('.edu-ghost').length, live: getComputedStyle(scene.querySelector<HTMLElement>('.educational')!).opacity };
+  });
+  expect(done).toEqual({ ghosts: 0, live: '1' });
+  // Same resting layout as the moving version lands in.
+  await stepToSceneAge(frame, 9000);
+  const rested = await sampleExpressionCards(frame);
+  expect(rested.filter((card) => card.look === 'compact')).toHaveLength(landed.filter((card) => card.look === 'compact').length);
+  expect(rested.filter((card) => card.look === 'focused')).toHaveLength(1);
 });
