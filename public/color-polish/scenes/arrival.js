@@ -38,6 +38,10 @@ function arrivalMountSky(){
  el.id='arrival-sky';
  el.setAttribute('aria-hidden','true');
  el.innerHTML=arrivalSkyMarkup();
+ // Self cleaning: whenever the backdrop finishes fading to nothing (the arrival
+ // frame stopped being active by any path, including a safe mode clear), it
+ // leaves the DOM on its own.
+ el.addEventListener('transitionend',event=>{if(event.target===el&&event.propertyName==='opacity'&&getComputedStyle(el).opacity==='0')el.remove()});
  tv.append(el);
  return el;
 }

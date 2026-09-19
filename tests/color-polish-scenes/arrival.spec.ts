@@ -410,8 +410,23 @@ test('G3 computed-style stage dim holds, and the backdrop is a bright full scree
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(650));
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(5600));
 
-  // Allow real wall-clock time past 900 ms for CSS transition on #stage to settle
+  // Wait for the CSS transitions on #stage and the backdrop to settle. A fixed wait is
+  // not enough on a loaded machine, so poll the settled values instead.
   await page.waitForTimeout(1000);
+  await expect
+    .poll(
+      async () =>
+        await frame.evaluate(() => {
+          const stage = document.getElementById('stage');
+          const sky = document.getElementById('arrival-sky');
+          return (
+            !!stage && parseFloat(window.getComputedStyle(stage).opacity) <= 0.23 &&
+            !!sky && parseFloat(window.getComputedStyle(sky).opacity) === 1
+          );
+        }),
+      { timeout: 20_000 },
+    )
+    .toBe(true);
 
   const styles = await frame.evaluate(() => {
     const stage = document.getElementById('stage');
@@ -1178,3 +1193,120 @@ test(`captures the bright single and group arrival at start, mid flight and afte
 }
 
 
+
+/* Reviewer additions (Plan 17 Lane 11 review). */
+
+async function pushSafeMode(page: Page, snapshot: ArrivalSnapshot, sequence: number, status: 'quiet' | 'unavailable') {
+  await page.evaluate(
+    ({ snapshot, sequence, status }) => {
+      (window as any).probePort.postMessage({
+        version: 'color-polish-v6',
+        type: 'color-polish:update',
+        nonce: (window as any).probeNonce,
+        sequence,
+        snapshot: status === 'quiet' ? { ...snapshot, recognitions: [], arrivals: [] } : null,
+        control: { nowMs: Date.parse(snapshot.serverTime), status, source: 'sample', playing: true, scene: 'welcome' },
+      });
+    },
+    { snapshot, sequence, status },
+  );
+}
+
+for (const status of ['quiet', 'unavailable'] as const) {
+for (const kind of ARRIVAL_KINDS) {
+test(`a ${status} update during the ${kind.name} arrival clears every personal word and the backdrop cannot outlive it`, async ({ page }) => {
+  test.setTimeout(180_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+  await pushArrivalWave(page, frame, snapshot, kind.wave, 2);
+  await stepToReading(frame);
+
+  const during = await frame.evaluate(() => ({
+    sky: !!document.getElementById('arrival-sky'),
+    names: document.querySelectorAll('#event [data-event-id], #event .event-orb').length,
+  }));
+  expect(during.sky).toBe(true);
+  expect(during.names).toBeGreaterThan(0);
+
+  await pushSafeMode(page, snapshot, 3, status);
+  await expect
+    .poll(async () => await frame.evaluate(() => (window as any).colorPolishRuntime.getState().mode), { timeout: 15_000 })
+    .not.toBe('normal');
+
+  const after = await frame.evaluate(() => {
+    const event = document.getElementById('event')!;
+    return {
+      active: event.classList.contains('active'),
+      children: event.childElementCount,
+      personal: document.querySelectorAll('[data-event-id], .event-orb').length,
+      sampleText: /Sample \d+\.\d+/.test(document.getElementById('tv')!.textContent || ''),
+    };
+  });
+  expect(after.active).toBe(false);
+  expect(after.children).toBe(0);
+  expect(after.personal).toBe(0);
+  expect(after.sampleText).toBe(false);
+
+  // The backdrop fades with the frame and then removes itself; it never stays painted.
+  await expect
+    .poll(
+      async () =>
+        await frame.evaluate(() => {
+          const sky = document.getElementById('arrival-sky');
+          return sky ? parseFloat(window.getComputedStyle(sky).opacity) : 0;
+        }),
+      { timeout: 15_000 },
+    )
+    .toBe(0);
+  await waitForSkyGone(frame);
+});
+}
+}
+
+test('captures every frame style, single and group, under the bright backdrop, and each stays bright', async ({ page }) => {
+  test.setTimeout(600_000);
+  const outputFolder =
+    process.env.L11_CAPTURE_DIR ??
+    resolve(process.cwd(), 'docs/runs/2026-09-18-tv-fit/logs/captures/L11/after');
+  await mkdir(outputFolder, { recursive: true });
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+  await page.waitForTimeout(300);
+  const panel = { x: 54, y: 148, width: 1812, height: 615 };
+  let seq = 1;
+  let written = 0;
+
+  for (const kind of ARRIVAL_KINDS) {
+    for (let f = 0; f < 4; f++) {
+      seq++;
+      await frame.evaluate((index) => {
+        // Force the next frame style; the bag is the arrival scene's own global.
+        (0, eval)(`ARRIVAL_FRAME_BAG=[${index}]`);
+      }, f);
+      await pushArrivalWave(page, frame, snapshot, kind.wave, seq, { idPrefix: `frame-${kind.name}-${f}` });
+      await stepToReading(frame);
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+      const info = await frame.evaluate(() => ({
+        frame: document.getElementById('event')!.dataset.frame,
+        name: document.getElementById('event')!.dataset.frameName || '',
+        radius: window.getComputedStyle(document.querySelector('#event .arrival-frame')!).borderTopLeftRadius,
+      }));
+      expect(info.frame).toBe(String(f));
+      expect(parseFloat(info.radius)).toBeGreaterThanOrEqual(36);
+      // Let the one time name shimmer finish so the capture shows the resting look.
+      await page.waitForTimeout(3600);
+
+      // The arrival panel itself must read as light in every frame style, not as a dim slab.
+      const stats = await luminanceStats(page, panel, 4);
+      expect(stats.mean, `${kind.name} ${info.name} panel mean luminance`).toBeGreaterThan(0.7);
+
+      const slug = info.name.toLowerCase().replace(/[^a-z]+/g, '-');
+      const target = resolve(outputFolder, `w1920-${kind.name}-frame-${f}-${slug}.png`);
+      await page.screenshot({ path: target });
+      expect((await stat(target)).size).toBeGreaterThan(0);
+      written++;
+      await stepToDrained(frame);
+    }
+  }
+  expect(written).toBe(8);
+});

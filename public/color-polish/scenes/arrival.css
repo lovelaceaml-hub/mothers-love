@@ -40,8 +40,8 @@
   inset: 0;
   background: linear-gradient(168deg,
     #fffdf7 0%,
-    color-mix(in srgb, var(--scene-floor, #ffe18e) 26%, #fffdf7) 52%,
-    color-mix(in srgb, var(--scene-top, #ffcccf) 30%, #fffdf7) 100%);
+    color-mix(in srgb, var(--scene-floor, #ffe18e) 36%, #fffdf7) 50%,
+    color-mix(in srgb, var(--scene-top, #ffcccf) 34%, #fffdf7) 100%);
 }
 
 #tv .arrival-sky-glow {
@@ -62,22 +62,23 @@
   transform-origin: 50% 0;
   transform: rotate(var(--ray-rot, 6deg));
   background: linear-gradient(180deg,
-    #ffffffe6 0%,
-    color-mix(in srgb, var(--scene-floor, #ffe18e) 52%, #ffffff) 34%,
-    transparent 88%);
-  filter: blur(18px);
-  opacity: .5;
+    #ffffff 0%,
+    #fffffff2 30%,
+    color-mix(in srgb, var(--scene-floor, #ffe18e) 22%, #ffffff) 58%,
+    transparent 92%);
+  filter: blur(14px);
+  opacity: .6;
   animation: arrivalSkyRay 7s ease-in-out infinite alternate;
   animation-delay: var(--ray-delay, 0s);
 }
 
 @keyframes arrivalSkyRay {
   0% {
-    opacity: .26;
+    opacity: .38;
     transform: rotate(var(--ray-rot, 6deg)) scaleY(.94);
   }
   100% {
-    opacity: .62;
+    opacity: .8;
     transform: rotate(var(--ray-rot, 6deg)) scaleX(1.08) scaleY(1);
   }
 }
@@ -160,6 +161,12 @@
   pointer-events: none;
   z-index: 2;
   overflow: hidden;
+  border-radius: 40px;
+}
+
+/* The small style caption stays readable above the frame's light. */
+#tv .event-stage .countdown-caption {
+  z-index: 3;
 }
 
 /* Frame Style 0: Light beam */
@@ -326,23 +333,22 @@
   inset: -30px -40px;
   pointer-events: none;
   filter: blur(34px);
-  opacity: 0.55;
-  mix-blend-mode: screen;
+  opacity: 0.6;
 }
 
 #tv .event-stage .arrival-frame-aurora .arrival-aurora-ribbon-0 {
-  background: linear-gradient(118deg, rgba(86, 185, 162, 0.4) 10%, rgba(116, 96, 174, 0.45) 48%, rgba(245, 130, 175, 0.42) 80%, transparent);
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.7) 10%, rgba(255, 232, 170, 0.62) 48%, rgba(255, 206, 222, 0.6) 80%, transparent);
   animation: arrivalAuroraDrift 11s ease-in-out infinite alternate;
 }
 
 #tv .event-stage .arrival-frame-aurora .arrival-aurora-ribbon-1 {
-  background: linear-gradient(128deg, rgba(130, 176, 237, 0.35) 15%, rgba(190, 156, 235, 0.4) 52%, rgba(255, 208, 95, 0.35) 85%, transparent);
+  background: linear-gradient(128deg, rgba(255, 214, 228, 0.55) 15%, rgba(255, 250, 236, 0.7) 52%, rgba(255, 222, 140, 0.55) 85%, transparent);
   animation: arrivalAuroraDrift 14s ease-in-out infinite alternate-reverse;
   animation-delay: -3s;
 }
 
 #tv .event-stage .arrival-frame-aurora .arrival-aurora-ribbon-2 {
-  background: linear-gradient(105deg, rgba(239, 122, 150, 0.38) 12%, rgba(178, 147, 231, 0.42) 50%, rgba(77, 139, 85, 0.32) 82%, transparent);
+  background: linear-gradient(105deg, rgba(255, 228, 160, 0.55) 12%, rgba(240, 226, 255, 0.5) 50%, rgba(255, 210, 222, 0.55) 82%, transparent);
   animation: arrivalAuroraDrift 17s ease-in-out infinite alternate;
   animation-delay: -6s;
 }
@@ -363,8 +369,8 @@
   width: var(--star-size, 3px);
   height: var(--star-size, 3px);
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px #f4d890;
+  background: #fffdf2;
+  box-shadow: 0 0 9px #e9b94a, 0 0 2px #d9a63a;
   animation: arrivalStarBlink 3.2s ease-in-out infinite alternate;
   animation-delay: var(--star-delay, 0s);
   pointer-events: none;
