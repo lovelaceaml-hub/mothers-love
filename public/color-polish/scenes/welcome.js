@@ -16,79 +16,116 @@
     near: { scale: 1, blur: 0, pace: WELCOME_NEAR_PACE, z: 80 }
   };
 
-  // Plan 17 bubble fit ("pages, long only", Anthony, September 18).
+  // Plan 17 round 5, "one reserved long bubble" (Anthony, September 19, after
+  // watching round 4 on the church TV).
   //
-  // Every message shows whole on one page in a bubble grown to the diameter
-  // it needs, with its words drawn at 18 px or larger on the 1920 wide TV
-  // (36 px at 3840) at every moment, depth layer and drift breathing
-  // included. Only a message too long for the largest bubble the layout can
-  // give flips pages, in that largest bubble, with as few pages as possible.
+  // One reserved large bubble. Welcome draws six bubbles at six fixed homes
+  // of fixed size: five regular bubbles and one reserved bubble of 334 drawn
+  // px, the largest circle the free area holds beside the other five. The
+  // reserved bubble is the only place a message too long for a regular bubble
+  // ever appears, and the only bubble that ever turns pages. Every other
+  // bubble only ever holds a message that fits it whole, so a long message
+  // can never take, shrink, move or page another bubble: the homes and the
+  // diameters are constants, and nothing in the layout depends on which
+  // messages are drawn. The round 3 and round 4 cascade (the welcomeChooseSet
+  // shrink fallback and the room-for-<id> deferral) is gone.
   //
-  // Layout. The six bubbles live in the free area right of the title block
-  // and the three speech bubbles: a 913 by 620 px box (x 869 to 1782, y 8 to
-  // 628 of the 1812 by 636 stage; 869 is the keep-out edge 855 plus the 14 px
-  // steering margin core applies). Five bubbles take exactly the drawn
-  // diameter their own message needs and are packed against the top and
-  // right edges of that box: TR and BR in the right column, TM and BM beside
-  // them, TL in the top row. The sixth, B, is the largest circle that still
-  // fits the box without touching the other five: the bottom-left position.
-  // The record with the greatest need goes to B, so B is as large as the box
-  // allows for the five records beside it (about 380 px when they are short,
-  // about 300 px when they are 100 to 120 characters). Six bubbles cannot
-  // all be wide: three across the box is 913 px and two down it is 620 px.
+  // Sizes come from the message's grapheme count (Intl.Segmenter), not its
+  // UTF-16 length: a regular bubble grows through WELCOME_SIZE_STEPS up to
+  // its own diameter while its words step down from 22 to 20 drawn px; the
+  // reserved bubble keeps its 334 px size (so it is never a gap) and its
+  // words step from 24 down to 18. Each step is then checked against the
+  // text as the browser actually lays it out, so a message with long words,
+  // many expression chips or a long name steps its words down further, and,
+  // if even the floor does not hold it, is simply not put in that bubble.
+  // Nothing is ever truncated, clipped or ellipsized.
   //
-  // Records ("fewer, whole", Anthony, September 18). Every record on screen
-  // either fits whole, or is long (needs more than WELCOME_NORMAL_CAP) and
-  // pages in B, the largest bubble, at the font floor, only when every page
-  // gets its full reading time (core shows a page for max(9, characters /
-  // 14) seconds) inside the time left in the scene; otherwise Welcome leaves
-  // it to the other scenes. When the records drawn cannot all fit whole, a
-  // larger one is swapped for a smaller one from the pool; six bubbles show
-  // whenever six records fit whole, otherwise as many as fit whole. A normal
-  // record is never paged.
+  // Floors. Drawn words never go below 18 px at 1920 wide (36 px at 3840).
+  // Core breathes a drifting bubble between 0.9 and 0.996 of its size, so a
+  // drifting bubble is laid out with 20 drawn px words that dip to 18 at the
+  // bottom of the breath; the reserved bubble and any other bubble that does
+  // not drift are laid out at 18 exactly. A bubble in the far or mid depth
+  // layer is laid out at drawn / layer scale px and drawn back down by the
+  // layer's scale, so its words are drawn at the size its message asks for
+  // whatever depth it sits at, and the layers keep their blur, pace and
+  // z-order. The near bubbles are the biggest and sharpest, the far ones the
+  // smallest and softest, as Plan 15 drew them.
   //
-  // Drift replacement keeps the same rule: a bubble that retires is refilled
-  // with the next record in core's rotation that fits its position whole.
+  // Homes. The six homes sit in the free area right of the title block and
+  // the three speech bubbles (x 869 to 1782, y 8 to 628 of the 1812 by 636
+  // stage, which is exactly what placeWelcome's clamps allow): three across
+  // the top, the reserved bubble at the bottom left with its rim clear of the
+  // community art (which ends at x 890), two at the bottom right. No two home
+  // circles come within 10 px of each other.
   //
-  // Sizes are measured on a hidden copy of the bubble that is never rotated
-  // or scaled, in layout pixels, with the font floor raised by the layer's
-  // drawn scale (far 0.84, mid 0.93) and, for a drifting bubble, by core's
-  // 0.9 depth breathing, so the drawn text never drops below the floor.
-  const WELCOME_REGION = { left: 869, top: 8, right: 1782, bottom: 628 };
-  const WELCOME_GAP = 10;
+  // Paging is the last resort. Only the reserved bubble pages, only for a
+  // message too long to fit it whole, always at the floor so the pages are as
+  // few as possible, and only when every page is read (core shows a page for
+  // max(9, characters / 14) seconds) inside the time left in the scene. The
+  // dwell is read from S.dwell[1] every time it is needed.
   const WELCOME_FONT_FLOOR = 18;
   const WELCOME_DEPTH_MIN = 0.9;
-  const WELCOME_DEPTH_MAX = 0.996;
   const WELCOME_RIM_MARGIN = 0.03;
   const WELCOME_RIM_MARGIN_MIN = 12;
   const WELCOME_CONTENT_WIDTHS = [80, 74, 68];
-  const WELCOME_MIN_DIAMETER = 200;
-  const WELCOME_MAX_DIAMETER = 700;
-  // The largest B the layout gives when the five neighbours are short (about
-  // 380 px drawn): a record needing no more than this is normal and is never
-  // paged; a record needing more is long and may page in B.
-  const WELCOME_NORMAL_CAP = 380;
-  // Slots: B first, then TL, TM, TR, BM, BR. Far layers draw smallest, so
-  // they take the slots that bound B (above it and in the bottom row).
+  const WELCOME_RESERVED_DRAWN = 334;
+
+  // Fixed homes and drawn diameters, in stage px. Array order is DOM order.
   const WELCOME_SLOTS = [
-    { name: 'B', layer: 'near' },
-    { name: 'TL', layer: 'far' },
-    { name: 'TM', layer: 'mid' },
-    { name: 'TR', layer: 'near' },
-    { name: 'BM', layer: 'far' },
-    { name: 'BR', layer: 'mid' }
+    { name: 'TL', layer: 'far', drawn: 274, cx: 1006, cy: 145, reserved: false },
+    { name: 'TC', layer: 'mid', drawn: 294, cx: 1306, cy: 155, reserved: false },
+    { name: 'TR', layer: 'near', drawn: 314, cx: 1625, cy: 165, reserved: false },
+    { name: 'R', layer: 'near', drawn: WELCOME_RESERVED_DRAWN, cx: 1057, cy: 461, reserved: true },
+    { name: 'BC', layer: 'far', drawn: 254, cx: 1365, cy: 501, reserved: false },
+    { name: 'BR', layer: 'far', drawn: 274, cx: 1645, cy: 491, reserved: false }
   ];
-  // Room a drift replacement may take in a position other than B (drawn px):
-  // about 130 characters at the floor. Larger records wait for B or another
-  // pass rather than page.
-  const WELCOME_OTHER_ROOM = 300;
-  // Overlap between two packed bubbles, in px, that the layout tolerates
-  // (their boxes then cross by under 20 px, the Plan 15 limit); the drift
-  // physics resolves it. Beyond it the set does not fit.
-  const WELCOME_OVERLAP_TOLERANCE = 16;
+  const WELCOME_RESERVED_SLOT = WELCOME_SLOTS.find((s) => s.reserved);
+  // The regular bubbles are filled smallest room first, so the fussiest
+  // bubble gets first pick of the pool and the roomiest takes what is left.
+  const WELCOME_FILL_ORDER = ['BC', 'TL', 'BR', 'TC', 'TR'].map((name) => WELCOME_SLOTS.find((s) => s.name === name));
+
+  // Size steps, in drawn px on the 1920 wide TV. A message of at most
+  // `graphemes` grapheme clusters is drawn in a bubble of `diameter` with its
+  // words at `font`: the bubble grows and the words step smaller as the
+  // message grows. The 334 px rows belong to the reserved bubble, which keeps
+  // that size and only steps its words. The grapheme numbers come from
+  // measuring the real bubble markup with a two chip, fourteen character name
+  // record (see the round 5 result file); they choose the step, and the
+  // rendered text then has the last word.
+  const WELCOME_SIZE_STEPS = [
+    { graphemes: 36, diameter: 254, font: 22 },
+    { graphemes: 56, diameter: 264, font: 21 },
+    { graphemes: 80, diameter: 274, font: 20 },
+    { graphemes: 114, diameter: 294, font: 20 },
+    { graphemes: 136, diameter: 314, font: 20 },
+    { graphemes: 100, diameter: WELCOME_RESERVED_DRAWN, font: 24 },
+    { graphemes: 134, diameter: WELCOME_RESERVED_DRAWN, font: 22 },
+    { graphemes: 158, diameter: WELCOME_RESERVED_DRAWN, font: 20 },
+    { graphemes: 206, diameter: WELCOME_RESERVED_DRAWN, font: 18 }
+  ];
+
+  // How far down the rotation Welcome measures records when it lays out.
+  const WELCOME_SCAN_LIMIT = 40;
   const WELCOME_SLOT_LIMITS = new Map();
-  const WELCOME_NEED_CACHE = new Map();
+  let WELCOME_MEASURE_CACHE = new Map();
   let WELCOME_FIT_CACHE = new Map();
+
+  const WELCOME_SEGMENTER =
+    typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('en', { granularity: 'grapheme' }) : null;
+
+  // Grapheme clusters, what a person would call characters: an emoji with a
+  // skin tone modifier is one, though it is four UTF-16 units.
+  const WELCOME_GRAPHEME_CACHE = new Map();
+  function welcomeGraphemes(text) {
+    const value = String(text ?? '');
+    if (WELCOME_GRAPHEME_CACHE.has(value)) return WELCOME_GRAPHEME_CACHE.get(value);
+    let count = 0;
+    if (!WELCOME_SEGMENTER) count = Array.from(value).length;
+    else for (const piece of WELCOME_SEGMENTER.segment(value)) count += piece ? 1 : 1;
+    if (WELCOME_GRAPHEME_CACHE.size > 2000) WELCOME_GRAPHEME_CACHE.clear();
+    WELCOME_GRAPHEME_CACHE.set(value, count);
+    return count;
+  }
 
   function welcomeWithHost(fn) {
     const stage = typeof document !== 'undefined' ? document.getElementById('stage') : null;
@@ -108,18 +145,29 @@
   }
 
   function welcomeRecordKey(r) {
-    return `${r.id}|${r.name}|${r.message}|${r.ids.join(',')}`;
+    return `${r.id}|${r.name}|${r.message}|${r.ids.join(',')}|${r.likes ?? ''}`;
   }
 
-  // Drawn scale bounds of a bubble in a layer: static (large) bubbles never
-  // breathe; drifting ones scale between 0.9 and 0.996 of the layer scale.
-  function welcomeScales(layer, isStatic) {
-    const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
-    return { min: L.scale * (isStatic ? 1 : WELCOME_DEPTH_MIN), max: L.scale * (isStatic ? 1 : WELCOME_DEPTH_MAX) };
+  function welcomeLayerScale(layer) {
+    return (WELCOME_LAYERS[layer] || WELCOME_LAYERS.near).scale;
   }
 
-  function welcomeFloorFor(scales) {
-    return Math.ceil((WELCOME_FONT_FLOOR / scales.min) * 10) / 10;
+  // A bubble that drifts breathes down to 0.9 of its size, so its words are
+  // laid out at 20 drawn px to stay at or above the 18 px floor at every
+  // moment; a bubble that does not drift uses the floor itself.
+  function welcomeStatic(slot, r) {
+    return !!slot.reserved || !smallFits(r);
+  }
+  function welcomeFloorDrawn(slot, r) {
+    return welcomeStatic(slot, r) ? WELCOME_FONT_FLOOR : Math.ceil((WELCOME_FONT_FLOOR / WELCOME_DEPTH_MIN) * 10) / 10;
+  }
+  // Layout px for a drawn size in a depth layer: the element is that many px
+  // wide and core draws it back down by the layer's scale.
+  function welcomeLayoutPx(drawn, layer) {
+    return Math.floor(drawn / welcomeLayerScale(layer));
+  }
+  function welcomeLayoutFont(drawnFont, layer) {
+    return Math.ceil((drawnFont / welcomeLayerScale(layer)) * 10) / 10;
   }
 
   function welcomeTextRects(el) {
@@ -195,38 +243,96 @@
     return host.firstElementChild;
   }
 
-  function welcomeWholeAt(host, r, d, font) {
-    const el = welcomeProbe(host, r, d);
-    const msg = el.querySelector('.message');
-    for (const width of WELCOME_CONTENT_WIDTHS) {
-      if (!welcomeStyleOrb(el, r, d, width, font)) return false;
-      msg.textContent = r.message;
-      if (welcomeInside(el, d)) return true;
-    }
-    return false;
-  }
-
-  // Smallest layout diameter at which the whole message fits on one page at
-  // the given font floor, or null when it does not fit even at the largest.
-  function welcomeNeed(host, r, floor) {
-    const key = `${welcomeRecordKey(r)}|${floor}`;
-    if (WELCOME_NEED_CACHE.has(key)) return WELCOME_NEED_CACHE.get(key);
-    let need = null;
+  // The content column width at which the whole message fits inside a bubble
+  // of layout diameter d with its words at `font` layout px, or null when it
+  // does not fit at any of them.
+  function welcomeMeasure(host, r, d, font) {
+    const key = `${welcomeRecordKey(r)}|${d}|${font}`;
+    if (WELCOME_MEASURE_CACHE.has(key)) return WELCOME_MEASURE_CACHE.get(key);
+    let out = null;
     if (host) {
-      let lo = WELCOME_MIN_DIAMETER, hi = WELCOME_MAX_DIAMETER;
-      if (welcomeWholeAt(host, r, hi, floor)) {
-        if (welcomeWholeAt(host, r, lo, floor)) hi = lo;
-        while (hi - lo > 2) {
-          const mid = Math.round((lo + hi) / 2);
-          if (welcomeWholeAt(host, r, mid, floor)) hi = mid;
-          else lo = mid;
+      const el = welcomeProbe(host, r, d);
+      const msg = el.querySelector('.message');
+      for (const width of WELCOME_CONTENT_WIDTHS) {
+        if (!welcomeStyleOrb(el, r, d, width, font)) break;
+        msg.textContent = r.message;
+        if (welcomeInside(el, d)) {
+          out = width;
+          break;
         }
-        need = hi;
       }
     }
-    if (WELCOME_NEED_CACHE.size > 3000) WELCOME_NEED_CACHE.clear();
-    WELCOME_NEED_CACHE.set(key, need);
-    return need;
+    if (WELCOME_MEASURE_CACHE.size > 4000) WELCOME_MEASURE_CACHE = new Map();
+    WELCOME_MEASURE_CACHE.set(key, out);
+    return out;
+  }
+
+  // The largest size on the half pixel ladder between `floor` and `start`
+  // whose whole message fits a bubble of layout diameter d, or null when even
+  // the floor does not hold it. Smaller words fit more, so this walks the
+  // ladder by halving; the size it returns was measured, never inferred.
+  function welcomeFontThatFits(host, r, d, start, floor) {
+    const steps = Math.max(0, Math.round((start - floor) * 2));
+    const at = (i) => Math.round((floor + i * 0.5) * 10) / 10;
+    const floorWidth = welcomeMeasure(host, r, d, at(0));
+    if (floorWidth === null) return null;
+    let lo = 0, hi = steps;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      if (welcomeMeasure(host, r, d, at(mid)) !== null) lo = mid;
+      else hi = mid - 1;
+    }
+    return { font: at(lo), width: welcomeMeasure(host, r, d, at(lo)) };
+  }
+
+  // The steps a slot can use. A regular bubble grows up to its own diameter;
+  // the reserved bubble always keeps its own diameter, so a short message
+  // there is drawn large rather than leaving a gap.
+  function welcomeStepsFor(slot) {
+    return WELCOME_SIZE_STEPS.filter((row) => (slot.reserved ? row.diameter === slot.drawn : row.diameter <= slot.drawn));
+  }
+
+  // How record r shows whole in this slot: the layout diameter, the layout
+  // message size and the content width, or null when its whole message
+  // cannot be drawn there at the floor. Never pages.
+  function welcomeFit(host, r, slot) {
+    const key = `${welcomeRecordKey(r)}|${slot.reserved ? 'R' : 'x'}|${slot.drawn}|${slot.layer}`;
+    if (WELCOME_FIT_CACHE.has(key)) return WELCOME_FIT_CACHE.get(key);
+    const fit = welcomeFitRaw(host, r, slot);
+    if (host) WELCOME_FIT_CACHE.set(key, fit);
+    return fit;
+  }
+
+  function welcomeFitRaw(host, r, slot) {
+    if (!host) return null;
+    const rows = welcomeStepsFor(slot);
+    if (!rows.length) return null;
+    const graphemes = welcomeGraphemes(r.message);
+    const floor = welcomeLayoutFont(welcomeFloorDrawn(slot, r), slot.layer);
+    const tryRow = (row) => {
+      const drawn = slot.reserved ? slot.drawn : Math.min(row.diameter, slot.drawn);
+      const d = welcomeLayoutPx(drawn, slot.layer);
+      const start = Math.max(floor, welcomeLayoutFont(row.font, slot.layer));
+      const hit = welcomeFontThatFits(host, r, d, start, floor);
+      return hit ? { d, drawn, font: hit.font, width: hit.width, graphemes, step: row.graphemes, pages: [r.message] } : null;
+    };
+    for (const row of rows) {
+      if (row.graphemes < graphemes) continue;
+      const fit = tryRow(row);
+      if (fit) return fit;
+    }
+    // Past the last step for this slot (or a message the steps overrated):
+    // the biggest bubble the slot gives, words down to the floor.
+    return tryRow(rows[rows.length - 1]);
+  }
+
+  // Whether a record is long: its whole message fits no regular bubble at the
+  // floor. Only a long message ever goes in the reserved bubble's pages. The
+  // roomiest regular bubble is tried first, so most records answer in one
+  // measurement.
+  const WELCOME_ROOMIEST_FIRST = [...WELCOME_FILL_ORDER].reverse();
+  function welcomeIsLong(host, r) {
+    return !WELCOME_ROOMIEST_FIRST.some((slot) => welcomeFit(host, r, slot));
   }
 
   function welcomePaginate(el, d, msg, message) {
@@ -244,41 +350,23 @@
     return pages;
   }
 
-  // Layout at layout diameter d: one page at the largest font that fits, or,
-  // when the message cannot fit whole at d, the fewest floor-size pages.
-  function welcomeFitAt(host, r, d, floor) {
-    const key = `${welcomeRecordKey(r)}|${d}|${floor}`;
-    if (WELCOME_FIT_CACHE.has(key)) return WELCOME_FIT_CACHE.get(key);
-    const fit = welcomeFitAtRaw(host, r, d, floor);
-    if (fit) WELCOME_FIT_CACHE.set(key, fit);
-    return fit;
-  }
-
-  function welcomeFitAtRaw(host, r, d, floor) {
+  // The fewest floor size pages of r inside the reserved bubble. Only ever
+  // called for a message that does not fit it whole.
+  function welcomePagedFit(host, r) {
+    if (!host) return null;
+    const slot = WELCOME_RESERVED_SLOT;
+    const d = welcomeLayoutPx(slot.drawn, slot.layer);
+    const font = welcomeLayoutFont(welcomeFloorDrawn(slot, r), slot.layer);
     const el = welcomeProbe(host, r, d);
     const msg = el.querySelector('.message'), page = el.querySelector('.orb-page-indicator');
     if (!msg || !page) return null;
-    const start = Math.max(floor, d >= 450 ? 28 : d >= 335 ? 24 : 21);
-    for (const width of WELCOME_CONTENT_WIDTHS) {
-      welcomeStyleOrb(el, r, d, width, floor);
-      msg.textContent = r.message;
-      if (!welcomeInside(el, d)) continue;
-      let font = start;
-      for (; font > floor; font -= 0.5) {
-        msg.style.fontSize = font + 'px';
-        if (welcomeInside(el, d)) break;
-      }
-      // Never below the floor (the floor itself was verified above).
-      font = Math.max(font, floor);
-      return { d, width, font, pages: [r.message] };
-    }
     page.hidden = false;
     let best = null;
     for (const width of WELCOME_CONTENT_WIDTHS) {
-      welcomeStyleOrb(el, r, d, width, floor);
+      if (!welcomeStyleOrb(el, r, d, width, font)) break;
       page.textContent = '00 / 00 · CONTINUED';
       const pages = welcomePaginate(el, d, msg, r.message);
-      if (!best || pages.length < best.pages.length) best = { d, width, font: floor, pages };
+      if (!best || pages.length < best.pages.length) best = { d, drawn: slot.drawn, font, width, graphemes: welcomeGraphemes(r.message), step: 0, pages };
     }
     return best;
   }
@@ -287,15 +375,15 @@
     return pages.reduce((n, p) => n + Math.max(9, p.length / 14), 0);
   }
 
+  // Anthony, September 19: every screen shows for 60 seconds. The live value
+  // always comes from the snapshot's playlist; 60 is only the last fallback.
   function welcomeDwell() {
-    return S.dwell?.[1] ?? DWELL[1] ?? 30;
+    return S.dwell?.[1] ?? DWELL?.[1] ?? 60;
   }
 
-  // Time left in the scene for a bubble that starts now: the dwell minus
-  // the scene's age, less the 3.8 s entry flight.
+  // Time left in the scene for a bubble that starts now: the dwell minus the
+  // scene's age, less the 3.8 s entry flight.
   const WELCOME_ENTRY_SECONDS = 3.8;
-  // A drift replacement is chosen as the old bubble starts to leave, so it
-  // also waits for the 3.8 s exit before it enters.
   function welcomeTimeLeft(wait = 0) {
     return welcomeDwell() - (S.sceneAge || 0) - WELCOME_ENTRY_SECONDS - wait;
   }
@@ -306,208 +394,19 @@
     return pages.length < 2 || welcomePageSeconds(pages) <= welcomeTimeLeft(wait);
   }
 
-  // The largest circle inside the region that touches none of the given
-  // circles ({cx, cy, r}). A 4 px grid search over centres.
-  function welcomeLargestFree(circles, step = 4) {
-    const R = WELCOME_REGION;
-    let best = { cx: R.left, cy: R.top, r: 0 };
-    for (let cy = R.top + 40; cy <= R.bottom - 40; cy += step) {
-      for (let cx = R.left + 40; cx <= R.right - 40; cx += step) {
-        let r = Math.min(cx - R.left, R.right - cx, cy - R.top, R.bottom - cy);
-        if (r <= best.r) continue;
-        for (const c of circles) {
-          // Clear of the circle, and of its square too (bubbles keep the
-          // Plan 15 grid feel: their boxes overlap by at most 18 px).
-          r = Math.min(r, Math.hypot(cx - c.cx, cy - c.cy) - c.r - 2, Math.max(Math.abs(cx - c.cx), Math.abs(cy - c.cy)) - c.r + 18);
-          if (r <= best.r) break;
-        }
-        if (r > best.r) best = { cx, cy, r };
-      }
-    }
-    return best;
+  // How the reserved bubble would show r: whole if it can, otherwise the
+  // fewest pages, and only when those pages are all read before the scene
+  // changes. Null means this record has to wait for another pass.
+  function welcomeReservedFit(host, r, wait = 0) {
+    const whole = welcomeFit(host, r, WELCOME_RESERVED_SLOT);
+    if (whole) return whole;
+    const paged = welcomePagedFit(host, r);
+    if (!paged) return null;
+    return welcomePagesFitTime(paged.pages, wait) ? paged : null;
   }
 
-  // Homes of the five packed slots for the given drawn diameters, keyed by
-  // slot name, plus whether they overflow the region.
-  function welcomePackFive(drawn) {
-    const R = WELCOME_REGION, g = WELCOME_GAP;
-    const D = (name) => drawn[name] || 0;
-    const homes = {};
-    homes.TR = { cx: R.right - D('TR') / 2, cy: R.top + D('TR') / 2, r: D('TR') / 2 };
-    homes.BR = { cx: R.right - D('BR') / 2, cy: R.bottom - D('BR') / 2, r: D('BR') / 2 };
-    homes.TM = { cx: R.right - D('TR') - (D('TR') ? g : 0) - D('TM') / 2, cy: R.top + D('TM') / 2, r: D('TM') / 2 };
-    homes.BM = { cx: R.right - D('BR') - (D('BR') ? g : 0) - D('BM') / 2, cy: R.bottom - D('BM') / 2, r: D('BM') / 2 };
-    homes.TL = { cx: homes.TM.cx - D('TM') / 2 - (D('TM') ? g : 0) - D('TL') / 2, cy: R.top + D('TL') / 2, r: D('TL') / 2 };
-    let overflow = false;
-    for (const name of Object.keys(homes)) {
-      if (!drawn[name]) {
-        delete homes[name];
-        continue;
-      }
-      const h = homes[name];
-      // A bubble that would leave the region keeps its size and moves back
-      // inside (it may overlap a neighbour a little) rather than cross the
-      // title, the speech bubbles or the stage edge.
-      if (h.cx - h.r < R.left || h.cy + h.r > R.bottom) overflow = true;
-      h.cx = clamp(h.cx, R.left + h.r, R.right - h.r);
-      h.cy = clamp(h.cy, R.top + h.r, R.bottom - h.r);
-    }
-    // Bubbles that still touch (a tall right column, a wide top row) are
-    // eased apart inside the region, a few pixels a step, so no two drawn
-    // circles overlap when the set fits at all.
-    const names = Object.keys(homes);
-    for (let step = 0; step < 60; step++) {
-      let moved = false;
-      for (let i = 0; i < names.length; i++) {
-        for (let j = i + 1; j < names.length; j++) {
-          const a = homes[names[i]], b = homes[names[j]];
-          const dx = b.cx - a.cx, dy = b.cy - a.cy;
-          const dist = Math.hypot(dx, dy) || 1;
-          const min = a.r + b.r + g;
-          if (dist >= min) continue;
-          const push = Math.min(6, (min - dist) / 2);
-          // Rows stay rows: bubbles slide apart sideways only (the left one
-          // further left, the right one further right), so the top row keeps
-          // the top edge and the bottom row the bottom edge.
-          const ux = a.cx <= b.cx ? 1 : -1;
-          a.cx = clamp(a.cx - ux * push, R.left + a.r, R.right - a.r);
-          b.cx = clamp(b.cx + ux * push, R.left + b.r, R.right - b.r);
-          moved = true;
-        }
-      }
-      if (!moved) break;
-    }
-    for (let i = 0; i < names.length; i++) {
-      for (let j = i + 1; j < names.length; j++) {
-        const a = homes[names[i]], b = homes[names[j]];
-        // Circles that still overlap, or boxes that cross by more than the
-        // tolerance on both axes (the Plan 15 no-crossing rule), mean the set
-        // does not fit.
-        const boxX = Math.min(a.cx + a.r, b.cx + b.r) - Math.max(a.cx - a.r, b.cx - b.r);
-        const boxY = Math.min(a.cy + a.r, b.cy + b.r) - Math.max(a.cy - a.r, b.cy - b.r);
-        if (Math.hypot(b.cx - a.cx, b.cy - a.cy) < a.r + b.r || (boxX > WELCOME_OVERLAP_TOLERANCE && boxY > WELCOME_OVERLAP_TOLERANCE)) overflow = true;
-      }
-    }
-    return { homes, overflow };
-  }
-
-  function welcomeIsStatic(r) {
-    return !smallFits(r);
-  }
-
-  // Drawn and layout need of record r in a slot's layer.
-  function welcomeSlotNeed(host, r, layer, isStatic) {
-    const scales = welcomeScales(layer, isStatic);
-    const floor = welcomeFloorFor(scales);
-    const layout = welcomeNeed(host, r, floor);
-    return { scales, floor, layout, drawn: layout === null ? null : layout * scales.max };
-  }
-
-  // Lays out a set of up to six records: per-slot placements. The record
-  // with the greatest need takes B (the largest circle the box leaves beside
-  // the others); the rest take the packed slots, largest first. Every record
-  // is placed at the diameter its whole message needs; only a long B (one
-  // that needs more than WELCOME_NORMAL_CAP) takes B's cap and pages there.
-  // Orders in which the packed slots take the other records (largest need
-  // first): every arrangement of the five slots, so the layout that fits
-  // the most records whole can be found.
-  const WELCOME_ORDERS = (() => {
-    const names = ['TR', 'TM', 'BR', 'TL', 'BM'];
-    const out = [];
-    const walk = (prefix, rest) => {
-      if (!rest.length) return out.push(prefix);
-      rest.forEach((n, i) => walk([...prefix, n], [...rest.slice(0, i), ...rest.slice(i + 1)]));
-    };
-    walk([], names);
-    return out;
-  })();
-
-  // Tries every slot arrangement for the set and keeps the best: one that
-  // shows every record whole (or a long B inside the time left) with the
-  // largest room for B; the plain arrangement when none does.
-  function welcomeLayoutSet(host, set) {
-    let best = null, bestScore = -Infinity;
-    const seenKeys = new Set();
-    for (const order of WELCOME_ORDERS) {
-      const used = order.slice(0, Math.max(0, set.length - 1));
-      const key = used.join(',');
-      if (seenKeys.has(key)) continue;
-      seenKeys.add(key);
-      const layout = welcomeLayoutOrder(host, set, used, 8);
-      if (!layout) continue;
-      const score = (welcomeSetProblem(layout) ? 0 : 1e6) + layout.placements.B.capDrawn;
-      if (score > bestScore) {
-        bestScore = score;
-        best = used;
-      }
-    }
-    return welcomeLayoutOrder(host, set, best || WELCOME_ORDERS[0].slice(0, Math.max(0, set.length - 1)), 4);
-  }
-
-  function welcomeLayoutOrder(host, set, order, step) {
-    const nearNeed = (r) => {
-      const n = welcomeSlotNeed(host, r, 'near', welcomeIsStatic(r));
-      return n.drawn === null ? Infinity : n.drawn;
-    };
-    const byNeed = [...set].sort((a, b) => nearNeed(b) - nearNeed(a) || b.message.length - a.message.length || a.id.localeCompare(b.id));
-    const b = byNeed[0];
-    const others = byNeed.slice(1);
-    const placements = {};
-    const drawn = {};
-    others.forEach((r, i) => {
-      const slot = WELCOME_SLOTS.find((s) => s.name === order[i]);
-      const need = welcomeSlotNeed(host, r, slot.layer, welcomeIsStatic(r));
-      const layout = need.layout === null ? WELCOME_MAX_DIAMETER : need.layout;
-      placements[slot.name] = { slot, r, layout, drawn: layout * need.scales.max, floor: need.floor, scales: need.scales, whole: need.layout !== null };
-      drawn[slot.name] = placements[slot.name].drawn;
-    });
-    const pack = welcomePackFive(drawn);
-    const present = order.filter((name) => placements[name]);
-    for (const name of present) placements[name].home = pack.homes[name];
-    const free = welcomeLargestFree(present.map((name) => pack.homes[name]), step);
-    const bSlot = WELCOME_SLOTS[0];
-    const bNeed = welcomeSlotNeed(host, b, bSlot.layer, welcomeIsStatic(b));
-    const bCapDrawn = free.r * 2;
-    const bCapLayout = Math.floor(bCapDrawn / bNeed.scales.max);
-    // Normal: fits whole in the largest bubble the layout gives when its
-    // neighbours are short (WELCOME_NORMAL_CAP drawn). Long: needs more.
-    const bNormal = bNeed.drawn !== null && bNeed.drawn <= WELCOME_NORMAL_CAP;
-    const bWhole = bNeed.layout !== null && bNeed.layout <= bCapLayout;
-    const bLayout = bWhole || bNormal ? bNeed.layout : bCapLayout;
-    let bPages = null;
-    if (!bWhole && !bNormal) {
-      const fit = welcomeFitAt(host, b, bLayout, bNeed.floor);
-      bPages = fit ? fit.pages : [b.message];
-    }
-    const bDrawn = bLayout * bNeed.scales.max;
-    const R = WELCOME_REGION;
-    const home = { cx: clamp(free.cx, R.left + bDrawn / 2, R.right - bDrawn / 2), cy: clamp(free.cy, R.top + bDrawn / 2, R.bottom - bDrawn / 2), r: bDrawn / 2 };
-    placements.B = { slot: bSlot, r: b, layout: bLayout, drawn: bDrawn, floor: bNeed.floor, scales: bNeed.scales, whole: bWhole, normal: bNormal, capLayout: bCapLayout, capDrawn: bCapDrawn, need: bNeed.layout, pages: bPages, home };
-    return { placements, overflow: pack.overflow, b, others };
-  }
-
-  // Why a laid-out set does not show every record whole (or a long B inside
-  // the time left), or null when it does.
-  function welcomeSetProblem(layout) {
-    const B = layout.placements.B;
-    if (!B.whole && !B.normal && !welcomePagesFitTime(B.pages)) return 'b-time';
-    if (!B.whole && B.normal && B.need * B.scales.max - B.capDrawn > WELCOME_OVERLAP_TOLERANCE) return 'b-room';
-    if (layout.overflow || Object.values(layout.placements).some((p) => p.slot.name !== 'B' && !p.whole)) return 'others';
-    return null;
-  }
-
-  // Chooses the records for Welcome ("fewer, whole", Anthony, September 18).
-  // Starts from the first six records in core's rotation order and repairs
-  // the set: a record that does not fit is traded for a record with a
-  // smaller need, next in rotation order; at most one long record, which
-  // pages in B only when its pages finish inside the time left in the scene.
-  // Six bubbles show whenever six records of the pool fit whole; only when
-  // even the six smallest do not fit does Welcome show fewer bubbles, as
-  // many as fit whole. A normal record is never paged.
-  function welcomeChooseSet(host) {
-    const pool = records();
-    if (!pool.length) return { set: [], layout: null };
-    // Core's rotation order over the whole pool.
+  // Core's rotation order over the whole pool, with a forced record first.
+  function welcomeRotation(pool, forcedId) {
     const order = [];
     const seen = new Set();
     while (order.length < pool.length) {
@@ -516,80 +415,95 @@
       seen.add(r.id);
       order.push(r);
     }
-    if (!host) return { set: order.slice(0, 6), layout: null };
-    const need = (r) => {
-      const n = welcomeSlotNeed(host, r, 'near', welcomeIsStatic(r));
-      return n.drawn === null ? Infinity : n.drawn;
-    };
-    const isLong = (r) => need(r) > WELCOME_NORMAL_CAP;
-    const excluded = new Set();
-    let set = [];
-    // First six in rotation order, with at most one long record (the first
-    // drawn); a second long record gives way to the next normal one.
-    for (const r of order) {
-      if (set.length >= 6) break;
-      if (isLong(r) && set.some(isLong)) {
-        log('welcome_record_deferred', { id: r.id, reason: 'one-long' });
+    const i = forcedId ? order.findIndex((r) => r.id === forcedId) : -1;
+    if (i > 0) order.unshift(...order.splice(i, 1));
+    return order;
+  }
+
+  // Chooses what each of the six fixed bubbles holds.
+  // The reserved bubble takes the first long message in rotation order that
+  // can be read here (whole, or in pages that finish before the scene
+  // changes); with no long message in the pool it takes the first message
+  // instead, drawn at the reserved bubble's larger size, so it is never
+  // empty. Each regular bubble then takes the next message in rotation order
+  // that fits it whole; a message that fits none of them is simply left for
+  // the reserved bubble on a later pass. No bubble is ever shrunk, deferred
+  // or paged to make room for another.
+  function welcomeChooseSet(host) {
+    const pool = records();
+    const forced = S.forceId;
+    S.forceId = null;
+    if (!pool.length) return [];
+    const order = welcomeRotation(pool, forced);
+    if (!host) return order.slice(0, WELCOME_SLOTS.length).map((r, i) => ({ slot: WELCOME_SLOTS[i], r, fit: null }));
+    const used = new Set();
+    const placements = [];
+    let reserved = null;
+    // Measuring every record of a large pool would cost more than a frame, so
+    // the search for a long message looks at the front of the rotation only;
+    // the rest come round on a later pass.
+    for (const r of order.slice(0, WELCOME_SCAN_LIMIT)) {
+      if (!welcomeIsLong(host, r)) continue;
+      const fit = welcomeReservedFit(host, r);
+      if (!fit) {
+        const paged = welcomePagedFit(host, r);
+        log('welcome_long_waits', { id: r.id, pages: paged ? paged.pages.length : 0, timeLeft: +welcomeTimeLeft().toFixed(1) });
         continue;
       }
-      set.push(r);
+      reserved = { slot: WELCOME_RESERVED_SLOT, r, fit };
+      break;
     }
-    // A pool of fewer than six fills the remaining bubbles with repeats of
-    // normal records, as the Plan 15 layout did.
-    if (pool.length < 6) {
-      const repeatable = order.filter((r) => !isLong(r));
-      for (let i = 0; set.length < 6 && repeatable.length; i++) set.push(repeatable[i % repeatable.length]);
+    if (!reserved) {
+      for (const r of order.slice(0, WELCOME_SCAN_LIMIT)) {
+        const fit = welcomeFit(host, r, WELCOME_RESERVED_SLOT);
+        if (!fit) continue;
+        reserved = { slot: WELCOME_RESERVED_SLOT, r, fit };
+        break;
+      }
     }
-    const inSet = (r) => set.some((x) => x.id === r.id);
-    // The next record in rotation order, not on screen, not excluded, normal,
-    // whose need is below `than`.
-    const smaller = (than, len) => order.find((r) => !inSet(r) && !excluded.has(r.id) && r.message.length <= len && !isLong(r) && need(r) < than - 0.5);
-    let layout = welcomeLayoutSet(host, set);
-    const limit = pool.length * 2 + 24;
-    for (let iter = 0; iter < limit; iter++) {
-      const problem = welcomeSetProblem(layout);
-      if (!problem) break;
-      const long = set.find(isLong);
-      // Trade the member with the largest need that has a smaller-need
-      // record waiting (a long B keeps its place while its neighbours can
-      // shrink; it gives way below when they cannot).
-      const members = [...set].filter((r) => r !== long).sort((a, b) => need(b) - need(a));
-      let traded = false;
-      for (const m of members) {
-        const s = smaller(need(m), m.message.length);
-        if (s) {
-          set.splice(set.indexOf(m), 1, s);
-          traded = true;
+    if (reserved) {
+      placements.push(reserved);
+      used.add(reserved.r.id);
+    }
+    for (const slot of WELCOME_FILL_ORDER) {
+      let picked = null;
+      for (const r of order.slice(0, WELCOME_SCAN_LIMIT)) {
+        if (used.has(r.id)) continue;
+        const fit = welcomeFit(host, r, slot);
+        if (!fit) continue;
+        picked = { slot, r, fit };
+        break;
+      }
+      if (picked) {
+        placements.push(picked);
+        used.add(picked.r.id);
+      }
+    }
+    // A pool smaller than the layout fills the bubbles that are still empty
+    // with repeats, as the Plan 15 layout did, rather than leave a gap.
+    if (placements.length < WELCOME_SLOTS.length && pool.length < WELCOME_SLOTS.length) {
+      const shown = placements.map((p) => p.r.id);
+      let next = 0;
+      for (const slot of WELCOME_FILL_ORDER) {
+        if (placements.some((p) => p.slot === slot)) continue;
+        for (let tries = 0; tries < order.length; tries++) {
+          const r = order[(next + tries) % order.length];
+          const fit = welcomeFit(host, r, slot);
+          if (!fit) continue;
+          placements.push({ slot, r, fit });
+          shown.push(r.id);
+          next = (next + tries + 1) % order.length;
           break;
         }
       }
-      if (!traded && long) {
-        // The long record cannot show inside the time left (or its
-        // neighbours cannot make room): it waits for a later pass and the
-        // next normal record in rotation order takes its place.
-        log('welcome_record_deferred', { id: long.id, reason: problem, pages: layout.placements.B.pages ? layout.placements.B.pages.length : 0, timeLeft: +welcomeTimeLeft().toFixed(1) });
-        excluded.add(long.id);
-        const next = order.find((r) => !inSet(r) && !excluded.has(r.id) && !isLong(r));
-        if (next) set.splice(set.indexOf(long), 1, next);
-        else set.splice(set.indexOf(long), 1);
-        traded = true;
-      }
-      if (!traded) {
-        // Even the smallest records left do not fit six whole: one bubble
-        // fewer, dropping the record with the greatest need.
-        if (set.length <= 1) break;
-        const drop = members[0];
-        log('welcome_fewer_bubbles', { id: drop.id, count: set.length - 1 });
-        set.splice(set.lastIndexOf(drop), 1);
-      }
-      if (!set.length) break;
-      layout = welcomeLayoutSet(host, set);
     }
-    return { set, layout };
+    placements.sort((a, b) => WELCOME_SLOTS.indexOf(a.slot) - WELCOME_SLOTS.indexOf(b.slot));
+    return placements;
   }
 
-  function welcomeApplyFit(a, r, d, fit, limits) {
+  function welcomeApplyFit(a, r, fit, slot) {
     const el = a.el;
+    const d = fit.d;
     el.style.width = d + 'px';
     el.style.height = d + 'px';
     el.dataset.growMax = String(d);
@@ -609,143 +523,100 @@
     if (b) b.reading = reading;
     a._welcomeFitId = r.id;
     a._welcomeFitBorn = a.born;
-    log('welcome_bubble_fit', { id: r.id, slot: limits ? limits.name : '', diameter: d, drawn: Math.round(d * (limits ? limits.scales.max : 1)), cap: limits ? Math.round(limits.capDrawn) : d, pages: fit.pages.length, font: fit.font, verbatim: fit.pages.join('') === r.message });
+    log('welcome_bubble_fit', {
+      id: r.id,
+      slot: slot ? slot.name : '',
+      reserved: !!(slot && slot.reserved),
+      diameter: d,
+      drawn: fit.drawn,
+      graphemes: fit.graphemes,
+      font: fit.font,
+      drawnFont: Math.round(fit.font * welcomeLayerScale(slot ? slot.layer : 'near') * 100) / 100,
+      pages: fit.pages.length,
+      verbatim: fit.pages.join('') === r.message
+    });
     // Core's own fit pass may already have logged this record's pagination
     // at this moment; log it only once.
-    if (fit.pages.length > 1 && !qaLog.some((e) => e.type === 'circular_pagination' && e.id === r.id && e.at === +S.t.toFixed(3))) log('circular_pagination', { id: r.id, pages: fit.pages.length, diameter: d, verbatim: fit.pages.join('') === r.message });
-  }
-
-  // Sizes and lays out one live bubble. With remeasure, the diameter is
-  // measured again for the record now in the bubble (a drift replacement, or
-  // the real fonts finished loading); otherwise the layout measured with the
-  // markup is reused.
-  function welcomeFitActor(a, host, remeasure) {
-    const r = S.pool.find((x) => x.id === a.id);
-    if (!r || !a.el) return;
-    const limits = WELCOME_SLOT_LIMITS.get(a.key);
-    let d = Math.round(a.d);
-    let floor = limits ? limits.floor : WELCOME_FONT_FLOOR;
-    if (remeasure && host && limits) {
-      const scales = welcomeScales(limits.layer, !!a.large);
-      floor = welcomeFloorFor(scales);
-      const need = welcomeNeed(host, r, floor);
-      const capLayout = Math.floor(limits.capDrawn / scales.max);
-      // The layout rule again: a normal record (whole within
-      // WELCOME_NORMAL_CAP drawn) takes its need, even past the position's
-      // room, rather than lose a word; a long record pages only in B, at B's
-      // cap. Outside B every record is whole (the replacement was vetted).
-      const normal = need !== null && need * scales.max <= WELCOME_NORMAL_CAP;
-      if (limits.name !== 'B' || normal || (need !== null && need <= capLayout)) d = need === null ? Math.max(capLayout, WELCOME_MIN_DIAMETER) : need;
-      else d = Math.max(capLayout, WELCOME_MIN_DIAMETER);
-      limits.floor = floor;
-      limits.scales = scales;
+    if (fit.pages.length > 1 && !qaLog.some((e) => e.type === 'circular_pagination' && e.id === r.id && e.at === +S.t.toFixed(3))) {
+      log('circular_pagination', { id: r.id, pages: fit.pages.length, diameter: d, verbatim: fit.pages.join('') === r.message });
     }
-    let fit = remeasure ? null : WELCOME_FIT_CACHE.get(`${welcomeRecordKey(r)}|${d}|${floor}`);
-    if (!fit && host) fit = welcomeFitAt(host, r, d, floor);
-    if (fit) welcomeApplyFit(a, r, d, fit, limits);
   }
 
-  function welcomeFitAll(remeasure) {
+  // Sizes and lays out one live bubble for the record now inside it (a drift
+  // replacement, or the real fonts having finished loading).
+  function welcomeFitActor(a, host) {
+    const r = S.pool.find((x) => x.id === a.id);
+    const slot = WELCOME_SLOT_LIMITS.get(a.key);
+    if (!r || !a.el || !slot || !host) return;
+    const fit = slot.reserved ? welcomeReservedFit(host, r) || welcomeFit(host, r, slot) || welcomePagedFit(host, r) : welcomeFit(host, r, slot);
+    if (fit) welcomeApplyFit(a, r, fit, slot);
+  }
+
+  function welcomeFitAll() {
     if (!V.actors || !V.actors.length) return;
-    welcomeWithHost((host) => V.actors.forEach((a) => welcomeFitActor(a, host, remeasure)));
+    welcomeWithHost((host) => V.actors.forEach((a) => welcomeFitActor(a, host)));
   }
 
   function welcomeBubbles() {
     WELCOME_SLOT_LIMITS.clear();
+    WELCOME_MEASURE_CACHE = new Map();
     WELCOME_FIT_CACHE = new Map();
-    const forced = S.forceId;
-    S.forceId = null;
     return welcomeWithHost((host) => {
-      const { set, layout } = welcomeChooseSet(host);
-      if (!set.length) return '';
-      if (!host || !layout) {
-        const fallback = [[870, 22, 300], [1228, 14, 286], [1530, 60, 270], [930, 345, 268], [1290, 336, 272], [1575, 350, 224]];
-        return drawSlots(set, fallback, { readerBounds: { maxW: 1780, maxH: 625 }, forceId: forced });
-      }
+      const placements = welcomeChooseSet(host);
+      if (!placements.length) return '';
       let html = '';
-      for (const slot of WELCOME_SLOTS) {
-        const p = layout.placements[slot.name];
-        if (!p) continue;
-        const d = Math.round(p.layout);
-        const fit = welcomeFitAt(host, p.r, d, p.floor);
-        if (fit) WELCOME_FIT_CACHE.set(`${welcomeRecordKey(p.r)}|${d}|${p.floor}`, fit);
-        // The home is the drawn circle's centre; the slot's box is d wide in
-        // layout px around it (placeWelcome scales about the centre).
-        const x = Math.round(p.home.cx - d / 2), y = Math.round(p.home.cy - d / 2);
-        html += addOrb(p.r, x, y, d, { growMax: d, large: !smallFits(p.r) });
-        WELCOME_SLOT_LIMITS.set('slot-' + S.slotCounter, { name: slot.name, layer: slot.layer, floor: p.floor, scales: p.scales, capDrawn: slot.name === 'B' ? p.capDrawn : p.drawn, layoutDrawn: p.drawn });
+      for (const p of placements) {
+        const d = p.fit ? p.fit.d : welcomeLayoutPx(p.slot.drawn, p.slot.layer);
+        const x = Math.round(p.slot.cx - d / 2), y = Math.round(p.slot.cy - d / 2);
+        html += addOrb(p.r, x, y, d, { growMax: d, large: welcomeStatic(p.slot, p.r) });
+        WELCOME_SLOT_LIMITS.set('slot-' + S.slotCounter, p.slot);
       }
-      log('welcome_layout', { count: set.length, b: layout.placements.B.r.id, bDrawn: Math.round(layout.placements.B.drawn), bCap: Math.round(layout.placements.B.capDrawn), others: layout.others.map((r) => r.id) });
+      log('welcome_layout', {
+        count: placements.length,
+        reserved: placements.find((p) => p.slot.reserved)?.r.id ?? '',
+        pages: placements.find((p) => p.slot.reserved)?.fit?.pages.length ?? 0,
+        others: placements.filter((p) => !p.slot.reserved).map((p) => p.r.id)
+      });
       return html;
     });
   }
 
-  // The largest free circle (drawn px) in the region beside every other
-  // bubble that stays on screen (leaving ones excluded; entering ones at
-  // the home they fly to).
-  function welcomeFreeNow(a) {
-    const circles = [];
-    for (const o of V.actors) {
-      if (o === a || o.life === 'exiting' || o.life === 'absent') continue;
-      const L = WELCOME_LAYERS[o.layer] || WELCOME_LAYERS.near;
-      const entering = o.life === 'entering';
-      circles.push({ cx: entering ? o.homeX : o.x, cy: entering ? o.homeY : o.y, r: (o.d * L.scale) / 2 });
-    }
-    return welcomeLargestFree(circles, 8);
-  }
-
   // Drift replacement: core's replaceActor has just chosen the next record
-  // for a retiring bubble. Keep that choice when the record fits the freed
-  // position whole; otherwise take the next record in core's rotation that
-  // does, or, for B, a long record whose pages finish inside the time left
-  // in the scene. A record other than the one leaving is preferred; when no
-  // other record fits whole, the bubble shows its current record again
-  // rather than page a normal one.
+  // for a retiring bubble. A regular bubble keeps that choice only when the
+  // record fits it whole, otherwise it takes the next record in core's
+  // rotation that does; the reserved bubble prefers a long record it can read
+  // in the time left, and falls back to any record that fits it. When nothing
+  // else fits, the bubble shows its own record again rather than page a
+  // message that belongs whole in a bubble.
   function welcomeVetReplacement(a) {
-    const limits = WELCOME_SLOT_LIMITS.get(a.key);
-    if (!limits || !a.nextId) return;
-    const scales = welcomeScales(limits.layer, !!a.large);
-    const floor = welcomeFloorFor(scales);
-    // Room for a whole replacement: the position's own room, the largest
-    // circle free beside the bubbles that stay on screen, and, outside B, WELCOME_OTHER_ROOM (drift
-    // physics eases a slightly larger bubble clear of its neighbours).
-    const free = welcomeFreeNow(a);
-    const here = free.r * 2;
-    const roomDrawn = Math.max(limits.capDrawn, here, limits.name === 'B' ? 0 : WELCOME_OTHER_ROOM);
-    const capLayout = Math.floor(roomDrawn / scales.max);
-    const pageLayout = Math.floor(Math.max(limits.capDrawn, here) / scales.max);
+    const slot = WELCOME_SLOT_LIMITS.get(a.key);
+    if (!slot || !a.nextId) return;
     const onScreen = new Set([...V.actors.map((x) => x.id), ...V.actors.filter((x) => x !== a).map((x) => x.nextId).filter(Boolean)]);
     const first = S.pool.find((r) => r.id === a.nextId);
     const rest = records().filter((r) => !onScreen.has(r.id) && r.id !== a.nextId);
     rest.sort((x, y) => (S.lastShown.get(x.id) ?? -10000) - (S.lastShown.get(y.id) ?? -10000) || y.createdAt - x.createdAt || x.id.localeCompare(y.id));
-    const candidates = (first && eligible(first) ? [first, ...rest] : rest).filter((r) => r.id !== a.id);
+    const candidates = (first && eligible(first) ? [first, ...rest] : rest).filter((r) => r.id !== a.id).slice(0, 60);
     welcomeWithHost((host) => {
       if (!host) return;
-      for (const r of candidates.slice(0, 60)) {
-        const need = welcomeNeed(host, r, floor);
-        if (need !== null && need <= capLayout) {
-          if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(roomDrawn) });
-          a.nextId = r.id;
-          // A record larger than the position's own room takes the free
-          // space beside the other bubbles.
-          a._welcomeHome = need * scales.max > Math.max(limits.capDrawn, limits.name === 'B' ? 0 : WELCOME_OTHER_ROOM) ? { x: free.cx, y: free.cy } : null;
+      const take = (r, why) => {
+        if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: slot.name, was: a.nextId, now: r.id, why });
+        a.nextId = r.id;
+      };
+      if (slot.reserved) {
+        for (const r of candidates) {
+          if (!welcomeIsLong(host, r)) continue;
+          if (!welcomeReservedFit(host, r, WELCOME_ENTRY_SECONDS)) continue;
+          take(r, 'long');
           return;
         }
-        // Only a long record pages, only in B, and only when every page is
-        // read before the scene changes.
-        const long = need === null || need * scales.max > WELCOME_NORMAL_CAP;
-        if (limits.name === 'B' && long) {
-          const fit = welcomeFitAt(host, r, pageLayout, floor);
-          if (fit && welcomePagesFitTime(fit.pages, WELCOME_ENTRY_SECONDS)) {
-            a._welcomeHome = here > limits.capDrawn ? { x: free.cx, y: free.cy } : null;
-            limits.capDrawn = Math.max(limits.capDrawn, here);
-            if (r.id !== a.nextId) log('welcome_replacement_vetted', { slot: limits.name, was: a.nextId, now: r.id, cap: Math.round(roomDrawn), pages: fit.pages.length, timeLeft: +welcomeTimeLeft(WELCOME_ENTRY_SECONDS).toFixed(1) });
-            a.nextId = r.id;
-            return;
-          }
-        }
       }
-      log('welcome_replacement_kept', { slot: limits.name, was: a.nextId, id: a.id, room: Math.round(roomDrawn), tried: candidates.length });
+      for (const r of candidates) {
+        if (!slot.reserved && welcomeIsLong(host, r)) continue;
+        if (!welcomeFit(host, r, slot)) continue;
+        take(r, 'whole');
+        return;
+      }
+      log('welcome_replacement_kept', { slot: slot.name, was: a.nextId, id: a.id, tried: candidates.length });
       a.nextId = a.id;
     });
   }
@@ -762,10 +633,10 @@
     const token = (V.welcomeFontToken = (V.welcomeFontToken || 0) + 1);
     document.fonts.ready.then(() => {
       if (S.s !== 1 || V.welcomeFontToken !== token) return;
-      WELCOME_NEED_CACHE.clear();
+      WELCOME_MEASURE_CACHE = new Map();
       WELCOME_FIT_CACHE = new Map();
       checkFullFits();
-      welcomeFitAll(true);
+      welcomeFitAll();
     });
   }
 
@@ -789,11 +660,16 @@
       }
 
       a.retireAt = 9 + i * 4.6;
-      // Each position carries its depth layer (Plan 17 layout); the Plan 15
-      // index rule stays as the fallback when no layout was measured.
-      const limits = WELCOME_SLOT_LIMITS.get(a.key);
-      const layer = limits ? limits.layer : i === 3 ? 'near' : ['far', 'mid', 'near'][i % 3];
+      // Each bubble carries its slot's depth layer and home (Plan 17 round 5
+      // layout); the Plan 15 index rule stays as the fallback when no layout
+      // was measured.
+      const slot = WELCOME_SLOT_LIMITS.get(a.key);
+      const layer = slot ? slot.layer : i === 3 ? 'near' : ['far', 'mid', 'near'][i % 3];
       a.layer = layer;
+      if (slot) {
+        a.homeX = slot.cx;
+        a.homeY = slot.cy;
+      }
       const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
       a.pace *= L.pace;
       if (a.el) a.el.dataset.depth = layer;
@@ -802,7 +678,7 @@
 
   function primeWelcome() {
     // Runs after core's mount-time checkFullFits, so this layout is final.
-    welcomeFitAll(false);
+    welcomeFitAll();
     if (!V.speech || !V.speech.length) return;
     const delays = [0, 2.5, 5.0];
     V.speech.forEach((b, i) => {
@@ -872,16 +748,17 @@
 
   function placeWelcome(a) {
     // Core installNext has just put a new record into this bubble (drift
-    // replacement): size and lay it out for its own message before it shows.
+    // replacement): size and lay it out for its own message before it shows,
+    // and send it back to its slot's fixed home.
     // (Only on a new record: settling after the entry flight also resets
     // core's born time, and must not restart the pages.)
     if (a._welcomeFitId && a.el && (a.id !== a._welcomeFitId || (a.born !== a._welcomeFitBorn && a.life === 'entering'))) {
-      if (a._welcomeHome && a.life === 'entering') {
-        a.homeX = a._welcomeHome.x;
-        a.homeY = a._welcomeHome.y;
+      const slot = WELCOME_SLOT_LIMITS.get(a.key);
+      if (slot && a.life === 'entering') {
+        a.homeX = slot.cx;
+        a.homeY = slot.cy;
       }
-      a._welcomeHome = null;
-      welcomeWithHost((host) => welcomeFitActor(a, host, true));
+      welcomeWithHost((host) => welcomeFitActor(a, host));
     }
     const layer = a.layer || 'near';
     const L = WELCOME_LAYERS[layer] || WELCOME_LAYERS.near;
