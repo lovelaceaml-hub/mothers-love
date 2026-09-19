@@ -53,6 +53,7 @@ type PublicFeedContextValue = {
   items: PublicFeedItem[];
   status: PublicFeedStatus;
   retry: () => void;
+  refresh: () => void;
   reactions: Readonly<Record<string, ReactionEntry>>;
   toggleReaction: (item: PublicFeedItem) => void;
   retryReactions: () => void;
@@ -62,6 +63,7 @@ const defaultContext: PublicFeedContextValue = {
   items: [],
   status: 'loading',
   retry: () => undefined,
+  refresh: () => undefined,
   reactions: {},
   toggleReaction: () => undefined,
   retryReactions: () => undefined,
@@ -233,6 +235,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const feedGenerationRef = useRef(0);
   const snapshotRef = useRef<VerifiedFeedSnapshot | null>(null);
   const retryRef = useRef<() => void>(() => undefined);
+  const refreshRef = useRef<() => void>(() => undefined);
   const retryReactionsRef = useRef<() => void>(() => undefined);
 
   const clearExpiryTimer = useCallback(() => {
@@ -339,6 +342,9 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const recovery = activeRecovery(id);
       if (recovery) return [id, recoveryEntry(current, recovery)];
       if (reactionInFlightRef.current.has(id) && current) return [id, { ...current, pending: true }];
+      // A heart that is already confirmed stays exactly as it is while the
+      // refresh reads new counts; only a heart never loaded shows loading.
+      if (current?.status === 'ready' && current.item) return [id, current];
       return [id, { status: 'loading' as const, pending: false }];
     })) as Record<string, ReactionEntry>;
     commitReactions(loadingEntries);
@@ -385,6 +391,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         if (writeChanged || reactionInFlightRef.current.has(id)) {
           return [id, current ?? { status: 'loading' as const, pending: true }];
         }
+        // One failed refresh keeps the last confirmed heart instead of blanking it.
+        if (current?.status === 'ready' && current.item) return [id, current];
         return [id, { status: 'unavailable' as const, pending: false }];
       })) as Record<string, ReactionEntry>);
     } finally {
@@ -500,6 +508,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       setStatus('loading');
       void fetchFeed();
     };
+    // Refetch without showing the loading state, so the list never blinks.
+    refreshRef.current = () => { void fetchFeed(); };
     retryReactionsRef.current = () => {
       const current = snapshotRef.current;
       if (!current) return;
@@ -534,7 +544,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, [active, clearFeed, fetchFeed]);
 
   const toggleReaction = useCallback((item: PublicFeedItem) => {
-    const entry = reactions[item.id];
+    const entry = reactionEntriesRef.current[item.id];
     if (!entry || entry.status !== 'ready' || !entry.item || entry.pending || reactionInFlightRef.current.has(item.id)) return;
     const desiredLiked = !entry.item.liked;
     const targetToken = reactionTargetTokensRef.current.get(item.id);
@@ -545,9 +555,17 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController();
     reactionMutationControllersRef.current.set(item.id, controller);
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
+    // Show the tap immediately. The server reply then replaces this with the
+    // confirmed count, and any failure below restores the confirmed entry.
+    const confirmed = entry.item;
+    const optimistic: ReactionItem = {
+      id: confirmed.id,
+      liked: desiredLiked,
+      count: Math.max(0, confirmed.count + (desiredLiked ? 1 : -1)),
+    };
     commitReactions((current) => ({
       ...current,
-      [item.id]: { ...entry, pending: true, error: undefined },
+      [item.id]: { item: optimistic, status: 'ready', pending: true },
     }));
 
     void (async () => {
@@ -622,6 +640,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
             ...current,
             [item.id]: {
               ...(current[item.id] ?? entry),
+              item: confirmed,
               status: 'throttled',
               pending: false,
               error: recovery.message,
@@ -640,6 +659,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
             ...current,
             [item.id]: {
               ...(current[item.id] ?? entry),
+              item: confirmed,
               status: 'cookies',
               pending: false,
               error: recovery.message,
@@ -649,7 +669,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         } else {
           commitReactions((current) => ({
             ...current,
-            [item.id]: { ...current[item.id], status: 'error', pending: false, error: 'Could not save heart.' },
+            [item.id]: { ...current[item.id], item: confirmed, status: 'error', pending: false, error: 'Could not save heart.' },
           }));
         }
       } finally {
@@ -660,12 +680,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         }
       }
     })();
-  }, [commitReactions, currentItems, reactions]);
+  }, [commitReactions, currentItems]);
 
   const context: PublicFeedContextValue = {
     items: snapshot ? activeFeedItems(snapshot, monotonicNow()) : [],
     status,
     retry: () => retryRef.current(),
+    refresh: () => refreshRef.current(),
     reactions,
     toggleReaction,
     retryReactions: () => retryReactionsRef.current(),
@@ -761,6 +782,9 @@ export function ReactionButton({
 }) {
   const confirmedItem = reaction?.item;
   const reactionItem = reaction?.status === 'ready' ? confirmedItem : undefined;
+  // Loading and saving keep the normal heart look: no grey flash, no text swap.
+  const loading = !reaction || reaction.status === 'loading';
+  const settling = loading || Boolean(reactionItem && reaction?.pending);
   const countId = `reaction-count-${item.id}`;
   const recoveryId = `reaction-recovery-${item.id}`;
   const label = reactionItem
@@ -812,10 +836,17 @@ export function ReactionButton({
       aria-label={label}
       aria-describedby={reactionItem ? countId : undefined}
       disabled={!reactionItem || Boolean(reaction?.pending)}
+      data-settling={settling ? 'true' : undefined}
       onClick={onToggle}
     >
       <span aria-hidden="true">{reactionItem?.liked ? '❤️' : '🤍'}</span>
-      <span id={reactionItem ? countId : undefined}>{reactionItem ? reactionItem.count : 'Hearts unavailable'}</span>
+      {reactionItem ? <span id={countId}>{reactionItem.count}</span> : loading ? (
+        <>
+          {/* Figure space holds the count's width so the button does not resize. */}
+          <span aria-hidden="true">{'\u2007'}</span>
+          <span className={styles.reactionQuietText}>Hearts unavailable</span>
+        </>
+      ) : <span>Hearts unavailable</span>}
     </button>
   );
 }

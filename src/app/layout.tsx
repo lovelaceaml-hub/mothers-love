@@ -7,6 +7,16 @@ import { PublicFeedFrame, PublicFeedProvider } from '@/components/feed/PublicFee
 export const metadata: Metadata = {
   title: "The Words of Mother's Love",
   description: "A place to share words of appreciation and peace.",
+  icons: {
+    icon: [
+      { url: "/icons/butterfly-heart-v1-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/butterfly-heart-v1-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico?v=butterfly-heart-v1",
+    apple: [
+      { url: "/icons/butterfly-heart-v1-180.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {

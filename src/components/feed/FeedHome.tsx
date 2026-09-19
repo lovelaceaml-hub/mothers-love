@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Component, createRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Component, createRef, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS, expressionById } from '@/lib/catalog';
 import { ReactionButton, usePublicFeed, type PublicFeedStatus } from './PublicFeedProvider';
@@ -74,7 +74,7 @@ function FeedCard({ item }: { item: PublicFeedItem }) {
   );
 }
 
-function FeedStateCard({ status, onRetry }: { status: PublicFeedStatus; onRetry: () => void }) {
+function FeedStateCard({ status, onRetry, showAction = true }: { status: PublicFeedStatus; onRetry: () => void; showAction?: boolean }) {
   if (status === 'loading' || status === 'hidden') {
     return (
       <section className={styles.stateCard} aria-live="polite" aria-busy="true">
@@ -96,8 +96,8 @@ function FeedStateCard({ status, onRetry }: { status: PublicFeedStatus; onRetry:
     <section className={styles.stateCard} aria-live="polite">
       <Medallion id={2} className={styles.emptyMedallion} />
       <h2>No recognitions yet</h2>
-      <p>Be the first to share a kind word.</p>
-      <Link className={styles.secondaryAction} href="/recognize">Share a recognition<Arrow /></Link>
+      {showAction && <p>Be the first to share a kind word.</p>}
+      {showAction && <Link className={styles.secondaryAction} href="/recognize">Share a recognition<Arrow /></Link>}
     </section>
   );
 }
@@ -143,8 +143,31 @@ class ReadingViewport extends Component<FeedViewportProps, Record<string, never>
   }
 }
 
+// The same live list the home page shows. `embedded` places it inside another
+// public page (the /recognize receipt), which scrolls normally instead of using
+// the home page's fixed-height phone layout.
+export function RecentRecognitions({ embedded = false }: { embedded?: boolean }) {
+  const { items, status, retry, refresh } = usePublicFeed();
+  // On the receipt, fetch once right away so a just-published recognition
+  // appears without waiting for the next 10 second refresh.
+  const refreshOnMount = useRef(refresh);
+  useEffect(() => { if (embedded) refreshOnMount.current(); }, [embedded]);
+  return (
+    <section className={embedded ? `${styles.feedSection} ${styles.embeddedFeed}` : styles.feedSection} data-testid={embedded ? 'receipt-live-feed' : undefined}>
+      <div className={styles.sectionHeader}>
+        <div><p className={styles.eyebrow}>Newest first</p><h2 id="feed-section-heading">Recent recognitions</h2></div>
+        <span className={styles.liveLabel} data-live={status === 'ready'}><i aria-hidden="true" />{status === 'ready' ? 'Live' : status === 'empty' ? 'Newest first' : status === 'error' ? 'Unavailable' : 'Updating'}</span>
+      </div>
+      <ReadingViewport status={status}>
+        {status === 'ready' && items.length > 0 ? (
+          <div className={styles.feedList}>{items.map((item) => <FeedCard key={item.id} item={item} />)}</div>
+        ) : <FeedStateCard status={status} onRetry={retry} showAction={!embedded} />}
+      </ReadingViewport>
+    </section>
+  );
+}
+
 export function FeedHome() {
-  const { items, status, retry } = usePublicFeed();
   const [motionPaused, setMotionPaused] = useState(false);
   const titleBreak = CAMPAIGN_TITLE.indexOf("MOTHER");
 
@@ -174,17 +197,7 @@ export function FeedHome() {
         </header>
 
         <div className={styles.contentLayout}>
-          <section className={styles.feedSection}>
-            <div className={styles.sectionHeader}>
-              <div><p className={styles.eyebrow}>Newest first</p><h2 id="feed-section-heading">Recent recognitions</h2></div>
-              <span className={styles.liveLabel} data-live={status === 'ready'}><i aria-hidden="true" />{status === 'ready' ? 'Live' : status === 'empty' ? 'Newest first' : status === 'error' ? 'Unavailable' : 'Updating'}</span>
-            </div>
-            <ReadingViewport status={status}>
-              {status === 'ready' && items.length > 0 ? (
-                <div className={styles.feedList}>{items.map((item) => <FeedCard key={item.id} item={item} />)}</div>
-              ) : <FeedStateCard status={status} onRetry={retry} />}
-            </ReadingViewport>
-          </section>
+          <RecentRecognitions />
 
           <aside className={styles.guidePanel} aria-labelledby="expression-guide-heading">
             <p className={styles.eyebrow}>Love in everyday words</p>
