@@ -340,4 +340,21 @@
  .reactionRow button { background: transparent; border-color: transparent; }
  .reactionRow button[aria-pressed='true'] { background: #AF315A; border-color: #AF315A; }
 }
+/* A heart that is loading or saving keeps its normal look, so a refresh or a
+   tap never flashes grey. */
+.reactionRow button[data-settling='true']:disabled { color: #A82F58; background: #FFEAF0; border-color: #E5A5B7; cursor: default; }
+.reactionRow button[data-settling='true'][aria-pressed='true']:disabled { color: white; background: #AF315A; border-color: #AF315A; }
+@media(max-width:560px) {
+ .reactionRow button[data-settling='true']:disabled { background: transparent; border-color: transparent; }
+ .reactionRow button[data-settling='true'][aria-pressed='true']:disabled { background: #AF315A; border-color: #AF315A; }
+}
 @media(forced-colors:active) { .page { background: Canvas; color: CanvasText; } .feedCard, .medallion { border-color: CanvasText; } .primaryAction { background: ButtonFace; color: ButtonText; border-color: ButtonText; } }
+
+/* The home feed embedded in another public page (the /recognize receipt). That
+   page scrolls normally, so the list gets its own bounded height instead of the
+   home page's fill-the-screen phone layout, and carries the home palette itself. */
+.embeddedFeed { --home-cream: var(--ml-ivory); --home-ink: var(--ml-ink); --home-muted: var(--ml-muted); --home-rose: var(--ml-rose-ink); --home-line: #C9DACE; display: block; width: 100%; margin: 1.25rem 0 0; color: var(--home-ink); font-family: Arial, Helvetica, sans-serif; text-align: left; }
+.embeddedFeed svg { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; }
+.embeddedFeed .feedViewport { flex: none; min-height: 12rem; max-height: min(62svh, 40rem); }
+.embeddedFeed .feedViewport:focus-visible { outline: 3px solid #476659; outline-offset: 5px; }
+.embeddedFeed .stateCard { min-height: 12rem; }

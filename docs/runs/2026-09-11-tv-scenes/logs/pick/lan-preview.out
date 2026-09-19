@@ -3,3 +3,25 @@
 - Network:       http://0.0.0.0:3100
 ✓ Ready in 115ms
 ✓ Running next.config.ts took 22ms
+⨯ unhandledRejection: Error: write CONNECTION_DESTROYED aws-0-us-west-1.pooler.supabase.com:6543
+    at <unknown> (Error: write CONNECTION_DESTROYED aws-0-us-west-1.pooler.supabase.com:6543)
+    at Object.eZ [as terminate] (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:4:4818)
+    at <unknown> (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:21:11309)
+    at Array.map (<anonymous>)
+    at Timeout.B [as _onTimeout] (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:21:11300) {
+  code: 'CONNECTION_DESTROYED',
+  errno: 'CONNECTION_DESTROYED',
+  address: [ 'aws-0-us-west-1.pooler.supabase.com' ],
+  port: [ 6543 ]
+}
+⨯ unhandledRejection: Error: write CONNECTION_DESTROYED aws-0-us-west-1.pooler.supabase.com:6543
+    at <unknown> (Error: write CONNECTION_DESTROYED aws-0-us-west-1.pooler.supabase.com:6543)
+    at Object.eZ [as terminate] (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:4:4818)
+    at <unknown> (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:21:11309)
+    at Array.map (<anonymous>)
+    at Timeout.B [as _onTimeout] (.next/server/chunks/[root-of-the-server]__1ibrmr1._.js:21:11300) {
+  code: 'CONNECTION_DESTROYED',
+  errno: 'CONNECTION_DESTROYED',
+  address: [ 'aws-0-us-west-1.pooler.supabase.com' ],
+  port: [ 6543 ]
+}

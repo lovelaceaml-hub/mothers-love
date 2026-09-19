@@ -350,6 +350,20 @@ button.secondaryAction {
   opacity: 0.72;
 }
 
+.reactionButton[data-settling='true']:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.reactionQuietText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .reactionRecovery {
   display: grid;
   justify-items: end;

@@ -11,6 +11,7 @@ import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib
 import baseStyles from './SubmissionForm.module.css';
 import experienceStyles from './SubmissionExperience.module.css';
 import { ExpressionDrift } from '@/components/campaign/ExpressionDrift';
+import { RecentRecognitions } from '@/components/feed/FeedHome';
 
 // Retain existing bouquet and receipt animation classes.
 const styles = { ...baseStyles, ...experienceStyles };
@@ -548,7 +549,12 @@ export function SubmissionForm() {
 
         {showClosed && <ClosedState configured={Boolean(config?.configured && !configError)} />}
 
-        {showReceipt && receiptStatus && <Receipt status={receiptStatus} onReset={resetForm} />}
+        {showReceipt && receiptStatus && (
+          <>
+            <Receipt status={receiptStatus} onReset={resetForm} />
+            <RecentRecognitions embedded />
+          </>
+        )}
 
         {!showLoading && !showClosed && !showReceipt && (
           <>

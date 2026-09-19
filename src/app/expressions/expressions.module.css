@@ -161,7 +161,7 @@
 .card3 { background: var(--orange); }
 .card4 { background: var(--coral); }
 .card5 { background: var(--red); }
-.card5 { --ink: #242531; color: var(--ink); }
+.card5 { --ink: #242531; --card-heading-ink: #242531; color: var(--ink); }
 .card6 { background: var(--lavender); }
 .card7 { background: var(--lime); }
 .card8 { background: var(--green); }
