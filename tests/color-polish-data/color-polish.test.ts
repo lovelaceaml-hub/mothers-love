@@ -6,6 +6,8 @@ import {
   projectColorPolishSnapshot,
   selectLeastUsedExpression,
 } from "@/lib/server/color-polish";
+import { COLOR_POLISH_DURATIONS, COLOR_POLISH_SCENES, normalizeColorPolishPlaylist } from "@/lib/color-polish/contracts";
+import { validateColorPolishPresentationChanges, validateColorPolishSnapshot } from "@/lib/color-polish/validation";
 
 const settings = {
   version: 7,
@@ -139,6 +141,8 @@ describe("Color Polish weekly goal", () => {
   });
 });
 
+const liveFeedDefault = { id: "live-feed", enabled: true, durationSeconds: 60 };
+
 describe("Color Polish projection", () => {
   it("projects only the versioned preset and anonymous insights", () => {
     const projected = projectColorPolishSnapshot(snapshot({
@@ -146,9 +150,11 @@ describe("Color Polish projection", () => {
       presentation,
     }));
 
+    // The saved ten entry playlist is projected with the optional live-feed screen
+    // appended at its default (Plan 17 Lane 13); the ten saved entries are untouched.
     expect(projected).toEqual(expect.objectContaining({
       submissionUrl: "https://mothers-love.vercel.app/recognize",
-      presentation,
+      presentation: { ...presentation, playlist: [...presentation.playlist, liveFeedDefault] },
     }));
     expect(projected).not.toHaveProperty("privateAudit");
   });
@@ -173,5 +179,85 @@ describe("Color Polish presentation patch projection", () => {
     expect(projectColorPolishPresentationChanges({ internalSecret: "drop" })).toBeNull();
     expect(projectColorPolishPresentationChanges({ playlist: presentation.playlist.map((item) => ({ ...item, durationSeconds: 11 })) })).toBeNull();
     expect(projectColorPolishPresentationChanges({ playlist: presentation.playlist.map((item) => ({ ...item, durationSeconds: 181 })) })).toBeNull();
+  });
+});
+
+// Plan 17 Lane 13: the optional eleventh screen, slug live-feed. These are the
+// compatibility proofs for database/013_color_polish_live_feed.sql.
+describe("Color Polish live-feed playlist compatibility", () => {
+  const ten = presentation.playlist;
+
+  it("knows eleven screens with live-feed last at 60 seconds", () => {
+    expect(COLOR_POLISH_SCENES).toHaveLength(11);
+    expect(COLOR_POLISH_SCENES[10]).toBe("live-feed");
+    expect(COLOR_POLISH_DURATIONS["live-feed"]).toBe(60);
+  });
+
+  it("proof (a), before the SQL runs: a saved ten entry playlist gains live-feed enabled, 60 seconds, last, on the server and in the browser", () => {
+    const server = projectColorPolishSnapshot(snapshot({ presentation }));
+    expect(server?.presentation.playlist).toHaveLength(11);
+    expect(server?.presentation.playlist.slice(0, 10)).toEqual(ten);
+    expect(server?.presentation.playlist[10]).toEqual(liveFeedDefault);
+
+    // The browser validates what the server sent (eleven entries) and also a raw ten
+    // entry payload, for instance one cached from before the release.
+    expect(validateColorPolishSnapshot(server)?.presentation.playlist).toEqual([...ten, liveFeedDefault]);
+    expect(validateColorPolishSnapshot(snapshot({ presentation }))?.presentation.playlist).toEqual([...ten, liveFeedDefault]);
+  });
+
+  it("proof (b), after the SQL runs: a saved eleven entry playlist keeps live-feed's own place, flag and duration", () => {
+    const saved = [ten[0], { id: "live-feed", enabled: false, durationSeconds: 45 }, ...ten.slice(1)];
+    const server = projectColorPolishSnapshot(snapshot({ presentation: { ...presentation, playlist: saved } }));
+    expect(server?.presentation.playlist).toEqual(saved);
+    expect(validateColorPolishSnapshot(server)?.presentation.playlist).toEqual(saved);
+    // Ten entries stay valid after the SQL as well.
+    expect(projectColorPolishSnapshot(snapshot({ presentation }))?.presentation.playlist).toHaveLength(11);
+  });
+
+  it("still requires all ten original screens and refuses duplicates, unknown screens and a twelfth entry", () => {
+    const withLiveFeed = [...ten, liveFeedDefault];
+    const project = (playlist: unknown) => projectColorPolishSnapshot(snapshot({ presentation: { ...presentation, playlist } }));
+    const validate = (playlist: unknown) => validateColorPolishSnapshot(snapshot({ presentation: { ...presentation, playlist } }));
+    const cases: unknown[] = [
+      ten.slice(0, 9),
+      [...ten.slice(0, 9), liveFeedDefault],
+      [...withLiveFeed, liveFeedDefault],
+      [...ten, { id: "unknown-screen", enabled: true, durationSeconds: 60 }],
+      [...ten, { ...liveFeedDefault, durationSeconds: 11 }],
+      [...ten, { ...liveFeedDefault, durationSeconds: 181 }],
+      [...ten, { ...liveFeedDefault, extra: true }],
+      withLiveFeed.map((item) => ({ ...item, enabled: false })),
+    ];
+    for (const playlist of cases) {
+      expect(project(playlist)).toBeNull();
+      expect(validate(playlist)).toBeNull();
+    }
+    expect(project(withLiveFeed)).not.toBeNull();
+    expect(validate(withLiveFeed)).not.toBeNull();
+  });
+
+  it("stores a change request exactly as sent, so ten entries still save against the old validator", () => {
+    expect(projectColorPolishPresentationChanges({ playlist: ten })).toEqual({ playlist: ten });
+    expect(projectColorPolishPresentationChanges({ playlist: [...ten, liveFeedDefault] })).toEqual({ playlist: [...ten, liveFeedDefault] });
+    expect(validateColorPolishPresentationChanges({ playlist: ten })).toEqual(ten);
+    expect(validateColorPolishPresentationChanges({ playlist: [...ten, liveFeedDefault] })).toEqual([...ten, liveFeedDefault]);
+  });
+
+  it("normalizes without changing the saved entries or their order", () => {
+    const reordered = [...ten].reverse();
+    expect(normalizeColorPolishPlaylist(reordered as never)).toEqual([...reordered, liveFeedDefault]);
+    const already = [liveFeedDefault, ...ten];
+    expect(normalizeColorPolishPlaylist(already as never)).toEqual(already);
+  });
+
+  it("the old production build's rule (exactly ten, known ids only) refuses eleven entries: the reason rollback returns the playlist to ten first", () => {
+    // Copied from b7d92a0 src/lib/server/color-polish.ts projectPresentation and
+    // src/lib/color-polish/validation.ts presentation: length must equal 10 and every
+    // id must be one of the ten. Either check alone answers null, which the old
+    // route turns into 503 UNAVAILABLE.
+    const oldScenes = ["welcome", "garden", "featured", "calendar", "peacemakers", "status", "expressions", "peace-in-practice", "orbit", "milestone"];
+    const oldBuildAccepts = (playlist: Array<{ id: unknown }>) => playlist.length === oldScenes.length && playlist.every((item) => typeof item.id === "string" && oldScenes.includes(item.id));
+    expect(oldBuildAccepts(ten)).toBe(true);
+    expect(oldBuildAccepts([...ten, liveFeedDefault])).toBe(false);
   });
 });

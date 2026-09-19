@@ -22,6 +22,7 @@ const SCENE_LABELS: Record<ColorPolishScene, string> = {
   'peace-in-practice': 'Peace in practice',
   orbit: 'Orbit',
   milestone: 'Milestone',
+  'live-feed': 'Live Recognitions',
 };
 
 export function ColorPolishStudio() {
