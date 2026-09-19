@@ -5,9 +5,12 @@ import {
   loadRenderer,
   noOverflow,
   openStudioScene,
+  recognition,
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
+import type { Frame } from '@playwright/test';
+import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildMediumFixture, buildMostlyLongFixture as buildTextFitsFixture, fitsWhole, textFits, welcomeLargestFreeCircle } from './text-fits';
 
 test('welcome renders circular bubbles and no overflow at 14 s', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'welcome', 14000);
@@ -215,7 +218,10 @@ test('scene replaces at least one bubble within 30 s', async ({ page }) => {
   expect(hasTransitioningActor || hasDifferentId).toBe(true);
 });
 
-test('entering bubble has non-zero rotate angle in slot transform', async ({ page }) => {
+// Plan 17: the enter and exit spin turns the words (.orb-content, via the
+// rotate property) inside the circle, so a spinning bubble at the stage edge
+// never widens the scene's scroll box with the corners of a rotated square.
+test('entering bubble has non-zero rotate angle on its words', async ({ page }) => {
   let foundEntering = false;
   for (const checkpoint of [13500, 14000, 15000]) {
     const testPage = await page.context().newPage();
@@ -228,17 +234,17 @@ test('entering bubble has non-zero rotate angle in slot transform', async ({ pag
       const slots = Array.from(document.querySelectorAll<HTMLElement>('.orb-slot'));
       return enteringActors.map((actor: any) => {
         const el = slots.find((s) => s.dataset.recordId === actor.id);
-        return el ? el.style.transform : '';
+        const words = el?.querySelector<HTMLElement>('.orb-content');
+        return words ? words.style.rotate : '';
       }).filter(Boolean);
     });
     await testPage.close();
 
     if (enteringSlots.length > 0) {
       foundEntering = true;
-      for (const tf of enteringSlots) {
-        expect(tf).toContain('rotate(');
-        const match = tf.match(/rotate\(([-0-9.]+)deg\)/);
-        expect(match).not.toBeNull();
+      for (const rotate of enteringSlots) {
+        const match = rotate.match(/^([-0-9.]+)deg$/);
+        expect(match, `rotate property on the words: ${rotate}`).not.toBeNull();
         const angle = parseFloat(match![1]);
         expect(Math.abs(angle)).toBeGreaterThan(0);
       }
@@ -637,7 +643,11 @@ test('every message renders at or above 18 px floor, fitting messages on one pag
     });
   });
 
-  expect(messageCheck).toHaveLength(6);
+  // Plan 17: a record whose pages cannot all be read inside the Welcome
+  // dwell (the 500 grapheme record at the default 30 s) is left to the other
+  // scenes, so the mostly-long fixture shows four to six bubbles here.
+  expect(messageCheck.length).toBeGreaterThanOrEqual(4);
+  expect(messageCheck.length).toBeLessThanOrEqual(6);
   let hasSinglePageFit = false;
   let hasPaginatedVerbatim = false;
 
@@ -662,7 +672,11 @@ test('every message renders at or above 18 px floor, fitting messages on one pag
   }
 
   expect(hasSinglePageFit).toBe(true);
-  expect(hasPaginatedVerbatim).toBe(true);
+  // Plan 17: these four 200 character messages now fit whole in bubbles
+  // grown to hold them, so pagination is no longer expected here; any bubble
+  // that does page was checked verbatim above, and the paging rule itself is
+  // covered by the "paging bubble" test below.
+  expect(hasPaginatedVerbatim || hasSinglePageFit).toBe(true);
 });
 
 test('reduced motion displays static speech bubbles without rotation or fading', async ({ page }) => {
@@ -690,4 +704,238 @@ test('reduced motion displays static speech bubbles without rotation or fading',
   expect(check.count).toBe(3);
   expect(check.fadingCount).toBe(0);
   expect(check.phrasesMatch).toBe(true);
+});
+
+// Plan 17 Lane 1: "pages, long only" (Anthony, September 18). Every short,
+// normal and medium message shows whole on one page in a bubble grown to fit
+// it, drawn at 18 px or larger (36 px at 3840) at every moment. Only a
+// message too long for the largest bubble the layout can give pages, in that
+// largest bubble, and only when every page fits the Welcome dwell. The
+// checks below never read a size the scene code wrote: the largest
+// achievable bubble is computed here from the stage geometry and the other
+// bubbles as drawn, and "could it have shown whole" is judged by this test's
+// own fit probe (fitsWhole in text-fits.ts).
+const TV_SIZES = [
+  { width: 1920, height: 1080 },
+  { width: 3840, height: 2160 },
+];
+const MOSTLY_IDS = ['mostly-short-1', 'mostly-short-2', 'mostly-emoji', 'mostly-250', 'mostly-400', 'mostly-500'];
+// Short, emoji and 250 grapheme messages fit a bubble the layout can always
+// give (about 360 px drawn for 250 graphemes) and must never page.
+const MOSTLY_WHOLE = ['mostly-short-1', 'mostly-short-2', 'mostly-emoji', 'mostly-250'];
+const WELCOME_ROOT = '#stage .scene[data-scene="1"]';
+
+async function welcomeState(frame: Frame) {
+  return await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    return { dwell: state.visual.dwell[1] as number, log: state.log as Array<{ type: string; id?: string; reason?: string; pages?: number }> };
+  });
+}
+
+test('mostly-long fixture: every word fits its bubble, drawn at the floor or larger, short and 250 grapheme messages whole, at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(240000);
+  const fixture = buildTextFitsFixture();
+  for (const size of TV_SIZES) {
+    for (const ms of [0, 6000, 14000, 21000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize(size);
+      const frame = await loadRenderer(testPage, { scene: 1, ms, fixture });
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+      const where = `${size.width} wide at ${ms} ms`;
+
+      const failures = await textFits(frame, WELCOME_ROOT, { singlePageIds: MOSTLY_WHOLE });
+      expect(failures, `welcome text-fit failures, ${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+
+      const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
+      expect(readings.length, `bubbles on screen, ${where}`).toBeGreaterThanOrEqual(4);
+      for (const reading of readings) {
+        expect(MOSTLY_IDS, `${reading.id} is a fixture record, ${where}`).toContain(reading.id);
+        expect(reading.drawnFont, `${reading.id} drawn message size, ${where}`).toBeGreaterThanOrEqual(18 * (size.width / 1920) - 0.05);
+        if (reading.pages > 1) expect(['mostly-400', 'mostly-500'], `${reading.id} may page, ${where}`).toContain(reading.id);
+      }
+
+      const overflow = await noOverflow(frame);
+      expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+      expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
+      await testPage.close();
+    }
+  }
+});
+
+test('a paging bubble is the largest circle the stage can give beside the other bubbles, holds a message that cannot show whole even there, and its pages fit the dwell', async ({ page }) => {
+  test.setTimeout(240000);
+  // Dwell 60 s: the 500 grapheme message (500 / 14 = 35.7 s of reading) may
+  // page. At the default 30 s dwell it may not, and is deferred (checked in
+  // the next test).
+  const fixture = buildTextFitsFixture({
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'welcome', enabled: true, durationSeconds: 60 }, { id: 'garden', enabled: true, durationSeconds: 60 }] },
+  });
+  for (const size of TV_SIZES) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize(size);
+    const frame = await loadRenderer(testPage, { scene: 1, ms: 0, fixture });
+    const where = `${size.width} wide`;
+    const failures = await textFits(frame, WELCOME_ROOT, { singlePageIds: MOSTLY_WHOLE });
+    expect(failures, `${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+    const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
+    const paging = readings.filter((r) => r.pages > 1);
+    expect(paging.length, `one long record pages at 60 s dwell, ${where}: ${JSON.stringify(readings)}`).toBe(1);
+    const big = paging[0];
+    expect(['mostly-400', 'mostly-500']).toContain(big.id);
+    // The largest circle that fits beside the other bubbles at their homes,
+    // computed from the DOM: the paging bubble must be that large (the scene
+    // packs on a 4 px grid with a 5 px gap on each side).
+    const free = await welcomeLargestFreeCircle(frame, big.id);
+    expect(big.drawn, `${big.id} drawn ${big.drawn} px is the largest achievable (${free.diameter.toFixed(0)} px), ${where}`).toBeGreaterThanOrEqual(free.diameter - 16);
+    // And the message truly cannot show whole at that size at the 18 px floor.
+    expect(await fitsWhole(frame, big.id, free.diameter, 18), `${big.id} does not fit whole at ${free.diameter.toFixed(0)} px, ${where}`).toBe(false);
+    // Page counts, for the record: 500 graphemes in the largest bubble.
+    const state = await welcomeState(frame);
+    expect(state.dwell).toBe(60);
+    console.log(`welcome ${where}: ${JSON.stringify(readings.map((r) => ({ id: r.id, diameter: r.diameter, drawn: r.drawn, pages: r.pages, drawnFont: r.drawnFont })))}`);
+    await testPage.close();
+  }
+});
+
+test('at the default 30 s dwell a message whose pages cannot all be read in time is left to the other scenes instead of paged or cut', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 1, ms: 0, fixture: buildTextFitsFixture() });
+  const state = await welcomeState(frame);
+  expect(state.dwell).toBe(30);
+  const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
+  const ids = readings.map((r) => r.id);
+  expect(ids, 'the 500 grapheme record needs 35.7 s of reading and is not shown at 30 s').not.toContain('mostly-500');
+  const deferred = state.log.filter((e) => e.type === 'welcome_record_deferred' && e.id === 'mostly-500');
+  expect(deferred.length).toBeGreaterThan(0);
+  expect(deferred[0].reason).toBe('b-dwell');
+  for (const r of readings) {
+    if (r.pages > 1) {
+      expect(r.id).toBe('mostly-400');
+      const seconds = await frame.evaluate((id) => {
+        const slots = (window as any).colorPolishRuntime.getState().slots as Array<{ id: string; reading?: { pages: string[] } }>;
+        const pages = slots.find((s) => s.id === id)?.reading?.pages ?? [];
+        return pages.reduce((n, p) => n + Math.max(9, p.length / 14), 0);
+      }, r.id);
+      expect(seconds, `${r.id} pages fit the 30 s dwell`).toBeLessThanOrEqual(30);
+    }
+  }
+  const failures = await textFits(frame, WELCOME_ROOT, { singlePageIds: MOSTLY_WHOLE });
+  expect(failures, JSON.stringify(failures)).toHaveLength(0);
+});
+
+test('medium messages (120 to 220 characters) always show whole, drawn at the floor or larger, at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(240000);
+  const fixture = buildMediumFixture();
+  for (const size of TV_SIZES) {
+    for (const ms of [0, 6000, 14000, 21000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize(size);
+      const frame = await loadRenderer(testPage, { scene: 1, ms, fixture });
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+      const where = `${size.width} wide at ${ms} ms`;
+      const failures = await textFits(frame, WELCOME_ROOT, { singlePageIds: [...MEDIUM_IDS, ...MEDIUM_SHORT_IDS] });
+      expect(failures, `${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+      const readings = (await bubbleReadings(frame, WELCOME_ROOT)).filter((r) => r.visible);
+      expect(readings.length, `six bubbles, ${where}`).toBe(6);
+      // Drift replacements bring in whichever records fit the freed room, so
+      // later checkpoints may hold fewer medium records than the first.
+      expect(readings.filter((r) => MEDIUM_IDS.includes(r.id)).length, `medium records on screen, ${where}`).toBeGreaterThanOrEqual(ms === 0 ? 3 : 2);
+      for (const reading of readings) {
+        expect([...MEDIUM_IDS, ...MEDIUM_SHORT_IDS], `${reading.id} is a fixture record`).toContain(reading.id);
+        expect(reading.pages, `${reading.id} shows whole, ${where}`).toBe(1);
+        expect(reading.drawnFont, `${reading.id} drawn size, ${where}`).toBeGreaterThanOrEqual(18 * (size.width / 1920) - 0.05);
+      }
+      await testPage.close();
+    }
+  }
+});
+
+test('a bubble replaced while drifting shows its new message whole, or pages a long one only in the largest bubble, never a medium one', async ({ page }) => {
+  test.setTimeout(180000);
+  const mostly = buildTextFitsFixture() as { recognitions: Array<Record<string, unknown>> };
+  const medium = buildMediumFixture() as { recognitions: Array<Record<string, unknown>> };
+  const extra = [
+    ['drift-40', 'Thank you for the warm tea and kind words.'],
+    ['drift-90', 'Thank you for noticing when I was tired and quietly taking the heavy boxes out to the car for me.'],
+  ].map(([id, message], i) =>
+    recognition({ id, message, recipient: 'Kind Friend', expressionIds: [(i % 9) + 1], createdAt: '2026-09-10T16:00:00Z', firstPublishedAt: '2026-09-10T16:00:00Z', expiresAt: '2026-09-17T16:00:00Z' }),
+  );
+  // A Welcome-only playlist with a long dwell keeps the scene up long enough
+  // for several drift replacements.
+  const fixture = buildActiveDisplayFixture({
+    recognitions: [...mostly.recognitions, ...medium.recognitions, ...extra],
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'welcome', enabled: true, durationSeconds: 600 }] },
+  });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 1, fixture });
+  const whole = [...MOSTLY_WHOLE, ...MEDIUM_IDS, 'drift-40', 'drift-90'];
+  const seen = new Set<string>();
+  for (let second = 5; second <= 120; second += 5) {
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(5000));
+    const failures = await textFits(frame, WELCOME_ROOT, { singlePageIds: whole });
+    expect(failures, `at ${second} s: ${JSON.stringify(failures)}`).toHaveLength(0);
+    (await bubbleReadings(frame, WELCOME_ROOT)).forEach((r) => seen.add(r.id));
+  }
+  const state = await welcomeState(frame);
+  const replaced = state.log.filter((e) => e.type === 'bubble_new').map((e) => e.id);
+  expect(replaced.length, 'at least three drift replacements happened').toBeGreaterThanOrEqual(3);
+  for (const id of replaced) {
+    expect(state.log.some((e) => e.type === 'welcome_bubble_fit' && e.id === id), `replacement ${id} was measured`).toBe(true);
+  }
+  expect(replaced.some((id) => MEDIUM_IDS.includes(id!)), 'a medium record arrived by drift replacement').toBe(true);
+});
+
+test('welcome bubble sizing re-measures once a still-loading document.fonts.ready resolves', async ({ page }) => {
+  await page.addInitScript(() => {
+    let seed = 7301;
+    Math.random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    window.requestAnimationFrame = () => 0;
+
+    // Simulates the slow-font-load case the re-measure hook targets:
+    // document.fonts.status is 'loading' at mount time, so welcome.js's
+    // hook must register the re-measure rather than skip it (it skips when
+    // status is already 'loaded', to avoid a redundant, log-duplicating
+    // second pass in the ordinary already-loaded case).
+    let resolveReady: () => void = () => {};
+    const readyPromise = new Promise<void>((resolve) => {
+      resolveReady = resolve;
+    });
+    const fakeFonts = { status: 'loading', ready: readyPromise };
+    Object.defineProperty(document, 'fonts', { value: fakeFonts, configurable: true });
+    (window as any).__resolveFontsReady = () => {
+      fakeFonts.status = 'loaded';
+      resolveReady();
+    };
+  });
+
+  // loadRenderer's bootstrap mounts scene 1 (welcome) while document.fonts
+  // is still the mocked "loading" state above, so welcome.js's mount-time
+  // call to refitWelcomeWhenFontsReady already registered the re-measure
+  // before this test can spy on it. What is directly checkable, and what
+  // matters, is that resolving that pending promise actually invokes
+  // checkFullFits.
+  const fixture = buildTextFitsFixture();
+  const frame = await loadRenderer(page, { fixture });
+
+  const fitCallCount = await frame.evaluate(async () => {
+    const win = window as any;
+    let calls = 0;
+    const original = win.checkFullFits;
+    win.checkFullFits = (...args: unknown[]) => {
+      calls++;
+      return original(...args);
+    };
+    win.__resolveFontsReady();
+    await win.document.fonts.ready;
+    // Let the .then() microtask queued by welcome.js's mount actually run.
+    await Promise.resolve();
+    await Promise.resolve();
+    win.checkFullFits = original;
+    return calls;
+  });
+
+  expect(fitCallCount).toBeGreaterThanOrEqual(1);
 });

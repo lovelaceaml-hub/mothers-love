@@ -8,6 +8,7 @@ import {
   studioClickDoesNotAdvance,
 } from './helpers';
 import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
+import { buildMostlyLongFixture, textFits } from './text-fits';
 
 test('milestone renders circular bubbles, studio preview, and does not overflow at 14 s', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'milestone', 14000);
@@ -587,3 +588,106 @@ test('noOverflow holds and no phrase is truncated at any pearl size', async ({ p
   }
 });
 
+test('mostly-long fixture: the goal card, milestone card and tribute pearl text all fit their panels and rims at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(120000);
+  const fixture = buildMostlyLongFixture();
+  const widths: Array<{ width: number; height: number }> = [
+    { width: 1920, height: 1080 },
+    { width: 3840, height: 2160 },
+  ];
+
+  for (const { width, height } of widths) {
+    for (const ms of [0, 6000, 14000, 21000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize({ width, height });
+      const frame = await loadRenderer(testPage, { scene: 11, ms, fixture });
+      await frame.evaluate(() => {
+        (window as any).colorPolishRuntime.step(1500);
+      });
+
+      // Pearl text is checked against its pearl's rim and the stream panel;
+      // the goal and milestone cards against their panel boxes.
+      const failures = await textFits(frame, '#stage .scene[data-scene="11"]');
+      expect(failures, `milestone text-fit failures at ${width}x${height}, ${ms} ms: ${JSON.stringify(failures)}`).toHaveLength(0);
+
+      const overflow = await noOverflow(frame);
+      expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
+      expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
+
+      await testPage.close();
+    }
+  }
+});
+
+test('the goal card and milestone card sit clear of the panel top and bottom edges, balanced, with no empty middle gap, at 1920 and 3840 wide', async ({ page }) => {
+  for (const size of [
+    { width: 1920, height: 1080 },
+    { width: 3840, height: 2160 },
+  ]) {
+    await page.setViewportSize(size);
+    const frame = await loadRenderer(page, { scene: 11, ms: 6000 });
+    const m = await frame.evaluate(() => {
+      const q = (sel: string) => document.querySelector<HTMLElement>(`#stage .scene[data-scene="11"] ${sel}`)!.getBoundingClientRect();
+      const scale = document.getElementById('tv')!.getBoundingClientRect().width / 1920;
+      const panel = q('.progress-sculpture'), goal = q('.progress-goal'), milestone = q('.progress-milestone');
+      return {
+        topGap: (goal.top - panel.top) / scale,
+        bottomGap: (panel.bottom - milestone.bottom) / scale,
+        middleGap: (milestone.top - goal.bottom) / scale,
+      };
+    });
+    // Real room from the rounded top and bottom edges (the Plan 15 layout
+    // left 0 px), the leftover split evenly, and the cards 40 px apart at
+    // most instead of all the slack collecting between them.
+    expect(m.topGap, JSON.stringify(m)).toBeGreaterThanOrEqual(40);
+    expect(m.bottomGap, JSON.stringify(m)).toBeGreaterThanOrEqual(36);
+    expect(Math.abs(m.topGap - m.bottomGap), JSON.stringify(m)).toBeLessThanOrEqual(12);
+    expect(m.middleGap, JSON.stringify(m)).toBeGreaterThan(0);
+    expect(m.middleGap, JSON.stringify(m)).toBeLessThanOrEqual(40);
+  }
+});
+
+test('tribute pearls are fully opaque inside the panel and fade out only at its edges, never crossing it while visible', async ({ page }) => {
+  test.setTimeout(120000);
+  for (const fixture of [buildMostlyLongFixture(), buildColorPolishSampleSnapshot()]) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize({ width: 1920, height: 1080 });
+    const frame = await loadRenderer(testPage, { scene: 11, fixture: fixture as Record<string, unknown> });
+    let crossings = 0;
+    let translucentInside = 0;
+    let samples = 0;
+    const detail: string[] = [];
+    // 25 s in quarter-second steps, inside the scene's 30 s dwell.
+    for (let i = 0; i < 100; i++) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(250));
+      const r = await frame.evaluate(() => {
+        const panel = document.querySelector('#stage .scene[data-scene="11"] .stream-world')!.getBoundingClientRect();
+        const out = { crossings: 0, translucentInside: 0, samples: 0, detail: [] as string[] };
+        document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="11"] .stream-node').forEach((node) => {
+          const opacity = parseFloat(getComputedStyle(node).opacity);
+          const box = node.getBoundingClientRect();
+          out.samples++;
+          const crosses = box.top < panel.top - 0.5 || box.bottom > panel.bottom + 0.5 || box.left < panel.left - 0.5 || box.right > panel.right + 0.5;
+          if (opacity > 0.1 && crosses) {
+            out.crossings++;
+            out.detail.push(`crossing at opacity ${opacity.toFixed(2)} box ${box.top.toFixed(0)}-${box.bottom.toFixed(0)}`);
+          }
+          // Clear of both edges by more than the 40 px fade band: fully opaque.
+          if (box.top > panel.top + 41 && box.bottom < panel.bottom - 41 && opacity < 0.999) {
+            out.translucentInside++;
+            out.detail.push(`translucent inside at ${opacity.toFixed(2)}`);
+          }
+        });
+        return out;
+      });
+      crossings += r.crossings;
+      translucentInside += r.translucentInside;
+      samples += r.samples;
+      detail.push(...r.detail.slice(0, 2));
+    }
+    expect(samples).toBeGreaterThan(500);
+    expect(crossings, detail.slice(0, 6).join('; ')).toBe(0);
+    expect(translucentInside, detail.slice(0, 6).join('; ')).toBe(0);
+    await testPage.close();
+  }
+});
