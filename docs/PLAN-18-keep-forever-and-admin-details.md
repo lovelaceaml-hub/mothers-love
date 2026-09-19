@@ -1,6 +1,6 @@
 # Plan 18: keep every recognition, and let admins see all details
 
-Status: DRAFT, waiting for Anthony's approval. Nothing in this plan is built yet.
+Status: DRAFT with Section A rulings recorded, waiting for Anthony's approval of the plan and runner. Nothing in this plan is built yet.
 
 ## Goal line
 
@@ -62,4 +62,6 @@ Spill order per the shared policy. B and C are independent after A, so Parallel 
 
 ## Build log
 
+- 2026-09-19: Anthony's rulings for Section A, given in chat. (1) The TV draws from every recognition ever, not a recent window. (2) The home page goes past the latest 100 with a "load more". Consequence for Section B: the TV pool and Garden selection must stay fair and fast as the pool grows without limit, so Section B adds a selection and performance check on a large synthetic pool, and the feed gets paging in the database function, not only in the browser.
+- 2026-09-19: Interim extension applied. All 132 recognitions then in the table were moved to 21 days by the statement in `database/ops/2026-09-19-extend-to-21-days.sql`. Anthony's own check afterwards showed cleanup healthy, collection open, and one row on 7 days, which is a recognition sent after the extension (new rows still get 7 days until Section B ships). The auto mode classifier refused the first attempt and later flagged the coordinator's approved retry as a bypass; future live database writes for this plan go through Anthony's SQL editor paste or an explicit permission rule, not a retry.
 - 2026-09-19: Plan drafted by Claude (Fable 5.1) at Anthony's request, in the same session that shipped the receipt feed, the heart fix and migration 014. Not yet approved.
