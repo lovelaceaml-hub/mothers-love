@@ -1,3 +1,11 @@
+## September 19 (later): Plan 17 update live, arrivals no longer cut off
+
+Live at https://mothers-love.vercel.app/display as commit `1102e87` on `tv17/pick`, Vercel production deployment `dpl_CezkcqH5eVHbebaFHvoZ5XThZj84` (mothers-love-l065i0zj3-lvzion.vercel.app), released at Anthony's word ("get it live") after he watched the preview on the TV. On top of the earlier September 19 release it adds the Welcome bubbles that fly in and out as one object, the group entrance as a wave of five (400 px, 21 seconds, long messages share that time across pages), the Peace in Practice heart with flowing ribbons of gold, and one fix: a newly arrived recognition's heart count reaches the TV a moment after the recognition, and the renderer treated that as the message changing and cancelled the entrance about a second in; a heart count change no longer cancels an arrival (`public/color-polish/core/host.js`).
+
+Rollback: `npx vercel rollback dpl_GQH2cvVPc7kPchUR9ko5AoHrZ7Br` (the earlier September 19 release). No database change was involved.
+
+Verified: live smoke check only (/display returns 200 and the live host.js carries the fix). Integration checks at `b81c488` earlier the same day: typecheck clean, 255 of 255 unit tests, build, 284 of 284 scene tests, probe at 3840. No test ran on the final build, and the arrival fix was found by reading the code, not reproduced; both at Anthony's request for speed. Open: watch one real arrival on the church TV; the Welcome 40 second saved playlist value still waits for Anthony; worktree cleanup not done.
+
 ## September 19: Plan 17 TV screens and Live Recognitions are live
 
 Live at https://mothers-love.vercel.app/display as commit `011a9ed` on `codex/mothers-love` and `tv17/pick` (Vercel production mothers-love-hoymiyv55-lvzion.vercel.app, deployed by Anthony). The release holds every Plan 17 screen change, the receipt feed and steady hearts release, and the new eleventh screen, Live Recognitions (https://mothers-love.vercel.app/display?scene=live-feed): the recognition strip grown to fill the screen, at the strip's own text sizes, two columns scrolling at 8 and 9 px per second, the second column starting half a card down. Anthony approved it on the church TV.
