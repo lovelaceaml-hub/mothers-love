@@ -6,6 +6,16 @@ const GROUP_STYLES=['Cascading constellation','Two tides, one wave','Spiral cons
 const GROUP_TITLES=['A new wave of Mother’s Love.','Kindness is being shared.','A constellation of kind words.','A garden of appreciation blooms.','Ten expressions. One shared moment.'];
 const ARRIVAL_FRAME_STYLES=['Light beam','Petal curtain','Aurora','Constellation gather'];
 
+// Full screen composition (Plan 17 Lane 14). The arrival frame is the whole TV
+// surface inside even 54 px margins: 1812 by 972, at TV 54,54. Every entrance
+// coordinate below is in that box. Orbs are laid out at their long standing
+// sizes, so circular fitting and paging are untouched, and are drawn larger
+// through a scale factor, so every word grows with the orb.
+const ARRIVAL_W=1812, ARRIVAL_H=972;
+const ARRIVAL_SINGLE={x:1300,y:486,layout:540,drawn:760};
+const ARRIVAL_GROUP={cx:906,cy:490,layout:258,drawn:300,x0:186,pitch:360,rowY:[296,684]};
+const ARRIVAL_PAIR={layout:518,drawn:720,x:[506,1306],y:490};
+
 let ARRIVAL_FRAME_BAG=[];
 let ARRIVAL_FRAME_LAST=null;
 
@@ -83,33 +93,33 @@ function arrivalBuildFrameMarkup(frameIndex, kind){
  if(frameIndex===0){
   let shafts='';
   for(let i=0;i<12;i++){
-   const left=group?(80+i*130):(910+i*28);
+   const left=group?(86+i*149):(ARRIVAL_SINGLE.x-230+i*40);
    shafts+=`<div class="arrival-beam-shaft" style="left:${left}px;--shaft-delay:${(i*0.14).toFixed(2)}s;--shaft-w:${3+i%3*2}px"></div>`;
   }
   let motes='';
   for(let i=0;i<14;i++){
-   const mx=group?(120+i*110):(930+i*20);
-   const my=90+((i*37)%430);
+   const mx=group?(120+i*120):(ARRIVAL_SINGLE.x-200+i*30);
+   const my=120+((i*59)%740);
    motes+=`<div class="arrival-beam-mote" style="left:${mx}px;top:${my}px;--mote-delay:${(i*0.22).toFixed(2)}s"></div>`;
   }
   return `<div class="arrival-frame arrival-frame-light-beam" data-frame-index="0"><div class="arrival-beam-column ${group?'group':''}"></div>${shafts}${motes}</div>`;
  }
  if(frameIndex===1){
   let leftPetals='';
-  for(let i=0;i<12;i++){
-   const px=30+(i%4)*75, py=40+Math.floor(i/4)*160;
+  for(let i=0;i<20;i++){
+   const px=30+(i%4)*100, py=44+Math.floor(i/4)*180;
    const rot=-22+i*6;
    leftPetals+=`<div class="arrival-curtain-petal" data-tint="${i%3}" style="left:${px}px;top:${py}px;--rot:${rot}deg"></div>`;
   }
   let rightPetals='';
-  for(let i=0;i<12;i++){
-   const px=group?(1400+(i%4)*75):(1340+(i%4)*75), py=40+Math.floor(i/4)*160;
+  for(let i=0;i<20;i++){
+   const px=1388+(i%4)*100, py=44+Math.floor(i/4)*180;
    const rot=22-i*6;
    rightPetals+=`<div class="arrival-curtain-petal" data-tint="${i%3}" style="left:${px}px;top:${py}px;--rot:${rot}deg"></div>`;
   }
   let floats='';
   for(let i=0;i<6;i++){
-   const fx=group?(300+i*210):(480+i*140), fy=100+((i*59)%390);
+   const fx=group?(300+i*210):(480+i*140), fy=120+((i*97)%720);
    floats+=`<div class="arrival-petal-float" style="left:${fx}px;top:${fy}px;--delay:${(i*0.35).toFixed(2)}s"></div>`;
   }
   return `<div class="arrival-frame arrival-frame-petal-curtain" data-frame-index="1"><div class="arrival-curtain-half left">${leftPetals}</div><div class="arrival-curtain-half right">${rightPetals}</div>${floats}</div>`;
@@ -120,26 +130,26 @@ function arrivalBuildFrameMarkup(frameIndex, kind){
    ribbons+=`<div class="arrival-aurora-ribbon arrival-aurora-ribbon-${i}"></div>`;
   }
   let stars='';
-  for(let i=0;i<24;i++){
-   const sx=40+((i*73)%1720), sy=30+((i*41)%545);
+  for(let i=0;i<36;i++){
+   const sx=40+((i*73)%1720), sy=30+((i*67)%900);
    stars+=`<div class="arrival-aurora-star" style="left:${sx}px;top:${sy}px;--star-delay:${(i*0.19).toFixed(2)}s;--star-size:${2+i%4}px"></div>`;
   }
   return `<div class="arrival-frame arrival-frame-aurora" data-frame-index="2">${ribbons}${stars}</div>`;
  }
  if(frameIndex===3){
   let stars='';
-  const cx=group?906:1070, cy=310;
+  const cx=group?ARRIVAL_GROUP.cx:ARRIVAL_SINGLE.x, cy=group?ARRIVAL_GROUP.cy:ARRIVAL_SINGLE.y;
   for(let i=0;i<16;i++){
    const angle=i*TAU/16;
-   const dist=group?(280+((i*37)%180)):(210+((i*37)%160));
-   const sx=cx+Math.cos(angle)*dist, sy=cy+Math.sin(angle)*(dist*0.62);
+   const dist=group?(300+((i*37)%260)):(300+((i*37)%230));
+   const sx=cx+Math.cos(angle)*dist, sy=cy+Math.sin(angle)*(dist*0.78);
    stars+=`<div class="arrival-const-star" style="left:${sx.toFixed(1)}px;top:${sy.toFixed(1)}px;--dx:${(cx-sx).toFixed(1)}px;--dy:${(cy-sy).toFixed(1)}px;--delay:${(i*0.08).toFixed(2)}s"></div>`;
   }
   let lines='';
   for(let i=0;i<14;i++){
    const angle=i*TAU/14;
-   const dist=group?220:170;
-   const lx=cx+Math.cos(angle)*dist, ly=cy+Math.sin(angle)*(dist*0.6);
+   const dist=group?300:245;
+   const lx=cx+Math.cos(angle)*dist, ly=cy+Math.sin(angle)*(dist*0.78);
    lines+=`<div class="arrival-const-line" style="left:${lx.toFixed(1)}px;top:${ly.toFixed(1)}px;--rot:${(angle*180/Math.PI).toFixed(1)}deg;--delay:${(i*0.1).toFixed(2)}s"></div>`;
   }
   return `<div class="arrival-frame arrival-frame-constellation" data-frame-index="3">${stars}${lines}</div>`;
@@ -157,7 +167,7 @@ function arrivalSpawnExitBurst(a){
    const el=document.createElement('div');
    el.className='arrival-burst-item '+(i%2===0?'heart':'petal');
    const angle=(i*TAU/count)+(Math.random()*0.4-0.2);
-   const dist=80+Math.random()*110;
+   const dist=(80+Math.random()*110)*(b.s||1);
    const dx=Math.cos(angle)*dist, dy=Math.sin(angle)*dist;
    el.style.cssText=`left:${b.x}px;top:${b.y}px;--bx:${dx.toFixed(1)}px;--by:${dy.toFixed(1)}px;--brot:${(Math.random()*80-40).toFixed(1)}deg;`;
    if(i%2===0){
@@ -176,26 +186,30 @@ function arrivalScene(){
 }
 
 function singleTrajectory(style,p){
- const tx=1070,ty=310;let x=tx,y=ty,z=0,scale=1,alpha=1;
+ const tx=ARRIVAL_SINGLE.x,ty=ARRIVAL_SINGLE.y;let x=tx,y=ty,z=0,scale=1,alpha=1;
  const q=outCubic(p);
  switch(style){
  case 0: // Through a luminous portal: approach, forward overshoot, settle.
   z=-1550*Math.pow(1-p,2.7)+Math.sin(Math.PI*p)*180;
-  x=tx+170*(1-q);y=ty-65*(1-q);alpha=smooth(p/.18);break;
+  x=tx+170*(1-q);y=ty-100*(1-q);alpha=smooth(p/.18);break;
  case 1: // Comet with a sweeping volumetric flight path.
-  x=curve(-390,80,1830,tx,q);y=curve(530,-285,5,ty,q);z=curve(-460,340,540,0,q);alpha=smooth(p/.1);break;
+  x=curve(-390,80,1830,tx,q);y=curve(840,-450,8,ty,q);z=curve(-460,340,540,0,q);alpha=smooth(p/.1);break;
  case 2: // Particle aggregation: the shell resolves where sparks converge.
   x=tx;y=ty;z=-900*(1-q)+120*Math.sin(Math.PI*clamp((p-.6)/.4,0,1));scale=.68+.32*smooth((p-.24)/.62);alpha=smooth((p-.33)/.23);break;
  case 3: // A pearl drops through depth; two diminishing rebounds.
-  if(p<.46){const s=p/.46;x=tx+170*(1-s);y=-670+1020*s*s;z=450*(1-s)}
-  else{const s=(p-.46)/.54;x=tx;y=ty-Math.abs(Math.sin(s*Math.PI*2.1))*145*(1-s);z=100*Math.sin(s*Math.PI)*(1-s)}
+  if(p<.46){const s=p/.46;x=tx+170*(1-s);y=mix(-1060,ty+40,s*s);z=450*(1-s)}
+  else{const s=(p-.46)/.54;x=tx;y=ty-Math.abs(Math.sin(s*Math.PI*2.1))*230*(1-s);z=100*Math.sin(s*Math.PI)*(1-s)}
   alpha=smooth(p/.13);break;
  case 4: // Loose corkscrew: wrap around the destination through depth.
-  {const r=630*Math.pow(1-p,1.4),theta=-p*Math.PI*3.4;x=tx+Math.cos(theta)*r;y=ty+Math.sin(theta)*r*.48;z=-360*(1-p)+Math.sin(theta)*r*.85;alpha=smooth(p/.14)}break;
+  {const r=760*Math.pow(1-p,1.4),theta=-p*Math.PI*3.4;x=tx+Math.cos(theta)*r;y=ty+Math.sin(theta)*r*.62;z=-360*(1-p)+Math.sin(theta)*r*.85;alpha=smooth(p/.14)}break;
  case 5: // Bloom shell opens; pearl rises from the flower's center.
-  x=tx+Math.sin(p*Math.PI*2)*40*(1-q);y=ty+210*(1-q);z=-760*(1-q);scale=.16+.84*smooth(p/.76);alpha=smooth((p-.08)/.21);break;
+  x=tx+Math.sin(p*Math.PI*2)*40*(1-q);y=ty+330*(1-q);z=-760*(1-q);scale=.16+.84*smooth(p/.76);alpha=smooth((p-.08)/.21);break;
  }
- const perspective=1300/(1300-z);return{x:tx+(x-tx)*perspective,y:ty+(y-ty)*perspective,z,k:perspective*scale,alpha};
+ const perspective=1300/(1300-z);
+ // The full screen orb is already large: a flight toward the viewer swells it only a
+ // little past its resting size, so it is never wider than the screen mid flight.
+ const raw=perspective*scale,k=raw>1?1+(raw-1)*.3:raw;
+ return{x:tx+(x-tx)*perspective,y:ty+(y-ty)*perspective,z,k,alpha};
 }
 
 function groupTrajectory(style,index,p,b){
@@ -206,18 +220,18 @@ function groupTrajectory(style,index,p,b){
  if(p<delay)return{x:tx,y:ty,z:-1000,k:.05,alpha:0};
  switch(style){
  case 0:
-  x=mix(906+(index%3-1)*150+(rank%2?60:-60),tx,q);y=mix(80-index%2*160,ty,q);z=(-1450-rank*90)*Math.pow(1-u,2.5)+Math.sin(Math.PI*u)*70;break;
+  x=mix(906+(index%3-1)*150+(rank%2?60:-60),tx,q);y=mix(126-index%2*250,ty,q);z=(-1450-rank*90)*Math.pow(1-u,2.5)+Math.sin(Math.PI*u)*70;break;
  case 1:
-  {const left=rank%2===0;x=curve(left?-350:2162,left?240:1572,tx+(left?170:-170),tx,q);y=curve(170+(rank%3)*125,-160+index*45,ty+75,ty,q);z=Math.sin(Math.PI*u)*340-350*(1-u)}break;
+  {const left=rank%2===0;x=curve(left?-350:2162,left?240:1572,tx+(left?170:-170),tx,q);y=curve(270+(rank%3)*200,-250+index*70,ty+118,ty,q);z=Math.sin(Math.PI*u)*340-350*(1-u)}break;
  case 2:
-  {const angle=index*2.4+(1-q)*Math.PI*3,rad=(1-q)*570;x=mix(906,tx,q)+Math.cos(angle)*rad;y=mix(315,ty,q)+Math.sin(angle)*rad*.33;z=Math.sin(angle)*rad*.8-400*(1-q)}break;
+  {const angle=index*2.4+(1-q)*Math.PI*3,rad=(1-q)*570;x=mix(906,tx,q)+Math.cos(angle)*rad;y=mix(ARRIVAL_GROUP.cy,ty,q)+Math.sin(angle)*rad*.5;z=Math.sin(angle)*rad*.8-400*(1-q)}break;
  case 3:
-  {const source=[300,906,1512][index%3];x=mix(source,tx,q);y=curve(940,-300,ty-130,ty,q);z=curve(-400,280,170,0,q);scale=.22+.78*q}break;
+  {const source=[300,906,1512][index%3];x=mix(source,tx,q);y=curve(1100,-470,ty-200,ty,q);z=curve(-400,280,170,0,q);scale=.22+.78*q}break;
  case 4:
-  {const source=[430,906,1382][index%3],zStart=[-900,-500,-700][index%3];x=mix(source,tx,q);y=mix(300,ty,q)+Math.sin(Math.PI*u)*(index<5?-65:65)*(1+(index%3)*.35);z=zStart*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
+  {const source=[430,906,1382][index%3],zStart=[-900,-500,-700][index%3];x=mix(source,tx,q);y=mix(ARRIVAL_GROUP.cy,ty,q)+Math.sin(Math.PI*u)*(index<5?-100:100)*(1+(index%3)*.35);z=zStart*(1-q)+Math.sin(Math.PI*u)*190;scale=.15+.85*smooth(u/.65);alpha=smooth((u-.06)/.18)}break;
  }
  const k=1100/(1100-z)*scale;
- return{x:906+(x-906)*(1100/(1100-z)),y:307+(y-307)*(1100/(1100-z)),z,k,alpha};
+ return{x:906+(x-906)*(1100/(1100-z)),y:ARRIVAL_GROUP.cy+(y-ARRIVAL_GROUP.cy)*(1100/(1100-z)),z,k,alpha};
 }
 
 registerScene(3,{
