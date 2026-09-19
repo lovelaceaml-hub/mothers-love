@@ -25,7 +25,7 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), lerp=(a,b,t)=>a+(b-a)*t, ease=t=
 const ZONE='America/Los_Angeles';
 const NAMES=['Welcome / Living campaign','Recognition Garden','New Recognition Arrival','Featured Expressions','Recognition Calendar','Participation Status','The Nine Expressions','We Are Peacemakers','Peace in Practice','Expression Orbit','Milestone & Weekly Goal'];
 const ORDER=[1,2,4,5,8,6,7,9,10,11];
-const DWELL={1:40,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30};
+const DWELL={1:60,2:180,3:30,4:60,5:60,6:60,7:60,8:60,9:60,10:60,11:60};
 // Exact phrase and principle catalog is inherited from the approved design files.
 // Supporting guidance below is an attributed paraphrase, not a verbatim website quotation.
 const GUIDANCE=[
