@@ -1,31 +1,84 @@
-/* Scene 3, Recognition Arrival. Every rule in this file is scoped to #tv .event-stage. Colors stay as shipped in renderer.css. */
+/* Scene 3, Recognition Arrival. Every rule in this file is scoped to #tv .event-stage or to the
+   arrival's own #tv .arrival-sky backdrop, which is on screen only while an arrival is running.
+   Colors stay as shipped in renderer.css. */
 
 #tv .event-stage .event-orb {
   border-radius: 50%;
 }
 
-/* Near-black backdrop */
-#tv .event-stage.active::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(14, 18, 17, 0.9);
-  z-index: 1;
-  pointer-events: none;
-  animation: arrivalBackdropFade 0.6s ease-out forwards;
-}
-
-/* Let the visual-only exit flight travel from the arrival frame toward the rail. */
+/* Let the visual-only exit flight travel from the arrival frame toward the rail,
+   and lift the live arrival above the header, the footer and the bright backdrop. */
 #tv .event-stage.active {
   overflow: visible;
+  z-index: 41;
 }
 
-@keyframes arrivalBackdropFade {
-  from {
-    opacity: 0;
+/* Bright, heavenly full screen backdrop.
+   The element is mounted on #tv for the length of one arrival chain, so the
+   entrance covers the whole 1920 by 1080 TV surface, including the header and
+   the live recognition rail, then clears. Colours are the arrival's own
+   #tv:has(.event-stage.active) tokens from renderer.css. */
+#tv .arrival-sky {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 600ms ease-out;
+}
+
+#tv:has(.event-stage.active) .arrival-sky {
+  opacity: 1;
+}
+
+#tv .arrival-sky-wash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(168deg,
+    #fffdf7 0%,
+    color-mix(in srgb, var(--scene-floor, #ffe18e) 26%, #fffdf7) 52%,
+    color-mix(in srgb, var(--scene-top, #ffcccf) 30%, #fffdf7) 100%);
+}
+
+#tv .arrival-sky-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 1180px 640px at 50% 2%, #ffffffee 0%, color-mix(in srgb, var(--scene-glow, #fff3b9b3) 72%, #ffffff) 44%, transparent 76%),
+    radial-gradient(ellipse 900px 520px at 7% 90%, color-mix(in srgb, var(--scene-side, #f7aed0) 32%, #ffffff), transparent 66%),
+    radial-gradient(ellipse 940px 540px at 93% 82%, color-mix(in srgb, var(--scene-floor, #ffe18e) 38%, #ffffff), transparent 64%);
+}
+
+#tv .arrival-sky-ray {
+  position: absolute;
+  top: -260px;
+  left: var(--ray-x, 0px);
+  width: var(--ray-w, 120px);
+  height: 1600px;
+  transform-origin: 50% 0;
+  transform: rotate(var(--ray-rot, 6deg));
+  background: linear-gradient(180deg,
+    #ffffffe6 0%,
+    color-mix(in srgb, var(--scene-floor, #ffe18e) 52%, #ffffff) 34%,
+    transparent 88%);
+  filter: blur(18px);
+  opacity: .5;
+  animation: arrivalSkyRay 7s ease-in-out infinite alternate;
+  animation-delay: var(--ray-delay, 0s);
+}
+
+@keyframes arrivalSkyRay {
+  0% {
+    opacity: .26;
+    transform: rotate(var(--ray-rot, 6deg)) scaleY(.94);
   }
-  to {
-    opacity: 1;
+  100% {
+    opacity: .62;
+    transform: rotate(var(--ray-rot, 6deg)) scaleX(1.08) scaleY(1);
   }
 }
 
@@ -414,10 +467,11 @@
   }
 }
 
-/* Still mode and reduced motion */
+/* Still mode and reduced motion: the bright backdrop stays, its rays hold still. */
 #tv.still .event-stage *,
 #tv .event-stage.still *,
-#tv .event-stage.still::before {
+#tv.still .arrival-sky,
+#tv.still .arrival-sky * {
   animation: none !important;
   transition: none !important;
 }
@@ -429,7 +483,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   #tv .event-stage *,
-  #tv .event-stage::before {
+  #tv .arrival-sky,
+  #tv .arrival-sky * {
     animation: none !important;
     transition: none !important;
   }

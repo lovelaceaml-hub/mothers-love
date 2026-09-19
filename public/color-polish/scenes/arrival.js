@@ -9,6 +9,49 @@ const ARRIVAL_FRAME_STYLES=['Light beam','Petal curtain','Aurora','Constellation
 let ARRIVAL_FRAME_BAG=[];
 let ARRIVAL_FRAME_LAST=null;
 
+// Bright, heavenly full screen backdrop. It is mounted on #tv, not inside the
+// arrival frame, so it covers the header and the live recognition rail too.
+const ARRIVAL_SKY_RAYS=9;
+let ARRIVAL_SKY_TIMER=null;
+
+function arrivalSkyMarkup(){
+ let rays='';
+ for(let i=0;i<ARRIVAL_SKY_RAYS;i++){
+  const x=-60+i*228;
+  const width=86+(i%4)*54;
+  const rot=(-7.4+i*1.9).toFixed(1);
+  rays+=`<div class="arrival-sky-ray" style="--ray-x:${x}px;--ray-w:${width}px;--ray-rot:${rot}deg;--ray-delay:-${(i*0.73).toFixed(2)}s"></div>`;
+ }
+ return `<div class="arrival-sky-wash"></div>${rays}<div class="arrival-sky-glow"></div>`;
+}
+
+function arrivalRemoveSky(){
+ if(ARRIVAL_SKY_TIMER){clearTimeout(ARRIVAL_SKY_TIMER);ARRIVAL_SKY_TIMER=null}
+ $('arrival-sky')?.remove();
+}
+
+function arrivalMountSky(){
+ const tv=$('tv');if(!tv)return null;
+ arrivalRemoveSky();
+ const el=document.createElement('div');
+ el.className='arrival-sky';
+ el.id='arrival-sky';
+ el.setAttribute('aria-hidden','true');
+ el.innerHTML=arrivalSkyMarkup();
+ tv.append(el);
+ return el;
+}
+
+// The backdrop fades out with the arrival frame, then leaves the DOM. Its
+// opacity is gated on #tv:has(.event-stage.active), so it never covers the rail
+// once the chain has ended, even if this removal is pre-empted.
+function arrivalClearSky(){
+ if(!$('arrival-sky'))return;
+ if(S.still){arrivalRemoveSky();return}
+ if(ARRIVAL_SKY_TIMER)clearTimeout(ARRIVAL_SKY_TIMER);
+ ARRIVAL_SKY_TIMER=setTimeout(()=>{ARRIVAL_SKY_TIMER=null;$('arrival-sky')?.remove()},700);
+}
+
 function nextArrivalFrame(){
  if(!ARRIVAL_FRAME_BAG.length){
   const values=Array.from({length:ARRIVAL_FRAME_STYLES.length},(_,i)=>i);
