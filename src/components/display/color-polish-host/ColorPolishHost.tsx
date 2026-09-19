@@ -100,6 +100,9 @@ export function previewBaseScene(snapshot: ColorPolishSnapshot | null): ColorPol
 
 export function buildPreviewArrivals(snapshot: ColorPolishSnapshot | null, cycle: number, size: number): ColorPolishSnapshot['arrivals'] {
   if (!snapshot || !Array.isArray(snapshot.recognitions) || !Number.isSafeInteger(size) || size < 1) return [];
+  // The owner's pause and the quiet and neutral modes win over a preview link.
+  // The renderer and the host phase already enforce both; this is a second stop.
+  if (snapshot.settings?.pauseArrivals === true || snapshot.settings?.mode !== 'normal') return [];
   const serverMs = Date.parse(snapshot.serverTime);
   if (!Number.isFinite(serverMs)) return [];
   // Only records the verified public snapshot already carries, still published
@@ -127,7 +130,47 @@ export function planScenePreview(request: ScenePreviewRequest, snapshot: ColorPo
   if (request.kind === 'scene') {
     return { scene: request.scene, replayKey: cycle, arrivals: null, holdInput: true };
   }
-  return { scene: previewBaseScene(snapshot), arrivals: buildPreviewArrivals(snapshot, cycle, request.size), holdInput: true };
+  const replayed = buildPreviewArrivals(snapshot, cycle, request.size);
+  // With nothing to replay the plan carries no arrivals at all, so the arrivals
+  // the server sent are passed through exactly as they came.
+  return { scene: previewBaseScene(snapshot), arrivals: replayed.length > 0 ? replayed : null, holdInput: true };
+}
+
+/**
+ * The snapshot the renderer receives while a preview link is held. It is always
+ * the fetched snapshot itself (same object) when no link is held, which is every
+ * request on a production build. Otherwise it is a shallow copy that differs in
+ * two places only, and the fetched object is never mutated:
+ *
+ * 1. A held screen is switched on in the copy's playlist, or added to it, so the
+ *    link can show a screen the saved playlist has disabled or does not list yet.
+ *    The renderer falls back to the first enabled screen for anything that is
+ *    not an enabled playlist entry, and the owner uses these links to judge every
+ *    screen, including a new one. Every screen draws from the same verified
+ *    public snapshot, so this shows nothing the enabled screens could not show.
+ * 2. Replayed entrances are added after the arrivals the server sent, so real
+ *    entrances still play and the renderer's record of seen events stays whole.
+ */
+export function scenePreviewSnapshot(request: ScenePreviewRequest, plan: ScenePreviewPlan, snapshot: ColorPolishSnapshot | null): ColorPolishSnapshot | null {
+  if (!snapshot || request.kind === 'none') return snapshot;
+  let next = snapshot;
+  if (request.kind === 'scene') {
+    const held = request.scene;
+    const playlist = Array.isArray(snapshot.presentation?.playlist) ? snapshot.presentation.playlist : [];
+    const listed = playlist.find((entry) => entry.id === held);
+    if (!listed || listed.enabled !== true) {
+      const entry = { id: held, enabled: true, durationSeconds: sceneDwellSeconds(snapshot, held) };
+      const others = playlist.filter((item) => item.id !== held);
+      // First, so the bridge's playlist length cap can never cut it off. Order
+      // does not matter while a screen is held, because nothing advances.
+      next = { ...next, presentation: { ...snapshot.presentation, playlist: [entry, ...others] } };
+    }
+  }
+  if (plan.arrivals && plan.arrivals.length > 0) {
+    const sent = Array.isArray(snapshot.arrivals) ? snapshot.arrivals : [];
+    next = { ...next, arrivals: [...sent, ...plan.arrivals] };
+  }
+  return next;
 }
 
 function performanceNow(): number {
@@ -272,6 +315,9 @@ export function ColorPolishHost() {
   const [previewElapsedMs, setPreviewElapsedMs] = useState(0);
 
   useEffect(() => {
+    // Build time constant. On a production build this effect does nothing: the
+    // query string is never read and no state is set.
+    if (!COLOR_POLISH_PREVIEW_BUILD) return;
     setPreviewSearch(typeof window === 'undefined' ? null : window.location.search);
   }, []);
 
@@ -305,8 +351,8 @@ export function ColorPolishHost() {
     [previewQuantizedMs, previewRequest, snapshot],
   );
   const previewSnapshot = useMemo(
-    () => (snapshot && previewPlan.arrivals ? { ...snapshot, arrivals: previewPlan.arrivals } : snapshot),
-    [previewPlan, snapshot],
+    () => scenePreviewSnapshot(previewRequest, previewPlan, snapshot),
+    [previewPlan, previewRequest, snapshot],
   );
 
   const eligibleIds = useMemo(() => {
@@ -344,7 +390,7 @@ export function ColorPolishHost() {
       <div
         data-testid="color-polish-display"
         data-display-phase={phase}
-        data-scene-hold={previewPlan.scene ?? ''}
+        {...(previewPlan.scene === undefined ? {} : { 'data-scene-hold': previewPlan.scene })}
         style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#fff9ed' }}
       >
         <ColorPolishRenderer
@@ -354,7 +400,7 @@ export function ColorPolishHost() {
           status="ready"
           source="live"
           reactionCounts={reactionCounts}
-          holdInput={previewPlan.holdInput}
+          {...(previewPlan.holdInput ? { holdInput: true } : {})}
           {...(previewPlan.scene === undefined ? {} : { scene: previewPlan.scene })}
           {...(previewPlan.replayKey === undefined ? {} : { replayKey: previewPlan.replayKey })}
         />

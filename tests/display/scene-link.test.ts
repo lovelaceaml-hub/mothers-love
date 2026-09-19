@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   ARRIVAL_GROUP_PREVIEW_SLUG,
@@ -11,6 +13,7 @@ import {
   previewBaseScene,
   sceneDwellSeconds,
   scenePreviewCycle,
+  scenePreviewSnapshot,
   scenePreviewStepMs,
   type ScenePreviewRequest,
 } from '@/components/display/color-polish-host/ColorPolishHost';
@@ -118,7 +121,140 @@ describe('one screen preview links on a production build', () => {
   });
 });
 
+describe('the production gate, end to end', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('hands the renderer the fetched snapshot object itself for every slug when the gate is false', () => {
+    const snapshot = snapshotWith(Array.from({ length: 12 }, (_, index) => record(index)), [
+      { id: 'welcome', enabled: true, durationSeconds: 60 },
+      { id: 'garden', enabled: false, durationSeconds: 180 },
+    ]);
+    const before = JSON.stringify(snapshot);
+    for (const slug of [...PREVIEW_SLUGS, 'live-feed', 'not-a-scene']) {
+      const request = parseScenePreviewRequest(`?scene=${slug}`, false);
+      const plan = planScenePreview(request, snapshot, 5 * 60_000);
+      expect(scenePreviewSnapshot(request, plan, snapshot)).toBe(snapshot);
+    }
+    expect(JSON.stringify(snapshot)).toBe(before);
+  });
+
+  it('reads the gate from the build time constant, false unless the build set it to the string true', async () => {
+    vi.resetModules();
+    const plain = await import('@/components/display/color-polish/renderer');
+    expect(plain.COLOR_POLISH_PREVIEW_BUILD).toBe(false);
+    for (const value of ['false', '1', 'TRUE', '']) {
+      vi.stubEnv('COLOR_POLISH_PREVIEW_BUILD', value);
+      vi.resetModules();
+      const module = await import('@/components/display/color-polish/renderer');
+      expect(module.COLOR_POLISH_PREVIEW_BUILD).toBe(false);
+    }
+    vi.stubEnv('COLOR_POLISH_PREVIEW_BUILD', 'true');
+    vi.resetModules();
+    const preview = await import('@/components/display/color-polish/renderer');
+    expect(preview.COLOR_POLISH_PREVIEW_BUILD).toBe(true);
+  });
+
+  it('never applies the input hold to the iframe on a production build, even when a caller asks for it', async () => {
+    vi.resetModules();
+    const { ColorPolishRenderer } = await import('@/components/display/color-polish/renderer');
+    const base = { snapshot: null, nowMs: 0, status: 'ready' as const, source: 'live' as const };
+    const plain = renderToStaticMarkup(createElement(ColorPolishRenderer, base));
+    const asked = renderToStaticMarkup(createElement(ColorPolishRenderer, { ...base, holdInput: true, scene: 'garden', replayKey: 3 }));
+    expect(asked).toBe(plain);
+    expect(asked).not.toContain('pointer-events');
+    expect(asked).not.toContain('tabindex');
+    expect(asked).toContain('sandbox="allow-scripts"');
+  });
+
+  it('applies the input hold on a preview build only while a link is held', async () => {
+    vi.stubEnv('COLOR_POLISH_PREVIEW_BUILD', 'true');
+    vi.resetModules();
+    const { ColorPolishRenderer } = await import('@/components/display/color-polish/renderer');
+    const base = { snapshot: null, nowMs: 0, status: 'ready' as const, source: 'live' as const };
+    const free = renderToStaticMarkup(createElement(ColorPolishRenderer, base));
+    const held = renderToStaticMarkup(createElement(ColorPolishRenderer, { ...base, holdInput: true }));
+    expect(free).not.toContain('pointer-events');
+    expect(free).not.toContain('tabindex');
+    expect(held).toContain('pointer-events:none');
+    expect(held).toContain('tabindex="-1"');
+  });
+});
+
 describe('one screen preview links on a preview build', () => {
+  it('accepts a slug exactly when the scene list carries it, so a new screen such as live-feed works once it is listed', () => {
+    const listed = (COLOR_POLISH_SCENES as readonly string[]).includes('live-feed');
+    expect(parseScenePreviewRequest('?scene=live-feed', true)).toEqual(listed ? { kind: 'scene', scene: 'live-feed' } : { kind: 'none' });
+  });
+
+  it('holds a screen that the saved playlist has disabled, without touching the fetched snapshot', () => {
+    const snapshot = snapshotWith([record(0)], [
+      { id: 'welcome', enabled: true, durationSeconds: 60 },
+      { id: 'orbit', enabled: false, durationSeconds: 45 },
+    ]);
+    const before = JSON.stringify(snapshot);
+    const request: ScenePreviewRequest = { kind: 'scene', scene: 'orbit' };
+    const held = scenePreviewSnapshot(request, planScenePreview(request, snapshot, 0), snapshot);
+    expect(held).not.toBe(snapshot);
+    expect(held?.presentation.playlist).toEqual([
+      { id: 'orbit', enabled: true, durationSeconds: 45 },
+      { id: 'welcome', enabled: true, durationSeconds: 60 },
+    ]);
+    expect(held?.recognitions).toBe(snapshot.recognitions);
+    expect(held?.arrivals).toBe(snapshot.arrivals);
+    expect(JSON.stringify(snapshot)).toBe(before);
+  });
+
+  it('holds a screen the saved playlist does not list yet, at the contract duration', () => {
+    const snapshot = snapshotWith([record(0)], [{ id: 'welcome', enabled: true, durationSeconds: 60 }]);
+    const request: ScenePreviewRequest = { kind: 'scene', scene: 'milestone' };
+    const held = scenePreviewSnapshot(request, planScenePreview(request, snapshot, 0), snapshot);
+    expect(held?.presentation.playlist[0]).toEqual({ id: 'milestone', enabled: true, durationSeconds: COLOR_POLISH_DURATIONS.milestone });
+    expect(held?.presentation.playlist).toHaveLength(2);
+  });
+
+  it('passes the fetched snapshot through unchanged when the held screen is already enabled', () => {
+    const snapshot = snapshotWith([record(0)]);
+    const request: ScenePreviewRequest = { kind: 'scene', scene: 'garden' };
+    expect(scenePreviewSnapshot(request, planScenePreview(request, snapshot, 0), snapshot)).toBe(snapshot);
+    expect(scenePreviewSnapshot(request, planScenePreview(request, null, 0), null)).toBeNull();
+  });
+
+  it('adds replayed entrances after the arrivals the server sent and never drops a real one', () => {
+    const snapshot = snapshotWith(Array.from({ length: 3 }, (_, index) => record(index)));
+    snapshot.arrivals = [{ eventId: '41', recognitionId: 'synthetic-record-2', publishedAt: SERVER_TIME }];
+    const request: ScenePreviewRequest = { kind: 'arrival', size: 1 };
+    const held = scenePreviewSnapshot(request, planScenePreview(request, snapshot, 0), snapshot);
+    expect(held?.arrivals).toHaveLength(2);
+    expect(held?.arrivals[0]).toEqual(snapshot.arrivals[0]);
+    expect(snapshot.arrivals).toHaveLength(1);
+
+    const thin = snapshotWith([]);
+    thin.arrivals = [{ eventId: '42', recognitionId: 'gone', publishedAt: SERVER_TIME }];
+    expect(scenePreviewSnapshot(request, planScenePreview(request, thin, 0), thin)).toBe(thin);
+  });
+
+  it('replays nothing while the owner has paused arrivals or the mode is quiet or neutral', () => {
+    const records = Array.from({ length: 12 }, (_, index) => record(index));
+    const paused = snapshotWith(records);
+    paused.settings = { ...paused.settings, pauseArrivals: true };
+    const quiet = snapshotWith(records);
+    quiet.settings = { ...quiet.settings, mode: 'quiet' };
+    const neutral = snapshotWith(records);
+    neutral.settings = { ...neutral.settings, mode: 'neutral' };
+    for (const snapshot of [paused, quiet, neutral]) {
+      for (const size of [1, ARRIVAL_GROUP_SIZE]) {
+        expect(buildPreviewArrivals(snapshot, 3, size)).toEqual([]);
+        const request: ScenePreviewRequest = { kind: 'arrival', size };
+        const plan = planScenePreview(request, snapshot, 60_000);
+        expect(plan.arrivals).toBeNull();
+        expect(scenePreviewSnapshot(request, plan, snapshot)).toBe(snapshot);
+      }
+    }
+  });
+
   it('accepts each of the ten screen slugs and rejects unknown slugs', () => {
     for (const scene of COLOR_POLISH_SCENES) {
       expect(parseScenePreviewRequest(`?scene=${scene}`, true)).toEqual({ kind: 'scene', scene });
@@ -201,7 +337,7 @@ describe('one screen preview links on a preview build', () => {
     expect(new Set(group.map((item) => item.eventId)).size).toBe(ARRIVAL_GROUP_SIZE);
     expect(new Set(group.map((item) => item.recognitionId)).size).toBe(ARRIVAL_GROUP_SIZE);
 
-    expect(planScenePreview(request, thin, 0).arrivals).toEqual([]);
+    expect(planScenePreview(request, thin, 0).arrivals).toBeNull();
   });
 
   it('never replays a record that is missing, unpublished or already expired', () => {
