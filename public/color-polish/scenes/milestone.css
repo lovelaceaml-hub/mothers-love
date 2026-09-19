@@ -12,11 +12,20 @@
   left: 0;
 }
 
+/* Plan 17, decision 6: the base .progress-rail rule (renderer.css, not owned
+   here) is top:0;bottom:0;justify-content:space-between, which put the goal
+   heading flush against the panel's rounded top edge and the milestone block
+   flush against its rounded bottom edge, with all the slack in one empty gap
+   between the two blocks. top/bottom give both ends clearance from the
+   rounded edges, the two blocks sit a fixed 26 px apart, and centring splits
+   whatever room is left evenly above and below them. */
 #tv .scene[data-scene="11"] .progress-rail {
   left: 46px;
-  top: 0;
-  bottom: 0;
+  top: 40px;
+  bottom: 36px;
   width: 560px;
+  justify-content: center;
+  gap: 26px;
 }
 
 #tv .scene[data-scene="11"] .stream-world {
@@ -138,13 +147,19 @@
 
 /* Stream Nodes and Pearls */
 #tv .scene[data-scene="11"] .stream-node {
-  width: 216px;
-  height: 216px;
+  /* 236 px (from 216, Plan 17): room for every catalog phrase, the name and
+     the icon row to sit max(3 percent, 12 px) inside the pearl's rim. */
+  width: 236px;
+  height: 236px;
 }
 
 #tv .scene[data-scene="11"] .stream-pearl {
   padding: 14px 18px;
   box-sizing: border-box;
+  /* Plan 17: the shipped pearl fill is slightly see-through (F7 and E8
+     alpha), which let the words of a pearl behind show through. Same
+     colours, fully opaque. */
+  background: radial-gradient(circle at 30% 15%, #ffffff 4%, #fffef2 45%, color-mix(in srgb, var(--tint) 46%, #fff9ef) 100%);
 }
 
 #tv .scene[data-scene="11"] .stream-pearl .stream-phrase {
@@ -152,7 +167,9 @@
   line-height: 1.15;
   color: #6a5840;
   text-align: center;
-  max-width: 176px;
+  /* 168 px (from 176) keeps every catalog phrase's corner lines inside the
+     Plan 17 rim margin of the 236 px pearl. */
+  max-width: 168px;
   margin-bottom: 4px;
   font-weight: 500;
 }
