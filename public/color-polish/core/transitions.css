@@ -18,3 +18,24 @@
   animation: none !important;
   transition: none !important;
 }
+
+/* Bubble entrance after a scene change (core/transitions.js drives the two
+ * properties): the circle and its rings fade and grow in together, while the
+ * slot itself keeps the position and drift its scene gives it. */
+#tv .orb-slot[data-arriving] > .orb-life {
+  opacity: var(--arrive-o, 1);
+  transform: scale(var(--arrive-s, 1));
+  /* renderer.css eases .orb-life opacity over .6 s; the entrance sets every
+   * frame itself, so that ease would only make it lag and flash. */
+  transition: none;
+}
+
+#tv .orb-slot[data-arriving]::before {
+  opacity: calc(.7 * var(--arrive-o, 1));
+  transform: scale(var(--arrive-s, 1));
+}
+
+#tv .orb-slot[data-arriving]::after {
+  opacity: var(--arrive-o, 1);
+  transform: scale(var(--arrive-s, 1));
+}

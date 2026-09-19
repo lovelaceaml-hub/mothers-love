@@ -65,7 +65,7 @@ function requestScene(id,{force=false}={}){
   }
   old?.remove();return;
  }
- el.style.opacity=0;transition=transitionStart(old,prev,el);
+ el.style.opacity=0;transition=transitionStart(old,prev,el);bubbleEntranceStart(el);
 }
 function nextPlaylistEntry(){
  const list=S.playlist;if(!list?.length)return null;
@@ -116,6 +116,7 @@ function coordinator(dt){
  if(!S.clockControlled)S.t+=dt;
  changeWeek();
  if(S.t>=S.privacyAt){mandatoryPrune();S.privacyAt=S.t+1}
+ tickBubbleEntrance(dt);
  if(transition)tickTransition(dt);
  else if(!active&&S.queue.length&&S.t>=(S.queueStart??0)&&!['offline','neutral','empty'].includes(S.mode))beginEvent();
  if(active)tickEvent(dt);
@@ -153,4 +154,4 @@ function stepRuntime(ms){
  let remaining=Math.min(120000,ms)/1000;while(remaining>0){const dt=Math.min(.02,remaining);coordinator(dt);remaining-=dt}
  S.clockControlled=wasControlled;S.playing=wasPlaying;frozen=wasFrozen;applyStill();drawAtmosphere(0);drawSceneFX(0);if(V.garden)drawGarden();if(V.stream)drawStream();
 }
-function runtimeState(){return{version:COLOR_POLISH_VERSION,initialized,scene:S.s,sceneAge:S.sceneAge,clock:S.t,playing:S.playing,still:S.still,mode:S.mode,queueLength:S.queue.length,active:active?{kind:active.kind,phase:active.phase,style:active.style,hold:active.hold,page:active.page,ids:active.items.map(r=>r.id)}:null,transition:transition?{age:transition.age,duration:transition.duration}:null,slots:slots.map(({el,...slot})=>slot),visual:visualState(),log:[...qaLog]}}
+function runtimeState(){return{version:COLOR_POLISH_VERSION,initialized,scene:S.s,sceneAge:S.sceneAge,clock:S.t,playing:S.playing,still:S.still,mode:S.mode,queueLength:S.queue.length,active:active?{kind:active.kind,phase:active.phase,style:active.style,hold:active.hold,page:active.page,ids:active.items.map(r=>r.id)}:null,transition:transition?{age:transition.age,duration:transition.duration}:null,bubbleEntrance:bubbleEntrance?{age:bubbleEntrance.age,end:bubbleEntrance.end,delays:bubbleEntrance.items.map(item=>item.delay)}:null,slots:slots.map(({el,...slot})=>slot),visual:visualState(),log:[...qaLog]}}
