@@ -83,23 +83,27 @@ function arrivalFocus(kind,oversize){
  return{x:ARRIVAL_SINGLE.x,y:ARRIVAL_SINGLE.y,s:1,quiet:{x0:80,x1:820,y0:290,y1:690}};
 }
 
-// Flowers bloom around the bubble in two counter-turning wreaths.
+// Flowers open petal by petal, scattered loosely across the scene behind the bubble.
 function arrivalFlower(x,y,size,turn,tone,delay){
  const petal=['#f4b6c8','#f8dc9a','#e3c6ee','#fbcdb2'][tone%4],heart=['#e0a93c','#d98aa2','#e0a93c','#d98a5e'][tone%4];
  let petals='';
- for(let k=0;k<6;k++)petals+=`<ellipse cx="0" cy="${(-size*.6).toFixed(1)}" rx="${(size*.34).toFixed(1)}" ry="${(size*.6).toFixed(1)}" transform="rotate(${k*60})" fill="${petal}" stroke="#fffaf0" stroke-width="1"/>`;
- return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${turn.toFixed(0)})"><g class="flower" style="--bloom-delay:${delay.toFixed(2)}s">${petals}<circle r="${(size*.26).toFixed(1)}" fill="${heart}" stroke="none"/></g></g>`;
+ for(let k=0;k<5;k++)petals+=`<g transform="rotate(${k*72})"><ellipse class="petal" style="--bloom-delay:${(delay+k*.11).toFixed(2)}s" cx="0" cy="${(-size*.6).toFixed(1)}" rx="${(size*.36).toFixed(1)}" ry="${(size*.6).toFixed(1)}" fill="${petal}" stroke="#fffaf0" stroke-width="1"/></g>`;
+ return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${turn.toFixed(0)})">${petals}<circle class="petal" style="--bloom-delay:${(delay+.5).toFixed(2)}s" r="${(size*.26).toFixed(1)}" fill="${heart}" stroke="none"/></g>`;
 }
 
-function arrivalRosette(layer){
- let shapes='';
- if(layer===0){
-  for(let i=0;i<16;i++){const t=i*TAU/16+.2;shapes+=arrivalFlower(Math.cos(t)*545,Math.sin(t)*545,i%2?24:32,i*37,i,.5+i*.07)}
- }else{
-  for(let i=0;i<12;i++){const t=i*TAU/12;shapes+=arrivalFlower(Math.cos(t)*440,Math.sin(t)*440,i%2?38:28,i*53,i+1,.15+i*.08)}
-  for(let i=0;i<12;i++){const t=(i+.5)*TAU/12;shapes+=arrivalFlower(Math.cos(t)*492,Math.sin(t)*492,15,i*29,i+2,.7+i*.06)}
+function arrivalPetals(){
+ let shapes='',placed=0;
+ for(let i=0;placed<30&&i<90;i++){
+  const x=(arrivalHash(i,1)-.5)*2300,y=(arrivalHash(i,2)-.5)*1300;
+  if(Math.hypot(x,y)<410)continue;
+  shapes+=arrivalFlower(x,y,20+arrivalHash(i,3)*30,arrivalHash(i,4)*360,i,.2+arrivalHash(i,5)*2.4);placed++;
  }
- return `<svg class="arrival-rosette arrival-rosette-${layer}" viewBox="-620 -620 1240 1240" width="1240" height="1240" aria-hidden="true">${shapes}</svg>`;
+ return `<svg class="arrival-petals" viewBox="-1200 -700 2400 1400" width="2400" height="1400" aria-hidden="true">${shapes}</svg>`;
+}
+
+// The two turning layers stay as empty anchors for the stage tick; the line art is retired.
+function arrivalRosette(layer){
+ return `<svg class="arrival-rosette arrival-rosette-${layer}" viewBox="-620 -620 1240 1240" width="1240" height="1240" aria-hidden="true"></svg>`;
 }
 
 function arrivalStageMarkup(kind){
@@ -109,7 +113,7 @@ function arrivalStageMarkup(kind){
   const size=150+((i*97)%230),x=((i*263+120)%1760)-60,y=((i*173+40)%900)-40;
   lights+=`<div class="arrival-light" style="left:${x}px;top:${y}px;width:${size}px;height:${size}px;--light-delay:-${(i*1.7).toFixed(1)}s;--light-dur:${13+i%4*3}s"></div>`;
  }
- return `<div class="arrival-architecture" aria-hidden="true">${lights}<div class="arrival-halo" style="left:${f.x}px;top:${f.y}px"><div class="arrival-halo-fan fan-a"></div><div class="arrival-halo-fan fan-b"></div>${arrivalRosette(0)}${arrivalRosette(1)}<div class="arrival-halo-bloom"></div></div><div class="arrival-dawn" style="left:${f.x}px;top:${f.y}px"></div></div><div class="arrival-edge" aria-hidden="true"><i></i></div>`;
+ return `<div class="arrival-architecture" aria-hidden="true">${lights}<div class="arrival-halo" style="left:${f.x}px;top:${f.y}px"><div class="arrival-halo-fan fan-a"></div><div class="arrival-halo-fan fan-b"></div>${arrivalRosette(0)}${arrivalRosette(1)}${arrivalPetals()}<div class="arrival-halo-bloom"></div></div><div class="arrival-dawn" style="left:${f.x}px;top:${f.y}px"></div></div><div class="arrival-edge" aria-hidden="true"><i></i></div>`;
 }
 
 const arrivalWord=html=>`<span class="arrival-word">${html}</span>`;

@@ -220,22 +220,22 @@
 
 #tv .event-stage .arrival-rosette {
   fill: none;
-  opacity: .92;
-  -webkit-mask-image: radial-gradient(circle closest-side, #000 84%, transparent 100%);
-  mask-image: radial-gradient(circle closest-side, #000 84%, transparent 100%);
 }
 
-#tv .event-stage .arrival-rosette .flower {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: arrivalFlowerBloom 1.5s cubic-bezier(.2, .8, .2, 1.15) both;
+#tv .event-stage .arrival-petals {
+  overflow: visible;
+  opacity: .95;
+  filter: drop-shadow(0 3px 5px rgba(170, 120, 60, .2));
+}
+
+#tv .event-stage .arrival-petals .petal {
+  animation: arrivalPetalOpen 1.3s cubic-bezier(.2, .8, .2, 1.12) both;
   animation-delay: var(--bloom-delay, 0s);
-  filter: drop-shadow(0 3px 5px rgba(170, 120, 60, .22));
 }
 
-@keyframes arrivalFlowerBloom {
-  from { transform: scale(0) rotate(-80deg); opacity: 0; }
-  to { transform: scale(1) rotate(0deg); opacity: 1; }
+@keyframes arrivalPetalOpen {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 #tv .event-stage .arrival-dawn {
