@@ -5,22 +5,44 @@
 
    Every class the scene's markup uses (.eyebrow, .subheading, .heart-host,
    .floating-heart, .orb-slot, .orb, ...) already ships in renderer.css, so the
-   only rules needed here are the one for the heart canvas that replaced the
-   flat heart image, and the soft change of words inside the reserved bubble,
+   only rules needed here are the ones for the heart's layers (the rose solid,
+   and the gold ribbons and glow behind and in front of it), and the soft change of words inside the reserved bubble,
    which stays in its place while one message hands over to the next. Every
    selector is scoped to this scene's root.
 */
 
+#tv .scene[data-scene='9'] .pip-heart-rig {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 52%;
+}
 #tv .scene[data-scene='9'] .pip-heart {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
+}
+/* The two ribbon layers reach 50 px past the heart's box on each side and
+   40 px below it, never above it, where the subheading is. The far side of the
+   ribbons and the glow sit behind the rose solid, the near side in front,
+   by their order in the rig. */
+#tv .scene[data-scene='9'] .pip-heart-back,
+#tv .scene[data-scene='9'] .pip-heart-front {
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: calc(100% + 100px);
+  height: calc(100% + 40px);
+  display: block;
+  pointer-events: none;
 }
 
 /* Reduced motion: the heart is drawn once at a three quarter angle and never
    redrawn, so nothing here may animate it either. */
 @media (prefers-reduced-motion: reduce) {
-  #tv .scene[data-scene='9'] .pip-heart {
+  #tv .scene[data-scene='9'] .pip-heart-rig,
+  #tv .scene[data-scene='9'] .pip-heart-rig canvas {
     animation: none;
     transition: none;
   }

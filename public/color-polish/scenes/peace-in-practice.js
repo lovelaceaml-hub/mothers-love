@@ -14,6 +14,11 @@
 //   2. The big turning heart is a real solid with thickness, drawn here as a
 //      shaded three dimensional surface, because the flat image thinned to a
 //      card edge as it span.
+//
+// A Plan 17 handoff on 2026-09-19 adds a third, after Anthony saw the solid on
+// the TV and found it plain:
+//   3. Flowing ribbons of gold sweep around the turning heart, behind it and
+//      in front of it, and the heart beats, floats and glows.
 // Everything else (art, heading, bubble styling, motion, the small floating
 // hearts) stays as the live TV shows it.
 'use strict';
@@ -657,6 +662,375 @@ function pipBuildHeartTable() {
   return table;
 }
 
+/* ---------------------------------------------------------------------------
+   Flowing ribbons of gold, and the life around the heart
+
+   Anthony, after seeing the solid on the TV: "it still looks very plain. I want
+   you to make it very dynamic with beautiful architecture". A first answer, a
+   heart set in raised gold tracery, he turned down: "the gold looks like metal.
+   I was imagining flowing ribbons of gold", and he wanted it more majestic.
+
+   So the rose solid stays as it is, and ribbons of gold silk sweep around it,
+   two wide and two fine. Each is a real band in space: it climbs around the heart in a wide loose
+   spiral from below the point to above the lobes, passes behind the heart and
+   then in front of it, twists along its length, tapers to a point at both
+   ends, and ripples as it flows. The whole spiral is seen from a little above,
+   so the loops open into ovals.
+
+   The ribbons are shaded as cloth and not as metal: a soft body colour from
+   the way the band faces the light, and the long sheen silk has, which runs
+   along the band and slides as it twists. Nothing here is a hard highlight.
+
+   Which side of the heart a piece of ribbon is on is not guessed: each piece
+   is compared with the depth of the solid painted at that spot, and is drawn
+   on the layer behind the solid or the layer in front of it.
+
+   Everything is a function of the scene clock, so a given moment always draws
+   the same picture, and with motion off it is drawn once and never again.
+
+   - The ribbons flow around the heart, one circuit in 26 seconds, rippling.
+   - A heartbeat: two soft beats every 1.9 seconds. The heart swells by three
+     percent, and the glow behind it brightens with each beat.
+   - The heart floats: it rises and falls a few pixels and leans a couple of
+     degrees either way as it turns.
+   - A wide glow cut into rays turns slowly behind it all.
+   - Small stars ride along the ribbons and flicker.
+--------------------------------------------------------------------------- */
+
+const PIP_RIBBON_PAD_X = 50;          // the ribbon layers reach this far past the heart's box on each side
+const PIP_RIBBON_PAD_BOTTOM = 40;     // and this far below it (never above: the subheading is there)
+const PIP_RIBBONS = 4;                // two wide ribbons, and two fine ones between them
+const PIP_RIBBON_SEGMENTS = 120;      // pieces each ribbon is drawn in
+const PIP_RIBBON_TURNS = 1.35;        // times each ribbon goes around the heart
+const PIP_RIBBON_RADIUS = 164;        // the heart is at most 140 from its axis, so the ribbons always clear it
+const PIP_RIBBON_RADIUS_WAVE = 17;
+const PIP_RIBBON_FLARE = 34;          // the two ends stream this much farther out
+const PIP_RIBBON_BOTTOM = 118;        // pixels below the heart's centre where a ribbon starts
+const PIP_RIBBON_TOP = -100;          // and above it where it ends
+const PIP_RIBBON_HEIGHT_WAVE = 19;
+const PIP_RIBBON_HALF_WIDTHS = [17, 6.5, 17, 6.5];
+const PIP_RIBBON_TILT = 0.4;          // radians the spiral is seen from above
+const PIP_RIBBON_CIRCUIT = 26;        // seconds for the ribbons to flow once around
+const PIP_RIBBON_DEEP = [176, 112, 30];
+const PIP_RIBBON_GOLD = [244, 190, 78];
+const PIP_RIBBON_SHEEN = [255, 244, 206];
+const PIP_RIBBON_STARS = 3;           // stars riding each ribbon
+const PIP_BEAT_SECONDS = 1.9;
+const PIP_BEAT_SWELL = 0.03;
+const PIP_FLOAT_PIXELS = 4;
+const PIP_LEAN_DEGREES = 2.2;
+const PIP_STILL_SECONDS = 2.2;        // the moment drawn when motion is off
+
+// 0 to 1: how far into a beat the heart is. Two bumps, the second smaller.
+function pipBeat(seconds) {
+  const p = ((seconds / PIP_BEAT_SECONDS) % 1 + 1) % 1;
+  const bump = (from, length) => {
+    const q = (p - from) / length;
+    return q <= 0 || q >= 1 ? 0 : Math.sin(Math.PI * q) ** 2;
+  };
+  return bump(0, 0.2) + 0.6 * bump(0.22, 0.2);
+}
+
+// The centre line of ribbon i at u (0 to 1 along it), before the tilt:
+// x to the right, y down the screen, z toward the viewer.
+function pipRibbonPoint(i, u, seconds, out) {
+  const angle = (i / PIP_RIBBONS) * Math.PI * 2 + PIP_RIBBON_TURNS * Math.PI * 2 * u + (seconds / PIP_RIBBON_CIRCUIT) * Math.PI * 2;
+  const end = Math.max(0, Math.abs(2 * u - 1) - 0.62) / 0.38;
+  const radius = PIP_RIBBON_RADIUS + PIP_RIBBON_FLARE * end * end
+    + PIP_RIBBON_RADIUS_WAVE * Math.sin(Math.PI * 2 * 1.1 * u - seconds * 0.8 + 2.1 * i);
+  out[0] = radius * Math.cos(angle);
+  out[1] = PIP_RIBBON_BOTTOM + (PIP_RIBBON_TOP - PIP_RIBBON_BOTTOM) * u + PIP_RIBBON_HEIGHT_WAVE * Math.sin(Math.PI * 2 * 1.4 * u + seconds * 1.1 + 1.3 * i);
+  out[2] = radius * Math.sin(angle);
+  return angle;
+}
+
+// Draws the ribbons, the glow and the stars on the two layers around the
+// solid, and moves the rig. `solid` gives the painted depth of the rose heart.
+function pipHeartLife(model, rig, backCanvas, frontCanvas, solid) {
+  const W = model.W;
+  const H = model.H;
+  const fullW = W + 2 * PIP_RIBBON_PAD_X;
+  const fullH = H + PIP_RIBBON_PAD_BOTTOM;
+  const back = backCanvas.getContext('2d');
+  const front = frontCanvas.getContext('2d');
+  const centreX = model.centreX;
+  const centreY = (model.topY + model.bottomY) / 2;
+  const cosTilt = Math.cos(PIP_RIBBON_TILT);
+  const sinTilt = Math.sin(PIP_RIBBON_TILT);
+  const norm = (v) => {
+    const length = Math.hypot(v[0], v[1], v[2]) || 1;
+    return [v[0] / length, v[1] / length, v[2] / length];
+  };
+  // The light the solid is lit by (upper left, in front), with y down here.
+  const light = norm([-0.46, -0.6, 0.66]);
+  const half = norm([light[0], light[1], light[2] + 1]);
+  const total = PIP_RIBBONS * PIP_RIBBON_SEGMENTS;
+  // Per ribbon, per station along it: the two edges on the screen, the depth,
+  // and the colour of the piece that starts there.
+  const stations = PIP_RIBBON_SEGMENTS + 1;
+  const edgeAX = new Float32Array(PIP_RIBBONS * stations);
+  const edgeAY = new Float32Array(PIP_RIBBONS * stations);
+  const edgeBX = new Float32Array(PIP_RIBBONS * stations);
+  const edgeBY = new Float32Array(PIP_RIBBONS * stations);
+  const midX = new Float32Array(PIP_RIBBONS * stations);
+  const midY = new Float32Array(PIP_RIBBONS * stations);
+  const deep = new Float32Array(PIP_RIBBONS * stations);
+  const shade = new Float32Array(PIP_RIBBONS * stations);
+  const sheen = new Float32Array(PIP_RIBBONS * stations);
+  const order = new Int32Array(total);
+  const isFront = new Uint8Array(PIP_RIBBONS * stations);
+  const p = [0, 0, 0];
+  const a = [0, 0, 0];
+  const b = [0, 0, 0];
+  let auraSprite = null;
+  let auraReach = 0;
+  let backing = 1;
+  let frontPieces = 0;
+  let backPieces = 0;
+  let starsDrawn = 0;
+
+  function setBacking(next) {
+    backing = next;
+    for (const layer of [backCanvas, frontCanvas]) {
+      layer.width = fullW * backing;
+      layer.height = fullH * backing;
+    }
+    auraSprite = null;
+  }
+
+  // The glow behind the heart, cut into twelve rays, drawn once at the size in
+  // use and then turned and brightened every frame.
+  function buildAura() {
+    auraReach = Math.min(centreX + PIP_RIBBON_PAD_X, centreY) - 2;
+    auraSprite = document.createElement('canvas');
+    auraSprite.width = Math.ceil(auraReach * 2 * backing);
+    auraSprite.height = auraSprite.width;
+    const sprite = auraSprite.getContext('2d');
+    sprite.setTransform(backing, 0, 0, backing, 0, 0);
+    const mid = auraReach;
+    const glow = sprite.createRadialGradient(mid, mid, 30, mid, mid, auraReach);
+    glow.addColorStop(0, 'rgba(255,214,128,1)');
+    glow.addColorStop(0.55, 'rgba(255,186,140,0.55)');
+    glow.addColorStop(1, 'rgba(255,190,160,0)');
+    sprite.fillStyle = glow;
+    sprite.fillRect(0, 0, mid * 2, mid * 2);
+    sprite.globalCompositeOperation = 'destination-out';
+    for (let ray = 0; ray < 12; ray++) {
+      const angle = (ray / 12) * Math.PI * 2;
+      const width = 0.1 + 0.04 * Math.sin(ray * 2.4);
+      const wedge = sprite.createRadialGradient(mid, mid, 70, mid, mid, auraReach);
+      wedge.addColorStop(0, 'rgba(0,0,0,0)');
+      wedge.addColorStop(1, 'rgba(0,0,0,0.8)');
+      sprite.fillStyle = wedge;
+      sprite.beginPath();
+      sprite.moveTo(mid, mid);
+      sprite.arc(mid, mid, auraReach + 4, angle - width, angle + width);
+      sprite.closePath();
+      sprite.fill();
+    }
+  }
+
+  // A four pointed star with a soft centre.
+  function star(target, x, y, reach, strength) {
+    const glow = target.createRadialGradient(x, y, 0, x, y, reach * 0.6);
+    glow.addColorStop(0, `rgba(255,255,246,${strength})`);
+    glow.addColorStop(0.4, `rgba(255,232,170,${strength * 0.5})`);
+    glow.addColorStop(1, 'rgba(255,220,150,0)');
+    target.fillStyle = glow;
+    target.beginPath();
+    target.arc(x, y, reach * 0.6, 0, Math.PI * 2);
+    target.fill();
+    target.lineCap = 'round';
+    target.lineWidth = Math.max(0.7, reach * 0.08);
+    for (const [dx, dy, scale] of [[1, 0, 1], [0, 1, 1], [0.7, 0.7, 0.42], [-0.7, 0.7, 0.42]]) {
+      const fade = target.createLinearGradient(x - dx * reach * scale, y - dy * reach * scale, x + dx * reach * scale, y + dy * reach * scale);
+      fade.addColorStop(0, 'rgba(255,250,235,0)');
+      fade.addColorStop(0.5, `rgba(255,253,245,${strength})`);
+      fade.addColorStop(1, 'rgba(255,250,235,0)');
+      target.strokeStyle = fade;
+      target.beginPath();
+      target.moveTo(x - dx * reach * scale, y - dy * reach * scale);
+      target.lineTo(x + dx * reach * scale, y + dy * reach * scale);
+      target.stroke();
+    }
+  }
+
+  function layOut(seconds) {
+    const step = 1 / PIP_RIBBON_SEGMENTS;
+    for (let i = 0; i < PIP_RIBBONS; i++) {
+      for (let k = 0; k < stations; k++) {
+        const u = k * step;
+        const at = i * stations + k;
+        const angle = pipRibbonPoint(i, u, seconds, p);
+        pipRibbonPoint(i, u - 0.004, seconds, a);
+        pipRibbonPoint(i, u + 0.004, seconds, b);
+        const t = norm([b[0] - a[0], b[1] - a[1], b[2] - a[2]]);
+        // The band's width runs partly up and partly outward; how much of each
+        // changes along the ribbon and with time, which is the twist.
+        const twist = 0.9 + i * 1.7 + Math.PI * 2 * 0.95 * u + seconds * 0.5;
+        let w = [Math.sin(twist) * Math.cos(angle), Math.cos(twist), Math.sin(twist) * Math.sin(angle)];
+        const along = w[0] * t[0] + w[1] * t[1] + w[2] * t[2];
+        w = norm([w[0] - along * t[0], w[1] - along * t[1], w[2] - along * t[2]]);
+        const n = [t[1] * w[2] - t[2] * w[1], t[2] * w[0] - t[0] * w[2], t[0] * w[1] - t[1] * w[0]];
+        // Seen from a little above: near parts drop, far parts rise.
+        const tilt = (v) => [v[0], v[1] * cosTilt + v[2] * sinTilt, -v[1] * sinTilt + v[2] * cosTilt];
+        const c = tilt(p);
+        const wt = tilt(w);
+        const nt = tilt(n);
+        const tt = tilt(t);
+        const halfWidth = PIP_RIBBON_HALF_WIDTHS[i % PIP_RIBBON_HALF_WIDTHS.length] * Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, u))), 0.55);
+        edgeAX[at] = centreX + c[0] - wt[0] * halfWidth;
+        edgeAY[at] = centreY + c[1] - wt[1] * halfWidth;
+        edgeBX[at] = centreX + c[0] + wt[0] * halfWidth;
+        edgeBY[at] = centreY + c[1] + wt[1] * halfWidth;
+        midX[at] = centreX + c[0];
+        midY[at] = centreY + c[1];
+        deep[at] = c[2];
+        // Cloth: lit on either face, and silk's long sheen, brightest where the
+        // thread direction is square to the light.
+        shade[at] = Math.abs(nt[0] * light[0] + nt[1] * light[1] + nt[2] * light[2]);
+        const threadwise = tt[0] * half[0] + tt[1] * half[1] + tt[2] * half[2];
+        sheen[at] = Math.pow(Math.max(0, 1 - threadwise * threadwise), 14) * (0.35 + 0.65 * Math.abs(nt[2]));
+        // In front of the solid, or behind it? Ask the painted depth.
+        const px = Math.round(midX[at] - 0.5);
+        const row = Math.round(midY[at] - 0.5);
+        const painted = px >= 0 && px < W && row >= 0 && row < H ? solid.depthAt(row * W + px) : -Infinity;
+        isFront[at] = (painted > -Infinity ? c[2] > painted : c[2] > 0) ? 1 : 0;
+      }
+    }
+    let count = 0;
+    for (let i = 0; i < PIP_RIBBONS; i++) for (let k = 0; k < PIP_RIBBON_SEGMENTS; k++) order[count++] = i * stations + k;
+    order.sort((m, n) => deep[m] - deep[n]);
+  }
+
+  function piece(target, at, grow, r, g, bl, alpha) {
+    const next = at + 1;
+    let ax = edgeAX[at];
+    let ay = edgeAY[at];
+    let bx = edgeBX[at];
+    let by = edgeBY[at];
+    let cx = edgeBX[next];
+    let cy = edgeBY[next];
+    let dx = edgeAX[next];
+    let dy = edgeAY[next];
+    if (grow !== 1) {
+      ax = midX[at] + (ax - midX[at]) * grow; ay = midY[at] + (ay - midY[at]) * grow;
+      bx = midX[at] + (bx - midX[at]) * grow; by = midY[at] + (by - midY[at]) * grow;
+      cx = midX[next] + (cx - midX[next]) * grow; cy = midY[next] + (cy - midY[next]) * grow;
+      dx = midX[next] + (dx - midX[next]) * grow; dy = midY[next] + (dy - midY[next]) * grow;
+    }
+    const style = `rgba(${r | 0},${g | 0},${bl | 0},${alpha})`;
+    target.fillStyle = style;
+    target.strokeStyle = style;
+    target.beginPath();
+    target.moveTo(ax, ay);
+    target.lineTo(bx, by);
+    target.lineTo(cx, cy);
+    target.lineTo(dx, dy);
+    target.closePath();
+    target.fill();
+    // A hairline in the same colour closes the seam between neighbouring pieces.
+    target.stroke();
+  }
+
+  function ribbons(target, wantFront) {
+    target.lineJoin = 'round';
+    target.lineCap = 'round';
+    // A soft warm halo first, so the far ribbons glow against the pale room:
+    // one wide faint stroke along each run. The near ribbons get none, because
+    // over the rose heart a halo shows as pale stripes.
+    target.strokeStyle = 'rgba(255,204,104,0.16)';
+    for (let i = 0; i < (wantFront ? 0 : PIP_RIBBONS); i++) {
+      target.lineWidth = PIP_RIBBON_HALF_WIDTHS[i % PIP_RIBBON_HALF_WIDTHS.length] * 2 + 12;
+      let open = false;
+      for (let k = 0; k < PIP_RIBBON_SEGMENTS; k++) {
+        const at = i * stations + k;
+        const mine = (isFront[at] === 1) === wantFront && k > 5 && k < PIP_RIBBON_SEGMENTS - 6;
+        if (mine && !open) { target.beginPath(); target.moveTo(midX[at], midY[at]); open = true; }
+        if (mine) target.lineTo(midX[at + 1], midY[at + 1]);
+        if (!mine && open) { target.stroke(); open = false; }
+      }
+      if (open) target.stroke();
+    }
+    target.lineWidth = 0.7;
+    let drawn = 0;
+    for (let q = 0; q < total; q++) {
+      const at = order[q];
+      if ((isFront[at] === 1) !== wantFront) continue;
+      drawn++;
+      const tone = 0.2 + 0.8 * shade[at];
+      const glint = Math.min(1, sheen[at] * 0.9);
+      const body = (c) => {
+        const cloth = PIP_RIBBON_DEEP[c] + (PIP_RIBBON_GOLD[c] - PIP_RIBBON_DEEP[c]) * tone;
+        return cloth + (PIP_RIBBON_SHEEN[c] - cloth) * glint;
+      };
+      // Three opaque bands, lighter toward the middle, give the ribbon its
+      // roundness without any piece showing through its neighbour.
+      for (const [grow, lift] of [[1, 0], [0.66, 0.16 + 0.2 * glint], [0.3, 0.3 + 0.4 * glint]]) {
+        piece(target, at, grow,
+          body(0) + (PIP_RIBBON_SHEEN[0] - body(0)) * lift,
+          body(1) + (PIP_RIBBON_SHEEN[1] - body(1)) * lift,
+          body(2) + (PIP_RIBBON_SHEEN[2] - body(2)) * lift, 1);
+      }
+    }
+    return drawn;
+  }
+
+  function stars(target, wantFront, seconds, still) {
+    let drawn = 0;
+    for (let i = 0; i < PIP_RIBBONS; i++) {
+      for (let j = 0; j < PIP_RIBBON_STARS; j++) {
+        const u = (((seconds * 0.07 + j / PIP_RIBBON_STARS + i * 0.11) % 1) + 1) % 1;
+        const at = i * stations + Math.min(PIP_RIBBON_SEGMENTS - 1, Math.floor(u * PIP_RIBBON_SEGMENTS));
+        if ((isFront[at] === 1) !== wantFront) continue;
+        const flicker = still ? 0.8 : 0.55 + 0.45 * Math.sin(seconds * 2.6 + i * 2.3 + j * 1.7);
+        const strength = Math.sin(Math.PI * u) * flicker * (0.45 + 0.55 * sheen[at]);
+        if (strength < 0.12) continue;
+        star(target, midX[at], midY[at], 8 + 12 * strength, Math.min(1, strength));
+        drawn++;
+      }
+    }
+    return drawn;
+  }
+
+  function draw(seconds, still) {
+    const s = backing;
+    const beat = still ? 0 : pipBeat(seconds);
+    layOut(seconds);
+    for (const target of [back, front]) {
+      target.setTransform(1, 0, 0, 1, 0, 0);
+      target.clearRect(0, 0, fullW * s, fullH * s);
+      target.setTransform(s, 0, 0, s, PIP_RIBBON_PAD_X * s, 0);
+    }
+    if (!auraSprite) buildAura();
+    back.save();
+    back.translate(centreX, centreY);
+    back.rotate(seconds * 0.09);
+    back.globalAlpha = 0.74 + 0.26 * beat;
+    back.drawImage(auraSprite, -auraReach, -auraReach, auraReach * 2, auraReach * 2);
+    back.restore();
+    backPieces = ribbons(back, false);
+    frontPieces = ribbons(front, true);
+    starsDrawn = stars(back, false, seconds, still) + stars(front, true, seconds, still);
+    if (still) {
+      rig.style.transform = 'none';
+    } else {
+      const swell = 1 + PIP_BEAT_SWELL * beat;
+      const lift = Math.sin(seconds * 0.8) * PIP_FLOAT_PIXELS;
+      const lean = Math.sin(seconds * 0.53 + 0.6) * PIP_LEAN_DEGREES;
+      rig.style.transform = `translateY(${lift.toFixed(2)}px) rotate(${lean.toFixed(2)}deg) scale(${swell.toFixed(4)})`;
+    }
+  }
+
+  return {
+    draw,
+    setBacking,
+    get frontPieces() { return frontPieces; },
+    get backPieces() { return backPieces; },
+    get stars() { return starsDrawn; }
+  };
+}
+
 function pipCreateHeartRenderer() {
   if (!pipHeartModel) pipHeartModel = pipBuildHeartModel();
   if (!pipHeartTable) pipHeartTable = pipBuildHeartTable();
@@ -665,7 +1039,7 @@ function pipCreateHeartRenderer() {
   canvas.height = PIP_HEART_BOX_H;
   canvas.className = 'pip-heart';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', 'A turning three dimensional heart');
+  canvas.setAttribute('aria-label', 'A turning three dimensional heart with ribbons of gold flowing around it');
   return pipHeartPainter(canvas, pipHeartModel, pipHeartTable);
 }
 
@@ -674,6 +1048,18 @@ function pipHeartPainter(canvas, model, table) {
   const H = model.H;
   const N = PIP_HEART_TABLE;
   const context = canvas.getContext('2d');
+  // The rig holds the three layers and carries the heartbeat, float and lean:
+  // the glow and the far side of the ribbons (behind), the rose solid, and the
+  // near side of the ribbons (in front), in that order.
+  const rig = document.createElement('div');
+  rig.className = 'pip-heart-rig';
+  const backCanvas = document.createElement('canvas');
+  backCanvas.className = 'pip-heart-back';
+  backCanvas.setAttribute('aria-hidden', 'true');
+  const frontCanvas = document.createElement('canvas');
+  frontCanvas.className = 'pip-heart-front';
+  frontCanvas.setAttribute('aria-hidden', 'true');
+  rig.append(backCanvas, canvas, frontCanvas);
   // The shading is always drawn at the box's own size. When the TV shows the
   // box at twice that size, this small picture is enlarged onto the canvas.
   const shadeCanvas = document.createElement('canvas');
@@ -696,6 +1082,8 @@ function pipHeartPainter(canvas, model, table) {
   let lastAngle = null;
   let spanLow = 0;
   let spanHigh = 0;
+  const life = pipHeartLife(model, rig, backCanvas, frontCanvas, { depthAt: (k) => depths[k] });
+  life.setBacking(1);
 
   function setBacking(scale) {
     const next = scale >= 1.4 ? 2 : 1;
@@ -703,6 +1091,7 @@ function pipHeartPainter(canvas, model, table) {
     backing = next;
     canvas.width = W * backing;
     canvas.height = H * backing;
+    life.setBacking(backing);
     lastAngle = null;
   }
 
@@ -864,6 +1253,13 @@ function pipHeartPainter(canvas, model, table) {
   }
 
   function draw(t, force) {
+    paintSolid(t, force);
+    // core/stage.js calls draw(clock * 0.55 + 6), so this is the scene clock.
+    const still = typeof S !== 'undefined' && !!S.still;
+    life.draw(still ? PIP_STILL_SECONDS : (t - 6) / 0.55, still);
+  }
+
+  function paintSolid(t, force) {
     const degrees = t * PIP_HEART_DEGREES_PER_T;
     if (!force && lastAngle !== null && Math.abs(degrees - lastAngle) < PIP_HEART_REDRAW_DEGREES) return;
     lastAngle = degrees;
@@ -914,7 +1310,7 @@ function pipHeartPainter(canvas, model, table) {
   }
 
   canvas.dataset.technique = 'canvas2d-per-pixel';
-  return { canvas, draw, setBacking, technique: 'canvas2d-per-pixel', rows, get backing() { return backing; } };
+  return { canvas, rig, backCanvas, frontCanvas, life, draw, setBacking, technique: 'canvas2d-per-pixel', rows, get backing() { return backing; } };
 }
 
 function pipMountHeart() {
@@ -924,7 +1320,7 @@ function pipMountHeart() {
   // A named handle for the scene spec and for checking the frame cost by hand,
   // alongside the renderer's existing colorPolishRuntime debug surface.
   window.pipHeartRenderer = heartRenderer;
-  host.append(heartRenderer.canvas);
+  host.append(heartRenderer.rig);
   // One canvas pixel per TV pixel: the whole TV is drawn at twice the size on
   // a 3840 wide screen, and at its own size on a 1920 wide one.
   const tv = $('tv');

@@ -218,7 +218,7 @@ async function reservedReports(frame: Frame) {
 // turned ninety degrees has almost no width, a solid keeps most of it.
 async function heartSilhouette(frame: Frame) {
   return await frame.evaluate(() => {
-    const canvas = document.querySelector<HTMLCanvasElement>(`#heart-host canvas`);
+    const canvas = document.querySelector<HTMLCanvasElement>(`#heart-host canvas.pip-heart`);
     if (!canvas) return null;
     const copy = document.createElement('canvas');
     copy.width = canvas.width;
@@ -247,7 +247,7 @@ async function heartSilhouette(frame: Frame) {
         }
       }
     }
-    if (!painted) return { width: 0, height: 0, painted: 0, upperWidth: 0, lowerWidth: 0, widestAt: 0, cleft: 0, canvasWidth: canvas.width, drawnWidth: canvas.getBoundingClientRect().width };
+    if (!painted) return { width: 0, height: 0, painted: 0, upperWidth: 0, lowerWidth: 0, widestAt: 0, cleft: 0, canvasWidth: canvas.width, drawnWidth: canvas.offsetWidth * (document.getElementById('tv')!.getBoundingClientRect().width / 1920) };
     const height = maxY - minY + 1;
     let widest = 0;
     let widestRow = minY;
@@ -265,7 +265,7 @@ async function heartSilhouette(frame: Frame) {
       // share of the height, on the middle column.
       cleft: (columnTop[Math.round((minX + maxX) / 2)] - minY) / height,
       canvasWidth: canvas.width,
-      drawnWidth: canvas.getBoundingClientRect().width,
+      drawnWidth: canvas.offsetWidth * (document.getElementById('tv')!.getBoundingClientRect().width / 1920),
     };
   });
 }
@@ -627,7 +627,7 @@ test('the heart surface is smooth: no bands, streaks or seam, at 1920 and at 384
     const frame = await loadAt(page, width, { fixture: allShortFixture, scene: 9 });
     await stepToAngle(frame, 180);
     const surface = await frame.evaluate(() => {
-      const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas')!;
+      const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas.pip-heart')!;
       const copy = document.createElement('canvas');
       copy.width = canvas.width;
       copy.height = canvas.height;
@@ -686,7 +686,7 @@ test('the heart surface is smooth: no bands, streaks or seam, at 1920 and at 384
 test('the heart is shaded, not a flat silhouette', async ({ page }) => {
   const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9, ms: 2000 });
   const tones = await frame.evaluate(() => {
-    const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas');
+    const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas.pip-heart');
     if (!canvas) return null;
     const copy = document.createElement('canvas');
     copy.width = canvas.width;
@@ -713,6 +713,57 @@ test('the heart is shaded, not a flat silhouette', async ({ page }) => {
   expect(tones!.bands).toBeGreaterThan(20);
 });
 
+// Plan 17 handoff, 2026-09-19: Anthony asked for flowing ribbons of gold around
+// the heart, and for the heart to be dynamic.
+async function ribbonReading(frame: Frame) {
+  return await frame.evaluate(() => {
+    const goldOn = (selector: string) => {
+      const canvas = document.querySelector<HTMLCanvasElement>(selector);
+      if (!canvas) return -1;
+      const copy = document.createElement('canvas');
+      copy.width = canvas.width;
+      copy.height = canvas.height;
+      const context = copy.getContext('2d')!;
+      context.drawImage(canvas, 0, 0);
+      const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let count = 0;
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        sum = (sum * 31 + data[i] + data[i + 3] * 7) >>> 0;
+        if (data[i + 3] > 200 && data[i] > 160 && data[i] - data[i + 2] > 60) count++;
+      }
+      return { count, sum };
+    };
+    const rig = document.querySelector<HTMLElement>('#heart-host .pip-heart-rig');
+    const life = (window as any).pipHeartRenderer.life;
+    return { back: goldOn('#heart-host .pip-heart-back'), front: goldOn('#heart-host .pip-heart-front'), transform: rig ? rig.style.transform : '', frontPieces: life.frontPieces, backPieces: life.backPieces };
+  });
+}
+
+test('ribbons of gold flow around the heart, behind it and in front of it, and the heart beats', async ({ page }) => {
+  const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9, ms: 2000 });
+  const first = await ribbonReading(frame);
+  // Gold is really drawn on both sides of the solid.
+  expect((first.back as any).count, 'no ribbon behind the heart').toBeGreaterThan(1500);
+  expect((first.front as any).count, 'no ribbon in front of the heart').toBeGreaterThan(1500);
+  expect(first.frontPieces).toBeGreaterThan(60);
+  expect(first.backPieces).toBeGreaterThan(60);
+  const transforms = new Set([first.transform]);
+  const fronts = new Set([(first.front as any).sum]);
+  for (let i = 0; i < 20; i++) {
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(100));
+    const next = await ribbonReading(frame);
+    transforms.add(next.transform);
+    fronts.add((next.front as any).sum);
+  }
+  // They flow, and the heart beats, floats and leans.
+  expect(fronts.size).toBeGreaterThan(15);
+  expect(transforms.size).toBeGreaterThan(15);
+  const swells = [...transforms].map((value) => Number(/scale\(([\d.]+)\)/.exec(value)?.[1] ?? 1));
+  expect(Math.max(...swells)).toBeGreaterThan(1.015);
+  expect(Math.max(...swells)).toBeLessThanOrEqual(1.0301);
+});
+
 test('reduced motion renders the scene still, with the heart held at a three quarter angle', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9 });
@@ -720,6 +771,7 @@ test('reduced motion renders the scene still, with the heart held at a three qua
   expect(still).toBe(true);
 
   const before = await heartSilhouette(frame);
+  const ribbonsBefore = await ribbonReading(frame);
   expect(before!.painted).toBeGreaterThan(10000);
   // Three quarters on, so clearly narrower than face on (1.02 of the height)
   // and clearly wider than edge on (0.47 of the height): the still frame is a
@@ -730,6 +782,11 @@ test('reduced motion renders the scene still, with the heart held at a three qua
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(9000));
   const after = await heartSilhouette(frame);
   expect(after!.width, 'the heart must not turn when motion is reduced').toBe(before!.width);
+  // The ribbons are there, and they and the rig hold still too.
+  const ribbonsAfter = await ribbonReading(frame);
+  expect((ribbonsBefore.front as any).count).toBeGreaterThan(1500);
+  expect(ribbonsBefore.transform).toBe('none');
+  expect(ribbonsAfter).toEqual(ribbonsBefore);
 
   const circleResult = await circularity(frame);
   expect(circleResult.count).toBeGreaterThan(0);
