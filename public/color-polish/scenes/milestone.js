@@ -65,6 +65,16 @@ function mountTributes(){
  for(let i=0;i<14;i++){const el=document.createElement('img');el.className='stream-icon';el.src=ASSETS['icon'+(1+i%9)];el.alt='';root.append(el);V.stream.icons.push({el,y:740*(i/14),phase:rng()*TAU,radius:240+rng()*145,rise:14+rng()*20,turn:.15+rng()*.16})}
 }
 
+// Plan 17, decision 6: a pearl stays fully opaque while it is inside the
+// panel and fades out only over a short band as its own drawn edge (half
+// size STREAM_PEARL_HALF px times its depth scale k) meets the panel's top or bottom
+// edge, reaching fully transparent before any of it crosses. Depth is shown
+// by blur and an opaque tone shift instead of transparency, so no pearl ever
+// lets the words of another pearl show through it.
+// 118 (pearls 236 px, up from 216): every catalog phrase, name and icon row
+// keeps max(3 percent, 12 px) inside the rim (Plan 17 rim rule).
+const STREAM_PEARL_HALF = 118;
+const STREAM_FADE_BAND = 40;
 function tickTributes(dt){
  if(S.s!==11||!V.stream||active||transition||(S.still&&dt>0))return;
  const v=V.stream,t=V.clock,W=v.width,H=v.height;
@@ -79,8 +89,10 @@ function tickTributes(dt){
   }
   const angle=a.phase+t*a.turn+Math.sin(t*.13+a.wobble)*.17,z=Math.sin(angle)*a.depth+a.offset,k=1000/(1000-z);
   const x=W*.52+Math.cos(angle)*a.radius*k+Math.sin(t*.23+a.wobble)*12,y=a.y-(k-.75)*27;
-  const opacity=smooth((y+115)/110)*smooth((H+125-y)/130)*(z< -220?Math.max(.45,.45+.35*(z+630)/410):1);
-  a.el.style.transform=`translate(${x-108}px,${y-108}px) scale(${k})`;a.el.style.opacity=clamp(opacity,0,1);a.el.style.zIndex=String(1000+Math.round(z));a.el.style.filter=`blur(${Math.min(2,Math.max(0,(-z-120)/260)).toFixed(2)}px) drop-shadow(${(-7*k).toFixed(1)}px ${(13*k).toFixed(1)}px ${(12*k).toFixed(1)}px #99846925)`;
+  const half=STREAM_PEARL_HALF*k;
+  const opacity=smooth((y-half)/STREAM_FADE_BAND)*smooth((H-y-half)/STREAM_FADE_BAND);
+  const depthTone=z< -220?Math.max(.45,.45+.35*(z+630)/410):1;
+  a.el.style.transform=`translate(${x-STREAM_PEARL_HALF}px,${y-STREAM_PEARL_HALF}px) scale(${k})`;a.el.style.opacity=clamp(opacity,0,1);a.el.style.zIndex=String(1000+Math.round(z));a.el.style.filter=`blur(${Math.min(2,Math.max(0,(-z-120)/260)).toFixed(2)}px) contrast(${(.55+.45*depthTone).toFixed(3)}) brightness(${(1+.3*(1-depthTone)).toFixed(3)}) drop-shadow(${(-7*k).toFixed(1)}px ${(13*k).toFixed(1)}px ${(12*k).toFixed(1)}px #99846925)`;
   a.x=x;a.z=z;a.scale=k;a.screenY=y;
  }
  for(const a of v.icons){a.y-=dt*a.rise;if(a.y< -80)a.y=H+80;const angle=a.phase+t*a.turn,z=Math.sin(angle)*370-120,k=950/(950-z),x=W*.52+Math.cos(angle)*a.radius*k;a.el.style.transform=`translate(${x}px,${a.y}px) scale(${k}) rotate(${Math.sin(t*.33+a.phase)*17}deg)`;a.el.style.opacity=.72*smooth((a.y+45)/80)*smooth((H+40-a.y)/80);a.el.style.zIndex=String(1000+Math.round(z));}

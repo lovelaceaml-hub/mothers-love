@@ -1,5 +1,6 @@
 import {
   COLOR_POLISH_DURATIONS,
+  COLOR_POLISH_REQUIRED_SCENES,
   COLOR_POLISH_SCENES,
   COLOR_POLISH_VERSION,
   type ColorPolishScene,
@@ -75,7 +76,8 @@ function sampleSettings(): DisplaySettings {
     readingSeconds: 20,
     maxBubbles: 6,
     gardenAmount: 'all-active',
-    playlist: COLOR_POLISH_SCENES.map((id) => ({ id: toDisplayScreenId(id), enabled: true, durationSeconds: Math.min(120, COLOR_POLISH_DURATIONS[id]) })),
+    // The legacy display settings only know ten screens; live-feed has no legacy counterpart.
+    playlist: COLOR_POLISH_REQUIRED_SCENES.map((id) => ({ id: toDisplayScreenId(id), enabled: true, durationSeconds: Math.min(120, COLOR_POLISH_DURATIONS[id]) })),
     tempo: 'standard',
     durationOverrides: {},
     effects: { ...DEFAULT_DISPLAY_EFFECTS },
@@ -86,8 +88,8 @@ function sampleSettings(): DisplaySettings {
   };
 }
 
-function toDisplayScreenId(scene: ColorPolishScene): DisplayScreenId {
-  const mapping: Record<ColorPolishScene, DisplayScreenId> = {
+function toDisplayScreenId(scene: (typeof COLOR_POLISH_REQUIRED_SCENES)[number]): DisplayScreenId {
+  const mapping: Record<(typeof COLOR_POLISH_REQUIRED_SCENES)[number], DisplayScreenId> = {
     welcome: 'garden',
     garden: 'featured',
     featured: 'impact',

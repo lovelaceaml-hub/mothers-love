@@ -23,9 +23,9 @@ const catalog=[
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)), lerp=(a,b,t)=>a+(b-a)*t, ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t)}, fmt=n=>Math.round(n).toLocaleString('en-US');
 const ZONE='America/Los_Angeles';
-const NAMES=['Welcome / Living campaign','Recognition Garden','New Recognition Arrival','Featured Expressions','Recognition Calendar','Participation Status','The Nine Expressions','We Are Peacemakers','Peace in Practice','Expression Orbit','Milestone & Weekly Goal'];
-const ORDER=[1,2,4,5,8,6,7,9,10,11];
-const DWELL={1:40,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30};
+const NAMES=['Welcome / Living campaign','Recognition Garden','New Recognition Arrival','Featured Expressions','Recognition Calendar','Participation Status','The Nine Expressions','We Are Peacemakers','Peace in Practice','Expression Orbit','Milestone & Weekly Goal','Live Recognitions'];
+const ORDER=[1,2,4,5,8,6,7,9,10,11,12];
+const DWELL={1:60,2:180,3:30,4:60,5:60,6:60,7:60,8:60,9:60,10:60,11:60,12:60};
 // Exact phrase and principle catalog is inherited from the approved design files.
 // Supporting guidance below is an attributed paraphrase, not a verbatim website quotation.
 const GUIDANCE=[
@@ -72,7 +72,7 @@ function normalizedDurations(playlist){const dwell={...DWELL};for(const entry of
 function snapshotClock(payload){return finiteNumber(payload?.nowMs)?Math.max(0,payload.nowMs):0}
 function selectedDayFor(ms){const text=localDay(ms),day=Number(text.slice(-2));return Number.isSafeInteger(day)&&day>=1&&day<=31?day:1}
 function thresholdFor(value){return Math.floor(Math.max(0,value)/250)*250}
-function sceneNumber(value){if(typeof value==='number'&&value>=1&&value<=11)return Math.floor(value);if(typeof value==='string'){const ids={welcome:1,garden:2,featured:4,calendar:5,peacemakers:8,status:6,expressions:7,'peace-in-practice':9,orbit:10,milestone:11};return ids[value]||1}return 1}
+function sceneNumber(value){if(typeof value==='number'&&value>=1&&value<=12)return Math.floor(value);if(typeof value==='string'){const ids={welcome:1,garden:2,featured:4,calendar:5,peacemakers:8,status:6,expressions:7,'peace-in-practice':9,orbit:10,milestone:11,'live-feed':12};return ids[value]||1}return 1}
 function usableSnapshot(snapshot){return !!snapshot&&typeof snapshot==='object'&&!Array.isArray(snapshot)&&snapshot.presentation?.version===COLOR_POLISH_VERSION&&snapshot.presentation?.enabled===true&&snapshot.settings&&Array.isArray(snapshot.recognitions)&&snapshot.insights&&typeof snapshot.insights==='object'}
 function safeQrDataUrl(value,submissionUrl){return submissionUrl==='https://mothers-love.vercel.app/recognize'&&typeof value==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]{40,500000}$/.test(value)?value:null}
 function setStateFromSnapshot(snapshot,control={}){
@@ -171,6 +171,6 @@ const outCubic=p=>1-Math.pow(1-clamp(p,0,1),3);
 
 const curve=(a,b,c,d,p)=>Math.pow(1-p,3)*a+3*(1-p)*(1-p)*p*b+3*(1-p)*p*p*c+p*p*p*d;
 
-const MOTION_ORDER=[1,2,4,5,8,6,7,9,10,11];
+const MOTION_ORDER=[1,2,4,5,8,6,7,9,10,11,12];
 
-const SCENE_NUMBERS={1:1,2:2,3:3,4:4,5:5,8:6,6:7,7:8,9:9,10:10,11:11};
+const SCENE_NUMBERS={1:1,2:2,3:3,4:4,5:5,8:6,6:7,7:8,9:9,10:10,11:11,12:12};

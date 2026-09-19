@@ -225,7 +225,9 @@ test('usable Color Polish TV and Studio', async ({ page }) => {
   await page.goto('/admin/display');
   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
   const selector=page.getByLabel('Color Polish preview scene');
-  await expect(selector.locator('option')).toHaveCount(10);
+  // Ten original screens plus Live Recognitions (Plan 17 Lane 13).
+  await expect(selector.locator('option')).toHaveCount(11);
+  await expect(selector.locator('option').last()).toHaveText('Live Recognitions');
   await selector.selectOption('garden');
   await expect(page.frameLocator('iframe').first().getByText('Appreciation, all around us.')).toBeVisible();
   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
@@ -244,7 +246,8 @@ test('click or tap on the display advances to the next scene', async ({ page }) 
   if (!tvFrame) throw new Error('color-polish renderer frame not found on /display');
   await tvFrame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
 
-  const playlistOrder = [1, 2, 4, 5, 8, 6, 7, 9, 10, 11];
+  // The mocked snapshot saves ten entries; the app appends Live Recognitions (12) last.
+  const playlistOrder = [1, 2, 4, 5, 8, 6, 7, 9, 10, 11, 12];
   const currentScene = await tvFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
   const expectedNextScene = playlistOrder[(playlistOrder.indexOf(currentScene) + 1) % playlistOrder.length];
 

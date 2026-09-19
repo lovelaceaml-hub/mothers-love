@@ -37,7 +37,7 @@ const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
 for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
- expect(state.dwell).toEqual({1:40,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+ expect(state.dwell).toEqual({1:60,2:180,3:30,4:60,5:60,6:60,7:60,8:60,9:60,10:60,11:60});expect(new Set(state.colors).size).toBe(9);
  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
  await capture(page,`v6-${String(index+1).padStart(2,'0')}`);writeFileSync(`${out}/v6-${index+1}-state.json`,JSON.stringify(state,null,2));
 });}

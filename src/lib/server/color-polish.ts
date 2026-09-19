@@ -1,7 +1,9 @@
 import {
   COLOR_POLISH_DURATIONS,
+  COLOR_POLISH_REQUIRED_SCENES,
   COLOR_POLISH_SCENES,
   COLOR_POLISH_VERSION,
+  normalizeColorPolishPlaylist,
   type ColorPolishGoal,
   type ColorPolishInsights,
   type ColorPolishPresentation,
@@ -113,10 +115,10 @@ function projectCalendar(value: unknown, serverTimeMs: number): Aggregate[] | nu
   return output;
 }
 
-function projectPresentation(value: unknown): ColorPolishPresentation | null {
+function projectPresentation(value: unknown, appendMissingOptional = true): ColorPolishPresentation | null {
   if (!isPlainRecord(value) || !hasExactKeys(value, PRESENTATION_KEYS)) return null;
   if (value.version !== COLOR_POLISH_VERSION || typeof value.enabled !== "boolean" || !Array.isArray(value.playlist)) return null;
-  if (value.playlist.length !== COLOR_POLISH_SCENES.length) return null;
+  if (value.playlist.length < COLOR_POLISH_REQUIRED_SCENES.length || value.playlist.length > COLOR_POLISH_SCENES.length) return null;
 
   const allowedScenes = new Set<string>(COLOR_POLISH_SCENES);
   const seen = new Set<string>();
@@ -128,14 +130,21 @@ function projectPresentation(value: unknown): ColorPolishPresentation | null {
     seen.add(item.id);
     playlist.push({ id: item.id as ColorPolishScene, enabled: item.enabled, durationSeconds: item.durationSeconds });
   }
-  if (seen.size !== COLOR_POLISH_SCENES.length || !COLOR_POLISH_SCENES.every((scene) => seen.has(scene)) || !playlist.some((entry) => entry.enabled)) return null;
-  return { version: COLOR_POLISH_VERSION, enabled: value.enabled, playlist };
+  // Ten or eleven entries, matching database/014_color_polish_live_feed.sql: the ten
+  // original screens are required, live-feed is optional. When it is absent (a playlist
+  // saved before the screen existed, or before that SQL ran) it is appended with its
+  // default entry, so the TV and the Studio always receive the full list.
+  if (!COLOR_POLISH_REQUIRED_SCENES.every((scene) => seen.has(scene)) || !playlist.some((entry) => entry.enabled)) return null;
+  return { version: COLOR_POLISH_VERSION, enabled: value.enabled, playlist: appendMissingOptional ? normalizeColorPolishPlaylist(playlist) : playlist };
 }
 
 export function projectColorPolishPresentationChanges(value: unknown): ColorPolishPresentationChanges | null {
   if (!isPlainRecord(value) || !hasOnlyKeys(value, ["playlist"]) || Object.keys(value).length === 0) return null;
   const changes: ColorPolishPresentationChanges = {};
-  const projected = projectPresentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist });
+  // A change request is stored exactly as sent (ten or eleven entries): nothing is
+  // appended here, so a ten entry playlist still saves against a database whose
+  // validator has not yet been replaced by database/014_color_polish_live_feed.sql.
+  const projected = projectPresentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist }, false);
   if (!projected) return null;
   changes.playlist = projected.playlist;
   return changes;

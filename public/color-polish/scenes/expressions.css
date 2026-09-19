@@ -5,10 +5,16 @@
   transform-style: preserve-3d;
 }
 
+/* The cards keep the scene's 1600px perspective about the same centre (this box fills the scene),
+   but they are no longer depth-sorted against each other: cards that pass over one another while
+   they glide between views would otherwise cut through each other where their tilted planes
+   cross. Stacking follows z-index instead, so the card in focus is always on top. The picture at
+   rest is unchanged, since resting cards never overlap. */
 #tv .scene[data-scene="7"] .educational {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
+  perspective: 1600px;
+  transform-style: flat;
 }
 
 #tv .scene[data-scene="7"] .edu-card {
@@ -182,5 +188,33 @@
   box-shadow: 0 0 12px var(--tint);
   margin-left: -8px;
   margin-top: -8px;
+  pointer-events: none;
+}
+
+/* Plan 17 Lane 7: the glide between the all-nine grid and the one-in-focus view. The script moves a
+   travelling card with transform and fades its words with opacity; nothing here animates. A card
+   in flight carries no shadow or glow, because a shadow scaled with the card would reach past the
+   16px edge budget; both drop at once on take-off (no fade, so nothing half-faded is
+   carried past the scene box) and return when the card lands, the glow with the 700ms fade it
+   always had. */
+#tv .scene[data-scene="7"] .edu-card.edu-moving,
+#tv .scene[data-scene="7"] .edu-card.focused.edu-moving {
+  box-shadow: none;
+  transition-duration: 0s;
+}
+
+#tv .scene[data-scene="7"] .edu-card.edu-moving .edu-front,
+#tv .scene[data-scene="7"] .edu-card.edu-moving .edu-detail {
+  will-change: transform, opacity;
+}
+
+/* In the last 0.8s of its hold the focused panel lets its ring and glow fade back to the plain card
+   shadow, in place and with the card's own 700ms box-shadow fade, so take-off has nothing to drop. */
+#tv .scene[data-scene="7"] .edu-card.focused.edu-settling {
+  box-shadow: 0 13px 25px -18px #4C628777;
+}
+
+/* Reduced motion crossfade: a frozen copy of the outgoing arrangement under the live one. */
+#tv .scene[data-scene="7"] .educational.edu-ghost {
   pointer-events: none;
 }

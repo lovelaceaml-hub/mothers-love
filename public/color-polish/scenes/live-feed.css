@@ -1,0 +1,133 @@
+/* Scene 12: Live Recognitions, full screen (Plan 17 Lane 13).
+ *
+ * Everything here is scoped to scene 12 or to its own lf- classes. The feed rail's
+ * own look (renderer.css) is not changed: while this screen is up the rail is only
+ * faded out, because this screen is the rail grown to the full height.
+ *
+ * Geometry, drawn at 1920 x 1080: the header's rule sits at y 102. The panel runs
+ * from y 118 to y 1055 (the rail's own bottom edge) and from x 34 to x 1886 (the
+ * rail's own left and right edges). The stage's origin is 54, 126, so inside the
+ * scene that is left -20, top -8, 1852 x 937.
+ */
+
+/* Let the panel reach past the stage box while scene 12 is in the stage (also
+ * while it fades in or out). Other scenes keep their own clipping. */
+#tv:has(#stage > .scene[data-scene='12'] .lf-panel) .stage { overflow: visible; }
+.scene[data-scene='12'] { overflow: visible; }
+
+/* The rail fades out while this screen is the current one, in step with the
+ * scene's own fade, and fades back when it leaves. It keeps its box, so anything
+ * that measures it still can. */
+#tv .footer { transition: opacity var(--lf-fade, 1.15s) ease; }
+#tv:has(#stage > .scene:last-child[data-scene='12'] .lf-panel) .footer {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--lf-fade, 1.15s) ease, visibility 0s linear var(--lf-fade, 1.15s);
+}
+#tv.still .footer,
+#tv.still:has(#stage > .scene:last-child[data-scene='12'] .lf-panel) .footer { transition: none; }
+
+/* The countdown ring normally sits just above the rail, which is now the middle of
+ * this panel. On this screen it moves into the panel's title row. */
+#tv:has(#stage > .scene:last-child[data-scene='12'] .lf-panel) .scene-countdown { right: 58px; bottom: auto; top: 131px; }
+
+#tv:has(#stage > .scene:last-child[data-scene='12']) { --scene-top:#CFE6F8; --scene-floor:#DDEDC2; --scene-side:#FBDDE6; --scene-glow:#FFF0C540; }
+
+.lf-panel {
+  position: absolute;
+  left: -20px;
+  top: -8px;
+  width: 1852px;
+  height: 937px;
+  padding: 15px 18px 18px;
+  border-radius: 29px;
+  border: 1px solid #D0DDD2;
+  background: linear-gradient(140deg, #FFFEF6F5, #FFFDFCFA);
+  box-shadow: 0 -6px 28px #578CA824;
+  display: grid;
+  grid-template-columns: 286px minmax(0, 1fr);
+  gap: 20px;
+  color: var(--ink);
+}
+
+/* QR block: the rail's block, larger, centred in the left column. */
+.lf-qr {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  border-right: 1px solid #dbd9c552;
+  padding-right: 18px;
+  text-align: center;
+  min-width: 0;
+}
+.lf-qr img { width: 236px; height: 236px; border-radius: 12px; background: #fff; image-rendering: pixelated; }
+.lf-qr img[hidden] { display: none; }
+.lf-qr-label { font-size: 32px; line-height: 1.18; font-weight: 700; }
+.lf-qr-label small { display: block; margin-top: 16px; font-size: 22px; font-weight: 400; line-height: 1.4; color: #596F61; }
+.lf-qr-url { position: absolute; left: 0; right: 18px; bottom: 6px; font-size: 17px; color: #596F61; overflow-wrap: anywhere; }
+
+.lf-feed { min-width: 0; min-height: 0; display: grid; grid-template-rows: 38px minmax(0, 1fr); gap: 10px; }
+.lf-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 58px; /* room for the countdown ring */
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #52624F;
+}
+.lf-title .live-dot { width: 10px; height: 10px; margin-right: 13px; }
+.lf-title small { font-size: 13px; font-weight: 400; letter-spacing: 1.4px; color: #596F61; }
+
+.lf-lanes {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  transition: opacity 600ms ease;
+}
+.lf-lanes.lf-turning { opacity: 0; }
+.lf-lane {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 1px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+}
+.lf-lane + .lf-lane { border-left: 1px solid #dcd9c858; padding-left: 17px; }
+.lf-track { will-change: transform; display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
+
+/* The rail's card, drawn larger. Colours, borders and shape come from renderer.css. */
+.lf-panel .chat-item { grid-template-columns: 46px minmax(0, 1fr); gap: 12px; padding: 14px 18px 13px 10px; border-radius: 22px 28px 28px 6px; }
+.lf-panel .chat-avatar { width: 44px; height: 44px; }
+.lf-panel .chat-avatar .icon { width: 36px; height: 36px; }
+.lf-panel .chat-head { gap: 10px; line-height: 1.2; }
+.lf-panel .chat-name { font-size: 27px; letter-spacing: -.4px; min-width: 0; overflow-wrap: anywhere; }
+.lf-panel .chat-time { font-size: 15px; }
+.lf-panel .chat-message { font-size: 26px; line-height: 1.32; margin: 8px 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lf-panel .chat-foot { gap: 6px; font-size: 16px; }
+.lf-panel .chat-foot img { width: 22px; height: 22px; }
+.lf-panel .chat-foot .chat-like { gap: 6px; }
+.lf-panel .chat-like .thumb { width: 17px; height: 17px; }
+
+/* Calm empty state. */
+.lf-empty { display: grid; place-content: center; justify-items: center; text-align: center; gap: 6px; color: var(--ink); }
+.lf-empty-heart { width: 92px; height: 86px; opacity: .85; animation: lf-breathe 6s ease-in-out infinite; }
+.lf-empty-heart svg { width: 100%; height: 100%; }
+.lf-empty h2 { margin: 12px 0 8px; font-size: 59px; line-height: 1.12; font-weight: 650; letter-spacing: -1.7px; }
+.lf-empty p { margin: 0; font-size: 26px; line-height: 1.45; color: #596F61; }
+@keyframes lf-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+/* Reduced motion: renderer.css switches every transition off for viewers who ask for
+ * less motion. The page turn is the one exception on this screen: an opacity fade
+ * with no movement, which the work order asks for in place of the scroll. */
+@media (prefers-reduced-motion: reduce) {
+  #tv .lf-lanes { transition: opacity 600ms ease !important; }
+  .lf-empty-heart { animation: none; }
+}
