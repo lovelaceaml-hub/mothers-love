@@ -1,9 +1,28 @@
-/* Scene 8, We Are Peacemakers. Restored to match what the live TV shows
-   today (Plan 12 production, commit b7d92a0): title copy, the globe
-   artwork, and message bubbles from the shared orb/floater engine. Every
-   class this scene's markup uses (.eyebrow, .heading, .subheading, .violet,
-   .art, .orb-slot, .orb, ...) already ships in renderer.css, and production
-   does not animate the globe artwork itself, so this scene needs no rules
-   of its own. Every rule added here would be scoped to
-   #tv .scene[data-scene="8"].
+/* Scene 8, We Are Peacemakers. The look the live TV shows today (Plan 12
+   production, commit b7d92a0): title copy, the globe artwork, and message
+   bubbles from the shared orb/floater engine, plus the one reserved large
+   bubble Anthony asked for on September 19. Every class this scene's markup
+   uses (.eyebrow, .heading, .subheading, .violet, .art, .orb-slot, .orb, ...)
+   already ships in renderer.css, and the reserved bubble is an ordinary large
+   orb at a fixed size and position. The only rules here are the soft change
+   of words inside the reserved bubble, which stays in its place while one
+   message hands over to the next. Every rule is scoped to scene 8.
 */
+#tv .scene[data-scene="8"] .orb-slot.peacemakers-fade-out .orb-content {
+  animation: peacemakers-words-out .6s ease both;
+}
+#tv .scene[data-scene="8"] .orb-slot.peacemakers-fade-in .orb-content {
+  animation: peacemakers-words-in .9s ease both;
+}
+@keyframes peacemakers-words-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes peacemakers-words-in { from { opacity: 0; } to { opacity: 1; } }
+#tv.still .scene[data-scene="8"] .orb-slot .orb-content {
+  animation: none;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  #tv .scene[data-scene="8"] .orb-slot .orb-content {
+    animation: none;
+    opacity: 1;
+  }
+}
