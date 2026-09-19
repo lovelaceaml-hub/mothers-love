@@ -85,6 +85,89 @@ test('the goal expression heading or phrase is the largest computed font size, s
   expect(Math.max(fontSizes.h3Size, fontSizes.phraseSize)).toBeGreaterThanOrEqual(fontSizes.maxSceneFontSize);
 });
 
+test('the gold-rimmed goal caption and the individual-acts stream caption are gone from the scene', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'milestone', 1000);
+
+  const counts = await frame.evaluate(() => {
+    const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
+    return {
+      goalCaption: sceneEl?.querySelectorAll('.goal-caption').length ?? -1,
+      streamCaption: sceneEl?.querySelectorAll('.stream-caption').length ?? -1,
+    };
+  });
+
+  expect(counts.goalCaption).toBe(0);
+  expect(counts.streamCaption).toBe(0);
+});
+
+/** A sample snapshot with the current month's expression total forced to a fictional value, to drive S.milestoneValue (thresholdFor(sum) in core/state.js) to a known reached or unreached threshold. */
+function buildSnapshotWithMonthTotal(total: number) {
+  const snapshot = buildColorPolishSampleSnapshot();
+  snapshot.insights.month = {
+    ...snapshot.insights.month,
+    recognitions: total > 0 ? 1 : 0,
+    expressionCounts: [total, 0, 0, 0, 0, 0, 0, 0, 0],
+    expressionTotal: total,
+  };
+  return snapshot;
+}
+
+test('with no milestone reached, the lower-left block never shows a bare 0 and the big number is not visible', async ({ page }) => {
+  // 120 expressions this month: under the first milestone, and not itself a
+  // 0, so the only bare 0 this block could show is the milestone number.
+  const snapshot = buildSnapshotWithMonthTotal(120);
+  const frame = await loadRenderer(page, { scene: 11, fixture: snapshot as unknown as Record<string, unknown>, ms: 2000 });
+
+  const result = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
+    const milestoneBlock = scene?.querySelector<HTMLElement>('.progress-milestone');
+    const eyebrow = milestoneBlock?.querySelector<HTMLElement>('.eyebrow');
+    const threshold = milestoneBlock?.querySelector<HTMLElement>('.threshold');
+    const texts = milestoneBlock
+      ? Array.from(milestoneBlock.querySelectorAll<HTMLElement>('*'))
+          .filter((el) => el.offsetParent !== null)
+          .map((el) => el.textContent?.trim() || '')
+          .filter((text) => text.length > 0)
+      : [];
+    return {
+      eyebrowText: eyebrow?.textContent?.trim() || '',
+      thresholdExists: !!threshold,
+      thresholdHidden: threshold ? threshold.hidden : null,
+      thresholdVisible: threshold ? threshold.offsetParent !== null : null,
+      hasBareZero: texts.some((text) => text === '0'),
+    };
+  });
+
+  expect(result.eyebrowText).toBe('Growing campaign');
+  expect(result.thresholdExists).toBe(true);
+  expect(result.thresholdHidden).toBe(true);
+  expect(result.thresholdVisible).toBe(false);
+  expect(result.hasBareZero).toBe(false);
+});
+
+test('with a milestone reached, the big number still shows', async ({ page }) => {
+  const snapshot = buildSnapshotWithMonthTotal(300);
+  const frame = await loadRenderer(page, { scene: 11, fixture: snapshot as unknown as Record<string, unknown>, ms: 2000 });
+
+  const result = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
+    const milestoneBlock = scene?.querySelector<HTMLElement>('.progress-milestone');
+    const eyebrow = milestoneBlock?.querySelector<HTMLElement>('.eyebrow');
+    const threshold = milestoneBlock?.querySelector<HTMLElement>('.threshold');
+    return {
+      eyebrowText: eyebrow?.textContent?.trim() || '',
+      thresholdHidden: threshold ? threshold.hidden : null,
+      thresholdVisible: threshold ? threshold.offsetParent !== null : null,
+      thresholdText: threshold?.textContent?.trim() || '',
+    };
+  });
+
+  expect(result.eyebrowText).toBe('Milestone reached');
+  expect(result.thresholdHidden).toBe(false);
+  expect(result.thresholdVisible).toBe(true);
+  expect(result.thresholdText).toBe('250');
+});
+
 function buildMilestoneSnapshot(goalExpressionId = 2) {
   const snapshot = buildColorPolishSampleSnapshot();
   const currentWeekStart = '2026-09-06';
@@ -732,7 +815,12 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
  * record is ever drawn twice at once on the 48 record sample. The readable
  * and copy assertions below fail on that first swirl.
  */
-const MIN_MOUNTED_PEARLS = 52;
+// Second watch (Anthony, September 19: "more variety of bubble sizes", "very
+// dynamic", "beautiful architecture"): the swirl is a funnel of 60 pearls,
+// 20 reading pearls and 40 depth pearls, each with its own size. Measured the
+// same way over a 60 second showing it draws between 20 and 31 pearls with a
+// mean of 25.2, and its near pearls' words are 0.13 covered on average.
+const MIN_MOUNTED_PEARLS = 60;
 const MIN_DRAWN_PEARLS = 16;
 const MIN_MEAN_DRAWN_PEARLS = 18;
 /** The same numbers for a pool of only six records: two pearls a record. */
@@ -1023,4 +1111,76 @@ test('a pool smaller than the swirl still fills the panel, and a record never ta
 
   const failures = await textFits(frame, '#stage .scene[data-scene="11"]');
   expect(failures, JSON.stringify(failures)).toHaveLength(0);
+});
+
+test('the vortex carries many bubble sizes, turns as a funnel and moves at many paces', async ({ page }) => {
+  test.setTimeout(240000);
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 11, fixture: milestoneSnapshotWithDwell(60) });
+
+  // Sizes. Every pearl has its own size on top of the depth scale, and glass
+  // bubbles from tiny foam to icon bubbles ride between them. The scene
+  // before this one had one pearl size and no glass bubbles.
+  const sizes = await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]')!;
+    return {
+      pearls: Array.from(scene.querySelectorAll<HTMLElement>('.stream-node')).map((el) => Number(el.dataset.size)),
+      glass: Array.from(scene.querySelectorAll<HTMLElement>('.stream-foam')).map((el) => el.offsetWidth),
+      iconGlass: scene.querySelectorAll('.stream-foam img').length,
+    };
+  });
+  expect(sizes.pearls.every((n) => Number.isFinite(n) && n > 0)).toBe(true);
+  expect(new Set(sizes.pearls.map((n) => n.toFixed(2))).size, 'distinct pearl sizes').toBeGreaterThanOrEqual(20);
+  expect(Math.min(...sizes.pearls), 'smallest pearl size').toBeLessThanOrEqual(0.75);
+  expect(Math.max(...sizes.pearls), 'largest pearl size').toBeGreaterThanOrEqual(1.2);
+  expect(sizes.glass.length, 'glass bubbles').toBeGreaterThanOrEqual(40);
+  expect(Math.min(...sizes.glass), 'smallest glass bubble, px').toBeLessThanOrEqual(16);
+  expect(Math.max(...sizes.glass), 'largest glass bubble, px').toBeGreaterThanOrEqual(90);
+  expect(sizes.iconGlass, 'glass bubbles carrying an icon').toBeGreaterThanOrEqual(10);
+
+  // Paces. Pearls rise at their own speed (the scene before: 23 to 24.5).
+  const rises = await frame.evaluate(
+    () => ((window as any).colorPolishRuntime.visualState().stream as Array<{ rise: number }>).map((n) => n.rise),
+  );
+  expect(Math.max(...rises) - Math.min(...rises), 'spread of rise speeds, px a second').toBeGreaterThanOrEqual(8);
+
+  // Funnel and size on the screen, over a 40 second stretch: depth pearls
+  // sit closer to the spine in the lower third of the panel than in the
+  // upper third, and the pearls drawn at one moment differ widely in size.
+  const low: number[] = [], high: number[] = [], ratios: number[] = [];
+  let crossings = 0;
+  for (let second = 0; second < 40; second++) {
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    const m = await frame.evaluate(() => {
+      const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]')!;
+      const panel = scene.querySelector<HTMLElement>('.stream-world')!.getBoundingClientRect();
+      const out = { low: [] as number[], high: [] as number[], widths: [] as number[], crossings: 0 };
+      scene.querySelectorAll<HTMLElement>('.stream-node').forEach((node) => {
+        if (parseFloat(getComputedStyle(node).opacity) < 0.9) return;
+        const box = node.getBoundingClientRect();
+        out.widths.push(box.width);
+        if (node.dataset.layer !== 'back') return;
+        const lift = 1 - (box.top + box.height / 2 - panel.top) / panel.height;
+        const reach = Math.abs(box.left + box.width / 2 - (panel.left + panel.width / 2)) / panel.width;
+        if (lift < 1 / 3) out.low.push(reach);
+        else if (lift > 2 / 3) out.high.push(reach);
+      });
+      // A glass bubble that is drawn never crosses the panel's sides.
+      scene.querySelectorAll<HTMLElement>('.stream-foam').forEach((el) => {
+        const box = el.getBoundingClientRect();
+        if (parseFloat(getComputedStyle(el).opacity) > 0.1 && (box.left < panel.left - 0.5 || box.right > panel.right + 0.5)) out.crossings += 1;
+      });
+      return out;
+    });
+    low.push(...m.low);
+    high.push(...m.high);
+    crossings += m.crossings;
+    if (m.widths.length >= 2) ratios.push(Math.max(...m.widths) / Math.min(...m.widths));
+  }
+  const mean = (list: number[]) => list.reduce((n, v) => n + v, 0) / list.length;
+  expect(low.length).toBeGreaterThan(20);
+  expect(high.length).toBeGreaterThan(20);
+  expect(mean(low) / mean(high), `funnel: mean reach low ${mean(low).toFixed(3)}, high ${mean(high).toFixed(3)}`).toBeLessThanOrEqual(0.9);
+  expect(mean(ratios), 'largest drawn pearl over smallest, mean over the stretch').toBeGreaterThanOrEqual(2);
+  expect(crossings, 'glass bubbles drawn past the panel sides').toBe(0);
 });
