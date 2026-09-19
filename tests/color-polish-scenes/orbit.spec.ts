@@ -5,12 +5,14 @@ import {
   loadRenderer,
   noOverflow,
   openStudioScene,
+  recognition,
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
 import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { MEDIUM_IDS, MEDIUM_SHORT_IDS, bubbleReadings, buildLongOnlyFixture, buildMediumFixture, buildMostlyLongFixture, textFits } from './text-fits';
 
 const publicFolder = resolve(process.cwd(), 'public');
 
@@ -309,12 +311,18 @@ test('the far planet is blurred and dim, the near planet sharp with a shadow', a
   const highest = observations[observations.length - 1];
 
   // At the sample where a planet has the lowest z:
-  // computed filter contains a blur of at least 1.2 px and its opacity is at most .75
+  // computed filter contains a blur of at least 1.2 px and a dimming tone
+  // (brightness at most .93). Plan 17: the planet stays fully opaque, so the
+  // centre quote can never show through its words; depth shows through
+  // blur and tone instead of transparency.
   const blurMatch = lowest.filter.match(/blur\(([\d.]+)px\)/);
   expect(blurMatch).not.toBeNull();
   const blurPx = parseFloat(blurMatch![1]);
   expect(blurPx).toBeGreaterThanOrEqual(1.2);
-  expect(lowest.opacity).toBeLessThanOrEqual(0.75);
+  expect(lowest.opacity).toBe(1);
+  const toneMatch = lowest.filter.match(/brightness\(([\d.]+)\)/);
+  expect(toneMatch, `far planet filter dims by tone: ${lowest.filter}`).not.toBeNull();
+  expect(parseFloat(toneMatch![1])).toBeLessThanOrEqual(0.93);
 
   // At the sample where a planet has the highest z:
   // filter has no blur (or blur 0) and contains drop-shadow
@@ -434,7 +442,7 @@ test('centre element bounding box is at least 1.5 times the largest orbiting bub
   expect(result.hasParticles).toBe(true);
 });
 
-test('centre element bounding box is at least 1.5 times the true largest tier (263 px) with a long message', async ({ page }) => {
+test('a 210 character planet grows past the old 263 px tier to show its message whole and stays smaller than the centre', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   const longFixture = buildActiveDisplayFixture({
     recognitions: [
@@ -464,20 +472,26 @@ test('centre element bounding box is at least 1.5 times the true largest tier (2
     const runtime = (window as any).colorPolishRuntime;
     const slots = runtime.getState().slots as Array<{ d: number }>;
     const largestBaseDiameter = Math.max(...slots.map((s) => s.d));
+    const indicator = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"] .planet-system .orb-page-indicator');
 
     return {
       sunWidth: sunRect.width / scale,
       sunHeight: sunRect.height / scale,
       largestBaseDiameter,
+      singlePage: !indicator || indicator.hidden,
     };
   });
 
-  expect(result.largestBaseDiameter).toBe(263);
-  expect(result.sunWidth).toBeGreaterThanOrEqual(263 * 1.5);
-  expect(result.sunHeight).toBeGreaterThanOrEqual(263 * 1.5);
+  // Plan 17 ("pages, long only"): the planet grows to the size its message
+  // needs instead of paging at the fixed 263 px tier, and the centre circle
+  // stays the largest circle in the scene.
+  expect(result.largestBaseDiameter).toBeGreaterThan(263);
+  expect(result.singlePage).toBe(true);
+  expect(result.sunWidth).toBeGreaterThan(result.largestBaseDiameter);
+  expect(result.sunHeight).toBeGreaterThan(result.largestBaseDiameter);
 });
 
-test('three distinct orbiting bubble diameters appear for short, medium and long messages and stay circular', async ({ page }) => {
+test('planet diameters grow with message length from the Plan 15 tiers, every message shows whole, and planets stay circular', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   const tieredFixture = buildActiveDisplayFixture({
     recognitions: [
@@ -534,14 +548,32 @@ test('three distinct orbiting bubble diameters appear for short, medium and long
 
   const frame = await loadRenderer(page, { scene: 10, ms: 1000, fixture: tieredFixture });
 
-  const diameters = await frame.evaluate(() => {
+  const planets = await frame.evaluate(() => {
     const runtime = (window as any).colorPolishRuntime;
-    const slots = runtime.getState().slots as Array<{ d: number }>;
-    return slots.map((s) => s.d);
+    const slots = runtime.getState().slots as Array<{ d: number; id: string }>;
+    return slots.map((s) => {
+      const el = document.querySelector<HTMLElement>(`#stage .scene[data-scene="10"] .orb-slot[data-record-id="${s.id}"]`);
+      const indicator = el?.querySelector<HTMLElement>('.orb-page-indicator');
+      return { id: s.id, d: s.d, width: el?.offsetWidth ?? 0, singlePage: !indicator || indicator.hidden };
+    });
   });
 
-  const uniqueDiameters = Array.from(new Set(diameters)).sort((a, b) => a - b);
-  expect(uniqueDiameters).toEqual([195, 227, 263]);
+  // Plan 17 ("pages, long only"): each planet starts at its Plan 15 tier
+  // (195, 227 or 263 px) and grows to the size its message needs, so every
+  // one of these messages shows whole and a longer message gets a larger
+  // planet.
+  const byId = new Map(planets.map((p) => [p.id, p]));
+  const d = (n: number) => byId.get(`00000000-0000-4000-8000-00000000000${n}`)!.d;
+  expect(d(1)).toBeGreaterThanOrEqual(195);
+  expect(d(4)).toBeGreaterThanOrEqual(195);
+  expect(d(2)).toBeGreaterThanOrEqual(227);
+  expect(d(3)).toBeGreaterThanOrEqual(263);
+  expect(d(2)).toBeGreaterThan(Math.max(d(1), d(4)));
+  expect(d(3)).toBeGreaterThan(d(2));
+  for (const planet of planets) {
+    expect(planet.singlePage, `${planet.id} shows whole`).toBe(true);
+    expect(planet.width, `${planet.id} bubble matches its planet`).toBe(planet.d);
+  }
 
   // Step past transition so only scene 10 remains in stage
   await frame.evaluate(() => {
@@ -612,5 +644,249 @@ test('two probe runs with the same seed produce the same focused expression', as
   await page2.close();
 
   expect(name1).toBe(name2);
+});
+
+test('centre circle fits the name, full quote and description with a rim margin for all nine catalog expressions at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(120000);
+  for (const size of [
+    { width: 1920, height: 1080 },
+    { width: 3840, height: 2160 },
+  ]) {
+    await page.setViewportSize(size);
+    const frame = await loadRenderer(page, { scene: 10, ms: 1000 });
+    for (let id = 1; id <= 9; id++) {
+      // Force the centre expression: the next pass draws from the bag.
+      await frame.evaluate((expressionId) => {
+        (0, eval)(`ORBIT_BAG = [${expressionId}]; ORBIT_PASS_TOKEN = 0; renderNow(10);`);
+      }, id);
+      const shown = await frame.evaluate(() => ({
+        name: document.querySelector('#stage .scene[data-scene="10"] .orbit-sun h2')?.textContent?.trim(),
+        catalog: (window as any).colorPolishRuntime.catalog.map((e: { name: string }) => e.name),
+      }));
+      expect(shown.name, `centre shows expression ${id}`).toBe(shown.catalog[id - 1]);
+
+      // A real margin: every line at least 4 percent of the circle's
+      // diameter (about 19 px at 1920) inside its rim.
+      const failures = await textFits(frame, '#stage .scene[data-scene="10"] .orbit-sun', { rimMargin: 0.04 });
+      expect(failures, `centre expression ${id} at ${size.width} wide: ${JSON.stringify(failures)}`).toHaveLength(0);
+    }
+  }
+});
+
+const ORBIT_SIZES = [
+  { width: 1920, height: 1080 },
+  { width: 3840, height: 2160 },
+];
+const ORBIT_ROOT = '#stage .scene[data-scene="10"]';
+const ORBIT_MOSTLY_IDS = ['mostly-short-1', 'mostly-short-2', 'mostly-emoji', 'mostly-250', 'mostly-400', 'mostly-500'];
+
+// Plan 17 Lane 1, Orbit. A planet is drawn at 0.782 of its layout size at
+// the back of the orbit and larger at the front, so the drawn message size is
+// what the floor applies to. The largest planet the layout can give is the
+// one drawn as tall as the room under the scene title all the way round,
+// which holds the 500 grapheme product maximum whole: nothing pages.
+
+/** Title bottom (layout px) and the room under it to the stage bottom, from the DOM. */
+async function orbitRoom(frame: Frame) {
+  return await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"]')!;
+    const sceneRect = scene.getBoundingClientRect();
+    const s = sceneRect.width / 1812;
+    const title = scene.querySelector<HTMLElement>('.heading')!;
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    const t = range.getBoundingClientRect();
+    const titleBottom = (t.bottom - sceneRect.top) / s;
+    const titleRight = (t.right - sceneRect.left) / s;
+    return { titleBottom, titleRight, cap: 636 - 4 - (titleBottom + 8) };
+  });
+}
+
+/** Per planet: drawn diameter, drawn message font, top and left (layout px), all at this moment. */
+async function orbitPlanets(frame: Frame) {
+  return await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="10"]')!;
+    const sceneRect = scene.getBoundingClientRect();
+    const s = sceneRect.width / 1812;
+    return Array.from(scene.querySelectorAll<HTMLElement>('.planet-system')).map((p) => {
+      const slot = p.querySelector<HTMLElement>('.orb-slot')!;
+      const msg = slot.querySelector<HTMLElement>('.message')!;
+      const r = slot.getBoundingClientRect();
+      const k = r.width / slot.offsetWidth;
+      return { id: slot.dataset.recordId || '', drawn: r.width / s, drawnFont: (parseFloat(getComputedStyle(msg).fontSize) * k) / s, top: (r.top - sceneRect.top) / s, left: (r.left - sceneRect.left) / s, layout: slot.offsetWidth };
+    });
+  });
+}
+
+test('mostly-long fixture: every planet shows its message whole with a rim margin, drawn at the floor or larger, at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(240000);
+  const fixture = buildMostlyLongFixture();
+  for (const size of ORBIT_SIZES) {
+    for (const ms of [0, 6000, 14000, 21000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize(size);
+      const frame = await loadRenderer(testPage, { scene: 10, ms, fixture });
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+      const where = `${size.width} wide at ${ms} ms`;
+      const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: ORBIT_MOSTLY_IDS });
+      expect(failures, `orbit text-fit failures at ${where}: ${JSON.stringify(failures)}`).toHaveLength(0);
+      const readings = await bubbleReadings(frame, ORBIT_ROOT);
+      expect(readings).toHaveLength(4);
+      for (const reading of readings) {
+        expect(reading.pages, `${reading.id} shows whole, ${where}`).toBe(1);
+        expect(reading.drawnFont, `${reading.id} drawn size, ${where}`).toBeGreaterThanOrEqual(18 * (size.width / 1920) - 0.05);
+      }
+      await testPage.close();
+    }
+  }
+});
+
+test('over a full orbit every planet keeps its words at the drawn floor, never rises over the title, and never exceeds the room under it', async ({ page }) => {
+  test.setTimeout(180000);
+  for (const size of ORBIT_SIZES) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize(size);
+    const frame = await loadRenderer(testPage, { scene: 10, ms: 0, fixture: buildLongOnlyFixture() });
+    const room = await orbitRoom(frame);
+    let minFont = Infinity, maxDrawn = 0, minTopOverTitle = Infinity;
+    for (let t = 0; t < 80; t++) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+      for (const p of await orbitPlanets(frame)) {
+        minFont = Math.min(minFont, p.drawnFont);
+        maxDrawn = Math.max(maxDrawn, p.drawn);
+        if (p.left < room.titleRight) minTopOverTitle = Math.min(minTopOverTitle, p.top);
+      }
+    }
+    const where = `${size.width} wide`;
+    expect(minFont, `smallest drawn message size over 80 s, ${where}`).toBeGreaterThanOrEqual(18 - 0.05);
+    expect(maxDrawn, `largest drawn planet stays inside the room under the title (${room.cap.toFixed(0)} px), ${where}`).toBeLessThanOrEqual(room.cap + 1);
+    expect(minTopOverTitle, `a planet over the title's words stays below the title (bottom ${room.titleBottom.toFixed(0)}), ${where}`).toBeGreaterThanOrEqual(room.titleBottom + 4);
+    await testPage.close();
+  }
+});
+
+test('long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 500 grapheme planet is drawn as large as the room under the title allows', async ({ page }) => {
+  test.setTimeout(120000);
+  for (const size of ORBIT_SIZES) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize(size);
+    const frame = await loadRenderer(testPage, { scene: 10, ms: 0, fixture: buildLongOnlyFixture() });
+    const room = await orbitRoom(frame);
+    let largest = 0;
+    for (let t = 0; t < 40; t++) {
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+      const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: ['mostly-emoji', 'mostly-250', 'mostly-400', 'mostly-500'] });
+      expect(failures, `${size.width} wide at ${t} s: ${JSON.stringify(failures)}`).toHaveLength(0);
+      for (const p of await orbitPlanets(frame)) if (p.id === 'mostly-500') largest = Math.max(largest, p.drawn);
+    }
+    const readings = await bubbleReadings(frame, ORBIT_ROOT);
+    expect(new Set(readings.map((r) => r.id))).toEqual(new Set(['mostly-250', 'mostly-400', 'mostly-500', 'mostly-emoji']));
+    for (const r of readings) expect(r.pages, `${r.id} shows whole`).toBe(1);
+    expect(largest, `the 500 grapheme planet reaches the room under the title (${room.cap.toFixed(0)} px)`).toBeGreaterThanOrEqual(room.cap - 3);
+    console.log(`orbit ${size.width} wide: ${JSON.stringify(readings.map((r) => ({ id: r.id, diameter: r.diameter, pages: r.pages, font: r.font })))}`);
+    await testPage.close();
+  }
+});
+
+test('medium messages (120 to 220 characters) show whole in Orbit, drawn at the floor or larger, at 1920 and 3840 wide', async ({ page }) => {
+  test.setTimeout(120000);
+  for (const size of ORBIT_SIZES) {
+    for (const ms of [0, 14000]) {
+      const testPage = await page.context().newPage();
+      await testPage.setViewportSize(size);
+      const frame = await loadRenderer(testPage, { scene: 10, ms, fixture: buildMediumFixture() });
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1500));
+      const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: [...MEDIUM_IDS, ...MEDIUM_SHORT_IDS] });
+      expect(failures, `${size.width} wide at ${ms} ms: ${JSON.stringify(failures)}`).toHaveLength(0);
+      const readings = await bubbleReadings(frame, ORBIT_ROOT);
+      expect(readings).toHaveLength(4);
+      for (const r of readings) {
+        expect([...MEDIUM_IDS, ...MEDIUM_SHORT_IDS]).toContain(r.id);
+        expect(r.pages, `${r.id} shows whole`).toBe(1);
+      }
+      await testPage.close();
+    }
+  }
+});
+
+test('a planet replaced on the far side is sized for its new message and still fits its rim', async ({ page }) => {
+  test.setTimeout(120000);
+  const base = buildMostlyLongFixture() as { recognitions: Array<Record<string, unknown>> };
+  const extra = [
+    ['orbit-90', 'Thank you for noticing when I was tired and quietly taking the heavy boxes out to the car for me.'],
+    ['orbit-200', 'Thank you for staying late to help set up the hall, for greeting every family at the door with a warm smile, and for checking that the youngest children found a seat near their parents before it all began.'],
+  ].map(([id, message]) =>
+    recognition({ id, message, recipient: 'Kind Friend', expressionIds: [3], createdAt: '2026-09-10T16:00:00Z', firstPublishedAt: '2026-09-10T16:00:00Z', expiresAt: '2026-09-17T16:00:00Z' }),
+  );
+  const fixture = buildActiveDisplayFixture({
+    recognitions: [...base.recognitions, ...extra],
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'orbit', enabled: true, durationSeconds: 600 }] },
+  });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, fixture });
+  for (let second = 10; second <= 120; second += 10) {
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(10000));
+    const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: [...ORBIT_MOSTLY_IDS, 'orbit-90', 'orbit-200'] });
+    expect(failures, `at ${second} s: ${JSON.stringify(failures)}`).toHaveLength(0);
+  }
+  const log = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().log as Array<{ type: string; id?: string }>);
+  const replaced = log.filter((e) => e.type === 'orbit_backside_replace').map((e) => e.id);
+  expect(replaced.length, 'at least one far-side replacement happened').toBeGreaterThan(0);
+  for (const id of replaced) {
+    expect(log.some((e) => e.type === 'orbit_bubble_fit' && e.id === id), `replacement ${id} was measured`).toBe(true);
+  }
+});
+
+test('orbit bubble sizing re-measures once a still-loading document.fonts.ready resolves', async ({ page }) => {
+  await page.addInitScript(() => {
+    let seed = 7301;
+    Math.random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 4294967296;
+    };
+    window.requestAnimationFrame = () => 0;
+
+    // Simulates the slow-font-load case the re-measure hook targets:
+    // document.fonts.status is 'loading' at mount time, so orbit.js's hook
+    // must register the re-measure rather than skip it (it skips when
+    // status is already 'loaded', to avoid a redundant, log-duplicating
+    // second pass in the ordinary already-loaded case).
+    let resolveReady: () => void = () => {};
+    const readyPromise = new Promise<void>((resolve) => {
+      resolveReady = resolve;
+    });
+    const fakeFonts = { status: 'loading', ready: readyPromise };
+    Object.defineProperty(document, 'fonts', { value: fakeFonts, configurable: true });
+    (window as any).__resolveFontsReady = () => {
+      fakeFonts.status = 'loaded';
+      resolveReady();
+    };
+  });
+
+  const fixture = buildMostlyLongFixture();
+  const frame = await loadRenderer(page, { fixture });
+
+  const fitCallCount = await frame.evaluate(async () => {
+    const win = window as any;
+    let calls = 0;
+    const original = win.checkFullFits;
+    win.checkFullFits = (...args: unknown[]) => {
+      calls++;
+      return original(...args);
+    };
+    // Triggers a fresh mount of scene 10 while fonts are still "loading":
+    // core's postRender calls checkFullFits synchronously (one call), and
+    // because document.fonts.status is 'loading', orbit.js's own hook
+    // registers a second, deferred call for when fonts become ready.
+    win.colorPolishRuntime.setScene(10);
+    win.__resolveFontsReady();
+    await win.document.fonts.ready;
+    await Promise.resolve();
+    await Promise.resolve();
+    win.checkFullFits = original;
+    return calls;
+  });
+
+  expect(fitCallCount).toBeGreaterThanOrEqual(2);
 });
 
