@@ -345,6 +345,14 @@ test('records including goal expression carry data-weekly="true" and gold rim', 
 
 test('the stream is dense, continuous and individual', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'milestone', 1000);
+  // From here only the explicit step() calls advance the swirl. Without
+  // this the renderer's own animation frames keep running between
+  // checkpoints, so a pearl travels by however long the round trip took and
+  // "moved down" below stops meaning "recycled at the top". Only the
+  // renderer frame is stubbed; the Studio page around it still animates.
+  await frame.evaluate(() => {
+    window.requestAnimationFrame = () => 0;
+  });
 
   const checkpoints = [1000, 6000, 11000, 16000, 21000, 26000];
   const samples: Array<
@@ -397,7 +405,11 @@ test('the stream is dense, continuous and individual', async ({ page }) => {
     const prevSample = samples[i - 1];
     const currSample = samples[i];
     for (const currNode of currSample) {
-      const prevNode = prevSample.find((n) => n.id === currNode.id);
+      // Pearls are matched by the motion triple asserted unique just above,
+      // not by record id: when the pool is smaller than the swirl a record
+      // holds more than one pearl, so its id no longer names one pearl.
+      const key = (n: { rise: number; radius: number; turn: number }) => `${n.rise},${n.radius},${n.turn}`;
+      const prevNode = prevSample.find((n) => key(n) === key(currNode));
       if (!prevNode) continue;
       const movedDown = currNode.y - prevNode.y;
       if (movedDown > 40) {
@@ -410,6 +422,11 @@ test('the stream is dense, continuous and individual', async ({ page }) => {
 
 test('extreme depth', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'milestone', 1000);
+  // Same reason as the test above: the checkpoints below must measure the
+  // time this test steps, not the time the machine took to answer.
+  await frame.evaluate(() => {
+    window.requestAnimationFrame = () => 0;
+  });
 
   const checkpoints = [1000, 6000, 11000, 16000, 21000, 26000];
   let smallestMinZ = Infinity;
@@ -589,7 +606,10 @@ test('noOverflow holds and no phrase is truncated at any pearl size', async ({ p
 });
 
 test('mostly-long fixture: the goal card, milestone card and tribute pearl text all fit their panels and rims at 0, 6, 14 and 21 s at 1920 and 3840 wide', async ({ page }) => {
-  test.setTimeout(120000);
+  // Plan 17 Lane 8 stepped the budget up from 120 s: the swirl now carries
+  // three pearls per record instead of one, so every checkpoint measures
+  // three times the text. The assertions are unchanged.
+  test.setTimeout(240000);
   const fixture = buildMostlyLongFixture();
   const widths: Array<{ width: number; height: number }> = [
     { width: 1920, height: 1080 },
@@ -648,7 +668,10 @@ test('the goal card and milestone card sit clear of the panel top and bottom edg
 });
 
 test('tribute pearls are fully opaque inside the panel and fade out only at its edges, never crossing it while visible', async ({ page }) => {
-  test.setTimeout(120000);
+  // 240 s rather than 120: the same 100 quarter-second steps now move 52
+  // pearls on the sample and 18 on the mostly-long fixture, where they
+  // moved 26 and 6. The assertions are unchanged.
+  test.setTimeout(240000);
   for (const fixture of [buildMostlyLongFixture(), buildColorPolishSampleSnapshot()]) {
     const testPage = await page.context().newPage();
     await testPage.setViewportSize({ width: 1920, height: 1080 });
@@ -690,4 +713,217 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
     expect(translucentInside, detail.slice(0, 6).join('; ')).toBe(0);
     await testPage.close();
   }
+});
+
+/**
+ * The swirl's stated minimums (Plan 17 Lane 8, Anthony: "the swirling
+ * recognitions need to be fuller, with more bubbles"). The scene mounts 52
+ * pearls where it mounted 26, and the numbers below are the pearls actually
+ * drawn inside the panel: measured second by second over a whole 60 second
+ * showing of the 48 record sample, this lane's swirl runs between 12 and 27
+ * with a mean of 20.4, where the same measurement on the previous scene ran
+ * between 5 and 15 with a mean of 10.4. Every assertion below therefore
+ * fails on the previous scene.
+ */
+const MIN_MOUNTED_PEARLS = 52;
+const MIN_DRAWN_PEARLS = 11;
+const MIN_MEAN_DRAWN_PEARLS = 18;
+/** The same numbers for a pool of only six records. */
+const MIN_MOUNTED_PEARLS_SMALL_POOL = 18;
+const MIN_DRAWN_PEARLS_SMALL_POOL = 5;
+/** No record may hold more pearls than this at the same moment. */
+const MAX_PEARLS_PER_RECORD = 3;
+
+/** The 48 record sample with the milestone scene's dwell set to `seconds`. */
+function milestoneSnapshotWithDwell(seconds: number) {
+  const snapshot = buildMilestoneSnapshot() as unknown as {
+    presentation: { playlist: Array<{ id: string; enabled: boolean; durationSeconds: number }> };
+  };
+  snapshot.presentation = {
+    ...snapshot.presentation,
+    playlist: snapshot.presentation.playlist.map((entry) =>
+      entry.id === 'milestone' ? { ...entry, durationSeconds: seconds } : entry,
+    ),
+  };
+  return snapshot as unknown as Record<string, unknown>;
+}
+
+type SwirlSample = {
+  drawn: number;
+  crossing: string[];
+  maxCopies: number;
+  nodes: Array<{ key: string; id: string; x: number; y: number }>;
+};
+
+/**
+ * One reading of the swirl: how many pearls are drawn (effective opacity
+ * above 0.1), which of those are cut by the panel's edges, the most pearls
+ * any one record holds, and each drawn pearl's position keyed by its motion
+ * triple, which the scene gives every pearl uniquely.
+ */
+async function swirlSample(frame: import('@playwright/test').Frame): Promise<SwirlSample> {
+  return await frame.evaluate(() => {
+    const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]')!;
+    const panel = scene.querySelector<HTMLElement>('.stream-world')!.getBoundingClientRect();
+    const stream = ((window as any).colorPolishRuntime.visualState().stream || []) as Array<{
+      id: string; x: number; y: number; rise: number; radius: number; turn: number;
+    }>;
+    const out: SwirlSample = { drawn: 0, crossing: [], maxCopies: 0, nodes: [] };
+    const copies = new Map<string, number>();
+    const elements = Array.from(scene.querySelectorAll<HTMLElement>('.stream-node'));
+    elements.forEach((node, index) => {
+      if (parseFloat(window.getComputedStyle(node).opacity) <= 0.1) return;
+      const box = node.getBoundingClientRect();
+      out.drawn += 1;
+      const id = node.dataset.tributeId || '';
+      copies.set(id, (copies.get(id) || 0) + 1);
+      if (
+        box.top < panel.top - 0.5 || box.bottom > panel.bottom + 0.5 ||
+        box.left < panel.left - 0.5 || box.right > panel.right + 0.5
+      ) {
+        out.crossing.push(
+          `${id} box ${box.left.toFixed(0)},${box.top.toFixed(0)},${box.right.toFixed(0)},${box.bottom.toFixed(0)} panel ${panel.left.toFixed(0)},${panel.top.toFixed(0)},${panel.right.toFixed(0)},${panel.bottom.toFixed(0)}`,
+        );
+      }
+      const motion = stream[index];
+      out.nodes.push({
+        key: motion ? `${motion.rise},${motion.radius},${motion.turn}` : `element-${index}`,
+        id,
+        x: box.left + box.width / 2,
+        y: box.top + box.height / 2,
+      });
+    });
+    for (const n of copies.values()) out.maxCopies = Math.max(out.maxCopies, n);
+    return out;
+  });
+}
+
+test('the swirl is full: at least 11 pearls drawn inside the panel, none cut at its edges, for a whole 60 second showing', async ({ page }) => {
+  test.setTimeout(300000);
+  const requestedDwell = 60;
+
+  // A whole 60 second showing is stepped at 1920, where the church TV runs.
+  // The same swirl at 3840 is checked by the test below, which measures the
+  // same counts and fits at four checkpoints instead of stepping a minute
+  // twice over.
+  for (const size of [{ width: 1920, height: 1080 }]) {
+    const testPage = await page.context().newPage();
+    await testPage.setViewportSize(size);
+    const frame = await loadRenderer(testPage, { scene: 11, fixture: milestoneSnapshotWithDwell(requestedDwell) });
+
+    // The showing's length is the scene's own dwell, read from state, never a
+    // number written into this file.
+    const dwell = await frame.evaluate(() => (window as any).colorPolishRuntime.visualState().dwell[11] as number);
+    expect(dwell).toBe(requestedDwell);
+
+    const mounted = await frame.evaluate(
+      () => document.querySelectorAll('#stage .scene[data-scene="11"] .stream-node').length,
+    );
+    expect(mounted, 'pearls mounted in the swirl').toBeGreaterThanOrEqual(MIN_MOUNTED_PEARLS);
+
+    const samples: SwirlSample[] = [await swirlSample(frame)];
+    const checkpoints = new Set([0, Math.round(dwell / 3), Math.round((dwell * 2) / 3), dwell - 1]);
+    for (let second = 0; second < dwell; second++) {
+      if (checkpoints.has(second)) {
+        const failures = await textFits(frame, '#stage .scene[data-scene="11"]', { dwellSeconds: dwell });
+        expect(
+          failures,
+          `milestone text-fit failures at ${size.width}x${size.height}, ${second} s: ${JSON.stringify(failures)}`,
+        ).toHaveLength(0);
+      }
+      await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+      samples.push(await swirlSample(frame));
+    }
+
+    const drawnCounts = samples.map((s) => s.drawn);
+    const thinnest = Math.min(...drawnCounts);
+    const mean = drawnCounts.reduce((n, v) => n + v, 0) / drawnCounts.length;
+    expect(
+      thinnest,
+      `fewest pearls drawn at once over ${dwell} s at ${size.width}: ${JSON.stringify(drawnCounts)}`,
+    ).toBeGreaterThanOrEqual(MIN_DRAWN_PEARLS);
+    expect(
+      mean,
+      `mean pearls drawn over ${dwell} s at ${size.width}: ${mean.toFixed(1)}`,
+    ).toBeGreaterThanOrEqual(MIN_MEAN_DRAWN_PEARLS);
+
+    const cut = samples.flatMap((s) => s.crossing);
+    expect(cut.slice(0, 4).join(' | '), 'pearls drawn past the panel edge').toBe('');
+
+    const mostCopies = Math.max(...samples.map((s) => s.maxCopies));
+    expect(mostCopies, 'pearls holding the same record at once').toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+
+    // Lively for the whole showing: between one second and the next, every
+    // drawn pearl that is still drawn has moved, and records keep arriving.
+    let stalled = 0;
+    for (let i = 1; i < samples.length; i++) {
+      const before = new Map(samples[i - 1].nodes.map((n) => [n.key, n]));
+      for (const node of samples[i].nodes) {
+        const previous = before.get(node.key);
+        if (!previous) continue;
+        if (Math.hypot(node.x - previous.x, node.y - previous.y) < 1) stalled += 1;
+      }
+    }
+    expect(stalled, 'pearls that did not move from one second to the next').toBe(0);
+
+    const seen = new Set(samples.flatMap((s) => s.nodes.map((n) => n.id)));
+    expect(seen.size, 'records that passed through the swirl during the showing').toBeGreaterThan(MIN_DRAWN_PEARLS);
+
+    await testPage.close();
+  }
+});
+
+test('at 3840 the swirl carries the same pearls, drawn inside the panel with their words fitting, at 0, 6, 14 and 21 s', async ({ page }) => {
+  test.setTimeout(300000);
+  await page.setViewportSize({ width: 3840, height: 2160 });
+  const frame = await loadRenderer(page, { scene: 11, fixture: milestoneSnapshotWithDwell(60) });
+
+  const dwell = await frame.evaluate(() => (window as any).colorPolishRuntime.visualState().dwell[11] as number);
+  const mounted = await frame.evaluate(
+    () => document.querySelectorAll('#stage .scene[data-scene="11"] .stream-node').length,
+  );
+  expect(mounted, 'pearls mounted in the swirl at 3840').toBeGreaterThanOrEqual(MIN_MOUNTED_PEARLS);
+
+  let elapsed = 0;
+  for (const ms of [0, 6000, 14000, 21000]) {
+    if (ms > elapsed) {
+      await frame.evaluate((step) => (window as any).colorPolishRuntime.step(step), ms - elapsed);
+      elapsed = ms;
+    }
+    const sample = await swirlSample(frame);
+    expect(sample.drawn, `pearls drawn at 3840, ${ms} ms`).toBeGreaterThanOrEqual(MIN_DRAWN_PEARLS);
+    expect(sample.crossing.slice(0, 4).join(' | '), `pearls past the panel edge at ${ms} ms`).toBe('');
+    expect(sample.maxCopies).toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+    const failures = await textFits(frame, '#stage .scene[data-scene="11"]', { dwellSeconds: dwell });
+    expect(failures, `milestone text-fit failures at 3840, ${ms} ms: ${JSON.stringify(failures)}`).toHaveLength(0);
+  }
+});
+
+test('a pool smaller than the swirl still fills the panel, and a record never takes more pearls than the pool needs', async ({ page }) => {
+  test.setTimeout(180000);
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  // Six records, the mostly-long fixture: before this lane the scene mounted
+  // one pearl per record and drew between 1 and 3 of them at a time.
+  const frame = await loadRenderer(page, { scene: 11, fixture: buildMostlyLongFixture() });
+
+  const mounted = await frame.evaluate(
+    () => document.querySelectorAll('#stage .scene[data-scene="11"] .stream-node').length,
+  );
+  expect(mounted, 'pearls mounted from a six record pool').toBe(MIN_MOUNTED_PEARLS_SMALL_POOL);
+
+  const samples: SwirlSample[] = [await swirlSample(frame)];
+  for (let second = 0; second < 30; second++) {
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+    samples.push(await swirlSample(frame));
+  }
+
+  const drawnCounts = samples.map((s) => s.drawn);
+  expect(Math.min(...drawnCounts), `pearls drawn: ${JSON.stringify(drawnCounts)}`).toBeGreaterThanOrEqual(
+    MIN_DRAWN_PEARLS_SMALL_POOL,
+  );
+  expect(samples.flatMap((s) => s.crossing).slice(0, 4).join(' | ')).toBe('');
+  expect(Math.max(...samples.map((s) => s.maxCopies))).toBeLessThanOrEqual(MAX_PEARLS_PER_RECORD);
+
+  const failures = await textFits(frame, '#stage .scene[data-scene="11"]');
+  expect(failures, JSON.stringify(failures)).toHaveLength(0);
 });
