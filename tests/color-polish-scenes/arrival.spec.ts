@@ -1173,7 +1173,7 @@ test('every entrance style, single and group, runs under the bright backdrop', a
   expect(new Set(groupStyles).size).toBe(5);
 });
 
-test('arrival timing is unchanged: single entrance, hold and exit keep their recorded lengths', async ({ page }) => {
+test('arrival timing: the single bubble shows for 7 seconds (Anthony, 2026-09-19); entrance and exit keep their recorded lengths', async ({ page }) => {
   test.setTimeout(120_000);
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);
@@ -1208,8 +1208,8 @@ test('arrival timing is unchanged: single entrance, hold and exit keep their rec
   expect(afterSingle).not.toBeNull();
   expect(singleReading! - singleEntrance!).toBeGreaterThanOrEqual(3.5);
   expect(singleReading! - singleEntrance!).toBeLessThanOrEqual(3.8);
-  expect(singleExit! - singleReading!).toBeGreaterThanOrEqual(7.9);
-  expect(singleExit! - singleReading!).toBeLessThanOrEqual(8.3);
+  expect(singleExit! - singleReading!).toBeGreaterThanOrEqual(6.9);
+  expect(singleExit! - singleReading!).toBeLessThanOrEqual(7.3);
   expect(afterSingle! - singleExit!).toBeGreaterThanOrEqual(1.25);
   expect(afterSingle! - singleExit!).toBeLessThanOrEqual(1.55);
 
@@ -1226,6 +1226,189 @@ test('arrival timing is unchanged: single entrance, hold and exit keep their rec
 
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(120000));
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(120000));
+});
+
+test('the dynamic entrance: living architecture opens behind the bubble, words rise, light fills the hold', async ({ page }) => {
+  test.setTimeout(180_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+
+  const probe = async () =>
+    await frame.evaluate(() => {
+      const event = document.getElementById('event')!;
+      const style = (selector: string) => {
+        const el = event.querySelector<HTMLElement>(selector);
+        return el ? { transform: el.style.transform, opacity: parseFloat(el.style.opacity || '1') } : null;
+      };
+      const words = [...event.querySelectorAll<HTMLElement>('.arrival-word')].map((el) => ({
+        opacity: parseFloat(el.style.opacity || '1'),
+        transform: el.style.transform,
+      }));
+      const canvas = document.getElementById('event-canvas') as HTMLCanvasElement;
+      const context = canvas.getContext('2d')!;
+      const painted = (x: number, y: number, w: number, h: number) => {
+        const data = context.getImageData(x, y, w, h).data;
+        let count = 0;
+        for (let i = 3; i < data.length; i += 4) if (data[i] > 24) count++;
+        return count;
+      };
+      const state = (window as any).colorPolishRuntime.getState();
+      return {
+        phase: state.active ? state.active.phase : null,
+        halo: style('.arrival-halo'),
+        fanA: style('.arrival-halo-fan.fan-a'),
+        fanB: style('.arrival-halo-fan.fan-b'),
+        rosette: style('.arrival-rosette-0'),
+        edge: style('.arrival-edge'),
+        dawn: style('.arrival-dawn'),
+        decorationHidden: ['.arrival-architecture', '.arrival-edge'].every(
+          (selector) => event.querySelector(selector)?.getAttribute('aria-hidden') === 'true',
+        ),
+        decorationText: (event.querySelector('.arrival-architecture')?.textContent || '').trim(),
+        words,
+        paintedAll: painted(0, 0, 1812, 972),
+        // The headline block (TV x 154 to 790, y 380 to 700 is stage x 100 to 736, y 326 to 646).
+        paintedOverHeadline: painted(100, 326, 636, 320),
+        // The bubble's face, well inside its rim (stage centre 1300,486, radius 380).
+        paintedOverBubble: painted(1300 - 240, 486 - 240, 480, 480),
+      };
+    });
+
+  const stepUntil = async (phase: string) =>
+    await frame.evaluate((target: string) => {
+      const runtime = (window as any).colorPolishRuntime;
+      for (let i = 0; i < 400; i++) {
+        if (runtime.getState().active?.phase === target) return;
+        runtime.step(50);
+      }
+      throw new Error('never reached ' + target);
+    }, phase);
+
+  // Opening: the scene starts closed, with a flash of light, and the words have not risen yet.
+  await stepUntil('entrance');
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(100));
+  const opening = await probe();
+  expect(opening.phase).toBe('entrance');
+  expect(opening.decorationHidden).toBe(true);
+  expect(opening.decorationText).toBe('');
+  expect(opening.halo!.opacity).toBeLessThan(0.35);
+  expect(opening.dawn!.opacity).toBeGreaterThan(0.5);
+  expect(opening.words.length).toBeGreaterThanOrEqual(7);
+  expect(opening.words[opening.words.length - 1].opacity).toBe(0);
+  expect(opening.words[0].transform).toContain('translate');
+
+  // Mid flight: the architecture is opening and the stardust wake is on the canvas.
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1700));
+  const flight = await probe();
+  expect(flight.phase).toBe('entrance');
+  expect(flight.halo!.opacity).toBeGreaterThan(opening.halo!.opacity);
+  expect(flight.paintedAll).toBeGreaterThan(400);
+
+  // Landed: everything is open, every word has risen and rests untransformed (so it is
+  // crisp and measured where it is laid out), and the hold is alive with light.
+  await stepUntil('reading');
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(2500));
+  const holdA = await probe();
+  expect(holdA.phase).toBe('reading');
+  expect(holdA.halo!.opacity).toBeGreaterThan(0.95);
+  expect(holdA.edge!.opacity).toBeGreaterThan(0.5);
+  expect(holdA.dawn!.opacity).toBeLessThan(0.05);
+  for (const word of holdA.words) {
+    expect(word.opacity).toBe(1);
+    expect(word.transform).toBe('');
+  }
+  expect(holdA.paintedAll).toBeGreaterThan(400);
+  // The light never crosses the headline or the words on the bubble.
+  expect(holdA.paintedOverHeadline).toBe(0);
+  expect(holdA.paintedOverBubble).toBe(0);
+
+  // It keeps moving through the hold: the two fans turn opposite ways, the rosette turns.
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
+  const holdB = await probe();
+  const angle = (transform: string) => parseFloat(/rotate\((-?[\d.]+)deg\)/.exec(transform)![1]);
+  expect(angle(holdB.fanA!.transform)).toBeGreaterThan(angle(holdA.fanA!.transform));
+  expect(angle(holdB.fanB!.transform)).toBeLessThan(angle(holdA.fanB!.transform));
+  expect(angle(holdB.rosette!.transform)).not.toBe(angle(holdA.rosette!.transform));
+
+  // Leaving: the architecture folds away with the bubble.
+  await stepUntil('exit');
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(900));
+  const leaving = await probe();
+  expect(leaving.phase).toBe('exit');
+  expect(leaving.halo!.opacity).toBeLessThan(0.6);
+  expect(leaving.words[0].opacity).toBeLessThan(0.6);
+  await stepToDrained(frame);
+});
+
+test('reduced motion: the architecture is open at once, nothing turns, words rest in place, no canvas light', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+  await pushArrivalWave(page, frame, snapshot, 0, 2);
+  await stepToReading(frame);
+  const read = async () =>
+    await frame.evaluate(() => {
+      const event = document.getElementById('event')!;
+      const canvas = document.getElementById('event-canvas') as HTMLCanvasElement;
+      const data = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
+      let painted = 0;
+      for (let i = 3; i < data.length; i += 4) if (data[i] > 24) painted++;
+      return {
+        still: (window as any).colorPolishRuntime.getState().still,
+        halo: parseFloat(event.querySelector<HTMLElement>('.arrival-halo')!.style.opacity),
+        dawn: parseFloat(event.querySelector<HTMLElement>('.arrival-dawn')!.style.opacity),
+        fan: event.querySelector<HTMLElement>('.arrival-halo-fan.fan-a')!.style.transform,
+        rosette: event.querySelector<HTMLElement>('.arrival-rosette-0')!.style.transform,
+        words: [...event.querySelectorAll<HTMLElement>('.arrival-word')].map((el) => el.style.opacity + '|' + el.style.transform),
+        running: document.getAnimations().filter((a) => a.playState === 'running' && event.contains((a.effect as KeyframeEffect).target)).length,
+        painted,
+      };
+    });
+  const first = await read();
+  expect(first.still).toBe(true);
+  expect(first.halo).toBe(1);
+  expect(first.dawn).toBe(0);
+  expect(first.painted).toBe(0);
+  expect(first.running).toBe(0);
+  for (const word of first.words) expect(word).toBe('1|');
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  const later = await read();
+  expect(later.fan).toBe(first.fan);
+  expect(later.rosette).toBe(first.rosette);
+  expect(later.painted).toBe(0);
+});
+
+test('a long single message still shows every page: 7 seconds for each page, never cut short', async ({ page }) => {
+  test.setTimeout(180_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+  await pushArrivalWave(page, frame, snapshot, 0, 2, { message: MOSTLY_LONG_MESSAGE_500 });
+  await stepToReading(frame);
+  const seen = await frame.evaluate(() => {
+    const runtime = (window as any).colorPolishRuntime;
+    const start = runtime.getState().clock;
+    const pages: string[] = [];
+    let readingEnd: number | null = null;
+    for (let i = 0; i < 1200; i++) {
+      const state = runtime.getState();
+      if (!state.active || state.active.phase !== 'reading') {
+        readingEnd = state.clock;
+        break;
+      }
+      const text = document.querySelector('#event .event-orb .message')?.textContent || '';
+      if (pages[pages.length - 1] !== text) pages.push(text);
+      runtime.step(100);
+    }
+    return { pages, held: readingEnd === null ? null : readingEnd - start };
+  });
+  expect(seen.held).not.toBeNull();
+  expect(seen.pages.length).toBeGreaterThanOrEqual(1);
+  // Every page was shown once, in order, and together they are the whole message.
+  expect(seen.pages.join(' ').replace(/\s+/g, ' ').trim()).toBe(MOSTLY_LONG_MESSAGE_500.replace(/\s+/g, ' ').trim());
+  expect(seen.held!).toBeGreaterThanOrEqual(7 * seen.pages.length - 0.2);
+  expect(seen.held!).toBeLessThanOrEqual(7 * seen.pages.length + 0.4);
 });
 
 for (const width of [1920, 3840]) {
