@@ -1,6 +1,8 @@
 import {
+  COLOR_POLISH_REQUIRED_SCENES,
   COLOR_POLISH_SCENES,
   COLOR_POLISH_VERSION,
+  normalizeColorPolishPlaylist,
   type ColorPolishPresentation,
   type ColorPolishSnapshot,
 } from './contracts';
@@ -94,16 +96,19 @@ function recognition(value: unknown, serverTime: string): Recognition | null {
   return { id: value.id, recipient: value.recipient, message: value.message, expressionIds: [...value.expressionIds], createdAt: value.createdAt, firstPublishedAt: value.firstPublishedAt, expiresAt: value.expiresAt, version: value.version, status: 'published', featured: value.featured };
 }
 
-function presentation(value: unknown): ColorPolishPresentation | null {
-  if (!record(value) || !exact(value, ['version', 'enabled', 'playlist']) || value.version !== COLOR_POLISH_VERSION || typeof value.enabled !== 'boolean' || !Array.isArray(value.playlist) || value.playlist.length !== COLOR_POLISH_SCENES.length) return null;
+function presentation(value: unknown, appendMissingOptional = true): ColorPolishPresentation | null {
+  if (!record(value) || !exact(value, ['version', 'enabled', 'playlist']) || value.version !== COLOR_POLISH_VERSION || typeof value.enabled !== 'boolean' || !Array.isArray(value.playlist) || value.playlist.length < COLOR_POLISH_REQUIRED_SCENES.length || value.playlist.length > COLOR_POLISH_SCENES.length) return null;
   const seen = new Set<string>();
   const playlist = value.playlist.map((entry) => {
     if (!record(entry) || !exact(entry, ['id', 'enabled', 'durationSeconds']) || typeof entry.id !== 'string' || !COLOR_POLISH_SCENES.includes(entry.id as never) || seen.has(entry.id) || typeof entry.enabled !== 'boolean' || !integer(entry.durationSeconds, 12) || entry.durationSeconds > 180) return null;
     seen.add(entry.id);
     return { id: entry.id, enabled: entry.enabled, durationSeconds: entry.durationSeconds } as ColorPolishPresentation['playlist'][number];
   });
-  if (playlist.some((entry) => entry === null) || seen.size !== COLOR_POLISH_SCENES.length || !playlist.some((entry) => entry?.enabled)) return null;
-  return { version: COLOR_POLISH_VERSION, enabled: value.enabled, playlist: playlist as ColorPolishPresentation['playlist'] };
+  // Ten or eleven entries: the ten original screens are all required, the optional
+  // live-feed screen may be absent (a playlist saved before it existed) and is then
+  // appended with its default entry.
+  if (playlist.some((entry) => entry === null) || !COLOR_POLISH_REQUIRED_SCENES.every((scene) => seen.has(scene)) || !playlist.some((entry) => entry?.enabled)) return null;
+  return { version: COLOR_POLISH_VERSION, enabled: value.enabled, playlist: appendMissingOptional ? normalizeColorPolishPlaylist(playlist as ColorPolishPresentation['playlist']) : playlist as ColorPolishPresentation['playlist'] };
 }
 
 function insightAggregate(value: unknown, start: string, end: string): Aggregate | null {
@@ -154,7 +159,7 @@ export function validateColorPolishSnapshot(value: unknown): ColorPolishSnapshot
 
 export function validateColorPolishPresentationChanges(value: unknown): ColorPolishPresentation['playlist'] | null {
   if (!record(value) || !only(value, ['playlist']) || !Array.isArray(value.playlist)) return null;
-  const projected = presentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist });
+  const projected = presentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist }, false);
   return projected?.playlist ?? null;
 }
 
