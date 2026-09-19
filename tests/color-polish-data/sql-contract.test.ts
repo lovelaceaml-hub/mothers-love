@@ -43,10 +43,10 @@ describe("Color Polish migration contract", () => {
   });
 });
 
-// Plan 17 Lane 13: database/013_color_polish_live_feed.sql and its two operator files.
+// Plan 17 Lane 13: database/014_color_polish_live_feed.sql and its two operator files.
 // Static contract only: no test here or anywhere else connects to a database.
 describe("Color Polish live-feed validator migration contract", () => {
-  const liveFeed = readFileSync(new URL("../../database/013_color_polish_live_feed.sql", import.meta.url), "utf8");
+  const liveFeed = readFileSync(new URL("../../database/014_color_polish_live_feed.sql", import.meta.url), "utf8");
   const stripComments = (sql: string) => sql.split("\n").filter((line) => !line.trimStart().startsWith("--")).join("\n");
   const statements = stripComments(liveFeed);
   const originalValidator = migration.slice(

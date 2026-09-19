@@ -183,7 +183,7 @@ describe("Color Polish presentation patch projection", () => {
 });
 
 // Plan 17 Lane 13: the optional eleventh screen, slug live-feed. These are the
-// compatibility proofs for database/013_color_polish_live_feed.sql.
+// compatibility proofs for database/014_color_polish_live_feed.sql.
 describe("Color Polish live-feed playlist compatibility", () => {
   const ten = presentation.playlist;
 

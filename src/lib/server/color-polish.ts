@@ -130,7 +130,7 @@ function projectPresentation(value: unknown, appendMissingOptional = true): Colo
     seen.add(item.id);
     playlist.push({ id: item.id as ColorPolishScene, enabled: item.enabled, durationSeconds: item.durationSeconds });
   }
-  // Ten or eleven entries, matching database/013_color_polish_live_feed.sql: the ten
+  // Ten or eleven entries, matching database/014_color_polish_live_feed.sql: the ten
   // original screens are required, live-feed is optional. When it is absent (a playlist
   // saved before the screen existed, or before that SQL ran) it is appended with its
   // default entry, so the TV and the Studio always receive the full list.
@@ -143,7 +143,7 @@ export function projectColorPolishPresentationChanges(value: unknown): ColorPoli
   const changes: ColorPolishPresentationChanges = {};
   // A change request is stored exactly as sent (ten or eleven entries): nothing is
   // appended here, so a ten entry playlist still saves against a database whose
-  // validator has not yet been replaced by database/013_color_polish_live_feed.sql.
+  // validator has not yet been replaced by database/014_color_polish_live_feed.sql.
   const projected = projectPresentation({ version: COLOR_POLISH_VERSION, enabled: true, playlist: value.playlist }, false);
   if (!projected) return null;
   changes.playlist = projected.playlist;
