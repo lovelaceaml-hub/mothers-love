@@ -266,6 +266,49 @@ function orbitSize(host, r) {
   return { d, fit };
 }
 
+// Plan 17 Lane 6 review (coordinator direction, September 19): a message that
+// cannot show whole inside the soft cap at the floor size is not chosen for
+// Orbit while the pool still holds a message that does. ORBIT_SOFT_LAYOUT is
+// the largest layout diameter whose whole path round the ring is drawn
+// inside ORBIT_SOFT_CAP. Only when no fitting record is left for a planet
+// does a longer one appear, at the smallest circle its own words fit (see
+// the cap in tickOrbit), and a planet that already holds a fitting record
+// keeps it rather than trade it for a longer one. Measured once per record
+// and remembered; cleared with the fit cache when the real fonts arrive.
+const ORBIT_SOFT_LAYOUT = Math.floor(ORBIT_SOFT_CAP / ORBIT_K_MIN);
+let ORBIT_SOFT_FITS = new Map();
+
+function orbitFitsSoft(host, r) {
+  if (!host) return true;
+  const key = orbitFitKey(r, 'soft');
+  if (!ORBIT_SOFT_FITS.has(key)) {
+    // Two probes decide it: the soft cap itself, and 334 px, the largest
+    // circle that gets the compact name and chip styling (orbitStyleOrb),
+    // where a message just over the line can still fit.
+    ORBIT_SOFT_FITS.set(key, [ORBIT_SOFT_LAYOUT, 334].some((d) => orbitWholeWidth(host, r, d) !== null));
+  }
+  return ORBIT_SOFT_FITS.get(key);
+}
+
+// The next record for a planet: a fitting one sharing the expression, then
+// any fitting one, and only with allowOversize a longer one. Records are
+// drawn through core's chooseRandom, so the rotation weights are unchanged;
+// a drawn record that does not fit is set aside and the draw repeats.
+function orbitChoose(host, exclude, expressionId, allowOversize) {
+  const oversize = [];
+  for (const expr of expressionId ? [expressionId, null] : [null]) {
+    const skipped = [];
+    for (;;) {
+      const r = chooseRandom([...exclude, ...skipped], expr);
+      if (!r) break;
+      if (orbitFitsSoft(host, r)) return { r, oversize: false, matched: !!expr };
+      skipped.push(r.id);
+      if (!oversize.some((x) => x.r.id === r.id)) oversize.push({ r, oversize: true, matched: !!expr });
+    }
+  }
+  return allowOversize && oversize.length ? oversize[0] : null;
+}
+
 // Puts record r into planet p at diameter d with the measured layout.
 function orbitApplyFit(p, r, d, fit) {
   const b = p.b, el = b.el;
@@ -296,7 +339,10 @@ function orbitApplyFit(p, r, d, fit) {
 // from the markup), or measured again once the real fonts have loaded.
 function orbitFitAll(remeasure) {
   if (!V.planets || !V.planets.length) return;
-  if (remeasure) ORBIT_FIT_CACHE = new Map();
+  if (remeasure) {
+    ORBIT_FIT_CACHE = new Map();
+    ORBIT_SOFT_FITS = new Map();
+  }
   orbitWithHost((host) => {
     V.planets.forEach((p) => {
       const r = S.pool.find((x) => x.id === p.b.id);
@@ -343,15 +389,17 @@ function orbitScene() {
   const id = (S.sceneAge > 0.5 && ORBIT_PASS_TOKEN && ORBIT_LAST) ? ORBIT_LAST : orbitNextId();
   ORBIT_PASS_TOKEN = id;
   const e = catalog[id - 1], chosen = [];
-  for (let i = 0; i < 4; i++) {
-    const r = chooseRandom(chosen.map((x) => x.r.id), id);
-    if (r) chosen.push({ r, expression: id });
-  }
-  while (chosen.length < 4) {
-    const r = chooseRandom(chosen.map((x) => x.r.id));
-    if (!r) break;
-    chosen.push({ r, expression: null });
-  }
+  // Fitting records first (this expression, then any); a longer record fills
+  // a planet only when the pool has no fitting record left for it.
+  orbitWithHost((host) => {
+    for (const allowOversize of [false, true]) {
+      while (chosen.length < 4) {
+        const pick = orbitChoose(host, chosen.map((x) => x.r.id), id, allowOversize);
+        if (!pick) break;
+        chosen.push({ r: pick.r, expression: pick.matched ? id : null });
+      }
+    }
+  });
   let h = heading('Expression Orbit', 'A shared expression. Many kind words.');
   h += '<div class="orbit-universe" id="orbit-universe">' +
     '<canvas id="orbit-lines" class="orbit-lines" width="1812" height="552" aria-hidden="true"></canvas>' +
@@ -515,7 +563,13 @@ function tickOrbit(dt) {
       moon.style.opacity = mz > 0 ? '1' : '.8';
     });
     if (V.clock - p.lastSwap > 24 && pos.z < -330) {
-      const r = chooseRandom(slots.map((x) => x.id), b.expression) || chooseRandom(slots.map((x) => x.id));
+      // A planet holding a fitting record never trades it for a longer one;
+      // a planet holding a longer record (or none) may take another.
+      const pick = orbitWithHost((host) => {
+        const current = S.pool.find((x) => x.id === b.id);
+        return orbitChoose(host, slots.map((x) => x.id), b.expression, !current || !orbitFitsSoft(host, current));
+      });
+      const r = pick ? pick.r : null;
       if (r) {
         b.id = r.id;
         b.el.dataset.recordId = r.id;

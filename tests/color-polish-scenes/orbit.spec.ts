@@ -1199,3 +1199,88 @@ test('orbit holds through a full showing at both the 30 and the 60 second dwell'
     await testPage.close();
   }
 });
+
+// ---------------------------------------------------------------------------
+// Plan 17 Lane 6 review (coordinator direction, September 19): a message that
+// cannot show whole inside the soft cap is not chosen for Orbit while the
+// pool still holds messages that do; only a pool with too few of those shows
+// a longer one, in one planet, at the smallest circle its words fit.
+// ---------------------------------------------------------------------------
+
+test('with enough fitting messages in the pool, no planet ever holds one too long for the soft cap, through a 60 second showing with far-side replacements', async ({ page }) => {
+  test.setTimeout(300000);
+  const long = buildMostlyLongFixture() as { recognitions: Array<Record<string, unknown>> };
+  const medium = buildMediumFixture() as { recognitions: Array<Record<string, unknown>> };
+  // Nine long records (250, 400 and 500 graphemes, three copies each under
+  // their own ids) against the fitting ones, so a chooser that ignores the
+  // rule puts a long one on screen at once.
+  const longIds = ['mostly-250', 'mostly-400', 'mostly-500'];
+  const copies = [1, 2].flatMap((n) =>
+    long.recognitions.filter((r) => longIds.includes(r.id as string)).map((r) => ({ ...r, id: `${r.id}-copy-${n}` })),
+  );
+  const tooLong = [...longIds, ...copies.map((r) => r.id as string)];
+  const fixture = buildActiveDisplayFixture({
+    recognitions: [...long.recognitions, ...copies, ...medium.recognitions],
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'orbit', enabled: true, durationSeconds: 60 }] },
+  });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, ms: 0, fixture });
+  // The pool really does hold messages too long for the soft cap, judged by
+  // text-fits.ts's own geometry, so the rule has something to refuse.
+  for (const id of tooLong) {
+    expect(await fitsWhole(frame, id, ORBIT_SOFT_CAP_LAYOUT, ORBIT_FONT_FLOOR), `${id} cannot fit the soft cap`).toBe(false);
+  }
+  const seen = new Set<string>();
+  for (let second = 0; second <= 60; second += 2) {
+    const planets = await orbitPlanetReadings(frame);
+    expect(planets, `four planets at ${second} s`).toHaveLength(4);
+    for (const planet of planets) {
+      seen.add(planet.id);
+      expect(tooLong, `${planet.id} on screen at ${second} s`).not.toContain(planet.id);
+      expect(planet.drawn, `${planet.id} drawn inside the soft cap at ${second} s`).toBeLessThanOrEqual(ORBIT_SOFT_CAP + 1);
+      expect(
+        await fitsWhole(frame, planet.id, ORBIT_SOFT_CAP_LAYOUT, ORBIT_FONT_FLOOR) || await fitsWhole(frame, planet.id, 334, ORBIT_FONT_FLOOR),
+        `${planet.id} fits whole inside the soft cap at ${second} s`,
+      ).toBe(true);
+    }
+    const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: [...seen] });
+    expect(failures, `at ${second} s: ${JSON.stringify(failures)}`).toHaveLength(0);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
+  const log = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().log as Array<{ type: string; id?: string }>);
+  expect(log.filter((e) => e.type === 'orbit_backside_replace').length, 'far-side replacements happened').toBeGreaterThan(0);
+  expect(seen.size, 'more than the first four records were shown').toBeGreaterThan(4);
+});
+
+test('with too few fitting messages, exactly one planet holds a longer one, never magnified, and the fitting planets keep fitting records', async ({ page }) => {
+  test.setTimeout(300000);
+  // Three records fit the soft cap (two short, the emoji one); 250, 400 and
+  // 500 graphemes do not. Four planets, so one of them must take a long one.
+  const fixture = buildMostlyLongFixture({
+    presentation: { version: 'color-polish-v6', enabled: true, playlist: [{ id: 'orbit', enabled: true, durationSeconds: 90 }] },
+  });
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  const frame = await loadRenderer(page, { scene: 10, ms: 0, fixture });
+  const longIds = ['mostly-250', 'mostly-400', 'mostly-500'];
+  for (let second = 0; second <= 90; second += 3) {
+    const planets = await orbitPlanetReadings(frame);
+    expect(planets, `four planets at ${second} s`).toHaveLength(4);
+    const longOnes = planets.filter((p) => longIds.includes(p.id));
+    expect(longOnes.map((p) => p.id), `exactly one longer message on screen at ${second} s`).toHaveLength(1);
+    expect(new Set(planets.map((p) => p.id)).size, `no record twice at ${second} s`).toBe(4);
+    for (const planet of planets) {
+      if (longIds.includes(planet.id)) {
+        expect(
+          Math.abs(planet.drawn - planet.layout * ORBIT_K_MIN),
+          `${planet.id} is never magnified at ${second} s: drawn ${planet.drawn.toFixed(1)} px against ${planet.layout} px of layout`,
+        ).toBeLessThanOrEqual(3);
+        expect(planet.drawn, `${planet.id} inside the room under the title`).toBeLessThanOrEqual(ORBIT_ROOM_CAP + 1);
+      } else {
+        expect(planet.drawn, `${planet.id} drawn inside the soft cap at ${second} s`).toBeLessThanOrEqual(ORBIT_SOFT_CAP + 1);
+      }
+    }
+    const failures = await textFits(frame, ORBIT_ROOT, { singlePageIds: ORBIT_MOSTLY_IDS });
+    expect(failures, `at ${second} s: ${JSON.stringify(failures)}`).toHaveLength(0);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(3000));
+  }
+});
