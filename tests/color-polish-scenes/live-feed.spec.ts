@@ -217,11 +217,87 @@ const offsetOf = (transform: string) => {
   return match ? Math.abs(parseFloat(match[1])) : 0;
 };
 
-for (const viewport of [{ width: 1920, height: 1080, floor: 24 }, { width: 3840, height: 2160, floor: 48 }]) {
-  test(`fills the screen from the header rule to the bottom, three readable columns, at ${viewport.width}`, async ({ page }) => {
+/**
+ * The drawn shape of one recognition card, read from the running renderer: every
+ * text size plus the proportions around the text. Pass '.lf-panel' for this screen
+ * and '.footer' for the recognition rail at the bottom of every other screen.
+ * Anthony, 2026-09-19: "the text size should be the same as the original", so these
+ * two readings must match, and this test fails if either one drifts.
+ */
+async function cardShape(frame: Frame, root: string) {
+  return frame.evaluate((selector) => {
+    const card = document.querySelector(`${selector} .chat-item`);
+    if (!card) return null;
+    const scale = document.getElementById('tv')!.getBoundingClientRect().width / 1920;
+    const px = (sel: string) => {
+      const el = card.querySelector(sel);
+      return el ? parseFloat(getComputedStyle(el).fontSize) : null;
+    };
+    const design = (sel: string) => {
+      const el = card.querySelector(sel);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return `${(r.width / scale).toFixed(2)} x ${(r.height / scale).toFixed(2)}`;
+    };
+    const card_ = getComputedStyle(card);
+    const message = getComputedStyle(card.querySelector('.chat-message')!);
+    return {
+      name: px('.chat-name'),
+      message: px('.chat-message'),
+      time: px('.chat-time'),
+      foot: px('.chat-foot'),
+      nameLetterSpacing: getComputedStyle(card.querySelector('.chat-name')!).letterSpacing,
+      messageLineHeight: message.lineHeight,
+      messageMargin: message.margin,
+      cardPadding: card_.padding,
+      cardRadius: card_.borderRadius,
+      cardGap: card_.gap,
+      // Only the avatar track: the text track resolves to the card's own width, and
+      // a card here is a little narrower than a card on the rail (743 against 763).
+      cardAvatarColumn: card_.gridTemplateColumns.split(' ')[0],
+      headGap: getComputedStyle(card.querySelector('.chat-head')!).gap,
+      avatar: design('.chat-avatar'),
+      avatarIcon: design('.chat-avatar .icon'),
+      footIcon: design('.chat-foot img'),
+      thumb: design('.chat-like .thumb'),
+    };
+  }, root);
+}
+
+/** Leaves this screen for Welcome and waits for the rail to be back on its own. */
+async function goToWelcome(page: Page, frame: Frame) {
+  await frame.evaluate(() => (window as any).colorPolishRuntime.setScene(1));
+  await step(frame, 1300);
+  await expect.poll(async () => (await measure(frame)).footer.visibility, { timeout: 30_000 }).toBe('visible');
+  await page.waitForTimeout(200);
+}
+
+for (const viewport of [{ width: 1920, height: 1080, floor: 18 }, { width: 3840, height: 2160, floor: 36 }]) {
+  test(`the cards are the rail's own cards, same text sizes as another screen's rail, at ${viewport.width}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const frame = await openLiveFeed(page, pool(20));
+    const panel = await cardShape(frame, '.lf-panel');
+    expect(panel).not.toBeNull();
+    // The rail as it is drawn on another screen, in the same running renderer.
+    await goToWelcome(page, frame);
+    const rail = await cardShape(frame, '.footer');
+    expect(rail).not.toBeNull();
+    // Anthony's change: identical text sizes, and the proportions around the text too.
+    expect(panel).toEqual(rail);
+    // Read, not assumed: the rail's own sizes, and the drawn floor for this width.
+    expect(rail!.name).toBe(18);
+    expect(rail!.message).toBe(18);
+    expect(rail!.time).toBe(11);
+    expect(rail!.foot).toBe(11);
+    const scale = (await measure(frame)).scale;
+    for (const size of [panel!.name!, panel!.message!]) expect(size * scale).toBeGreaterThanOrEqual(viewport.floor);
+  });
+
+  test(`fills the screen from the header rule to the bottom, two readable columns, at ${viewport.width}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     const records = pool(100);
     const frame = await openLiveFeed(page, records);
+    const railSizes = { name: 18, message: 18 };
     for (const ms of [0, 6000, 8000, 7000]) {
       if (ms) await step(frame, ms);
       const m = await measure(frame);
@@ -234,7 +310,10 @@ for (const viewport of [{ width: 1920, height: 1080, floor: 24 }, { width: 3840,
       expect(m.panel!.right).toBeCloseTo(1886, 0);
       expect(m.panel!.bottom).toBeCloseTo(1055, 0);
       expect(m.title).toBe('LIVE RECOGNITIONS');
-      expect(m.lanes).toHaveLength(3);
+      expect(m.lanes).toHaveLength(2);
+      // Two columns keep a card about as wide as a card on the rail (763.5 and 746.5
+      // drawn at 1920); a third column would draw a 490 px card.
+      for (const lane of m.lanes) expect(lane.box.width).toBeGreaterThan(700);
       for (const lane of m.lanes) {
         expect(lane.cards.length).toBeGreaterThanOrEqual(3);
         expect(lane.box.top).toBeGreaterThan(m.panel!.top);
@@ -244,7 +323,7 @@ for (const viewport of [{ width: 1920, height: 1080, floor: 24 }, { width: 3840,
           expect(card.message).toBe(source.message);
           expect(card.name).toBe(source.recipient);
           expect(card.nameFits).toBe(true);
-          expect(card.fontSize).toBeGreaterThanOrEqual(24);
+          expect(card.fontSize).toBe(railSizes.message);
           expect(card.drawnFontSize).toBeGreaterThanOrEqual(viewport.floor);
           expect(card.fits).toBe(true);
           expect(card.clipped).toBe(false);
@@ -255,11 +334,14 @@ for (const viewport of [{ width: 1920, height: 1080, floor: 24 }, { width: 3840,
           expect(card.chips).toBe(source.expressionIds.length);
           expect(card.hasLike).toBe(true);
           expect(card.hasTime).toBe(true);
-          // Larger than the rail's card text (18 px).
-          expect(card.fontSize).toBeGreaterThan(18);
         }
       }
     }
+    // The size the cards were compared against is the rail's own, read from the rail
+    // on Welcome at the end of this run, so a drift on either side fails here.
+    await goToWelcome(page, frame);
+    const rail = await cardShape(frame, '.footer');
+    expect({ name: rail!.name, message: rail!.message }).toEqual(railSizes);
   });
 }
 
@@ -315,31 +397,35 @@ test('same records and order as the rail, newest first, and every one of 100 get
   const records = pool(100);
   const frame = await openLiveFeed(page, records);
   const first = await measure(frame);
-  // Newest first across the three columns: column c opens with the c-th newest record.
-  expect(first.lanes.map((lane) => lane.cards[0].id)).toEqual([records[0].id, records[1].id, records[2].id]);
-  expect(first.lanes.map((lane) => lane.cards[1].id)).toEqual([records[3].id, records[4].id, records[5].id]);
+  // Newest first across the two columns: column c opens with the c-th newest record.
+  expect(first.lanes.map((lane) => lane.cards[0].id)).toEqual([records[0].id, records[1].id]);
+  expect(first.lanes.map((lane) => lane.cards[1].id)).toEqual([records[2].id, records[3].id]);
   const seen = new Set<string>();
   const known = new Set(records.map((r) => r.id));
-  for (let i = 0; i < 45; i++) {
+  // At the rail's own 5.5 px per second a column of 50 cards takes about 1000
+  // seconds to come round, so the clock is stepped a long way here.
+  for (let i = 0; i < 42; i++) {
     const m = await measure(frame);
     for (const lane of m.lanes) for (const card of lane.cards) {
       expect(known.has(card.id)).toBe(true);
       seen.add(card.id);
     }
-    await step(frame, 10000);
+    await step(frame, 30000);
   }
   expect(seen.size).toBe(100);
 });
 
-test('scrolls continuously at a calm pace and never while an arrival or a pause holds the screen', async ({ page }) => {
+test('scrolls continuously at the rail\'s own pace and never while an arrival or a pause holds the screen', async ({ page }) => {
   const frame = await openLiveFeed(page, pool(60));
   const before = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
-  await step(frame, 2000);
+  await step(frame, 4000);
   const after = (await measure(frame)).lanes.map((lane) => offsetOf(lane.transform));
+  // The rail moves 5.5 px per second (tickFeeds in core/chrome.js), so four seconds
+  // are 22 px here too: the two screens drift at the same speed.
   after.forEach((value, index) => {
     const moved = value - before[index];
-    expect(moved).toBeGreaterThan(30);
-    expect(moved).toBeLessThan(70);
+    expect(moved).toBeGreaterThan(20);
+    expect(moved).toBeLessThan(24);
   });
   // Pause (the Studio's Pause button): the frame holds exactly where it is.
   await frame.evaluate(() => (window as any).colorPolishRuntime.setPlaying(false));
@@ -348,7 +434,7 @@ test('scrolls continuously at a calm pace and never while an arrival or a pause 
   expect((await measure(frame)).lanes.map((lane) => lane.transform)).toEqual(held);
 });
 
-test('500 grapheme messages are shown whole at 26 px, never shortened', async ({ page }) => {
+test('500 grapheme messages are shown whole at the rail\'s 18 px, never shortened', async ({ page }) => {
   const records = Array.from({ length: 12 }, (_, n) => record(n, n % 3 === 0 ? { message: longMessage(n) } : {}));
   for (const r of records.filter((_, n) => n % 3 === 0)) expect([...r.message]).toHaveLength(500);
   const frame = await openLiveFeed(page, records);
@@ -361,7 +447,7 @@ test('500 grapheme messages are shown whole at 26 px, never shortened', async ({
       expect(card.message).toBe(source.message);
       expect(card.fits).toBe(true);
       expect(card.clipped).toBe(false);
-      expect(card.fontSize).toBeGreaterThanOrEqual(24);
+      expect(card.fontSize).toBe(18);
       // The whole message sits inside its own card.
       expect(card.messageBox.top).toBeGreaterThanOrEqual(card.box.top);
       expect(card.messageBox.bottom).toBeLessThanOrEqual(card.box.bottom);
@@ -376,12 +462,13 @@ test('500 grapheme messages are shown whole at 26 px, never shortened', async ({
   expect(seenLong.size).toBe(longIds.size);
 });
 
-test('three records sit still in three columns with nothing repeated', async ({ page }) => {
+test('three records sit still in two columns with nothing repeated', async ({ page }) => {
   const records = pool(3);
   const frame = await openLiveFeed(page, records);
   await step(frame, 14000);
   const m = await measure(frame);
-  expect(m.lanes.map((lane) => lane.cards.map((card) => card.id))).toEqual([[records[0].id], [records[1].id], [records[2].id]]);
+  // Newest first, one per column in turn: the first column takes the first and third.
+  expect(m.lanes.map((lane) => lane.cards.map((card) => card.id))).toEqual([[records[0].id, records[2].id], [records[1].id]]);
   for (const lane of m.lanes) {
     expect(offsetOf(lane.transform)).toBe(0);
     expect(lane.cards[0].box.top).toBeGreaterThanOrEqual(lane.box.top);
@@ -544,7 +631,7 @@ test('reduced motion: no scroll, whole cards only, pages change with a fade', as
   second.lanes.forEach((lane, index) => {
     expect(offsetOf(lane.transform)).toBe(0);
     // The next page starts right after the last card of the page before.
-    const column = pool(60).filter((_, n) => n % 3 === index).map((r) => r.id);
+    const column = pool(60).filter((_, n) => n % 2 === index).map((r) => r.id);
     expect(lane.cards[0].id).toBe(column[firstIds[index].length]);
     for (const card of lane.cards) {
       expect(card.box.top).toBeGreaterThanOrEqual(lane.box.top);

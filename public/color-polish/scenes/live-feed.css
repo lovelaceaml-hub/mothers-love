@@ -83,11 +83,15 @@
 .lf-title .live-dot { width: 10px; height: 10px; margin-right: 13px; }
 .lf-title small { font-size: 13px; font-weight: 400; letter-spacing: 1.4px; color: #596F61; }
 
+/* Two columns, because the cards are the rail's own size now: two columns make each
+ * card about as wide as a card drawn on the rail (measured at 1920: rail lane 763.5
+ * and 746.5, this panel 743.5 and 726.5). Three columns would draw a 490 px card and
+ * leave long sparse lines. The gap is the rail's own 19 px. */
 .lf-lanes {
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 19px;
   transition: opacity 600ms ease;
 }
 .lf-lanes.lf-turning { opacity: 0; }
@@ -101,20 +105,17 @@
   mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
 }
 .lf-lane + .lf-lane { border-left: 1px solid #dcd9c858; padding-left: 17px; }
-.lf-track { will-change: transform; display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
+.lf-track { will-change: transform; display: flex; flex-direction: column; gap: 9px; padding-top: 16px; }
 
-/* The rail's card, drawn larger. Colours, borders and shape come from renderer.css. */
-.lf-panel .chat-item { grid-template-columns: 46px minmax(0, 1fr); gap: 12px; padding: 14px 18px 13px 10px; border-radius: 22px 28px 28px 6px; }
-.lf-panel .chat-avatar { width: 44px; height: 44px; }
-.lf-panel .chat-avatar .icon { width: 36px; height: 36px; }
-.lf-panel .chat-head { gap: 10px; line-height: 1.2; }
-.lf-panel .chat-name { font-size: 27px; letter-spacing: -.4px; min-width: 0; overflow-wrap: anywhere; }
-.lf-panel .chat-time { font-size: 15px; }
-.lf-panel .chat-message { font-size: 26px; line-height: 1.32; margin: 8px 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.lf-panel .chat-foot { gap: 6px; font-size: 16px; }
-.lf-panel .chat-foot img { width: 22px; height: 22px; }
-.lf-panel .chat-foot .chat-like { gap: 6px; }
-.lf-panel .chat-like .thumb { width: 17px; height: 17px; }
+/* Anthony, 2026-09-19, watching this screen on the church TV: "good but the text size
+ * should be the same as the original". The original is the recognition rail at the
+ * bottom of every other screen, so this screen adds no size of its own: name 18 px,
+ * message 18 px, time 11 px, chips and likes 11 px, the 29 px avatar, the rail's
+ * padding, radius and gaps all come from renderer.css and are not overridden here.
+ *
+ * The one rule that stays is not about size: a single very long word in a name must
+ * wrap inside its card instead of pushing the card wide. Nothing is ever shortened. */
+.lf-panel .chat-name { min-width: 0; overflow-wrap: anywhere; }
 
 /* Calm empty state. */
 .lf-empty { display: grid; place-content: center; justify-items: center; text-align: center; gap: 6px; color: var(--ink); }

@@ -5,7 +5,8 @@
 // screen grows into one panel that runs from just under the header's rule to the
 // bottom of the screen. Same data and order as the rail (records(), newest first,
 // the verified public feed only), the same card markup (chatMarkup from
-// core/chrome.js), drawn larger and in three columns that scroll continuously.
+// core/chrome.js) at the rail's own text size, in two columns that scroll
+// continuously at the rail's own pace.
 //
 // Privacy: every card lives inside this scene's root. Neutral, Quiet, offline,
 // stale and expired states replace or prune the scene through the core exactly as
@@ -15,10 +16,16 @@
 // out as pages and the pages change with a fade.
 'use strict';
 
+// Card size, card spacing and scroll speed are the rail's own numbers, because
+// Anthony asked for the rail's text size here (2026-09-19). Two columns, since a
+// rail sized card fills about half this panel's width; the gap matches renderer.css
+// (.lf-track gap 9px, the rail's .feed-track gap) and the speed matches the rail's
+// own 5.5 px per second in tickFeeds (core/chrome.js), so the two screens drift at
+// the same pace.
 const LIVE_FEED = Object.freeze({
-  columns: 3,
-  gap: 14, // px between cards, drawn at 1920
-  speeds: [22, 25, 23.5], // px per second per column, drawn at 1920
+  columns: 2,
+  gap: 9, // px between cards, drawn at 1920; must equal .lf-track's gap in live-feed.css
+  speeds: [5.5, 5.5], // px per second per column, drawn at 1920; the rail's own speed
   buffer: 260, // px of cards kept ready below the visible part of a column
   fadeMs: 600, // page fade in reduced motion
   overlap: 90, // px repeated when one card is taller than a column (paged mode)
