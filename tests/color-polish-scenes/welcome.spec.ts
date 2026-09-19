@@ -380,42 +380,51 @@ test('four whole bubbles at 0 s, 6 s and 14 s with mostly-long fixture, none pag
 });
 
 test('speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with border-radius 16px', async ({ page }) => {
-  const frame6 = await loadRenderer(page, { ms: 6000, scene: 1 });
-  await frame6.evaluate(() => {
-    (window as any).colorPolishRuntime.step(1500);
-  });
-  const visibleAt6 = await frame6.evaluate(() => {
-    const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
-    return bubbles.filter((el) => {
-      const cs = window.getComputedStyle(el);
-      return !el.classList.contains('fading') && cs.opacity !== '0' && cs.visibility !== 'hidden';
-    }).length;
-  });
-  expect(visibleAt6).toBeGreaterThanOrEqual(2);
-
-  const page9 = await page.context().newPage();
-  const frame9 = await loadRenderer(page9, { ms: 9000, scene: 1 });
-  // All three people have spoken by 9 s. Each speech bubble then swaps its
-  // phrase every 6 to 9 s with a half second fade, and a single instant can
-  // land inside one of those swaps (10.5 s did, which is why this test used to
-  // read 2 on the untouched base). So the count is read every quarter second
-  // from 9 s to 10.5 s: all three must be showing together at some moment, and
-  // never fewer than two at any moment.
-  const counts: number[] = [];
-  for (let step = 0; step <= 6; step++) {
-    if (step) await frame9.evaluate(() => (window as any).colorPolishRuntime.step(250));
-    counts.push(
-      await frame9.evaluate(() => {
+  test.setTimeout(90000);
+  // The speech schedule lives on the renderer clock: the first person speaks
+  // at once, the second at 2.5 s and the third at 5 s, then each swaps its
+  // phrase every 6 to 9 s behind a half second fade out. The fade itself is a
+  // CSS opacity transition, which runs on wall time. This test used to step
+  // the renderer clock and then read the computed opacity a few milliseconds
+  // later: on a busy machine the browser had not yet ticked the new fade in
+  // transition, so the bubble that swaps at 8.9 s read opacity 0 for the whole
+  // 9 s to 10.5 s window (2, 2, 2, 2, 2, 2, 2). So the whole test now runs on
+  // the renderer clock alone: after every quarter second step each running
+  // fade is carried to its end, and a bubble counts as showing only when it is
+  // not fading AND its finished opacity is fully opaque.
+  const frame9 = await loadRenderer(page, { scene: 1 });
+  const timeline: Array<{ age: number; showing: number }> = [];
+  for (let step = 0; step <= 42; step++) {
+    timeline.push(
+      await frame9.evaluate((advance) => {
+        const runtime = (window as any).colorPolishRuntime;
+        if (advance) runtime.step(250);
         const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
-        return bubbles.filter((el) => {
+        // getAnimations() flushes style, which creates the fade for a class
+        // that changed during the step; finish() then lands it on its end value.
+        bubbles.forEach((el) => el.getAnimations().forEach((animation) => animation.finish()));
+        const showing = bubbles.filter((el) => {
           const cs = window.getComputedStyle(el);
-          return !el.classList.contains('fading') && cs.opacity !== '0' && cs.visibility !== 'hidden';
+          return !el.classList.contains('fading') && cs.opacity === '1' && cs.visibility !== 'hidden';
         }).length;
-      }),
+        return { age: runtime.getState().sceneAge as number, showing };
+      }, step > 0),
     );
   }
-  expect(Math.max(...counts), `speech bubbles showing, 9 s to 10.5 s: ${counts.join(', ')}`).toBe(3);
-  expect(Math.min(...counts), `speech bubbles showing, 9 s to 10.5 s: ${counts.join(', ')}`).toBeGreaterThanOrEqual(2);
+  const trace = timeline.map((t) => `${t.age.toFixed(2)}:${t.showing}`).join(' ');
+  const from = (a: number, b: number) => timeline.filter((t) => t.age >= a - 0.01 && t.age <= b + 0.01).map((t) => t.showing);
+  // The clock really moved a quarter second per step, to 10.5 s.
+  expect(timeline[timeline.length - 1].age, trace).toBeGreaterThan(10.4);
+  expect(timeline[timeline.length - 1].age, trace).toBeLessThan(10.7);
+  // One person speaks from the start, and the others have not spoken yet.
+  expect(timeline[0].showing, trace).toBe(1);
+  // At least two are showing by 6 s, and it stays that way.
+  expect(Math.min(...from(6, 10.5)), `never fewer than two from 6 s: ${trace}`).toBeGreaterThanOrEqual(2);
+  // All three people have spoken, together, by 9 s.
+  expect(Math.max(...from(0, 9)), `all three showing together by 9 s: ${trace}`).toBe(3);
+  // And all three are together again in the 9 s to 10.5 s window, once the
+  // swap that begins at 8.9 s has faded back in.
+  expect(Math.max(...from(9, 10.5)), `speech bubbles showing, 9 s to 10.5 s: ${trace}`).toBe(3);
 
   const radii = await frame9.evaluate(() => {
     const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
@@ -475,7 +484,6 @@ test('speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with b
   expect(phraseCheck.hasImmediateRepeat).toBe(false);
   expect(phraseCheck.totalDistinctDraws).toBeGreaterThanOrEqual(12);
 
-  await page9.close();
 });
 
 test('circularity and noOverflow pass with speech bubbles present', async ({ page }) => {
