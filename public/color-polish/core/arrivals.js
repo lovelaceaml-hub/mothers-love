@@ -7,7 +7,7 @@ function beginEvent(){
  if(active&&active.phase!=='gap')return;
  S.queue=S.queue.filter(id=>eligible(S.pool.find(r=>r.id===id)));
  if(!S.queue.length){endChain();return}
- const items=S.queue.splice(0,S.queue.length>=10?10:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===10;
+ const items=S.queue.splice(0,S.queue.length>=5?5:1).map(id=>S.pool.find(r=>r.id===id)),group=items.length===5;
  if(!S.chain){S.chain=true;S.returnScene=S.s;S.returnAge=S.sceneAge;$('stage').classList.add('dimmed');arrivalMountSky()}
  const style=nextStyle(group?'group':'single');
  const frameStyle=nextArrivalFrame();
@@ -21,14 +21,15 @@ function buildEvent(){
  const root=$('event');root.className='event-stage active'+(S.still?' still':'');root.dataset.style=(group?'group-':'single-')+a.style;
  root.dataset.frame=String(a.frameStyle);root.dataset.frameName=ARRIVAL_FRAME_STYLES[a.frameStyle];
  const frameMarkup=arrivalBuildFrameMarkup(a.frameStyle,a.kind);
- root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF TEN</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · ${esc(ARRIVAL_FRAME_STYLES[a.frameStyle])}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
+ root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF FIVE</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · ${esc(ARRIVAL_FRAME_STYLES[a.frameStyle])}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
  a.elements=[];
  if(a.oversize){buildGroupPage(0);log('extended_group_reading',{reason:'Long messages are shown in circular pairs with content-aware reading time.'})}
  else{
   a.items.forEach((r,i)=>{
    // Laid out at the long standing size, drawn larger for the full screen box.
    const g=ARRIVAL_GROUP,o=ARRIVAL_SINGLE;
-   const d=group?g.layout:o.layout,drawn=group?g.drawn:o.drawn,x=group?g.x0+i%5*g.pitch:o.x,y=group?g.rowY[Math.floor(i/5)]:o.y;
+   const slot=group?g.slots[i%g.slots.length]:null;
+   const d=group?g.layout:o.layout,drawn=group?g.drawn:o.drawn,x=group?slot[0]:o.x,y=group?slot[1]:o.y;
    a.elements.push(eventElement(r,d,x,y,i,group,drawn));
   });
   const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(8,s.length/14),0)));
@@ -38,11 +39,15 @@ function buildEvent(){
  drawEventParticles(0);
 }
 
+// Oversize group reading shows two full messages per page, so a wave of five
+// reads over three pages: two, two, then the last one on its own.
+function groupPageCount(a){return Math.max(1,Math.ceil((a?.items?.length||0)/2))}
+
 function buildGroupPage(page){
  const a=active;if(!a)return;a.page=page;$('event-items').replaceChildren();a.elements=[];
  a.items.slice(page*2,page*2+2).forEach((r,i)=>a.elements.push(eventElement(r,ARRIVAL_PAIR.layout,ARRIVAL_PAIR.x[i],ARRIVAL_PAIR.y,i,false,ARRIVAL_PAIR.drawn)));
  a.hold=Math.max(10,...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(9,s.length/14),0)));
- const cap=document.querySelector('.group-kind');if(cap)cap.textContent=`CIRCULAR FULL-MESSAGE PAIRS · ${page+1}/5 · EXTENDED READING`;
+ const cap=document.querySelector('.group-kind');if(cap)cap.textContent=`CIRCULAR FULL-MESSAGE PAIRS · ${page+1}/${groupPageCount(a)} · EXTENDED READING`;
 }
 
 function tickEvent(dt){
@@ -51,7 +56,7 @@ function tickEvent(dt){
  if(a.phase==='entrance'){
   const p=S.still?1:clamp(elapsed/a.entrance,0,1);
   a.elements.forEach((b,i)=>{
-   let pos=a.kind==='group'?groupTrajectory(a.style,a.oversize?i*5:i,p,b):singleTrajectory(a.style,p);
+   let pos=a.kind==='group'?groupTrajectory(a.style,a.oversize?i*2:i,p,b):singleTrajectory(a.style,p);
    if(a.oversize)pos={...pos,x:mix(pos.x,b.x,smooth(p)),y:mix(pos.y,b.y,smooth(p))};
    if(S.still)pos={x:b.x,y:b.y,z:0,k:1,alpha:1};positionEvent(b,pos);
   });drawEventParticles(p);
@@ -60,7 +65,7 @@ function tickEvent(dt){
   a.localTime=elapsed;
   a.elements.forEach((b,i)=>{tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
   if(elapsed>=a.hold){
-   if(a.oversize&&a.page<4){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
+   if(a.oversize&&a.page<groupPageCount(a)-1){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
    else{
     a.phase='exit';a.phaseAt=S.t;
     const feed=$('feed-columns'), targetEl=feed?.firstElementChild||feed;
@@ -126,7 +131,7 @@ function drawEventParticles(p){
  if((!group&&[1,4].includes(style))||(group&&[1,2,3].includes(style))){
   a.elements.forEach((b,j)=>{
    c.save();c.lineWidth=group?2.5:5;c.lineCap='round';c.strokeStyle=group?'#d3b7aa68':'#dfbb7688';c.shadowColor='#edcc8a';c.shadowBlur=15;c.beginPath();
-   for(let i=0;i<22;i++){const q=Math.max(0,p-i*.008),pos=group?groupTrajectory(style,a.oversize?j*5:j,q,b):singleTrajectory(style,q);i?c.lineTo(pos.x,pos.y):c.moveTo(pos.x,pos.y)}c.stroke();c.restore();
+   for(let i=0;i<22;i++){const q=Math.max(0,p-i*.008),pos=group?groupTrajectory(style,a.oversize?j*2:j,q,b):singleTrajectory(style,q);i?c.lineTo(pos.x,pos.y):c.moveTo(pos.x,pos.y)}c.stroke();c.restore();
   });
  }
  const N=group?155:115;

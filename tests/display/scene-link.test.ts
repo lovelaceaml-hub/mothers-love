@@ -267,10 +267,10 @@ describe('one screen preview links on a preview build', () => {
     expect(parseScenePreviewRequest('?other=garden', true)).toEqual({ kind: 'none' });
   });
 
-  it('maps the two arrival slugs to a single entrance and a wave of ten', () => {
+  it('maps the two arrival slugs to a single entrance and a wave of five', () => {
     expect(parseScenePreviewRequest(`?scene=${ARRIVAL_PREVIEW_SLUG}`, true)).toEqual({ kind: 'arrival', size: 1 });
     expect(parseScenePreviewRequest(`?scene=${ARRIVAL_GROUP_PREVIEW_SLUG}`, true)).toEqual({ kind: 'arrival', size: ARRIVAL_GROUP_SIZE });
-    expect(ARRIVAL_GROUP_SIZE).toBe(10);
+    expect(ARRIVAL_GROUP_SIZE).toBe(5);
   });
 
   it('pins the requested screen and restarts it once per dwell instead of advancing', () => {
@@ -327,9 +327,9 @@ describe('one screen preview links on a preview build', () => {
     }
   });
 
-  it('sends ten distinct arrivals for the group entrance and none when the snapshot holds fewer than ten records', () => {
+  it('sends five distinct arrivals for the group entrance and none when the snapshot holds fewer than five records', () => {
     const full = snapshotWith(Array.from({ length: 14 }, (_, index) => record(index)));
-    const thin = snapshotWith(Array.from({ length: 9 }, (_, index) => record(index)));
+    const thin = snapshotWith(Array.from({ length: ARRIVAL_GROUP_SIZE - 1 }, (_, index) => record(index)));
     const request: ScenePreviewRequest = { kind: 'arrival', size: ARRIVAL_GROUP_SIZE };
 
     const group = planScenePreview(request, full, 0).arrivals ?? [];

@@ -6,6 +6,14 @@ import { resolve } from 'node:path';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
+// A wave is five recognitions, drawn at 240 TV px and laid out at the same 240 px,
+// so every word on a group bubble is drawn at the size it is laid out at.
+const GROUP_SIZE = 5;
+const GROUP_LAYOUT = 240;
+const GROUP_DRAWN = 240;
+// Anthony's floor: text a viewer reads is never under 18 px drawn at 1920.
+const TEXT_FLOOR_PX = 18;
+
 type ArrivalRecord = {
   id: string;
   recipient: string;
@@ -36,15 +44,15 @@ async function pushArrivalWave(
   snapshot: ArrivalSnapshot,
   wave: number,
   sequence: number,
-  options?: { idPrefix?: string; expressionIds?: number[]; message?: string },
+  options?: { idPrefix?: string; expressionIds?: number[]; message?: string; messages?: string[]; count?: number },
 ) {
-  const count = wave < 6 ? 1 : 10;
+  const count = options?.count ?? (wave < 6 ? 1 : GROUP_SIZE);
   const prefix = options?.idPrefix || `arrival-w${wave}-s${sequence}`;
   const records: ArrivalRecord[] = Array.from({ length: count }, (_, index) => ({
     ...snapshot.recognitions[0],
     id: `${prefix}-${index}`,
     recipient: `Sample ${wave + 1}.${index + 1}`,
-    message: options?.message || 'Thank you for helping today.',
+    message: options?.messages?.[index] || options?.message || 'Thank you for helping today.',
     createdAt: snapshot.serverTime,
     firstPublishedAt: snapshot.serverTime,
     expiresAt: new Date(Date.parse(snapshot.serverTime) + 86_400_000).toISOString(),
@@ -162,10 +170,14 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   const g0zRank0 = await frame.evaluate(
     () => (window as any).groupTrajectory(0, 0, 0.15, { x: 906, y: 307 }).z,
   );
-  const g0zRank9 = await frame.evaluate(
-    () => (window as any).groupTrajectory(0, 9, 9 * 0.032 + 0.15, { x: 906, y: 307 }).z,
+  const lastRank = GROUP_SIZE - 1;
+  const g0zLastRank = await frame.evaluate(
+    (rank: number) => (window as any).groupTrajectory(0, 2, rank * 0.032 + 0.15, { x: 906, y: 307 }).z,
+    lastRank,
   );
-  expect(g0zRank0 - g0zRank9).toBeGreaterThanOrEqual(400);
+  // Each later rank starts deeper by at least as much per rank as the wave of ten did
+  // (400 over its 9 ranks), so the cascade keeps its depth with five bubbles.
+  expect((g0zRank0 - g0zLastRank) / lastRank).toBeGreaterThanOrEqual(400 / 9);
 
   const [g4z0, g4z1, g4z2] = await frame.evaluate(() => {
     const b = { x: 906, y: 307 };
@@ -181,7 +193,7 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
   const [normZ0, normZ1, normZ2] = await frame.evaluate(() => {
     const b = { x: 906, y: 307 };
     const duration = 0.71;
-    const orders = [2, 7, 1, 3, 6, 8, 0, 4, 5, 9];
+    const orders = [0, 3, 4, 2, 1];
     const pForU = (idx: number, uVal: number) => orders.indexOf(idx) * 0.032 + uVal * duration;
     return [
       (window as any).groupTrajectory(4, 0, pForU(0, 0.2), b).z,
@@ -199,7 +211,7 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
       s2: (window as any).singleTrajectory(2, 1),
       s5: (window as any).singleTrajectory(5, 1),
       g0: (window as any).groupTrajectory(0, 3, 1, b),
-      g4: (window as any).groupTrajectory(4, 5, 1, b),
+      g4: (window as any).groupTrajectory(4, 4, 1, b),
     };
   });
   expect(Math.abs(settled.s2.z)).toBeLessThanOrEqual(0.5);
@@ -237,8 +249,8 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
     for (const orb of resolvedInfo) {
       expect(Math.abs(orb.z)).toBeLessThanOrEqual(2);
       // Flat means no flight scale is left: only the fixed drawn size over layout size
-      // factor remains (760 over 540 single, 300 over 258 group; Plan 17 Lane 14).
-      const drawnOverLayout = wave < 6 ? 760 / 540 : 300 / 258;
+      // factor remains (760 over 540 single, 240 over 240 group).
+      const drawnOverLayout = wave < 6 ? 760 / 540 : GROUP_DRAWN / GROUP_LAYOUT;
       expect(Math.abs(orb.scale - drawnOverLayout)).toBeLessThanOrEqual(0.02);
       expect(orb.opacity).toBe(1);
     }
@@ -688,19 +700,19 @@ test('arrival records log exactly one arrival_record_shown per record for single
   }, singleRecordId);
   expect(singleShownLogs).toHaveLength(1);
 
-  // 2. Full oversize group wave of ten: each of the ten ids has exactly one entry, not more
+  // 2. Full oversize group wave of five: each of the five ids has exactly one entry, not more
   seq++;
   const groupPrefix = 'arrival-group-oversize-log';
   const longMessage =
-    'This is an extended appreciation message designed to test the full oversize group reading flow across all five circular pair pages on the display. Thank you for your continued support and kindness.';
+    'This is an extended appreciation message designed to test the full oversize group reading flow across every circular pair page on the display. Thank you for your continued support and kindness.';
   await pushArrivalWave(page, frame, snapshot, 6, seq, {
     idPrefix: groupPrefix,
     message: longMessage,
   });
 
-  const expectedGroupIds = Array.from({ length: 10 }, (_, i) => `${groupPrefix}-${i}`);
+  const expectedGroupIds = Array.from({ length: GROUP_SIZE }, (_, i) => `${groupPrefix}-${i}`);
 
-  // Step through all 5 buildGroupPage pages and exit to completion
+  // Step through every buildGroupPage page and exit to completion
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
   for (let step = 0; step < 25; step++) {
     const isDone = await frame.evaluate(() => {
@@ -716,16 +728,18 @@ test('arrival records log exactly one arrival_record_shown per record for single
     return st.active === null && st.queueLength === 0;
   });
 
-  // Verify all 5 pages (0 through 4) executed
+  // Verify every page of the five messages executed: two, two, then the last one alone
   const pagesLogged = await frame.evaluate(() => {
     const logs = (window as any).colorPolishRuntime.getState().log || [];
     return logs
       .filter((l: any) => l.type === 'reading_start' && l.kind === 'group')
       .map((l: any) => l.page);
   });
-  expect(pagesLogged).toEqual(expect.arrayContaining([0, 1, 2, 3, 4]));
+  const expectedPages = Array.from({ length: Math.ceil(GROUP_SIZE / 2) }, (_, i) => i);
+  expect(pagesLogged).toEqual(expect.arrayContaining(expectedPages));
+  expect(Math.max(...pagesLogged)).toBe(expectedPages[expectedPages.length - 1]);
 
-  // Verify each of the ten record ids has exactly one arrival_record_shown entry
+  // Verify each of the five record ids has exactly one arrival_record_shown entry
   const allShownLogs = await frame.evaluate(() => {
     const logs = (window as any).colorPolishRuntime.getState().log || [];
     return logs.filter((l: any) => l.type === 'arrival_record_shown');
@@ -735,6 +749,148 @@ test('arrival records log exactly one arrival_record_shown per record for single
     const idLogs = allShownLogs.filter((l: any) => l.id === id);
     expect(idLogs).toHaveLength(1);
   }
+});
+
+test('a wave of five draws five smaller bubbles, one per recognition, with every word on screen', async ({ page }) => {
+  test.setTimeout(120_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  const prefix = 'wave-of-five';
+  const messages = Array.from(
+    { length: GROUP_SIZE },
+    (_, index) => `Sample message ${index + 1}. Thank you for the steady help you gave this week.`,
+  );
+  await pushArrivalWave(page, frame, snapshot, 6, 2, { idPrefix: prefix, messages });
+  await stepToReading(frame);
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1700));
+
+  const shown = await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    const orbs = [...document.querySelectorAll<HTMLElement>('#event .event-orb')];
+    const tv = document.getElementById('tv')!.getBoundingClientRect();
+    const zoom = tv.width / 1920;
+    return {
+      kind: state.active?.kind ?? null,
+      itemCount: state.active?.ids?.length ?? 0,
+      orbs: orbs.map((orb) => {
+        const matrix = new DOMMatrixReadOnly(window.getComputedStyle(orb).transform);
+        const scale = Math.hypot(matrix.a, matrix.b);
+        const message = orb.querySelector<HTMLElement>('.message')!;
+        const content = orb.querySelector<HTMLElement>('.orb-content')!;
+        return {
+          id: orb.dataset.eventId || '',
+          text: message.textContent || '',
+          drawnDiameter: orb.getBoundingClientRect().width / zoom,
+          messagePx: parseFloat(window.getComputedStyle(message).fontSize) * scale,
+          fits: content.scrollHeight <= parseFloat(orb.style.width) * 0.855 + 0.5,
+        };
+      }),
+    };
+  });
+
+  expect(shown.kind).toBe('group');
+  expect(shown.itemCount).toBe(GROUP_SIZE);
+  expect(shown.orbs).toHaveLength(GROUP_SIZE);
+  const ids = shown.orbs.map((orb) => orb.id);
+  expect(new Set(ids).size).toBe(GROUP_SIZE);
+  for (let index = 0; index < GROUP_SIZE; index++) {
+    expect(ids.filter((id) => id === `${prefix}-${index}`)).toHaveLength(1);
+  }
+  for (const orb of shown.orbs) {
+    const own = messages[Number(orb.id.slice(prefix.length + 1))];
+    expect(own.startsWith(orb.text) || own.includes(orb.text)).toBe(true);
+    expect(orb.text.length).toBeGreaterThan(0);
+    expect(orb.text.endsWith('...'), 'a message is never ellipsized').toBe(false);
+    expect(orb.fits, 'the words fit inside the bubble').toBe(true);
+    expect(orb.drawnDiameter, 'the bubble is drawn at the smaller group size').toBeCloseTo(GROUP_DRAWN, 0);
+    expect(orb.messagePx, 'message drawn px').toBeGreaterThanOrEqual(TEXT_FLOOR_PX);
+  }
+  // Every word of every message is reachable: whatever does not fit at once is paged, verbatim.
+  const paginated = await frame.evaluate(
+    (idPrefix: string) =>
+      ((window as any).colorPolishRuntime.getState().log || []).filter(
+        (l: any) => l.type === 'circular_pagination' && String(l.id).startsWith(idPrefix),
+      ),
+    prefix,
+  );
+  for (const entry of paginated) expect(entry.verbatim).toBe(true);
+  await stepToDrained(frame);
+});
+
+test('the oversize group reading reaches every one of the five messages across its pages', async ({ page }) => {
+  test.setTimeout(180_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  const prefix = 'five-oversize';
+  const messages = Array.from(
+    { length: GROUP_SIZE },
+    (_, index) =>
+      `Message ${index + 1} of five. This is a long appreciation note written so the wave of five has to open its circular full message pages, and every word of it belongs to recognition number ${index + 1}. Thank you for the care you showed this week, and for the quiet steady help nobody was asked to give.`,
+  );
+  await pushArrivalWave(page, frame, snapshot, 6, 2, { idPrefix: prefix, messages });
+
+  const seen = new Map<string, string>();
+  await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
+  for (let step = 0; step < 120; step++) {
+    const state = await frame.evaluate(() => {
+      const runtime = (window as any).colorPolishRuntime;
+      const value = runtime.getState();
+      return {
+        done: value.active === null && value.queueLength === 0,
+        orbs: [...document.querySelectorAll<HTMLElement>('#event .event-orb')].map((orb) => ({
+          id: orb.dataset.eventId || '',
+          text: orb.querySelector<HTMLElement>('.message')!.textContent || '',
+        })),
+      };
+    });
+    if (state.done) break;
+    for (const orb of state.orbs) seen.set(orb.id, (seen.get(orb.id) || '') + orb.text);
+    await frame.evaluate(() => (window as any).colorPolishRuntime.step(2000));
+  }
+
+  for (let index = 0; index < GROUP_SIZE; index++) {
+    const id = `${prefix}-${index}`;
+    expect(seen.has(id), `recognition ${index + 1} of five reached the screen`).toBe(true);
+    expect(messages[index].includes(seen.get(id)!.slice(0, 40))).toBe(true);
+  }
+  const pages = await frame.evaluate(
+    (idPrefix: string) =>
+      ((window as any).colorPolishRuntime.getState().log || []).filter(
+        (l: any) => l.type === 'circular_pagination' && String(l.id).startsWith(idPrefix),
+      ),
+    prefix,
+  );
+  for (const entry of pages) expect(entry.verbatim).toBe(true);
+  await stepToDrained(frame);
+});
+
+test('fewer than five waiting still arrive one at a time as single entrances', async ({ page }) => {
+  test.setTimeout(120_000);
+  const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
+  const frame = await loadRenderer(page);
+
+  await pushArrivalWave(page, frame, snapshot, 6, 2, { idPrefix: 'four-waiting', count: GROUP_SIZE - 1 });
+  const queueWording = await frame.evaluate(() => document.getElementById('queue')?.textContent || '');
+  expect(queueWording).not.toContain('release together');
+
+  await stepToReading(frame);
+  const first = await frame.evaluate(() => {
+    const state = (window as any).colorPolishRuntime.getState();
+    return { kind: state.active?.kind ?? null, items: state.active?.ids?.length ?? 0 };
+  });
+  expect(first.kind).toBe('single');
+  expect(first.items).toBe(1);
+
+  await stepToDrained(frame);
+  const entrances = await frame.evaluate(() =>
+    ((window as any).colorPolishRuntime.getState().log || [])
+      .filter((l: any) => l.type === 'entrance_start')
+      .map((l: any) => l.kind),
+  );
+  expect(entrances).toHaveLength(GROUP_SIZE - 1);
+  expect(entrances.every((kind: string) => kind === 'single')).toBe(true);
 });
 
 type LuminanceStats = {
@@ -1520,27 +1676,73 @@ function expectFullScreenComposition(geometry: ArrivalGeometry, kind: 'single' |
   expect(geometry.canvas.cssHeight, `${label}: sparkle canvas height`).toBeCloseTo(972, 0);
 
   // Orbs: larger than before, inside the frame with room for their rings, centred top to bottom.
-  const expectedCount = kind === 'group' ? 10 : kind === 'pair' ? 2 : 1;
+  const expectedCount = kind === 'group' ? GROUP_SIZE : kind === 'pair' ? 2 : 1;
   expect(orbs, `${label}: orb count`).toHaveLength(expectedCount);
   const before = kind === 'group' ? BEFORE_LANE_14.groupOrb : kind === 'pair' ? BEFORE_LANE_14.pairOrb : BEFORE_LANE_14.singleOrb;
-  const ring = 28 * (orbs[0].width / before);
+  const ring = 28 * (orbs[0].width / (kind === 'group' ? GROUP_LAYOUT : before));
   for (const orb of orbs) {
-    expect(orb.width, `${label}: orb drawn diameter`).toBeGreaterThanOrEqual(before * 1.15);
+    if (kind === 'group') {
+      // Anthony asked for smaller group bubbles: the drawn diameter is exactly the new
+      // size in TV units, which is that many real pixels at 1920 and double at 3840.
+      expect(orb.width, `${label}: orb drawn diameter`).toBeCloseTo(GROUP_DRAWN, 0);
+      expect(orb.width * zoom, `${label}: orb drawn diameter in screen px`).toBeCloseTo(GROUP_DRAWN * zoom, 0);
+      expect(orb.scale, `${label}: orb drawn over layout`).toBeCloseTo(GROUP_DRAWN / GROUP_LAYOUT, 2);
+    } else {
+      expect(orb.width, `${label}: orb drawn diameter`).toBeGreaterThanOrEqual(before * 1.15);
+      expect(orb.scale, `${label}: orb words are scaled up with the orb`).toBeGreaterThanOrEqual(1.15);
+    }
     expect(Math.abs(orb.width - orb.height), `${label}: orb is round`).toBeLessThan(1);
     expect(orb.left - ring, `${label}: orb and ring inside the frame, left`).toBeGreaterThanOrEqual(stage.left);
     expect(orb.right + ring, `${label}: orb and ring inside the frame, right`).toBeLessThanOrEqual(stage.right);
     expect(orb.top - ring, `${label}: orb and ring inside the frame, top`).toBeGreaterThanOrEqual(stage.top);
     expect(orb.bottom + ring, `${label}: orb and ring inside the frame, bottom`).toBeLessThanOrEqual(stage.bottom);
-    // Every word on the orb: never below today's size, never below 18 px drawn at 1920 (36 at 3840).
-    expect(orb.messagePx, `${label}: message drawn px`).toBeGreaterThanOrEqual(18 * zoom);
+    // Every word on the orb: never below 18 px drawn at 1920 (36 at 3840).
+    expect(orb.messagePx, `${label}: message drawn px`).toBeGreaterThanOrEqual(TEXT_FLOOR_PX * zoom);
     expect(orb.recipientPx, `${label}: recipient drawn px`).toBeGreaterThanOrEqual(23 * zoom);
-    expect(orb.scale, `${label}: orb words are scaled up with the orb`).toBeGreaterThanOrEqual(1.15);
     expect(orb.contentFits, `${label}: orb words fit the circle`).toBe(true);
+  }
+  // No bubble may touch another bubble, judged on the drawn circles.
+  for (let i = 0; i < orbs.length; i++) {
+    for (let j = i + 1; j < orbs.length; j++) {
+      const a = orbs[i];
+      const b = orbs[j];
+      const gap = Math.hypot(
+        (a.left + a.right) / 2 - (b.left + b.right) / 2,
+        (a.top + a.bottom) / 2 - (b.top + b.bottom) / 2,
+      ) - (a.width + b.width) / 2;
+      expect(gap, `${label}: bubble ${i} clear of bubble ${j}`).toBeGreaterThan(0);
+    }
   }
   const orbTop = Math.min(...orbs.map((orb) => orb.top));
   const orbBottom = Math.max(...orbs.map((orb) => orb.bottom));
   expect(Math.abs((orbTop + orbBottom) / 2 - 540), `${label}: orbs centred top to bottom`).toBeLessThanOrEqual(12);
   expect(orbBottom - orbTop, `${label}: orbs span most of the screen height`).toBeGreaterThanOrEqual(680);
+  if (kind === 'group') {
+    // Five bubbles stay a composed arrangement across the stage, not a thin strip:
+    // a 3 over 2 stagger, centred on the group centre, spread across the frame.
+    const orbLeft = Math.min(...orbs.map((orb) => orb.left));
+    const orbRight = Math.max(...orbs.map((orb) => orb.right));
+    expect(orbRight - orbLeft, `${label}: bubbles spread across the frame`).toBeGreaterThanOrEqual(1100);
+    expect(Math.abs((orbLeft + orbRight) / 2 - 960), `${label}: bubbles centred left to right`).toBeLessThanOrEqual(12);
+    // The reading sway moves each bubble a few px, so rows are judged by band.
+    const centreY = (orb: TvRect) => (orb.top + orb.bottom) / 2;
+    const topRow = orbs.filter((orb) => centreY(orb) < 540);
+    const bottomRow = orbs.filter((orb) => centreY(orb) >= 540);
+    expect(topRow, `${label}: three bubbles on the upper row`).toHaveLength(3);
+    expect(bottomRow, `${label}: two bubbles on the lower row`).toHaveLength(2);
+    for (const row of [topRow, bottomRow]) {
+      const spread = Math.max(...row.map(centreY)) - Math.min(...row.map(centreY));
+      expect(spread, `${label}: a row sits level`).toBeLessThanOrEqual(12);
+    }
+    // The lower two sit under the gaps of the upper three, not under a bubble.
+    const topCentres = topRow.map((orb) => (orb.left + orb.right) / 2).sort((a, b) => a - b);
+    for (const orb of bottomRow) {
+      const x = (orb.left + orb.right) / 2;
+      for (const topX of topCentres) {
+        expect(Math.abs(x - topX), `${label}: lower bubble staggered against the upper row`).toBeGreaterThan(80);
+      }
+    }
+  }
 
   // Words: never below today's sizes, inside the frame, and the whole composition reaches
   // from near the top margin to near the bottom margin.
@@ -1656,7 +1858,7 @@ test(`a 500 grapheme message fits whole on the full screen single orb and the gr
   expect(MOSTLY_LONG_MESSAGE_500.includes(singleText.trim())).toBe(true);
   await stepToDrained(frame);
 
-  // Group of ten long messages: shown as circular pairs.
+  // Group of five long messages: shown as circular pairs.
   await pushArrivalWave(page, frame, snapshot, 6, 3, { idPrefix: `long-group-${width}`, message: MOSTLY_LONG_MESSAGE_500 });
   await stepToReading(frame);
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(1700));
