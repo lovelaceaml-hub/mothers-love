@@ -21,7 +21,7 @@ function buildEvent(){
  const root=$('event');root.className='event-stage active'+(S.still?' still':'');root.dataset.style=(group?'group-':'single-')+a.style;
  root.dataset.frame=String(a.frameStyle);root.dataset.frameName=ARRIVAL_FRAME_STYLES[a.frameStyle];
  const frameMarkup=arrivalBuildFrameMarkup(a.frameStyle,a.kind);
- root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${group?`<h2 class="group-title">${shimmer(GROUP_TITLES[a.style])}</h2><span class="group-kind">${esc(GROUP_STYLES[a.style].toUpperCase())} · A WAVE OF TEN</span>`:`<div class="event-kicker">A NEW RECOGNITION HAS ARRIVED</div><div class="event-title"><div class="eyebrow">Mother’s Love, shared</div><h2>${shimmer('Kindness')}<br>comes full circle.</h2><p>A moment of appreciation<br>for you.</p></div><div class="countdown-caption">${esc(SINGLE_STYLES[a.style])} · ${esc(ARRIVAL_FRAME_STYLES[a.frameStyle])}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
+ root.innerHTML=`${frameMarkup}<div class="event-world ${group?'group-world':''}"></div>${arrivalStageMarkup(a.kind)}${group?`<h2 class="group-title">${arrivalWord(shimmer(GROUP_TITLES[a.style]))}</h2><span class="group-kind">${arrivalWord(esc(GROUP_STYLES[a.style].toUpperCase())+' · A WAVE OF TEN')}</span>`:`<div class="event-kicker">${arrivalWord('A NEW RECOGNITION HAS ARRIVED')}</div><div class="event-title"><div class="eyebrow">${arrivalWord('Mother’s Love, shared')}</div><h2>${arrivalWord(shimmer('Kindness'))}<br>${arrivalWord('comes')} ${arrivalWord('full')} ${arrivalWord('circle.')}</h2><p>${arrivalWord('A moment of appreciation')}<br>${arrivalWord('for you.')}</p></div><div class="countdown-caption">${arrivalWord(esc(SINGLE_STYLES[a.style])+' · '+esc(ARRIVAL_FRAME_STYLES[a.frameStyle]))}</div>`}<canvas class="event-sparkles" id="event-canvas" width="${ARRIVAL_W}" height="${ARRIVAL_H}" aria-hidden="true"></canvas><div id="event-items"></div>`;
  a.elements=[];
  if(a.oversize){buildGroupPage(0);log('extended_group_reading',{reason:'Long messages are shown in circular pairs with content-aware reading time.'})}
  else{
@@ -32,9 +32,11 @@ function buildEvent(){
    a.elements.push(eventElement(r,d,x,y,i,group,drawn));
   });
   const longest=Math.max(...a.elements.map(b=>b.reading.pages.reduce((n,s)=>n+Math.max(8,s.length/14),0)));
-  a.hold=group?Math.max(30,longest):Math.max(8,longest);
+  // A single bubble shows for ARRIVAL_SHOW seconds, once for each page of its message.
+  a.hold=group?Math.max(30,longest):ARRIVAL_SHOW*Math.max(1,...a.elements.map(b=>b.reading.pages.length));
  }
  $('qr-zone').classList.add('qr-active');
+ arrivalStageBind(a);
  drawEventParticles(0);
 }
 
@@ -48,6 +50,7 @@ function buildGroupPage(page){
 function tickEvent(dt){
  const a=active;if(!a)return;let elapsed=S.t-a.phaseAt;
  if(a.phase==='gap'){if(elapsed>=.4)beginEvent();return}
+ arrivalStageTick(a);
  if(a.phase==='entrance'){
   const p=S.still?1:clamp(elapsed/a.entrance,0,1);
   a.elements.forEach((b,i)=>{
@@ -55,10 +58,11 @@ function tickEvent(dt){
    if(a.oversize)pos={...pos,x:mix(pos.x,b.x,smooth(p)),y:mix(pos.y,b.y,smooth(p))};
    if(S.still)pos={x:b.x,y:b.y,z:0,k:1,alpha:1};positionEvent(b,pos);
   });drawEventParticles(p);
-  if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
+  if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;if(a.fx&&a.fx.landedAt===null)a.fx.landedAt=S.t;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
  }else if(a.phase==='reading'){
   a.localTime=elapsed;
-  a.elements.forEach((b,i)=>{tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
+  a.elements.forEach((b,i)=>{if(a.kind==='single')b.reading.duration=Math.min(b.reading.duration,ARRIVAL_SHOW);if(elapsed<a.hold)tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
+  drawArrivalAmbient(a,elapsed);
   if(elapsed>=a.hold){
    if(a.oversize&&a.page<4){buildGroupPage(a.page+1);a.phase='entrance';a.phaseAt=S.t;a.entrance=S.still?0:1.5}
    else{
@@ -83,6 +87,7 @@ function tickEvent(dt){
   }
  }else if(a.phase==='exit'){
   const p=S.still?1:smooth(elapsed/a.exit);
+  drawArrivalExit(a,p);
   a.elements.forEach((b,i)=>{
    let tx, ty, tk;
    if(a.exitPos){
@@ -129,6 +134,7 @@ function drawEventParticles(p){
    for(let i=0;i<22;i++){const q=Math.max(0,p-i*.008),pos=group?groupTrajectory(style,a.oversize?j*5:j,q,b):singleTrajectory(style,q);i?c.lineTo(pos.x,pos.y):c.moveTo(pos.x,pos.y)}c.stroke();c.restore();
   });
  }
+ drawArrivalWake(c,a,p);
  const N=group?155:115;
  for(let i=0;i<N;i++){
   const theta=i*2.39996,band=i%9,cx=group?GX:SX,cy=group?GY:SY;
