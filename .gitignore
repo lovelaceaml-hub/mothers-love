@@ -10,3 +10,8 @@ playwright-report/
 .DS_Store
 docs/private/
 .vercel
+
+# Generated from the approved app-icon source before dev/build.
+/public/icons/butterfly-heart-v1-*.png
+/public/apple-touch-icon.png
+/public/favicon.ico
