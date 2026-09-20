@@ -7,6 +7,7 @@ import {
   graphemeLength,
   isExpired,
   makeAggregateCsv,
+  numberRecognitions,
   reconcileEditor,
   validateEditorDraft,
 } from '@/components/admin/admin-utils';
@@ -84,5 +85,27 @@ describe('admin role and display helpers', () => {
     expect(csv).toContain('period_start,period_end,recognitions,expression_total');
     expect(csv).not.toContain('Synthetic Sender');
     expect(csv).not.toContain('Mina K.');
+  });
+});
+
+describe('numberRecognitions', () => {
+  const rows = [recognition({ id: 'a' }), recognition({ id: 'b' }), recognition({ id: 'c' })];
+
+  it('counts up from 1 in arrival order when oldest first', () => {
+    expect(numberRecognitions(rows, 164, 1, 'oldest').map((row) => row.sequence)).toEqual([1, 2, 3]);
+    expect(numberRecognitions(rows, 164, 4, 'oldest').map((row) => row.sequence)).toEqual([151, 152, 153]);
+  });
+
+  it('counts down from the total when newest first so the number still means arrival order', () => {
+    expect(numberRecognitions(rows, 164, 1, 'newest').map((row) => row.sequence)).toEqual([164, 163, 162]);
+    expect(numberRecognitions(rows, 164, 4, 'newest').map((row) => row.sequence)).toEqual([14, 13, 12]);
+  });
+
+  it('never numbers below 1 when the total is stale', () => {
+    expect(numberRecognitions(rows, 1, 1, 'newest').map((row) => row.sequence)).toEqual([1, 1, 1]);
+  });
+
+  it('keeps every field of the recognition', () => {
+    expect(numberRecognitions(rows, 3, 1, 'oldest')[0]).toMatchObject({ id: 'a', submittedName: 'Synthetic Sender', sequence: 1 });
   });
 });

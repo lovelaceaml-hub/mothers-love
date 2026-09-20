@@ -884,3 +884,10 @@
 .cardWarm { background:#FFF7DE; }
 .button { background:#AC355B; border-color:#A33356; color:#fff; }
 .buttonSecondary { background:#EEF5F8; border-color:#A8C2CF; color:#345970; }
+
+.messageCell {
+  min-width: 16rem;
+  max-width: 28rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

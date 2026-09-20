@@ -63,3 +63,4 @@ Spill order per the shared policy. B and C are independent after A, so Parallel 
 ## Build log
 
 - 2026-09-19: Plan drafted by Claude (Fable 5.1) at Anthony's request, in the same session that shipped the receipt feed, the heart fix and migration 014. Not yet approved.
+- 2026-09-20: Before Section C, Anthony reported submissions missing from admin. Found and fixed a page offset bug (screen page 1 was database page 2, so the newest 50 never showed) and added arrival-order listing with numbering, submitted name and message in the list (branch `change/admin-all-submissions-in-order`, migration 015). Section C still covers hidden, invalid and archived rows, heart counts and the audit trail. See HANDOFF September 20.

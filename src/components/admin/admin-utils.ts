@@ -31,6 +31,28 @@ export const capabilitiesFor = (role: AdminRole): AdminCapabilities => ({
 export const isExpired = (expiresAt: string, now = Date.now()): boolean =>
   new Date(expiresAt).getTime() <= now;
 
+export type ListSort = 'oldest' | 'newest';
+export type NumberedRecognition = AdminRecognition & { sequence: number };
+export const ADMIN_LIST_PAGE_SIZE = 50;
+
+/**
+ * Number every row by the order it came in, whatever order the page is shown in.
+ * Oldest first: the first row on page 1 is submission 1. Newest first: it is the latest.
+ */
+export const numberRecognitions = (
+  items: AdminRecognition[],
+  total: number,
+  page: number,
+  sort: ListSort,
+  pageSize = ADMIN_LIST_PAGE_SIZE,
+): NumberedRecognition[] =>
+  items.map((item, index) => ({
+    ...item,
+    sequence: sort === 'oldest'
+      ? (page - 1) * pageSize + index + 1
+      : Math.max(1, total - ((page - 1) * pageSize + index)),
+  }));
+
 export const formatDateTime = (value: string | null | undefined): string => {
   if (!value) return 'Not available';
   const date = new Date(value);

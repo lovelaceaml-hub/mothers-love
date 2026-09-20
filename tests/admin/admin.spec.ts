@@ -371,6 +371,53 @@ test.describe('synthetic admin browser workflows', () => {
     await expect(page.getByText('Cleanup has not run yet. Keep collection closed.', { exact: true })).toBeVisible();
   });
 
+  test('recognitions list shows every submission numbered in the order it came in', async ({ page }) => {
+    const requests: string[] = [];
+    const future = new Date(Date.now() + 86_400_000).toISOString();
+    const rows = [1, 2, 3].map((n) => recognition({ id: `synthetic-${n}`, submittedName: `Sender ${n}`, recipient: `Friend ${n}`, message: `Message number ${n}.`, expiresAt: future, createdAt: `2026-09-12T10:0${n}:00.000Z` }));
+    await mockCommon(page);
+    await page.route('**/api/admin/recognitions?*', async (route) => {
+      requests.push(new URL(route.request().url()).search);
+      await fulfillJson(route, { items: rows, total: 164, sort: 'oldest' });
+    });
+    await signInAs(page);
+    await page.goto('/admin/recognitions');
+    await expect(page.getByRole('heading', { name: 'Current recognitions' })).toBeVisible();
+    const body = page.locator('table tbody tr');
+    await expect(body).toHaveCount(3);
+    expect(requests[0]).toContain('page=1');
+    expect(requests[0]).toContain('sort=oldest');
+    await expect(body.nth(0)).toContainText('1');
+    await expect(body.nth(0)).toContainText('Sender 1');
+    await expect(body.nth(0)).toContainText('Friend 1');
+    await expect(body.nth(0)).toContainText('Message number 1.');
+    await expect(body.nth(2)).toContainText('Sender 3');
+    await expect(page.getByText('164 results', { exact: true })).toBeVisible();
+    await expect(page.getByText('Page 1 of 4', { exact: true })).toBeVisible();
+    await expect(page.getByText('oldest first. The number is the order', { exact: false })).toBeVisible();
+    await expect(page.getByRole('status')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expect.poll(() => requests.length).toBe(2);
+    expect(requests[1]).toContain('page=2');
+    await expect(body.nth(0)).toContainText('51');
+  });
+
+  test('recognitions list says so when the database still answers newest first', async ({ page }) => {
+    const future = new Date(Date.now() + 86_400_000).toISOString();
+    const rows = [164, 163].map((n) => recognition({ id: `synthetic-${n}`, submittedName: `Sender ${n}`, expiresAt: future }));
+    await mockCommon(page);
+    await page.route('**/api/admin/recognitions?*', (route) => fulfillJson(route, { items: rows, total: 164 }));
+    await signInAs(page);
+    await page.goto('/admin/recognitions');
+    await expect(page.getByRole('status')).toContainText('Apply database migration 015');
+    const body = page.locator('table tbody tr');
+    await expect(body.nth(0)).toContainText('164');
+    await expect(body.nth(0)).toContainText('Sender 164');
+    await expect(body.nth(1)).toContainText('163');
+    await expect(page.getByText('newest first. The number is the order', { exact: false })).toBeVisible();
+  });
+
   test('editor reconciles a 409 with the newer copy before saving', async ({ page }) => {
     let patchAttempts = 0;
     let submittedReason = '';

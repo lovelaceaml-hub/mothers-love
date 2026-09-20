@@ -5,17 +5,20 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
 import { adminApi, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, isExpired, statusLabel } from './admin-utils';
+import { ADMIN_LIST_PAGE_SIZE as PAGE_SIZE, formatDateTime, isExpired, numberRecognitions, statusLabel, type ListSort, type NumberedRecognition } from './admin-utils';
 import styles from './admin.module.css';
 
-type RecognitionResponse = { items: AdminRecognition[]; total: number };
+type RecognitionResponse = { items: AdminRecognition[]; total: number; sort?: ListSort };
 
 const expressionCatalog = EXPRESSIONS as Expression[];
 
+
 export function RecognitionManager() {
-  const [items, setItems] = useState<AdminRecognition[]>([]);
+  const [items, setItems] = useState<NumberedRecognition[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<ListSort>('oldest');
+  const [appliedSort, setAppliedSort] = useState<ListSort>('oldest');
   const [status, setStatus] = useState('');
   const [expression, setExpression] = useState('');
   const [search, setSearch] = useState('');
@@ -27,7 +30,7 @@ export function RecognitionManager() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const query = new URLSearchParams({ page: String(page) });
+    const query = new URLSearchParams({ page: String(page), sort });
     if (status) query.set('status', status);
     if (expression) query.set('expression', expression);
     if (search.trim()) query.set('search', search.trim());
@@ -35,8 +38,12 @@ export function RecognitionManager() {
     if (to) query.set('to', to);
     try {
       const response = await adminApi<RecognitionResponse>(`/api/admin/recognitions?${query.toString()}`);
-      const currentItems = response.items.filter((item) => !isExpired(item.expiresAt));
-      const expiredOnPage = response.items.length - currentItems.length;
+      // The database says which order it used; until migration 015 is applied it only knows newest first.
+      const usedSort: ListSort = response.sort === 'oldest' ? 'oldest' : 'newest';
+      const numbered = numberRecognitions(response.items, response.total, page, usedSort);
+      const currentItems = numbered.filter((item) => !isExpired(item.expiresAt));
+      const expiredOnPage = numbered.length - currentItems.length;
+      setAppliedSort(usedSort);
       setItems(currentItems);
       setTotal(Math.max(0, response.total - expiredOnPage));
     } catch (cause) {
@@ -44,7 +51,7 @@ export function RecognitionManager() {
     } finally {
       setLoading(false);
     }
-  }, [expression, from, page, search, status, to]);
+  }, [expression, from, page, search, sort, status, to]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void load(); }, 0);
@@ -58,7 +65,7 @@ export function RecognitionManager() {
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [items]);
 
-  const totalPages = Math.max(1, Math.ceil(total / 50));
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const clearFilters = (event?: FormEvent) => {
     event?.preventDefault();
     setSearch('');
@@ -66,8 +73,12 @@ export function RecognitionManager() {
     setExpression('');
     setFrom('');
     setTo('');
+    setSort('oldest');
     setPage(1);
   };
+  const orderNotice = sort !== appliedSort && !loading && !error
+    ? 'The database is still showing newest first. Apply database migration 015 to sort oldest first.'
+    : null;
 
   const expressionText = useMemo(() => new Map(expressionCatalog.map((item) => [item.id, item.phrase])), []);
 
@@ -75,7 +86,7 @@ export function RecognitionManager() {
     <>
       <section className={styles.card}>
         <div className={styles.cardHeader}>
-          <div><h2 className={styles.cardTitle}>Current recognitions</h2><p className={styles.cardDescription}>Search and update recognitions.</p></div>
+          <div><h2 className={styles.cardTitle}>Current recognitions</h2><p className={styles.cardDescription}>Every current recognition with its submitted name and message, numbered in the order it came in.</p></div>
           <span className={styles.badge}>{total} result{total === 1 ? '' : 's'}</span>
         </div>
         <form className={styles.filters} onSubmit={(event) => { event.preventDefault(); setPage(1); void load(); }}>
@@ -84,20 +95,25 @@ export function RecognitionManager() {
           <div className={styles.filterField}><label className={styles.label} htmlFor="recognition-expression">Expression</label><select id="recognition-expression" className={styles.select} value={expression} onChange={(event) => { setExpression(event.target.value); setPage(1); }}><option value="">All expressions</option>{expressionCatalog.map((item) => <option key={item.id} value={item.id}>{item.id}. {item.phrase}</option>)}</select></div>
           <div className={styles.filterField}><label className={styles.label} htmlFor="recognition-from">From</label><input id="recognition-from" className={styles.input} type="date" value={from} onChange={(event) => { setFrom(event.target.value); setPage(1); }} /></div>
           <div className={styles.filterField}><label className={styles.label} htmlFor="recognition-to">To</label><input id="recognition-to" className={styles.input} type="date" value={to} onChange={(event) => { setTo(event.target.value); setPage(1); }} /></div>
+          <div className={styles.filterField}><label className={styles.label} htmlFor="recognition-sort">Order</label><select id="recognition-sort" className={styles.select} value={sort} onChange={(event) => { setSort(event.target.value === 'newest' ? 'newest' : 'oldest'); setPage(1); }}><option value="oldest">Oldest first (as they came in)</option><option value="newest">Newest first</option></select></div>
           <button type="button" className={styles.buttonSecondary} onClick={() => clearFilters()}>Clear</button>
         </form>
         {error ? <div className={styles.error} role="alert">{error} <button type="button" className={styles.authLink} onClick={() => void load()}>Try again</button></div> : null}
+        {orderNotice ? <div className={styles.notice} role="status">{orderNotice}</div> : null}
         {loading ? <div className={styles.skeleton} aria-label="Loading recognitions" /> : null}
         {!loading && !error && !items.length ? <div className={styles.empty}>No current recognition records match these filters.</div> : null}
         {!loading && !error && items.length ? (
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <caption className={styles.srOnly}>Current campaign recognition records</caption>
-              <thead><tr><th scope="col">Recipient</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
+              <thead><tr><th scope="col">#</th><th scope="col">Submitted by</th><th scope="col">Recipient</th><th scope="col">Message</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
               <tbody>{items.map((item) => {
                 const badgeClass = item.status === 'published' ? styles.badgePublished : item.status === 'held' ? styles.badgeHeld : item.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
                 return <tr key={item.id}>
-                  <td><strong>{item.recipient}</strong><div className={styles.fieldHint}>Admin detail includes submitted name</div></td>
+                  <td><span className={styles.badge}>{item.sequence}</span></td>
+                  <td>{item.submittedName}</td>
+                  <td><strong>{item.recipient}</strong></td>
+                  <td className={styles.messageCell}>{item.message}</td>
                   <td><div>{item.expressionIds.length} selected</div><div className={styles.fieldHint}>{item.expressionIds.map((id) => expressionText.get(id) ?? `Expression ${id}`).join(', ')}</div></td>
                   <td><span className={`${styles.badge} ${badgeClass}`}>{statusLabel(item.status)}</span></td>
                   <td>{formatDateTime(item.createdAt)}</td>
@@ -109,7 +125,7 @@ export function RecognitionManager() {
           </div>
         ) : null}
         <div className={styles.buttonRow} style={{ justifyContent: 'space-between', marginTop: 16 }}>
-          <span className={styles.fieldHint}>Showing up to 50 records per page. Search is exact text matching, not identity verification.</span>
+          <span className={styles.fieldHint}>Showing up to {PAGE_SIZE} records per page, {appliedSort === 'oldest' ? 'oldest first' : 'newest first'}. The number is the order the recognition came in. Search is exact text matching, not identity verification.</span>
           <div className={styles.buttonRow}><button type="button" className={styles.buttonQuiet} disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</button><span className={styles.badge}>Page {page} of {totalPages}</span><button type="button" className={styles.buttonQuiet} disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</button></div>
         </div>
       </section>

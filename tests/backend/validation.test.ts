@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { screenRecognition } from "@/lib/server/filter";
 import { addVectors, expressionTotal, vectorDiff, vectorForExpressions, zeroVector } from "@/lib/server/vectors";
 import { graphemeLength, startOfLosAngelesWeek } from "@/lib/server/time";
-import { validateEditablePatch, validateRecognitionInput } from "@/lib/server/validation";
+import { validateAdminListQuery, validateEditablePatch, validateRecognitionInput } from "@/lib/server/validation";
 
 describe("backend input validation", () => {
   const base = { submittedName: "Sender A.", recipient: "Friend M.", message: "Thank you for your kindness.", expressionIds: [2, 6, 8], requestKey: "request-1234" };
@@ -88,5 +88,21 @@ describe("contribution vectors", () => {
 describe("reporting time", () => {
   it("uses Sunday-start Los Angeles weeks", () => {
     expect(startOfLosAngelesWeek(new Date("2026-09-07T12:00:00Z"))).toMatch(/^2026-09-0[67]$/);
+  });
+});
+
+describe("admin list query validation", () => {
+  it("defaults to newest first when no order is asked for", () => {
+    expect(validateAdminListQuery(null, null, null, null)).toEqual({ status: null, expression: null, from: null, to: null, sort: "newest" });
+    expect(validateAdminListQuery(null, null, null, null, "")).toMatchObject({ sort: "newest" });
+  });
+
+  it("accepts oldest first, the order submissions came in", () => {
+    expect(validateAdminListQuery("held", "2", "2026-09-01", "2026-09-30", "oldest")).toEqual({ status: "held", expression: 2, from: "2026-09-01", to: "2026-09-30", sort: "oldest" });
+  });
+
+  it("rejects any other order word", () => {
+    expect(validateAdminListQuery(null, null, null, null, "random")).toBeNull();
+    expect(validateAdminListQuery(null, null, null, null, "created_at DESC")).toBeNull();
   });
 });
