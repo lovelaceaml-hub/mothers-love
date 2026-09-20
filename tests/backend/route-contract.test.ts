@@ -22,6 +22,7 @@ vi.mock("@/lib/server/response", async () => {
 });
 
 import * as adminRecognitionRoute from "@/app/api/admin/recognitions/[id]/route";
+import * as adminListRoute from "@/app/api/admin/recognitions/route";
 import * as publicRecognitionRoute from "@/app/api/recognitions/route";
 import * as reportsRoute from "@/app/api/admin/reports/route";
 import * as settingsRoute from "@/app/api/admin/settings/route";
@@ -122,5 +123,37 @@ describe("admin route DTOs", () => {
     const response = await pairRoute.POST(request("/api/display/pair", { method: "POST", headers: { origin: "https://mothers-love.example", "content-type": "application/json" }, body: "{}" }));
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ paired: true });
+  });
+});
+
+describe("admin list route paging and order", () => {
+  it("asks the database for page 0 when the screen asks for page 1, oldest first", async () => {
+    databaseAction.mockResolvedValue({ data: { ok: true, items: [recognition], total: 164, sort: "oldest" }, error: null });
+    const response = await adminListRoute.GET(request("/api/admin/recognitions?page=1&sort=oldest"));
+    expect(response.status).toBe(200);
+    expect(databaseAction).toHaveBeenCalledWith("admin_list", expect.objectContaining({ page: 0, pageSize: 50, sort: "oldest" }));
+    await expect(response.json()).resolves.toMatchObject({ items: [recognition], total: 164, sort: "oldest" });
+  });
+
+  it("treats a missing or zero page as the first page", async () => {
+    databaseAction.mockResolvedValue({ data: { ok: true, items: [], total: 0 }, error: null });
+    await adminListRoute.GET(request("/api/admin/recognitions"));
+    await adminListRoute.GET(request("/api/admin/recognitions?page=0"));
+    await adminListRoute.GET(request("/api/admin/recognitions?page=abc"));
+    for (const call of databaseAction.mock.calls) expect(call[1]).toMatchObject({ page: 0, sort: "newest" });
+  });
+
+  it("moves to the next 50 for page 2 and beyond", async () => {
+    databaseAction.mockResolvedValue({ data: { ok: true, items: [], total: 0 }, error: null });
+    await adminListRoute.GET(request("/api/admin/recognitions?page=2"));
+    await adminListRoute.GET(request("/api/admin/recognitions?page=4&status=held"));
+    expect(databaseAction.mock.calls[0][1]).toMatchObject({ page: 1 });
+    expect(databaseAction.mock.calls[1][1]).toMatchObject({ page: 3, status: "held" });
+  });
+
+  it("rejects an unknown order before touching the database", async () => {
+    const response = await adminListRoute.GET(request("/api/admin/recognitions?sort=sideways"));
+    expect(response.status).toBe(400);
+    expect(databaseAction).not.toHaveBeenCalled();
   });
 });
