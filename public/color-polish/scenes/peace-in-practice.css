@@ -38,6 +38,26 @@
   pointer-events: none;
 }
 
+/* The WebGL 2 heart and ribbons (peace-in-practice-heart3d.js). Its one clear
+   canvas is wider than the heart's box, because the ribbons sweep well past
+   the heart on both sides; the rig's place and size are set by that script.
+   It never takes a pointer, so a click on the TV still advances the scene.
+   The host's drop shadow is for the Canvas 2D solid alone. */
+#tv .scene[data-scene='9'] .pip-heart3d-rig {
+  position: absolute;
+  pointer-events: none;
+}
+#tv .scene[data-scene='9'] .pip-heart3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#tv .scene[data-scene='9'] .heart-host.pip-heart-host-3d {
+  filter: none;
+}
+
 /* Reduced motion: the heart is drawn once at a three quarter angle and never
    redrawn, so nothing here may animate it either. */
 @media (prefers-reduced-motion: reduce) {

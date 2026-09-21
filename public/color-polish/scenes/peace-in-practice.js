@@ -21,6 +21,12 @@
 //      in front of it, and the heart beats, floats and glows.
 // Everything else (art, heading, bubble styling, motion, the small floating
 // hearts) stays as the live TV shows it.
+//
+// Anthony, 2026-09-20, replaces that heart and its thick gold hoops with the
+// approved three dimensional study: a sculpted rose heart with sheer pearl and
+// champagne ribbons, drawn with WebGL 2 by peace-in-practice-heart3d.js. The
+// Canvas 2D solid below is kept, unchanged, as what the scene shows when
+// WebGL 2 cannot be had. See "Mounting the heart" at the foot of this file.
 'use strict';
 
 /* ---------------------------------------------------------------------------
@@ -1313,20 +1319,108 @@ function pipHeartPainter(canvas, model, table) {
   return { canvas, rig, backCanvas, frontCanvas, life, draw, setBacking, technique: 'canvas2d-per-pixel', rows, get backing() { return backing; } };
 }
 
-function pipMountHeart() {
-  const host = $('heart-host');
-  if (!host) return;
-  if (!heartRenderer) heartRenderer = pipCreateHeartRenderer();
+/* ---------------------------------------------------------------------------
+   Mounting the heart
+
+   The scene shows the WebGL 2 heart and ribbons (peace-in-practice-heart3d.js)
+   and keeps the Canvas 2D solid above for a display where WebGL 2 is missing,
+   fails to start, or loses its graphics context part way through.
+
+   Either one is handed to the core as `heartRenderer`, and the core draws it
+   from its single frame loop while the scene is in motion (never in still
+   mode, never during an arrival or a scene change, never while the display is
+   paused or the tab hidden), so neither heart needs a loop of its own.
+
+   The WebGL 2 heart is built when the scene opens and given back when the
+   scene is left: its programs, buffers, textures, render targets and the
+   graphics context itself. A scene that is only redrawn in place (a new
+   recognition arrived) keeps the same heart, so the ribbons do not start over.
+--------------------------------------------------------------------------- */
+
+let pipHeart2D = null;                // the Canvas 2D solid, built at most once
+let pipHeart3D = null;                // the WebGL 2 heart, only while this scene is showing
+let pipHeart3DLeftAt = -Infinity;     // when the scene last let go of it
+const PIP_HEART_REMOUNT_MS = 250;     // a mount this soon after a leave is the same showing, redrawn in place
+
+// One canvas pixel per TV pixel: the whole TV is drawn at twice the size on a
+// 3840 wide screen, at its own size on a 1920 wide one, and smaller on a phone.
+function pipHeartBacking() {
+  const tv = $('tv');
+  const shown = tv ? tv.getBoundingClientRect().width / 1920 : 1;
+  return shown * (window.devicePixelRatio || 1);
+}
+
+function pipHeart3DResize() {
+  if (pipHeart3D) pipHeart3D.solid.setBacking(pipHeartBacking());
+}
+
+function pipReleaseHeart3D() {
+  const held = pipHeart3D;
+  if (!held) return;
+  pipHeart3D = null;
+  window.removeEventListener('resize', pipHeart3DResize);
+  held.solid.dispose();
+  if (heartRenderer === held) heartRenderer = null;
+  if (window.pipHeartRenderer === held) window.pipHeartRenderer = null;
+}
+
+// The graphics context was lost while the heart was up: show the Canvas 2D
+// solid in its place, at once, if the scene is still on the stage.
+function pipHeart3DLost() {
+  pipReleaseHeart3D();
+  if ($('heart-host')) pipMountHeart2D($('heart-host'));
+}
+
+function pipMountHeart3D(host) {
+  if (typeof pipCreateHeart3D !== 'function') return false;
+  const sameShowing = !!pipHeart3D && performance.now() - pipHeart3DLeftAt < PIP_HEART_REMOUNT_MS;
+  if (pipHeart3D && !pipHeart3D.solid.alive) pipReleaseHeart3D();
+  if (!pipHeart3D) {
+    const solid = pipCreateHeart3D(pipHeart3DLost);
+    if (!solid) return false;
+    // The core hands the Canvas 2D heart a turn angle. This heart keeps time
+    // in seconds, so it reads the scene's own clock instead.
+    pipHeart3D = { solid, canvas: solid.canvas, rig: solid.rig, technique: solid.technique, draw: (t, force) => solid.draw(V.clock, force, S.still), setBacking: solid.setBacking, get stats() { return solid.stats; }, get glError() { return solid.glError; } };
+    window.addEventListener('resize', pipHeart3DResize);
+  }
+  if (!sameShowing) pipHeart3D.solid.restart();
+  heartRenderer = pipHeart3D;
+  window.pipHeartRenderer = pipHeart3D;
+  // The host's soft drop shadow is for the solid alone; the ribbons and their
+  // light reach far past it and carry their own depth.
+  host.classList.add('pip-heart-host-3d');
+  host.replaceChildren(pipHeart3D.rig);
+  pipHeart3D.solid.setBacking(pipHeartBacking());
+  pipHeart3D.draw(0, true);
+  return true;
+}
+
+function pipMountHeart2D(host) {
+  if (!pipHeart2D) pipHeart2D = pipCreateHeartRenderer();
+  heartRenderer = pipHeart2D;
   // A named handle for the scene spec and for checking the frame cost by hand,
   // alongside the renderer's existing colorPolishRuntime debug surface.
   window.pipHeartRenderer = heartRenderer;
-  host.append(heartRenderer.rig);
-  // One canvas pixel per TV pixel: the whole TV is drawn at twice the size on
-  // a 3840 wide screen, and at its own size on a 1920 wide one.
-  const tv = $('tv');
-  const shown = tv ? tv.getBoundingClientRect().width / 1920 : 1;
-  heartRenderer.setBacking(shown * (window.devicePixelRatio || 1));
+  host.classList.remove('pip-heart-host-3d');
+  host.replaceChildren(heartRenderer.rig);
+  heartRenderer.setBacking(pipHeartBacking());
   heartRenderer.draw(S.still ? PIP_HEART_STILL_T : S.t, true);
+}
+
+function pipMountHeart() {
+  const host = $('heart-host');
+  if (!host) return;
+  if (!pipMountHeart3D(host)) pipMountHeart2D(host);
+}
+
+// Leaving the scene gives the WebGL 2 heart back. The core also calls this
+// just before it redraws this same scene in place, so the release waits one
+// turn: if the heart is back on the stage by then, it is kept.
+function pipLeaveHeart() {
+  const held = pipHeart3D;
+  if (!held) return;
+  pipHeart3DLeftAt = performance.now();
+  setTimeout(() => { if (pipHeart3D === held && !held.canvas.isConnected) pipReleaseHeart3D(); }, 0);
 }
 
 registerScene(9, {
@@ -1347,6 +1441,7 @@ registerScene(9, {
     pipReport('first');
   },
   integrate: pipIntegrate,
+  onLeave: pipLeaveHeart,
   floaters: true,
   fxCanvas: true,
   replaceMode: 'hearts',
