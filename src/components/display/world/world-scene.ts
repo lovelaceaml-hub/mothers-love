@@ -7,7 +7,14 @@ export function createWorldScene() {
   const world = createLegacyWorldScene();
   // Simple, explicit visual rollback for comparison on the preview branch.
   if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("art") === "classic") return world;
-  const art = attachCinematicArt(world.scene);
+  let art: ReturnType<typeof attachCinematicArt>;
+  try {
+    art = attachCinematicArt(world.scene);
+  } catch (error) {
+    console.error("Cinematic art initialization failed", error);
+    world.dispose();
+    throw error;
+  }
   return {
     ...world,
     update(...args: Parameters<typeof world.update>) {
