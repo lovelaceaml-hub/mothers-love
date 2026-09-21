@@ -393,6 +393,13 @@ export class WorldRecognitionBubbles {
         slot.radius =
           [4.4, 3, 2.8][slot.index] * (mobile && slot.index === 0 ? 1.06 : 1);
         if (this.designStudy && slot.index > 0) slot.radius *= .72;
+        if (this.designStudy && slot.index === 0) {
+          // Keep the exterior symbol orbit above the terrace, with depth testing intact.
+          slot.root.position.y = Math.max(
+            slot.root.position.y,
+            definition.center[1] + .9 + slot.radius * 1.46,
+          );
+        }
         const grow =
           still || slot.index === 0
             ? 1
