@@ -1,3 +1,5 @@
+> Held for visual review. Anthony subsequently requested designs and prototypes before Fable/Opus implementation. Do not execute this historical P0 capsule until Anthony approves the visual study and implementation is resumed at a recorded section boundary. Authentication alone is not a resume instruction. Current authority: /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/PLAN-24-world-visual-quality.md.
+
 # Implement Mother's Love Plan 24, Phase P0: Runtime baseline
 
 Anthony explicitly approved `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/PLAN-24-world-visual-quality.md` and said "Continue". This is the approved fresh Claude implementation lane. Use Claude Opus at high effort. The user explicitly assigned Opus and Fable implementation; this overrides historical skills that default implementation to Luna or prohibit routine Opus implementation. Do not switch to Luna/Sonnet or claim a different model ran.

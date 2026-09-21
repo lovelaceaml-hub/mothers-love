@@ -1,8 +1,11 @@
 # Mother’s Love visual review
 
-Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra design study](docs/runs/2026-09-21-world-quality/DESIGN-STUDY.md) is integrated into the existing world at `/display/world-preview?source=sample&art=design`. It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
+Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) is ready for [visual review](docs/runs/2026-09-21-world-quality/VISUAL-REVIEW.md), with a [same-build classic comparison](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=classic). It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
 
 [Plan 24](docs/PLAN-24-world-visual-quality.md) and [draft PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8) remain the continuation. Fable/Opus implementation is held for visual approval. The [baseline checkpoint](docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md) records six passing local render comparisons; the historical CI readiness failure is unresolved. This prototype is not a completed whole-world upgrade or a production release.
+
+Storage: [verified review media and tour](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45>) ([copy manifest](docs/runs/2026-09-21-world-quality/DESIGN-RECOVERY-MANIFEST.json)).
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
