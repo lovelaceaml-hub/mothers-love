@@ -57,6 +57,11 @@
 #tv .scene[data-scene='9'] .heart-host.pip-heart-host-3d {
   filter: none;
 }
+/* The ribbons keep the study's full sweep, so their thin tips rise behind the
+   heading at times. The words are drawn on top of them and are never covered. */
+#tv .scene[data-scene='9'] .scene-copy {
+  z-index: 2;
+}
 
 /* Reduced motion: the heart is drawn once at a three quarter angle and never
    redrawn, so nothing here may animate it either. */

@@ -10,8 +10,9 @@ import { buildActiveDisplayFixture, loadRenderer, withoutWebGL2 } from './helper
 //
 // These specs check what the handoff asked of the integration, on the real
 // renderer page with synthetic records:
-//   - the sculpture is what the scene shows, in the live heart's place, clear
-//     of the words above it, and it never takes a pointer;
+//   - the sculpture is what the scene shows, in the live heart's place, its
+//     ribbons keep the study's full sweep with the heading's words drawn on
+//     top of their tips, and it never takes a pointer;
 //   - the ribbons unfold by themselves after the scene opens, keep moving, and
 //     lie over the heart in places (sheer silk in front of a solid);
 //   - motion off holds it still, whole and unrolled;
@@ -81,7 +82,7 @@ async function picture(frame: Frame) {
     const tv = document.getElementById('tv')!.getBoundingClientRect().width / 1920;
     const box = canvas.getBoundingClientRect();
     const k = canvas.width / (box.width / tv);
-    const cx = 380 * k, cy = 161.5 * k, reach = 62 * k;
+    const cx = 360 * k, cy = 313.5 * k, reach = 60 * k;
     for (let y = 0; y < copy.height; y++) for (let x = 0; x < copy.width; x++) {
       const i = (y * copy.width + x) * 4;
       const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
@@ -111,7 +112,7 @@ async function picture(frame: Frame) {
   });
 }
 
-test('the scene shows the sculpted heart and its ribbons, in the live heart\'s place, clear of the words above it', async ({ page }) => {
+test('the scene shows the sculpted heart and its ribbons, in the live heart\'s place, with the words above drawn on top', async ({ page }) => {
   const frame = await loadRenderer(page, { fixture, scene: 9, ms: 6000 });
   test.skip(!(await hasWebGL2(page)), 'this browser has no WebGL 2, even in software');
   const state = await heartState(frame);
@@ -132,6 +133,8 @@ test('the scene shows the sculpted heart and its ribbons, in the live heart\'s p
       pointer: getComputedStyle(rig).pointerEvents,
       hostFilter: getComputedStyle(host).filter,
       wordsBottom: (words.bottom - stage.top) / tv,
+      wordsLayer: Number(getComputedStyle(document.querySelector<HTMLElement>('.scene[data-scene="9"] .scene-copy')!).zIndex),
+      heartLayer: Number(getComputedStyle(host).zIndex),
       studio: document.querySelectorAll('#heart-host input, #heart-host button, #heart-host select, #heart-host dialog').length,
     };
   });
@@ -147,9 +150,14 @@ test('the scene shows the sculpted heart and its ribbons, in the live heart\'s p
   expect(shot.centre[0], 'the centre of the heart should be rose').toBeGreaterThan(shot.centre[1] * 1.5);
   for (const corner of shot.corners) expect(corner[3], 'the canvas corners must be clear').toBeLessThan(4);
   expect(shot.rose, 'the solid heart should fill its own middle').toBeGreaterThan(1500);
-  // Everything painted sits under the subheading, above the feed, left of the bubbles' ground.
-  expect(shot.stage.top, 'the sculpture must not reach up into the subheading').toBeGreaterThan(layout.wordsBottom - 4);
-  expect(shot.stage.bottom).toBeLessThan(650);
+  // The ribbons keep the study's full sweep (Anthony, 2026-09-20: "too bunched
+  // together"), so they reach well above and below the heart, and their tips
+  // may rise behind the heading. The words are drawn on top of them, the solid
+  // heart itself stays under the subheading, and the silk stays left of the
+  // bubbles' ground.
+  expect(shot.stage.bottom - shot.stage.top, 'the ribbons should sweep far above and below the heart').toBeGreaterThan(420);
+  expect(layout.wordsLayer, 'the heading must be drawn on top of the ribbons').toBeGreaterThan(layout.heartLayer);
+  expect(413.5 - 1.6 * 90, 'the top of the solid heart must stay under the subheading').toBeGreaterThan(layout.wordsBottom);
   expect(shot.stage.left).toBeGreaterThan(0);
   expect(shot.stage.right).toBeLessThan(790);
 });

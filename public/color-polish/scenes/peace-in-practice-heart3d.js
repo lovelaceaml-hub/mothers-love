@@ -23,9 +23,15 @@
 //      one frame loop, exactly as it does for the Canvas 2D heart, so still
 //      mode, reduced motion, a paused display, a hidden tab, arrivals and
 //      scene changes all hold it without any code here.
-//   5. It fits the scene. The ribbons rise and fall a little less than in the
-//      study, because the subheading is just above the heart and the feed
-//      just below the hands.
+//   5. It keeps the study's full sweep. Anthony, 2026-09-20, on seeing a first
+//      version whose ribbons were held under the subheading: "the ribbons are
+//      too bunched together", with a picture of the study at movement 1.80,
+//      golden glow 100, sculptural depth 115, drifting light 100 and the
+//      gentle camera sway on. Those are the settings here. The ribbons rise
+//      and fall as far as in the study, so their thin tapered tips pass behind
+//      the heading (whose words are drawn on top, see the scene's stylesheet)
+//      and behind the feed panel below; about 4 percent of the silk is ever
+//      up there, and the last few percent of the canvas fade out.
 //   6. dispose() gives back every GPU object and the context itself. If
 //      WebGL 2 is missing, fails to start, or the context is lost, the scene
 //      falls back to the Canvas 2D heart (peace-in-practice.js).
@@ -35,22 +41,25 @@
 'use strict';
 
 // The canvas, in the scene's own pixels, relative to #heart-host (390 x 363,
-// whose centre is the heart's centre). Wider than the host: the ribbons sweep
-// well past the heart on both sides. The top stays under the subheading.
-const PIP3D_BOX = { left: -185, top: 20, width: 760, height: 392 };
-const PIP3D_UNIT = 92;                // scene pixels per unit of the study, at the heart's depth
-const PIP3D_HEART_Y = 161.5;          // where the heart's centre sits, down from the canvas top (the host's own centre)
+// whose centre is the heart's centre). Much larger than the host: the ribbons
+// sweep well past the heart on every side, as they do in the study.
+const PIP3D_BOX = { left: -165, top: -132, width: 720, height: 590 };
+const PIP3D_UNIT = 90;                // scene pixels per unit of the study, at the heart's depth (a heart 250 wide)
+const PIP3D_HEART_Y = 313.5;          // where the heart's centre sits, down from the canvas top (the host's own centre)
 const PIP3D_CAMERA = { yaw: 0.15, pitch: 0.11, distance: 8.7, targetY: 0.12 }; // the study's opening view
-const PIP3D_SPAN = 0.56;              // how much of the study's rise and fall the ribbons keep
-const PIP3D_LIFT = -0.18;             // and where the middle of that sweep sits, in study units
+const PIP3D_SWAY = 0.34;              // the study's gentle camera sway, radians either side, once in 52 seconds
+const PIP3D_SPAN = 1;                 // the ribbons keep all of the study's rise and fall
+const PIP3D_LIFT = -0.1;              // the middle of that sweep, in study units: a touch low, toward the raised hands
+const PIP3D_DEPTH = 1.15;             // the study's sculptural depth, at Anthony's 115 percent
+const PIP3D_MOTION = 1.8;             // and its movement, at his 1.80
 const PIP3D_OPENING_TIME = 26;        // the study opens at this moment of its own motion
 const PIP3D_UNFOLD_SECONDS = 3.4;     // the ribbons unroll along their length when the scene opens
 const PIP3D_WAVE_FIRST = 0.5;         // seconds into the scene for the first wave of light
 const PIP3D_WAVE_EVERY = 23;          // and between the ones that follow
 const PIP3D_WAVE_SECONDS = 5;
 const PIP3D_FRAME_MS = 24;            // the study paints 40 times a second at most; so does this
-const PIP3D_GLOW = 0.62;              // the study's default glow
-const PIP3D_SPARKS = 0.72;            // and its default share of drifting sparks
+const PIP3D_GLOW = 1;                 // the study's golden glow, at Anthony's 100 percent
+const PIP3D_SPARKS = 1;               // and its drifting light, at 100 percent
 const PIP3D_SHADOW = 768;
 const PIP3D_RIBBON_SEGMENTS = 288;
 const PIP3D_RIBBON_ACROSS = 24;
@@ -70,7 +79,7 @@ const PIP3D_RIBBONS = [
 
 // The silk, shared by the surface, its shadow and the sparks that ride it.
 const PIP3D_CLOTH_GLSL = `
-uniform float uTime,uFlourish,uSpan,uLift;
+uniform float uTime,uFlourish,uSpan,uLift,uDepth;
 uniform int uId;
 const float PI=3.14159265358979;
 vec4 configA(int id){
@@ -89,7 +98,7 @@ vec3 center(float u,int id){
  float h=(u-.5)*c.z+(id==2?-.38:0.);
  h+=.26*sin(a*1.3+fi)+.14*sin(u*9.0-t*.8+fi);
  h+=.10*sin(t*.58+fi*2.)+uFlourish*(u-.35)*.72;
- return vec3(cos(a)*r,h*uSpan+uLift,sin(a)*r*.69);
+ return vec3(cos(a)*r,h*uSpan+uLift,sin(a)*r*.69*uDepth);
 }
 vec3 ribbon(float u,float v,int id){
  vec3 c=center(u,id);
@@ -183,13 +192,13 @@ void main(){
   float edge=min(vUV.y,1.-vUV.y);
   hem=1.-smoothstep(.010,.030,edge);
   float s=.5+.5*sin(vUV.x*12.-uTime*.36+float(uId));
-  // The study's silk was seen against a dusk sky. Against this scene's pale
-  // paper the same pearl would all but vanish, so here it is a shade deeper
-  // (champagne, with a warm pearl for the two finer ribbons) and a little
-  // less sheer. It is still sheer: the heart and the hands show through it.
-  vec3 silk=mix(vec3(.86,.60,.26),vec3(.95,.87,.62),s*.65);
-  if(uId==1||uId==3)silk=mix(silk,vec3(.92,.82,.76),.35);
-  albedo=mix(silk,vec3(.84,.47,.09),hem*.80);
+  // The study's own ivory and champagne silk. Against this scene's pale paper
+  // it needs a little more body than it had against the study's sky, so it is
+  // a touch less sheer, its pearl is warm instead of grey, and its gold hems
+  // are a shade deeper. The heart and the hands still show through it.
+  vec3 silk=mix(vec3(.82,.59,.29),vec3(.94,.89,.69),s*.65);
+  if(uId==1||uId==3)silk=mix(silk,vec3(.90,.84,.78),.35);
+  albedo=mix(silk,vec3(.85,.49,.10),hem*.78);
   rough=mix(.43,.29,hem);metal=mix(.08,.63,hem);
   float nv=abs(dot(N,V));
   alpha=mix(.56,.80,pow(1.-nv,.8));
@@ -221,9 +230,9 @@ void main(){
   col+=hem*vec3(1.25,1.0,.48)*(.18+travel*(1.2+uGlow*2.0));
   col+=albedo*travel*.14;
   col+=uFlourish*hem*vec3(.8,.56,.2);
-  // Less light on the silk than the study gave it, for the same reason: lit
-  // that brightly it turns paper white. The travelling gold stays bright.
-  col*=mix(.84,1.,max(hem*.6,travel));
+  // A little less light on the silk than the study gave it: lit that brightly
+  // it turns as white as the paper behind it. The travelling gold stays bright.
+  col*=mix(.92,1.,max(hem*.6,travel));
  }
  color=vec4(max(col,vec3(0.)),alpha);
 }`;
@@ -246,7 +255,7 @@ uniform float uFlourish,uGlow;
 out vec4 color;
 void main(){
  vec2 q=(vUV-uCentre)*uSize/uSize.y;
- float halo=exp(-dot(q,q)*7.5);
+ float halo=exp(-dot(q,q)*17.);
  float a=halo*(.30+uGlow*.20+uFlourish*.22);
  vec3 sun=vec3(1.16,1.0,.70)+uFlourish*vec3(.20,.08,.0);
  color=vec4(sun*a,a);
@@ -268,7 +277,7 @@ void main(){
   // Sparks adrift in the space around the heart, rising.
   float angle=a*6.28318+uTime*(.03+c*.045);
   float r=1.8+b*1.65;
-  float span=4.1;
+  float span=6.2;
   p=vec3(cos(angle)*r,mod(b*span+uTime*(.045+c*.06),span)-span*.5+uLift,sin(angle)*r*.72);
   float rise=fract(b+uTime*(.045+c*.06)/span);
   size=8.+c*20.;vAlpha=(.28+.44*pow(.5+.5*sin(uTime*(1.+b)+a*50.),3.))*smoothstep(0.,.15,rise)*smoothstep(1.,.82,rise);
@@ -283,7 +292,7 @@ void main(){
   // The burst that opens with each wave of light.
   float age=clamp(uBurstAge,0.,6.),angle=a*6.283185+age*(.3+b*.5);
   float r=.7+age*(.42+b*.31);
-  p=vec3(cos(angle)*r,((b-.5)*2.+age*(.36+c*.3))*.7+uLift,sin(angle)*r*.74);
+  p=vec3(cos(angle)*r,(b-.5)*2.+age*(.36+c*.3)+uLift,sin(angle)*r*.74);
   size=20.+c*18.;vAlpha=exp(-age*.75)*(1.-smoothstep(3.2,4.5,age))*step(0.,uBurstAge);vKind=step(.7,c);
  }
  vec4 clip=uVP*vec4(p,1.);gl_Position=clip;gl_PointSize=clamp(size*(6.0/max(1.,clip.w))*uPixelRatio,1.,80.);
@@ -584,12 +593,19 @@ function pipCreateHeart3D(onLost) {
   // The fixed, calm view: the study's opening camera, framed so that one unit
   // of the study is PIP3D_UNIT scene pixels at the heart's depth, with the
   // heart's centre at the host's centre.
-  const pitch = PIP3D_CAMERA.pitch, yaw = PIP3D_CAMERA.yaw, distance = PIP3D_CAMERA.distance;
-  const eye = [Math.sin(yaw) * Math.cos(pitch) * distance, Math.sin(pitch) * distance + PIP3D_CAMERA.targetY, Math.cos(yaw) * Math.cos(pitch) * distance];
+  // The camera only sways, slowly, a little to either side of that view, as
+  // the study's "gentle camera sway" does; it never orbits.
+  const pitch = PIP3D_CAMERA.pitch, distance = PIP3D_CAMERA.distance;
   const fov = 2 * Math.atan(PIP3D_BOX.height / PIP3D_UNIT / 2 / distance);
   const shiftY = 1 - 2 * PIP3D_HEART_Y / PIP3D_BOX.height;
-  const view = pip3dLook(eye, [0, PIP3D_CAMERA.targetY, 0]);
-  const vp = pip3dMul(pip3dPerspective(fov, PIP3D_BOX.width / PIP3D_BOX.height, 0.1, 60, 0, shiftY), view);
+  const projection = pip3dPerspective(fov, PIP3D_BOX.width / PIP3D_BOX.height, 0.1, 60, 0, shiftY);
+  let eye = [0, 0, distance];
+  let vp = projection;
+  function aim() {
+    const yaw = PIP3D_CAMERA.yaw + Math.sin(time * 0.12) * PIP3D_SWAY;
+    eye = [Math.sin(yaw) * Math.cos(pitch) * distance, Math.sin(pitch) * distance + PIP3D_CAMERA.targetY, Math.cos(yaw) * Math.cos(pitch) * distance];
+    vp = pip3dMul(projection, pip3dLook(eye, [0, PIP3D_CAMERA.targetY, 0]));
+  }
   const lightVP = pip3dMul(pip3dOrtho(-5, 5, -5, 5, 0.1, 25), pip3dLook([-4, 7, 5], [0, 0, 0]));
   const identity = pip3dModel(0, 0, 0, 1, 0);
   // Where the heart's centre lands on the canvas, 0 to 1 from the lower left.
@@ -634,7 +650,7 @@ function pipCreateHeart3D(onLost) {
     const a = c[3] + c[1] * u + time * c[4] + 0.13 * Math.sin(time * 0.37 + u * 5 + id * 1.7);
     const r = c[0] * (1 + 0.055 * Math.sin(u * 6.4 + time * 0.47 + id)) * (1 + flourish * 0.22);
     const h = (u - 0.5) * c[2] + (id === 2 ? -0.38 : 0) + 0.26 * Math.sin(a * 1.3 + id) + 0.14 * Math.sin(u * 9 - time * 0.8 + id) + 0.10 * Math.sin(time * 0.58 + id * 2) + flourish * (u - 0.35) * 0.72;
-    return [Math.cos(a) * r, h * PIP3D_SPAN + PIP3D_LIFT, Math.sin(a) * r * 0.69];
+    return [Math.cos(a) * r, h * PIP3D_SPAN + PIP3D_LIFT, Math.sin(a) * r * 0.69 * PIP3D_DEPTH];
   }
 
   function shared(p, flourish, reveal) {
@@ -643,6 +659,7 @@ function pipCreateHeart3D(onLost) {
     f1(p, 'uFlourish', flourish);
     f1(p, 'uSpan', PIP3D_SPAN);
     f1(p, 'uLift', PIP3D_LIFT);
+    f1(p, 'uDepth', PIP3D_DEPTH);
     f1(p, 'uReveal', reveal);
   }
   function bindTexture(p, name, tex, unit) {
@@ -660,6 +677,7 @@ function pipCreateHeart3D(onLost) {
     if (trailing) { clearTimeout(trailing); trailing = 0; }
     const started = performance.now();
     sizeTargets();
+    aim();
     const flourish = still ? 0 : pip3dWave(time - waveAt);
     const unrolled = still ? 1 : Math.min(1, age / PIP3D_UNFOLD_SECONDS);
     const reveal = (1 - (1 - unrolled) ** 3) * 1.1;
@@ -816,7 +834,7 @@ function pipCreateHeart3D(onLost) {
     } else {
       const step = lastSceneT === null || sceneT < lastSceneT ? 0 : Math.min(0.1, sceneT - lastSceneT);
       lastSceneT = sceneT;
-      time += step;
+      time += step * PIP3D_MOTION;
       age += step;
       if (age >= nextWave) { waveAt = time; nextWave += PIP3D_WAVE_EVERY; }
       if (!force) watchPace(now);
