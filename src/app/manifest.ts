@@ -13,7 +13,13 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#FFF6DC",
     icons: [
       {
-        src: "/api/app-icon?v=butterfly-heart-v2",
+        src: "/icons/butterfly-heart-v1-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/butterfly-heart-v1-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
