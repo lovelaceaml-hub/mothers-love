@@ -1,3 +1,11 @@
+## September 21: Plan 24 approved and starting P0
+
+Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
+
+The approved [Plan 24](PLAN-24-world-visual-quality.md) and its Build log now govern the art continuation. Claude Opus high owns P0 in `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`; Claude Fable high owns subsequent bounded visual work, and Astra may develop the initial design/prototype. The [execution record](runs/2026-09-21-world-quality/RECORD.md), [ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json), and [P0 kickoff](runs/2026-09-21-world-quality/P0-KICKOFF.md) contain current ownership and evidence requirements.
+
+Baseline source is `b324b81cabe947592f6723425c58f14307b58083`, continuing draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). [Cinematic sample](https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample) and [same-build classic sample](https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample&art=classic) rendered during a planning spot-check. The historical CI readiness failure is unresolved; no controlled local matrix or fixed-head CI pass is claimed. Production remains outside this task.
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.

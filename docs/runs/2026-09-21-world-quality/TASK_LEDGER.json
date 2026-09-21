@@ -1,0 +1,82 @@
+{
+  "plan": "docs/PLAN-24-world-visual-quality.md",
+  "baseline": "b324b81cabe947592f6723425c58f14307b58083",
+  "branch": "feature/world-cinematic-art-pass",
+  "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
+  "updatedUtc": "2026-09-21T21:34:48.384547+00:00",
+  "phases": [
+    {
+      "id": "P0",
+      "status": "in_progress",
+      "owner": "Claude Opus high",
+      "evidence": [],
+      "notes": "Reference bundle and lane launch preparation complete; runtime diagnosis not yet run."
+    },
+    {
+      "id": "P1",
+      "status": "queued",
+      "owner": "Astra high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P2",
+      "status": "queued",
+      "owner": "Claude Fable high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P3",
+      "status": "queued",
+      "owner": "Claude Fable high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P4",
+      "status": "queued",
+      "owner": "Claude Fable high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P5",
+      "status": "queued",
+      "owner": "Claude Fable high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P6",
+      "status": "queued",
+      "owner": "Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P7",
+      "status": "queued",
+      "owner": "Claude Opus high with fresh nonauthor Opus review",
+      "evidence": [],
+      "notes": ""
+    }
+  ],
+  "runs": [
+    {
+      "phase": "preparation",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "complete",
+      "tools": [
+        "shell",
+        "git",
+        "gh",
+        "apply_patch"
+      ],
+      "sourceChanges": false,
+      "independentReview": false
+    }
+  ]
+}

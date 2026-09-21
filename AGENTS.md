@@ -1,3 +1,9 @@
+## September 21: Approved whole-world visual upgrade
+
+[Plan 24](docs/PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
+
+Work in `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md), [task ledger](docs/runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
