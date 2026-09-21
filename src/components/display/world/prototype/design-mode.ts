@@ -2,7 +2,8 @@
 export function isWorldDesignStudy() {
   if (typeof window === "undefined") return false;
   const query = new URLSearchParams(window.location.search);
-  return query.get("art") === "design" && query.get("source") === "sample";
+  return query.getAll("art").length === 1 && query.getAll("source").length === 1
+    && query.get("art") === "design" && query.get("source") === "sample";
 }
 
 export type StudyArrival = "bloom" | "ribbon" | "constellation";
