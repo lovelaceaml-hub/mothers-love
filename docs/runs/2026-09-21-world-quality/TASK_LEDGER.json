@@ -3,14 +3,18 @@
   "baseline": "b324b81cabe947592f6723425c58f14307b58083",
   "branch": "feature/world-cinematic-art-pass",
   "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
-  "updatedUtc": "2026-09-21T21:34:48.384547+00:00",
+  "updatedUtc": "2026-09-21T21:50:20.739284+00:00",
   "phases": [
     {
       "id": "P0",
-      "status": "in_progress",
+      "status": "blocked_authentication",
       "owner": "Claude Opus high",
-      "evidence": [],
-      "notes": "Reference bundle and lane launch preparation complete; runtime diagnosis not yet run."
+      "evidence": [
+        "docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md",
+        "docs/runs/2026-09-21-world-quality/BASELINE-OPTIMIZED.json",
+        "docs/runs/2026-09-21-world-quality/BASELINE-DEV-HARNESS.json"
+      ],
+      "notes": "All six local macOS headless baseline cases rendered on unchanged application code; typecheck, optimized build, and 40 world unit tests passed. No historical CI reproduction, startup fix, or CI pass yet. Opus implementation remains blocked by authentication."
     },
     {
       "id": "P1",
@@ -77,6 +81,37 @@
       ],
       "sourceChanges": false,
       "independentReview": false
+    },
+    {
+      "phase": "P0",
+      "runtime": "Claude Code native background session",
+      "requestedModel": "opus",
+      "displayedModel": "Opus 5",
+      "exactResponseModelId": null,
+      "effort": "high",
+      "sessionId": "c2da192f-e083-47be-9d94-47402e9aa117",
+      "status": "blocked_authentication",
+      "sourceChanges": false,
+      "independentReview": false,
+      "notes": "Stopped idle session after verification; conversation preserved for authenticated resume."
+    },
+    {
+      "phase": "P0-baseline-validation",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "status": "partial",
+      "sourceChanges": false,
+      "independentReview": false,
+      "tools": [
+        "npm ci",
+        "TypeScript",
+        "Vitest",
+        "Next build and servers",
+        "Playwright",
+        "esbuild",
+        "view_image"
+      ],
+      "results": "40 unit tests, typecheck, build, and six local render cases passed. Historical CI configuration differs; P0 incomplete."
     }
   ]
 }

@@ -2,6 +2,8 @@
 
 The approved [Plan 24](docs/PLAN-24-world-visual-quality.md) upgrades all 13 connected destinations toward the supplied visual references. Work is beginning with runtime readiness diagnosis on draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). The [existing cinematic sample](https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample) and [same-build classic sample](https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample&art=classic) remain the baseline, not the completed upgrade. See the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md) and [reference manifest](docs/design/world-quality/REFERENCE-MANIFEST.json).
 
+The [local baseline checkpoint](docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md) records six rendered comparisons, a passing optimized build/typecheck, and 40 passing world unit tests. Claude sign-in is required before Opus implementation can resume. The historical CI failure remains unresolved and P0 is incomplete.
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
