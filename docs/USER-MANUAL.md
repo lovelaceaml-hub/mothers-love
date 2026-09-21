@@ -48,3 +48,18 @@ Open [Display Studio](https://mothers-love.vercel.app/admin/display). Choose any
 On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this screen once if the browser requires a sound gesture. Studio volume and event toggles still control sound. Pause also stops decorative motion. Long circle messages move to reveal their complete text, with dedicated reading pages as well. All nine Spotlight and Daily Practice expressions and all three One Kind Word lines rotate fairly. Home, school and work appear in sequence.
 
 The latest owner choice keeps all selected effects active. The app does not automatically reduce effects. Actual TV speed, room audio and a real phone scan remain hardware checks, outside the selected software-only proof.
+
+
+## Heavenly World preview
+
+The separate [world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) opens in **Sample world**, with fictional names and messages. **World map** opens all thirteen locations. Garden, Sanctuary, and Expressions also have quick buttons. The camera travels gently and rests while a recognition is read.
+
+**Read recognitions** opens complete messages and an expression filter. **Linger with this recognition** returns to its reading view and holds it. **Continue reading tour** resumes. Long messages turn through numbered pages; the full unbroken message is always available in Read recognitions. Previous and next arrows select another story. In Garden of Days, choose a date to see its counts and currently available stories.
+
+**Settings** controls speed, picture quality, and still view. **Preview grand entrance** demonstrates one fictional arrival; **Preview five arrivals** demonstrates a wave with separate reading time for every person. Resume the tour and release a held recognition before starting a demonstration. Reduced motion gives a stable reading celebration. The owner's arrival-pause setting suppresses live entrances.
+
+To show current campaign content, choose **Settings > Content > Live recognitions**. This uses the existing public TV feed and the owner's mode, motion, reading time, arrival pause, rotation pause, and scene selections. A new verified publication enters after the current reading interval. Existing records are not replayed as new arrivals when opening or reconnecting. Quiet and unavailable states clear messages. The world does not submit recognitions or change settings.
+
+**Hide details** clears the usual story panels; Show details or Escape brings them back. **Fullscreen** uses the browser's fullscreen support. If 3D cannot run, a still view retains the reading browser and all locations; Try 3D again recreates the renderer. The original [TV display](https://mothers-love.vercel.app/display) continues separately.
+
+Vercel protects preview deployments. Use the final handoff's temporary share link or a signed-in owning Vercel session. Share links expire, without changing the original TV address. Sound is not part of this preview; celebrations are visual.

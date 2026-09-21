@@ -1,3 +1,13 @@
+## September 21: Heavenly World preview
+
+The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.
+
+[Full plan](PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](runs/2026-09-20-world-prototype-01/RECORD.md).
+
+Source checkpoint: [private feature branch](https://github.com/lovelaceaml-hub/mothers-love/tree/feature/tv-3d-world-prototype-01). Native controller review passed; the additional Claude privacy audit remains pending sign-in or explicit deferral.
+
+Continue branch `feature/tv-3d-world-prototype-01` in its isolated worktree. The initial three-zone hosting receipt is historical; Plan 20's final receipt governs the expanded world. Rollback means stop using this preview, with no production or database rollback. Physical-TV performance and viewing distance remain separate commissioning checks.
+
 ## September 19 (night): flowers bloom behind the arrival bubble
 
 Live at https://mothers-love.vercel.app/display as commit `4bdf122` on `tv17/pick` (docs at `587f620`), Vercel production mothers-love-lxebiei0c-lvzion.vercel.app, deployed by Anthony. At Anthony's request the overlapping line circles and tick ring behind the arrival bubble are gone. In their place, scattered pink, gold, lavender and peach flowers open one petal at a time; no wreath and no circular arrangement. Anthony approved the single and group preview captures and asked that nothing else be removed, so the landing ripples and entrance rings stay. Changed files: public/color-polish/scenes/arrival.js and public/color-polish/scenes/arrival.css. The two empty `.arrival-rosette` layers remain as anchors for the stage tick and its tests. Verification: syntax check, preview captures at 1920, live file check after deploy. The full test suite was not run, at Anthony's request for speed. An earlier deploy that night from `tv17/flowers-release` briefly dropped the bubble entrance change; this deploy from `tv17/pick` holds both.

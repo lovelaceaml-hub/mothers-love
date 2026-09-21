@@ -1,3 +1,11 @@
+## September 21: Heavenly World preview
+
+The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.
+
+[Full plan](docs/PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](docs/PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](docs/runs/2026-09-20-world-prototype-01/RECORD.md).
+
+Current authority is Plan 20, including the user's full-world expansion and radiant pearl choice. Live mode is authorized only as a read of the existing explicitly public projection. No production promotion, database modification, real-data fixture/screenshot, or change to the current TV renderer belongs in this preview. This branch starts from `tv17/pick` at `8a10f8c`; newer independent production heart work must be preserved.
+
 ## Bubble entrance on scene change (September 19)
 Anthony approved: after every scene change on the live TV, the incoming scene's message bubbles come in one at a time (fade and grow, shuffled order, uneven intervals), the first about half way through the 1.15 second fade and all settled within about 3.5 seconds. Still mode and reduced motion keep bubbles instant. It lives in core/transitions.js and transitions.css and only drives each bubble's inner circle and rings, never the bubble's position or drift; tests/color-polish-scenes/bubble-entrance.spec.ts covers it. Live as deployment dpl_6TxaUYW8F7fMGJfqBRJnYMtf51K2 from tv17/pick; see docs/HANDOFF.md.
 
