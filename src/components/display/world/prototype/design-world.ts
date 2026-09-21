@@ -33,13 +33,16 @@ export function createDesignWorld(): WorldScene {
   const bloom = material(new T.MeshPhysicalMaterial({ color: "#ffffff", roughness: .64, sheen: .7, sheenColor: new T.Color("#ffe4dd"), sheenRoughness: .85, side: T.DoubleSide }));
   const cylinder = geometry(new T.CylinderGeometry(1, 1, 1, 16));
   const bead = geometry(new T.SphereGeometry(1, 12, 8));
-  const petal = geometry(new T.PlaneGeometry(1, 1, 8, 5));
-  const pos = petal.getAttribute("position"), uv = petal.getAttribute("uv");
-  for (let i = 0; i < pos.count; i++) {
-    const u = uv.getY(i), v = uv.getX(i) * 2 - 1, span = Math.pow(Math.max(0, Math.sin(Math.PI * u)), .58);
-    pos.setXYZ(i, v * span * .63, .45 * u * u - .11 * Math.sin(Math.PI * u) + v * v * span * .19, u);
+  function petalGeometry(columns: number, rows: number) {
+    const g = geometry(new T.PlaneGeometry(1, 1, columns, rows));
+    const pos = g.getAttribute("position"), uv = g.getAttribute("uv");
+    for (let i = 0; i < pos.count; i++) {
+      const u = uv.getY(i), v = uv.getX(i) * 2 - 1, span = Math.pow(Math.max(0, Math.sin(Math.PI * u)), .58);
+      pos.setXYZ(i, v * span * .63, .45 * u * u - .11 * Math.sin(Math.PI * u) + v * v * span * .19, u);
+    }
+    g.computeVertexNormals(); g.computeBoundingSphere(); return g;
   }
-  petal.computeVertexNormals(); petal.computeBoundingSphere();
+  const petal = petalGeometry(8, 5);
   const dummy = new T.Object3D(), tint = new T.Color();
   function mesh(parent: T.Object3D, g: T.BufferGeometry, m: T.Material, p: number[] = [0, 0, 0], scale: number[] = [1, 1, 1]) {
     const o = new T.Mesh(g, m); o.position.set(p[0], p[1], p[2]); o.scale.set(scale[0], scale[1], scale[2]); o.receiveShadow = !m.transparent; parent.add(o); return o;
@@ -318,9 +321,10 @@ export function createDesignWorld(): WorldScene {
   portal.position.y=constellation.position.y=2.7;
   lotus.userData.dynamic=portal.userData.dynamic=constellation.userData.dynamic=true;
   const lotusPetals:T.Mesh[]=[];
+  const lotusShape=petalGeometry(40,24);
   const lotusPink=material(new T.MeshPhysicalMaterial({color:"#ed9cba",roughness:.42,sheen:1,sheenColor:new T.Color("#fff0df"),side:T.DoubleSide}));
   const lotusPale=material(new T.MeshPhysicalMaterial({color:"#f7c9d1",roughness:.4,sheen:1,sheenColor:new T.Color("#fff5dd"),side:T.DoubleSide}));
-  for(let k=0;k<18;k++){const inner=k>=10,o=mesh(lotus,petal,k%3?lotusPink:lotusPale,[0,.4,0],inner?[2.4,6.3,4.3]:[3.2,5.1,6.0]);o.rotation.y=k*Math.PI*2/(inner?8:10);o.userData.dynamic=true;lotusPetals.push(o);}
+  for(let k=0;k<18;k++){const inner=k>=10,o=mesh(lotus,lotusShape,k%3?lotusPink:lotusPale,[0,.4,0],inner?[2.4,6.3,4.3]:[3.2,5.1,6.0]);o.rotation.y=k*Math.PI*2/(inner?8:10);o.userData.dynamic=true;lotusPetals.push(o);}
   for(let k=0;k<3;k++){const p=mesh(portal,geometry(new T.TorusGeometry(7.4+k*.37,.07,10,120)),k===1?ivory:gold,[0,8.7,0]);p.rotation.set(.09,k*.25-.2,-.14+k*.13);}
   for(let ribbon=0;ribbon<3;ribbon++){
     const g=geometry(new T.PlaneGeometry(1,1,100,6)),veil=mesh(portal,g,silkMat);veil.userData.dynamic=true;

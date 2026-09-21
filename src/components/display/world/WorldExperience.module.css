@@ -44,6 +44,7 @@
   .studyControls > span { display: none; }
   .studyControls > div { justify-content: center; flex-wrap: wrap; }
   .studyControls button { min-height: 38px; padding: 9px 10px; font-size: 10px; }
+  .world[data-design-review] .worldArrivalCue { top: 193px; margin: 8px 0 0; }
 }
 .canvas {
   position: absolute;
