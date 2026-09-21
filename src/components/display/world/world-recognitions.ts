@@ -2,6 +2,8 @@ import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
 import type { ArrivalState } from "./arrival-director";
 import { messagePages, readingSeconds } from "./reading";
+import { isWorldDesignStudy } from "./prototype/design-mode";
+import { StudyPearlAssets, StudyPearlSkin, paintStudyPearl } from "./prototype/pearl-skin";
 import {
   RECOGNITION_ZONES,
   WORLD_EXPRESSIONS,
@@ -65,6 +67,7 @@ type Slot = {
   texture?: T.CanvasTexture;
   born: number;
   radius: number;
+  study?: StudyPearlSkin;
 };
 
 /** All recognition pixels belong to depth-tested scene objects, never the camera. */
@@ -92,8 +95,11 @@ export class WorldRecognitionBubbles {
   private focused?: Slot;
   private projection = new T.Vector3();
   private arrivalInWorld = false;
+  private readonly designStudy = isWorldDesignStudy();
+  private readonly studyAssets?: StudyPearlAssets;
 
   constructor(scene: T.Scene) {
+    if (this.designStudy) this.studyAssets = new StudyPearlAssets(() => scene.userData.invalidate?.());
     this.root.name = "Recognition bubbles in the world";
     scene.add(this.root);
     for (const zone of RECOGNITION_ZONES)
@@ -116,6 +122,7 @@ export class WorldRecognitionBubbles {
     const lights = new T.InstancedMesh(this.dot, this.lightMaterial, 10);
     lights.frustumCulled = false;
     root.add(face, ring, lights);
+    const study = this.studyAssets ? new StudyPearlSkin(root, this.studyAssets) : undefined;
     root.visible = face.visible = false;
     this.root.add(root);
     this.slots.push({
@@ -129,11 +136,13 @@ export class WorldRecognitionBubbles {
       pageKey: "",
       born: 0,
       radius: 0,
+      study,
     });
     this.hitTargets.push(face);
   }
   private clear(slot: Slot) {
     slot.root.visible = slot.face.visible = false;
+    slot.study?.clear();
     slot.face.userData = {};
     slot.record = undefined;
     slot.fingerprint = slot.pageKey = "";
@@ -199,6 +208,11 @@ export class WorldRecognitionBubbles {
     const key = `${page}:${minimum}`;
     if (slot.pageKey === key) return false;
     slot.pageKey = key;
+    if (this.designStudy) {
+      paintStudyPearl(slot.canvas, record, pages[page], page, pages.length, wrapBubbleText);
+      slot.texture.needsUpdate = true;
+      return true;
+    }
     const c = slot.canvas.getContext("2d")!;
     const color =
       WORLD_EXPRESSIONS.find(
@@ -378,6 +392,7 @@ export class WorldRecognitionBubbles {
           );
         slot.radius =
           [4.4, 3, 2.8][slot.index] * (mobile && slot.index === 0 ? 1.06 : 1);
+        if (this.designStudy && slot.index > 0) slot.radius *= .72;
         const grow =
           still || slot.index === 0
             ? 1
@@ -400,6 +415,7 @@ export class WorldRecognitionBubbles {
             minimum,
           ) || changed;
         this.effects(slot, time, input.sparkles, input.trails);
+        slot.study?.update(time, slot.record.expressionIds, place === zone && slot.index === 0);
         if (place === zone && slot.index === 0) this.focused = slot;
       }
     }
@@ -435,6 +451,7 @@ export class WorldRecognitionBubbles {
             : 0;
       changed = this.paint(arrivalSlot, age, minimum) || changed;
       this.effects(arrivalSlot, time, input.sparkles, input.trails);
+      arrivalSlot.study?.update(time, arrivalSlot.record.expressionIds, true);
       this.focused = arrivalSlot;
       this.arrivalInWorld = true;
     }
@@ -449,7 +466,8 @@ export class WorldRecognitionBubbles {
     trails: boolean,
   ) {
     slot.lights.visible = sparkles || trails;
-    slot.ring.visible = true;
+    slot.ring.visible = !this.designStudy;
+    if (this.designStudy) slot.lights.visible = false;
     for (let i = 0; i < 10; i++) {
       const angle = time * 0.17 + (i * Math.PI * 2) / 10;
       this.dummy.position.set(
@@ -485,8 +503,10 @@ export class WorldRecognitionBubbles {
       this.clear(slot);
       slot.face.material.dispose();
       slot.lights.dispose();
+      slot.study?.dispose();
     });
     this.records.clear();
+    this.studyAssets?.dispose();
     this.focused = undefined;
     this.hitTargets.length = 0;
     this.disc.dispose();

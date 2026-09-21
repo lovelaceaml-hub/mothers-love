@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   RECOGNITION_ZONES,
   ZONES,
@@ -13,6 +13,7 @@ import { readingSeconds, type WorldSource } from "./world-feed";
 import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
 import type { WorldEngine, WorldStatus } from "./world-engine";
 import styles from "./WorldExperience.module.css";
+import { studyArrival, type StudyArrival } from "./prototype/design-mode";
 
 const INITIAL: WorldStatus = {
   zone: "garden",
@@ -37,9 +38,15 @@ const INITIAL: WorldStatus = {
 };
 export function WorldExperience({
   initialSource = "live",
+  designReview = false,
+  initialStudyArrival,
 }: {
   initialSource?: WorldSource;
+  designReview?: boolean;
+  initialStudyArrival?: string;
 }) {
+  const [arrivalStudy, setArrivalStudy] = useState<StudyArrival>(studyArrival(initialStudyArrival));
+  const launchedStudy = useRef(false);
   const neighborDescriptionId = useId();
   const recognitionDescriptionId = useId();
   const canvas = useRef<HTMLCanvasElement>(null),
@@ -64,8 +71,17 @@ export function WorldExperience({
     [held, setHeld] = useState(false),
     [filter, setFilter] = useState(0),
     [selectedFallback, setSelectedFallback] = useState<string | null>(null);
-  const feed = useWorldFeed(source),
-    feedRef = useRef(feed);
+  const rawFeed = useWorldFeed(source);
+  const feed = useMemo(() => designReview && rawFeed.phase === "sample"
+    ? { ...rawFeed, records: rawFeed.records.map((record, index) => index === 0 ? { ...record, expressionIds: [2, 7, 8] } : record) }
+    : rawFeed, [designReview, rawFeed]);
+  const feedRef = useRef(feed);
+  useEffect(() => {
+    if (designReview && initialStudyArrival && ready && feed.phase === "sample" && !launchedStudy.current) {
+      launchedStudy.current = true;
+      engine.current?.previewStudyArrival(studyArrival(initialStudyArrival));
+    }
+  }, [designReview, initialStudyArrival, ready, feed.phase]);
   const settings = useRef({
     paused,
     reduced: reduced || still,
@@ -255,6 +271,8 @@ export function WorldExperience({
       ref={root}
       className={`${styles.world} ${arriving ? styles.arriving : ""}`}
       data-testid="world-preview"
+      data-design-review={designReview || undefined}
+      data-prototype-heart-ready={status.prototypeHeartReady}
       data-zone={status.zone}
       data-traveling={status.traveling}
       data-ready={ready}
@@ -323,9 +341,29 @@ export function WorldExperience({
         <div className={styles.preview}>
           <span className={styles.statusDot} />
           {sourceLabel}
-          <span>A heavenly journey · Preview</span>
+          <span>{designReview ? "Visual study 01 · For your review" : "A heavenly journey · Preview"}</span>
         </div>
       </header>
+      {designReview && !immersive && (
+        <aside className={styles.studyControls} aria-label="Arrival design studies">
+          <span>ARRIVAL STUDIES</span>
+          <div>
+            {([
+              ["constellation", "Pearl formation"],
+              ["ribbon", "Silk unveiling"],
+              ["bloom", "Petal bloom"],
+            ] as const).map(([value, label]) => (
+              <button key={value} aria-pressed={arrivalStudy === value} disabled={!ready || arriving}
+                onClick={() => {
+                  setArrivalStudy(value); setHeld(false); setPaused(false);
+                  engine.current?.setPaused(false); engine.current?.holdReading(false);
+                  engine.current?.previewStudyArrival(value);
+                }}>{label}</button>
+            ))}
+            {arriving && <button onClick={() => engine.current?.finishStudyArrival()}>Back to world</button>}
+          </div>
+        </aside>
+      )}
       {!ready && !fallback && (
         <p className={styles.notice} role="status">
           Opening your world...
@@ -550,6 +588,7 @@ export function WorldExperience({
               Content
               <select
                 value={source}
+                disabled={designReview}
                 onChange={(event) => {
                   setSource(event.target.value as WorldSource);
                   setHeld(false);

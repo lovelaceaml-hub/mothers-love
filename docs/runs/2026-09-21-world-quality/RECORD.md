@@ -8,7 +8,7 @@ Goal: Upgrade all 13 connected locations and their travel corridors toward the s
 - Working directory: `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`.
 - Run ledger: [TASK_LEDGER.json](TASK_LEDGER.json).
 - P0 assignment: [P0-KICKOFF.md](P0-KICKOFF.md).
-- Runtime authority: Claude Opus owns P0 after the handoff; Codex/Astra performs preparation and independent read-only checks only. No concurrent source writers.
+- Current runtime authority: Astra owns the explicit sample-only design study. Claude P0 and all Fable/Opus implementation are held for Anthony visual approval. No concurrent source writers.
 - Production and all real personal data are outside this task's write/evidence scope.
 
 ## Verified before launch
@@ -25,16 +25,11 @@ Preparation is committed as `9a6bbf8bf34f04b5885b6ede39732f026baab488`. All 29 s
 
 Native Claude session `c2da192f-e083-47be-9d94-47402e9aa117` displayed Opus 5 at high effort. It stopped before its first source read with an expired login. A separate elevated `claude auth status` confirmed `loggedIn: false`; this is not a sandbox-only authentication result. No successful model response or exact response model ID exists. The unrelated Supabase connector was not enabled.
 
-The idle background session was stopped with its conversation retained. The existing-account Claude sign-in flow is open and requires Anthony. No credentials or login codes belong in this record. P0 remains blocked by authentication, with the original readiness failure unresolved. Parent source ownership is limited to checkpoint documentation and dependency setup until the same Claude lane resumes.
+The idle background session was stopped with its conversation retained. Anthony subsequently directed Astra to show designs and prototypes before Fable/Opus implementation. That instruction supersedes the previous authentication-resume checkpoint. No Claude sign-in or session resume is needed for this stage. The earlier failed launch is historical evidence only.
 
-Resume after sign-in with the existing session and original approved capsule. Read `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/runs/2026-09-21-world-quality/P0-KICKOFF.md` and `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/PLAN-24-world-visual-quality.md`; then run from `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`:
+## Active design checkpoint
 
-```sh
-cd /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation
-claude --bg --resume c2da192f-e083-47be-9d94-47402e9aa117 --model opus --effort high --permission-mode auto 'Resume the approved P0 assignment in /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/runs/2026-09-21-world-quality/P0-KICKOFF.md. Verify authentication and the exact model, then continue within the original scope.'
-```
-
-The parent will perform that routine resume after authentication is restored; Anthony only needs to finish the sign-in flow.
+Astra is building the opt-in sample study described in [DESIGN-STUDY.md](DESIGN-STUDY.md). The prototype is integrated into the existing Three.js renderer, camera, recognition slots, and arrival director. It does not close P0 or authorize production. All Claude implementation remains held for visual approval.
 
 ## Parent baseline validation while authentication is pending
 

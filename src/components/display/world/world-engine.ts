@@ -5,6 +5,7 @@ import { createWorldScene } from "./world-scene";
 import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
+import { isWorldDesignStudy, type StudyArrival } from "./prototype/design-mode";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import {
   RECOGNITION_ZONES,
@@ -29,6 +30,7 @@ export type WorldStatus = {
   readingRemaining: number;
   cameraPosition?: number[];
   worldBubbles?: ReturnType<WorldRecognitionBubbles["inspect"]>;
+  prototypeHeartReady?: boolean;
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -85,11 +87,18 @@ export class WorldEngine {
       });
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       this.renderer.toneMappingExposure = 0.82;
+      if (isWorldDesignStudy()) {
+        this.renderer.toneMappingExposure = .92;
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.world.scene.userData.invalidate = () => { this.dirty = true; };
+      }
       const pmrem = new THREE.PMREMGenerator(this.renderer);
       const room = new RoomEnvironment();
       this.environment = pmrem.fromScene(room, 0.04);
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
+      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = .42;
       room.dispose();
       pmrem.dispose();
     } catch (error) {
@@ -315,6 +324,7 @@ export class WorldEngine {
     this.options.onStatus({
       zone: this.director.zone,
       cameraPosition: this.director.position.toArray(),
+      prototypeHeartReady: this.world.scene.userData.prototypeHeartReady,
       worldBubbles: this.bubbles.inspect(),
       destination: this.director.destination,
       traveling: this.director.traveling,
@@ -448,6 +458,16 @@ export class WorldEngine {
         this.feed.records.slice(0, size).map((record) => record.id),
       );
     }
+  }
+  previewStudyArrival(style: StudyArrival) {
+    if (!isWorldDesignStudy() || this.feed.phase !== "sample" || this.arrivalState.phase !== "idle") return;
+    this.world.scene.userData.studyArrival = style;
+    this.demonstrateArrival(1);
+  }
+  finishStudyArrival() {
+    if (!isWorldDesignStudy() || this.feed.phase !== "sample") return;
+    this.arrivals.cancel(); this.arrivalState = this.arrivals.state();
+    this.director.endArrival(true); this.dirty = true; this.report();
   }
   selectRecognition(id: string) {
     const enabled = new Set(

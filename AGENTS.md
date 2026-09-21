@@ -1,3 +1,7 @@
+## Active correction: designs and prototypes before implementation
+
+Anthony's latest instruction is: "i want to see the designs and protos before implementing with fable & opus". Astra now owns a sample-only integrated design study using the existing world renderer and clock. Claude implementation and its P0 dispatch are held until Anthony approves the visual prototype. No Claude sign-in is needed for this design stage. Preserve the pending CI diagnosis and all existing app paths. The design study is a review artifact, not an accepted runtime upgrade or production release.
+
 ## September 21: Approved whole-world visual upgrade
 
 [Plan 24](docs/PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.

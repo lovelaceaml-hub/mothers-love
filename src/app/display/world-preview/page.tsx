@@ -11,12 +11,14 @@ export const metadata: Metadata = {
 export default async function WorldPreviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ source?: string }>;
+  searchParams: Promise<{ source?: string; art?: string; entrance?: string }>;
 }) {
   const query = await searchParams;
   return (
     <WorldExperience
       initialSource={query.source === "sample" ? "sample" : "live"}
+      designReview={query.art === "design" && query.source === "sample"}
+      initialStudyArrival={query.entrance}
     />
   );
 }

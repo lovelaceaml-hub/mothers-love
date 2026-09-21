@@ -3,18 +3,18 @@
   "baseline": "b324b81cabe947592f6723425c58f14307b58083",
   "branch": "feature/world-cinematic-art-pass",
   "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
-  "updatedUtc": "2026-09-21T21:50:20.739284+00:00",
+  "updatedUtc": "2026-09-21T23:12:14.925141+00:00",
   "phases": [
     {
       "id": "P0",
-      "status": "blocked_authentication",
+      "status": "held_for_visual_approval",
       "owner": "Claude Opus high",
       "evidence": [
         "docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md",
         "docs/runs/2026-09-21-world-quality/BASELINE-OPTIMIZED.json",
         "docs/runs/2026-09-21-world-quality/BASELINE-DEV-HARNESS.json"
       ],
-      "notes": "All six local macOS headless baseline cases rendered on unchanged application code; typecheck, optimized build, and 40 world unit tests passed. No historical CI reproduction, startup fix, or CI pass yet. Opus implementation remains blocked by authentication."
+      "notes": "Six unchanged baseline cases passed locally. Historical CI readiness cause remains unresolved. Claude implementation is held until Anthony reviews and approves Astra designs. Authentication alone must not resume it."
     },
     {
       "id": "P1",
@@ -112,6 +112,38 @@
         "view_image"
       ],
       "results": "40 unit tests, typecheck, build, and six local render cases passed. Historical CI configuration differs; P0 incomplete."
+    },
+    {
+      "phase": "D0",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "verification_in_progress",
+      "sourceChanges": true,
+      "independentReview": false,
+      "tools": [
+        "shell",
+        "apply_patch",
+        "Three.js procedural meshes",
+        "original supplied GLB",
+        "CUA browser",
+        "TypeScript",
+        "Vitest",
+        "Next build"
+      ],
+      "notes": "One Astra writer. No Claude implementation, subagent, Blender asset authoring, or image generation ran."
     }
-  ]
+  ],
+  "designCheckpoint": {
+    "id": "D0",
+    "status": "verification_in_progress",
+    "owner": "Astra",
+    "purpose": "Show designs and prototypes before Fable/Opus implementation, per Anthony latest correction.",
+    "route": "/display/world-preview?source=sample&art=design",
+    "approval": "pending_visual_review",
+    "sourceBoundary": "Explicit sample-only study. Classic/cinematic and production paths retained.",
+    "evidence": [
+      "docs/runs/2026-09-21-world-quality/DESIGN-STUDY.md"
+    ]
+  }
 }

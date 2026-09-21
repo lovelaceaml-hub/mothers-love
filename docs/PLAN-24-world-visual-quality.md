@@ -2,6 +2,10 @@
 
 Approved by Anthony on September 21, 2026: "I approve plan. Continue".
 
+Latest correction, September 21: "i want to see the designs and protos before implementing with fable & opus". Astra will first produce a reviewable integrated visual prototype. Fable and Opus implementation is held until Anthony approves that prototype. This design checkpoint precedes the remaining P0 implementation gate; the six baseline comparisons already provide a working local surface. P0's unresolved CI diagnosis remains open for the later implementation handoff. Do not resume the stopped Claude session on authentication alone.
+
+Design checkpoint setup: Astra, high; one writer; no subagents; prototype and appearance validation only. Use the existing renderer, camera, directors, sample records, and world-space reading system. Gate the study behind an explicit sample-only preview selection, preserve classic/cinematic behavior, and show Garden, Sanctuary, Expressions, the pearl, and the three arrival treatments before requesting visual approval. All 13 destinations remain accessible. No production release or Claude implementation is authorized before that approval.
+
 ## Goal and authority
 
 Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
@@ -35,7 +39,7 @@ This approved plan retains P0 through P7 from the supplied `02_EXECUTION_PLAN.md
 
 Execution default: one Opus-controlled full-project task with sequential ownership handoffs. Agents: no automatic fan-out. Record exact model identifiers and actual tools. No silent model substitution. A different implementation role must be resolved at a phase boundary.
 
-The Codex/Astra session may prepare the approved plan, reference package, worktree, and handoff, and perform read-only validation. It does not silently take Opus/Fable's implementation ownership. Every receiving runtime first checks its work against the Goal line above.
+The Codex/Astra session may prepare the approved plan, reference package, worktree, and handoff, perform validation, and author the explicitly requested sample-only design study before Claude implementation. It does not silently take Opus/Fable's implementation ownership. Every receiving runtime first checks its work against the Goal line above.
 
 One writer owns each worktree at a time. If later explicitly authorized parallel work is used, only disjoint asset files or isolated visual modules may overlap, in separate worktrees. Shared engine contracts, integration, Git state, and release stay with the controller. Preserve unrelated work; never reset a dirty checkout, force-push, or copy an old snapshot over the app.
 
@@ -138,3 +142,5 @@ Visual acceptance requires the recognizable original heart, detailed planting/ar
 - 2026-09-21: The plan, reference copies, ledger, and fresh-session P0 handoff are being prepared. No P0 fix or CI pass is claimed. Exact model IDs must be recorded when each runtime starts.
 - 2026-09-21: Preparation committed as 9a6bbf8. Native Opus 5 high session launched but could not infer because its login expired. Elevated authentication check also returned loggedIn false. Sign-in is awaiting Anthony; P0 is blocked before application edits, and the preserved session can resume after authentication.
 - 2026-09-21: With Claude authentication pending, Codex/Astra completed baseline-only validation: locked dependencies, typecheck, optimized build, 40 world unit tests, and six local headless macOS render cases passed. Actual source remains unchanged from b324b81. Reports and inspected captures are recorded in docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md. Historical Linux CI failure remains unexplained; P0 is not complete.
+
+- September 21 design checkpoint: Anthony requested designs and prototypes before Fable/Opus implementation. Astra authored an opt-in sample study on the existing world engine. The original heart loads, canonical symbols orbit world-space pearls, and the three arrival appearances use the existing director. Typecheck, optimized build and 40 world tests pass. Visual approval and final evidence are pending; P0 remains open. See [the design record](runs/2026-09-21-world-quality/DESIGN-STUDY.md).
