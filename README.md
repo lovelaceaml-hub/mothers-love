@@ -7,7 +7,7 @@ The missing interview sequences, whole-card selection, true screen previews, and
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).
-- **Status:** Live Garden-led TV playlist, animated ribbons and expression scenes, flexible Display Studio controls, and nine matching submission expression cards.
+- **Status:** Sculpted 3D heart with sheer ribbons live on the Peace in Practice TV screen (September 20, commit `4c4b340`). Live Garden-led TV playlist, animated ribbons and expression scenes, flexible Display Studio controls, and nine matching submission expression cards.
 - **TV display:** [Live TV](https://mothers-love.vercel.app/display), eleven screens since September 19, including [Live Recognitions](https://mothers-love.vercel.app/display?scene=live-feed); bubbles come in one at a time after each screen change; release notes in [docs/HANDOFF.md](docs/HANDOFF.md).
 - **Expression guide:** [Nine expressions and everyday examples](https://mothers-love.vercel.app/expressions), live.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login), Sign in with the existing password; no authenticator required.

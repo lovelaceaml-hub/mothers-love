@@ -1,6 +1,8 @@
-## September 20: sculpted 3D heart with sheer ribbons, on a branch, not released
+## September 20: sculpted 3D heart with sheer ribbons, live
 
-Anthony asked to replace the rose heart and its thick gold hoops on the Peace in Practice TV screen with the approved three dimensional study from his handoff folder (`Mothers_Love_Heavenly_Ribbons_3D.html`): a sculpted rose heart, sheer pearl and champagne ribbons passing behind it and in front of it, fine gold hems, sparks in the space around it, and a wave that unfolds through the silk. Status: built and checked on branch `change/heart-ribbons-3d`, cut from production commit `5d113e8` (`codex/mothers-love`). Production is unchanged; merging and releasing wait for Anthony's word.
+Released September 20 at Anthony's word, after he reviewed the preview and asked for the ribbons' full sweep: pull request 6 merged `change/heart-ribbons-3d` into `codex/mothers-love` as commit `4c4b340`, Vercel production deployment `dpl_6wmAeMRmLigLcAYuFJkq1S1qQhGD`, READY. Live checks: https://mothers-love.vercel.app/display answers 200, the renderer page loads both new scripts, the live heart script carries the full sweep settings, and the browser console is clean. The TV keeps its old page until its browser is refreshed once. Rollback: `npx vercel rollback dpl_7wKs8wqW6wh3Qf8HcvxqdRTj1jni` (commit `5d113e8`); no database change.
+
+Anthony asked to replace the rose heart and its thick gold hoops on the Peace in Practice TV screen with the approved three dimensional study from his handoff folder (`Mothers_Love_Heavenly_Ribbons_3D.html`): a sculpted rose heart, sheer pearl and champagne ribbons passing behind it and in front of it, fine gold hems, sparks in the space around it, and a wave that unfolds through the silk. Built and checked on branch `change/heart-ribbons-3d`, cut from production commit `5d113e8` (`codex/mothers-love`).
 
 Verified render path: `/display` renders `ColorPolishHost`, which frames `/color-polish/renderer.html`; the heart belongs to scene 9, `public/color-polish/scenes/peace-in-practice.js`, inside `#heart-host`.
 
