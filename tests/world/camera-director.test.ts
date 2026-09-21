@@ -7,6 +7,22 @@ import {
 } from "@/components/display/world/world-data";
 
 describe("persistent world camera", () => {
+  it("glides while reading and automatically changes still views without input", () => {
+    const camera = new CameraDirector();
+    const initial = camera.position.clone();
+    camera.update(5, true, false, false);
+    expect(camera.zone).toBe("garden");
+    expect(camera.position.distanceTo(initial)).toBeGreaterThan(0.1);
+    const held = camera.position.clone();
+    camera.update(5, true, true, false);
+    expect(camera.position.equals(held)).toBe(true);
+    camera.update(60, true, false, true, true);
+    expect(camera.zone).toBe("featured");
+    expect(camera.traveling).toBe(false);
+    expect(camera.position.toArray()).toEqual([
+      ...ZONES.find((zone) => zone.id === "featured")!.eye,
+    ]);
+  });
   it("tours every zone and returns to the garden with no jumps", () => {
     const camera = new CameraDirector();
     const visited = new Set([camera.zone]);

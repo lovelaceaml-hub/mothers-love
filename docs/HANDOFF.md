@@ -1,3 +1,9 @@
+## September 21: Circular recognitions and hands-free TV touring
+
+[Corrected heavenly world](https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview) now presents recognition and arrival messages inside circular pearl bubbles. The camera glides during reading and automatically travels between locations without clicks. Reduced motion and Still view automatically change viewpoints; explicit reading holds and owner pauses remain available. The world uses a 20-second minimum stop extended for full message reading, replacing the inherited three-minute Garden wait.
+
+[Plan 22](PLAN-22-tv-bubbles-and-autoplay.md) is current authority for this correction. Deployment `dpl_2d4mnuhiNsSw8GuBngUjEEXXypo7` is a preview only. The original production display, API and database are unchanged. The [run record](runs/2026-09-21-tv-bubbles/RECORD.md) records the focused checks, one review round and source checkpoint process.
+
 ## September 21: Live heavenly journey continuation
 
 [Plan 21](PLAN-21-living-heaven.md) is current authority: Anthony requested live data by default, fully animated scenery, interacting people and autonomous completion with minimal tests and at most one review round. The world now opens with live approved recognitions; explicit `?source=sample` selects fictional demonstrations. New fictional neighbors illustrate canonical expressions with gestures, smiles and heart exchanges. Animated sky veils complement the existing water, silk, flowers, clouds and grand entrances.

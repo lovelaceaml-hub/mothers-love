@@ -26,6 +26,7 @@ export type WorldStatus = {
   arrival: ArrivalState;
   recognitionId: string | null;
   readingRemaining: number;
+  cameraPosition?: number[];
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -216,22 +217,26 @@ export class WorldEngine {
         this.feed.records,
       );
     const canDepart = this.isReadingComplete(delta, minimum);
-    if (moving) {
-      this.elapsed += delta;
+    const departingZone = this.director.zone;
+    if (!this.paused) {
+      if (moving) this.elapsed += delta;
+      const previousZone = this.director.zone;
       this.director.update(
         arriving ? delta : delta * this.speed * this.ownerTempo,
         !this.rotationPaused && !arriving,
         !arriving && (this.readingHeld || this.rotationPaused),
         canDepart,
+        !moving,
       );
-      this.world.update(this.elapsed, this.director.zone, this.arrivalState);
-    } else if (arriving || before !== "idle") {
+      if (previousZone !== this.director.zone) this.dirty = true;
+    }
+    if (moving || arriving || before !== "idle") {
       this.world.update(this.elapsed, this.director.zone, this.arrivalState);
       this.dirty = true;
     }
     if (
       readingBeforeCamera &&
-      this.director.traveling &&
+      (this.director.traveling || this.director.zone !== departingZone) &&
       !arriving &&
       canDepart
     )
@@ -285,6 +290,7 @@ export class WorldEngine {
   private report() {
     this.options.onStatus({
       zone: this.director.zone,
+      cameraPosition: this.director.position.toArray(),
       destination: this.director.destination,
       traveling: this.director.traveling,
       elapsed: this.elapsed,
@@ -344,17 +350,9 @@ export class WorldEngine {
         !feed.snapshot ||
         enabled.has(ZONES.find((zone) => zone.id === id)!.scene),
     );
-    const dwells = new Map<ZoneId, number>(
-      ids.map((id) => [
-        id,
-        Math.max(
-          40,
-          feed.snapshot?.presentation.playlist.find(
-            (item) => item.id === ZONES.find((zone) => zone.id === id)!.scene,
-          )?.durationSeconds ?? 40,
-        ),
-      ]),
-    );
+    // Flat-screen playlist durations can park Garden for several minutes.
+    // This world has its own TV touring pace and still waits for complete reading.
+    const dwells = new Map<ZoneId, number>(ids.map((id) => [id, 20]));
     this.director.setPlaylist(ids, dwells);
     if (!safe || settings?.pauseArrivals) {
       this.arrivals.cancel();

@@ -117,6 +117,7 @@
 }
 .reading {
   position: absolute;
+  transition: opacity 0.8s;
   right: 4vw;
   bottom: 17vh;
   width: clamp(290px, 27vw, 550px);
@@ -1196,4 +1197,240 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Recognition bubbles leave the landscape visible around their circular silhouette. */
+.reading.recognitionBubble,
+.arrivalCard {
+  --bubble-size: min(34vw, 55vh, 580px);
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  max-height: none;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid #fffaf4e8;
+  background:
+    radial-gradient(
+      ellipse at 29% 16%,
+      #ffffffef 0%,
+      #fff9f078 20%,
+      transparent 40%
+    ),
+    radial-gradient(ellipse at 72% 84%, #c4e8efd9, transparent 52%),
+    radial-gradient(
+      circle at 50% 48%,
+      #fff8eddc 0%,
+      #ffe6e6cb 64%,
+      #e5cff0d6 82%,
+      #fff1cbdc 100%
+    );
+  box-shadow:
+    inset 9px 12px 30px #fffdfbe8,
+    inset -9px -10px 22px #ccabd573,
+    0 8px 35px #67507b20,
+    0 0 0 5px #ffe6b52b;
+  backdrop-filter: blur(3px);
+  transition: opacity 0.8s;
+}
+.reading.recognitionBubble {
+  right: 5vw;
+  bottom: 21vh;
+}
+.recognitionBubble::before,
+.arrivalCard::before {
+  content: "";
+  position: absolute;
+  top: 7%;
+  left: 19%;
+  width: 40%;
+  height: 12%;
+  border-radius: 50%;
+  background: linear-gradient(#ffffffbf, transparent);
+  transform: rotate(-24deg);
+  pointer-events: none;
+}
+.recognitionBubble .cardLabel {
+  display: none;
+}
+.recognitionBubble .bubbleCopy,
+.arrivalCard .bubbleCopy {
+  width: 72%;
+  max-height: 68%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  position: relative;
+}
+.bubbleCopy h2 {
+  font-size: clamp(24px, 2.2vw, 42px);
+  line-height: 1.08;
+  margin: 0 0 10px;
+  flex-shrink: 0;
+  width: 100%;
+}
+.bubbleCopy[data-long-name="true"] h2 {
+  font-size: clamp(14px, 1.15vw, 26px);
+}
+.bubbleMessage {
+  min-height: 0;
+  max-height: calc(var(--bubble-size) * 0.33);
+  overflow: hidden;
+  scrollbar-width: none;
+}
+.bubbleCopy .message {
+  font-size: clamp(16px, 1.25vw, 28px);
+  line-height: 1.4;
+  margin: 0;
+  color: #45394c;
+}
+.bubbleCopy .expressionTags {
+  flex-shrink: 0;
+  justify-content: center;
+  gap: 5px;
+  margin: 9px 0 0;
+}
+.bubbleCopy .expressionTags span {
+  border: 1px solid #a9799566;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 11px;
+  color: #69435e;
+}
+.bubbleCopy .pageNumber {
+  margin: 7px 0 0;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.recognitionBubble .readingControls {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 6%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.recognitionBubble .readingControls button {
+  font-size: 10px;
+  min-height: 32px;
+  min-width: 26px;
+  padding: 3px;
+}
+.recognitionBubble .sampleNote {
+  position: absolute;
+  bottom: 2%;
+  font-size: 8px;
+  margin: 0;
+}
+.reading.inTransit {
+  opacity: 0;
+  pointer-events: none;
+}
+.arrivalOverlay {
+  inset: 11vh 4vw 12vh;
+}
+.arrivalCard {
+  --bubble-size: min(67vh, 65vw, 820px);
+  flex-shrink: 0;
+}
+.arrivalCard .bubbleCopy {
+  max-height: 65%;
+}
+.arrivalCard .largeRecognition h2 {
+  font-size: clamp(30px, 3.4vw, 66px);
+}
+.arrivalCard .bubbleCopy[data-long-name="true"] h2 {
+  font-size: clamp(18px, 1.6vw, 34px);
+}
+.arrivalCard .message {
+  font-size: clamp(18px, 1.65vw, 36px);
+}
+.arrivalProgress {
+  position: absolute;
+  bottom: 9%;
+  margin: 0;
+}
+.arrivalCard > .cardFoot {
+  position: absolute;
+  bottom: 4%;
+  max-width: 60%;
+  font-size: 10px;
+}
+@media (max-width: 800px) {
+  .presentation .reading.recognitionBubble {
+    --bubble-size: min(87vw, 48vh);
+    width: var(--bubble-size);
+    height: var(--bubble-size);
+    min-height: var(--bubble-size);
+    max-height: var(--bubble-size);
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+  }
+  .bubbleCopy h2 {
+    font-size: 24px;
+    margin-bottom: 7px;
+  }
+  .bubbleCopy[data-long-name="true"] h2 {
+    font-size: 14px;
+  }
+  .bubbleCopy .message {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .bubbleCopy .expressionTags {
+    gap: 3px;
+    margin-top: 6px;
+  }
+  .bubbleCopy .expressionTags span {
+    width: 17px;
+    height: 17px;
+    font-size: 9px;
+  }
+  .bubbleCopy .pageNumber {
+    font-size: 9px;
+    margin-top: 5px;
+  }
+  .recognitionBubble .readingControls {
+    bottom: 5%;
+    left: 21%;
+    right: 21%;
+  }
+  .recognitionBubble .readingControls button {
+    font-size: 9px;
+    min-height: 28px;
+  }
+  .arrivalCard {
+    --bubble-size: min(91vw, 60vh);
+  }
+  .arrivalCard .message {
+    font-size: 16px;
+  }
+  .arrivalCard .largeRecognition h2 {
+    font-size: 28px;
+  }
+  .arrivalCard .bubbleCopy[data-long-name="true"] h2 {
+    font-size: 14px;
+  }
+  .arrivalCard > .cardFoot {
+    font-size: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reading,
+  .reading.recognitionBubble {
+    transition: none;
+  }
 }

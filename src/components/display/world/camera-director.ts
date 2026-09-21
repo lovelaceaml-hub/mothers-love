@@ -156,7 +156,13 @@ export class CameraDirector {
     this.returning = false;
     this.saved = undefined;
   }
-  update(delta: number, automatic = true, hold = false, canDepart = true) {
+  update(
+    delta: number,
+    automatic = true,
+    hold = false,
+    canDepart = true,
+    instant = false,
+  ) {
     if (hold && !this.special) return;
     this.age += Math.max(0, delta);
     if (this.traveling && this.path && this.lookPath) {
@@ -182,8 +188,20 @@ export class CameraDirector {
         this.playlist[
           (this.playlist.indexOf(this.zone) + 1) % this.playlist.length
         ];
-      if (next !== this.zone) this.visit(next);
+      if (next !== this.zone) this.visit(next, instant);
       else this.age = 0;
+    }
+    // Keep the world gently moving while a stationary HTML bubble stays readable.
+    if (!instant && !this.special && !this.traveling) {
+      const zone = ZONES[zoneIndex(this.zone)];
+      const angle = Math.sin(this.age * 0.065) * 0.12;
+      const dx = zone.eye[0] - zone.target[0],
+        dz = zone.eye[2] - zone.target[2];
+      this.position.set(
+        zone.target[0] + dx * Math.cos(angle) - dz * Math.sin(angle),
+        zone.eye[1] + Math.sin(this.age * 0.08) * 0.35,
+        zone.target[2] + dx * Math.sin(angle) + dz * Math.cos(angle),
+      );
     }
   }
 }

@@ -106,12 +106,15 @@ export function RecognitionText({
   large = false,
   elapsed,
   minimum = 24,
+  bubble = false,
 }: {
   record: Recognition;
   large?: boolean;
   elapsed?: number;
   minimum?: number;
+  bubble?: boolean;
 }) {
+  const viewport = useRef<HTMLDivElement>(null);
   const pages = messagePages(record.message);
   const page =
     elapsed === undefined
@@ -123,22 +126,71 @@ export function RecognitionText({
               (readingSeconds(record.message, minimum) / pages.length),
           ),
         );
+  const pageDuration = readingSeconds(record.message, minimum) / pages.length;
+  useEffect(() => {
+    const box = viewport.current;
+    if (!bubble || !box || elapsed === undefined) return;
+    const update = () => {
+      const withinPage = Math.max(0, elapsed) % pageDuration;
+      const fraction = Math.min(
+        1,
+        Math.max(0, (withinPage - 2) / Math.max(1, pageDuration - 4)),
+      );
+      box.scrollTo({
+        top: Math.max(0, box.scrollHeight - box.clientHeight) * fraction,
+        behavior: "auto",
+      });
+    };
+    update();
+    const resize = new ResizeObserver(update);
+    resize.observe(box);
+    return () => resize.disconnect();
+  }, [bubble, elapsed, page, pageDuration, record.id, record.message]);
+  const message = (
+    <p className={styles.message}>{page < 0 ? record.message : pages[page]}</p>
+  );
   return (
-    <div className={large ? styles.largeRecognition : styles.recognitionText}>
+    <div
+      className={`${large ? styles.largeRecognition : styles.recognitionText} ${bubble ? styles.bubbleCopy : ""}`}
+      data-long-name={
+        [
+          ...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
+            record.recipient,
+          ),
+        ].length > 36
+      }
+    >
       <h2>{record.recipient}</h2>
-      <p className={styles.message}>
-        {page < 0 ? record.message : pages[page]}
-      </p>
+      {bubble ? (
+        <div ref={viewport} className={styles.bubbleMessage}>
+          {message}
+        </div>
+      ) : (
+        message
+      )}
       {pages.length > 1 && page >= 0 && (
         <span className={styles.pageNumber}>
-          Message {page + 1} of {pages.length} · Full message in Read
-          recognitions
+          {bubble
+            ? `${page + 1} of ${pages.length}`
+            : `Message ${page + 1} of ${pages.length} · Full message in Read recognitions`}
         </span>
       )}
       <div className={styles.expressionTags}>
         {record.expressionIds.map((id) => (
-          <span key={id}>
-            {EXPRESSIONS.find((expression) => expression.id === id)?.phrase}
+          <span
+            key={id}
+            aria-label={
+              bubble
+                ? EXPRESSIONS.find((expression) => expression.id === id)?.phrase
+                : undefined
+            }
+            title={
+              EXPRESSIONS.find((expression) => expression.id === id)?.phrase
+            }
+          >
+            {bubble
+              ? id
+              : EXPRESSIONS.find((expression) => expression.id === id)?.phrase}
           </span>
         ))}
       </div>
@@ -374,6 +426,7 @@ export function WorldContent({
       {record ? (
         <RecognitionText
           record={record}
+          bubble
           elapsed={elapsed}
           minimum={feed.snapshot?.settings.readingSeconds ?? 24}
         />

@@ -1,0 +1,12 @@
+{
+  "deployment": "dpl_2d4mnuhiNsSw8GuBngUjEEXXypo7",
+  "preview": "https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview",
+  "files": {
+    "src/components/display/world/WorldContent.tsx": "e6fd4a4749ba61aaca5b83ddfaddcd8e6b7053af2f410d9f0883303cd1c767e2",
+    "src/components/display/world/WorldExperience.module.css": "f4f2e484924a76dd975227b3e324f031ca4e8bf65f70d63591790c974a3c2336",
+    "src/components/display/world/WorldExperience.tsx": "b31a668dfb6bc4ffabaa0fe6a1d338d99c27f9c0529f0a9e4106f23ebfa5f95f",
+    "src/components/display/world/camera-director.ts": "a2e9986e9df7fb4da56b19c2302dfa3d9f25af46aa43c6a8e2715c29be1e180d",
+    "src/components/display/world/reading.ts": "88444767607bce007d0a5b1ef4e1edfedbf5a75e66e0282096aa42e194c17084",
+    "src/components/display/world/world-engine.ts": "5368f8d43c120172570bc02b2cd22a4bf25618882cc492007f0b0eac21369526"
+  }
+}

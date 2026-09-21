@@ -260,6 +260,9 @@ export function WorldExperience({
       data-frames={status.frames}
       data-elapsed={status.elapsed.toFixed(2)}
       data-reading-remaining={status.readingRemaining.toFixed(2)}
+      data-camera-position={status.cameraPosition
+        ?.map((value) => value.toFixed(3))
+        .join(",")}
       data-motion={paused || reduced || still || ownerStill ? "still" : "tour"}
       data-source={source}
       data-feed-phase={feed.phase}
@@ -363,7 +366,7 @@ export function WorldExperience({
             <p className={styles.caption}>{zone.caption}</p>
           </section>
           <aside
-            className={`${styles.reading} ${record && record.message.length > 260 ? styles.longReading : ""}`}
+            className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}`}
             aria-label="World content"
           >
             <WorldContent
@@ -449,6 +452,7 @@ export function WorldExperience({
               <RecognitionText
                 record={arrivalRecord}
                 large
+                bubble
                 elapsed={
                   arrival.phase === "reading"
                     ? arrival.age
