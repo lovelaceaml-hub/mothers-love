@@ -122,11 +122,23 @@ export function createHeavenlyDistricts(scene: T.Scene) {
   const sky = new T.ShaderMaterial({
     side: T.BackSide,
     depthWrite: false,
-    uniforms: {},
+    uniforms: { time: { value: 0 } },
     vertexShader:
       "varying vec3 v; void main(){v=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
-    fragmentShader:
-      "varying vec3 v; void main(){vec3 d=normalize(v); float h=smoothstep(-.1,.8,d.y); vec3 c=mix(vec3(1.,.87,.78),vec3(.32,.65,.89),h); float sun=pow(max(dot(d,normalize(vec3(-.5,.4,-.6))),0.),14.); c+=vec3(.2,.12,.05)*sun; gl_FragColor=vec4(c,1.);}",
+    fragmentShader: `varying vec3 v; uniform float time;
+      void main(){
+        vec3 d=normalize(v);
+        float h=smoothstep(-.08,.85,d.y);
+        vec3 c=mix(vec3(1.,.88,.80),vec3(.43,.70,.96),h);
+        float sun=pow(max(dot(d,normalize(vec3(-.5,.4,-.6))),0.),18.);
+        c+=vec3(.25,.16,.07)*sun;
+        float wave=sin(d.x*5.+d.z*3.+sin(d.z*7.+time*.022)*.5+time*.018);
+        float veil=pow(max(0.,1.-abs(d.y-.37-wave*.085)*9.),3.);
+        float ribbons=smoothstep(.08,.38,d.y)*veil*.21;
+        c=mix(c,vec3(.90,.65,.91),ribbons*(.65+.35*sin(d.z*5.+time*.025)));
+        c+=vec3(.12,.15,.12)*ribbons;
+        gl_FragColor=vec4(c,1.);
+      }`,
   });
   mesh(new T.SphereGeometry(400, 32, 20), sky, root);
   scene.background = null;
@@ -559,6 +571,7 @@ export function createHeavenlyDistricts(scene: T.Scene) {
   animated.forEach((fn) => fn(0, "garden"));
   return {
     update(time: number, zone: ZoneId, arrival?: ArrivalState) {
+      sky.uniforms.time.value = time;
       animated.forEach((fn) => fn(time, zone));
       portal.visible =
         !!arrival && arrival.phase !== "idle" && arrival.phase !== "return";

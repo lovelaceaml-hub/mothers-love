@@ -257,6 +257,8 @@ export class WorldEngine {
       this.feed.records,
     );
     if (moving || this.dirty) {
+      if (!moving)
+        this.world.update(this.elapsed, this.director.zone, this.arrivalState);
       this.camera.position.copy(this.director.position);
       this.camera.lookAt(this.director.target);
       this.renderer.render(this.world.scene, this.camera);

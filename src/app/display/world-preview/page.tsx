@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function WorldPreviewPage() {
-  return <WorldExperience />;
+export default async function WorldPreviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ source?: string }>;
+}) {
+  const query = await searchParams;
+  return (
+    <WorldExperience
+      initialSource={query.source === "sample" ? "sample" : "live"}
+    />
+  );
 }

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { batchScenery } from "./static-batch";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { createWorldNeighbors } from "./world-neighbors";
 import { createHeavenlyDistricts } from "./world-districts";
 import type { ArrivalState } from "./arrival-director";
 import type { Recognition } from "@/lib/contracts";
@@ -175,7 +176,8 @@ export function createWorldScene(): WorldScene {
     const angle = random() * Math.PI * 2,
       radius = 4 + Math.sqrt(random()) * 9;
     const x = Math.cos(angle) * radius,
-      z = Math.sin(angle) * radius,
+      rawZ = Math.sin(angle) * radius,
+      z = x > -8 && x < 2 && rawZ > 4 && rawZ < 9 ? rawZ - 5.5 : rawZ,
       h = 0.8 + random() * 2.4;
     dummy.position.set(x, 0.65 + h / 2, z);
     dummy.scale.set(1, h, 1);
@@ -472,6 +474,7 @@ export function createWorldScene(): WorldScene {
   updateSilk(0);
   const releaseBatch = batchScenery(scene);
   const districts = createHeavenlyDistricts(scene);
+  const neighbors = createWorldNeighbors(scene);
   return {
     scene,
     anchors,
@@ -489,11 +492,13 @@ export function createWorldScene(): WorldScene {
     },
     setEffects(sparkles, trails) {
       particles.visible = sparkles;
+      neighbors.setEffects(sparkles);
       ribbonMaterial.visible = trails;
     },
     update(time, zone, arrival) {
       water.uniforms.time.value = time;
       districts.update(time, zone, arrival);
+      neighbors.update(time, zone, !!arrival && arrival.phase !== "idle");
       pearls.forEach((p, i) => {
         p.position.y = initialPearlY[i] + Math.sin(time * 0.4 + i) * 0.24;
       });
@@ -504,6 +509,7 @@ export function createWorldScene(): WorldScene {
     dispose() {
       releaseBatch();
       districts.dispose();
+      neighbors.dispose();
       new Set(geometries).forEach((g) => g.dispose());
       new Set(materials).forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());

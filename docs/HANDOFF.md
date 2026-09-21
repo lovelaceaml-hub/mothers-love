@@ -1,3 +1,9 @@
+## September 21: Live heavenly journey continuation
+
+[Plan 21](PLAN-21-living-heaven.md) is current authority: Anthony requested live data by default, fully animated scenery, interacting people and autonomous completion with minimal tests and at most one review round. The world now opens with live approved recognitions; explicit `?source=sample` selects fictional demonstrations. New fictional neighbors illustrate canonical expressions with gestures, smiles and heart exchanges. Animated sky veils complement the existing water, silk, flowers, clouds and grand entrances.
+
+Delivery: [live heavenly world](https://mothers-love-60sz9lgsq-lvzion.vercel.app/display/world-preview), deployment `dpl_2i8BhTKT2mosL4ryhFYK8Cd7idrc`. Existing production and database resources are unchanged. The new instruction supersedes the previous additional Claude review gate; one native read-only completion review covers this continuation. The [run record](runs/2026-09-21-living-heaven/RECORD.md) records verification and the source checkpoint. One native review round is complete; its three findings were corrected without another review.
+
 ## September 21: Heavenly World preview
 
 The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.

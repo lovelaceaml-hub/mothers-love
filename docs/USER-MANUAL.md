@@ -52,13 +52,15 @@ The latest owner choice keeps all selected effects active. The app does not auto
 
 ## Heavenly World preview
 
-The separate [world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) opens in **Sample world**, with fictional names and messages. **World map** opens all thirteen locations. Garden, Sanctuary, and Expressions also have quick buttons. The camera travels gently and rests while a recognition is read.
+The separate [world preview](https://mothers-love-60sz9lgsq-lvzion.vercel.app/display/world-preview) opens with **Live recognitions** from the campaign. For fictional demonstrations, choose Sample world in Settings or add `?source=sample` to the preview address. **World map** opens all thirteen locations. Garden, Sanctuary, and Expressions also have quick buttons. The camera travels gently and rests while a recognition is read.
 
 **Read recognitions** opens complete messages and an expression filter. **Linger with this recognition** returns to its reading view and holds it. **Continue reading tour** resumes. Long messages turn through numbered pages; the full unbroken message is always available in Read recognitions. Previous and next arrows select another story. In Garden of Days, choose a date to see its counts and currently available stories.
 
-**Settings** controls speed, picture quality, and still view. **Preview grand entrance** demonstrates one fictional arrival; **Preview five arrivals** demonstrates a wave with separate reading time for every person. Resume the tour and release a held recognition before starting a demonstration. Reduced motion gives a stable reading celebration. The owner's arrival-pause setting suppresses live entrances.
+Animated fictional neighbors greet, gesture, smile and exchange hearts throughout the world. Their speech illustrates the campaign's words of kindness; the recognition panels show actual approved campaign messages in Live recognitions and fictional examples in Sample world. Soft sky ribbons, water, silk and light animate around the reading stops.
 
-To show current campaign content, choose **Settings > Content > Live recognitions**. This uses the existing public TV feed and the owner's mode, motion, reading time, arrival pause, rotation pause, and scene selections. A new verified publication enters after the current reading interval. Existing records are not replayed as new arrivals when opening or reconnecting. Quiet and unavailable states clear messages. The world does not submit recognitions or change settings.
+**Settings** controls speed, picture quality, and still view. In Sample world, **Preview grand entrance** demonstrates one fictional arrival; **Preview five arrivals** demonstrates a wave with separate reading time for every person. Resume the tour and release a held recognition before starting a demonstration. Reduced motion gives a stable reading celebration. The owner's arrival-pause setting suppresses live entrances.
+
+Live recognitions is the default and uses the existing public TV feed and the owner's mode, motion, reading time, arrival pause, rotation pause, and scene selections. A new verified publication enters after the current reading interval. Existing records are not replayed as new arrivals when opening or reconnecting. Quiet and unavailable states clear messages. The world does not submit recognitions or change settings.
 
 **Hide details** clears the usual story panels; Show details or Escape brings them back. **Fullscreen** uses the browser's fullscreen support. If 3D cannot run, a still view retains the reading browser and all locations; Try 3D again recreates the renderer. The original [TV display](https://mothers-love.vercel.app/display) continues separately.
 

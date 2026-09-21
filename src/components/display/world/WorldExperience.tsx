@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   RECOGNITION_ZONES,
   ZONES,
@@ -7,6 +7,7 @@ import {
   type Quality,
   type ZoneId,
 } from "./world-data";
+import { neighborDialogue } from "./neighbor-dialogue";
 import { useWorldFeed } from "./use-world-feed";
 import { readingSeconds, type WorldSource } from "./world-feed";
 import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
@@ -34,7 +35,12 @@ const INITIAL: WorldStatus = {
   recognitionId: null,
   readingRemaining: 0,
 };
-export function WorldExperience() {
+export function WorldExperience({
+  initialSource = "live",
+}: {
+  initialSource?: WorldSource;
+}) {
+  const neighborDescriptionId = useId();
   const canvas = useRef<HTMLCanvasElement>(null),
     root = useRef<HTMLElement>(null),
     engine = useRef<WorldEngine | null>(null);
@@ -47,7 +53,7 @@ export function WorldExperience() {
     [still, setStill] = useState(false),
     [speed, setSpeed] = useState(1),
     [quality, setQuality] = useState<Quality>("auto");
-  const [source, setSource] = useState<WorldSource>("sample"),
+  const [source, setSource] = useState<WorldSource>(initialSource),
     [panel, setPanel] = useState<"settings" | "map" | "recognitions" | null>(
       null,
     ),
@@ -72,12 +78,6 @@ export function WorldExperience() {
     feedRef.current = feed;
     engine.current?.setFeed(feed);
   }, [feed]);
-  useEffect(() => {
-    queueMicrotask(() => {
-      if (new URLSearchParams(location.search).get("source") === "live")
-        setSource("live");
-    });
-  }, []);
   useEffect(() => {
     let cancelled = false;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)"),
@@ -265,12 +265,18 @@ export function WorldExperience() {
       data-feed-phase={feed.phase}
       data-arrival={arrival.phase}
     >
+      <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
+        Fictional neighbors illustrate words of kindness.{" "}
+        {neighborDialogue(status.elapsed, status.zone, arriving) ??
+          "They greet and walk together."}
+      </p>
       <canvas
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label="A continuous three-dimensional heavenly world celebrating Mother's Love"
+        aria-label="A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"
         role="img"
+        aria-describedby={neighborDescriptionId}
         hidden={fallback}
       />
       {fallback && (

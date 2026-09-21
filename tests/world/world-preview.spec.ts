@@ -12,7 +12,7 @@ const path = "/display/world-preview";
 const canvas = (page: Page) =>
   page.locator('canvas[aria-label^="A continuous"]');
 async function open(page: Page, live = false) {
-  await page.goto(path + (live ? "?source=live" : ""));
+  await page.goto(path + (live ? "?source=live" : "?source=sample"));
   await expect(page.getByTestId("world-preview")).toHaveAttribute(
     "data-ready",
     "true",
