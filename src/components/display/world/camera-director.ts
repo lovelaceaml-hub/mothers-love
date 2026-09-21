@@ -89,8 +89,11 @@ export class CameraDirector {
       lookPath: this.lookPath,
     };
     this.special = true;
-    if (reduced) this.traveling = false;
-    else
+    if (reduced) {
+      this.position.fromArray(ARRIVAL_VIEW.eye);
+      this.target.fromArray(ARRIVAL_VIEW.target);
+      this.traveling = false;
+    } else
       this.move(
         new Vector3(...ARRIVAL_VIEW.eye),
         new Vector3(...ARRIVAL_VIEW.target),
@@ -110,6 +113,8 @@ export class CameraDirector {
   }
   settleForStill() {
     if (this.special && !this.returning) {
+      this.position.fromArray(ARRIVAL_VIEW.eye);
+      this.target.fromArray(ARRIVAL_VIEW.target);
       this.traveling = false;
       return;
     }
@@ -191,16 +196,19 @@ export class CameraDirector {
       if (next !== this.zone) this.visit(next, instant);
       else this.age = 0;
     }
-    // Keep the world gently moving while a stationary HTML bubble stays readable.
+    // Fly a broad, slow arc among the world-space bubbles throughout reading.
     if (!instant && !this.special && !this.traveling) {
       const zone = ZONES[zoneIndex(this.zone)];
-      const angle = Math.sin(this.age * 0.065) * 0.12;
+      const angle = Math.sin(this.age * 0.035) * 0.48;
+      const approach = 1 - Math.sin(this.age * 0.03) * 0.1;
       const dx = zone.eye[0] - zone.target[0],
         dz = zone.eye[2] - zone.target[2];
       this.position.set(
-        zone.target[0] + dx * Math.cos(angle) - dz * Math.sin(angle),
-        zone.eye[1] + Math.sin(this.age * 0.08) * 0.35,
-        zone.target[2] + dx * Math.sin(angle) + dz * Math.cos(angle),
+        zone.target[0] +
+          (dx * Math.cos(angle) - dz * Math.sin(angle)) * approach,
+        zone.eye[1] + Math.sin(this.age * 0.045) * 1.6,
+        zone.target[2] +
+          (dx * Math.sin(angle) + dz * Math.cos(angle)) * approach,
       );
     }
   }

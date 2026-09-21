@@ -4,9 +4,24 @@ import {
   seededRandom,
   ZONES,
   TOUR_ORDER,
+  ARRIVAL_VIEW,
 } from "@/components/display/world/world-data";
 
 describe("persistent world camera", () => {
+  it("cuts to the physical arrival portal in reduced motion and restores the route", () => {
+    const camera = new CameraDirector();
+    camera.update(7);
+    const previous = camera.position.clone();
+    camera.beginArrival(true);
+    expect(camera.position.toArray()).toEqual([...ARRIVAL_VIEW.eye]);
+    expect(camera.target.toArray()).toEqual([...ARRIVAL_VIEW.target]);
+    camera.endArrival(true);
+    expect(camera.position.equals(previous)).toBe(true);
+    camera.beginArrival(false);
+    camera.update(1);
+    camera.settleForStill();
+    expect(camera.position.toArray()).toEqual([...ARRIVAL_VIEW.eye]);
+  });
   it("glides while reading and automatically changes still views without input", () => {
     const camera = new CameraDirector();
     const initial = camera.position.clone();

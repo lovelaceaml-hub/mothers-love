@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { CameraDirector } from "./camera-director";
 import { createWorldScene } from "./world-scene";
+import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
@@ -27,6 +28,7 @@ export type WorldStatus = {
   recognitionId: string | null;
   readingRemaining: number;
   cameraPosition?: number[];
+  worldBubbles?: ReturnType<WorldRecognitionBubbles["inspect"]>;
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -50,6 +52,7 @@ export class WorldEngine {
   private arrivalState: ArrivalState = this.arrivals.state();
   private readonly camera = new THREE.PerspectiveCamera(43, 1, 0.1, 450);
   private readonly world = createWorldScene();
+  private readonly bubbles = new WorldRecognitionBubbles(this.world.scene);
   private readonly observer: ResizeObserver;
   private readonly environment: THREE.WebGLRenderTarget;
   private elapsed = 0;
@@ -90,6 +93,7 @@ export class WorldEngine {
       room.dispose();
       pmrem.dispose();
     } catch (error) {
+      this.bubbles.dispose();
       this.world.dispose();
       throw error;
     }
@@ -114,7 +118,9 @@ export class WorldEngine {
       this.camera,
     );
     const hit = ray.intersectObjects(
-      this.world.recognitionPearls.filter((pearl) => pearl.visible),
+      [...this.bubbles.hitTargets, ...this.world.recognitionPearls].filter(
+        (pearl) => pearl.visible,
+      ),
       false,
     )[0];
     const id = hit?.object.userData.recognitionId;
@@ -261,11 +267,29 @@ export class WorldEngine {
       readingVisible,
       this.feed.records,
     );
+    this.camera.position.copy(this.director.position);
+    this.camera.lookAt(this.director.target);
+    this.camera.updateMatrixWorld();
+    this.dirty =
+      this.bubbles.update({
+        time: this.elapsed,
+        camera: this.camera,
+        zone: this.director.zone,
+        selectedId: this.recognitions.id,
+        readingAge: this.recognitions.age,
+        arrival: this.arrivalState,
+        minimum,
+        expressionId: this.expressionId,
+        still: !moving,
+        sparkles: this.feed.snapshot?.settings.effects?.sparkles !== false,
+        trails:
+          this.feed.snapshot?.settings.effects?.trails ??
+          this.feed.snapshot?.settings.showTrails ??
+          true,
+      }) || this.dirty;
     if (moving || this.dirty) {
       if (!moving)
         this.world.update(this.elapsed, this.director.zone, this.arrivalState);
-      this.camera.position.copy(this.director.position);
-      this.camera.lookAt(this.director.target);
       this.renderer.render(this.world.scene, this.camera);
       this.frameCount++;
       this.windowFrames++;
@@ -291,6 +315,7 @@ export class WorldEngine {
     this.options.onStatus({
       zone: this.director.zone,
       cameraPosition: this.director.position.toArray(),
+      worldBubbles: this.bubbles.inspect(),
       destination: this.director.destination,
       traveling: this.director.traveling,
       elapsed: this.elapsed,
@@ -331,7 +356,9 @@ export class WorldEngine {
             ["fast", "lively"].includes(settings?.tempo ?? "")
           ? 1.2
           : 1;
-    this.world.setRecognitions(safe ? feed.records : []);
+    // Readable world bubbles replace the old empty Garden markers.
+    this.world.setRecognitions([]);
+    this.bubbles.setRecords(safe ? feed.records : []);
     this.world.setEffects(
       settings?.effects?.sparkles !== false,
       settings?.effects?.trails ?? settings?.showTrails ?? true,
@@ -506,6 +533,7 @@ export class WorldEngine {
     this.canvas.removeEventListener("webglcontextlost", this.contextLost);
     this.canvas.removeEventListener("click", this.selectPearl);
     this.world.dispose();
+    this.bubbles.dispose();
     this.environment.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();

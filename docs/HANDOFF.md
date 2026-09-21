@@ -1,3 +1,9 @@
+## September 21: Recognition bubbles inside the world
+
+[Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
+
+[Plan 23](PLAN-23-recognitions-in-the-world.md) supersedes the screen-fixed presentation in Plan 22. Deployment `dpl_4fxa6cxBK7giTmqZsAg8aEQRrRUJ` is a preview only. Production, API and database are unchanged. One native Sol high review ran; both findings were corrected directly, with no further review round. The [run record](runs/2026-09-21-world-recognitions/RECORD.md) contains verification and release evidence. Physical TV performance and room-distance readability remain separate from browser verification.
+
 ## September 21: Circular recognitions and hands-free TV touring
 
 [Corrected heavenly world](https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview) now presents recognition and arrival messages inside circular pearl bubbles. The camera glides during reading and automatically travels between locations without clicks. Reduced motion and Still view automatically change viewpoints; explicit reading holds and owner pauses remain available. The world uses a 20-second minimum stop extended for full message reading, replacing the inherited three-minute Garden wait.

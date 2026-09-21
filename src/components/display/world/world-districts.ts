@@ -576,6 +576,8 @@ export function createHeavenlyDistricts(scene: T.Scene) {
       portal.visible =
         !!arrival && arrival.phase !== "idle" && arrival.phase !== "return";
       if (!portal.visible || !arrival) return;
+      // The readable world bubble takes over from the small incoming light.
+      arrivalPearl.visible = arrival.phase === "approach";
       const opening = arrival.phase === "approach" ? arrival.progress : 1;
       arches.forEach((a, i) =>
         a.scale.setScalar(
@@ -605,6 +607,8 @@ export function createHeavenlyDistricts(scene: T.Scene) {
       }
       shower.instanceMatrix.needsUpdate = true;
       beams.forEach((b, i) => {
+        (b.material as T.MeshBasicMaterial).opacity =
+          arrival.phase === "reading" ? 0.025 : 0.08;
         b.rotation.z = Math.sin(time * 0.2 + i) * 0.15;
       });
     },

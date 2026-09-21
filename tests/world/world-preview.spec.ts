@@ -1,7 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { ZONES } from "../../src/components/display/world/world-data";
-import { messagePages } from "../../src/components/display/world/reading";
 import { snapshot } from "./fixtures";
 
 test.use({
@@ -46,25 +45,34 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
     await open(page, true);
     await smallCanvas(page);
     const world = page.getByTestId("world-preview");
-    const bubble = page.getByRole("complementary", { name: "World content" });
-    const shape = await bubble.evaluate((node) => {
-      const rect = node.getBoundingClientRect();
-      return {
-        width: rect.width,
-        height: rect.height,
-        radius: getComputedStyle(node).borderRadius,
-      };
+    const bubble = page.getByRole("region", {
+      name: "Recognition in the world",
+      exact: true,
     });
-    expect(Math.abs(shape.width - shape.height)).toBeLessThan(1);
-    expect(shape.radius).toBe("50%");
+    await expect
+      .poll(async () => Number(await world.getAttribute("data-world-bubbles")))
+      .toBeGreaterThan(0);
+    await expect(
+      page.getByRole("complementary", { name: "World content" }),
+    ).toHaveCount(0);
+    await expect(world).toHaveAttribute("data-world-bubble-position", /-?\d/);
     const initialCamera = await world.getAttribute("data-camera-position");
+    const initialProjection = await world.getAttribute(
+      "data-world-bubble-screen",
+    );
     const firstName = await bubble.getByRole("heading").textContent();
-    if (reducedMotion === "no-preference")
+    if (reducedMotion === "no-preference") {
       await expect
         .poll(() => world.getAttribute("data-camera-position"), {
           timeout: 8000,
         })
         .not.toBe(initialCamera);
+      await expect
+        .poll(() => world.getAttribute("data-world-bubble-screen"), {
+          timeout: 8000,
+        })
+        .not.toBe(initialProjection);
+    }
     // No clicks, key presses or time overrides: the old 180-second Garden must advance on its own.
     await expect(world).toHaveAttribute("data-zone", "featured", {
       timeout: 55000,
@@ -172,12 +180,30 @@ for (const viewport of [
         "data-zone",
         id,
       );
-      const reading = await page
+      if (id === "expressions") {
+        const reading = await page
           .getByRole("complementary", { name: "World content" })
-          .boundingBox(),
-        footer = await page.locator("footer").boundingBox();
-      expect(reading!.y).toBeGreaterThan(0);
-      expect(reading!.y + reading!.height).toBeLessThan(footer!.y);
+          .boundingBox();
+        const footer = await page.locator("footer").boundingBox();
+        expect(reading!.y).toBeGreaterThan(0);
+        expect(reading!.y + reading!.height).toBeLessThan(footer!.y);
+      } else {
+        await expect(page.getByTestId("world-preview")).toHaveAttribute(
+          "data-world-bubble-position",
+          /-?\d/,
+        );
+        if (viewport.width === 390) {
+          const story = await page
+            .getByRole("region", { name: "Current world location" })
+            .boundingBox();
+          const controls = await page
+            .locator('[aria-label="Recognition controls"]')
+            .boundingBox();
+          const footer = await page.locator("footer").boundingBox();
+          expect(controls!.y).toBeGreaterThanOrEqual(story!.y + story!.height);
+          expect(controls!.y + controls!.height).toBeLessThan(footer!.y);
+        }
+      }
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -195,7 +221,7 @@ for (const viewport of [
     expect(results.violations).toEqual([]);
   });
 
-test("single entrance settles into a quiet readable card and pauses without advancing", async ({
+test("single entrance settles into a quiet readable bubble and pauses without advancing", async ({
   page,
 }) => {
   test.setTimeout(90000);
@@ -212,6 +238,10 @@ test("single entrance settles into a quiet readable card and pauses without adva
     "data-arrival",
     "reading",
     { timeout: 30000 },
+  );
+  await expect(page.getByTestId("world-preview")).toHaveAttribute(
+    "data-arrival-in-world",
+    "true",
   );
   await expect(
     page
@@ -245,7 +275,13 @@ test("live projection replaces samples, responds to privacy settings, and never 
     route.fulfill({ json: response }),
   );
   page.on("request", (r) => {
-    if (!["GET", "HEAD"].includes(r.method())) writes.push(r.method());
+    const url = new URL(r.url());
+    if (
+      url.origin === new URL(page.url()).origin &&
+      url.pathname.startsWith("/api/") &&
+      !["GET", "HEAD", "OPTIONS"].includes(r.method())
+    )
+      writes.push(r.method());
   });
   await open(page, true);
   await smallCanvas(page);
@@ -277,6 +313,14 @@ test("live projection replaces samples, responds to privacy settings, and never 
   await expect(
     page.getByRole("heading", { name: "A quiet moment." }),
   ).toBeVisible();
+  await expect(page.getByTestId("world-preview")).toHaveAttribute(
+    "data-world-bubbles",
+    "0",
+  );
+  await expect(page.getByTestId("world-preview")).toHaveAttribute(
+    "data-world-textures",
+    "0",
+  );
   expect(writes).toEqual([]);
 });
 
@@ -381,14 +425,15 @@ test("long Unicode recognition pages retain the full message in the reading brow
   await open(page, true);
   await page.getByRole("button", { name: "Hold this recognition" }).click();
   await expect(
-    page.getByText(`1 of ${messagePages(message).length}`, { exact: true }),
-  ).toBeVisible();
-  const card = page.getByRole("complementary", { name: "World content" });
-  expect(
-    await card.evaluate(
-      (element) => element.scrollHeight <= element.clientHeight,
-    ),
-  ).toBe(true);
+    page.getByRole("region", { name: "Recognition in the world", exact: true }),
+  ).toContainText(message);
+  await expect(page.getByTestId("world-preview")).toHaveAttribute(
+    "data-world-bubbles",
+    /[1-9]/,
+  );
+  await expect(
+    page.getByRole("complementary", { name: "World content" }),
+  ).toHaveCount(0);
   await page
     .getByRole("button", { name: "Read recognitions", exact: true })
     .click();
@@ -768,4 +813,30 @@ test("arrival return resumes fair selection after a completed reading", async ({
       exact: true,
     }),
   ).toBeVisible();
+});
+
+test("a recognition bubble can be selected inside the environment", async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page);
+  const world = page.getByTestId("world-preview");
+  await expect(world).toHaveAttribute("data-world-bubble-screen", /-?\d/);
+  const point = (await world.getAttribute("data-world-bubble-screen"))!
+    .split(",")
+    .map(Number);
+  const bounds = (await canvas(page).boundingBox())!;
+  expect(Math.abs(point[0])).toBeLessThan(1);
+  expect(Math.abs(point[1])).toBeLessThan(1);
+  await page.mouse.click(
+    bounds.x + ((point[0] + 1) * bounds.width) / 2,
+    bounds.y + ((1 - point[1]) * bounds.height) / 2,
+  );
+  await expect(
+    page.getByRole("button", { name: "Continue reading tour", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("complementary", { name: "World content" }),
+  ).toHaveCount(0);
 });

@@ -41,6 +41,7 @@ export function WorldExperience({
   initialSource?: WorldSource;
 }) {
   const neighborDescriptionId = useId();
+  const recognitionDescriptionId = useId();
   const canvas = useRef<HTMLCanvasElement>(null),
     root = useRef<HTMLElement>(null),
     engine = useRef<WorldEngine | null>(null);
@@ -263,6 +264,15 @@ export function WorldExperience({
       data-camera-position={status.cameraPosition
         ?.map((value) => value.toFixed(3))
         .join(",")}
+      data-world-bubbles={status.worldBubbles?.count ?? 0}
+      data-world-bubble-position={status.worldBubbles?.focused?.position
+        .map((value) => value.toFixed(3))
+        .join(",")}
+      data-world-bubble-screen={status.worldBubbles?.focused?.screen
+        .map((value) => value.toFixed(3))
+        .join(",")}
+      data-arrival-in-world={status.worldBubbles?.arrivalInWorld ?? false}
+      data-world-textures={status.worldBubbles?.textures ?? 0}
       data-motion={paused || reduced || still || ownerStill ? "still" : "tour"}
       data-source={source}
       data-feed-phase={feed.phase}
@@ -279,9 +289,18 @@ export function WorldExperience({
         className={styles.canvas}
         aria-label="A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"
         role="img"
-        aria-describedby={neighborDescriptionId}
+        aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
       />
+      <section
+        id={recognitionDescriptionId}
+        className={styles.screenReaderOnly}
+        aria-label="Recognition in the world"
+      >
+        {safe && !fallback && !arriving && selected && (
+          <RecognitionText record={selected} />
+        )}
+      </section>
       {fallback && (
         <div className={styles.fallbackArt} aria-hidden="true">
           <div className={styles.fallbackHeart}>♡</div>
@@ -365,120 +384,110 @@ export function WorldExperience({
             <h1>{zone.name}</h1>
             <p className={styles.caption}>{zone.caption}</p>
           </section>
-          <aside
-            className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}`}
-            aria-label="World content"
-          >
-            <WorldContent
-              elapsed={
-                record
-                  ? Math.max(
-                      0,
-                      readingSeconds(
-                        record.message,
-                        feed.snapshot?.settings.readingSeconds ?? 24,
-                      ) - status.readingRemaining,
-                    )
-                  : 0
-              }
-              zone={zone.id}
-              feed={feed}
-              record={record}
-              expressionId={expressionId}
-              onExpression={(id) => {
-                setExpressionId(id);
-                engine.current?.setExpression(id);
-              }}
-            />
-            {record &&
-              [
-                "garden",
-                "heart",
-                "featured",
-                "orbit",
-                "peacemakers",
-                "live-feed",
-              ].includes(zone.id) && (
-                <div className={styles.readingControls}>
-                  <button
-                    onClick={() => engine.current?.stepRecognition(-1)}
-                    disabled={fallback}
-                    aria-label="Previous recognition"
-                  >
-                    ←
-                  </button>
-                  <button onClick={() => setHeld(!held)} aria-pressed={held}>
-                    {held ? "Continue reading tour" : "Hold this recognition"}
-                  </button>
-                  <button
-                    onClick={() => engine.current?.stepRecognition(1)}
-                    disabled={fallback}
-                    aria-label="Next recognition"
-                  >
-                    →
-                  </button>
-                </div>
+          {(fallback || !RECOGNITION_ZONES.includes(status.zone)) && (
+            <aside
+              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}`}
+              aria-label="World content"
+            >
+              <WorldContent
+                elapsed={
+                  record
+                    ? Math.max(
+                        0,
+                        readingSeconds(
+                          record.message,
+                          feed.snapshot?.settings.readingSeconds ?? 24,
+                        ) - status.readingRemaining,
+                      )
+                    : 0
+                }
+                zone={zone.id}
+                feed={feed}
+                record={record}
+                expressionId={expressionId}
+                onExpression={(id) => {
+                  setExpressionId(id);
+                  engine.current?.setExpression(id);
+                }}
+              />
+              {record &&
+                [
+                  "garden",
+                  "heart",
+                  "featured",
+                  "orbit",
+                  "peacemakers",
+                  "live-feed",
+                ].includes(zone.id) && (
+                  <div className={styles.readingControls}>
+                    <button
+                      onClick={() => engine.current?.stepRecognition(-1)}
+                      disabled={fallback}
+                      aria-label="Previous recognition"
+                    >
+                      ←
+                    </button>
+                    <button onClick={() => setHeld(!held)} aria-pressed={held}>
+                      {held ? "Continue reading tour" : "Hold this recognition"}
+                    </button>
+                    <button
+                      onClick={() => engine.current?.stepRecognition(1)}
+                      disabled={fallback}
+                      aria-label="Next recognition"
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
+              {source === "sample" && (
+                <span className={styles.sampleNote}>
+                  Fictional sample content
+                </span>
               )}
-            {source === "sample" && (
-              <span className={styles.sampleNote}>
-                Fictional sample content
-              </span>
+            </aside>
+          )}
+          {!fallback &&
+            !immersive &&
+            !status.traveling &&
+            RECOGNITION_ZONES.includes(status.zone) && (
+              <div
+                className={styles.worldReadingControls}
+                aria-label="Recognition controls"
+              >
+                <button
+                  onClick={() => engine.current?.stepRecognition(-1)}
+                  aria-label="Previous recognition"
+                >
+                  ←
+                </button>
+                <button onClick={() => setHeld(!held)} aria-pressed={held}>
+                  {held ? "Continue reading tour" : "Hold this recognition"}
+                </button>
+                <button
+                  onClick={() => engine.current?.stepRecognition(1)}
+                  aria-label="Next recognition"
+                >
+                  →
+                </button>
+              </div>
             )}
-          </aside>
         </div>
       )}
       {safe && arriving && (
         <section
-          className={styles.arrivalOverlay}
+          className={styles.screenReaderOnly}
           aria-label="Recognition arrival"
         >
-          <div className={styles.arrivalLight} aria-hidden="true" />
-          <p className={styles.arrivalEyebrow}>
-            {source === "sample"
-              ? "SAMPLE ENTRANCE"
-              : "A NEW LIGHT IN OUR WORLD"}
-            {arrival.waveSize > 1
-              ? ` · ${arrival.waveIndex} of ${arrival.waveSize}`
-              : ""}
-          </p>
-          {arrival.phase === "approach" ? (
-            <h1>A kindness is arriving.</h1>
-          ) : arrival.phase === "return" ? (
-            <h1>Love becomes part of our world.</h1>
-          ) : arrivalRecord ? (
-            <div
-              className={`${styles.arrivalCard} ${arrival.phase === "reading" ? styles.arrivalRead : ""}`}
-            >
-              <RecognitionText
-                record={arrivalRecord}
-                large
-                bubble
-                elapsed={
-                  arrival.phase === "reading"
-                    ? arrival.age
-                    : arrival.phase === "settle"
-                      ? 90
-                      : 0
-                }
-                minimum={feed.snapshot?.settings.readingSeconds ?? 24}
-              />
-              <div className={styles.arrivalProgress}>
-                <span
-                  style={{
-                    width: `${arrival.phase === "reading" ? arrival.progress * 100 : 0}%`,
-                  }}
-                />
-              </div>
-              <span className={styles.cardFoot}>
-                {arrival.phase === "settle"
-                  ? "A new bloom in our garden."
-                  : "A moment to celebrate and read."}
-              </span>
-            </div>
-          ) : (
-            <h1>Love is all around us.</h1>
-          )}
+          {arrivalRecord && <RecognitionText record={arrivalRecord} />}
         </section>
+      )}
+      {safe && arriving && !immersive && (
+        <p className={styles.worldArrivalCue}>
+          {source === "sample" ? "SAMPLE ENTRANCE" : "A NEW LIGHT IN OUR WORLD"}
+          {arrival.waveSize > 1
+            ? ` · ${arrival.waveIndex} of ${arrival.waveSize}`
+            : ""}
+        </p>
       )}
       <footer className={styles.footer}>
         {!immersive && (
