@@ -1,13 +1,4 @@
-/* Core transition layer and decorative transition elements. */
-
-/* The WHOLE screen, not the stage. Anthony, 2026-09-12: "it needs to cover the
-   ENTIRE screen. even the title and the live feed." So the layer spans the full
-   1920 by 1080 TV rather than the 1812 by 636 stage box, and it sits above the
-   header (z 30), the footer and feed rail (z 32) and the countdown ring
-   (z 900). The countdown is already hidden for the whole duration of a
-   transition, because sceneCountdownHidden ends with a check on `transition`,
-   so nothing is being covered that should still be legible. #tv clips at
-   1920 by 1080, so nothing escapes the TV. */
+/* The transition spans the full 1920 by 1080 display. */
 #tv #transition-layer {
   position: absolute;
   top: 0;
@@ -19,51 +10,84 @@
   z-index: 950;
   visibility: hidden;
   opacity: 0;
+  perspective: none;
+  transform-style: flat;
+  isolation: isolate;
 }
 
-#tv #transition-layer.active {
-  visibility: visible;
-  opacity: 1;
-}
+#tv #transition-layer.active { visibility: visible; opacity: 1; }
 
-#tv #transition-layer:empty {
-  visibility: hidden;
+#tv #transition-layer:empty { visibility: hidden; opacity: 0; display: none; }
+
+#tv #transition-layer .transition-wash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  background-color: #f7e7c8;
+  background-image: linear-gradient(118deg, #fff6e4 0%, #f7e2bd 34%, #f3d6c4 64%, #efd0d6 100%);
   opacity: 0;
-  display: none;
+  z-index: 0;
+  will-change: opacity;
+  transform: translate3d(0, 0, 0);
+  pointer-events: none;
+  transition: none;
+  animation: none;
 }
 
-#tv #transition-layer .transition-bubble,
-#tv #transition-layer .transition-heart,
-#tv #transition-layer .transition-petal {
+#tv #transition-layer .transition-vault-far,
+#tv #transition-layer .transition-vault-near {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+#tv #transition-layer .transition-vault-far { z-index: 1; }
+#tv #transition-layer .transition-vault-near { z-index: 2000; }
+
+#tv #transition-layer .transition-bubble {
   position: absolute;
   left: 0;
   top: 0;
+  border-radius: 50%;
+  overflow: hidden;
   pointer-events: none;
-  will-change: transform, opacity;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#tv #transition-layer .transition-bubble {
-  border-radius: 50%;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  contain: layout paint;
   background: radial-gradient(circle at 30% 20%, #ffffff 0%, #fffcf5 35%, var(--tint, #ffd05f) 92%);
   border: 2px solid #ffffff;
-  box-shadow: inset 5px 6px 14px #ffffff, inset -8px -10px 18px rgba(180, 140, 70, 0.25), 0 10px 24px -6px rgba(120, 100, 70, 0.35);
+  box-shadow: inset 5px 6px 14px #ffffff,
+              inset -8px -10px 18px rgba(180, 140, 70, 0.25),
+              0 10px 24px -6px rgba(120, 100, 70, 0.35);
+  transition: none;
+  animation: none;
 }
 
-#tv #transition-layer .transition-bubble-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 54%;
-  height: 54%;
+#tv #transition-layer .transition-bubble .orb,
+#tv #transition-layer .transition-bubble .orb-breath {
+  width: 100%;
+  height: 100%;
 }
 
 #tv #transition-layer .transition-heart {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 140px;
   height: 130px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #tv #transition-layer .transition-heart svg {
@@ -74,12 +98,19 @@
 }
 
 #tv #transition-layer .transition-petal {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 130px;
   height: 170px;
   border-radius: 80% 30% 70% 35%;
   background: radial-gradient(ellipse at 30% 25%, #ffffff 0%, var(--tint, #f582af) 85%);
   border: 1.5px solid #ffffff;
   box-shadow: 0 8px 20px rgba(150, 100, 110, 0.25), inset 3px 4px 10px #ffffff;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #tv #transition-layer .transition-icon {
@@ -91,66 +122,12 @@
   pointer-events: none;
 }
 
-/* The full-bleed wash. One element per transition, swept across the stage so
-   that at the swap moment nothing of either scene is visible. Anthony rejected
-   the earlier version because 24 decorative bubbles left the background fully
-   visible; coverage is this element's job and the bubbles are texture on top
-   of it. Opaque by construction: the gradient has no alpha below 1, and only
-   transform and opacity are ever animated, so the compositor handles it. */
-#tv #transition-layer .transition-wash {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1920px;
-  height: 1080px;
-  background-color: #f7e7c8;
-  background-image: linear-gradient(118deg, #fff6e4 0%, #f7e2bd 34%, #f3d6c4 64%, #efd0d6 100%);
-  opacity: 1;
-  z-index: 0;
-  will-change: transform, opacity;
-  transform: translate3d(0, 0, 0);
-  pointer-events: none;
-}
-
-/* The decorative elements ride above the wash. */
-#tv #transition-layer .transition-bubble,
-#tv #transition-layer .transition-heart,
-#tv #transition-layer .transition-petal {
+#tv #transition-layer .transition-wash + .transition-vault-far {
   z-index: 1;
 }
 
-/* Stillness never populates the layer, but belt and braces: no motion here. */
-#tv.still #transition-layer .transition-wash {
-  transition: none;
-  animation: none;
-}
-
-
-/* Transition bubbles now carry a real recognition card (completeOrb), so they
-   must stay perfectly circular like every other bubble on this display, and
-   they must not be the thing that makes a transition expensive: only transform,
-   opacity and a blur that the vortex sets per frame. Anthony, 2026-09-12: the
-   transition vortexes with real recognition bubbles. */
-#tv #transition-layer .transition-bubble {
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  will-change: transform, opacity;
-  contain: layout paint;
-  z-index: 1;
-}
-
-#tv #transition-layer .transition-bubble .orb,
-#tv #transition-layer .transition-bubble .orb-breath {
-  width: 100%;
-  height: 100%;
-}
-
-/* The wash is a guarantee, not the visual: it holds the campaign's warm ground
-   under the crowd so nothing of either scene shows through in the frames
-   before the bubbles have closed up. */
-#tv #transition-layer .transition-wash {
-  transition: none;
+#tv.still #transition-layer,
+#tv.still #transition-layer * {
+  animation: none !important;
+  transition: none !important;
 }
