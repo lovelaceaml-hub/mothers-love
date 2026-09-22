@@ -4,8 +4,8 @@
    tall and its two children occupy 205, and the 9 px of reported overflow is a
    scroll-area artifact with no element actually outside the rail. This display
    is read from across a room, so 11 to 14 px type is the one thing it must not
-   have. The goal expression stays the largest text: its name at 44 px, its
-   phrase at 30 px, everything else below. */
+   have. The goal phrase is the largest text at 50 px, with its name at 34 px
+   as the supporting label. */
 /* Scene 11, Milestone and Weekly Goal. Every rule in this file is scoped to #tv .scene[data-scene="11"]. Colors stay as shipped in renderer.css. */
 
 #tv .scene[data-scene="11"] .progress-sculpture {
@@ -14,8 +14,8 @@
 
 #tv .scene[data-scene="11"] .progress-rail {
   left: 46px;
-  top: 18px;
-  bottom: 18px;
+  top: 0;
+  bottom: 0;
   width: 560px;
 }
 
@@ -53,7 +53,7 @@
 }
 
 #tv .scene[data-scene="11"] .progress-goal h3 {
-  font-size: 44px;
+  font-size: 34px;
   line-height: 1.06;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -65,8 +65,8 @@
 }
 
 #tv .scene[data-scene="11"] .progress-goal .goal-phrase {
-  font-size: 30px;
-  line-height: 1.15;
+  font-size: 50px;
+  line-height: 1.08;
   font-weight: 600;
   color: #4a3b2c;
   letter-spacing: -0.3px;
@@ -99,8 +99,8 @@
 /* Secondary section: Milestone Progress Rail */
 #tv .scene[data-scene="11"] .progress-milestone {
   border-top: 1px solid #d5c3a65e;
-  padding-top: 8px;
-  margin-top: 6px;
+  padding-top: 2px;
+  margin-top: 4px;
 }
 
 #tv .scene[data-scene="11"] .progress-milestone .eyebrow {
@@ -130,6 +130,10 @@
 
 #tv .scene[data-scene="11"] .progress-milestone .progress-track {
   height: 6px;
+}
+
+#tv .scene[data-scene="11"] .progress-milestone .progress-fill::after {
+  display: none;
 }
 
 /* Stream Nodes and Pearls */
