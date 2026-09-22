@@ -1,3 +1,13 @@
+## Active: Live TV pearl design study
+
+Anthony approved the proposed side-by-side live-TV-style Garden and reference-led Pearl Garden, followed by an animated arrival preview. Follow /Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design/docs/PLAN-25-live-tv-pearl-study.md and its Build log. This isolated worktree starts at production 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a on codex/tv-pearl-design-study. It is a sample-only design checkpoint, separate from the continuous-world Plan 24 and PR 8.
+
+Current Astra design stage remains solo. Fable/Opus implementation and production promotion wait for visual approval. No build-polished-apps or Stitch. Preserve Thank you above the name, canonical icons and complete messages. The live-source path never selects the study renderer. No personal-data reads, screenshots, fixtures, API/database/auth changes or production updates belong here.
+
+The scenery is actually authored and rendered in Blender 5.2.2, in an isolated background process. Keep its reproducible script, source scene and provenance. Blender render quality is distinct from runtime GLB readiness; this deliverable is layered TV scenery, not a whole-world asset kit.
+
+Focused checks: npm_config_cache=/tmp/npm-cache npm test -- tests/color-polish-data/tv-study-guard.test.tsx; npm_config_cache=/tmp/npm-cache npm run build; PLAYWRIGHT_BASE_URL=<optimized local URL> npm_config_cache=/tmp/npm-cache npx playwright test tests/tv-pearl-study.spec.ts --workers=1. Record actual browser captures, motion evidence and device limits in docs/runs/2026-09-21-tv-pearl-study/RECORD.md.
+
 ## Sculpted 3D heart on Peace in Practice (September 20, branch only)
 On branch change/heart-ribbons-3d, not released: scene 9 shows the approved WebGL 2 heart with sheer ribbons (public/color-polish/scenes/peace-in-practice-heart3d.js, mesh in peace-in-practice-heart-mesh.js). The Canvas 2D heart in peace-in-practice.js is the fallback only; never delete it and never edit only the fallback by mistake. The heart owns no loop (the core calls draw), gives its graphics context back on leaving the scene, and the renderer page's content policy must stay as it is. The default test browser has no WebGL 2, so the 3D journeys live in tests/color-polish-scenes/peace-in-practice-heart3d.spec.ts, which asks for software WebGL. See docs/HANDOFF.md.
 

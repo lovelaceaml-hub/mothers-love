@@ -33,3 +33,6 @@ The missing interview sequences, whole-card selection, true screen previews, and
 A live appreciation feed and submission form, secured administrative workspace and public TV Living Wall. Code and synthetic fixtures may be privately backed up; live personal recognitions never belong in this repository. Existing database resources outside the campaign namespace are protected.
 
 Color Polish usable release: [TV](https://mothers-love.vercel.app/display), [admin preview](https://mothers-love.vercel.app/admin/display). See [current release handoff](docs/HANDOFF.md) for verification and deferred refinements.
+# Live TV pearl design review
+
+The sample-only [TV comparison](http://127.0.0.1:5679/display/tv-design-preview) places the current TV style beside a Pearl Garden with native 4K Blender scenery. The existing TV renderer draws the fictional recognitions and handles an animated arrival. [Plan 25](docs/PLAN-25-live-tv-pearl-study.md), [run record](docs/runs/2026-09-21-tv-pearl-study/RECORD.md). This is a visual checkpoint; the [live TV](https://mothers-love.vercel.app/display) is unchanged.

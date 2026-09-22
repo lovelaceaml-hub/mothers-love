@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'none'; object-src 'none';">
+  <link rel="stylesheet" href="/color-polish/renderer.css">
+  <link rel="stylesheet" href="/color-polish/core/speech.css">
+  <link rel="stylesheet" href="/color-polish/core/transitions.css">
+  <link rel="stylesheet" href="/color-polish/scenes/welcome.css">
+  <link rel="stylesheet" href="/color-polish/scenes/garden.css">
+  <link rel="stylesheet" href="/color-polish/scenes/arrival.css">
+  <link rel="stylesheet" href="/color-polish/scenes/featured.css">
+  <link rel="stylesheet" href="/color-polish/scenes/calendar.css">
+  <link rel="stylesheet" href="/color-polish/scenes/peacemakers.css">
+  <link rel="stylesheet" href="/color-polish/scenes/status.css">
+  <link rel="stylesheet" href="/color-polish/scenes/expressions.css">
+  <link rel="stylesheet" href="/color-polish/scenes/peace-in-practice.css">
+  <link rel="stylesheet" href="/color-polish/scenes/orbit.css">
+  <link rel="stylesheet" href="/color-polish/scenes/milestone.css">
+  <link rel="stylesheet" href="/color-polish/scenes/live-feed.css">
+  <title>Mother's Love display renderer</title>
+  <link rel="stylesheet" href="/tv-pearl-study/study.css">
+</head>
+<body>
+  <div class="frame" id="frame">
+    <div class="tv" id="tv">
+      <div class="background"></div>
+      <div class="sunlight"></div>
+      <div class="arch" id="arch"></div>
+      <img id="flowers" class="botanical flowers" alt="">
+      <img id="foliage" class="botanical foliage" alt="">
+      <canvas id="atmosphere" width="1920" height="686" aria-hidden="true"></canvas>
+      <header class="tv-header">
+        <div>
+          <div class="brand">THE WORDS OF <span class="text-shimmer pearl">MOTHER’S LOVE</span></div>
+          <div class="tagline">Where a mother’s love resides, peace abides.</div>
+        </div>
+        <div class="header-right">
+          <div class="campaign-likes" id="campaign-likes"></div>
+          <div class="header-time" id="header-time"></div>
+        </div>
+      </header>
+      <div class="queue-dock" id="queue" hidden role="status"></div>
+      <section class="stage" id="stage" aria-label="Current TV scene"></section>
+      <section class="event-stage" id="event" aria-label="Recognition arrival"></section>
+      <div class="transition-layer" id="transition-layer" aria-hidden="true"></div>
+      <div class="scene-countdown" id="scene-countdown" hidden aria-hidden="true">
+        <svg class="scene-countdown-ring" viewBox="0 0 36 36" aria-hidden="true">
+          <circle class="scene-countdown-track" cx="18" cy="18" r="16"></circle>
+          <circle class="scene-countdown-fill" id="scene-countdown-fill" cx="18" cy="18" r="16"></circle>
+        </svg>
+        <span class="scene-countdown-number" id="scene-countdown-number"></span>
+      </div>
+      <footer class="footer">
+        <div class="qr-zone" id="qr-zone">
+          <div class="qr-halo"></div>
+          <img id="qr" alt="QR to the recognition form">
+          <div class="qr-label">Recognize<br>Someone<small>Who encouraged<br>you today?</small></div>
+          <div class="qr-url">mothers-love.vercel.app</div>
+        </div>
+        <div class="feed-region">
+          <div class="feed-title"><span><i class="live-dot"></i> LIVE RECOGNITIONS</span><small>LIVE CAMPAIGN</small></div>
+          <div class="feed-columns" id="feed-columns"></div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  <script src="/color-polish/core/state.js" defer></script>
+  <script src="/color-polish/core/orbs.js" defer></script>
+  <script src="/color-polish/core/motion.js" defer></script>
+  <script src="/color-polish/core/speech.js" defer></script>
+  <script src="/color-polish/core/chrome.js" defer></script>
+  <script src="/color-polish/core/arrivals.js" defer></script>
+  <script src="/color-polish/core/transitions.js" defer></script>
+  <script src="/color-polish/core/stage.js" defer></script>
+  <script src="/color-polish/core/host.js" defer></script>
+  <script src="/color-polish/scenes/welcome.js" defer></script>
+  <script src="/color-polish/scenes/garden.js" defer></script>
+  <script src="/color-polish/scenes/arrival.js" defer></script>
+  <script src="/color-polish/scenes/featured.js" defer></script>
+  <script src="/color-polish/scenes/calendar.js" defer></script>
+  <script src="/color-polish/scenes/peacemakers.js" defer></script>
+  <script src="/color-polish/scenes/status.js" defer></script>
+  <script src="/color-polish/scenes/expressions.js" defer></script>
+  <script src="/color-polish/scenes/peace-in-practice-heart-mesh.js" defer></script>
+  <script src="/color-polish/scenes/peace-in-practice-heart3d.js" defer></script>
+  <script src="/color-polish/scenes/peace-in-practice.js" defer></script>
+  <script src="/color-polish/scenes/orbit.js" defer></script>
+  <script src="/color-polish/scenes/milestone.js" defer></script>
+  <script src="/color-polish/scenes/live-feed.js" defer></script>
+  <script src="/tv-pearl-study/study.js" defer></script>
+  <script src="/color-polish/boot.js" defer></script>
+</body>
+</html>

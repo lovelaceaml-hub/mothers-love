@@ -1,0 +1,25 @@
+{
+  "version": "5.2.2 LTS",
+  "objects": 528,
+  "meshes": 257,
+  "samples": 32,
+  "resolution": [
+    3840,
+    2160
+  ],
+  "device": "GPU",
+  "authored": true,
+  "thirdPartyAssets": false,
+  "purpose": "Rendered TV scenery, not a runtime GLB asset kit",
+  "authoringScript": "scripts/tv-pearl-study/author-garden.py",
+  "renderWidth": 3840,
+  "renderHeight": 2160,
+  "sourceSceneBytes": 50988405,
+  "sourceSceneSha256": "cc1620380ccdfa11c19091913e08b311c2e73064768ba17a3bd7b03cc3ee53f1",
+  "webpSha256": "981f8dec762cd7e4c0d44d2e67650e3d3fb21a2ddbd242fb3284003c18a7da1c",
+  "usedInPrototype": true,
+  "geometryExportedForRuntime": false,
+  "reference": "User-supplied Approved_Direction_Overview.jpg",
+  "externalModels": [],
+  "imageGeneration": false
+}

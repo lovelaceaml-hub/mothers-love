@@ -259,7 +259,7 @@ function buildQrDataUrl(url: string): Promise<string | null> {
  * live inside the renderer document never fire and the held screen stays put.
  * It is ignored on production builds, where the gate below is false.
  */
-export type ColorPolishRendererHostProps = ColorPolishRendererProps & { holdInput?: boolean };
+export type ColorPolishRendererHostProps = ColorPolishRendererProps & { holdInput?: boolean; designStudy?: boolean };
 
 export function ColorPolishRenderer({
   snapshot,
@@ -274,6 +274,7 @@ export function ColorPolishRenderer({
   className,
   onReady,
   holdInput = false,
+  designStudy = false,
 }: ColorPolishRendererHostProps) {
   const inputHeld = PREVIEW_BUILD && holdInput === true;
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -286,7 +287,8 @@ export function ColorPolishRenderer({
   // carried to the child through the postMessage control below, never by
   // remounting the iframe. Remounting would drop the bootstrap handshake and
   // force a fresh blank state, which is exactly the flash this avoids.
-  const frameKey = source;
+  const studyEnabled = designStudy === true && source === 'sample';
+  const frameKey = `${source}:${studyEnabled}`;
   const bridgedSnapshot = useMemo(() => bridgeSnapshot(snapshot), [snapshot]);
 
   useEffect(() => {
@@ -416,7 +418,7 @@ export function ColorPolishRenderer({
       key={frameKey}
       ref={iframeRef}
       title="Mother's Love color polish display"
-      src={RENDERER_URL}
+      src={studyEnabled ? '/tv-pearl-study/renderer.html' : RENDERER_URL}
       referrerPolicy="no-referrer"
       loading="eager"
       aria-label="Mother's Love color polish display"
