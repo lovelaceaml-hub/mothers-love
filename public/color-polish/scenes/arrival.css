@@ -10,9 +10,14 @@
   position: absolute;
   inset: 0;
   background: rgba(14, 18, 17, 0.9);
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   animation: arrivalBackdropFade 0.6s ease-out forwards;
+}
+
+/* Let the visual-only exit flight travel from the arrival frame toward the rail. */
+#tv .event-stage.active {
+  overflow: visible;
 }
 
 @keyframes arrivalBackdropFade {
