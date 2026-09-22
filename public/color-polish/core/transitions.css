@@ -1,130 +1,15 @@
-/* The transition spans the full 1920 by 1080 display. */
+/* Plan12's live scene transition animates the two scene roots directly. */
 #tv #transition-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 1920px;
-  height: 1080px;
+  inset: 0;
   pointer-events: none;
-  overflow: hidden;
   z-index: 950;
   visibility: hidden;
   opacity: 0;
-  perspective: none;
-  transform-style: flat;
-  isolation: isolate;
 }
 
 #tv #transition-layer.active { visibility: visible; opacity: 1; }
-
 #tv #transition-layer:empty { visibility: hidden; opacity: 0; display: none; }
-
-#tv #transition-layer .transition-wash {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1920px;
-  height: 1080px;
-  background-color: #f7e7c8;
-  background-image: linear-gradient(118deg, #fff6e4 0%, #f7e2bd 34%, #f3d6c4 64%, #efd0d6 100%);
-  opacity: 0;
-  z-index: 0;
-  will-change: opacity;
-  transform: translate3d(0, 0, 0);
-  pointer-events: none;
-  transition: none;
-  animation: none;
-}
-
-#tv #transition-layer .transition-vault-far,
-#tv #transition-layer .transition-vault-near {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1920px;
-  height: 1080px;
-  pointer-events: none;
-  will-change: opacity;
-}
-
-#tv #transition-layer .transition-vault-far { z-index: 1; }
-#tv #transition-layer .transition-vault-near { z-index: 2000; }
-
-#tv #transition-layer .transition-bubble {
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-origin: 50% 50%;
-  will-change: transform, opacity;
-  contain: layout paint;
-  background: radial-gradient(circle at 30% 20%, #ffffff 0%, #fffcf5 35%, var(--tint, #ffd05f) 92%);
-  border: 2px solid #ffffff;
-  box-shadow: inset 5px 6px 14px #ffffff,
-              inset -8px -10px 18px rgba(180, 140, 70, 0.25),
-              0 10px 24px -6px rgba(120, 100, 70, 0.35);
-  transition: none;
-  animation: none;
-}
-
-#tv #transition-layer .transition-bubble .orb,
-#tv #transition-layer .transition-bubble .orb-breath {
-  width: 100%;
-  height: 100%;
-}
-
-#tv #transition-layer .transition-heart {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 140px;
-  height: 130px;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#tv #transition-layer .transition-heart svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-#tv #transition-layer .transition-petal {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 130px;
-  height: 170px;
-  border-radius: 80% 30% 70% 35%;
-  background: radial-gradient(ellipse at 30% 25%, #ffffff 0%, var(--tint, #f582af) 85%);
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 8px 20px rgba(150, 100, 110, 0.25), inset 3px 4px 10px #ffffff;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#tv #transition-layer .transition-icon {
-  position: relative;
-  z-index: 2;
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-#tv #transition-layer .transition-wash + .transition-vault-far {
-  z-index: 1;
-}
 
 #tv.still #transition-layer,
 #tv.still #transition-layer * {
