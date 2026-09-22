@@ -3,7 +3,7 @@
   "baseline": "b324b81cabe947592f6723425c58f14307b58083",
   "branch": "feature/world-cinematic-art-pass",
   "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
-  "updatedUtc": "2026-09-22T03:56:23.597297+00:00",
+  "updatedUtc": "2026-09-22T11:18:33.079848+00:00",
   "phases": [
     {
       "id": "P0",
@@ -14,7 +14,7 @@
         "docs/runs/2026-09-21-world-quality/BASELINE-OPTIMIZED.json",
         "docs/runs/2026-09-21-world-quality/BASELINE-DEV-HARNESS.json"
       ],
-      "notes": "Six unchanged baseline cases passed locally. Historical CI readiness cause remains unresolved. Claude implementation is held until Anthony reviews and approves Astra designs. Authentication alone must not resume it."
+      "notes": "Six unchanged baseline cases passed locally. Historical CI readiness cause remains unresolved. Claude implementation is held until Anthony reviews and approves Astra designs. Authentication alone must not resume it. 2026-09-22: still open; owned by Plan 25 G3 after pass D2 landed the visual work."
     },
     {
       "id": "P1",
@@ -171,5 +171,27 @@
     ],
     "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
     "previewUrl": "https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design"
-  }
+  },
+  "passes": [
+    {
+      "id": "D2",
+      "status": "landed",
+      "owner": "Fable coordinator, Opus 5 writers, Sonnet 5 landing reviews",
+      "head": "2ad95b07f1338c387fccc075fc30b38152bdcb9e",
+      "preview": "https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design",
+      "record": "docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md",
+      "design": "docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md",
+      "sections": [
+        "78eeb15 light and air",
+        "c6df983 the pearl",
+        "b6ef137 clouds and canopies",
+        "05ec18f three arrivals",
+        "23702fa islands water landmarks",
+        "582d563 radiance",
+        "35c58c1 finesse",
+        "2ad95b0 smoothness and tiers"
+      ],
+      "notes": "Sample-only art=design path. P0, P7 and production promotion move to Plan 25."
+    }
+  ]
 }
