@@ -65,7 +65,7 @@ function useStoryClock(elapsedMs?: number) {
     if (elapsedMs === undefined || !ref.current) return;
     for (const animation of ref.current.getAnimations({ subtree: true })) {
       // Synchronize narrative reveals without advancing the CSS clock twice.
-      if ('animationName' in animation && /impactTotalLight|impactFlowReveal|impactRibbonDraw|radialFlowerExit|petalColorWave|expressionCardUnfold|connectedRecognitionArrive|sharedHeartReveal|heartRibbonWeave|sharedCopyReveal/.test(String(animation.animationName))) {
+      if ('animationName' in animation && /impactTotalLight|impactFlowReveal|impactRibbonDraw|radialFlowerExit|petalColorWave|expressionCardUnfold|expressionCardBreath|expressionCardLightSweep|connectedRecognitionArrive|sharedHeartReveal|sharedCircleReveal|sharedCircleBreath|sharedCircleLightSweep|heartRibbonWeave|sharedCopyReveal/.test(String(animation.animationName))) {
         animation.currentTime = normalizeElapsedMs(elapsedMs);
       }
     }
@@ -207,10 +207,19 @@ export function NineExpressions({ className, elapsedMs, motion = 'standard' }: N
             <li key={item.id} style={styleVars({ '--wave-index': index })}>
               <article
                 className={styles.flowerCard}
-                style={styleVars({ '--flower-color': item.color, '--wave-index': index })}
+                style={styleVars({
+                  '--flower-color': item.color,
+                  '--wave-index': index,
+                  '--card-depth': `${Math.min(18, 6 + (index % 3) * 6)}px`,
+                  '--card-lift': `${[6, 0, 10][index % 3]}px`,
+                  '--card-tilt': `${[-0.8, 0.35, 0.8, 0, -0.65, 0.55][index % 6]}deg`,
+                })}
                 data-testid="flower-expression-card"
                 data-expression-id={item.id}
               >
+                <span className={styles.flowerCardAura} aria-hidden="true" />
+                <span className={styles.flowerCardSweep} aria-hidden="true" />
+                <span className={styles.flowerCardEdge} aria-hidden="true" />
                 <span className={styles.flowerNumber}>{String(item.id).padStart(2, '0')}</span>
                 <strong className={styles.flowerPhrase}>{item.phrase}</strong>
                 <p className={styles.flowerPrinciple}>{item.principle}</p>
@@ -264,12 +273,17 @@ export function SharedExpression({ recognitions, expressionId, className, elapse
                   style={styleVars({
                     '--connected-color': primaryRecognitionColor(recognition, shared.id),
                     '--wave-index': index,
+                    '--circle-depth': `${Math.min(16, 4 + (index % 3) * 6)}px`,
                   })}
                   data-testid="connected-recognition"
                   data-recognition-id={recognition.id}
                 >
-                  <h3 className={styles.connectedRecipient}>{recognition.recipient}</h3>
-                  <p className={styles.connectedMessage}>{recognition.message}</p>
+                  <span className={styles.connectedBubbleHalo} aria-hidden="true" />
+                  <span className={styles.connectedBubbleSweep} aria-hidden="true" />
+                  <div className={styles.connectedBubbleContent}>
+                    <h3 className={styles.connectedRecipient}>{recognition.recipient}</h3>
+                    <p className={styles.connectedMessage}>{recognition.message}</p>
+                  </div>
                 </article>
               </li>
             ))}
