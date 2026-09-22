@@ -9,6 +9,15 @@ import {
 } from "./world-data";
 
 export class CameraDirector {
+  /**
+   * How a travel is paced, from 0 at its start to 1 at its end.
+   *
+   * The default is the app's own `smoothstep`, which is what every path and every test of
+   * this class uses; the sample-only design study swaps in a gentler curve from its own
+   * module. Nothing else in this class reads it, so replacing it changes the pacing of a
+   * travel and nothing whatever besides.
+   */
+  ease: (t: number) => number = smoothstep;
   readonly position = new Vector3(...ZONES[0].eye);
   readonly target = new Vector3(...ZONES[0].target);
   zone: ZoneId = "garden";
@@ -171,7 +180,7 @@ export class CameraDirector {
     if (hold && !this.special) return;
     this.age += Math.max(0, delta);
     if (this.traveling && this.path && this.lookPath) {
-      const t = smoothstep(this.age / this.duration);
+      const t = this.ease(this.age / this.duration);
       this.path.getPoint(t, this.position);
       this.lookPath.getPoint(t, this.target);
       if (this.age >= this.duration) {

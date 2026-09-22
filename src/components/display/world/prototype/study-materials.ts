@@ -46,6 +46,16 @@ export const STUDY_SUN_VIEW = { value: new T.Vector3(1, 0, 0) };
 /** 0 is the ordinary twinkle. Section 8 raises it to hush the sparkles during an arrival. */
 export const STUDY_CALM = { value: 0 };
 /**
+ * Section 8: the study mood envelope, 1 parked and a little under one in flight.
+ *
+ * The sky and the cloud banks multiply their fragment output by it, so the whole backdrop
+ * dips through a travel and lifts again on arrival with the tone mapping exposure the engine
+ * sets from the same value. It is deliberately not bound to any material that draws a pearl's
+ * words: the face, the finishing pass and the halo are all `toneMapped: false` and none of
+ * them reads this uniform, so the wording is identical at every point of the envelope.
+ */
+export const STUDY_EXPOSURE = { value: 1 };
+/**
  * The sculpted heart's five second breath, 0 to 1. Section 7 drives it from the shared study
  * clock so the emissive, the glow branch and the halo all swell on the same beat, and so a
  * still frame or a reduced motion frame resolves it exactly like any other frozen value.

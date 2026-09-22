@@ -119,7 +119,11 @@ export class StudyPearlSkin {
   private readonly orbits = new T.Group();
   private readonly medallions: Array<{ id: number; root: T.Group; glint: T.Sprite }> = [];
   private readonly clock = { value: 0 };
-  private readonly orbitBeads: T.Mesh[] = [];
+  /** Two draws: the pearl beads, then the gold ones. */
+  private readonly orbitBeads: T.InstancedMesh[] = [];
+  /** Which of the ten authored bead ordinals each instance stands in for. */
+  private readonly orbitBeadIndices: number[][] = [];
+  private readonly beadDummy = new T.Object3D();
   private readonly orbitAxis = new T.Vector3(0, 0, 1);
   private readonly rings: T.Mesh[] = [];
   private readonly shell: T.Mesh;
@@ -248,10 +252,19 @@ export class StudyPearlSkin {
     }
     const beadGeometry = this.geometry(new T.SphereGeometry(.024, 20, 12));
     const beadPearl = this.material(new T.MeshPhysicalMaterial({ color: "#fff0dc", roughness: .2, metalness: .18, clearcoat: 1, clearcoatRoughness: .15, iridescence: .35, iridescenceIOR: 1.3 }));
-    for (let i = 0; i < 10; i++) {
-      const pearl = new T.Mesh(beadGeometry, i % 3 ? beadPearl : gold);
-      pearl.scale.setScalar(i % 3 ? .9 : 1.22); this.orbits.add(pearl); this.orbitBeads.push(pearl);
-    }
+    // Section 8: the ten beads travelling the two gold orbits become two instanced draws,
+    // one for the six pearl beads and one for the four gold ones, in place of ten meshes.
+    // Each instance keeps the ordinal it stands in for, so its lane, phase and size are
+    // exactly the ones that bead had as a mesh of its own.
+    const pearlBeads: number[] = [], goldBeads: number[] = [];
+    for (let i = 0; i < 10; i++) (i % 3 ? pearlBeads : goldBeads).push(i);
+    this.orbitBeadIndices.push(pearlBeads, goldBeads);
+    [beadPearl, gold].forEach((beadMaterial, group) => {
+      const beads = new T.InstancedMesh(beadGeometry, beadMaterial, this.orbitBeadIndices[group].length);
+      beads.name = group ? "pearl orbit gold beads" : "pearl orbit pearl beads";
+      beads.frustumCulled = false;
+      this.orbits.add(beads); this.orbitBeads.push(beads);
+    });
     // Warm dust inside the glass and a looser drift around it. Seeded, so every pearl is stable.
     const random = seededRandom(1201 + seed);
     const positions = new Float32Array(56 * 3), phases = new Float32Array(56);
@@ -340,10 +353,18 @@ export class StudyPearlSkin {
       this.shimmer.geometry.getAttribute("position").needsUpdate = true;
     }
     this.rings.forEach((ring, index) => { ring.visible = detailed || index === 0; });
-    this.orbitBeads.forEach((bead, i) => {
-      const lane = i % 2, a = i * 2.399 + time * .035;
-      bead.position.set(Math.cos(a) * (1.37 + lane * .11), Math.sin(a) * (1.26 + lane * .055), Math.sin(a * 2 + lane) * .12 - .08);
-      bead.position.applyAxisAngle(this.orbitAxis, lane ? -.46 : .38);
+    this.orbitBeads.forEach((beads, group) => {
+      const size = group ? 1.22 : .9;
+      this.orbitBeadIndices[group].forEach((i, slot) => {
+        const lane = i % 2, a = i * 2.399 + time * .035;
+        this.beadDummy.position
+          .set(Math.cos(a) * (1.37 + lane * .11), Math.sin(a) * (1.26 + lane * .055), Math.sin(a * 2 + lane) * .12 - .08)
+          .applyAxisAngle(this.orbitAxis, lane ? -.46 : .38);
+        this.beadDummy.scale.setScalar(size);
+        this.beadDummy.updateMatrix();
+        beads.setMatrixAt(slot, this.beadDummy.matrix);
+      });
+      beads.instanceMatrix.needsUpdate = true;
     });
     const selected = this.medallions.filter(item => ids.includes(item.id));
     this.medallions.forEach(item => {
@@ -385,8 +406,11 @@ export class StudyPearlSkin {
   }
   dispose() {
     this.root.removeFromParent(); this.root.clear();
+    // The two instanced beads own per instance buffers the geometry registrar cannot reach.
+    this.orbitBeads.forEach(beads => beads.dispose());
     this.geometries.forEach(g => g.dispose()); this.materials.forEach(m => m.dispose());
     this.geometries.clear(); this.materials.clear();
     this.medallions.length = 0; this.orbitBeads.length = 0; this.rings.length = 0;
+    this.orbitBeadIndices.length = 0;
   }
 }

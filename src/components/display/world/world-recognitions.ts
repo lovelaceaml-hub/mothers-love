@@ -122,7 +122,14 @@ export class WorldRecognitionBubbles {
     orbitScale: 1,
   };
 
-  constructor(scene: T.Scene) {
+  /**
+   * Study only: how far the world has stepped back for an entrance, 0 to 1, published on the
+   * scene by the engine each frame. It is read once per update rather than per slot.
+   */
+  private hush = 0;
+
+  constructor(private readonly hostScene: T.Scene) {
+    const scene = hostScene;
     if (this.designStudy) this.studyAssets = new StudyPearlAssets(() => scene.userData.invalidate?.());
     if (this.designStudy) this.waterHalo = new StudyWaterHalo(scene);
     this.root.name = "Recognition bubbles in the world";
@@ -340,6 +347,11 @@ export class WorldRecognitionBubbles {
     let changed = false;
     this.focused = undefined;
     this.arrivalInWorld = false;
+    const publishedHush = this.hostScene.userData.studyHush;
+    this.hush =
+      this.designStudy && typeof publishedHush === "number"
+        ? Math.max(0, Math.min(1, publishedHush))
+        : 0;
     const entranceActive =
       arrival.phase !== "idle" && arrival.phase !== "return";
     const records = [...this.records.values()].filter(
@@ -518,13 +530,17 @@ export class WorldRecognitionBubbles {
    * The hero pearl reads at full strength. Residents step back into the scenery,
    * paler and a little warmer, so one message at a time carries the eye.
    * Slots are reused, so the hero values are restored every frame.
+   *
+   * Section 8 rides the entrance hush through this same channel: while an arrival approaches,
+   * the residents fade a little further back, and they fill in again over the first seconds
+   * of reading. At hush 0, which is every parked and every still frame, this is unchanged.
    */
   private recede(slot: Slot) {
     if (!this.designStudy) return;
     const material = slot.face.material;
     if (slot.index > 0) {
       // Nearly opaque: residents can overlap, and text showing through text reads as a defect.
-      material.opacity = 0.9;
+      material.opacity = 0.9 - 0.12 * this.hush;
       material.color.set("#f3e6ea");
     } else {
       material.opacity = 1;

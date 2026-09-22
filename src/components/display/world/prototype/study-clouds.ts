@@ -1,5 +1,6 @@
 import * as T from "three";
 import { ZONES, seededRandom } from "../world-data";
+import { STUDY_EXPOSURE } from "./study-materials";
 
 /**
  * Soft pink cloud banks for the sample-only visual study.
@@ -121,6 +122,7 @@ void main() {
 
 const FRAGMENT = `uniform sampler2D atlas;
 uniform float fogRelief;
+uniform float studyExposure;
 varying vec3 vPuffTint;
 varying float vPuffAlpha;
 varying float vPuffVariant;
@@ -131,7 +133,9 @@ void main() {
   float alpha = texel.a * vPuffAlpha;
   if (alpha < .004) discard;
   // A brighter crown and a deeper underside, so a puff reads as a volume, not a decal.
-  gl_FragColor = vec4(texel.rgb * vPuffTint * (.9 + .2 * vPuffUv.y), alpha);
+  // Section 8 multiplies the study mood envelope in here, exactly as the sky does, so the
+  // cloud banks dip and lift with the backdrop they sit in front of. Parked it is 1.
+  gl_FragColor = vec4(texel.rgb * vPuffTint * (.9 + .2 * vPuffUv.y) * studyExposure, alpha);
   #include <colorspace_fragment>
   vec3 unhazed = gl_FragColor.rgb;
   #include <fog_fragment>
@@ -167,6 +171,8 @@ export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, ti
     uniforms.fogRelief = { value: tier < .5 ? .6 : 0 };
     // The study clock is shared by reference, so nothing here needs its own frame hook.
     uniforms.time = time;
+    // Shared by reference too, so the engine's one write reaches both cloud tiers.
+    uniforms.studyExposure = STUDY_EXPOSURE;
     const material = new T.ShaderMaterial({
       uniforms,
       vertexShader: VERTEX,
@@ -177,7 +183,7 @@ export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, ti
       side: T.DoubleSide,
       fog: true,
     });
-    material.customProgramCacheKey = () => `study-cloud-v1-${name}`;
+    material.customProgramCacheKey = () => `study-cloud-v2-${name}`;
 
     const mesh = new T.InstancedMesh(geometry, material, count);
     mesh.name = `Study clouds, ${name} tier`;

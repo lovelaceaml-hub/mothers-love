@@ -2,6 +2,7 @@ import { chromium, expect } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { cpus, loadavg } from 'node:os';
 import path from 'node:path';
 
 // A real-app sample-only visual check. No clocks, renderer or camera are replaced.
@@ -17,7 +18,13 @@ const applicationPaths = execFileSync('git', ['ls-files', 'src/components/displa
 const sourceFiles = [];
 for (const file of applicationPaths) sourceFiles.push({ file, sha256: createHash('sha256').update(await readFile(file)).digest('hex') });
 const browser = await chromium.launch({ headless: true, args });
-const report = { sourceSha, origin, mode, sourceFiles, browser: browser.version(), platform: process.platform, args, checks: [], errors: [], consoleMessages: [], failedRequests: [], apiRequests: [], cameraSamples: [], limitations: ['Design review only. P0 and physical device acceptance remain open.', 'All records are fictional. This is not a real-data test.'] };
+// A frame timing taken while the rest of the machine is busy says nothing about the world,
+// so every run records the load it was taken at and every timing carries its own reading.
+const load = () => loadavg().map(value => Math.round(value * 100) / 100);
+const report = { sourceSha, origin, mode, sourceFiles, browser: browser.version(), platform: process.platform, args,
+  machine: { cores: cpus().length, loadAverageAtStart: load() },
+  renderingDetailsMeaning: 'The study turns renderer.info.autoReset off and resets once per presented frame, so Draw calls and Triangles sum every pass of that frame: the main pass, the sun shadow map on the frames that refresh it, the glow, protect and ray mask passes, the thirteen bloom quads, the ray blur and the composite. They are not a main pass figure.',
+  checks: [], errors: [], consoleMessages: [], failedRequests: [], apiRequests: [], cameraSamples: [], limitations: ['Design review only. P0 and physical device acceptance remain open.', 'All records are fictional. This is not a real-data test.'] };
 const context = await browser.newContext({
   viewport: mode === 'tour' ? { width: 1440, height: 900 } : { width: 1920, height: 1080 },
   deviceScaleFactor: 1, reducedMotion: mode === 'tour' ? 'no-preference' : 'reduce',
@@ -72,6 +79,11 @@ async function renderingDetails() {
   await page.getByRole('dialog').getByRole('button',{name:/^Close /}).click();
   return text;
 }
+/** The two numbers out of one rendering details panel, so a report can be read at a glance. */
+function renderingNumbers(text) {
+  const read=label=>{const m=String(text).match(new RegExp(`${label}\\n([\\d,]+)`));return m?Number(m[1].replace(/,/g,'')):null;};
+  return { calls: read('Draw calls'), triangles: read('Triangles'), meaning: 'every pass of one presented frame' };
+}
 function intervalStats(intervals) {
   const sorted=[...intervals].sort((a,b)=>a-b);
   const at=q=>Math.round(sorted[Math.min(sorted.length-1,Math.floor(q*sorted.length))]*100)/100;
@@ -88,18 +100,26 @@ async function measure(label,width,height,quality) {
   if(await resume.count()) await resume.click();
   await expect(world).toHaveAttribute('data-motion','tour');
   const before=await attrs();
+  const loadBefore=load();
   const intervals=await page.evaluate(()=>new Promise(resolve=>{
     const samples=[];let previous=0;
     const step=now=>{if(previous)samples.push(now-previous);previous=now;if(samples.length<120)requestAnimationFrame(step);else resolve(samples);};requestAnimationFrame(step);
   }));
   const after=await attrs();
+  const loadAfter=load();
   const movingRenderingDetails=await renderingDetails();
   const stats=intervalStats(intervals);
   const advanced=intervals.length===120&&Number(after['data-frames'])>Number(before['data-frames'])+10&&Number(after['data-elapsed'])>Number(before['data-elapsed']);
-  report.measurements.push({label,viewport:{width,height},quality,...stats,pausedGardenRenderingDetails,movingRenderingDetails,
+  // One minute load average above eight means other work on this machine, not this world,
+  // decided the intervals. The number is recorded either way so a reader can tell.
+  const polluted=Math.max(loadBefore[0],loadAfter[0])>8;
+  report.measurements.push({label,viewport:{width,height},quality,...stats,
+    loadAverage:{before:loadBefore,after:loadAfter},loadPolluted:polluted,
+    pausedGardenRenderingDetails,movingRenderingDetails,
+    pausedGarden:renderingNumbers(pausedGardenRenderingDetails),moving:renderingNumbers(movingRenderingDetails),
     frames:{before:Number(before['data-frames']),after:Number(after['data-frames'])},
     elapsed:{before:Number(before['data-elapsed']),after:Number(after['data-elapsed'])}});
-  report.checks.push({test:`Real animation timing with advancing app frames and clock at ${label}`,passed:advanced,...stats});
+  report.checks.push({test:`Real animation timing with advancing app frames and clock at ${label}`,passed:advanced,...stats,loadAverage1Min:loadAfter[0],loadPolluted:polluted});
 }
 try {
   await open('design');
@@ -126,6 +146,7 @@ try {
       await measure(label,width,height,quality);
     }
     report.renderingDetails=report.measurements[0]?.pausedGardenRenderingDetails;
+    report.loadPolluted=report.measurements.some(m=>m.loadPolluted);
   } else if (mode === 'tour') {
     const started=performance.now();
     const sample=async label=>{report.cameraSamples.push({label,wallSeconds:Math.round((performance.now()-started)/100)/10,attributes:await attrs()});};
@@ -155,6 +176,7 @@ try {
     }
     await visit('garden','Garden of Kindness');
     report.renderingDetails=await renderingDetails();
+    report.renderingNumbers=renderingNumbers(report.renderingDetails);
     for (const [style,label] of [['constellation','Pearl formation'],['ribbon','Silk unveiling'],['bloom','Petal bloom']]) {
       await page.getByRole('button',{name:label,exact:true}).click();
       await expect(world).toHaveAttribute('data-arrival','reading',{timeout:20000});
@@ -187,10 +209,13 @@ try {
   if(await world.getAttribute('data-source').catch(()=>null)==='sample') await shot(`${mode}-failure`).catch(()=>{});
 } finally {
   report.checks.push({test:'No page errors, error console messages or API requests',passed:!report.errors.length&&!report.consoleMessages.some(m=>m.type==='error')&&!report.apiRequests.length});
+  report.machine.loadAverageAtEnd=load();
   await context.close();
   if(mode==='tour') report.video=await page.video().path();
   await browser.close();
   await writeFile(path.join(output,`${mode}-report.json`),JSON.stringify(report,null,2)+'\n');
-  console.log(JSON.stringify({report:path.join(output,`${mode}-report.json`),checks:report.checks.length,failed:report.checks.filter(c=>!c.passed),video:report.video}));
+  console.log(JSON.stringify({report:path.join(output,`${mode}-report.json`),checks:report.checks.length,failed:report.checks.filter(c=>!c.passed),video:report.video,
+    machine:report.machine,
+    measurements:report.measurements?.map(m=>({label:m.label,medianMs:m.medianMs,p95Ms:m.p95Ms,maxMs:m.maxMs,fractionOver33_3:m.fractionOver33_3,load1Min:m.loadAverage.after[0],loadPolluted:m.loadPolluted,pausedGarden:m.pausedGarden,moving:m.moving}))}));
 }
 if(report.checks.some(c=>!c.passed))process.exitCode=1;

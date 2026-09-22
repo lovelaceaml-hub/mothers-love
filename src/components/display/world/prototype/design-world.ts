@@ -11,7 +11,7 @@ import { bloomStage, constellationStage, ribbonStage, type StageContext } from "
 import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
 import {
-  STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW,
+  STUDY_EXPOSURE, STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW,
   softDot, sparklePoints, studyGlow, studyRim, studySilk, studyStone, studyStoneCaustic,
 } from "./study-materials";
 import { lanternLayout, type LanternPoint } from "./study-glory";
@@ -159,15 +159,18 @@ export function createDesignWorld(): WorldScene {
   const fill = new T.DirectionalLight("#ffd0c8", .75); fill.position.set(70, 38, 95); scene.add(fill);
   // A quiet lavender bounce from the cool side of the sky, in place of the old pink rim light.
   const cool = new T.DirectionalLight("#c9c3ff", .35); cool.position.set(80, 30, -40); scene.add(cool);
-  const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, top: { value: new T.Color(STUDY_SKY.zenith) }, mid: { value: new T.Color(STUDY_SKY.mid) }, horizon: { value: new T.Color(STUDY_SKY.horizon) }, sun: { value: new T.Vector3(...STUDY_SUN.direction) } },
+  // Section 8: the sky carries the study mood envelope, so the whole backdrop dips a little
+  // through a travel and lifts again on arrival, together with the tone mapping exposure the
+  // engine sets from the same value. Parked, the uniform is exactly 1 and this is unchanged.
+  const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, studyExposure: STUDY_EXPOSURE, top: { value: new T.Color(STUDY_SKY.zenith) }, mid: { value: new T.Color(STUDY_SKY.mid) }, horizon: { value: new T.Color(STUDY_SKY.horizon) }, sun: { value: new T.Vector3(...STUDY_SUN.direction) } },
     vertexShader: `varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader: `varying vec3 p;uniform float time;uniform vec3 top,mid,horizon,sun;
+    fragmentShader: `varying vec3 p;uniform float time,studyExposure;uniform vec3 top,mid,horizon,sun;
       float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
       float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+1.71;a*=.5;}return v;}
       void main(){vec3 d=normalize(p);vec3 c=mix(horizon,mid,smoothstep(0.,.18,d.y));c=mix(c,top,smoothstep(.18,.75,d.y));
       float lift=smoothstep(0.,.16,d.y);
       vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.965,.831,.871),cloud*.55*lift);
-      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*.20+pow(key,60.)*.5)*lift;c=min(c,vec3(1.));gl_FragColor=vec4(c,1.);
+      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*.20+pow(key,60.)*.5)*lift;c=min(c,vec3(1.))*studyExposure;gl_FragColor=vec4(c,1.);
       #include <colorspace_fragment>
       }` }));
   mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
@@ -179,6 +182,9 @@ export function createDesignWorld(): WorldScene {
   // pass's override material (three 0.180 WebGLRenderer.js L1987).
   halo.sprites.forEach(sprite => scene.add(sprite));
   halo.materials.forEach(material); texture(halo.map);
+  // Section 8: the authored sizes, so the travel swell below is applied to them rather than
+  // compounded frame on frame. Parked, the sprites are exactly the size they are today.
+  const haloScale = halo.sprites.map(sprite => sprite.scale.x);
   const sunAt = new T.Vector3(...STUDY_SUN.direction).multiplyScalar(330);
   const skyBand = new T.Sprite(material(new T.SpriteMaterial({
     // Corrected down from the design's .14 after the checkpoint captures.
@@ -496,17 +502,52 @@ export function createDesignWorld(): WorldScene {
   motions.push(t=>{heartRoot.rotation.y=.25+Math.sin(t*.13)*.10;heartRoot.position.y=8.7+Math.sin(t*.36)*.07;});
 
   // Canonical expression artwork remains recognizable and retains its original meaning.
+  //
+  // Section 8: the nine surrounds become one instanced draw and the nine gold rims another,
+  // in place of eighteen. The surround colour moves onto a per instance colour, so one shared
+  // material serves all nine; three only multiplies an instance colour into the fragment when
+  // the material declares `vertexColors`, which needs a colour attribute on the geometry, so
+  // the shared sphere is cloned with a white one. The nine icon discs keep their own draw,
+  // because each carries its own artwork.
   const grove = districtRoots.get("expressions")!;
+  const groveBead = geometry(bead.clone());
+  groveBead.setAttribute("color", new T.Float32BufferAttribute(new Float32Array(groveBead.getAttribute("position").count * 3).fill(1), 3));
+  const groveSurround = material(new T.MeshPhysicalMaterial({ vertexColors: true, metalness: .12, roughness: .25, clearcoat: .8 }));
+  const groveRim = geometry(new T.TorusGeometry(1.18, .022, 6, 64));
+  const groveIcon = geometry(new T.CircleGeometry(.96, 48));
+  const groveSurrounds = instance(grove, groveBead, groveSurround, WORLD_EXPRESSIONS.length);
+  const groveRims = instance(grove, groveRim, gold, WORLD_EXPRESSIONS.length);
+  groveSurrounds.name = "Study grove surrounds"; groveRims.name = "Study grove rims";
+  // The material sweep at the end of this builder skips instanced meshes, so the rims join
+  // the glow layer here instead, exactly where the nine separate toruses used to be put.
+  groveRims.layers.enable(1);
+  const groveSpin = new T.Euler(0, .48, 0), groveAt = new T.Vector3();
+  const groveSites: Array<{ x: number; z: number; group: T.Group }> = [];
   WORLD_EXPRESSIONS.forEach((expression,i)=>{
     const a=-Math.PI*.9+i/8*Math.PI*1.6, x=Math.cos(a)*10.5,z=Math.sin(a)*9.3;
     mesh(grove,cylinder,ivory,[x,2.8,z],[.48,4.25,.48]);ring(grove,3.7,.71,.015);
     const group=new T.Group();group.position.set(x,5.15,z);group.rotation.y=.48;grove.add(group);
     const map=texture(new T.TextureLoader().load(`/home-art/icon${expression.id}.webp`,invalidate));map.colorSpace=T.SRGBColorSpace;
     const iconMat=material(new T.MeshBasicMaterial({map,transparent:true,toneMapped:false,side:T.DoubleSide}));
-    const surround=material(new T.MeshPhysicalMaterial({color:new T.Color(expression.color).lerp(new T.Color("#fff0e5"),.66),metalness:.12,roughness:.25,clearcoat:.8}));
-    mesh(group,bead,surround,[0,0,0],[1.08,1.08,.35]);mesh(group,geometry(new T.CircleGeometry(.96,48)),iconMat,[0,0,.37]);
-    mesh(group,geometry(new T.TorusGeometry(1.18,.022,6,64)),gold);group.userData.dynamic=true;
-    motions.push(t=>{group.position.y=5.15+Math.sin(t*.23+i)*.15;});
+    mesh(group,groveIcon,iconMat,[0,0,.37]);group.userData.dynamic=true;
+    groveSurrounds.setColorAt(i, tint.set(expression.color).lerp(new T.Color("#fff0e5"), .66));
+    groveSites.push({ x, z, group });
+  });
+  if (groveSurrounds.instanceColor) groveSurrounds.instanceColor.needsUpdate = true;
+  let groveBounded = false;
+  motions.push(t=>{
+    groveSites.forEach((site,i)=>{
+      const y = 5.15 + Math.sin(t * .23 + i) * .15;
+      site.group.position.y = y;
+      groveAt.set(site.x, y, site.z);
+      stamp(groveSurrounds, i, groveAt, [1.08, 1.08, .35], groveSpin);
+      stamp(groveRims, i, groveAt, [1, 1, 1], groveSpin);
+    });
+    groveSurrounds.instanceMatrix.needsUpdate = true;
+    groveRims.instanceMatrix.needsUpdate = true;
+    // Bounded once, from the authored places. Each bead only breathes .15 either side of
+    // them, which is well inside the radius the beads themselves already add to the sphere.
+    if (!groveBounded) { groveBounded = true; groveSurrounds.computeBoundingSphere(); groveRims.computeBoundingSphere(); }
   });
 
   // Distinct distant landmarks keep every destination legible throughout a continuous tour.
@@ -549,13 +590,24 @@ export function createDesignWorld(): WorldScene {
   const stageEffects={sparkles:true,trails:true};
 
   // A few quiet, miniature figures provide scale without covering the scenery with labels.
+  //
+  // Section 8: one skin, one hair, one dress per colour and one body lathe, shared by every
+  // figure instead of rebuilt per figure. The static batcher groups by material identity, so
+  // sharing collapses each district's six little merged meshes into four, and the six
+  // identical lathes and twelve identical capsules are built once.
+  const figureSkin = material(new T.MeshStandardMaterial({color:"#deb995",roughness:.8}));
+  const figureHair = material(new T.MeshStandardMaterial({color:"#594339",roughness:.9}));
+  const figureDresses = new Map<string, T.MeshStandardMaterial>();
+  const figureBody = geometry(new T.LatheGeometry(new T.SplineCurve([new T.Vector2(.35,0),new T.Vector2(.37,.05),new T.Vector2(.29,.4),new T.Vector2(.23,.76),new T.Vector2(.25,.92),new T.Vector2(.12,1.02)]).getPoints(22),32));
+  const figureArm = geometry(new T.CapsuleGeometry(.087,.44,5,12));
+  figureSkin.name="figure skin";figureHair.name="figure hair";
   function figure(parent:T.Object3D,x:number,z:number,color:string){
     const root=new T.Group();root.position.set(x,.72,z);parent.add(root);
-    const dress=material(new T.MeshStandardMaterial({color,roughness:.8})),skin=material(new T.MeshStandardMaterial({color:"#deb995",roughness:.8})),hair=material(new T.MeshStandardMaterial({color:"#594339",roughness:.9}));
-    const body = geometry(new T.LatheGeometry(new T.SplineCurve([new T.Vector2(.35,0),new T.Vector2(.37,.05),new T.Vector2(.29,.4),new T.Vector2(.23,.76),new T.Vector2(.25,.92),new T.Vector2(.12,1.02)]).getPoints(22),32));
-    mesh(root,body,dress,[0,.35,0]);mesh(root,bead,skin,[0,1.65,0],[.33,.35,.32]);mesh(root,bead,hair,[0,1.8,-.035],[.34,.24,.32]);
-    for(const side of [-1,1]){const arm=mesh(root,geometry(new T.CapsuleGeometry(.087,.44,5,12)),dress,[side*.29,1.00,.03]);arm.rotation.z=side*.20;mesh(root,bead,skin,[side*.35,.71,.03],[.09,.1,.09]);}
-    for(const s of [-1,1]){mesh(root,cylinder,skin,[s*.17,.28,0],[.085,.42,.085]);mesh(root,bead,hair,[s*.17,.065,.08],[.11,.07,.19]);}contact(parent,x,z,1.5,.85);
+    let dress=figureDresses.get(color);
+    if(!dress){dress=material(new T.MeshStandardMaterial({color,roughness:.8}));dress.name=`figure dress ${color}`;figureDresses.set(color,dress);}
+    mesh(root,figureBody,dress,[0,.35,0]);mesh(root,bead,figureSkin,[0,1.65,0],[.33,.35,.32]);mesh(root,bead,figureHair,[0,1.8,-.035],[.34,.24,.32]);
+    for(const side of [-1,1]){const arm=mesh(root,figureArm,dress,[side*.29,1.00,.03]);arm.rotation.z=side*.20;mesh(root,bead,figureSkin,[side*.35,.71,.03],[.09,.1,.09]);}
+    for(const s of [-1,1]){mesh(root,cylinder,figureSkin,[s*.17,.28,0],[.085,.42,.085]);mesh(root,bead,figureHair,[s*.17,.065,.08],[.11,.07,.19]);}contact(parent,x,z,1.5,.85);
   }
   for(const id of ["garden","heart","expressions"] as const){const root=districtRoots.get(id)!;figure(root,-5,8,"#d788a9");figure(root,-3.8,8.5,"#a79ac9");}
 
@@ -689,6 +741,12 @@ export function createDesignWorld(): WorldScene {
       // The engine resolves the picture quality tier and publishes it on the scene in resize().
       // Low drops the sky cloud ring, which is pure overdraw near the horizon, and halves the sparkles.
       const lowTier=scene.userData.lowTier===true;
+      // Section 8, haze during travel: the engine publishes a smoothed 0 to 1 travel amount,
+      // and the low sun swells a little inside the thicker air. Parked it is 0 and the two
+      // sprites are exactly their authored size, so a still capture is unchanged.
+      const travel=typeof scene.userData.studyTravel==="number"?scene.userData.studyTravel:0;
+      const swell=1+.12*travel;
+      halo.sprites.forEach((sprite,i)=>sprite.scale.set(haloScale[i]*swell,haloScale[i]*swell,1));
       // The engine publishes its camera on the scene under the study gate, so the motes can
       // wrap around the viewer without changing the shared WorldScene update signature.
       const viewer=scene.userData.studyCamera as T.Camera|undefined;

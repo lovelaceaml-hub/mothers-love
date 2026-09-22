@@ -46,6 +46,21 @@ import { STUDY_SUN } from "./study-palette";
 export type StudyTier = "high" | "auto" | "low";
 
 /**
+ * The one place the study's picture quality tier is decided.
+ *
+ * High is the explicit choice and never drops. Auto starts at the middle tier and becomes
+ * Low once the engine's existing three window under 25 fps rule flips `lowered`; that rule
+ * stays the only trigger. Low is Low however it was reached, so a lowered Auto and an
+ * explicit Low resolve to exactly the same work.
+ *
+ * Pure, so the whole ladder is provable without a WebGL context.
+ */
+export function resolveStudyTier(quality: string, lowered: boolean): StudyTier {
+  if (quality === "low" || (quality === "auto" && lowered)) return "low";
+  return quality === "high" ? "high" : "auto";
+}
+
+/**
  * Half of the drawing buffer, capped at 1920 wide and kept on the buffer's aspect.
  * Pure, so the sizing ladder is provable without a WebGL context.
  */
@@ -125,6 +140,10 @@ export class StudyRadiance {
   /** Tuned down from the design's .62 and .5 after the checkpoint captures. See the uniforms below. */
   glowStrength = 0.22;
   rayStrength = 0.12;
+  /** The tier's own glow strength, before Section 8's mood envelope scales it. */
+  private baseGlowStrength = 0.22;
+  /** `.9 + .1 * mood`, so a parked frame is exactly the tier's authored strength. */
+  private moodScale = 1;
   private tier: StudyTier = "auto";
   private readonly glowRT: T.WebGLRenderTarget;
   private readonly protectRT: T.WebGLRenderTarget;
@@ -244,7 +263,21 @@ export class StudyRadiance {
     if (tier === "low") return;
     this.rayQuad.material = this.rayMaterial(tier === "high" ? 48 : 32);
     // Corrected from the design's .62 High and .45 Auto after the checkpoint captures.
-    this.glowStrength = tier === "high" ? .22 : .16;
+    this.baseGlowStrength = tier === "high" ? .22 : .16;
+    this.glowStrength = this.baseGlowStrength * this.moodScale;
+  }
+
+  /**
+   * Section 8: the mood envelope, 1 parked and a little under one in flight.
+   *
+   * The glow only follows a tenth of it, because the bloom is already the most forgiving
+   * part of the frame and taking the whole dip out of it reads as the light being switched
+   * down rather than as air. Applied to the tier's own strength, never compounded, so a
+   * hundred frames at the same envelope value give the same glow as one.
+   */
+  setMood(value: number) {
+    this.moodScale = .9 + .1 * value;
+    if (this.tier !== "low") this.glowStrength = this.baseGlowStrength * this.moodScale;
   }
 
   resize(width: number, height: number) {

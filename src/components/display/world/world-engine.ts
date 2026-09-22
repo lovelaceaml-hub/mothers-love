@@ -6,9 +6,17 @@ import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, studyRadiance, type StudyArrival } from "./prototype/design-mode";
-import { StudyRadiance } from "./prototype/study-radiance";
+import { resolveStudyTier, StudyRadiance } from "./prototype/study-radiance";
+import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./prototype/camera-finesse";
+import {
+  StudyMood,
+  studyHaze,
+  type MoodInput,
+  type StudyHaze,
+} from "./prototype/study-mood";
+import { STUDY_CALM, STUDY_EXPOSURE } from "./prototype/study-materials";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
-import { STUDY_TONE } from "./prototype/study-palette";
+import { STUDY_FOG, STUDY_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import {
   RECOGNITION_ZONES,
@@ -60,8 +68,35 @@ export class WorldEngine {
   private readonly bubbles = new WorldRecognitionBubbles(this.world.scene);
   private readonly observer: ResizeObserver;
   private readonly environment: THREE.WebGLRenderTarget;
+  /** Resolved once: the tick runs sixty times a second and must not reparse the URL. */
+  private readonly study = isWorldDesignStudy();
   /** Study only, and only when the context can render to a half float target. */
   private radiance?: StudyRadiance;
+  /**
+   * Study only. The finesse places the camera after the director, without changing what the
+   * director thinks the pose is; the mood carries the light between one place and the next.
+   * Both are the identity whenever the world is not moving, so every still capture is today's.
+   */
+  private readonly finesse?: StudyCameraFinesse;
+  private readonly mood?: StudyMood;
+  /** Reused every frame, so neither study hook allocates in the tick. */
+  private readonly finesseInput: FinesseInput = {
+    dt: 0,
+    moving: false,
+    traveling: false,
+    arrivalPhase: "idle",
+    reading: false,
+    position: new THREE.Vector3(),
+    target: new THREE.Vector3(),
+    elapsed: 0,
+  };
+  private readonly moodInput: MoodInput = {
+    dt: 0,
+    moving: false,
+    traveling: false,
+    arrivalPhase: "idle",
+  };
+  private readonly haze: StudyHaze = { near: STUDY_FOG.near, far: STUDY_FOG.far };
   private readonly bufferSize = new THREE.Vector2();
   private elapsed = 0;
   private last = 0;
@@ -98,6 +133,17 @@ export class WorldEngine {
         this.renderer.toneMappingExposure = STUDY_TONE.exposure;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // The shadow cadence in tick() owns this from here: one refresh in six moving frames
+        // and one on every dirty still frame. Only the sculpted heart bobs, so nothing the
+        // sun casts moves fast enough for an amortised map to slip visibly.
+        this.renderer.shadowMap.autoUpdate = false;
+        this.renderer.shadowMap.needsUpdate = true;
+        this.finesse = new StudyCameraFinesse();
+        this.mood = new StudyMood();
+        // The one line the camera director takes part in: its public pacing field, which
+        // defaults to the app's own smoothstep everywhere else and is never read by anything
+        // but its own travel. Classic and cinematic keep the default untouched.
+        this.director.ease = studyTravelEase;
         this.world.scene.userData.invalidate = () => { this.dirty = true; };
       }
       if (isWorldDesignStudy()) {
@@ -182,8 +228,8 @@ export class WorldEngine {
     if (!this.alive || this.failed) return;
     const width = Math.max(1, this.canvas.clientWidth),
       height = Math.max(1, this.canvas.clientHeight);
-    const low =
-      this.quality === "low" || (this.quality === "auto" && this.lowered);
+    const tier = resolveStudyTier(this.quality, this.lowered);
+    const low = tier === "low";
     if (isWorldDesignStudy()) this.studyTier(low);
     const pixels = low ? 1_050_000 : 2_600_000;
     const ratio = isWorldDesignStudy() ? studyPixelRatio(width, height, window.devicePixelRatio, this.quality, this.lowered) : Math.min(
@@ -194,7 +240,7 @@ export class WorldEngine {
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
     if (this.radiance) {
-      this.radiance.setTier(low ? "low" : this.quality === "high" ? "high" : "auto");
+      this.radiance.setTier(tier);
       this.renderer.getDrawingBufferSize(this.bufferSize);
       this.radiance.resize(this.bufferSize.x, this.bufferSize.y);
     }
@@ -232,7 +278,9 @@ export class WorldEngine {
       | THREE.DirectionalLight
       | undefined;
     if (!sun) return;
-    const size = low ? 1536 : 2048;
+    // Low takes the 1024 map the design's drop order names, with the wider, cheaper filter
+    // below. The shadow is softer there by intent, not by accident.
+    const size = low ? 1024 : 2048;
     if (sun.shadow.mapSize.width !== size) {
       sun.shadow.mapSize.set(size, size);
       sun.shadow.map?.dispose();
@@ -311,6 +359,7 @@ export class WorldEngine {
       );
       if (previousZone !== this.director.zone) this.dirty = true;
     }
+    if (this.mood) this.applyStudyMood(this.paused ? 0 : delta, moving);
     if (moving || arriving || before !== "idle") {
       this.world.update(this.elapsed, this.director.zone, this.arrivalState);
       this.dirty = true;
@@ -344,6 +393,19 @@ export class WorldEngine {
     );
     this.camera.position.copy(this.director.position);
     this.camera.lookAt(this.director.target);
+    if (this.finesse) {
+      const input = this.finesseInput;
+      input.dt = this.paused ? 0 : delta;
+      input.moving = moving;
+      input.traveling = this.director.traveling;
+      input.arrivalPhase = this.arrivalState.phase;
+      input.reading = readingVisible && this.recognitions.id !== null;
+      input.position = this.director.position;
+      input.target = this.director.target;
+      input.elapsed = this.elapsed;
+      this.finesse.apply(this.camera, input);
+    }
+    // Everything downstream, the world bubbles included, reads the finished pose.
     this.camera.updateMatrixWorld();
     this.dirty =
       this.bubbles.update({
@@ -364,11 +426,24 @@ export class WorldEngine {
       }) || this.dirty;
     // Study only: the focal pearl's place in the world, so the drifting petals can keep clear
     // of the words. Read on the next frame, which at these speeds is well inside the guard's margin.
-    if (isWorldDesignStudy())
+    if (this.study)
       this.world.scene.userData.studyFocus = this.bubbles.inspect().focused;
     if (moving || this.dirty) {
       if (!moving)
         this.world.update(this.elapsed, this.director.zone, this.arrivalState);
+      // One sun shadow refresh in six moving frames, and one on every dirty still frame, so
+      // a paused capture always carries a fresh map and is the deterministic worst case.
+      //
+      // A flag already standing is kept rather than overwritten: `studyTier` raises it after
+      // disposing the shadow map on a tier change, and dropping that would leave the world
+      // sampling a null map for up to five frames. Only the main pass clears it, because
+      // three returns from the shadow pass before clearing when the camera's layer collects
+      // no lights, which is every auxiliary pass of the radiance frame.
+      if (this.study)
+        this.renderer.shadowMap.needsUpdate =
+          this.renderer.shadowMap.needsUpdate ||
+          !moving ||
+          this.frameCount % 6 === 0;
       if (this.radiance) this.radiance.render(this.world.scene, this.camera);
       else this.renderer.render(this.world.scene, this.camera);
       this.frameCount++;
@@ -391,6 +466,42 @@ export class WorldEngine {
       this.report();
     }
   };
+  /**
+   * Study only: what the light does between one place and the next.
+   *
+   * One smoothed envelope is spent four ways, and none of them can reach a pearl's words.
+   * The tone mapping exposure never touches the face, the finishing pass or the halo, all of
+   * which are `toneMapped: false`; the shared uniform is bound only to the sky and the cloud
+   * banks; the glow strength belongs to the radiance composite, which is already multiplied
+   * by one minus the protect mask over the pearl being read. The haze and the hush are the
+   * world stepping back, not the message.
+   *
+   * With `moving` false the mood resolves to its parked values on the frame it is asked, so
+   * a paused, reduced motion or Still capture renders at exactly today's exposure, haze and
+   * twinkle, and two captures of it are identical.
+   */
+  private applyStudyMood(delta: number, moving: boolean) {
+    const mood = this.mood;
+    if (!mood) return;
+    const input = this.moodInput;
+    input.dt = delta;
+    input.moving = moving;
+    input.traveling = this.director.traveling;
+    input.arrivalPhase = this.arrivalState.phase;
+    mood.update(input);
+    STUDY_EXPOSURE.value = mood.exposure;
+    STUDY_CALM.value = mood.hush;
+    this.renderer.toneMappingExposure = STUDY_TONE.exposure * mood.exposure;
+    this.radiance?.setMood(mood.exposure);
+    const scene = this.world.scene;
+    scene.userData.studyHush = mood.hush;
+    scene.userData.studyTravel = mood.travel;
+    if (scene.fog instanceof THREE.Fog) {
+      studyHaze(mood.travel, this.haze);
+      scene.fog.near = this.haze.near;
+      scene.fog.far = this.haze.far;
+    }
+  }
   private report() {
     this.options.onStatus({
       zone: this.director.zone,
