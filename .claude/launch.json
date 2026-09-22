@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "world-study",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "start", "-p", "32743"],
+      "port": 32743
+    },
+    {
+      "name": "world-study-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-p", "32743"],
+      "port": 32743
+    }
+  ]
+}

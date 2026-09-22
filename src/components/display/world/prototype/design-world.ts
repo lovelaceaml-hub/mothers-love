@@ -5,13 +5,16 @@ import { ZONES, WORLD_EXPRESSIONS, seededRandom, type ZoneId } from "../world-da
 import type { WorldScene } from "../world-scene-legacy";
 import { studyArrival } from "./design-mode";
 import { studyPetal, studyTerrace } from "./study-geometry";
+import { studySunHalo } from "./study-lighting";
+import { softDot, sparklePoints, studyRim } from "./study-materials";
+import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
 
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
 export function createDesignWorld(): WorldScene {
   const scene = new T.Scene();
   scene.name = "Mother's Love, visual study 02";
-  scene.background = new T.Color("#d7deed");
-  scene.fog = new T.FogExp2("#d7deed", .0023);
+  scene.background = new T.Color(STUDY_FOG.color);
+  scene.fog = new T.Fog(STUDY_FOG.color, STUDY_FOG.near, STUDY_FOG.far);
   scene.userData.prototypeHeartReady = false;
   scene.userData.studyArrival = studyArrival(new URLSearchParams(window.location.search).get("entrance"));
   const geometries = new Set<T.BufferGeometry>(), materials = new Set<T.Material>(), textures = new Set<T.Texture>();
@@ -23,11 +26,11 @@ export function createDesignWorld(): WorldScene {
   const material = <M extends T.Material>(m: M) => { materials.add(m); return m; };
   const texture = <X extends T.Texture>(t: X) => { textures.add(t); return t; };
   const invalidate = () => { if (!disposed) scene.userData.invalidate?.(); };
-  const ivory = material(new T.MeshPhysicalMaterial({ color: "#fff4e4", roughness: .28, metalness: .025, clearcoat: .42, clearcoatRoughness: .25 }));
-  const edge = material(new T.MeshStandardMaterial({ color: "#e1cdb7", roughness: .64 }));
+  const ivory = studyRim(material(new T.MeshPhysicalMaterial({ color: "#fff4e4", roughness: .28, metalness: .025, clearcoat: .42, clearcoatRoughness: .25, dithering: true })), "#ffe6c9", 3, .22);
+  const edge = material(new T.MeshStandardMaterial({ color: "#e1cdb7", roughness: .64, dithering: true }));
   const gold = material(new T.MeshStandardMaterial({ color: "#d3ae6c", metalness: .78, roughness: .27 }));
   const roseGold = material(new T.MeshStandardMaterial({ color: "#8d7462", metalness: .05, roughness: .77 }));
-  const rose = material(new T.MeshPhysicalMaterial({ color: "#d9567f", roughness: .44, metalness: .04, clearcoat: .45, clearcoatRoughness: .48, sheen: .2, sheenColor: new T.Color("#ffc5d5") }));
+  const rose = studyRim(material(new T.MeshPhysicalMaterial({ color: "#d9567f", roughness: .44, metalness: .04, clearcoat: .45, clearcoatRoughness: .48, sheen: .2, sheenColor: new T.Color("#ffc5d5"), dithering: true })), "#ffb6c8", 2.5, .3);
   const leaf = material(new T.MeshPhysicalMaterial({ color: "#739a77", roughness: .57, sheen: .2, side: T.DoubleSide }));
   const lawn = material(new T.MeshStandardMaterial({ color: "#a8c7a8", roughness: .96, metalness: 0 }));
   const rock = material(new T.MeshStandardMaterial({ color: "#acbcb6", roughness: .95 }));
@@ -91,22 +94,27 @@ export function createDesignWorld(): WorldScene {
     }
   }
 
-  scene.add(new T.HemisphereLight("#e0edff", "#688267", .32));
-  const sun = new T.DirectionalLight("#ffe6c1", 2.7); sun.position.set(-38, 72, 38);
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = sun.shadow.camera.bottom = -95; sun.shadow.camera.right = sun.shadow.camera.top = 95; sun.shadow.camera.far = 220; sun.shadow.normalBias = .045; sun.shadow.bias = -.00018; scene.add(sun);
-  const fill = new T.DirectionalLight("#b9ceff", .45); fill.position.set(52, 35, -30); scene.add(fill);
-  const rim = new T.DirectionalLight("#ffc3d7", .55); rim.position.set(-30, 14, -60); scene.add(rim);
-  const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, top: { value: new T.Color("#809bcf") }, horizon: { value: new T.Color("#f2c9d8") } },
+  scene.add(new T.HemisphereLight("#f7dbe0", "#cfa79d", .55));
+  const sun = new T.DirectionalLight(STUDY_SUN.color, 2.3); sun.position.set(...STUDY_SUN.lightPosition);
+  sun.castShadow = true; sun.shadow.intensity = STUDY_TONE.shadowIntensity; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = sun.shadow.camera.bottom = -120; sun.shadow.camera.right = sun.shadow.camera.top = 120; sun.shadow.camera.far = 300; sun.shadow.normalBias = .06; sun.shadow.bias = -.0002; scene.add(sun);
+  const fill = new T.DirectionalLight("#ffd0c8", .75); fill.position.set(70, 38, 95); scene.add(fill);
+  // A quiet lavender bounce from the cool side of the sky, in place of the old pink rim light.
+  const cool = new T.DirectionalLight("#c9c3ff", .35); cool.position.set(80, 30, -40); scene.add(cool);
+  const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, top: { value: new T.Color(STUDY_SKY.zenith) }, mid: { value: new T.Color(STUDY_SKY.mid) }, horizon: { value: new T.Color(STUDY_SKY.horizon) }, sun: { value: new T.Vector3(...STUDY_SUN.direction) } },
     vertexShader: `varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader: `varying vec3 p;uniform float time;uniform vec3 top,horizon;
+    fragmentShader: `varying vec3 p;uniform float time;uniform vec3 top,mid,horizon,sun;
       float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
       float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+1.71;a*=.5;}return v;}
-      void main(){vec3 d=normalize(p);float y=smoothstep(-.12,.40,d.y);vec3 c=mix(horizon,top,y);vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.98,.89,.87),cloud*.70);float glow=pow(max(0.,dot(d,normalize(vec3(-.8,.25,.3)))),34.);c+=vec3(.25,.16,.07)*glow;gl_FragColor=vec4(c,1.);
-      #include <tonemapping_fragment>
+      void main(){vec3 d=normalize(p);vec3 c=mix(horizon,mid,smoothstep(0.,.18,d.y));c=mix(c,top,smoothstep(.18,.75,d.y));
+      float lift=smoothstep(0.,.16,d.y);
+      vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.965,.831,.871),cloud*.55*lift);
+      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*.20+pow(key,60.)*.5)*lift;c=min(c,vec3(1.));gl_FragColor=vec4(c,1.);
       #include <colorspace_fragment>
       }` }));
   mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
-  const water = material(new T.MeshPhysicalMaterial({ color: "#72b9b9", roughness: .2, metalness: .36, clearcoat: .75, clearcoatRoughness: .2 }));
+  const halo = studySunHalo();
+  halo.sprites.forEach(sprite => scene.add(sprite)); halo.materials.forEach(material); texture(halo.map);
+  const water = material(new T.MeshPhysicalMaterial({ color: "#72b9b9", roughness: .2, metalness: .36, clearcoat: .75, clearcoatRoughness: .2, dithering: true }));
   water.onBeforeCompile = shader => {
     shader.uniforms.studyTime = time;
     shader.vertexShader = "varying vec3 waterPosition;\n" + shader.vertexShader.replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nwaterPosition=(modelMatrix*vec4(position,1.)).xyz;");
@@ -275,7 +283,7 @@ export function createDesignWorld(): WorldScene {
     if (disposed) { gltf.scene.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); }); return; }
     heartRoot.add(gltf.scene); scene.userData.prototypeHeartReady = true; invalidate();
   }, undefined, error => { if (!disposed) { scene.userData.prototypeHeartError = "Original heart did not load"; console.error("Design study original heart", error); invalidate(); } });
-  const silkMat = material(new T.MeshPhysicalMaterial({ color: "#f9ded6", roughness: .36, metalness: .035, transparent: true, opacity: .31, side: T.DoubleSide, depthWrite: false, sheen: 1, sheenColor: new T.Color("#fff0df"), sheenRoughness: .38 }));
+  const silkMat = material(new T.MeshPhysicalMaterial({ color: "#f9ded6", roughness: .36, metalness: .035, transparent: true, opacity: .31, side: T.DoubleSide, depthWrite: false, sheen: 1, sheenColor: new T.Color("#fff0df"), sheenRoughness: .38, dithering: true }));
   const ribbons: T.Mesh[] = [];
   for (let index = 0; index < 4; index++) {
     const g = geometry(new T.PlaneGeometry(1,1,100,6)), o = mesh(sanctuary,g,silkMat);o.userData.dynamic=true;ribbons.push(o);
@@ -339,8 +347,8 @@ export function createDesignWorld(): WorldScene {
   lotus.userData.dynamic=portal.userData.dynamic=constellation.userData.dynamic=true;
   const lotusPetals:T.Mesh[]=[];
   const lotusShape=petalGeometry(40,24);
-  const lotusPink=material(new T.MeshPhysicalMaterial({color:"#ed9cba",roughness:.42,sheen:1,sheenColor:new T.Color("#fff0df"),side:T.DoubleSide}));
-  const lotusPale=material(new T.MeshPhysicalMaterial({color:"#f7c9d1",roughness:.4,sheen:1,sheenColor:new T.Color("#fff5dd"),side:T.DoubleSide}));
+  const lotusPink=studyRim(material(new T.MeshPhysicalMaterial({color:"#ed9cba",roughness:.42,sheen:1,sheenColor:new T.Color("#fff0df"),side:T.DoubleSide})),"#fff0d8",3,.25);
+  const lotusPale=studyRim(material(new T.MeshPhysicalMaterial({color:"#f7c9d1",roughness:.4,sheen:1,sheenColor:new T.Color("#fff5dd"),side:T.DoubleSide})),"#fff0d8",3,.25);
   for(let k=0;k<18;k++){const inner=k>=10,o=mesh(lotus,lotusShape,k%3?lotusPink:lotusPale,[0,.4,0],inner?[2.4,6.3,4.3]:[3.2,5.1,6.0]);o.rotation.y=k*Math.PI*2/(inner?8:10);o.userData.dynamic=true;lotusPetals.push(o);}
   for(let k=0;k<3;k++){const p=mesh(portal,geometry(new T.TorusGeometry(7.4+k*.37,.07,10,120)),k===1?ivory:gold,[0,8.7,0]);p.rotation.set(.09,k*.25-.2,-.14+k*.13);}
   for(let ribbon=0;ribbon<3;ribbon++){
@@ -369,15 +377,24 @@ export function createDesignWorld(): WorldScene {
   }
   for(const id of ["garden","heart","expressions"] as const){const root=districtRoots.get(id)!;figure(root,-5,8,"#d788a9");figure(root,-3.8,8.5,"#a79ac9");}
 
-  const fireflies = instance(scene,pollen,material(new T.MeshBasicMaterial({color:"#fff1ca",transparent:true,opacity:.8,toneMapped:false})),90);
-  const rand=seededRandom(455);for(let i=0;i<90;i++)stamp(fireflies,i,new T.Vector3((rand()-.5)*125,2+rand()*18,(rand()-.5)*115-15),[.026,.026,.026],new T.Euler());finish(fireflies);
+  // Soft glowing dots that breathe, in place of the old solid firefly cubes.
+  const sparkleCount=140,sparklePlaces=new Float32Array(sparkleCount*3),sparklePhase=new Float32Array(sparkleCount);
+  const rand=seededRandom(455);
+  for(let i=0;i<sparkleCount;i++){
+    sparklePlaces[i*3]=(rand()-.5)*125;sparklePlaces[i*3+1]=2+rand()*18;sparklePlaces[i*3+2]=(rand()-.5)*115-15;sparklePhase[i]=rand();
+  }
+  const sparkleGeometry=geometry(new T.BufferGeometry());
+  sparkleGeometry.setAttribute("position",new T.BufferAttribute(sparklePlaces,3));
+  sparkleGeometry.setAttribute("phase",new T.BufferAttribute(sparklePhase,1));
+  const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,texture(softDot(64)))));
+  sparkleField.name="Study sparkles";sparkleField.frustumCulled=false;scene.add(sparkleField);
   motions.forEach(fn=>fn(0));districtRoots.forEach(batch);batch(entry);
   return {
     scene, anchors: WORLD_EXPRESSIONS.map((_,i)=>new T.Vector3(14+Math.cos(i)*10,5,-45+Math.sin(i)*10)), recognitionPearls: [],
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
     setEffects(s, t) { sparkles=s;trails=t; },
     update(t,_zone,arrival){
-      time.value=t;motions.forEach(fn=>fn(t));ribbons.forEach(o=>{o.visible=trails;});fireflies.visible=sparkles;fireflies.rotation.y=Math.sin(t*.016)*.04;
+      time.value=t;motions.forEach(fn=>fn(t));ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
       const active=!!arrival&&arrival.phase!=="idle"&&arrival.phase!=="return";
       const style=studyArrival(scene.userData.studyArrival);
       lotus.visible=active&&style==="bloom";portal.visible=active&&style==="ribbon";constellation.visible=active&&style==="constellation";

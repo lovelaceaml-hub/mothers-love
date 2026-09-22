@@ -7,6 +7,7 @@ import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, type StudyArrival } from "./prototype/design-mode";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
+import { STUDY_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import {
   RECOGNITION_ZONES,
@@ -89,7 +90,8 @@ export class WorldEngine {
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       this.renderer.toneMappingExposure = 0.82;
       if (isWorldDesignStudy()) {
-        this.renderer.toneMappingExposure = .84;
+        this.renderer.toneMapping = THREE.NeutralToneMapping;
+        this.renderer.toneMappingExposure = STUDY_TONE.exposure;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.world.scene.userData.invalidate = () => { this.dirty = true; };
@@ -104,7 +106,7 @@ export class WorldEngine {
       }
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
-      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = .68;
+      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = STUDY_TONE.environmentIntensity;
     } catch (error) {
       this.bubbles.dispose();
       this.world.dispose();
