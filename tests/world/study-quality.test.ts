@@ -1,8 +1,9 @@
 import * as T from "three";
 import { describe, expect, it } from "vitest";
 import { studyPixelRatio } from "../../src/components/display/world/prototype/study-lighting";
-import { studyPetal, studyTerrace } from "../../src/components/display/world/prototype/study-geometry";
-import { softDot } from "../../src/components/display/world/prototype/study-materials";
+import { STUDY_RIBBON_PHASE, studyPetal, studyRibbonPoint, studyTerrace } from "../../src/components/display/world/prototype/study-geometry";
+import { softDot, studySilk, studyStone } from "../../src/components/display/world/prototype/study-materials";
+import { studyLandmarkCloudSites, studyLandmarkLayout } from "../../src/components/display/world/prototype/study-landmarks";
 import { studyCanopyPuffs } from "../../src/components/display/world/prototype/study-canopy";
 import { studyCloudLayout } from "../../src/components/display/world/prototype/study-clouds";
 import { ZONES } from "../../src/components/display/world/world-data";
@@ -131,5 +132,110 @@ describe("study cotton canopy", () => {
   it("stays deterministic per seed and differs between seeds", () => {
     expect(studyCanopyPuffs(5)).toEqual(studyCanopyPuffs(5));
     expect(studyCanopyPuffs(5)).not.toEqual(studyCanopyPuffs(6));
+  });
+});
+
+describe("study landmark horizon", () => {
+  it("lays out the same six landmarks on every call", () => {
+    expect(studyLandmarkLayout()).toEqual(studyLandmarkLayout());
+    expect(studyLandmarkLayout().length).toBe(6);
+  });
+  it("keeps every landmark past the connected world, inside the sky, and off every district", () => {
+    for (const site of studyLandmarkLayout()) {
+      const [x, y, z] = site.center;
+      expect(Math.sqrt(x * x + z * z)).toBeGreaterThanOrEqual(150);
+      expect(Math.sqrt(x * x + z * z)).toBeLessThanOrEqual(260);
+      expect(Math.sqrt(x * x + y * y + z * z)).toBeLessThan(400);
+      for (const zone of ZONES) {
+        const gap = new T.Vector3(x, y, z).distanceTo(new T.Vector3(zone.center[0], zone.center[1], zone.center[2]));
+        expect(gap).toBeGreaterThanOrEqual(70);
+      }
+      expect(site.radius).toBeGreaterThanOrEqual(9);
+      expect(site.radius).toBeLessThanOrEqual(16);
+      expect(site.domeRadius).toBeGreaterThanOrEqual(4);
+      expect(site.domeRadius).toBeLessThanOrEqual(7);
+      expect(site.columns).toBeGreaterThanOrEqual(4);
+      expect(site.columns).toBeLessThanOrEqual(6);
+      expect(site.arches).toBeGreaterThanOrEqual(1);
+      expect(site.arches).toBeLessThanOrEqual(2);
+    }
+  });
+  it("gives every landmark its own cloud collar without disturbing the district collars", () => {
+    const layout = studyLandmarkLayout();
+    const withLandmarks = studyCloudLayout(777, studyLandmarkCloudSites(layout));
+    const plain = studyCloudLayout(777);
+    expect(withLandmarks.sky).toEqual(plain.sky);
+    expect(withLandmarks.island.slice(0, ZONES.length * 7)).toEqual(plain.island);
+    const extra = withLandmarks.island.length - ZONES.length * 7;
+    expect(extra).toBeGreaterThanOrEqual(layout.length * 3);
+    expect(extra).toBeLessThanOrEqual(layout.length * 4);
+  });
+});
+
+describe("study island stone and Sanctuary silk", () => {
+  it("builds both materials outside a browser, with distinct program keys", () => {
+    const stone = studyStone(), silk = studySilk();
+    expect(stone).toBeInstanceOf(T.MeshStandardMaterial);
+    expect(silk).toBeInstanceOf(T.MeshPhysicalMaterial);
+    expect(stone.color.getHexString()).toBe("f3e3da");
+    expect(stone.roughness).toBeCloseTo(.86);
+    expect(stone.customProgramCacheKey()).toContain("study-stone-v1");
+    expect(stone.customProgramCacheKey()).not.toBe(silk.customProgramCacheKey());
+    stone.dispose();
+    silk.dispose();
+  });
+  it("injects the underside gradient and the rim into the compiled stone shader", () => {
+    const stone = studyStone();
+    const shader = {
+      uniforms: {} as Record<string, unknown>,
+      vertexShader: "#include <begin_vertex>",
+      fragmentShader: "#include <color_fragment>\n#include <opaque_fragment>",
+    };
+    stone.onBeforeCompile(shader as never, null as never);
+    expect(shader.vertexShader).toContain("studyLocalY = position.y");
+    expect(shader.vertexShader).toContain("vStoneXZ = position.xz");
+    expect(shader.fragmentShader).toContain("smoothstep(-5.9,-1.2,studyLocalY)");
+    expect(shader.fragmentShader).toContain("studyRimColor");
+    expect(shader.uniforms.studyRimColor).toBeDefined();
+    stone.dispose();
+  });
+});
+
+describe("Sanctuary silk clears the sculpted heart", () => {
+  // The heart root sits at (0, 8.7, 0) in the Sanctuary's local space at scale 3.25.
+  // The supplied GLB spans x 1.389, y -1.181 to 1.508 and z .827 before that scale, and the
+  // root sways up to .35 rad about y, so its axis-aligned footprint reaches about 5.16 wide,
+  // 4.9 tall and 4.1 deep. The box below is a conservative superset of that footprint.
+  const CENTRE = new T.Vector3(0, 8.7, 0), HALF = new T.Vector3(5.3, 5.0, 4.2), TIMES = [0, 10, 60, 300];
+  it("never puts a ribbon vertex inside the heart's bounding box", () => {
+    const point = new T.Vector3();
+    let closest = Infinity;
+    for (const t of TIMES) {
+      for (let index = 0; index < 4; index++) {
+        for (let i = 0; i <= 400; i++) {
+          for (let j = 0; j <= 6; j++) {
+            studyRibbonPoint(index, i / 400, j / 6 - .5, t, point);
+            expect([point.x, point.y, point.z].every(Number.isFinite)).toBe(true);
+            closest = Math.min(closest, Math.max(
+              Math.abs(point.x - CENTRE.x) - HALF.x,
+              Math.abs(point.y - CENTRE.y) - HALF.y,
+              Math.abs(point.z - CENTRE.z) - HALF.z,
+            ));
+          }
+        }
+      }
+    }
+    expect(closest).toBeGreaterThan(.2);
+  });
+  it("starts every ribbon below the heart and ends it above", () => {
+    const point = new T.Vector3();
+    expect(new Set(STUDY_RIBBON_PHASE).size).toBe(4);
+    for (const t of TIMES) {
+      for (let index = 0; index < 4; index++) {
+        // The heart itself spans y 4.86 to 13.6 in this space (GLB extents at scale 3.25).
+        expect(studyRibbonPoint(index, 0, 0, t, point).y).toBeLessThan(4.7);
+        expect(studyRibbonPoint(index, 1, 0, t, point).y).toBeGreaterThan(13.7);
+      }
+    }
   });
 });

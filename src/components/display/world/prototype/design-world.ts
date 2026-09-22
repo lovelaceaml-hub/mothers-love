@@ -8,9 +8,10 @@ import { studyCanopyPuffs, studyCottonMaterial } from "./study-canopy";
 import { createStudyClouds, studyCloudAtlas, studyCloudLayout } from "./study-clouds";
 import { arrivalPose } from "./arrival-choreography";
 import { bloomStage, constellationStage, ribbonStage, type StageContext } from "./arrival-stages";
-import { studyPetal, studyTerrace } from "./study-geometry";
+import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
-import { softDot, sparklePoints, studyRim, studySilk } from "./study-materials";
+import { softDot, sparklePoints, studyRim, studySilk, studyStone } from "./study-materials";
+import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
 
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
@@ -31,13 +32,14 @@ export function createDesignWorld(): WorldScene {
   const texture = <X extends T.Texture>(t: X) => { textures.add(t); return t; };
   const invalidate = () => { if (!disposed) scene.userData.invalidate?.(); };
   const ivory = studyRim(material(new T.MeshPhysicalMaterial({ color: "#fff4e4", roughness: .28, metalness: .025, clearcoat: .42, clearcoatRoughness: .25, dithering: true })), "#ffe6c9", 3, .22);
-  const edge = material(new T.MeshStandardMaterial({ color: "#e1cdb7", roughness: .64, dithering: true }));
-  const gold = material(new T.MeshStandardMaterial({ color: "#d3ae6c", metalness: .78, roughness: .27 }));
+  const edge = material(new T.MeshStandardMaterial({ color: "#f2dfd3", roughness: .64, dithering: true }));
+  const gold = material(new T.MeshStandardMaterial({ color: "#e6c17c", metalness: .82, roughness: .24 }));
   const roseGold = material(new T.MeshStandardMaterial({ color: "#8d7462", metalness: .05, roughness: .77 }));
-  const rose = studyRim(material(new T.MeshPhysicalMaterial({ color: "#d9567f", roughness: .44, metalness: .04, clearcoat: .45, clearcoatRoughness: .48, sheen: .2, sheenColor: new T.Color("#ffc5d5"), dithering: true })), "#ffb6c8", 2.5, .3);
-  const leaf = material(new T.MeshPhysicalMaterial({ color: "#739a77", roughness: .57, sheen: .2, side: T.DoubleSide }));
-  const lawn = material(new T.MeshStandardMaterial({ color: "#a8c7a8", roughness: .96, metalness: 0 }));
-  const rock = material(new T.MeshStandardMaterial({ color: "#acbcb6", roughness: .95 }));
+  // Cosmetic only. The supplied heart GLB, its geometry and its normals are never touched.
+  const rose = studyRim(material(new T.MeshPhysicalMaterial({ color: "#e05d85", roughness: .36, metalness: .04, clearcoat: .55, clearcoatRoughness: .3, sheen: .35, sheenColor: new T.Color("#ffd1dd"), emissive: new T.Color("#3a0a1c"), emissiveIntensity: .06, dithering: true })), "#ffb6c8", 2.5, .3);
+  const leaf = material(new T.MeshPhysicalMaterial({ color: "#8fb48c", roughness: .57, sheen: .2, side: T.DoubleSide }));
+  const lawn = material(new T.MeshStandardMaterial({ color: "#c1d7ad", roughness: .9, metalness: 0 }));
+  const stone = material(studyStone());
   const bloom = material(new T.MeshPhysicalMaterial({ color: "#ffffff", roughness: .46, sheen: .65, sheenColor: new T.Color("#ffe4e9"), sheenRoughness: .5, vertexColors: true, side: T.DoubleSide }));
   // Thin petals transmit a little broad backlight without a second scene render or transparency sorting.
   bloom.onBeforeCompile = shader => {
@@ -82,7 +84,7 @@ export function createDesignWorld(): WorldScene {
   function finish(o: T.InstancedMesh) { o.instanceMatrix.needsUpdate = true; if (o.instanceColor) o.instanceColor.needsUpdate = true; o.computeBoundingSphere(); }
 
   // Preserve attributes in compatible static batches. Imported heart and animated cloth never enter this path.
-  function batch(group: T.Group) {
+  function batch(group: T.Group, shadows = true) {
     group.updateMatrixWorld(true); const inverse = group.matrixWorld.clone().invert();
     const groups = new Map<string, T.Mesh[]>();
     function walk(o: T.Object3D) {
@@ -97,13 +99,31 @@ export function createDesignWorld(): WorldScene {
       if (meshes.length < 3) continue;
       const copies = meshes.map(o => { const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(inverse.clone().multiply(o.matrixWorld)); return g; });
       const merged = mergeGeometries(copies, false); copies.forEach(g => g.dispose()); if (!merged) continue;
-      meshes.forEach(o => o.removeFromParent()); const out = mesh(group, geometry(merged), meshes[0].material as T.Material); out.castShadow = true;
+      meshes.forEach(o => o.removeFromParent());
+      const source = meshes[0].material as T.Material;
+      const out = mesh(group, geometry(merged), source);
+      out.castShadow = shadows; out.receiveShadow = shadows && !source.transparent;
+      // Named so a later pass can address a merged mesh, for example to put the gold or the decks on a render layer.
+      out.name = `${group.name} merged ${source.name || source.type}`;
     }
   }
 
   scene.add(new T.HemisphereLight("#f7dbe0", "#cfa79d", .55));
-  const sun = new T.DirectionalLight(STUDY_SUN.color, 2.3); sun.position.set(...STUDY_SUN.lightPosition);
-  sun.castShadow = true; sun.shadow.intensity = STUDY_TONE.shadowIntensity; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = sun.shadow.camera.bottom = -120; sun.shadow.camera.right = sun.shadow.camera.top = 120; sun.shadow.camera.far = 300; sun.shadow.normalBias = .06; sun.shadow.bias = -.0002; scene.add(sun);
+  const sun = new T.DirectionalLight(STUDY_SUN.color, 2.3);
+  // STUDY_SUN fixes the direction; the distance only decides where the orthographic shadow
+  // box sits along that ray. At the authored length the two high districts at z -112 (orbit
+  // and milestone) sat behind the shadow camera near plane and received no shadow at all, so
+  // the light is pushed out along the same direction. Shadow angles are unchanged.
+  sun.position.set(...STUDY_SUN.lightPosition).setLength(180);
+  sun.castShadow = true; sun.shadow.intensity = STUDY_TONE.shadowIntensity; sun.shadow.mapSize.set(2048, 2048);
+  // Bounds measured in light space over all 13 district footprints and the arrival platform, and
+  // left asymmetric so the box stays tight: 227 by 125 units is a finer texel on a 2048 map than
+  // the old symmetric 240 by 240 box, and the worst remaining district margin is about 10 units.
+  sun.shadow.camera.left = -126; sun.shadow.camera.right = 101;
+  sun.shadow.camera.bottom = -60; sun.shadow.camera.top = 65;
+  sun.shadow.camera.near = 20; sun.shadow.camera.far = 290;
+  sun.shadow.normalBias = .06; sun.shadow.bias = -.0002; scene.add(sun);
+  scene.userData.studySun = sun;
   const fill = new T.DirectionalLight("#ffd0c8", .75); fill.position.set(70, 38, 95); scene.add(fill);
   // A quiet lavender bounce from the cool side of the sky, in place of the old pink rim light.
   const cool = new T.DirectionalLight("#c9c3ff", .35); cool.position.set(80, 30, -40); scene.add(cool);
@@ -121,21 +141,39 @@ export function createDesignWorld(): WorldScene {
   mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
   const halo = studySunHalo();
   halo.sprites.forEach(sprite => scene.add(sprite)); halo.materials.forEach(material); texture(halo.map);
-  const water = material(new T.MeshPhysicalMaterial({ color: "#72b9b9", roughness: .2, metalness: .36, clearcoat: .75, clearcoatRoughness: .2, dithering: true }));
+  // Turquoise, glossier, with a second high frequency ripple and a tight sun glitter path.
+  // Verified against three 0.180 meshphysical: at `#include <lights_fragment_end>` the shader
+  // carries `reflectedLight`, the perturbed view space `normal` and `vViewPosition`, and the
+  // fragment prefix declares `viewMatrix`, so the world space sun folds into view space here.
+  const water = material(new T.MeshPhysicalMaterial({ color: "#6ec9cf", roughness: .14, metalness: .14, clearcoat: .55, clearcoatRoughness: .12, envMapIntensity: .95, dithering: true }));
   water.onBeforeCompile = shader => {
     shader.uniforms.studyTime = time;
+    shader.uniforms.studySunWorld = { value: new T.Vector3(...STUDY_SUN.direction) };
     shader.vertexShader = "varying vec3 waterPosition;\n" + shader.vertexShader.replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nwaterPosition=(modelMatrix*vec4(position,1.)).xyz;");
-    shader.fragmentShader = "varying vec3 waterPosition;uniform float studyTime;\n" + shader.fragmentShader.replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
-      vec2 q=waterPosition.xz;float dx=.034*cos(q.x*.33+q.y*.18+studyTime*.32)+.017*cos(q.x*.9-q.y*.4-studyTime*.23);
-      float dz=.028*cos(q.y*.44-q.x*.13-studyTime*.28)+.009*sin(q.x*.55+q.y*.7+studyTime*.18);
-      normal=normalize(mat3(viewMatrix)*vec3(-dx,1.,-dz));`);
+    shader.fragmentShader = "varying vec3 waterPosition;uniform float studyTime;uniform vec3 studySunWorld;\n" + shader.fragmentShader
+      .replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
+      vec2 q=waterPosition.xz;float dx=.034*cos(q.x*.33+q.y*.18+studyTime*.32)+.017*cos(q.x*.9-q.y*.4-studyTime*.23)+.010*sin(q.x*6.7+studyTime*1.3)*cos(q.y*5.3-studyTime*.9);
+      float dz=.028*cos(q.y*.44-q.x*.13-studyTime*.28)+.009*sin(q.x*.55+q.y*.7+studyTime*.18)+.008*cos(q.x*9.1-studyTime*1.1);
+      normal=normalize(mat3(viewMatrix)*vec3(-dx,1.,-dz));`)
+      .replace("#include <opaque_fragment>", `vec3 studyV = normalize(vViewPosition);
+      vec3 studyR = reflect(-studyV, normal);
+      vec3 studyS = normalize((viewMatrix * vec4(studySunWorld, 0.)).xyz);
+      // The sun path adds straight to outgoingLight. Added to reflectedLight.directSpecular
+      // instead, the clearcoat block below <lights_fragment_end> scales it by (1 - clearcoat * Fcc),
+      // which at the grazing angles a sea is seen from erases most of the glitter.
+      outgoingLight += vec3(1.,.9,.72) * pow(max(0., dot(studyR, studyS)), 320.) * 2.2;
+#include <opaque_fragment>`);
   };
-  water.customProgramCacheKey = () => "study-outdoor-water-v1";
+  water.customProgramCacheKey = () => "study-outdoor-water-v2";
+  // Named so every merged mesh below carries a readable name a later pass can find.
+  ivory.name = "ivory"; edge.name = "edge"; gold.name = "gold"; stone.name = "stone"; lawn.name = "lawn";
+  leaf.name = "leaf"; rose.name = "rose"; roseGold.name = "rose gold"; bloom.name = "bloom"; water.name = "water";
   const sea = mesh(scene, geometry(new T.CircleGeometry(320, 96)), water, [0, -5, -30]); sea.rotation.x = -Math.PI / 2;
 
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.
-  const clouds = createStudyClouds(studyCloudLayout(777), texture(studyCloudAtlas()), time);
+  const landmarkLayout = studyLandmarkLayout();
+  const clouds = createStudyClouds(studyCloudLayout(777, studyLandmarkCloudSites(landmarkLayout)), texture(studyCloudAtlas()), time);
   clouds.geometries.forEach(geometry); clouds.materials.forEach(material);
   clouds.meshes.forEach(o => { instances.add(o); scene.add(o); });
 
@@ -195,24 +233,39 @@ export function createDesignWorld(): WorldScene {
     finish(crowns.mesh);
     contact(parent, x, z, 7 * size, 5.5 * size);
   }
-  function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number) {
+  function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number, contacts = true, detail = 80) {
     const root = new T.Group(); root.position.set(x, y, z); parent.add(root);
     const points = Array.from({ length: 25 }, (_, i) => { const a = i / 24 * Math.PI; return new T.Vector3(Math.cos(a) * width / 2, height * .57 + Math.sin(a) * height * .43, 0); });
-    tube(root, points, .31, ivory, 80); tube(root, points.map(p => p.clone().add(new T.Vector3(0, .025, .26))), .022, gold, 80);
+    tube(root, points, .31, ivory, detail); tube(root, points.map(p => p.clone().add(new T.Vector3(0, .025, .26))), .022, gold, detail);
     for (const s of [-1, 1]) {
       mesh(root, cylinder, ivory, [s * width / 2, height * .285, 0], [.32, height * .57, .32]);
       for (const h of [.13, .36, height * .56]) mesh(root, cylinder, h === .13 ? edge : gold, [s * width / 2, h, 0], [.45, h === .13 ? .2 : .06, .45]);
-      contact(root, s * width / 2, 0, 2.3, 1.7, .035);
+      if (contacts) contact(root, s * width / 2, 0, 2.3, 1.7, .035);
     }
     return root;
   }
-  const islandShape = geometry(new T.LatheGeometry(new T.SplineCurve([new T.Vector2(0,-5.9),new T.Vector2(.25,-5.4),new T.Vector2(.42,-4.2),new T.Vector2(.62,-3.8),new T.Vector2(.73,-2.6),new T.Vector2(.96,-1.9),new T.Vector2(1,-.55),new T.Vector2(.98,0)]).getPoints(48), 96));
+  const islandProfile = new T.SplineCurve([new T.Vector2(0,-5.9),new T.Vector2(.25,-5.4),new T.Vector2(.42,-4.2),new T.Vector2(.62,-3.8),new T.Vector2(.73,-2.6),new T.Vector2(.96,-1.9),new T.Vector2(1,-.55),new T.Vector2(.98,0)]);
+  const islandShape = geometry(new T.LatheGeometry(islandProfile.getPoints(48), 96));
+  // The same silhouette at a fraction of the cost, for keels no viewer sees closer than 190 units.
+  const islandShapeFar = geometry(new T.LatheGeometry(islandProfile.getPoints(20), 32));
   const falls: T.Mesh[] = [];
-  const fall = material(new T.ShaderMaterial({ transparent: true, side: T.DoubleSide, depthWrite: false, uniforms: { time },
-    vertexShader: `varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader: `varying vec2 v;uniform float time;void main(){float thread=.6+.25*sin(v.x*120.+sin(v.y*8.-time)*1.1)+.15*sin(v.x*279.-time*.2);float crest=pow(max(0.,sin(v.y*28.-time*3.+v.x*3.)),12.);float edge=pow(max(0.,sin(v.x*3.14159)),.5);float fade=smoothstep(0.,.07,v.y);gl_FragColor=vec4(mix(vec3(.52,.78,.78),vec3(.99,.96,.88),thread),edge*fade*(.27+thread*.3+crest*.12));
+  // A raw ShaderMaterial opts out of fog unless it asks for it, which left the far waterfalls
+  // sitting in front of the haze. The fog uniforms are merged the same way study-clouds does it,
+  // and the shared study clock is re-attached afterwards because merge() clones its values.
+  const fallUniforms = T.UniformsUtils.merge([T.UniformsLib.fog]);
+  fallUniforms.time = time;
+  const fall = material(new T.ShaderMaterial({ transparent: true, side: T.DoubleSide, depthWrite: false, fog: true, uniforms: fallUniforms,
+    vertexShader: `varying vec2 v;
+    #include <fog_pars_vertex>
+    void main(){v=uv;vec4 mvPosition=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mvPosition;
+    #include <fog_vertex>
+    }`,
+    fragmentShader: `varying vec2 v;uniform float time;
+    #include <fog_pars_fragment>
+    void main(){float thread=.6+.25*sin(v.x*120.+sin(v.y*8.-time)*1.1)+.15*sin(v.x*279.-time*.2);float crest=pow(max(0.,sin(v.y*28.-time*3.+v.x*3.)),12.);float edge=pow(max(0.,sin(v.x*3.14159)),.5);float fade=smoothstep(0.,.07,v.y);gl_FragColor=vec4(mix(vec3(.52,.78,.78),vec3(.99,.96,.90),thread),edge*fade*(.27+thread*.3+crest*.12));
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
+    #include <fog_fragment>
     }` }));
   function waterfall(parent: T.Object3D, x: number, z: number, height: number, width: number, rotation: number) {
     const o = mesh(parent, geometry(new T.PlaneGeometry(width, height, 8, 18)), fall, [x, .25 - height / 2, z]); o.rotation.y = rotation; falls.push(o);
@@ -222,7 +275,7 @@ export function createDesignWorld(): WorldScene {
   ZONES.forEach((zone, i) => {
     const root = new T.Group(); root.name = `Design district: ${zone.id}`; root.position.fromArray(zone.center); scene.add(root); districtRoots.set(zone.id, root);
     const radius = i < 3 ? 17.8 : 13.8;
-    mesh(root, islandShape, rock, [0, -.9, 0], [radius * 1.01, 1.25 + i % 3 * .2, radius * .97]);
+    mesh(root, islandShape, stone, [0, -.9, 0], [radius * 1.01, 1.25 + i % 3 * .2, radius * .97]);
     for (let layer = 0; layer < 3; layer++) {
       mesh(root, geometry(studyTerrace(radius - layer * .65, radius - layer * .65 + .2, .38)), layer === 2 ? ivory : edge, [0, -.35 + layer * .42, 0]);
       ring(root, radius - layer * .65 - .12, -.14 + layer * .42, .018);
@@ -289,6 +342,17 @@ export function createDesignWorld(): WorldScene {
     mesh(scene,g,ivory);rails.forEach(points=>tube(scene,points,.045,gold,48));
   }
 
+  // A horizon that is not empty haze. Six far islands carrying domes, colonnades and arches sit
+  // between 190 and 240 units out, past the fog far distance, so they read as pale silhouettes.
+  // They are static, so the same batcher collapses the whole horizon to one call per material.
+  const landmarks = createStudyLandmarks(landmarkLayout, {
+    geometry, ivory, edge, gold, stone, cylinder,
+    underside: islandShapeFar,
+    terrace: (top, bottom, height, segments) => studyTerrace(top, bottom, height, segments),
+    arch: (parent, x, y, z, width, height) => arch(parent, x, y, z, width, height, false, 28),
+  });
+  scene.add(landmarks);
+
   // Sanctuary silhouette: curved ivory arcade, original sculpted heart, independent silk.
   const sanctuary = districtRoots.get("heart")!;
   const arcade = new T.Group(); arcade.rotation.y = Math.atan2(14,28); sanctuary.add(arcade);
@@ -307,14 +371,21 @@ export function createDesignWorld(): WorldScene {
   // One silk recipe now serves the Sanctuary ribbons and the arrival ribbon study.
   const silkMat = material(studySilk()); silkMat.color.set("#f9cfd6");
   const ribbons: T.Mesh[] = [];
+  // The four ribbons used to orbit at radius 5.7 while the heart is 4.5 half-wide, so from the
+  // paused Sanctuary framing they crossed the heart as four broad horizontal bands. They now
+  // clear the heart by a wide margin and climb away from it, and the phase offsets were chosen
+  // numerically so that at the still clock every ribbon passes clear of the heart silhouette,
+  // two to each side. The minimum radius, 8.0 - .7 - .15 = 7.15, keeps every vertex outside the
+  // heart's scaled, swaying footprint (5.3 wide by 4.2 deep), whose far corner sits 6.76 units out.
+  // The path itself lives in study-geometry, so a plain Node test proves it clear of the heart.
+  const ribbonPoint = new T.Vector3();
   for (let index = 0; index < 4; index++) {
     const g = geometry(new T.PlaneGeometry(1,1,100,6)), o = mesh(sanctuary,g,silkMat);o.userData.dynamic=true;ribbons.push(o);
     motions.push(t=>{
       const p=g.getAttribute("position");
       for(let j=0;j<=6;j++)for(let i=0;i<=100;i++){
-        const u=i/100,v=j/6-.5,a=u*Math.PI*(2.02+index*.17)+index*1.65+t*(.054+index*.009);
-        const width=Math.pow(Math.max(.00001,Math.sin(u*Math.PI)),.7)*(1.3+index*.22),r=5.7+Math.sin(u*5+index)*.9+Math.sin(t*.27+index)*.3;
-        p.setXYZ(j*101+i,Math.cos(a)*(r+v*.35),2.8+u*11.7+Math.sin(a+t*.1+index)*1.2+v*width+Math.sin(u*37+v*7+t*(.8+index*.08))*.08,Math.sin(a)*(r+v*.4));
+        studyRibbonPoint(index,i/100,j/6-.5,t,ribbonPoint);
+        p.setXYZ(j*101+i,ribbonPoint.x,ribbonPoint.y,ribbonPoint.z);
       }p.needsUpdate=true;g.computeVertexNormals();
     });
   }
@@ -395,13 +466,19 @@ export function createDesignWorld(): WorldScene {
   sparkleGeometry.setAttribute("phase",new T.BufferAttribute(sparklePhase,1));
   const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,texture(softDot(64)))));
   sparkleField.name="Study sparkles";sparkleField.frustumCulled=false;scene.add(sparkleField);
-  motions.forEach(fn=>fn(0));districtRoots.forEach(batch);batch(entry);
+  // The landmarks opt out of shadow casting: the sun shadow box covers the connected world only.
+  motions.forEach(fn=>fn(0));districtRoots.forEach(root=>batch(root));batch(entry);batch(landmarks,false);
   return {
     scene, anchors: WORLD_EXPRESSIONS.map((_,i)=>new T.Vector3(14+Math.cos(i)*10,5,-45+Math.sin(i)*10)), recognitionPearls: [],
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
     setEffects(s, t) { sparkles=s;trails=t; },
     update(t,_zone,arrival){
       time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
+      // The engine resolves the picture quality tier and publishes it on the scene in resize().
+      // Low drops the sky cloud ring, which is pure overdraw near the horizon, and halves the sparkles.
+      const lowTier=scene.userData.lowTier===true;
+      clouds.meshes[0].visible=!lowTier;
+      sparkleGeometry.setDrawRange(0,lowTier?Math.floor(sparkleCount/2):sparkleCount);
       const pose=arrivalPose(arrival);
       scene.userData.studyArrivalPose=pose;
       const style=studyArrival(scene.userData.studyArrival);

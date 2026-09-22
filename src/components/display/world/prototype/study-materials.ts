@@ -166,3 +166,38 @@ diffuseColor.a *= 1.0 - silkF * .25;
   silk.customProgramCacheKey = () => "study-silk-v1";
   return silk;
 }
+
+/**
+ * The sculpted rock of every floating island: warm ivory at the walkable rim,
+ * deepening to a rose shadow under the keel, with a slow vertical ripple so the
+ * lathe reads as carved stone rather than a smooth cone.
+ *
+ * Verified against three 0.180 `ShaderLib/meshphysical.glsl.js`, which
+ * MeshStandardMaterial also compiles: `vec4 diffuseColor` is declared before
+ * `<map_fragment>` and `<color_fragment>`, so the tint multiply goes after
+ * `<color_fragment>`, where diffuse is final. `#include <begin_vertex>` is the
+ * first place the vertex stage has run, and `position` is still object space
+ * there, so `studyLocalY` spans the lathe profile (-5.9 to 0).
+ *
+ * Section 6 and 7 chain further `onBeforeCompile` patches onto this material,
+ * so it is built by a factory and keeps a distinct program key.
+ */
+export function studyStone() {
+  const stone = new T.MeshStandardMaterial({ color: "#f3e3da", roughness: .86, dithering: true });
+  stone.onBeforeCompile = shader => {
+    shader.vertexShader = "varying float studyLocalY;\nvarying vec2 vStoneXZ;\n" + shader.vertexShader.replace(
+      "#include <begin_vertex>",
+      `#include <begin_vertex>
+studyLocalY = position.y;
+vStoneXZ = position.xz;`,
+    );
+    shader.fragmentShader = "varying float studyLocalY;\nvarying vec2 vStoneXZ;\n" + shader.fragmentShader.replace(
+      "#include <color_fragment>",
+      `#include <color_fragment>
+// The epsilon keeps atan defined at the single lathe vertex on the axis, where x and z are both zero.
+diffuseColor.rgb *= mix(vec3(.87,.70,.72), vec3(1.), smoothstep(-5.9,-1.2,studyLocalY)) * (.94 + .06*sin(studyLocalY*3.1 + atan(vStoneXZ.y, vStoneXZ.x + 1e-5)*6.));`,
+    );
+  };
+  stone.customProgramCacheKey = () => "study-stone-v1";
+  return studyRim(stone, "#ffe1cf", 3, .25);
+}

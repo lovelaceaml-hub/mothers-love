@@ -168,6 +168,7 @@ export class WorldEngine {
       height = Math.max(1, this.canvas.clientHeight);
     const low =
       this.quality === "low" || (this.quality === "auto" && this.lowered);
+    if (isWorldDesignStudy()) this.studyTier(low);
     const pixels = low ? 1_050_000 : 2_600_000;
     const ratio = isWorldDesignStudy() ? studyPixelRatio(width, height, window.devicePixelRatio, this.quality, this.lowered) : Math.min(
       window.devicePixelRatio || 1,
@@ -181,6 +182,44 @@ export class WorldEngine {
     this.camera.updateProjectionMatrix();
     this.dirty = true;
   };
+  /**
+   * Study only: publish the resolved picture quality tier on the scene, so the study
+   * world can drop work on Low, and give Low a cheaper, wider shadow filter.
+   *
+   * three allocates the shadow render target once and only re-reads the orthographic
+   * frustum when it allocates, so changing the map size means disposing the old target.
+   */
+  private studyTier(low: boolean) {
+    this.world.scene.userData.lowTier = low;
+    const type = low ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+    if (this.renderer.shadowMap.type !== type) {
+      this.renderer.shadowMap.type = type;
+      // The shadow filter is baked into every compiled program, so every material
+      // must recompile, or the scene keeps the old filter after a tier change.
+      this.world.scene.traverse((object) => {
+        const material = (object as THREE.Mesh).material as
+          | THREE.Material
+          | THREE.Material[]
+          | undefined;
+        if (!material) return;
+        (Array.isArray(material) ? material : [material]).forEach((m) => {
+          m.needsUpdate = true;
+        });
+      });
+    }
+    const sun = this.world.scene.userData.studySun as
+      | THREE.DirectionalLight
+      | undefined;
+    if (!sun) return;
+    const size = low ? 1536 : 2048;
+    if (sun.shadow.mapSize.width !== size) {
+      sun.shadow.mapSize.set(size, size);
+      sun.shadow.map?.dispose();
+      sun.shadow.map = null;
+    }
+    sun.shadow.radius = low ? 3 : 1;
+    this.renderer.shadowMap.needsUpdate = true;
+  }
   private tick = (now: number) => {
     if (!this.alive || this.failed || document.hidden) return;
     const delta = this.last ? Math.min((now - this.last) / 1000, 1) : 0;
