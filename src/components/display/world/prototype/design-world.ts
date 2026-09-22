@@ -4,6 +4,8 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ZONES, WORLD_EXPRESSIONS, seededRandom, type ZoneId } from "../world-data";
 import type { WorldScene } from "../world-scene-legacy";
 import { studyArrival } from "./design-mode";
+import { studyCanopyPuffs, studyCottonMaterial } from "./study-canopy";
+import { createStudyClouds, studyCloudAtlas, studyCloudLayout } from "./study-clouds";
 import { studyPetal, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
 import { softDot, sparklePoints, studyRim } from "./study-materials";
@@ -54,7 +56,8 @@ export function createDesignWorld(): WorldScene {
   }
   const petal = geometry(studyPetal(20, 12));
   const midPetal = geometry(studyPetal(10, 6));
-  const farPetal = geometry(studyPetal(6, 4));
+  const cottonSphere = geometry(new T.SphereGeometry(1, 18, 12));
+  const cotton = material(studyCottonMaterial());
   const dummy = new T.Object3D(), tint = new T.Color();
   function mesh(parent: T.Object3D, g: T.BufferGeometry, m: T.Material, p: number[] = [0, 0, 0], scale: number[] = [1, 1, 1]) {
     const o = new T.Mesh(g, m); o.position.set(p[0], p[1], p[2]); o.scale.set(scale[0], scale[1], scale[2]); o.receiveShadow = !m.transparent; parent.add(o); return o;
@@ -126,6 +129,12 @@ export function createDesignWorld(): WorldScene {
   water.customProgramCacheKey = () => "study-outdoor-water-v1";
   const sea = mesh(scene, geometry(new T.CircleGeometry(320, 96)), water, [0, -5, -30]); sea.rotation.x = -Math.PI / 2;
 
+  // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
+  // under every island rim so the terraces read as floating rather than cut off.
+  const clouds = createStudyClouds(studyCloudLayout(777), texture(studyCloudAtlas()), time);
+  clouds.geometries.forEach(geometry); clouds.materials.forEach(material);
+  clouds.meshes.forEach(o => { instances.add(o); scene.add(o); });
+
   const shadowCanvas = document.createElement("canvas"); shadowCanvas.width = shadowCanvas.height = 128;
   const sc = shadowCanvas.getContext("2d")!, sg = sc.createRadialGradient(64, 64, 0, 64, 64, 64);
   sg.addColorStop(0, "#65566460"); sg.addColorStop(.45, "#75697424"); sg.addColorStop(1, "#75697400"); sc.fillStyle = sg; sc.fillRect(0, 0, 128, 128);
@@ -136,15 +145,16 @@ export function createDesignWorld(): WorldScene {
     const o = mesh(parent, contactPlane, shadow, [x, y, z], [width, depth, 1]); o.rotation.x = -Math.PI / 2;
   }
 
-  function flowers(parent: T.Object3D, count: number, seed: number, base: T.Vector3, spread: number, canopy = false, color = "#f0afc9", detail = 0) {
+  // Ground beds only. Crowns are cotton puffs now, so this path no longer builds a canopy.
+  function flowers(parent: T.Object3D, count: number, seed: number, base: T.Vector3, spread: number, color = "#f4b9c9") {
     const petalCount = 5;
-    const rand = seededRandom(seed), petals = instance(parent, detail === 0 ? petal : detail === 1 ? midPetal : farPetal, bloom, count * petalCount, canopy), cores = instance(parent, pollen, gold, count);
-    const stems = canopy ? undefined : instance(parent, cylinder, leaf, count);
+    const rand = seededRandom(seed), petals = instance(parent, midPetal, bloom, count * petalCount), cores = instance(parent, pollen, gold, count);
+    const stems = instance(parent, cylinder, leaf, count);
     for (let i = 0; i < count; i++) {
       const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * spread;
-      const p = base.clone().add(new T.Vector3(Math.cos(a) * r, canopy ? (rand() - .5) * spread * .92 + (1 - r / spread) * .85 : .45 + rand() * .8, Math.sin(a) * r));
-      const size = canopy ? .26 + rand() * .23 : .28 + rand() * .30;
-      const normal = canopy ? p.clone().sub(base).multiply(new T.Vector3(1, .7, 1)).add(new T.Vector3(0, .7, 0)).normalize() : new T.Vector3((rand()-.5)*.6,1,(rand()-.5)*.6).normalize();
+      const p = base.clone().add(new T.Vector3(Math.cos(a) * r, .45 + rand() * .8, Math.sin(a) * r));
+      const size = .28 + rand() * .30;
+      const normal = new T.Vector3((rand()-.5)*.6,1,(rand()-.5)*.6).normalize();
       const up = new T.Vector3(0,1,0), orientation = new T.Quaternion().setFromUnitVectors(up, normal);
       for (let j = 0; j < petalCount; j++) {
         const c = new T.Color(color).lerp(new T.Color(i % 4 ? "#ffe9dc" : "#d799ce"), rand() * .30);
@@ -153,26 +163,32 @@ export function createDesignWorld(): WorldScene {
         stamp(petals, i * petalCount + j, p, [scale, scale, scale], rotation, c);
       }
       stamp(cores, i, p.clone().addScaledVector(normal, size*.10), [size * .10, size * .08, size * .10], new T.Euler().setFromQuaternion(orientation));
-      if (stems) stamp(stems, i, new T.Vector3(p.x, .72 + (p.y - .72) / 2, p.z), [.022, Math.max(.08, p.y - .72), .022], new T.Euler());
+      stamp(stems, i, new T.Vector3(p.x, .72 + (p.y - .72) / 2, p.z), [.022, Math.max(.08, p.y - .72), .022], new T.Euler());
     }
-    finish(petals); finish(cores); if (stems) finish(stems);
+    finish(petals); finish(cores); finish(stems);
   }
-  function tree(parent: T.Object3D, x: number, z: number, size: number, seed: number, color: string, full: boolean) {
+  /** One district shares a single cotton mesh, so every crown in it costs one draw call together. */
+  type Crowns = { mesh: T.InstancedMesh; used: number };
+  function tree(parent: T.Object3D, x: number, z: number, size: number, seed: number, color: string, crowns: Crowns) {
     const root = new T.Group(); root.position.set(x, .7, z); root.scale.setScalar(size); parent.add(root);
     const rand = seededRandom(seed);
     tube(root, [new T.Vector3(), new T.Vector3(-.18, 1.7, .1), new T.Vector3(.28, 3.6, -.12), new T.Vector3(.1, 5.4, .2)], .16, roseGold, 18);
     for (let j = 0; j < 7; j++) {
-      const a = j * 2.399, r = 1.55 + rand() * .8, y = 3.4 + rand() * 1.5;
+      // Tips stop short of the crown surface, so no branch pokes out of a cotton puff.
+      const a = j * 2.399, r = (1.55 + rand() * .8) * .8, y = 3.4 + rand() * 1.5;
       const end = new T.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
       tube(root, [new T.Vector3(.1, 1.6 + rand(), 0), new T.Vector3(end.x * .35, y - .9, end.z * .35), end], .06, roseGold, 14);
       for (let k = 0; k < 2; k++) tube(root, [end.clone().multiplyScalar(.88), end.clone().add(new T.Vector3((rand() - .5) * 1.3, .65, (rand() - .5) * 1.3))], .022, roseGold, 8);
     }
-    const canopy = new T.LOD(); canopy.name = "Blossom canopy, three distance levels"; canopy.userData.dynamic = true; root.add(canopy);
-    for (let level = 0; level < 3; level++) {
-      const crown = new T.Group();
-      flowers(crown, full ? 230 : 135, seed + 73, new T.Vector3(0, 4.6, 0), 3.05, true, color, level);
-      canopy.addLevel(crown, [0, 18, 45][level], .12);
+    const crown = new T.Color(color), pale = new T.Color("#fdeef2"), shade = seededRandom(seed + 91);
+    for (const puff of studyCanopyPuffs(seed + 73)) {
+      const place = new T.Vector3(x + puff.x * size, .7 + puff.y * size, z + puff.z * size);
+      const spin = new T.Euler((shade() - .5) * .5, shade() * Math.PI * 2, (shade() - .5) * .5);
+      stamp(crowns.mesh, crowns.used++, place, [puff.r * size, puff.r * puff.squash * size, puff.r * size], spin, crown.clone().lerp(pale, .5 + shade() * .25));
     }
+    // The capacity is generous, so the drawn count follows the puffs that were actually stamped.
+    crowns.mesh.count = crowns.used;
+    finish(crowns.mesh);
     contact(parent, x, z, 7 * size, 5.5 * size);
   }
   function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number) {
@@ -215,25 +231,26 @@ export function createDesignWorld(): WorldScene {
       for (let k = 0; k < arches; k++) arch(layout, (k - (arches - 1) / 2) * width * 1.1, .65, -9.3, width, i < 3 ? 10.3 + (k === 1 ? 1.2 : 0) : 8.4);
     }
     const color = ["#e893b9", "#f0a8b8", "#bc92d9", "#edb4ba"][i % 4];
+    const crowns: Crowns = { mesh: instance(layout, cottonSphere, cotton, (i < 3 ? 4 : 2) * 15, true), used: 0 };
     for (const side of [-1, 1]) {
       const bed = mesh(layout, geometry(new T.RingGeometry(7.6, i < 3 ? 14.7 : 11.5, 64, 2, side === 1 ? -.75 : Math.PI - .75, 1.50)), lawn, [0, .68, 0]);
       bed.rotation.x = -Math.PI / 2;
-      const foliage = instance(layout, petal, leaf, 48);
+      const foliage = instance(layout, midPetal, leaf, 48);
       const random = seededRandom(i * 12 + side + 50);
       for (let j = 0; j < 48; j++) {
         const a = (side === 1 ? -.75 : Math.PI - .75) + random() * 1.5, r = 9 + random() * (i < 3 ? 4.8 : 2);
         stamp(foliage, j, new T.Vector3(Math.cos(a)*r, .69, -Math.sin(a)*r), [.52, .75, 1.05], new T.Euler(.45, random()*Math.PI*2, .08));
       } finish(foliage);
     }
-    tree(layout, -12.4, -2.8, i < 3 ? 1.16 : .95, 900 + i * 11, color, i < 3);
-    tree(layout, 12.3, -6.9, i < 3 ? 1.10 : .92, 980 + i * 19, color, i < 3);
+    tree(layout, -12.4, -2.8, i < 3 ? 1.16 : .95, 900 + i * 11, color, crowns);
+    tree(layout, 12.3, -6.9, i < 3 ? 1.10 : .92, 980 + i * 19, color, crowns);
     if (i < 3) {
-      tree(layout, -9.4, -11.5, .91, 1220 + i, "#f8dbd6", true);
-      tree(layout, 14.1, 6.3, .94, 1290 + i, color, true);
+      tree(layout, -9.4, -11.5, .91, 1220 + i, "#f8dbd6", crowns);
+      tree(layout, 14.1, 6.3, .94, 1290 + i, color, crowns);
     }
     for (let k = 0; k < (i < 3 ? 4 : 2); k++) {
       const x = (k % 2 ? 1 : -1) * (10 + k * .5), z = 5 - Math.floor(k / 2) * 11;
-      flowers(layout, i < 3 ? 26 : 15, 1440 + i * 17 + k, new T.Vector3(x, .68, z), 2.1, false, k % 2 ? "#d9b4de" : "#f0b3c0");
+      flowers(layout, i < 3 ? 26 : 15, 1440 + i * 17 + k, new T.Vector3(x, .68, z), 2.1, k % 2 ? "#dcbde3" : "#f4b9c9");
     }
     waterfall(layout, -4.8, -radius + .35, Math.max(5.6, zone.center[1] + 5.3), 3.6, 0);
     waterfall(layout, 6.7, -radius + 1.4, Math.max(5.6, zone.center[1] + 5.3), 2.1, -.15);
@@ -394,7 +411,7 @@ export function createDesignWorld(): WorldScene {
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
     setEffects(s, t) { sparkles=s;trails=t; },
     update(t,_zone,arrival){
-      time.value=t;motions.forEach(fn=>fn(t));ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
+      time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
       const active=!!arrival&&arrival.phase!=="idle"&&arrival.phase!=="return";
       const style=studyArrival(scene.userData.studyArrival);
       lotus.visible=active&&style==="bloom";portal.visible=active&&style==="ribbon";constellation.visible=active&&style==="constellation";

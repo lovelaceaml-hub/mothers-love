@@ -3,6 +3,9 @@ import { describe, expect, it } from "vitest";
 import { studyPixelRatio } from "../../src/components/display/world/prototype/study-lighting";
 import { studyPetal, studyTerrace } from "../../src/components/display/world/prototype/study-geometry";
 import { softDot } from "../../src/components/display/world/prototype/study-materials";
+import { studyCanopyPuffs } from "../../src/components/display/world/prototype/study-canopy";
+import { studyCloudLayout } from "../../src/components/display/world/prototype/study-clouds";
+import { ZONES } from "../../src/components/display/world/world-data";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "../../src/components/display/world/prototype/study-palette";
 
 describe("sample study quality", () => {
@@ -76,5 +79,57 @@ describe("study sparkle dot", () => {
     expect(map.image.width).toBe(32);
     expect(map.image.data.length).toBe(32 * 32 * 4);
     map.dispose();
+  });
+});
+
+describe("study clouds", () => {
+  it("lays out the same clouds on every call", () => {
+    const first = studyCloudLayout(777), second = studyCloudLayout(777);
+    expect(first.sky).toEqual(second.sky);
+    expect(first.island).toEqual(second.island);
+  });
+  it("keeps every island collar puff below its own terrace", () => {
+    const { island } = studyCloudLayout(777);
+    expect(island.length).toBe(ZONES.length * 7);
+    island.forEach((puff, i) => {
+      const zone = ZONES[Math.floor(i / 7)];
+      expect(puff.y).toBeLessThan(zone.center[1] - 1);
+      expect([puff.x, puff.y, puff.z, puff.width, puff.height, puff.alpha, puff.phase].every(Number.isFinite)).toBe(true);
+    });
+  });
+  it("rings the sky tier around the world at the intended distance", () => {
+    const { sky } = studyCloudLayout(777);
+    expect(sky.length).toBe(28);
+    for (const puff of sky) {
+      const radius = Math.sqrt(puff.x * puff.x + puff.z * puff.z);
+      expect(radius).toBeGreaterThanOrEqual(150);
+      expect(radius).toBeLessThanOrEqual(215);
+    }
+  });
+  it("adds a smaller collar for an extra site", () => {
+    const { island } = studyCloudLayout(777, [{ center: [4, 2, -8], radius: 9 }]);
+    const extra = island.length - ZONES.length * 7;
+    expect(extra).toBeGreaterThanOrEqual(3);
+    expect(extra).toBeLessThanOrEqual(4);
+  });
+});
+
+describe("study cotton canopy", () => {
+  it("builds a rounded cluster with no stray puff", () => {
+    const puffs = studyCanopyPuffs(5);
+    expect(puffs.length).toBeGreaterThanOrEqual(13);
+    expect(puffs.length).toBeLessThanOrEqual(15);
+    for (const puff of puffs) {
+      const distance = Math.sqrt(puff.x * puff.x + (puff.y - 4.9) * (puff.y - 4.9) + puff.z * puff.z);
+      expect(distance).toBeLessThanOrEqual(2.6);
+      expect([puff.x, puff.y, puff.z, puff.r, puff.squash].every(Number.isFinite)).toBe(true);
+      expect(puff.r).toBeGreaterThan(0);
+      expect(puff.squash).toBeGreaterThanOrEqual(.8);
+      expect(puff.squash).toBeLessThanOrEqual(.95);
+    }
+  });
+  it("stays deterministic per seed and differs between seeds", () => {
+    expect(studyCanopyPuffs(5)).toEqual(studyCanopyPuffs(5));
+    expect(studyCanopyPuffs(5)).not.toEqual(studyCanopyPuffs(6));
   });
 });
