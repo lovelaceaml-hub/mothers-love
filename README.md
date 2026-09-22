@@ -1,10 +1,10 @@
 # Mother’s Love visual review
 
-Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) is ready for [visual review](docs/runs/2026-09-21-world-quality/VISUAL-REVIEW.md), with a [same-build classic comparison](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=classic). It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
+Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) is ready for [visual review](docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md), with a [same-build classic comparison](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=classic). Refinement 02 adds smoother models, richer pearl detail and higher-definition output, preserving Thank you at the top. It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
 
 [Plan 24](docs/PLAN-24-world-visual-quality.md) and [draft PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8) remain the continuation. Fable/Opus implementation is held for visual approval. The [baseline checkpoint](docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md) records six passing local render comparisons; the historical CI readiness failure is unresolved. This prototype is not a completed whole-world upgrade or a production release.
 
-Storage: [verified review media and tour](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45>) ([copy manifest](docs/runs/2026-09-21-world-quality/DESIGN-RECOVERY-MANIFEST.json)).
+Storage: [verified review media and tour](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2>) ([copy manifest](docs/runs/2026-09-21-world-quality/D1-RECOVERY-MANIFEST.json)).
 
 ## September 21: Recognition bubbles inside the world
 

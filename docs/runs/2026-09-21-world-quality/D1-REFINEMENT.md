@@ -16,10 +16,14 @@ Anthony authorized all four proposed refinement areas and specified: "The layout
 
 | Item | Status | Evidence required |
 | --- | --- | --- |
-| Preserve wording; add ornate pearl finish | In progress | Same wording geometry plus new rim, ornaments, reflections and beads |
-| Smooth nearby models; support distant detail levels | In progress | Close-up planting/architecture and all-destination checks |
-| Outdoor lighting and distinct materials | In progress | Same-camera stills and normal-motion footage |
-| Higher-definition rendering | In progress | Actual drawing-buffer size at HD and 4K; crisp focus texture |
-| Reviewable preview | Pending | Exact source, optimized build, focused tests, screenshots and real tour |
+| Preserve wording; add ornate pearl finish | Implemented and verified | Same wording geometry plus new rim, ornaments, reflections and beads |
+| Smooth nearby models; support distant detail levels | Implemented and verified | Close-up planting/architecture and all-destination checks |
+| Outdoor lighting and distinct materials | Implemented and verified | Same-camera stills and normal-motion footage |
+| Higher-definition rendering | Implemented and verified | Actual drawing-buffer size at HD and 4K; crisp focus texture |
+| Reviewable preview | Ready for visual review | Exact source, optimized build, focused tests, screenshots and real tour |
 
 No production promotion, live-data artifacts, Blender export, independent review or completed P0 diagnosis is implied. Record actual tools and model use at delivery.
+
+## Delivery
+
+[Refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `80586a20b2aaee166bbd48d26ac8bd3f0c5daa29`. [Visual review and limitations](D1-VISUAL-REVIEW.md). Build/TypeScript, 52 unit tests and 32 browser checks pass. The approved text layout and original heart bytes were verified unchanged. Geometry is reproducible source with three canopy detail levels, not a new Blender/GLB export. Initial quality capture retained reduced motion; the check was corrected to require advancing app frames and clock, and the final normal tour provides separate motion evidence.

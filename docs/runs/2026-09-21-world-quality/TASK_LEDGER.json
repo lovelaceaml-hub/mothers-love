@@ -3,7 +3,7 @@
   "baseline": "b324b81cabe947592f6723425c58f14307b58083",
   "branch": "feature/world-cinematic-art-pass",
   "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
-  "updatedUtc": "2026-09-21T23:38:27.835113+00:00",
+  "updatedUtc": "2026-09-22T03:56:23.597297+00:00",
   "phases": [
     {
       "id": "P0",
@@ -134,23 +134,42 @@
       "notes": "One Astra writer. No Claude implementation, subagent, Blender asset authoring, or image generation ran.",
       "results": "Final optimized build and TypeScript pass; 47 world unit tests pass; 23 final still/browser checks pass. Normal camera tour and receipt saved separately. No independent review or Claude implementation ran.",
       "sourceSha": "9dc7e455047f7eebb8ebfcc1affd125f3b591d3c"
+    },
+    {
+      "phase": "D1",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "ready_for_visual_review",
+      "sourceChanges": true,
+      "independentReview": false,
+      "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+      "tools": [
+        "shell",
+        "apply_patch",
+        "Three.js",
+        "Next build",
+        "Vitest",
+        "Playwright capture",
+        "CUA",
+        "FFmpeg"
+      ],
+      "results": "Build and TypeScript pass; 52 unit tests and 32 browser checks pass. Hosted sample inspected. No Claude, subagents, Blender or image generation."
     }
   ],
   "designCheckpoint": {
-    "id": "D0",
+    "id": "D1",
     "status": "ready_for_visual_review",
     "owner": "Astra",
-    "purpose": "Show designs and prototypes before Fable/Opus implementation, per Anthony latest correction.",
+    "purpose": "Authorized smoother HD prototype and Atelier ornamentation, preserving current wording with Thank you at top.",
     "route": "/display/world-preview?source=sample&art=design",
     "approval": "pending_visual_review",
     "sourceBoundary": "Explicit sample-only study. Classic/cinematic and production paths retained.",
     "evidence": [
-      "docs/runs/2026-09-21-world-quality/VISUAL-REVIEW.md",
-      "docs/runs/2026-09-21-world-quality/DESIGN-RECEIPT.json",
-      "docs/runs/2026-09-21-world-quality/DESIGN-STILLS-REPORT.json",
-      "docs/runs/2026-09-21-world-quality/DESIGN-TOUR-REPORT.json"
+      "docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md",
+      "docs/runs/2026-09-21-world-quality/D1-RECEIPT.json"
     ],
-    "sourceSha": "9dc7e455047f7eebb8ebfcc1affd125f3b591d3c",
-    "previewUrl": "https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design"
+    "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+    "previewUrl": "https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design"
   }
 }

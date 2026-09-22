@@ -1,0 +1,208 @@
+{
+  "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+  "createdUtc": "2026-09-22T03:57:19.785945+00:00",
+  "method": "Copy and SHA-256 verification; originals retained",
+  "cloudSync": "Not independently queried",
+  "count": 33,
+  "bytes": 81337771,
+  "files": [
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/cinematic-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/cinematic-garden.png",
+      "bytes": 1201469,
+      "sha256": "3eef26f2561a9e748d4dae687e591c44c4a8df050b8695fa7024b6e102851f49"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/classic-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/classic-garden.png",
+      "bytes": 1203435,
+      "sha256": "d119c334d8f469a4f30279976ae5136d7a01ea323f0c7e51b38b7a340a824939"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-promise.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-promise.png",
+      "bytes": 1023646,
+      "sha256": "df670e1793420ca2f21e2a2f9e36a972dbcd533100cb7be3c9dee1b5fb0256dc"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-milestone.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-milestone.png",
+      "bytes": 664400,
+      "sha256": "20e9fc411105cc0fcca89092fbda1fdb2dd7d1767ed605eea0408fd4db8298b0"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-orbit.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-orbit.png",
+      "bytes": 1009709,
+      "sha256": "46cc16703ecf391b86be8ccee6b627409df913493e84508b18a1b7461d2c281f"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-garden.png",
+      "bytes": 1463543,
+      "sha256": "c03ab342bd774afc182aaf7632d280ffed9bb9e2acbc872a5c9cfb007a6056a1"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/arrival-bloom.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/arrival-bloom.png",
+      "bytes": 1422657,
+      "sha256": "b371bac1e24d5f7b81cb36aa082f6358852c679fcf5d7fecb2d15ea6181f2d5e"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-expressions.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-expressions.png",
+      "bytes": 1161762,
+      "sha256": "f02b91a16b6bfa33aecf6f041234fc95deb654245685d38a596ecd1a5f9e241d"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-status.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-status.png",
+      "bytes": 877118,
+      "sha256": "dd07afbfb8a0db5c4c6720b9094a8fdbc73668dc415a4f2ee27058bdc5a99276"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-featured.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-featured.png",
+      "bytes": 1088412,
+      "sha256": "e35a8cac841bdba92619cf369824c7e0cdb42139659bdc356d0373b7a37ee749"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/arrival-ribbon.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/arrival-ribbon.png",
+      "bytes": 1476475,
+      "sha256": "96538a21c385019115591955647fe40d4c0ec4dbe4131d4f9260826b20fd2985"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-practice.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-practice.png",
+      "bytes": 817958,
+      "sha256": "b8660736518260a2d6d9f55e609a31863eaaa1a40c0aaef90416716a49d7dc91"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/high-4k-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/high-4k-garden.png",
+      "bytes": 4313749,
+      "sha256": "e432ef1855ae0b9ec034e1623b72cbcbe01f59cbb8f2c1445a5bfa6c50e3d4d0"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/c89a69fec50caaa4bfc70d6a1e6f1882.webm",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/c89a69fec50caaa4bfc70d6a1e6f1882.webm",
+      "bytes": 9433500,
+      "sha256": "cf5c4be679f56c6ea40b2c3b1a4c690307a117b7196b65dd5ef68b355ad29684"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-live-feed.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-live-feed.png",
+      "bytes": 1214554,
+      "sha256": "6f061f8ebdda8ef07bf0d91efd0b649d72f960925226fb8f0cdbba63ca50d247"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/classic-heart.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/classic-heart.png",
+      "bytes": 922780,
+      "sha256": "200648987b5caf5049293723c35362d5691a78cf7739d229e68efdeab00bdb13"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/phone-bloom.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/phone-bloom.png",
+      "bytes": 260245,
+      "sha256": "9557b372085af3230ba9bafcd906befb7348e79a156fd270956194575ef6847f"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/tour-report.json",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/tour-report.json",
+      "bytes": 11910,
+      "sha256": "f07778e13c40c2f7a6de738463734768c5cc0fb25c5ffc7df4c272deab837962"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/cinematic-heart.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/cinematic-heart.png",
+      "bytes": 939219,
+      "sha256": "36996f01fb2263a2206ec9ae0f9d8c18d04ff3a9b2af2b41d524130f3d023c99"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-heart.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-heart.png",
+      "bytes": 1480265,
+      "sha256": "0a7334a48df162b1e78b6220b8d44eeb7b95e7e6ba67e328d5b64a54c96282d0"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/high-hd-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/high-hd-garden.png",
+      "bytes": 1462545,
+      "sha256": "b7328ff912ffd2bc0a8fe4d713e4cd46c441851dba8ac458f8fec3257b4a1ea8"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/connected-tour.mp4",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/connected-tour.mp4",
+      "bytes": 40761889,
+      "sha256": "0a067d677b76760a53782977f084bbef1988c3aaab57eb1b7b6e5c5920b00ee2"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-calendar.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-calendar.png",
+      "bytes": 1087390,
+      "sha256": "641f98b712cae6100997d94aa6f3081e07b52e8e8daff8f54e58b9a51414ce5e"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-welcome.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-welcome.png",
+      "bytes": 1227176,
+      "sha256": "a840ec3ce795815c50a90c60f6aed2352539555474fb49f18802fc5f2cb22844"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/phone-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/phone-garden.png",
+      "bytes": 247755,
+      "sha256": "19086fd5bc01a2ca2bf6c276dbd24163f546979098c16aa2b5203ca2abd95203"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/stills-report.json",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/stills-report.json",
+      "bytes": 21032,
+      "sha256": "5839a75b001b1f988b5ba9d63dc49a9a864367c8d0e8bd95724bce5043611849"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/design-peacemakers.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-peacemakers.png",
+      "bytes": 1016709,
+      "sha256": "6aadab29fe3b7d5c5821d2006dd7fe91da2660d5f5537ed04a1c3dec2ad2d2a7"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/phone-ribbon.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/phone-ribbon.png",
+      "bytes": 265505,
+      "sha256": "4fa3167ada67f83fdb71ab714a596eb49ec820abdb7611024cb84e9c2cb9dc16"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/quality-report.json",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/quality-report.json",
+      "bytes": 10934,
+      "sha256": "f9ebae8c313417284bf373124606ebea614279d63133406de2160a37f0c36d98"
+    },
+    {
+      "source": "/private/tmp/mothers-love-d1-80586a2/arrival-constellation.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/arrival-constellation.png",
+      "bytes": 1424254,
+      "sha256": "d90d4f1fe34605cc02809bc7bad3fe40421c81f09c8a5e813036f6a5a1eb0f39"
+    },
+    {
+      "source": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-garden.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/previous-garden.png",
+      "bytes": 1435663,
+      "sha256": "940baf84b540c64119819e62c1e5089d23c3530cb9ce3bd56968e5eed3e000b5"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Bubble_Atelier/previews/Recognition_Pearl_Closeup.png",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/atelier-pearl-reference.png",
+      "bytes": 383564,
+      "sha256": "eb1ec3248d7d29f8baab765fde2740fe5f881ad3ed21ac9aac3f83249e256e79"
+    },
+    {
+      "source": "/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md",
+      "copy": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/VISUAL-REVIEW.md",
+      "bytes": 6549,
+      "sha256": "2299b085afc28e79e274d356072c2f4d1c68ff2ae2b59373dfcf5b6403ac0c98"
+    }
+  ]
+}
