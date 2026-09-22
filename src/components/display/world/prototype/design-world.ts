@@ -10,7 +10,8 @@ import { arrivalPose } from "./arrival-choreography";
 import { bloomStage, constellationStage, ribbonStage, type StageContext } from "./arrival-stages";
 import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
-import { softDot, sparklePoints, studyRim, studySilk, studyStone } from "./study-materials";
+import { STUDY_GLOW_PASS, softDot, sparklePoints, studyRim, studySilk, studyStone } from "./study-materials";
+import { createStudyAir, type AirFocus } from "./study-air";
 import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
 
@@ -140,7 +141,29 @@ export function createDesignWorld(): WorldScene {
       }` }));
   mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
   const halo = studySunHalo();
-  halo.sprites.forEach(sprite => scene.add(sprite)); halo.materials.forEach(material); texture(halo.map);
+  // Section 6: the two visible sun sprites stay off the glow layer. They are already large and
+  // additive, so blooming them doubled the sun and washed out the top of the frame; only the
+  // wide band below feeds the bloom. A third sprite lives on the rays layer alone, where it is
+  // the one bright thing in the black occluder mask. `allowOverride` false exempts it from that
+  // pass's override material (three 0.180 WebGLRenderer.js L1987).
+  halo.sprites.forEach(sprite => scene.add(sprite));
+  halo.materials.forEach(material); texture(halo.map);
+  const sunAt = new T.Vector3(...STUDY_SUN.direction).multiplyScalar(330);
+  const skyBand = new T.Sprite(material(new T.SpriteMaterial({
+    // Corrected down from the design's .14 after the checkpoint captures.
+    map: halo.map, color: "#ffd9b8", transparent: true, opacity: .05,
+    blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false,
+  })));
+  skyBand.name = "Study sky glow band"; skyBand.position.copy(sunAt);
+  skyBand.scale.set(420, 140, 1); skyBand.renderOrder = -60;
+  skyBand.layers.set(1); scene.add(skyBand);
+  const raysSun = new T.Sprite(material(new T.SpriteMaterial({
+    map: halo.map, color: "#ffe9cc", transparent: true, opacity: 1,
+    blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false,
+  })));
+  raysSun.material.allowOverride = false;
+  raysSun.name = "Study rays sun"; raysSun.position.copy(sunAt);
+  raysSun.scale.set(64, 64, 1); raysSun.layers.set(2); scene.add(raysSun);
   // Turquoise, glossier, with a second high frequency ripple and a tight sun glitter path.
   // Verified against three 0.180 meshphysical: at `#include <lights_fragment_end>` the shader
   // carries `reflectedLight`, the perturbed view space `normal` and `vViewPosition`, and the
@@ -254,15 +277,19 @@ export function createDesignWorld(): WorldScene {
   // and the shared study clock is re-attached afterwards because merge() clones its values.
   const fallUniforms = T.UniformsUtils.merge([T.UniformsLib.fog]);
   fallUniforms.time = time;
+  // Section 6: the same shader draws the crest into the glow layer when the radiance pass asks.
+  fallUniforms.studyGlowPass = STUDY_GLOW_PASS;
   const fall = material(new T.ShaderMaterial({ transparent: true, side: T.DoubleSide, depthWrite: false, fog: true, uniforms: fallUniforms,
     vertexShader: `varying vec2 v;
     #include <fog_pars_vertex>
     void main(){v=uv;vec4 mvPosition=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mvPosition;
     #include <fog_vertex>
     }`,
-    fragmentShader: `varying vec2 v;uniform float time;
+    fragmentShader: `varying vec2 v;uniform float time,studyGlowPass;
     #include <fog_pars_fragment>
     void main(){float thread=.6+.25*sin(v.x*120.+sin(v.y*8.-time)*1.1)+.15*sin(v.x*279.-time*.2);float crest=pow(max(0.,sin(v.y*28.-time*3.+v.x*3.)),12.);float edge=pow(max(0.,sin(v.x*3.14159)),.5);float fade=smoothstep(0.,.07,v.y);gl_FragColor=vec4(mix(vec3(.52,.78,.78),vec3(.99,.96,.90),thread),edge*fade*(.27+thread*.3+crest*.12));
+    // Only the breaking crest reaches the glow layer, so a fall reads as spray and not as a lit sheet.
+    if(studyGlowPass>.5)gl_FragColor=vec4(vec3(1.,.97,.9)*crest*edge*fade*.8,1.);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
     #include <fog_fragment>
@@ -464,19 +491,42 @@ export function createDesignWorld(): WorldScene {
   const sparkleGeometry=geometry(new T.BufferGeometry());
   sparkleGeometry.setAttribute("position",new T.BufferAttribute(sparklePlaces,3));
   sparkleGeometry.setAttribute("phase",new T.BufferAttribute(sparklePhase,1));
-  const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,texture(softDot(64)))));
+  const sparkleDot=texture(softDot(64));
+  const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,sparkleDot)));
   sparkleField.name="Study sparkles";sparkleField.frustumCulled=false;scene.add(sparkleField);
   // The landmarks opt out of shadow casting: the sun shadow box covers the connected world only.
   motions.forEach(fn=>fn(0));districtRoots.forEach(root=>batch(root));batch(entry);batch(landmarks,false);
+
+  // Section 6 layer membership, resolved after batching so the merged meshes are the ones flagged.
+  // Layer 1 is the glow layer. Only the breaking crest of a fall reaches it, through the shader
+  // branch above. Layer 2 is the god ray occluder set: the carved rock, the ivory architecture,
+  // the bridge decks and the entry terrace, all of them by material identity. The cotton crowns
+  // stay out of it on purpose, so the rays sift through the canopies instead of being blocked.
+  falls.forEach(o => o.layers.enable(1));
+  // The carved rock and the ivory architecture already give each district its silhouette, so the
+  // thin edge bands are left out: they cost a merged draw per district and change no shaft.
+  const rayOccluders = new Set<T.Material>([ivory, stone]);
+  scene.traverse(object => {
+    if (!(object instanceof T.Mesh) || object instanceof T.InstancedMesh) return;
+    const m = object.material;
+    if (!Array.isArray(m) && rayOccluders.has(m)) object.layers.enable(2);
+  });
+
+  // Living air. Four objects, one draw call each, all seeded.
+  const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time }, ZONES.map(zone => zone.center));
   return {
     scene, anchors: WORLD_EXPRESSIONS.map((_,i)=>new T.Vector3(14+Math.cos(i)*10,5,-45+Math.sin(i)*10)), recognitionPearls: [],
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
-    setEffects(s, t) { sparkles=s;trails=t; },
+    setEffects(s, t) { sparkles=s;trails=t;air.setEffects(s,t); },
     update(t,_zone,arrival){
       time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
       // The engine resolves the picture quality tier and publishes it on the scene in resize().
       // Low drops the sky cloud ring, which is pure overdraw near the horizon, and halves the sparkles.
       const lowTier=scene.userData.lowTier===true;
+      // The engine publishes its camera on the scene under the study gate, so the motes can
+      // wrap around the viewer without changing the shared WorldScene update signature.
+      const viewer=scene.userData.studyCamera as T.Camera|undefined;
+      if(viewer)air.update(t,viewer,lowTier,scene.userData.studyFocus as AirFocus);
       clouds.meshes[0].visible=!lowTier;
       sparkleGeometry.setDrawRange(0,lowTier?Math.floor(sparkleCount/2):sparkleCount);
       const pose=arrivalPose(arrival);
@@ -489,6 +539,6 @@ export function createDesignWorld(): WorldScene {
         if(visible)stages[key].update(pose,t,stageEffects);
       }
     },
-    dispose(){disposed=true;instances.forEach(o=>o.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();shadowCanvas.width=shadowCanvas.height=1;scene.clear();},
+    dispose(){disposed=true;air.dispose();instances.forEach(o=>o.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();shadowCanvas.width=shadowCanvas.height=1;scene.clear();},
   };
 }

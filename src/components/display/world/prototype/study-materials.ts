@@ -29,6 +29,50 @@ export function studyRim<M extends T.Material>(target: M, hex: string, power: nu
   return target;
 }
 
+/**
+ * Uniform objects shared by every study material that takes part in the radiance pass.
+ *
+ * `STUDY_GLOW_PASS` is 0 for the main pass and 1 while `StudyRadiance` renders the glow
+ * layer, so one compiled program serves both passes. `STUDY_SUN_VIEW` carries the sun
+ * direction in view space, refreshed once per frame.
+ *
+ * Verified against three 0.180 `WebGLRenderer.js` L2048-2091: `materialProperties.programs`
+ * is a Map owned by each material and `materialProperties.uniforms` is assigned from the
+ * object `onBeforeCompile` received, so assigning these shared objects reaches every
+ * material that asks for them, and two materials may still share one program cache key.
+ */
+export const STUDY_GLOW_PASS = { value: 0 };
+export const STUDY_SUN_VIEW = { value: new T.Vector3(1, 0, 0) };
+/** 0 is the ordinary twinkle. Section 8 raises it to hush the sparkles during an arrival. */
+export const STUDY_CALM = { value: 0 };
+
+/**
+ * What this material contributes to the glow layer.
+ *
+ * It chains any hook the material already carries, so it composes with `studyRim`,
+ * `studyGlass`, `studySilk` and `studyStone`, and it reads whatever those patches left in
+ * scope because it replaces the `#include <opaque_fragment>` they re-emitted.
+ *
+ * At `studyGlowPass` 0 the mix is exactly `outgoingLight`, so the main image is unchanged.
+ */
+export function studyGlow<M extends T.Material>(target: M, key: string, colorGlsl: string, alphaGlsl?: string) {
+  const previousCompile = target.onBeforeCompile.bind(target);
+  const previousKey = target.customProgramCacheKey();
+  target.onBeforeCompile = (shader, renderer) => {
+    previousCompile(shader, renderer);
+    shader.uniforms.studyGlowPass = STUDY_GLOW_PASS;
+    shader.uniforms.studySunView = STUDY_SUN_VIEW;
+    shader.fragmentShader = "uniform float studyGlowPass;\nuniform vec3 studySunView;\n" + shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `outgoingLight = mix(outgoingLight, (${colorGlsl}), studyGlowPass);
+${alphaGlsl ? `diffuseColor.a = mix(diffuseColor.a, (${alphaGlsl}), studyGlowPass);` : ""}
+#include <opaque_fragment>`,
+    );
+  };
+  target.customProgramCacheKey = () => `${previousKey}|study-glow-${key}`;
+  return target;
+}
+
 /** A soft round dot built from plain bytes. No canvas, so it works anywhere the module loads. */
 export function softDot(size = 32) {
   const data = new Uint8Array(size * size * 4), radius = size / 2;
@@ -51,25 +95,36 @@ export function softDot(size = 32) {
  * Glowing sparkle dots that breathe out of step with each other.
  * PointsMaterial keeps the renderer supplied size attenuation uniform, which a
  * raw ShaderMaterial would lose.
+ *
+ * `rate` scales the breathing speed. `STUDY_CALM` hushes the twinkle during an arrival,
+ * and at the default 0 with `rate` 1 the formula is exactly the v1 one.
+ *
+ * Verified against three 0.180 `WebGLMaterials.js` L292-297 and `WebGLRenderer.js` L2534:
+ * the point scale uniform is `_height * .5` with `_pixelRatio`, both the canvas values,
+ * never the bound render target's, so a point drawn into the half size glow target covers
+ * the same pixels and therefore twice the relative area. The glow pass damps it back.
  */
-export function sparklePoints(clock: { value: number }, size: number, color: string, opacity: number, map: T.Texture) {
+export function sparklePoints(clock: { value: number }, size: number, color: string, opacity: number, map: T.Texture, rate = 1) {
   const dots = new T.PointsMaterial({
     size, sizeAttenuation: true, map, color: new T.Color(color),
     transparent: true, opacity, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
   });
   dots.onBeforeCompile = shader => {
     shader.uniforms.pearlTime = clock;
-    shader.vertexShader = "attribute float phase;\nuniform float pearlTime;\nvarying float twinkle;\n" + shader.vertexShader.replace(
+    shader.uniforms.sparkleRate = { value: rate };
+    shader.uniforms.studyCalm = STUDY_CALM;
+    shader.uniforms.studyGlowPass = STUDY_GLOW_PASS;
+    shader.vertexShader = "attribute float phase;\nuniform float pearlTime, sparkleRate, studyCalm, studyGlowPass;\nvarying float twinkle;\n" + shader.vertexShader.replace(
       "gl_PointSize = size;",
-      `twinkle = .35 + .65 * pow(.5 + .5 * sin(pearlTime * 1.6 + phase * 6.2832), 2.);
-gl_PointSize = size * (.6 + .4 * twinkle);`,
+      `twinkle = (.35 + .30 * studyCalm) + (.65 - .40 * studyCalm) * pow(.5 + .5 * sin(pearlTime * 1.6 * sparkleRate * (1. - .5 * studyCalm) + phase * 6.2832), 2.);
+gl_PointSize = size * (.6 + .4 * twinkle) * mix(1., .6, studyGlowPass);`,
     );
     shader.fragmentShader = "varying float twinkle;\n" + shader.fragmentShader.replace(
       "vec4 diffuseColor = vec4( diffuse, opacity );",
       "vec4 diffuseColor = vec4( diffuse, opacity ) * twinkle;",
     );
   };
-  dots.customProgramCacheKey = () => "study-sparkle-v1";
+  dots.customProgramCacheKey = () => "study-sparkle-v2";
   return dots;
 }
 

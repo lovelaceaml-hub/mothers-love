@@ -5,7 +5,8 @@ import { createWorldScene } from "./world-scene";
 import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
-import { isWorldDesignStudy, type StudyArrival } from "./prototype/design-mode";
+import { isWorldDesignStudy, studyRadiance, type StudyArrival } from "./prototype/design-mode";
+import { StudyRadiance } from "./prototype/study-radiance";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
 import { STUDY_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
@@ -59,6 +60,9 @@ export class WorldEngine {
   private readonly bubbles = new WorldRecognitionBubbles(this.world.scene);
   private readonly observer: ResizeObserver;
   private readonly environment: THREE.WebGLRenderTarget;
+  /** Study only, and only when the context can render to a half float target. */
+  private radiance?: StudyRadiance;
+  private readonly bufferSize = new THREE.Vector2();
   private elapsed = 0;
   private last = 0;
   private reportAt = 0;
@@ -104,10 +108,22 @@ export class WorldEngine {
         this.environment = pmrem.fromScene(room, 0.04);
         room.dispose(); pmrem.dispose();
       }
+      if (isWorldDesignStudy() && studyRadiance()) {
+        this.radiance = StudyRadiance.create(this.renderer);
+        if (this.radiance) {
+          // Every pass of one presented frame is counted together, so the reset moves into
+          // StudyRadiance.render and happens exactly once per frame it presents.
+          this.renderer.info.autoReset = false;
+          this.world.scene.userData.studyRadiance = true;
+        }
+      }
+      // The study world wraps the motes around the viewer, so it needs the live camera.
+      if (isWorldDesignStudy()) this.world.scene.userData.studyCamera = this.camera;
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
       if (isWorldDesignStudy()) this.world.scene.environmentIntensity = STUDY_TONE.environmentIntensity;
     } catch (error) {
+      this.radiance?.dispose();
       this.bubbles.dispose();
       this.world.dispose();
       throw error;
@@ -177,6 +193,11 @@ export class WorldEngine {
     );
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
+    if (this.radiance) {
+      this.radiance.setTier(low ? "low" : this.quality === "high" ? "high" : "auto");
+      this.renderer.getDrawingBufferSize(this.bufferSize);
+      this.radiance.resize(this.bufferSize.x, this.bufferSize.y);
+    }
     this.camera.aspect = width / height;
     this.camera.fov = width < height ? 63 : 43;
     this.camera.updateProjectionMatrix();
@@ -341,10 +362,15 @@ export class WorldEngine {
           this.feed.snapshot?.settings.showTrails ??
           true,
       }) || this.dirty;
+    // Study only: the focal pearl's place in the world, so the drifting petals can keep clear
+    // of the words. Read on the next frame, which at these speeds is well inside the guard's margin.
+    if (isWorldDesignStudy())
+      this.world.scene.userData.studyFocus = this.bubbles.inspect().focused;
     if (moving || this.dirty) {
       if (!moving)
         this.world.update(this.elapsed, this.director.zone, this.arrivalState);
-      this.renderer.render(this.world.scene, this.camera);
+      if (this.radiance) this.radiance.render(this.world.scene, this.camera);
+      else this.renderer.render(this.world.scene, this.camera);
       this.frameCount++;
       this.windowFrames++;
       this.dirty = false;
@@ -597,6 +623,7 @@ export class WorldEngine {
     document.removeEventListener("visibilitychange", this.visibilityChanged);
     this.canvas.removeEventListener("webglcontextlost", this.contextLost);
     this.canvas.removeEventListener("click", this.selectPearl);
+    this.radiance?.dispose();
     this.world.dispose();
     this.bubbles.dispose();
     this.environment.dispose();

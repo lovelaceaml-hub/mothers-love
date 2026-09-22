@@ -1,7 +1,7 @@
 import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
 import { WORLD_EXPRESSIONS, seededRandom } from "../world-data";
-import { softDot, sparklePoints, studyGlass } from "./study-materials";
+import { softDot, sparklePoints, studyGlass, studyGlow } from "./study-materials";
 
 type Wrap = (measure: (text: string) => number, text: string, width: number) => string[];
 
@@ -123,6 +123,7 @@ export class StudyPearlSkin {
   private readonly finish: T.Mesh;
   private readonly halo: T.Mesh;
   private readonly sparkles: T.Points;
+  private readonly occluder: T.Mesh;
 
   constructor(parent: T.Group, assets: StudyPearlAssets, seed: number) {
     this.root.name = "Design study pearl glass, halo and exterior canonical symbols";
@@ -142,10 +143,39 @@ export class StudyPearlSkin {
           #include <colorspace_fragment>
         }`,
     })));
-    this.halo.name = "pearl halo"; this.halo.position.z = -.4; this.halo.renderOrder = 2; this.root.add(this.halo);
+    this.halo.name = "pearl halo"; this.halo.position.z = -.4; this.halo.renderOrder = 2;
+    this.halo.layers.enable(1); this.root.add(this.halo);
+    // The guard that makes the radiance pass safe for the words.
+    //
+    // It is never on layer 0, so it is invisible in the main image. On layer 1 it writes depth
+    // at the disc's own plane, which clips the halo, the back of the glass shell and anything
+    // else behind it out of the glow. `update` adds it to layer 3 for the protect pass, and the
+    // radiance composite multiplies by (1 - protect), so no glow and no god ray light can land
+    // on a single pixel of the pearl face being read. `?radiance=off` proves it pixel for pixel.
+    //
+    // Layer 3 is granted only while this pearl is the one being read. The protect pass renders
+    // layer 3 alone, so nothing else in the world writes depth into it: a resident bubble
+    // standing behind the sculpted heart would otherwise paint its disc straight through the
+    // heart and cut a blotch out of the glow there.
+    //
+    // .985 rather than 1: the edge then lands just inside the pearl's own rim ring, so the mask
+    // ends under the rim instead of on the scenery beside it.
+    this.occluder = new T.Mesh(
+      this.geometry(new T.CircleGeometry(.985, 64)),
+      this.material(new T.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false })),
+    );
+    this.occluder.name = "pearl occluder";
+    this.occluder.renderOrder = 1;
+    this.occluder.layers.set(1);
+    this.root.add(this.occluder);
     // A real sphere, so the pearl reads the same under every billboard rotation and the text never turns.
-    this.shell = new T.Mesh(this.geometry(new T.SphereGeometry(1.02, 48, 24)), this.material(studyGlass(.16)));
+    // Rim only: `pearlRim` is already in scope from studyGlass's own patch, and it is near zero
+    // across the middle of the sphere, so the glow layer receives the lit edge and nothing else.
+    this.shell = new T.Mesh(this.geometry(new T.SphereGeometry(1.02, 48, 24)), this.material(
+      studyGlow(studyGlass(.16), "pearl", "vec3(1., .93, .86) * pearlRim * 1.15", "pearlRim * .9"),
+    ));
     this.shell.name = "pearl glass"; this.shell.scale.z = .84; this.shell.position.z = 0; this.shell.renderOrder = 3;
+    this.shell.layers.enable(1);
     this.root.add(this.shell);
     const finishing = this.material(new T.ShaderMaterial({
       transparent: true, depthTest: true, depthWrite: false, toneMapped: false,
@@ -181,7 +211,12 @@ export class StudyPearlSkin {
       ring.name = `pearl ring ${i}`;
       ring.position.z = .045; this.root.add(ring); this.rings.push(ring);
     }
-    const gold = this.material(new T.MeshStandardMaterial({ color: "#dfbd79", metalness: .8, roughness: .22, transparent: true, opacity: .83, depthWrite: false }));
+    // The orbit tubes and beads share this material but stay off layer 1, so only the
+    // medallion rims carry it into the glow.
+    const gold = this.material(studyGlow(
+      new T.MeshStandardMaterial({ color: "#dfbd79", metalness: .8, roughness: .22, transparent: true, opacity: .83, depthWrite: false }),
+      "medallion-rim", "vec3(1., .84, .58) * .95",
+    ));
     for (let i = 0; i < 2; i++) {
       const points = Array.from({ length: 129 }, (_, j) => { const a=j/128*Math.PI*2;return new T.Vector3(Math.cos(a)*(1.37+i*.11),Math.sin(a)*(1.26+i*.055),Math.sin(a*2+i)*.12-.08); });
       const orbit = new T.Mesh(this.geometry(new T.TubeGeometry(new T.CatmullRomCurve3(points), 128, .0027, 4, false)), gold);
@@ -209,13 +244,14 @@ export class StudyPearlSkin {
     dust.setAttribute("phase", new T.BufferAttribute(phases, 1));
     this.sparkles = new T.Points(dust, this.material(sparklePoints(this.clock, .13, "#fff2d8", 1, assets.dot())));
     this.sparkles.name = "pearl sparkles"; this.sparkles.renderOrder = 5; this.sparkles.frustumCulled = false;
+    this.sparkles.layers.enable(1);
     this.root.add(this.sparkles);
     // Every canonical symbol sits inside its own little glass sphere over a tinted disc.
     const tintDisc = this.geometry(new T.CircleGeometry(.178, 40));
     const iconDisc = this.geometry(new T.CircleGeometry(.148));
     const medallionGlass = this.geometry(new T.SphereGeometry(.196, 40, 24));
     const medallionRim = this.geometry(new T.TorusGeometry(.205, .0042, 6, 56));
-    const glass = this.material(studyGlass(.24));
+    const glass = this.material(studyGlow(studyGlass(.24), "medallion", "vec3(1., .93, .86) * pearlRim * 1.15", "pearlRim * .9"));
     for (const expression of WORLD_EXPRESSIONS) {
       const root = new T.Group(); root.visible = false; root.name = `pearl medallion ${expression.id}`;
       const tint = new T.Mesh(tintDisc, this.material(new T.MeshBasicMaterial({ color: new T.Color(expression.color).lerp(new T.Color("#fff8ef"), .55), toneMapped: false, transparent: true, opacity: .96, depthWrite: false })));
@@ -223,8 +259,8 @@ export class StudyPearlSkin {
       const map = assets.icon(expression.id);
       const icon = new T.Mesh(iconDisc, this.material(new T.MeshBasicMaterial({ map, transparent: true, depthTest: true, depthWrite: false, toneMapped: false })));
       icon.position.z = .05; icon.renderOrder = 4; root.add(icon);
-      const ball = new T.Mesh(medallionGlass, glass); ball.renderOrder = 5; root.add(ball);
-      root.add(new T.Mesh(medallionRim, gold));
+      const ball = new T.Mesh(medallionGlass, glass); ball.renderOrder = 5; ball.layers.enable(1); root.add(ball);
+      const rim = new T.Mesh(medallionRim, gold); rim.layers.enable(1); root.add(rim);
       this.root.add(root); this.medallions.push({ id: expression.id, root });
     }
   }
@@ -234,6 +270,13 @@ export class StudyPearlSkin {
     this.clock.value = time;
     // A resident pearl keeps only its glass shell and one gold ring: two extra draws.
     this.orbits.visible = this.finish.visible = this.halo.visible = detailed;
+    // The occluder always blocks the glow layer behind this disc. Only the pearl being read
+    // joins the protect mask, which carries no scene depth of its own.
+    this.occluder.visible = true;
+    if (detailed) this.occluder.layers.enable(3); else this.occluder.layers.disable(3);
+    // A resident steps back into the scenery, so it keeps its shell but leaves the glow layer.
+    // One message at a time carries the eye, and the glow pass drops a dozen draws with it.
+    if (detailed) this.shell.layers.enable(1); else this.shell.layers.disable(1);
     this.sparkles.visible = detailed && frame.sparkles;
     this.rings.forEach((ring, index) => { ring.visible = detailed || index === 0; });
     this.orbitBeads.forEach((bead, i) => {
@@ -256,6 +299,22 @@ export class StudyPearlSkin {
   clear() {
     this.medallions.forEach(item => { item.root.visible = false; });
     this.halo.visible = this.sparkles.visible = false;
+    this.occluder.layers.disable(3);
+  }
+  /** Test seam: the exact layer mask of one named study object. */
+  layerMask(name: string) {
+    let mask: number | undefined;
+    this.root.traverse(object => { if (object.name === name) mask = object.layers.mask; });
+    return mask;
+  }
+  /** Test seam: the authored radius of one named circular study object. */
+  radius(name: string) {
+    let value: number | undefined;
+    this.root.traverse(object => {
+      const geometry = (object as T.Mesh).geometry as T.CircleGeometry | undefined;
+      if (object.name === name && geometry?.parameters) value = geometry.parameters.radius;
+    });
+    return value;
   }
   dispose() {
     this.root.removeFromParent(); this.root.clear();

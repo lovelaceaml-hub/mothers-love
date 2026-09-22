@@ -1,6 +1,6 @@
 import * as T from "three";
 import type { ArrivalPose } from "./arrival-choreography";
-import { softDot, sparklePoints, studySilk } from "./study-materials";
+import { softDot, sparklePoints, studyGlow, studySilk } from "./study-materials";
 
 /**
  * The three arrival studies, each a self contained stage on the entry platform.
@@ -115,6 +115,8 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
     })));
     sprite.scale.setScalar(scale);
     sprite.position.set(0, 2.6, 0);
+    // Section 6: the entrance light is the brightest thing in the study, so it joins the glow layer.
+    sprite.layers.enable(1);
     group.add(sprite);
     return sprite;
   }
@@ -152,6 +154,7 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
   );
   beam.position.set(0, BEAM_Y, 0);
   beam.frustumCulled = false;
+  beam.layers.enable(1);
   group.add(beam);
 
   const driftCount = 40, driftFlow = flow();
@@ -243,9 +246,14 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
 
   const columns = 241, rows = 11;
   const silkGeometry = ctx.geometry(new T.PlaneGeometry(1, 1, columns - 1, rows - 1));
-  const silk = new T.Mesh(silkGeometry, ctx.material(studySilk()));
+  // `silkF` is the grazing angle term studySilk leaves in scope, so the glow layer receives the
+  // lit folded edges of the ribbon and not its broad face.
+  const silk = new T.Mesh(silkGeometry, ctx.material(
+    studyGlow(studySilk(), "silk", "vec3(1., .80, .88) * silkF * .55", "silkF * .6"),
+  ));
   silk.userData.dynamic = true;
   silk.frustumCulled = false;
+  silk.layers.enable(1);
   group.add(silk);
   const silkFlow = flow(), foldFlow = flow();
   const centers = new Float32Array(columns * 3), widthAxis = new Float32Array(columns * 3);
@@ -279,6 +287,7 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
   })));
   glowSprite.scale.setScalar(22);
   glowSprite.position.set(0, PEARL_Y, -2.5);
+  glowSprite.layers.enable(1);
   group.add(glowSprite);
 
   const dummy = new T.Object3D();
@@ -382,6 +391,7 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
   })), count);
   lights.receiveShadow = false;
   lights.frustumCulled = false;
+  lights.layers.enable(1);
   const places = new Float32Array(count * 3), phases = new Float32Array(count);
   const sizes = new Float32Array(count), base: T.Color[] = [];
   const random = ctx.seededRandom(5101);
@@ -404,6 +414,7 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
   const dot = ctx.texture(softDot(32));
   const glow = new T.Points(glowGeometry, ctx.material(sparklePoints(ctx.time, .9, "#fff0cc", .55, dot)));
   glow.frustumCulled = false;
+  glow.layers.enable(1);
   group.add(glow);
 
   const flash = new T.Sprite(ctx.material(new T.SpriteMaterial({
@@ -412,6 +423,7 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
   })));
   flash.scale.setScalar(4);
   flash.position.set(places[(count - 1) * 3], places[(count - 1) * 3 + 1], places[(count - 1) * 3 + 2]);
+  flash.layers.enable(1);
   group.add(flash);
 
   // Reading starts with the last reveal pulse still fading, so the calm twinkle is

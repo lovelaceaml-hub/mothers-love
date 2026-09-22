@@ -102,3 +102,72 @@ describe("study pearl skin", () => {
     expect(parent.children).toHaveLength(0);
   });
 });
+
+/**
+ * Layer membership is what keeps the radiance pass away from the words. The text face itself
+ * lives in the host slot and is never touched here, so these assertions cover the skin: the
+ * occluder disc is the only object on the protect layer, and nothing that draws over the text
+ * ever joins the glow layer.
+ */
+describe("study pearl radiance layers", () => {
+  const ONLY_WORLD = 0b0001;
+  const WORLD_AND_GLOW = 0b0011;
+  const ONLY_GLOW = 0b0010;
+  const GLOW_AND_PROTECT = 0b1010;
+  it("keeps the occluder disc off the world layer and off the protect layer until it is read", () => {
+    const { skin } = build();
+    expect(skin.layerMask("pearl occluder")).toBe(ONLY_GLOW);
+    skin.dispose();
+  });
+  /**
+   * The protect pass renders layer 3 alone, so it carries no scene depth. A resident pearl
+   * standing behind solid scenery would paint its disc straight through that scenery and cut
+   * a blotch out of the glow, so only the pearl being read may join the mask.
+   */
+  it("admits only the pearl being read to the protect mask", () => {
+    const { skin } = build();
+    skin.update(3, [1], true, wide);
+    expect(skin.layerMask("pearl occluder")).toBe(GLOW_AND_PROTECT);
+    skin.update(3, [1], false, wide);
+    expect(skin.layerMask("pearl occluder")).toBe(ONLY_GLOW);
+    skin.clear();
+    expect(skin.layerMask("pearl occluder")).toBe(ONLY_GLOW);
+    skin.dispose();
+  });
+  it("keeps the occluder disc inside the pearl's own rim ring", () => {
+    const { skin } = build();
+    skin.update(0, [], true, wide);
+    expect(skin.radius("pearl occluder")).toBeCloseTo(0.985, 5);
+    skin.dispose();
+  });
+  it("leaves every object that draws over the text on the world layer alone", () => {
+    const { skin } = build();
+    for (const name of ["pearl finishing", "pearl ring 0", "pearl ring 1", "pearl ring 2", "pearl orbits"]) {
+      expect(skin.layerMask(name)).toBe(ONLY_WORLD);
+    }
+    skin.dispose();
+  });
+  it("lifts the rim, the halo and the sparkles into the glow layer without leaving the world", () => {
+    const { skin } = build();
+    for (const name of ["pearl glass", "pearl halo", "pearl sparkles"]) {
+      expect(skin.layerMask(name)).toBe(WORLD_AND_GLOW);
+    }
+    skin.dispose();
+  });
+  it("drops a resident out of the glow layer and puts the hero back into it", () => {
+    const { skin } = build();
+    skin.update(3, [1], false, wide);
+    expect(skin.layerMask("pearl glass")).toBe(ONLY_WORLD);
+    skin.update(3, [1], true, wide);
+    expect(skin.layerMask("pearl glass")).toBe(WORLD_AND_GLOW);
+    skin.dispose();
+  });
+  it("keeps the occluder with the face rather than with the detail level", () => {
+    const { skin, named } = build();
+    skin.update(3, [1], false, wide);
+    expect(named("pearl occluder").visible).toBe(true);
+    skin.update(3, [1], true, wide);
+    expect(named("pearl occluder").visible).toBe(true);
+    skin.dispose();
+  });
+});
