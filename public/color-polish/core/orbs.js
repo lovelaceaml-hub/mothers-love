@@ -80,7 +80,7 @@ function fitCircle(el,r,d,clock=0,growBudget=null){
  const content=el.querySelector('.orb-content'),msg=el.querySelector('.message');if(!content||!msg)return null;
  const title=el.querySelector('.recipient'),chipBox=el.querySelector('.chips'),page=el.querySelector('.orb-page-indicator');
  const grouped=el.classList.contains('grouped');
- const fontFloor=grouped?16:18;
+ const fontFloor=18;
  let font=d>=450?28:grouped?18.5:d>=335?24:21;
  if(r.name.length>16)title.style.fontSize=(d>=450?30:23)+'px';
  if(r.ids.length>3){chipBox.style.gap='3px';chipBox.querySelectorAll('.chip').forEach(x=>{x.style.fontSize=(d>=450?13:10)+'px';x.style.padding='2px 4px'})}
@@ -99,6 +99,7 @@ function fitCircle(el,r,d,clock=0,growBudget=null){
    slotEl.dataset.growMax=String(d);
   }
   const slotObj=slots.find(s=>s.key===slotEl?.id);if(slotObj)slotObj.d=d;
+  const actor=typeof V!=='undefined'?V.actors?.find(a=>a.key===slotEl?.id):null;if(actor)actor.d=d;
   const orb=el.querySelector('.orb')||(el.classList.contains('orb')?el:null);
   if(orb){if(d>=450){orb.classList.add('orb-large');orb.classList.remove('orb-small')}else if(d<285){orb.classList.add('orb-small');orb.classList.remove('orb-large')}}
   font=d>=450?28:grouped?18.5:d>=335?24:21;

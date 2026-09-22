@@ -56,7 +56,7 @@ function fullDateLabel(aggregate,day){const key=monthKey(aggregate),parsed=Date.
 function daysInMonth(aggregate){const key=monthKey(aggregate),parts=key.split('-').map(Number);return parts.length===2&&parts.every(Number.isInteger)?new Date(Date.UTC(parts[0],parts[1],0)).getUTCDate():31}
 const sum=a=>a.reduce((n,v)=>n+v,0);
 const EMPTY_AGGREGATE={rec:0,expr:Array(9).fill(0),periodStart:'',periodEnd:''};
-const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),shownCount:new Map(),forceId:null,replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,speechBag:[],speechLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
+const blankState=()=>({t:0,s:1,sceneAge:0,eduAge:0,bloomIndex:1,bloomNext:1,featured:2,mode:'offline',still:true,playing:false,clockControlled:true,pool:[],queue:[],seen:new Set(),arrivalIds:new Set(),days:{},currentWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},previousWeek:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},campaign:{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},goal:{id:1,value:0,target:1,rank:null,ratio:0,week:'',referenceFourth:0,achieved:false},playlist:[{id:1,duration:DWELL[1]}],dwell:{...DWELL},pauseRotation:false,sceneControlled:false,idCounter:0,lastShown:new Map(),shownCount:new Map(),randomDrawCounter:0,forceId:null,replenishAt:10,slotCounter:0,selectedDay:1,singleStyle:0,groupStyle:0,groupNumber:0,singleBag:[],groupBag:[],singleBagLast:null,groupBagLast:null,speechBag:[],speechLast:null,feedArrivalCounter:0,returnScene:null,returnAge:0,pendingScene:null,chain:false,countJobs:new Map(),lowSince:0,lowAutomatic:false,week:'',goalExpression:1,milestoneValue:0,milestonePending:null,milestoneContributors:[],milestonesSeen:new Set(),privacyAt:0,shimmerUntil:0,lastHeader:-1,snapshotRevision:null,source:'live',qrDataUrl:null,nowMs:0,replayKey:null,queueStart:0,motion:'standard'});
 let S=blankState(), active=null, transition=null, slots=[], sceneRoot=null, eduCards=[], numberNodes=[], numCache=new Map(), feedLanes=[], particles=[], heartRenderer=null, hearts=[], tributes=[], lastFrame=0, frozen=false, parentPort=null, parentOrigin='', expectedSequence=0, bootstrapNonce='', initialized=false, reducedMotionPreferred=false, lastManualAdvanceAt=-Infinity;
 function motionStill(motion,forced){return forced||motion==='still'||(reducedMotionPreferred&&motion!=='lively')}
 const qaLog=[];function log(type,data={}){qaLog.push({at:+S.t.toFixed(3),type,...data});if(qaLog.length>1400)qaLog.shift()}
@@ -136,8 +136,10 @@ function chooseRandom(exclude=[],expressionId=null){
  const pool=records().filter(r=>!exclude.includes(r.id)&&(!expressionId||r.ids.includes(expressionId)));
  if(!pool.length)return undefined;
  const stable=pool.map(r=>r.id).join(',');
+ const draw=S.randomDrawCounter||0;
+ S.randomDrawCounter=draw+1;
  const salt=Math.floor(S.t);
- const seed=((hashText(stable)^salt)>>>0)||1;
+ const seed=((hashText(stable)^salt^Math.imul(draw,0x9e3779b9))>>>0)||1;
  const rng=randSeed(seed);
  let total=0;
  for(const r of pool)total+=1/(1+(S.shownCount.get(r.id)??0));

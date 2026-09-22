@@ -121,7 +121,7 @@ function replaceActor(a,mode){
 
 function installNext(a){
  let r=S.pool.find(r=>r.id===a.nextId);if(!eligible(r)){a.nextId=null;a.life='steady';return}
- a.id=r.id;S.lastShown.set(r.id,S.t);a.el.dataset.recordId=r.id;a.el.style.setProperty('--tint',catalog[r.ids[0]-1].color);
+ a.id=r.id;S.lastShown.set(r.id,S.t);markShown(r.id);a.el.dataset.recordId=r.id;a.el.style.setProperty('--tint',catalog[r.ids[0]-1].color);
  // Larger messages keep a circle, using automatic verbatim page composition.
  a.el.innerHTML=`<div class="orb-life">${completeOrb(r,a.d)}</div>`;bindNumbers(a.el);a.reading=fitCircle(a.el,r,a.d,V.clock);
  const b=slots.find(x=>x.key===a.key);if(b){b.id=r.id;b.reading=a.reading;b.born=S.t}
