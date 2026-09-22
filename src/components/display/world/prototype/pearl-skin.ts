@@ -1,11 +1,20 @@
 import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
-import { WORLD_EXPRESSIONS } from "../world-data";
+import { WORLD_EXPRESSIONS, seededRandom } from "../world-data";
+import { softDot, sparklePoints, studyGlass } from "./study-materials";
 
 type Wrap = (measure: (text: string) => number, text: string, width: number) => string[];
 
+/** What the host slot knows about this pearl's place on screen for the current frame. */
+export type StudyPearlFrame = {
+  sparkles: boolean;
+  portrait: boolean;
+  orbitScale: number;
+};
+
 export class StudyPearlAssets {
   private readonly textures = new Map<number, T.Texture>();
+  private sparkleDot?: T.DataTexture;
   private disposed = false;
   constructor(private readonly invalidate: () => void) {}
   icon(id: number) {
@@ -14,7 +23,13 @@ export class StudyPearlAssets {
     const map = new T.TextureLoader().load(`/home-art/icon${id}.webp`, () => { if (!this.disposed) this.invalidate(); });
     map.colorSpace = T.SRGBColorSpace; this.textures.set(id, map); return map;
   }
-  dispose() { this.disposed = true; this.textures.forEach(t => t.dispose()); this.textures.clear(); }
+  /** One soft dot shared by every sparkle in the study. Built from plain bytes, so no canvas. */
+  dot() { return (this.sparkleDot ??= softDot(32)); }
+  dispose() {
+    this.disposed = true;
+    this.textures.forEach(t => t.dispose()); this.textures.clear();
+    this.sparkleDot?.dispose(); this.sparkleDot = undefined;
+  }
 }
 
 /** Appearance study only. Pagination and reading age remain owned by the app. */
@@ -103,28 +118,35 @@ export class StudyPearlSkin {
   private readonly clock = { value: 0 };
   private readonly orbitBeads: T.Mesh[] = [];
   private readonly orbitAxis = new T.Vector3(0, 0, 1);
+  private readonly rings: T.Mesh[] = [];
+  private readonly shell: T.Mesh;
+  private readonly finish: T.Mesh;
+  private readonly halo: T.Mesh;
+  private readonly sparkles: T.Points;
 
-  constructor(parent: T.Group, assets: StudyPearlAssets) {
-    this.root.name = "Design study pearl film and exterior canonical symbols";
+  constructor(parent: T.Group, assets: StudyPearlAssets, seed: number) {
+    this.root.name = "Design study pearl glass, halo and exterior canonical symbols";
     parent.add(this.root);
     this.root.add(this.orbits);
-    const sphere = this.geometry(new T.SphereGeometry(1.014, 64, 32));
-    const film = this.material(new T.ShaderMaterial({
-      transparent: true, depthTest: true, depthWrite: false,
-      uniforms: { time: this.clock },
-      vertexShader: `varying vec3 n;varying vec3 p;void main(){n=normalize(normalMatrix*normal);vec4 v=modelViewMatrix*vec4(position,1.);p=v.xyz;gl_Position=projectionMatrix*v;}`,
-      fragmentShader: `varying vec3 n;varying vec3 p;uniform float time;
-        void main(){vec3 N=normalize(n),V=normalize(-p);float nv=max(0.,dot(N,V));float rim=pow(1.-nv,1.7);vec3 R=reflect(-V,N);
-        float key=pow(max(0.,dot(R,normalize(vec3(-.47,.67,1.)))),27.);float fill=pow(max(0.,dot(R,normalize(vec3(.74,-.38,.9)))),20.);
-        float a=atan(N.y,N.x);float irid=.5+.5*sin(a*2.4+nv*9.+time*.12);
-        vec3 tint=mix(vec3(.84,.23,.48),vec3(.15,.52,.78),irid);
-        vec3 color=mix(vec3(1.,.94,.84),tint,rim*.90)+key*.85+fill*.22;
-        gl_FragColor=vec4(color,.035+rim*.75+key*.45+fill*.15);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
+    this.orbits.name = "pearl orbits";
+    // The halo sits behind the depth writing face, so only the glow outside the disc reaches the eye.
+    this.halo = new T.Mesh(this.geometry(new T.PlaneGeometry(3.6, 3.6)), this.material(new T.ShaderMaterial({
+      transparent: true, depthTest: true, depthWrite: false, toneMapped: false, blending: T.AdditiveBlending,
+      vertexShader: "varying vec2 haloUv;void main(){haloUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+      fragmentShader: `varying vec2 haloUv;
+        void main(){float d=length(haloUv-.5)*3.6;
+          float core=pow(max(0.,1.-d/1.75),2.4);
+          float outer=exp(-pow((d-1.18)*2.2,2.));
+          vec3 rgb=mix(vec3(1.,.90,.80),vec3(1.,.78,.86),smoothstep(.6,1.6,d))*core*.55+vec3(.80,.86,1.)*outer*.16;
+          gl_FragColor=vec4(rgb,clamp(dot(rgb,vec3(.2126,.7152,.0722)),0.,1.));
+          #include <colorspace_fragment>
         }`,
-    }));
-    const dome = new T.Mesh(sphere, film); dome.scale.z = .78; dome.position.z = .026; dome.renderOrder = 3; this.root.add(dome);
+    })));
+    this.halo.name = "pearl halo"; this.halo.position.z = -.4; this.halo.renderOrder = 2; this.root.add(this.halo);
+    // A real sphere, so the pearl reads the same under every billboard rotation and the text never turns.
+    this.shell = new T.Mesh(this.geometry(new T.SphereGeometry(1.02, 48, 24)), this.material(studyGlass(.16)));
+    this.shell.name = "pearl glass"; this.shell.scale.z = .84; this.shell.position.z = 0; this.shell.renderOrder = 3;
+    this.root.add(this.shell);
     const finishing = this.material(new T.ShaderMaterial({
       transparent: true, depthTest: true, depthWrite: false, toneMapped: false,
       uniforms: { time: this.clock },
@@ -142,15 +164,22 @@ export class StudyPearlSkin {
             float pulse=.3+.7*pow(.5+.5*sin(time*.7+k*3.),3.);
             sparkle+=pulse*(exp(-length(q)*220.)+exp(-abs(q.x)*1200.-abs(q.y)*100.)*.6+exp(-abs(q.y)*1200.-abs(q.x)*100.)*.6);}
           float alpha=clamp(rim*.92+inner*.32+reflection*.52+lower*.7+sparkle,0.,1.);
-          gl_FragColor=vec4(mix(c,vec3(1.,.985,.93),clamp(reflection+sparkle,0.,1.)),alpha);
+          vec3 finalColor=mix(c,vec3(1.,.985,.93),clamp(reflection+sparkle,0.,1.));
+          // A soft pink, lavender and blue wash inside the glass. The centre, r below .36, is left
+          // untouched so the approved wording keeps its contrast.
+          float washA=smoothstep(.36,.99,r)*.16;
+          vec3 washCol=mix(mix(vec3(.97,.78,.87),vec3(.85,.80,.96),smoothstep(-.6,.6,p.y)),vec3(.81,.88,.97),smoothstep(.1,.9,p.x)*.6);
+          gl_FragColor=vec4((washCol*washA+finalColor*alpha)/max(.001,washA+alpha),clamp(washA+alpha,0.,1.));
           #include <colorspace_fragment>
         }`,
     }));
-    const finish = new T.Mesh(this.geometry(new T.PlaneGeometry(2.18, 2.18)), finishing);
-    finish.position.z = .065; finish.renderOrder = 4; this.root.add(finish);
+    this.finish = new T.Mesh(this.geometry(new T.PlaneGeometry(2.18, 2.18)), finishing);
+    this.finish.name = "pearl finishing"; this.finish.position.z = .065; this.finish.renderOrder = 4;
+    this.root.add(this.finish);
     for (let i = 0; i < 3; i++) {
-      const ring = new T.Mesh(this.geometry(new T.TorusGeometry(1.005 + i * .016, i ? .0025 : .006, 6, 128)), this.material(new T.MeshBasicMaterial({ color: ["#fffef5", "#d6b483", "#e2afca"][i], transparent: true, opacity: i ? .48 : .86, depthWrite: false })));
-      ring.position.z = .045; this.root.add(ring);
+      const ring = new T.Mesh(this.geometry(new T.TorusGeometry(1.005 + i * .016, i ? .0025 : .006, 6, 128)), this.material(new T.MeshBasicMaterial({ color: ["#e8c78e", "#d6b483", "#e2afca"][i], transparent: true, opacity: i ? .48 : .78, depthWrite: false })));
+      ring.name = `pearl ring ${i}`;
+      ring.position.z = .045; this.root.add(ring); this.rings.push(ring);
     }
     const gold = this.material(new T.MeshStandardMaterial({ color: "#dfbd79", metalness: .8, roughness: .22, transparent: true, opacity: .83, depthWrite: false }));
     for (let i = 0; i < 2; i++) {
@@ -164,24 +193,49 @@ export class StudyPearlSkin {
       const pearl = new T.Mesh(beadGeometry, i % 3 ? beadPearl : gold);
       pearl.scale.setScalar(i % 3 ? .9 : 1.22); this.orbits.add(pearl); this.orbitBeads.push(pearl);
     }
-    const circle = this.geometry(new T.CircleGeometry(.154, 48));
-    const bead = this.geometry(new T.SphereGeometry(.162, 24, 16));
+    // Warm dust inside the glass and a looser drift around it. Seeded, so every pearl is stable.
+    const random = seededRandom(1201 + seed);
+    const positions = new Float32Array(56 * 3), phases = new Float32Array(56);
+    for (let i = 0; i < 56; i++) {
+      const inside = i < 36, u = random(), angle = random() * Math.PI * 2, lift = random();
+      const r = inside ? .2 + .72 * Math.sqrt(u) : 1.08 + .42 * u;
+      positions[i * 3] = Math.cos(angle) * r;
+      positions[i * 3 + 1] = Math.sin(angle) * r;
+      positions[i * 3 + 2] = inside ? .06 + lift * .5 * Math.sqrt(Math.max(0, 1 - r * r)) : -.1 + lift * .35;
+      phases[i] = random();
+    }
+    const dust = this.geometry(new T.BufferGeometry());
+    dust.setAttribute("position", new T.BufferAttribute(positions, 3));
+    dust.setAttribute("phase", new T.BufferAttribute(phases, 1));
+    this.sparkles = new T.Points(dust, this.material(sparklePoints(this.clock, .13, "#fff2d8", 1, assets.dot())));
+    this.sparkles.name = "pearl sparkles"; this.sparkles.renderOrder = 5; this.sparkles.frustumCulled = false;
+    this.root.add(this.sparkles);
+    // Every canonical symbol sits inside its own little glass sphere over a tinted disc.
+    const tintDisc = this.geometry(new T.CircleGeometry(.178, 40));
+    const iconDisc = this.geometry(new T.CircleGeometry(.148));
+    const medallionGlass = this.geometry(new T.SphereGeometry(.196, 40, 24));
+    const medallionRim = this.geometry(new T.TorusGeometry(.205, .0042, 6, 56));
+    const glass = this.material(studyGlass(.24));
     for (const expression of WORLD_EXPRESSIONS) {
-      const root = new T.Group(); root.visible = false;
-      const pearl = this.material(new T.MeshPhysicalMaterial({ color: new T.Color(expression.color).lerp(new T.Color("#fff7e9"), .66), roughness: .26, metalness: .1, clearcoat: .9, clearcoatRoughness: .22 }));
-      const ball = new T.Mesh(bead, pearl); ball.scale.z = .55; root.add(ball);
+      const root = new T.Group(); root.visible = false; root.name = `pearl medallion ${expression.id}`;
+      const tint = new T.Mesh(tintDisc, this.material(new T.MeshBasicMaterial({ color: new T.Color(expression.color).lerp(new T.Color("#fff8ef"), .55), toneMapped: false, transparent: true, opacity: .96, depthWrite: false })));
+      tint.position.z = -.02; tint.renderOrder = 3; root.add(tint);
       const map = assets.icon(expression.id);
-      const icon = new T.Mesh(circle, this.material(new T.MeshBasicMaterial({ map, transparent: true, depthTest: true, depthWrite: false, toneMapped: false })));
-      icon.position.z = .10; root.add(icon);
-      const rim = new T.Mesh(this.geometry(new T.TorusGeometry(.173, .0038, 5, 48)), gold); rim.position.z = .015; root.add(rim);
+      const icon = new T.Mesh(iconDisc, this.material(new T.MeshBasicMaterial({ map, transparent: true, depthTest: true, depthWrite: false, toneMapped: false })));
+      icon.position.z = .05; icon.renderOrder = 4; root.add(icon);
+      const ball = new T.Mesh(medallionGlass, glass); ball.renderOrder = 5; root.add(ball);
+      root.add(new T.Mesh(medallionRim, gold));
       this.root.add(root); this.medallions.push({ id: expression.id, root });
     }
   }
   private geometry<G extends T.BufferGeometry>(g: G) { this.geometries.add(g); return g; }
   private material<M extends T.Material>(m: M) { this.materials.add(m); return m; }
-  update(time: number, ids: readonly number[], detailed: boolean) {
+  update(time: number, ids: readonly number[], detailed: boolean, frame: StudyPearlFrame) {
     this.clock.value = time;
-    this.orbits.visible = detailed;
+    // A resident pearl keeps only its glass shell and one gold ring: two extra draws.
+    this.orbits.visible = this.finish.visible = this.halo.visible = detailed;
+    this.sparkles.visible = detailed && frame.sparkles;
+    this.rings.forEach((ring, index) => { ring.visible = detailed || index === 0; });
     this.orbitBeads.forEach((bead, i) => {
       const lane = i % 2, a = i * 2.399 + time * .035;
       bead.position.set(Math.cos(a) * (1.37 + lane * .11), Math.sin(a) * (1.26 + lane * .055), Math.sin(a * 2 + lane) * .12 - .08);
@@ -189,15 +243,24 @@ export class StudyPearlSkin {
     });
     const selected = this.medallions.filter(item => ids.includes(item.id));
     this.medallions.forEach(item => { item.root.visible = detailed && ids.includes(item.id); });
+    // A narrow viewport pulls the ring in and shrinks the symbols, so none of them leaves the frame.
+    const radiusX = (frame.portrait ? 1.06 : 1.36) * frame.orbitScale;
+    const radiusY = (frame.portrait ? 1.44 : 1.28) * frame.orbitScale;
+    const size = frame.portrait ? .9 : frame.orbitScale;
     selected.forEach((item, i) => {
       const a = time * .105 + i * Math.PI * 2 / selected.length + .8;
-      item.root.position.set(Math.cos(a) * 1.36, Math.sin(a) * 1.28, .09 + Math.sin(a * 2) * .055);
+      item.root.position.set(Math.cos(a) * radiusX, Math.sin(a) * radiusY, .09 + Math.sin(a * 2) * .055);
+      item.root.scale.setScalar(size);
     });
   }
-  clear() { this.medallions.forEach(item => { item.root.visible = false; }); }
+  clear() {
+    this.medallions.forEach(item => { item.root.visible = false; });
+    this.halo.visible = this.sparkles.visible = false;
+  }
   dispose() {
     this.root.removeFromParent(); this.root.clear();
     this.geometries.forEach(g => g.dispose()); this.materials.forEach(m => m.dispose());
-    this.geometries.clear(); this.materials.clear(); this.medallions.length = 0; this.orbitBeads.length = 0;
+    this.geometries.clear(); this.materials.clear();
+    this.medallions.length = 0; this.orbitBeads.length = 0; this.rings.length = 0;
   }
 }

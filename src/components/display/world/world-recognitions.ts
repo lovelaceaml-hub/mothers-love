@@ -3,7 +3,12 @@ import type { Recognition } from "@/lib/contracts";
 import type { ArrivalState } from "./arrival-director";
 import { messagePages, readingSeconds } from "./reading";
 import { isWorldDesignStudy } from "./prototype/design-mode";
-import { StudyPearlAssets, StudyPearlSkin, paintStudyPearl } from "./prototype/pearl-skin";
+import {
+  StudyPearlAssets,
+  StudyPearlSkin,
+  paintStudyPearl,
+  type StudyPearlFrame,
+} from "./prototype/pearl-skin";
 import {
   RECOGNITION_ZONES,
   WORLD_EXPRESSIONS,
@@ -97,6 +102,18 @@ export class WorldRecognitionBubbles {
   private arrivalInWorld = false;
   private readonly designStudy = isWorldDesignStudy();
   private readonly studyAssets?: StudyPearlAssets;
+  private readonly frameScratch = new T.Vector3();
+  private readonly plainFrame: StudyPearlFrame = {
+    sparkles: false,
+    portrait: false,
+    orbitScale: 1,
+  };
+  // Reused every frame so the detailed slots never allocate.
+  private readonly detailedFrame: StudyPearlFrame = {
+    sparkles: false,
+    portrait: false,
+    orbitScale: 1,
+  };
 
   constructor(scene: T.Scene) {
     if (this.designStudy) this.studyAssets = new StudyPearlAssets(() => scene.userData.invalidate?.());
@@ -122,7 +139,10 @@ export class WorldRecognitionBubbles {
     const lights = new T.InstancedMesh(this.dot, this.lightMaterial, 10);
     lights.frustumCulled = false;
     root.add(face, ring, lights);
-    const study = this.studyAssets ? new StudyPearlSkin(root, this.studyAssets) : undefined;
+    // The slot ordinal seeds this pearl, so its sparkle scatter is stable and unlike its neighbours.
+    const study = this.studyAssets
+      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length)
+      : undefined;
     root.visible = face.visible = false;
     this.root.add(root);
     this.slots.push({
@@ -392,7 +412,7 @@ export class WorldRecognitionBubbles {
           );
         slot.radius =
           [4.4, 3, 2.8][slot.index] * (mobile && slot.index === 0 ? 1.06 : 1);
-        if (this.designStudy && slot.index > 0) slot.radius *= .72;
+        if (this.designStudy && slot.index > 0) slot.radius *= .64;
         if (this.designStudy && slot.index === 0) {
           // Keep the exterior symbol orbit above the terrace, with depth testing intact.
           slot.root.position.y = Math.max(
@@ -422,7 +442,16 @@ export class WorldRecognitionBubbles {
             minimum,
           ) || changed;
         this.effects(slot, time, input.sparkles, input.trails);
-        slot.study?.update(time, slot.record.expressionIds, place === zone && slot.index === 0);
+        this.recede(slot);
+        // While an entrance is running the arrival pearl is the only detailed one.
+        const detailed =
+          place === zone && slot.index === 0 && !entranceActive;
+        slot.study?.update(
+          time,
+          slot.record.expressionIds,
+          detailed,
+          detailed ? this.frameFor(slot, camera, input.sparkles) : this.plainFrame,
+        );
         if (place === zone && slot.index === 0) this.focused = slot;
       }
     }
@@ -458,13 +487,63 @@ export class WorldRecognitionBubbles {
             : 0;
       changed = this.paint(arrivalSlot, age, minimum) || changed;
       this.effects(arrivalSlot, time, input.sparkles, input.trails);
-      arrivalSlot.study?.update(time, arrivalSlot.record.expressionIds, true);
+      this.recede(arrivalSlot);
+      arrivalSlot.study?.update(
+        time,
+        arrivalSlot.record.expressionIds,
+        true,
+        this.frameFor(arrivalSlot, camera, input.sparkles),
+      );
       this.focused = arrivalSlot;
       this.arrivalInWorld = true;
     }
     if (this.focused)
       this.projection.copy(this.focused.root.position).project(camera);
     return changed;
+  }
+  /**
+   * The hero pearl reads at full strength. Residents step back into the scenery,
+   * paler and a little warmer, so one message at a time carries the eye.
+   * Slots are reused, so the hero values are restored every frame.
+   */
+  private recede(slot: Slot) {
+    if (!this.designStudy) return;
+    const material = slot.face.material;
+    if (slot.index > 0) {
+      // Nearly opaque: residents can overlap, and text showing through text reads as a defect.
+      material.opacity = 0.9;
+      material.color.set("#f3e6ea");
+    } else {
+      material.opacity = 1;
+      material.color.set("#ffffff");
+    }
+  }
+  /**
+   * How much room this pearl and its symbol ring have on screen right now.
+   * `reach` is the orbit radius plus a symbol radius, in world units.
+   */
+  private frameFor(
+    slot: Slot,
+    camera: T.PerspectiveCamera,
+    sparkles: boolean,
+  ): StudyPearlFrame {
+    const reach = slot.radius * (1.36 + 0.21);
+    const distance = camera.position.distanceTo(slot.root.position);
+    const ndcY =
+      reach /
+      Math.max(0.001, distance * Math.tan((camera.fov * Math.PI) / 360));
+    const ndcX = ndcY / camera.aspect;
+    const p = this.frameScratch.copy(slot.root.position).project(camera);
+    const overflow = Math.max(
+      0,
+      Math.abs(p.x) + ndcX - 0.96,
+      Math.abs(p.y) + ndcY - 0.92,
+    );
+    const frame = this.detailedFrame;
+    frame.sparkles = sparkles;
+    frame.portrait = camera.aspect < 1;
+    frame.orbitScale = T.MathUtils.clamp(1 - overflow * 1.6, 0.94, 1);
+    return frame;
   }
   private effects(
     slot: Slot,

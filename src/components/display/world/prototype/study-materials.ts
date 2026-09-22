@@ -72,3 +72,56 @@ gl_PointSize = size * (.6 + .4 * twinkle);`,
   dots.customProgramCacheKey = () => "study-sparkle-v1";
   return dots;
 }
+
+/**
+ * The glass of the study pearl and of its canonical medallions.
+ *
+ * It stays a lit physical material rather than a raw ShaderMaterial so it keeps
+ * sampling `scene.environment` through the ordinary pipeline, which is where the
+ * broad curved reflections come from. Only the coloured fresnel rim and the
+ * rim-driven opacity are added on top.
+ *
+ * Verified against three 0.180 `ShaderLib/meshphysical.glsl.js`: at
+ * `#include <opaque_fragment>` the shader already has `vViewPosition` (declared
+ * unconditionally in the fragment head), the view space `vec3 normal` from
+ * `<normal_fragment_begin>`, `outgoingLight`, `totalSpecular`, `diffuseColor`
+ * and the `opacity` uniform, plus the `saturate` macro from `<common>`.
+ * Three 0.180 ships no `luminance()` helper in any shader chunk, so the
+ * specular weight below uses the Rec. 709 coefficients directly.
+ */
+export function studyGlass(opacity: number) {
+  const glass = new T.MeshPhysicalMaterial({
+    color: "#ffffff",
+    roughness: .07,
+    metalness: 0,
+    clearcoat: 1,
+    clearcoatRoughness: .08,
+    iridescence: 1,
+    iridescenceIOR: 1.32,
+    iridescenceThicknessRange: [140, 520],
+    envMapIntensity: 1.6,
+    specularIntensity: 1,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    side: T.FrontSide,
+  });
+  glass.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `float pearlNv = saturate(dot(normalize(vViewPosition), normal));
+float pearlRim = pow(1.0 - pearlNv, 2.6);
+vec3 pearlTint = mix(vec3(.97,.55,.74), vec3(.68,.60,.94), smoothstep(-.5,.7,normal.y));
+pearlTint = mix(pearlTint, vec3(1.,.87,.60), smoothstep(.15,.95,normal.x) * .55);
+// The lit sphere is already near white at grazing angles, so the tint has to colour that
+// specular as well as add to it, or the rim tone maps back to plain white.
+outgoingLight = mix(outgoingLight, outgoingLight * pearlTint, pearlRim * .85);
+outgoingLight += pearlTint * pearlRim * 1.35;
+diffuseColor.a = clamp(opacity + pearlRim * .82 + dot(totalSpecular, vec3(.2126, .7152, .0722)) * .35, 0., 1.);
+#include <opaque_fragment>`,
+    );
+  };
+  // clone() drops the patch above, so the key names this exact recipe.
+  glass.customProgramCacheKey = () => `study-glass-v1-${opacity}`;
+  return glass;
+}
