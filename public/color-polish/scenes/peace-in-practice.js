@@ -26,6 +26,7 @@ const PIP_CARD_SLOTS = [
 
 let pipCards = [];
 let pipActiveTimers = [];
+let pipExplosionSerial = 0;
 
 function peaceScene() {
   return `<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true"><defs><clipPath id="pip-heart-clip" clipPathUnits="objectBoundingBox"><path d="M 0.5,0.894 C 0.42,0.809 0.09,0.606 0.08,0.34 C 0.07,0.117 0.30,0.032 0.43,0.191 C 0.46,0.223 0.49,0.287 0.5,0.319 C 0.52,0.266 0.55,0.213 0.59,0.17 C 0.76,0.021 0.95,0.17 0.92,0.372 C 0.89,0.628 0.58,0.83 0.5,0.894 Z"/></clipPath></defs></svg><div style="position:absolute;left:12px;top:36px;width:861px"><div class="eyebrow">Peace in practice</div><h1 style="font-size:61px;letter-spacing:-2px;line-height:1.1;margin:23px 0">May Mother’s ${shimmer('love')}<br>bring ${shimmer('peace')} to the world!</h1><p class="subheading">Love expressed through words and actions.</p></div>${art('hands_banner', 'left:20px;top:393px;width:823px;height:238px;opacity:.8;mask-image:linear-gradient(transparent,#000 20%,#000 85%,transparent)')}<div class="heart-host" id="heart-host" style="left:198px;top:232px;width:390px;height:363px"></div><div id="heart-field"></div><div id="heart-cards"></div>`;
@@ -220,6 +221,7 @@ function pipCreateCardElement(def, record, slotIdx) {
 
 function pipMountCards(root) {
   pipCards = [];
+  pipExplosionSerial = 0;
   const container = $('heart-cards');
   if (!container) return;
   container.replaceChildren();
@@ -345,7 +347,9 @@ function pipTickAge(dt) {
       if (slot.age >= 1.0 + card.holdDuration) {
         const cx = slot.def.left + slot.def.width * 0.5;
         const cy = slot.def.top + slot.def.height * 0.5;
-        const pieces = 12 + ((slot.slotIndex + Math.floor(V.clock || 0)) % 3);
+        // Keep each burst varied while building the fuller persistent heart
+        // field specified for this scene.
+        const pieces = 14 + ((pipExplosionSerial++ * 7) % 4);
         pipSpawnExplosionHearts(cx, cy, pieces, card.record.id);
 
         card.el.remove();
@@ -573,6 +577,7 @@ function pipInitHeartBuffers() {
   PIP_HEART_ROT_BUFFERS = {
     px: new Float32Array(verts),
     py: new Float32Array(verts),
+    outline: new Int16Array(PIP_HEART_N),
     depth: new Float32Array(quads),
     colorIdx: new Uint16Array(quads),
     visible: new Int16Array(quads),
@@ -781,6 +786,26 @@ function pipRenderHeartFrame(ctx, canvas, t) {
   const visSlice = visible.subarray(0, visibleCount);
   visSlice.sort((a, b) => qDepth[a] - qDepth[b]);
 
+  // Keep the mesh for the projected silhouette and motion, but paint the
+  // visible heart as one continuous surface. Filling each mesh quad with a
+  // flat color made the intended glossy red read as a tiled object on TV.
+  const outline = buf.outline;
+  for (let i = 0; i < PIP_HEART_N; i++) {
+    let bestIndex = Math.floor(PIP_HEART_M * 0.5) * PIP_HEART_N + i;
+    let bestRadius = -1;
+    for (let j = 0; j <= PIP_HEART_M; j++) {
+      const vertexIndex = j * PIP_HEART_N + i;
+      const dx = projX[vertexIndex] - cx;
+      const dy = projY[vertexIndex] - cy;
+      const radius = dx * dx + dy * dy;
+      if (radius > bestRadius) {
+        bestRadius = radius;
+        bestIndex = vertexIndex;
+      }
+    }
+    outline[i] = bestIndex;
+  }
+
   ctx.fillStyle = '#8a0f2230';
   ctx.beginPath();
   ctx.ellipse(cx, cy + 285 * scale, 115 * scale, 18 * scale, 0, 0, TAU);
@@ -823,27 +848,59 @@ function pipRenderHeartFrame(ctx, canvas, t) {
   }
   ctx.globalAlpha = 1;
 
-  const v0 = mesh.v0;
-  const v1 = mesh.v1;
-  const v2 = mesh.v2;
-  const v3 = mesh.v3;
-
-  for (let i = 0; i < visibleCount; i++) {
-    const qIdx = visSlice[i];
-    const a = v0[qIdx];
-    const b = v1[qIdx];
-    const c = v2[qIdx];
-    const d = v3[qIdx];
-
-    ctx.fillStyle = colorTable[qColorIdx[qIdx]];
-    ctx.beginPath();
-    ctx.moveTo(projX[a], projY[a]);
-    ctx.lineTo(projX[b], projY[b]);
-    ctx.lineTo(projX[c], projY[c]);
-    ctx.lineTo(projX[d], projY[d]);
-    ctx.closePath();
-    ctx.fill();
+  const outlinePoint = (index) => ({ x: projX[outline[index]], y: projY[outline[index]] });
+  const first = outlinePoint(0);
+  const previous = outlinePoint(PIP_HEART_N - 1);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo((first.x + previous.x) * 0.5, (first.y + previous.y) * 0.5);
+  for (let i = 0; i < PIP_HEART_N; i++) {
+    const point = outlinePoint(i);
+    const next = outlinePoint((i + 1) % PIP_HEART_N);
+    ctx.quadraticCurveTo(point.x, point.y, (point.x + next.x) * 0.5, (point.y + next.y) * 0.5);
   }
+  ctx.closePath();
+  ctx.clip();
+
+  const highlightX = cx - scaleCanvas * (0.2 + 0.08 * Math.sin(rotY));
+  const highlightY = cy - scaleCanvas * (0.22 + 0.03 * Math.cos(rotX));
+  const surface = ctx.createRadialGradient(
+    highlightX,
+    highlightY,
+    scaleCanvas * 0.04,
+    cx + scaleCanvas * 0.1 * Math.sin(rotY),
+    cy + scaleCanvas * 0.08,
+    scaleCanvas * 1.22
+  );
+  surface.addColorStop(0, '#fff1f4');
+  surface.addColorStop(0.18, '#ffccd5');
+  surface.addColorStop(0.52, '#d7263d');
+  surface.addColorStop(0.82, '#a9162b');
+  surface.addColorStop(1, '#710b1c');
+  ctx.fillStyle = surface;
+  ctx.fillRect(0, 0, W, H);
+
+  const depthShade = ctx.createLinearGradient(0, cy - scaleCanvas, 0, cy + scaleCanvas);
+  depthShade.addColorStop(0, 'rgba(255, 150, 164, 0.04)');
+  depthShade.addColorStop(0.58, 'rgba(90, 0, 20, 0.02)');
+  depthShade.addColorStop(1, 'rgba(65, 0, 16, 0.24)');
+  ctx.fillStyle = depthShade;
+  ctx.fillRect(0, 0, W, H);
+
+  const gloss = ctx.createRadialGradient(
+    highlightX,
+    highlightY,
+    0,
+    highlightX + scaleCanvas * 0.04,
+    highlightY + scaleCanvas * 0.03,
+    scaleCanvas * 0.34
+  );
+  gloss.addColorStop(0, 'rgba(255, 250, 252, 0.42)');
+  gloss.addColorStop(0.28, 'rgba(255, 218, 224, 0.20)');
+  gloss.addColorStop(1, 'rgba(255, 190, 204, 0)');
+  ctx.fillStyle = gloss;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
 
   for (let sIdx = 0; sIdx < numSparks; sIdx++) {
     if (spZ[sIdx] >= 0) {
