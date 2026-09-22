@@ -1,0 +1,48 @@
+{
+  "classification": "Original scenery and fictional browser evidence only",
+  "storage": "Local worktree, no cloud copy or source removal",
+  "files": [
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/assets/pearl-atelier.blend",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/pearl-atelier.blend",
+      "bytes": 9315783,
+      "sha256": "395c1097c08c4957fb7e755c7441175e3110bc2b20d6a241568bd853cdc5a19e"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/optimized/cosmos-hd.png",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/cosmos-hd.png",
+      "bytes": 1230829,
+      "sha256": "45ec50b61d47ba025b49cc39eb0fb4dd9ace2ba6f87012106250420a5a7ee874"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/optimized/cosmos-4k.png",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/cosmos-4k.png",
+      "bytes": 3518574,
+      "sha256": "6cfde55136eb1a474da2ddf2b843cfb7f44900e621b75d4e7651d68ff165ddaa"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/optimized/cosmos-phone.png",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/cosmos-phone.png",
+      "bytes": 189308,
+      "sha256": "2baf57cfc502e5b77b9c24b84d77808f8771262ea1c56f3fc62e5c0604c4e276"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/optimized/cosmos-floating.png",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/cosmos-floating.png",
+      "bytes": 1229991,
+      "sha256": "2afd5eb8c5768638dd5be300cf241416c17fccd768015fc23442e51134246861"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/optimized/report.json",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/report.json",
+      "bytes": 4516,
+      "sha256": "752f8fb5044e27244fa011e3c540b2b63d752c842db7b84deb7124b64412d62c"
+    },
+    {
+      "source": "/private/tmp/mothers-love-pearl-sequence/touch-optimized-report.json",
+      "destination": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence/docs/private/cosmos-prototype/touch-optimized-report.json",
+      "bytes": 422,
+      "sha256": "d242d980cdcc1ca2682c67957e39e89aeca8d839751fa034483c50a2dc9cafc0"
+    }
+  ]
+}

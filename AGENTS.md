@@ -1,3 +1,11 @@
+## Active in this isolated checkout: Expression Cosmos prototype
+
+Anthony narrowed the approved recommendation to one prototype of the "cosmopolitan" reference, then approved the resulting Expression Cosmos appearance. Follow docs/PLAN-26-pearl-sequence.md and its Build log. One Codex writer owns this checkout; the active Plan 24 Claude worktree and separate Plan 25 TV study are outside its ownership.
+
+Anthony approved the prototype's look and requested more effects and a pearl that moves around. The main pearl now follows a bounded 3D path with trailing gold dust, light ribbons and drifting petals. Hold, Pause and reduced motion freeze its motion. The prototype route /display/cosmos-prototype always uses fictional records. It imports original Blender-authored geometry into the existing Three.js renderer and keeps the established recognition text, reading and privacy lifecycle. No live-source switch, API/database/auth changes, production promotion, purchases, or external generation. No build-polished-apps or Stitch workflow.
+
+The optimized local prototype and reference comparison are verified. Physical-TV performance is untested. Automatic approval review rejected the Vercel preview upload because the exact hosted destination and upload lacked explicit approval. Do not publish or push a branch that triggers a deployment until Anthony approves that action. Preserve the local source checkpoint and evidence. This is one visual checkpoint, not whole-world completion.
+
 ## Active correction: designs and prototypes before implementation
 
 Anthony approved a further Astra prototype refinement: smoother models, richer outdoor lighting/materials, higher definition and Atelier-level pearl ornamentation. Preserve the current wording layout exactly, including "Thank you" at the top. Do not use build-polished-apps or Stitch; Anthony explicitly rejected that workflow. Supplied references plus these corrections govern this design stage. Fable and Opus remain held until visual approval.

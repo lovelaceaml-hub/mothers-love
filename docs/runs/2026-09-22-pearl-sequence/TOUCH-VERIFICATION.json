@@ -1,0 +1,12 @@
+{
+  "origin": "http://127.0.0.1:32862",
+  "checks": [
+    "Touch controls remain visible and interactive after the idle timer",
+    "A stationary first tap on the visible reading button opens the complete reader",
+    "Closing the reader restores focus",
+    "A stationary click cannot activate an invisible desktop control",
+    "Keyboard activity reveals the desktop controls"
+  ],
+  "errors": [],
+  "apiRequests": []
+}

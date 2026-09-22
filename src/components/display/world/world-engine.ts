@@ -8,6 +8,7 @@ import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, type StudyArrival } from "./prototype/design-mode";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
 import { STUDY_TONE } from "./prototype/study-palette";
+import { COSMOS_CENTER, isCosmosPrototype } from "./prototype/cosmos-mode";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import {
   RECOGNITION_ZONES,
@@ -33,6 +34,7 @@ export type WorldStatus = {
   cameraPosition?: number[];
   worldBubbles?: ReturnType<WorldRecognitionBubbles["inspect"]>;
   prototypeHeartReady?: boolean;
+  prototypeSceneryReady?: boolean;
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -51,6 +53,8 @@ export class WorldEngine {
   private rotationPaused = false;
   private sourceStill = false;
   private expressionId = 1;
+  private readonly cosmosPrototype = isCosmosPrototype();
+  private readonly cosmosTarget = new THREE.Vector3();
   private demoRequested = false;
   private ownerTempo = 1;
   private arrivalState: ArrivalState = this.arrivals.state();
@@ -107,6 +111,11 @@ export class WorldEngine {
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
       if (isWorldDesignStudy()) this.world.scene.environmentIntensity = STUDY_TONE.environmentIntensity;
+      if (this.cosmosPrototype) {
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.03;
+        this.world.scene.environmentIntensity = .68;
+      }
     } catch (error) {
       this.bubbles.dispose();
       this.world.dispose();
@@ -177,6 +186,7 @@ export class WorldEngine {
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
+    if (this.cosmosPrototype) this.world.scene.userData.cosmosPortrait = width < height;
     this.camera.fov = width < height ? 63 : 43;
     this.camera.updateProjectionMatrix();
     this.dirty = true;
@@ -185,7 +195,7 @@ export class WorldEngine {
     if (!this.alive || this.failed || document.hidden) return;
     const delta = this.last ? Math.min((now - this.last) / 1000, 1) : 0;
     this.last = now;
-    const moving = !this.paused && !this.reduced && !this.sourceStill;
+    const moving = !this.paused && !this.reduced && !this.sourceStill && !(this.cosmosPrototype && this.readingHeld);
     const safe =
       this.feed.phase === "sample" ||
       this.feed.phase === "live" ||
@@ -284,6 +294,12 @@ export class WorldEngine {
     );
     this.camera.position.copy(this.director.position);
     this.camera.lookAt(this.director.target);
+    if (this.cosmosPrototype) {
+      const angle = this.elapsed * .026;
+      this.camera.position.set(COSMOS_CENTER[0] + Math.sin(angle) * 1.1, COSMOS_CENTER[1] + 11.8 + Math.sin(angle * .7) * .3, COSMOS_CENTER[2] + 34 + Math.cos(angle) * .4);
+      this.cosmosTarget.set(COSMOS_CENTER[0], COSMOS_CENTER[1] + 8.4, COSMOS_CENTER[2]);
+      this.camera.lookAt(this.cosmosTarget);
+    }
     this.camera.updateMatrixWorld();
     this.dirty =
       this.bubbles.update({
@@ -329,8 +345,9 @@ export class WorldEngine {
   private report() {
     this.options.onStatus({
       zone: this.director.zone,
-      cameraPosition: this.director.position.toArray(),
+      cameraPosition: this.camera.position.toArray(),
       prototypeHeartReady: this.world.scene.userData.prototypeHeartReady,
+      prototypeSceneryReady: this.world.scene.userData.prototypeSceneryReady,
       worldBubbles: this.bubbles.inspect(),
       destination: this.director.destination,
       traveling: this.director.traveling,
@@ -396,7 +413,8 @@ export class WorldEngine {
     // Flat-screen playlist durations can park Garden for several minutes.
     // This world has its own TV touring pace and still waits for complete reading.
     const dwells = new Map<ZoneId, number>(ids.map((id) => [id, 20]));
-    this.director.setPlaylist(ids, dwells);
+    this.director.setPlaylist(this.cosmosPrototype ? ["orbit"] : ids, dwells);
+    if (this.cosmosPrototype && this.director.zone !== "orbit") this.director.visit("orbit", true);
     if (!safe || settings?.pauseArrivals) {
       this.arrivals.cancel();
       this.finishArrival(true);
@@ -483,7 +501,7 @@ export class WorldEngine {
     );
     const destination = ZONES.find(
       (zone) =>
-        RECOGNITION_ZONES.includes(zone.id) &&
+        RECOGNITION_ZONES.includes(zone.id) && (!this.cosmosPrototype || zone.id === "orbit") &&
         (!this.feed.snapshot || enabled.has(zone.scene)),
     );
     if (
@@ -504,6 +522,7 @@ export class WorldEngine {
   }
   holdReading(hold: boolean) {
     this.readingHeld = hold;
+    if (this.cosmosPrototype) this.dirty = true;
   }
   visit(zone: ZoneId) {
     if (this.arrivalState.phase !== "idle") return;

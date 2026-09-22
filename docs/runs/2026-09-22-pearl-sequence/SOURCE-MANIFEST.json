@@ -1,0 +1,161 @@
+{
+  "baseline": "c6df983",
+  "branch": "codex/tv-pearl-sequence",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 19762,
+      "sha256": "89288c3bcbe8a9fa3866d949c500a0821959421480106973cbc60b896c140aed"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10296,
+      "sha256": "bbc385b2d012e8ba89339ca0c91293f5fb2fb6167adc1ed86fd6e63b81c5315a"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "bytes": 41257,
+      "sha256": "25d972ab8e946f622380e9121b640111a2353436d0a5b52b1d8def93804be1d3"
+    },
+    {
+      "path": "docs/PLAN-26-pearl-sequence.md",
+      "bytes": 5967,
+      "sha256": "1086b08b9f9e43fc3cc76a7437015bf61e9797c226579f034c91600c81079c17"
+    },
+    {
+      "path": "docs/USER-MANUAL.md",
+      "bytes": 9501,
+      "sha256": "abe3de43a70c904a70ab172679ceb4def7899e51175ff74d607878cbb676e64f"
+    },
+    {
+      "path": "docs/runs/2026-09-22-pearl-sequence/RECORD.md",
+      "bytes": 5847,
+      "sha256": "53337d1df8347741703eeae3cb9b3357d30cef3759406d17e41fe56ce9f4d601"
+    },
+    {
+      "path": "docs/runs/2026-09-22-pearl-sequence/RECOVERY-MANIFEST.json",
+      "bytes": 2552,
+      "sha256": "f8e5c5fd1e20c1485a90fd774e524c973de1f3fbd6a607f41a2241885afcad56"
+    },
+    {
+      "path": "docs/runs/2026-09-22-pearl-sequence/TOUCH-VERIFICATION.json",
+      "bytes": 422,
+      "sha256": "d242d980cdcc1ca2682c67957e39e89aeca8d839751fa034483c50a2dc9cafc0"
+    },
+    {
+      "path": "docs/runs/2026-09-22-pearl-sequence/VERIFICATION.json",
+      "bytes": 4516,
+      "sha256": "752f8fb5044e27244fa011e3c540b2b63d752c842db7b84deb7124b64412d62c"
+    },
+    {
+      "path": "public/cosmos-review/cosmos-hd.png",
+      "bytes": 1229991,
+      "sha256": "2afd5eb8c5768638dd5be300cf241416c17fccd768015fc23442e51134246861"
+    },
+    {
+      "path": "public/cosmos-review/cosmos-phone.png",
+      "bytes": 189308,
+      "sha256": "2baf57cfc502e5b77b9c24b84d77808f8771262ea1c56f3fc62e5c0604c4e276"
+    },
+    {
+      "path": "public/cosmos-review/index.html",
+      "bytes": 3890,
+      "sha256": "78c52168525d283694696675c689ab96319037c0553173d4efb02805a4738b4d"
+    },
+    {
+      "path": "public/cosmos-review/reference.jpeg",
+      "bytes": 300084,
+      "sha256": "bab28bd5685c75107139cdff8550f3beaa3656c32ad8e079ce3038d7b9832187"
+    },
+    {
+      "path": "public/world-prototype/atelier/pearl-atelier.glb",
+      "bytes": 16039756,
+      "sha256": "89b756ed06b80d1022f4d39e9b47bf72e9b51403d8b61ab5f068a8d5a1e47974"
+    },
+    {
+      "path": "public/world-prototype/atelier/provenance.json",
+      "bytes": 1127,
+      "sha256": "a0470080ed78615d1fb5ece14c39034b02b634747ce071a531d8dd5c2b4611e6"
+    },
+    {
+      "path": "scripts/build-pearl-atelier.py",
+      "bytes": 13231,
+      "sha256": "a662c9d0ef64ba16301e569cef58f255ca131f43032519e1f8fbfd7243c46001"
+    },
+    {
+      "path": "scripts/verify-cosmos-prototype.mjs",
+      "bytes": 7805,
+      "sha256": "2489a1f926262f9dc1427373b66f71aba8a0623c0d33e7632bab9aa6e021b19e"
+    },
+    {
+      "path": "scripts/verify-cosmos-touch.mjs",
+      "bytes": 4192,
+      "sha256": "5530e8f3156a5b4bc0e2a03c3d26a86d0bca3c4b7cb23ecdf7936a74628b2c1b"
+    },
+    {
+      "path": "src/app/display/cosmos-prototype/page.tsx",
+      "bytes": 549,
+      "sha256": "ec8a26722603f87cdb299bf6e23384887e9c8de43fea9523d22db1b491860040"
+    },
+    {
+      "path": "src/components/display/world/WorldExperience.module.css",
+      "bytes": 32036,
+      "sha256": "4579b318a80c8f8def3434c08387d6e50eef9fef9ab5136bb09ff0df75d5f1cf"
+    },
+    {
+      "path": "src/components/display/world/WorldExperience.tsx",
+      "bytes": 29704,
+      "sha256": "5cdc19361002b85cb5da2fcb2446d8f11553ac5abfe6e6bf5f4b507dd6bfef02"
+    },
+    {
+      "path": "src/components/display/world/prototype/cosmos-effects.ts",
+      "bytes": 5196,
+      "sha256": "8c905aedd80548ab88850881188f82320b3ee3fadbf1a12347ff9054cade6308"
+    },
+    {
+      "path": "src/components/display/world/prototype/cosmos-mode.ts",
+      "bytes": 416,
+      "sha256": "02e0b906310f304707ac3787fb7348ebec14c0ba1d35ad91a3bca057512dae18"
+    },
+    {
+      "path": "src/components/display/world/prototype/cosmos-motion.ts",
+      "bytes": 673,
+      "sha256": "ebb94cfcf890767d0971938cc5c4d365c03bb29db316423ba355ad8cc5769f8f"
+    },
+    {
+      "path": "src/components/display/world/prototype/cosmos-world.ts",
+      "bytes": 10022,
+      "sha256": "39cf254285d1f2320a8bf2d90fe66e24e38928f7fcfbf563aa3ae921d88dcad6"
+    },
+    {
+      "path": "src/components/display/world/prototype/design-mode.ts",
+      "bytes": 686,
+      "sha256": "36a1f361ba2215306263d22d0cfbbe4d706a2ae17544872f0b5fcb1bff59fa77"
+    },
+    {
+      "path": "src/components/display/world/world-engine.ts",
+      "bytes": 20710,
+      "sha256": "afc5635f3f68f10acd53c45c6ab608734cb7f7cfda13a7d9af1689a16e95072e"
+    },
+    {
+      "path": "src/components/display/world/world-recognitions.ts",
+      "bytes": 20666,
+      "sha256": "9c944523248c117fcc49f86d3ebb603432e555f44255525c9bce1f0d3ca91bc2"
+    },
+    {
+      "path": "src/components/display/world/world-scene.ts",
+      "bytes": 1532,
+      "sha256": "7b6a3a7cf36e2494088bbe3905101799f9a16aa5c8c6beff6123e5ed194878a7"
+    },
+    {
+      "path": "tests/world/cosmos-motion.test.ts",
+      "bytes": 1380,
+      "sha256": "8dc17eb32508db66ab130f951165a49e0c057c4bf00aadcbaefcdf75b93b7fa4"
+    },
+    {
+      "path": "tests/world/design-mode.test.ts",
+      "bytes": 1565,
+      "sha256": "43c918f448e47e403659b7e5ce7226cc0af34a715949690f62a6d34dd77b8979"
+    }
+  ]
+}

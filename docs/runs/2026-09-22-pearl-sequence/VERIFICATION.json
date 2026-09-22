@@ -1,0 +1,142 @@
+{
+  "origin": "http://127.0.0.1:32862",
+  "browser": "145.0.7632.6",
+  "checks": [
+    {
+      "test": "Authored scenery renders with three fictional pearls even for source=live",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-cosmos-prototype": "true",
+        "data-cosmos-scene-visible": "true",
+        "data-controls-visible": "true",
+        "data-zone": "orbit",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "4",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.98",
+        "data-world-bubbles": "3",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "3",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-scenery-ready": "true",
+        "data-camera-position": "8.000,37.800,-77.600",
+        "data-world-bubble-position": "8.000,35.900,-109.000",
+        "data-world-bubble-screen": "0.000,0.097,0.994"
+      }
+    },
+    {
+      "test": "Paused scene freezes camera and scene time",
+      "passed": true
+    },
+    {
+      "test": "Complete fictional recognition remains accessible",
+      "passed": true
+    },
+    {
+      "test": "Native 4K drawing buffer",
+      "passed": true
+    },
+    {
+      "test": "Phone has no horizontal page overflow",
+      "passed": true
+    },
+    {
+      "test": "Phone title is above the pearl",
+      "passed": true
+    },
+    {
+      "test": "Real app clock and gentle camera advance",
+      "passed": true,
+      "before": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-cosmos-prototype": "true",
+        "data-cosmos-scene-visible": "true",
+        "data-controls-visible": "true",
+        "data-zone": "orbit",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "12",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.38",
+        "data-world-bubbles": "3",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "3",
+        "data-motion": "tour",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-scenery-ready": "true",
+        "data-camera-position": "8.000,37.800,-77.600",
+        "data-world-bubble-position": "8.000,35.900,-109.000",
+        "data-world-bubble-screen": "0.000,0.097,0.994"
+      },
+      "after": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-cosmos-prototype": "true",
+        "data-cosmos-scene-visible": "true",
+        "data-controls-visible": "true",
+        "data-zone": "orbit",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "276",
+        "data-elapsed": "5.64",
+        "data-reading-remaining": "12.74",
+        "data-world-bubbles": "3",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "3",
+        "data-motion": "tour",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-scenery-ready": "true",
+        "data-camera-position": "8.161,37.831,-77.604",
+        "data-world-bubble-position": "10.289,36.383,-109.154",
+        "data-world-bubble-screen": "0.103,0.136,0.994"
+      }
+    },
+    {
+      "test": "The pearl visibly floats through the world",
+      "passed": true,
+      "worldDistanceX": 2.2889999999999997
+    },
+    {
+      "test": "Holding preserves the reading position",
+      "passed": true,
+      "before": "11.79",
+      "after": "11.79"
+    },
+    {
+      "test": "Hold also freezes the floating pearl and effects",
+      "passed": true
+    },
+    {
+      "test": "Reduced motion stops visual scene time",
+      "passed": true
+    },
+    {
+      "test": "Escape closes the dialog and restores keyboard focus",
+      "passed": true
+    },
+    {
+      "test": "Lost graphics context retains the full fictional reader and retry control",
+      "passed": true
+    },
+    {
+      "test": "No API calls or browser errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "apiRequests": [],
+  "failedRequests": [],
+  "rendering": "Renderer\nWebGL 2\nFrame rate\n0 fps\nQuality\nHigh\nDraw calls\n251\nTriangles\n4,111,764",
+  "motionRendering": "Renderer\nWebGL 2\nFrame rate\n48 fps\nQuality\nHigh\nDraw calls\n251\nTriangles\n4,111,764"
+}

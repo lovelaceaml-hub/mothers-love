@@ -50,6 +50,12 @@ On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this
 The latest owner choice keeps all selected effects active. The app does not automatically reduce effects. Actual TV speed, room audio and a real phone scan remain hardware checks, outside the selected software-only proof.
 
 
+## Expression Cosmos prototype
+
+The separate [local Expression Cosmos prototype](http://127.0.0.1:32862/display/cosmos-prototype) shows one scene inspired by the supplied pearl-world artwork. Use [the comparison page](http://127.0.0.1:32862/cosmos-review/index.html) to see the reference beside the working TV composition. These links run on this Mac while the local preview server is running; hosted access is pending approval.
+
+The pearl floats across the scene, with gold dust, passing light ribbons and falling petals. The scene starts moving automatically and uses fictional recognitions only. **Read recognitions** opens complete messages. **Pause tour** freezes the view, and **Hold this recognition** keeps the message and its pearl still for reading. **Settings** offers picture quality and Still view. **Fullscreen** fills the screen where supported. With a mouse, the controls become quiet after inactivity and reappear with pointer or keyboard activity. Touchscreen controls remain visible. Reduced motion and a reading fallback are supported. The original live TV display is separate.
+
 ## Heavenly World preview
 
 The separate [world preview](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview) opens with **Live recognitions** from the campaign. For fictional demonstrations, choose Sample world in Settings or add `?source=sample` to the preview address. **World map** opens all thirteen locations. Garden, Sanctuary, and Expressions also have quick buttons. The tour starts automatically without a click. The camera flies in a slow arc among readable pearl bubbles above the gardens and along the river, then travels to the next location. These bubbles live inside the world: their position, size and depth change naturally as the camera passes them. They remain part of the scenery during travel.

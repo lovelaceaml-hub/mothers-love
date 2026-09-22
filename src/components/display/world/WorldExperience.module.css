@@ -53,6 +53,54 @@
   inset: 0;
   display: block;
 }
+
+/* A single widescreen composition, with controls that yield to the scene. */
+.world[data-cosmos-prototype] .shade {
+  background: linear-gradient(180deg, #fffbf740, transparent 26%, transparent 77%, #fff5ef90);
+}
+.world[data-cosmos-prototype] .header { top: 4vh; left: 3.4vw; right: 3.4vw; }
+.world[data-cosmos-prototype] .brand strong { font-size: clamp(24px, 1.8vw, 36px); }
+.world[data-cosmos-prototype] .brandMark { font-size: 49px; }
+.world[data-cosmos-prototype] .story { top: 16vh; bottom: auto; left: 3.4vw; width: 30%; }
+.world[data-cosmos-prototype] .story h1 { font-size: clamp(26px, 2.55vw, 49px); max-width: 18ch; letter-spacing: -.04em; }
+.world[data-cosmos-prototype] .eyebrow { font-size: 10px; letter-spacing: .25em; margin-bottom: 11px; }
+.world[data-cosmos-prototype] .caption { font-size: clamp(13px, 1vw, 19px); }
+.world[data-cosmos-prototype] .footer { justify-content: center; bottom: 3vh; transition: opacity .65s; }
+.world[data-cosmos-prototype] .controls { margin-left: 0; padding: 7px; background: #fffaf2a8; border: 1px solid #ffffffb3; border-radius: 32px; backdrop-filter: blur(12px); }
+.world[data-cosmos-prototype][data-controls-visible="false"] .footer,
+.world[data-cosmos-prototype][data-controls-visible="false"] .worldReadingControls,
+.world[data-cosmos-prototype][data-controls-visible="false"] .readingControls { opacity: 0; pointer-events: none; }
+.world[data-cosmos-prototype] .footer:focus-within,
+.world[data-cosmos-prototype] .worldReadingControls:focus-within,
+.world[data-cosmos-prototype] .readingControls:focus-within { opacity: 1; pointer-events: auto; }
+.world[data-cosmos-prototype] .worldReadingControls,
+.world[data-cosmos-prototype] .readingControls { transition: opacity .65s; }
+.world[data-cosmos-prototype] .preview { padding: 10px 14px; border-radius: 24px; background: #fff9f370; }
+/* A stationary touch must never have to discover an invisible button. */
+@media (hover: none), (pointer: coarse) {
+  .world[data-cosmos-prototype][data-controls-visible="false"] .footer,
+  .world[data-cosmos-prototype][data-controls-visible="false"] .worldReadingControls,
+  .world[data-cosmos-prototype][data-controls-visible="false"] .readingControls { opacity: 1; pointer-events: auto; }
+}
+@media (max-width: 850px) {
+  .world[data-cosmos-prototype] .header { top: 23px; left: 20px; right: 20px; }
+  .world[data-cosmos-prototype] .brand { font-size: 7px; gap: 7px; }
+  .world[data-cosmos-prototype] .brand strong { font-size: 23px; }
+  .world[data-cosmos-prototype] .brandMark { font-size: 36px; }
+  .world[data-cosmos-prototype] .preview { font-size: 8px; padding: 8px; max-width: 115px; gap: 5px; }
+  .world[data-cosmos-prototype] .preview > span:last-child { font-size: 8px; }
+  .world[data-cosmos-prototype] .story { top: 125px; left: 20px; width: 80%; }
+  .world[data-cosmos-prototype] .story h1 { font-size: 30px; margin-bottom: 6px; }
+  .world[data-cosmos-prototype] .caption { font-size: 14px; }
+  .world[data-cosmos-prototype] .footer { left: 12px; right: 12px; bottom: 16px; }
+  .world[data-cosmos-prototype] .controls { gap: 3px; padding: 5px; justify-content: center; flex-wrap: wrap; }
+  .world[data-cosmos-prototype] .controls button { padding: 10px 8px; font-size: 10px; min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world[data-cosmos-prototype] .footer,
+  .world[data-cosmos-prototype] .worldReadingControls,
+  .world[data-cosmos-prototype] .readingControls { transition: none; }
+}
 .canvas[hidden] {
   display: none;
 }
@@ -1517,6 +1565,7 @@
   max-width: 30vw;
   bottom: 15vh;
 }
+.world[data-cosmos-scene-visible="true"] .story { bottom: auto; }
 @media (max-width: 800px) {
   .worldReadingControls {
     position: static;
@@ -1534,5 +1583,21 @@
   .worldArrivalCue {
     top: 16vh;
     font-size: 10px;
+  }
+  .world[data-cosmos-scene-visible="true"] .presentation:not(.hidden) { display: contents; }
+  .world[data-cosmos-scene-visible="true"] .presentation .story {
+    position: absolute;
+    top: 125px;
+    left: 20px;
+    width: calc(100% - 40px);
+    max-width: none;
+    margin: 0;
+  }
+  .world[data-cosmos-scene-visible="true"] .worldReadingControls {
+    position: absolute;
+    bottom: 156px;
+    left: 0;
+    right: 0;
+    justify-content: center;
   }
 }

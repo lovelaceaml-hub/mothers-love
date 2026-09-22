@@ -1,0 +1,47 @@
+{
+  "blender": "5.2.2 LTS",
+  "source": "Original geometry authored locally with scripts/build-pearl-atelier.py",
+  "rights": "Project-owned original geometry; no external assets or generated personal data",
+  "coordinate_system": "Blender Z up, exported glTF Y up",
+  "assets": [
+    {
+      "name": "ML_Terrace",
+      "polygons": 20736,
+      "mesh_parts": 3
+    },
+    {
+      "name": "ML_Island",
+      "polygons": 3328,
+      "mesh_parts": 2
+    },
+    {
+      "name": "ML_Arcade",
+      "polygons": 10626,
+      "mesh_parts": 3
+    },
+    {
+      "name": "ML_Blossom_Rose",
+      "polygons": 125868,
+      "mesh_parts": 6
+    },
+    {
+      "name": "ML_Blossom_Lavender",
+      "polygons": 125868,
+      "mesh_parts": 6
+    },
+    {
+      "name": "ML_FlowerBed",
+      "polygons": 16992,
+      "mesh_parts": 5
+    },
+    {
+      "name": "ML_Cloudbank",
+      "polygons": 5280,
+      "mesh_parts": 3
+    }
+  ],
+  "sha256": {
+    "pearl-atelier.glb": "89b756ed06b80d1022f4d39e9b47bf72e9b51403d8b61ab5f068a8d5a1e47974",
+    "build-pearl-atelier.py": "a662c9d0ef64ba16301e569cef58f255ca131f43032519e1f8fbfd7243c46001"
+  }
+}

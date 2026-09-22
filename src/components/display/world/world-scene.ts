@@ -2,10 +2,13 @@ import { createWorldScene as createLegacyWorldScene } from "./world-scene-legacy
 import { attachCinematicArt } from "./world-cinematic-art";
 import { isWorldDesignStudy } from "./prototype/design-mode";
 import { createDesignWorld } from "./prototype/design-world";
+import { isCosmosPrototype } from "./prototype/cosmos-mode";
+import { createCosmosWorld } from "./prototype/cosmos-world";
 export type { WorldScene } from "./world-scene-legacy";
 
 /** Preview-only art pass. The existing public data, camera and reading contracts are unchanged. */
 export function createWorldScene() {
+  if (isCosmosPrototype()) return createCosmosWorld();
   if (isWorldDesignStudy()) return createDesignWorld();
   const world = createLegacyWorldScene();
   // Simple, explicit visual rollback for comparison on the preview branch.

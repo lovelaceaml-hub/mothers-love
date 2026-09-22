@@ -1,4 +1,12 @@
-# Mother’s Love visual review
+# Expression Cosmos prototype
+
+[Open the local prototype](http://127.0.0.1:32862/display/cosmos-prototype) or [compare it with the supplied reference](http://127.0.0.1:32862/cosmos-review/index.html). This isolated checkout contains one Expression Cosmos scene: an actual 3D pearl, nine canonical expression symbols, original Blender scenery, animated water/clouds, full recognition reading, and TV/phone layouts. The pearl floats around with trailing gold dust, flowing light ribbons and drifting petals. Hold or Pause freezes it. All records on this route are fictional, including when the URL requests live content.
+
+The optimized build, 71 world tests, 14 browser checks and five focused touch/control checks passed. The browser checks include native 4K, pause, reading hold, reduced motion, keyboard focus and graphics-loss fallback. Native controller review is complete, including the corrected touch-control finding and the motion/effects refinement. This Mac measured 48 fps in the final short HD check; the physical TV and Safari remain untested. [Plan 26](docs/PLAN-26-pearl-sequence.md) and the [run record](docs/runs/2026-09-22-pearl-sequence/RECORD.md) contain the evidence and local restart command.
+
+Hosting and remote backup are pending: automatic approval review rejected the Vercel preview upload, and pushing this branch would also create a preview. The live app and other working copies remain unchanged. Native source and full-size captures are preserved locally with a [SHA-256 recovery manifest](docs/runs/2026-09-22-pearl-sequence/RECOVERY-MANIFEST.json).
+
+## Previous visual review
 
 Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) is ready for [visual review](docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md), with a [same-build classic comparison](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=classic). Refinement 02 adds smoother models, richer pearl detail and higher-definition output, preserving Thank you at the top. It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
 

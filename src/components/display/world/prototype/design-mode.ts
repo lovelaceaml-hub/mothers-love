@@ -1,6 +1,9 @@
+import { isCosmosPrototype } from "./cosmos-mode";
+
 /** Explicit, fictional design study. It never activates for a live feed URL. */
 export function isWorldDesignStudy() {
   if (typeof window === "undefined") return false;
+  if (isCosmosPrototype()) return true;
   const query = new URLSearchParams(window.location.search);
   return query.getAll("art").length === 1 && query.getAll("source").length === 1
     && query.get("art") === "design" && query.get("source") === "sample";

@@ -1,3 +1,13 @@
+# September 22: One Expression Cosmos prototype
+
+Goal: Build one Expression Cosmos prototype based on the first supplied pearl-world image.
+
+[Local prototype](http://127.0.0.1:32862/display/cosmos-prototype) and [reference comparison](http://127.0.0.1:32862/cosmos-review/index.html) are ready in this isolated checkout, `/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence`, branch `codex/tv-pearl-sequence`, baseline `c6df983`. Anthony approved the Expression Cosmos appearance and requested more effects and a pearl that moves around. That refinement is implemented and verified.
+
+The prototype renders original Blender geometry in the existing Three.js engine and preserves complete fictional message reading. It has gold symbol orbits, blossom trees, floating islands, ivory arches, water, clouds and a slowly moving camera. The pearl now follows a bounded 3D path with gold dust, light ribbons and drifting petals; Hold, Pause and reduced motion freeze it. The dedicated route always uses sample content. All 71 world tests, 14 optimized browser checks and five touch/control checks pass, including HD/native 4K, phone layout, reading hold, reduced motion, keyboard focus, and graphics-loss fallback. Native controller review and focused correction/refinement reviews are complete with no remaining actionable findings. [Verification](runs/2026-09-22-pearl-sequence/VERIFICATION.json), [plan](PLAN-26-pearl-sequence.md), [run record](runs/2026-09-22-pearl-sequence/RECORD.md).
+
+Automatic approval review rejected the hosted Vercel preview upload because explicit approval for that destination and payload was required. No deployment ran. Remote push is held because it would trigger a preview. Continue the local checkpoint and obtain the publishing approval before uploading or pushing. The production target and active Plan 24/25 working copies were not changed. Physical TV viewing and Safari remain unverified.
+
 ## September 21: Show designs before Claude implementation
 
 Current D1: [refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `80586a20b2aaee166bbd48d26ac8bd3f0c5daa29` is ready for [visual review](runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md). Preserve the wording layout and Thank you at the top. Anthony rejected build-polished-apps and Stitch; do not use them. Build/TypeScript, 52 unit tests and 32 browser checks pass. Fable/Opus remain held until visual approval; P0 and physical-device acceptance remain open.

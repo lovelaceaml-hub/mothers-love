@@ -39,13 +39,16 @@ const INITIAL: WorldStatus = {
 export function WorldExperience({
   initialSource = "live",
   designReview = false,
+  cosmosPrototype = false,
   initialStudyArrival,
 }: {
   initialSource?: WorldSource;
   designReview?: boolean;
+  cosmosPrototype?: boolean;
   initialStudyArrival?: string;
 }) {
   const [arrivalStudy, setArrivalStudy] = useState<StudyArrival>(studyArrival(initialStudyArrival));
+  const [controlsVisible, setControlsVisible] = useState(true);
   const launchedStudy = useRef(false);
   const neighborDescriptionId = useId();
   const recognitionDescriptionId = useId();
@@ -73,8 +76,10 @@ export function WorldExperience({
     [selectedFallback, setSelectedFallback] = useState<string | null>(null);
   const rawFeed = useWorldFeed(source);
   const feed = useMemo(() => designReview && rawFeed.phase === "sample"
-    ? { ...rawFeed, records: rawFeed.records.map((record, index) => index === 0 ? { ...record, expressionIds: [2, 7, 8] } : record) }
-    : rawFeed, [designReview, rawFeed]);
+    ? { ...rawFeed, records: rawFeed.records.map((record, index) => cosmosPrototype
+      ? { ...record, expressionIds: index === 0 ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [...new Set([1, ...record.expressionIds])] }
+      : index === 0 ? { ...record, expressionIds: [2, 7, 8] } : record) }
+    : rawFeed, [designReview, cosmosPrototype, rawFeed]);
   const feedRef = useRef(feed);
   useEffect(() => {
     if (designReview && initialStudyArrival && ready && feed.phase === "sample" && !launchedStudy.current) {
@@ -154,6 +159,18 @@ export function WorldExperience({
   useEffect(() => {
     engine.current?.holdReading(held || panel === "recognitions");
   }, [held, panel]);
+  useEffect(() => {
+    if (!cosmosPrototype || !ready || paused || held || panel) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const show = () => {
+      setControlsVisible(true); clearTimeout(timer);
+      timer = setTimeout(() => setControlsVisible(false), 7000);
+    };
+    show();
+    window.addEventListener("pointermove", show);
+    window.addEventListener("keydown", show);
+    return () => { clearTimeout(timer); window.removeEventListener("pointermove", show); window.removeEventListener("keydown", show); };
+  }, [cosmosPrototype, ready, paused, held, panel]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setImmersive(false);
@@ -272,6 +289,11 @@ export function WorldExperience({
       className={`${styles.world} ${arriving ? styles.arriving : ""}`}
       data-testid="world-preview"
       data-design-review={designReview || undefined}
+      data-cosmos-prototype={cosmosPrototype || undefined}
+      data-cosmos-scene-visible={cosmosPrototype ? !fallback : undefined}
+      data-controls-visible={controlsVisible || paused || held || !!panel}
+      data-prototype-scenery-ready={status.prototypeSceneryReady}
+      onFocusCapture={() => setControlsVisible(true)}
       data-prototype-heart-ready={status.prototypeHeartReady}
       data-zone={status.zone}
       data-traveling={status.traveling}
@@ -291,21 +313,23 @@ export function WorldExperience({
         .join(",")}
       data-arrival-in-world={status.worldBubbles?.arrivalInWorld ?? false}
       data-world-textures={status.worldBubbles?.textures ?? 0}
-      data-motion={paused || reduced || still || ownerStill ? "still" : "tour"}
+      data-motion={paused || reduced || still || ownerStill || (cosmosPrototype && (held || panel === "recognitions")) ? "still" : "tour"}
       data-source={source}
       data-feed-phase={feed.phase}
       data-arrival={arrival.phase}
     >
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
-        Fictional neighbors illustrate words of kindness.{" "}
-        {designReview ? "Miniature figures provide scale in this visual study." : (neighborDialogue(status.elapsed, status.zone, arriving) ??
-          "They greet and walk together.")}
+        {cosmosPrototype ? "A pearl and expression symbols float among blossom trees, ivory arches, and islands above blue water." : <>
+          Fictional neighbors illustrate words of kindness.{" "}
+          {designReview ? "Miniature figures provide scale in this visual study." : (neighborDialogue(status.elapsed, status.zone, arriving) ??
+            "They greet and walk together.")}
+        </>}
       </p>
       <canvas
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label={designReview ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
+        aria-label={cosmosPrototype ? "Expression Cosmos, a three-dimensional pearl world celebrating Mother's Love" : designReview ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
         role="img"
         aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
@@ -341,10 +365,10 @@ export function WorldExperience({
         <div className={styles.preview}>
           <span className={styles.statusDot} />
           {sourceLabel}
-          <span>{designReview ? "Visual study 02 · For your review" : "A heavenly journey · Preview"}</span>
+          <span>{cosmosPrototype ? "Expression Cosmos · Fictional recognitions" : designReview ? "Visual study 02 · For your review" : "A heavenly journey · Preview"}</span>
         </div>
       </header>
-      {designReview && !immersive && (
+      {designReview && !cosmosPrototype && !immersive && (
         <aside className={styles.studyControls} aria-label="Arrival design studies">
           <span>ARRIVAL STUDIES</span>
           <div>
@@ -415,12 +439,12 @@ export function WorldExperience({
         >
           <section className={styles.story} aria-label="Current world location">
             <div className={styles.eyebrow}>
-              {status.traveling
+              {cosmosPrototype ? "A WORLD OF KINDNESS" : status.traveling
                 ? "JOURNEYING TO"
                 : `${String(zoneIndex(zone.id) + 1).padStart(2, "0")} / A WORLD OF KINDNESS`}
             </div>
-            <h1>{zone.name}</h1>
-            <p className={styles.caption}>{zone.caption}</p>
+            <h1>{cosmosPrototype ? "Expression Cosmos" : zone.name}</h1>
+            <p className={styles.caption}>{cosmosPrototype ? "A shared expression. Many kind words." : zone.caption}</p>
           </section>
           {(fallback || !RECOGNITION_ZONES.includes(status.zone)) && (
             <aside
@@ -528,7 +552,7 @@ export function WorldExperience({
         </p>
       )}
       <footer className={styles.footer}>
-        {!immersive && (
+        {!immersive && !cosmosPrototype && (
           <nav className={styles.tour} aria-label="World locations">
             {ZONES.slice(0, 3).map((item, i) => (
               <button
@@ -587,6 +611,7 @@ export function WorldExperience({
             <label>
               Content
               <select
+                aria-label="Content"
                 value={source}
                 disabled={designReview}
                 onChange={(event) => {
@@ -646,7 +671,7 @@ export function WorldExperience({
                     : "The owner has paused automatic scene rotation."}
               </p>
             )}
-            {source === "sample" && (
+            {source === "sample" && !cosmosPrototype && (
               <div className={styles.demoButtons}>
                 <button
                   onClick={() => {

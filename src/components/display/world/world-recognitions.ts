@@ -3,6 +3,8 @@ import type { Recognition } from "@/lib/contracts";
 import type { ArrivalState } from "./arrival-director";
 import { messagePages, readingSeconds } from "./reading";
 import { isWorldDesignStudy } from "./prototype/design-mode";
+import { COSMOS_CENTER, isCosmosPrototype } from "./prototype/cosmos-mode";
+import { cosmosPearlPosition } from "./prototype/cosmos-motion";
 import {
   StudyPearlAssets,
   StudyPearlSkin,
@@ -101,6 +103,7 @@ export class WorldRecognitionBubbles {
   private projection = new T.Vector3();
   private arrivalInWorld = false;
   private readonly designStudy = isWorldDesignStudy();
+  private readonly cosmosPrototype = isCosmosPrototype();
   private readonly studyAssets?: StudyPearlAssets;
   private readonly frameScratch = new T.Vector3();
   private readonly plainFrame: StudyPearlFrame = {
@@ -338,6 +341,7 @@ export class WorldRecognitionBubbles {
       (record) => !entranceActive || record.id !== arrival.id,
     );
     for (const place of RECOGNITION_ZONES) {
+      if (this.cosmosPrototype && place !== "orbit") continue;
       let pool = records;
       if (place === "featured") {
         const featured = records.filter((r) => r.featured);
@@ -419,6 +423,11 @@ export class WorldRecognitionBubbles {
             slot.root.position.y,
             definition.center[1] + .9 + slot.radius * 1.46,
           );
+        }
+        if (this.cosmosPrototype) {
+          const offset = cosmosPearlPosition(time, slot.index, mobile);
+          slot.root.position.set(COSMOS_CENTER[0] + offset[0], COSMOS_CENTER[1] + offset[1], COSMOS_CENTER[2] + offset[2]);
+          slot.radius = (mobile ? [4.6, 2.0, 2.2] : [6.25, 2.35, 2.65])[slot.index];
         }
         const grow =
           still || slot.index === 0
