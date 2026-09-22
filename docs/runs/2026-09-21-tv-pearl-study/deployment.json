@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-09-22T05:17:19.883Z",
+  "deployments": [
+    {
+      "id": "dpl_FtiYB4AH8GaHpJ7hxSbhvvTyrdGL",
+      "name": "mothers-love",
+      "url": "mothers-love-o1r4y3ing-lvzion.vercel.app",
+      "created": 1790054144486,
+      "state": "READY",
+      "target": null,
+      "creator": {
+        "uid": "ELDrH1pTcyqZwrLCamtKfoLv",
+        "username": "lovelaceaml-hub"
+      },
+      "meta": {
+        "githubCommitRef": "codex/tv-pearl-design-study",
+        "githubCommitSha": "d8d93e6487698d060e31a094c0ab104feb3e8e1e",
+        "githubCommitMessage": "Add sample TV Pearl Garden design with Blender scenery",
+        "githubRepo": "mothers-love",
+        "githubOrg": "lovelaceaml-hub"
+      },
+      "inspectorUrl": "https://vercel.com/lvzion/mothers-love/FtiYB4AH8GaHpJ7hxSbhvvTyrdGL",
+      "isRollbackCandidate": false
+    },
+    {
+      "id": "dpl_6LcL3K4yACzvRd799Lb63XjYvwZa",
+      "name": "mothers-love",
+      "url": "mothers-love-dl4bro6r3-lvzion.vercel.app",
+      "created": 1790021555452,
+      "state": "READY",
+      "target": "production",
+      "creator": {
+        "uid": "ELDrH1pTcyqZwrLCamtKfoLv",
+        "username": "lovelaceaml-hub"
+      },
+      "meta": {
+        "githubCommitRef": "codex/mothers-love",
+        "githubCommitSha": "1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a",
+        "githubCommitMessage": "Fix Android PWA install and fullscreen display kiosk mode\n\n* Fix PWA manifest icons for Android install\n\n* Register Mother’s Love service worker\n\n* Add minimal PWA service worker\n\n* Wire PWA bootstrap and static app icons\n\n* Add fullscreen display PWA manifest\n\n* Attach fullscreen manifest to dis...",
+        "githubRepo": "mothers-love",
+        "githubOrg": "lovelaceaml-hub"
+      },
+      "inspectorUrl": "https://vercel.com/lvzion/mothers-love/6LcL3K4yACzvRd799Lb63XjYvwZa",
+      "isRollbackCandidate": true
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## Current review checkpoint: live TV Pearl Garden
+
+[Open the hosted comparison](https://mothers-love-o1r4y3ing-lvzion.vercel.app/display/tv-design-preview) in the signed-in browser. Source d8d93e6487698d060e31a094c0ab104feb3e8e1e, branch codex/tv-pearl-design-study, base 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a. Vercel is READY; production is unchanged. [Evidence and limits](runs/2026-09-21-tv-pearl-study/RECORD.md). Fable/Opus implementation waits for Anthony's design review. The separate world-art work and PR 8 are untouched.
+
 ## September 20: sculpted 3D heart with sheer ribbons, on a branch, not released
 
 Anthony asked to replace the rose heart and its thick gold hoops on the Peace in Practice TV screen with the approved three dimensional study from his handoff folder (`Mothers_Love_Heavenly_Ribbons_3D.html`): a sculpted rose heart, sheer pearl and champagne ribbons passing behind it and in front of it, fine gold hems, sparks in the space around it, and a wave that unfolds through the silk. Status: built and checked on branch `change/heart-ribbons-3d`, cut from production commit `5d113e8` (`codex/mothers-love`). Production is unchanged; merging and releasing wait for Anthony's word.

@@ -1,0 +1,136 @@
+{
+  "createdAt": "2026-09-22T05:19:59.679428+00:00",
+  "classification": "non-sensitive fictional design study and user-provided visual reference",
+  "sourceSha": "d8d93e6487698d060e31a094c0ab104feb3e8e1e",
+  "copyVerified": true,
+  "remoteCloudSyncVerified": false,
+  "originalsRetained": true,
+  "files": [
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/arrival-preview.mp4",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/arrival-preview.mp4",
+      "bytes": 4393883,
+      "sha256": "4d1639834009fe665369d765e3136f78d4dfaa6553a48376e628b84e917ec620"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/phone-review.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/phone-review.png",
+      "bytes": 250434,
+      "sha256": "6181b153deb7dd27b0aa2a9490262d7e549e7f2e295a95ab6502a9dd71bb5c84"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/report.json",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/report.json",
+      "bytes": 3121,
+      "sha256": "38f1eddd4f7f59f512f422303808774b91a1d554796b78070bad3c80003f23cc"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/review.html",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/review.html",
+      "bytes": 2320,
+      "sha256": "577dd3ae5464c10c8fa9a2f5fdf042a78620a808f052b6afe7f94ac56f2da9fe"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/deployment.json",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/deployment.json",
+      "bytes": 1894,
+      "sha256": "94dd0514d708debc6c887fea2ad733cadcf1c8dcc95ffdf691909975e6586238"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/arrival.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/arrival.png",
+      "bytes": 1034542,
+      "sha256": "a608c1e20f762b228588dbeee9db90c12cd26fbfe1c484cf335c6ab11c1d8a8c"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/design-4k.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/design-4k.png",
+      "bytes": 4854988,
+      "sha256": "9e6d64e867e0fb62e3182266b4e9e1c9749fd0169d2e918864c1303fdfad70e7"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/optimized-build.log",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/optimized-build.log",
+      "bytes": 1839,
+      "sha256": "a12434968ebb3eb49e7ac31437cdc0e02ed0aafd21cc347b4b159a8d175ee6b1"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/comparison.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/comparison.png",
+      "bytes": 1183554,
+      "sha256": "d3b21f2001fda3c6ec3dd03961f11a4a63f4e273d77ce6a2bb809398da36480f"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/hosted-tests.log",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/hosted-tests.log",
+      "bytes": 5979,
+      "sha256": "5381248afae08a1a2e007b534fd8365a87add5160fba269474d5ba67e4716877"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/ffc58a42a998880fba7bfa1eeaeb451a.webm",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/ffc58a42a998880fba7bfa1eeaeb451a.webm",
+      "bytes": 1896264,
+      "sha256": "d7aeefaa8edf04960df7a278d96ec37e75905c4f713154709258239f3a14bdb2"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/current-hd.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/current-hd.png",
+      "bytes": 1468153,
+      "sha256": "efce8af1c6b4fa2b7259af417c46f410ab00565a1efbddd3ba93096f98e9e28c"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/video-reading-frame.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/video-reading-frame.png",
+      "bytes": 947259,
+      "sha256": "106652ac0f0ce8f3d6e3a27a6b339b8dedbe0a4118272550e34257234a36da28"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/verification.json",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/verification.json",
+      "bytes": 1059,
+      "sha256": "9dc51e4cbae8fa3403986dd16c6975fc71771d6e9a8eecac4a771cbede3bb484"
+    },
+    {
+      "source": "/private/tmp/tv-pearl-d8d93e6/design-hd.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/design-hd.png",
+      "bytes": 1716469,
+      "sha256": "4469e38bb8c8863dae539d02b09abfc0031ae1183925f22b84a019e093952469"
+    },
+    {
+      "source": "/private/tmp/mothers-love-tv-pearl-final/pearl-garden.blend",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/pearl-garden.blend",
+      "bytes": 50988405,
+      "sha256": "cc1620380ccdfa11c19091913e08b311c2e73064768ba17a3bd7b03cc3ee53f1"
+    },
+    {
+      "source": "/private/tmp/mothers-love-tv-pearl-final/garden-background.png",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/blender-render-4k.png",
+      "bytes": 9929433,
+      "sha256": "5460e5e43b665d5f0bfd3afa9e06439940d89b5fead268a8f571dece082cf710"
+    },
+    {
+      "source": "/private/tmp/mothers-love-tv-pearl-final/blender-receipt.json",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/blender-receipt.json",
+      "bytes": 255,
+      "sha256": "b17196a432ad9435f80ec7c1334ebe9c27810bb256c8dd472c393d31d9d2407a"
+    },
+    {
+      "source": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design/scripts/tv-pearl-study/author-garden.py",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/author-garden.py",
+      "bytes": 11692,
+      "sha256": "4fa4dec9e5f2b41e8f6a50da7564ce02aac8e13ebafb26b5c6e8f571a7c265b2"
+    },
+    {
+      "source": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design/public/tv-pearl-study/PROVENANCE.json",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/PROVENANCE.json",
+      "bytes": 756,
+      "sha256": "f717420dc0515aa9aa0d0c198101d2f183c1887034991f2b66a74b94a8566707"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/Approved_Direction_Overview.jpg",
+      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-live-tv-pearl-d8d93e6/approved-direction.jpg",
+      "bytes": 293478,
+      "sha256": "3fc09894a6e20bf6aed2dff326eb5cd3661bd838cbc6b6db529c4eca4872608f"
+    }
+  ]
+}

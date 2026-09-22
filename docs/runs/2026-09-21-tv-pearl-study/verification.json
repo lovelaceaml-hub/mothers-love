@@ -1,0 +1,36 @@
+{
+  "sourceSha": "d8d93e6487698d060e31a094c0ab104feb3e8e1e",
+  "preview": "https://mothers-love-o1r4y3ing-lvzion.vercel.app/display/tv-design-preview",
+  "local": {
+    "typecheck": "passed",
+    "optimizedBuild": "passed",
+    "unitGuards": {
+      "passed": 2,
+      "failed": 0
+    },
+    "browserTests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "captureChecks": {
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "hosted": {
+    "deployment": "READY",
+    "authenticatedBrowser": "comparison, reset and full Morgan arrival visually observed",
+    "unauthenticatedAutomation": "3 tests reached Vercel login instead of app, no hosted automated pass claimed"
+  },
+  "video": {
+    "filename": "arrival-preview.mp4",
+    "seconds": 18.12,
+    "width": 1360,
+    "height": 764,
+    "fps": 25,
+    "speed": "normal",
+    "source": "actual browser WebM, cropped to TV frame without clock changes"
+  },
+  "production": "unchanged at 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a",
+  "review": "visual checkpoint for Anthony; no independent review claimed"
+}

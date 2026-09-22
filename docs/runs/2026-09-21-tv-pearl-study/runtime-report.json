@@ -1,0 +1,145 @@
+{
+  "base": "http://127.0.0.1:5679",
+  "sourceSha": "d8d93e6487698d060e31a094c0ab104feb3e8e1e",
+  "started": "2026-09-22T05:15:31.775Z",
+  "checks": [
+    {
+      "name": "current HD bounds",
+      "passed": true,
+      "bounds": [
+        {
+          "width": 254.96478271484375,
+          "height": 254.96481323242188,
+          "messageSize": "21px",
+          "messageInside": true,
+          "thanksAboveName": true
+        },
+        {
+          "width": 283.36566162109375,
+          "height": 283.3656005859375,
+          "messageSize": "21px",
+          "messageInside": true,
+          "thanksAboveName": true
+        },
+        {
+          "width": 299.9765625,
+          "height": 299.9765625,
+          "messageSize": "21px",
+          "messageInside": true,
+          "thanksAboveName": true
+        }
+      ]
+    },
+    {
+      "name": "design HD bounds",
+      "passed": true,
+      "bounds": [
+        {
+          "width": 625.4855346679688,
+          "height": 625.485595703125,
+          "messageSize": "28px",
+          "messageInside": true,
+          "thanksAboveName": true
+        },
+        {
+          "width": 351.84326171875,
+          "height": 351.84326171875,
+          "messageSize": "24px",
+          "messageInside": true,
+          "thanksAboveName": true
+        },
+        {
+          "width": 351.177001953125,
+          "height": 351.177001953125,
+          "messageSize": "24px",
+          "messageInside": true,
+          "thanksAboveName": true
+        }
+      ]
+    },
+    {
+      "name": "Phone review controls fit",
+      "passed": true
+    },
+    {
+      "name": "Normal-speed director reaches reading and completion",
+      "passed": true
+    },
+    {
+      "name": "No page errors or app API reads",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "apiReads": [],
+  "captures": [
+    "current-hd.png",
+    "design-hd.png",
+    "design-4k.png",
+    "comparison.png",
+    "phone-review.png"
+  ],
+  "videoCrop": {
+    "x": 39,
+    "y": 255.515625,
+    "width": 1362,
+    "height": 765.25
+  },
+  "arrivalStill": true,
+  "arrivalEvents": [
+    {
+      "atMs": 2091,
+      "phase": null,
+      "state": null
+    },
+    {
+      "atMs": 2858,
+      "phase": "entrance",
+      "state": {
+        "kind": "single",
+        "phase": "entrance",
+        "style": 1,
+        "hold": 7,
+        "page": 0,
+        "ids": [
+          "tv-study-arrival-1"
+        ]
+      }
+    },
+    {
+      "atMs": 6460,
+      "phase": "reading",
+      "state": {
+        "kind": "single",
+        "phase": "reading",
+        "style": 1,
+        "hold": 7,
+        "page": 0,
+        "ids": [
+          "tv-study-arrival-1"
+        ]
+      }
+    },
+    {
+      "atMs": 13503,
+      "phase": "exit",
+      "state": {
+        "kind": "single",
+        "phase": "exit",
+        "style": 1,
+        "hold": 7,
+        "page": 0,
+        "ids": [
+          "tv-study-arrival-1"
+        ]
+      }
+    },
+    {
+      "atMs": 14985,
+      "phase": null,
+      "state": null
+    }
+  ],
+  "video": "/private/tmp/tv-pearl-d8d93e6/ffc58a42a998880fba7bfa1eeaeb451a.webm",
+  "finished": "2026-09-22T05:15:56.756Z"
+}
