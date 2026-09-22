@@ -35,6 +35,7 @@
 .studyControls button[aria-pressed="true"] { background: #f5e0df; border-color: #c796a5; }
 .studyControls button:disabled { cursor: default; opacity: .58; }
 .studyControls button:focus-visible { outline: 2px solid #956c51; outline-offset: 3px; }
+.studyCue { display: block; margin-top: 8px; font-size: 10px; letter-spacing: .2em; color: #754466; }
 .world[data-design-review] .shade {
   background: linear-gradient(180deg, #fff9f076, transparent 21%, transparent 62%, #fff6e970 82%, #fff8eef2);
 }
@@ -44,7 +45,7 @@
   .studyControls > span { display: none; }
   .studyControls > div { justify-content: center; flex-wrap: wrap; }
   .studyControls button { min-height: 38px; padding: 9px 10px; font-size: 10px; }
-  .world[data-design-review] .worldArrivalCue { top: 193px; margin: 8px 0 0; }
+  .world[data-design-review][data-arrival="reading"] .studyCue { display: none; }
 }
 .canvas {
   position: absolute;

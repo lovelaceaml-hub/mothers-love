@@ -125,3 +125,44 @@ diffuseColor.a = clamp(opacity + pearlRim * .82 + dot(totalSpecular, vec3(.2126,
   glass.customProgramCacheKey = () => `study-glass-v1-${opacity}`;
   return glass;
 }
+
+/**
+ * Translucent pink silk, shared by the Sanctuary ribbons and by the arrival
+ * ribbon study. It stays a lit physical material so the sheen and the clearcoat
+ * still read as cloth; only a grazing-angle lift and a matching alpha falloff
+ * are added, which is what gives a broad ribbon its lit folded edges.
+ *
+ * Verified against three 0.180 `ShaderLib/meshphysical.glsl.js`: at
+ * `#include <opaque_fragment>` the shader already carries `vViewPosition`, the
+ * view space `vec3 normal` from `<normal_fragment_begin>`, `outgoingLight`,
+ * `diffuseColor` and the `saturate` macro from `<common>`.
+ */
+export function studySilk() {
+  const silk = new T.MeshPhysicalMaterial({
+    color: "#f7bfd3",
+    transparent: true,
+    opacity: .64,
+    side: T.DoubleSide,
+    depthWrite: false,
+    roughness: .42,
+    clearcoat: .35,
+    clearcoatRoughness: .5,
+    sheen: 1,
+    sheenColor: new T.Color("#ffe6ee"),
+    sheenRoughness: .35,
+    emissive: new T.Color("#ff9ec0"),
+    emissiveIntensity: .07,
+    dithering: true,
+  });
+  silk.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      `float silkF = pow(1.0 - saturate(dot(normalize(vViewPosition), normal)), 3.0);
+outgoingLight += vec3(1., .86, .92) * silkF * .35;
+diffuseColor.a *= 1.0 - silkF * .25;
+#include <opaque_fragment>`,
+    );
+  };
+  silk.customProgramCacheKey = () => "study-silk-v1";
+  return silk;
+}

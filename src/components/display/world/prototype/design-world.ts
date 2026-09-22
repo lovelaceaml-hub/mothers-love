@@ -6,9 +6,11 @@ import type { WorldScene } from "../world-scene-legacy";
 import { studyArrival } from "./design-mode";
 import { studyCanopyPuffs, studyCottonMaterial } from "./study-canopy";
 import { createStudyClouds, studyCloudAtlas, studyCloudLayout } from "./study-clouds";
+import { arrivalPose } from "./arrival-choreography";
+import { bloomStage, constellationStage, ribbonStage, type StageContext } from "./arrival-stages";
 import { studyPetal, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
-import { softDot, sparklePoints, studyRim } from "./study-materials";
+import { softDot, sparklePoints, studyRim, studySilk } from "./study-materials";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
 
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
@@ -56,6 +58,8 @@ export function createDesignWorld(): WorldScene {
   }
   const petal = geometry(studyPetal(20, 12));
   const midPetal = geometry(studyPetal(10, 6));
+  // A cheap petal for the arrival studies: drifting bloom petals and butterfly wings.
+  const farPetal = geometry(studyPetal(6, 4));
   const cottonSphere = geometry(new T.SphereGeometry(1, 18, 12));
   const cotton = material(studyCottonMaterial());
   const dummy = new T.Object3D(), tint = new T.Color();
@@ -300,7 +304,8 @@ export function createDesignWorld(): WorldScene {
     if (disposed) { gltf.scene.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); }); return; }
     heartRoot.add(gltf.scene); scene.userData.prototypeHeartReady = true; invalidate();
   }, undefined, error => { if (!disposed) { scene.userData.prototypeHeartError = "Original heart did not load"; console.error("Design study original heart", error); invalidate(); } });
-  const silkMat = material(new T.MeshPhysicalMaterial({ color: "#f9ded6", roughness: .36, metalness: .035, transparent: true, opacity: .31, side: T.DoubleSide, depthWrite: false, sheen: 1, sheenColor: new T.Color("#fff0df"), sheenRoughness: .38, dithering: true }));
+  // One silk recipe now serves the Sanctuary ribbons and the arrival ribbon study.
+  const silkMat = material(studySilk()); silkMat.color.set("#f9cfd6");
   const ribbons: T.Mesh[] = [];
   for (let index = 0; index < 4; index++) {
     const g = geometry(new T.PlaneGeometry(1,1,100,6)), o = mesh(sanctuary,g,silkMat);o.userData.dynamic=true;ribbons.push(o);
@@ -359,29 +364,14 @@ export function createDesignWorld(): WorldScene {
   // Arrival forms share the existing director phases and complete reading interval.
   const entry = new T.Group(); entry.name="Design study arrival stage";entry.position.set(4.138,.6,19.104);scene.add(entry);
   mesh(entry,geometry(studyTerrace(10.8,11,.65)),ivory);ring(entry,10.2,.35,.03);ring(entry,9.9,.36,.009);
-  const lotus=new T.Group(), portal=new T.Group(), constellation=new T.Group();entry.add(lotus,portal,constellation);
-  portal.position.y=constellation.position.y=2.7;
-  lotus.userData.dynamic=portal.userData.dynamic=constellation.userData.dynamic=true;
-  const lotusPetals:T.Mesh[]=[];
+  // Each study is an independent stage on the entry platform, built from the shared
+  // registrars so dispose() still covers every geometry, material and texture.
   const lotusShape=petalGeometry(40,24);
-  const lotusPink=studyRim(material(new T.MeshPhysicalMaterial({color:"#ed9cba",roughness:.42,sheen:1,sheenColor:new T.Color("#fff0df"),side:T.DoubleSide})),"#fff0d8",3,.25);
-  const lotusPale=studyRim(material(new T.MeshPhysicalMaterial({color:"#f7c9d1",roughness:.4,sheen:1,sheenColor:new T.Color("#fff5dd"),side:T.DoubleSide})),"#fff0d8",3,.25);
-  for(let k=0;k<18;k++){const inner=k>=10,o=mesh(lotus,lotusShape,k%3?lotusPink:lotusPale,[0,.4,0],inner?[2.4,6.3,4.3]:[3.2,5.1,6.0]);o.rotation.y=k*Math.PI*2/(inner?8:10);o.userData.dynamic=true;lotusPetals.push(o);}
-  for(let k=0;k<3;k++){const p=mesh(portal,geometry(new T.TorusGeometry(7.4+k*.37,.07,10,120)),k===1?ivory:gold,[0,8.7,0]);p.rotation.set(.09,k*.25-.2,-.14+k*.13);}
-  for(let ribbon=0;ribbon<3;ribbon++){
-    const g=geometry(new T.PlaneGeometry(1,1,100,6)),veil=mesh(portal,g,silkMat);veil.userData.dynamic=true;
-    motions.push(t=>{
-      const p=g.getAttribute("position");
-      for(let j=0;j<=6;j++)for(let i=0;i<=100;i++){
-        const u=i/100,a=u*Math.PI*2+ribbon*.39,v=j/6-.5,phase=t*.22+ribbon*1.7;
-        const width=1.6+Math.sin(a+phase)*.5,r=7.5+ribbon*.37+v*width;
-        p.setXYZ(j*101+i,Math.cos(a)*r,8.7+Math.sin(a)*r,Math.sin(a*2+phase)*.68+v*Math.sin(a+phase)*1.5+ribbon*.17);
-      }p.needsUpdate=true;g.computeVertexNormals();
-    });
-  }
-  const stars=instance(constellation,pollen,material(new T.MeshBasicMaterial({color:"#ffedbf",toneMapped:false})),96);
-  for(let k=0;k<96;k++){const a=k*2.399,r=2+Math.sqrt(k/96)*8;stamp(stars,k,new T.Vector3(Math.cos(a)*r,4+k/96*16,Math.sin(a)*r),[.05,.05,.05],new T.Euler());}finish(stars);
-  for(let k=0;k<3;k++){const o=mesh(constellation,geometry(new T.TorusGeometry(6.7+k*.45,.018,5,100)),gold,[0,9,0]);o.rotation.set(k*.5,.3+k*.2,k*.4);}
+  const stageContext:StageContext={geometry,material,texture,instance,gold,ivory,farPetal,pollen,lotusShape,time,seededRandom};
+  const stages={bloom:bloomStage(stageContext),ribbon:ribbonStage(stageContext),constellation:constellationStage(stageContext)} as const;
+  const stageStyles=["bloom","ribbon","constellation"] as const;
+  for(const key of stageStyles){stages[key].group.visible=false;entry.add(stages[key].group);}
+  const stageEffects={sparkles:true,trails:true};
 
   // A few quiet, miniature figures provide scale without covering the scenery with labels.
   function figure(parent:T.Object3D,x:number,z:number,color:string){
@@ -412,10 +402,15 @@ export function createDesignWorld(): WorldScene {
     setEffects(s, t) { sparkles=s;trails=t; },
     update(t,_zone,arrival){
       time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
-      const active=!!arrival&&arrival.phase!=="idle"&&arrival.phase!=="return";
+      const pose=arrivalPose(arrival);
+      scene.userData.studyArrivalPose=pose;
       const style=studyArrival(scene.userData.studyArrival);
-      lotus.visible=active&&style==="bloom";portal.visible=active&&style==="ribbon";constellation.visible=active&&style==="constellation";
-      if(arrival){const reveal=arrival.phase==="approach"?0:arrival.phase==="reveal"?arrival.progress:1;lotusPetals.forEach((o,i)=>{const inner=i>=10;o.rotation.x=-.72+reveal*(inner?.54:.88);o.rotation.y=(inner?i-10:i)*Math.PI*2/(inner?8:10)+(inner?.2:0);});portal.scale.setScalar(.72+reveal*.28);constellation.rotation.y=t*.09;}
+      stageEffects.sparkles=sparkles;stageEffects.trails=trails;
+      for(const key of stageStyles){
+        const visible=pose.active&&style===key;
+        stages[key].group.visible=visible;
+        if(visible)stages[key].update(pose,t,stageEffects);
+      }
     },
     dispose(){disposed=true;instances.forEach(o=>o.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();shadowCanvas.width=shadowCanvas.height=1;scene.clear();},
   };

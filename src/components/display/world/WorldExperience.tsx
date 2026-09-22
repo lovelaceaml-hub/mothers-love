@@ -266,6 +266,11 @@ export function WorldExperience({
           : feed.phase === "connecting"
             ? "Connecting"
             : "Quiet world";
+  // One cue text, shown floating for classic and cinematic and inside the study
+  // panel for the design review, where a floating line would cover the pearl.
+  const arrivalCue = `${source === "sample" ? "SAMPLE ENTRANCE" : "A NEW LIGHT IN OUR WORLD"}${
+    arrival.waveSize > 1 ? ` · ${arrival.waveIndex} of ${arrival.waveSize}` : ""
+  }`;
   return (
     <main
       ref={root}
@@ -362,6 +367,7 @@ export function WorldExperience({
             ))}
             {arriving && <button onClick={() => engine.current?.finishStudyArrival()}>Back to world</button>}
           </div>
+          {arriving && <span className={styles.studyCue}>{arrivalCue}</span>}
         </aside>
       )}
       {!ready && !fallback && (
@@ -519,13 +525,8 @@ export function WorldExperience({
           {arrivalRecord && <RecognitionText record={arrivalRecord} />}
         </section>
       )}
-      {safe && arriving && !immersive && (
-        <p className={styles.worldArrivalCue}>
-          {source === "sample" ? "SAMPLE ENTRANCE" : "A NEW LIGHT IN OUR WORLD"}
-          {arrival.waveSize > 1
-            ? ` · ${arrival.waveIndex} of ${arrival.waveSize}`
-            : ""}
-        </p>
+      {safe && arriving && !immersive && !designReview && (
+        <p className={styles.worldArrivalCue}>{arrivalCue}</p>
       )}
       <footer className={styles.footer}>
         {!immersive && (
