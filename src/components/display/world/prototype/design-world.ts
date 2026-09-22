@@ -10,7 +10,11 @@ import { arrivalPose } from "./arrival-choreography";
 import { bloomStage, constellationStage, ribbonStage, type StageContext } from "./arrival-stages";
 import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
-import { STUDY_GLOW_PASS, softDot, sparklePoints, studyRim, studySilk, studyStone } from "./study-materials";
+import {
+  STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW,
+  softDot, sparklePoints, studyGlow, studyRim, studySilk, studyStone, studyStoneCaustic,
+} from "./study-materials";
+import { lanternLayout, type LanternPoint } from "./study-glory";
 import { createStudyAir, type AirFocus } from "./study-air";
 import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
@@ -34,13 +38,40 @@ export function createDesignWorld(): WorldScene {
   const invalidate = () => { if (!disposed) scene.userData.invalidate?.(); };
   const ivory = studyRim(material(new T.MeshPhysicalMaterial({ color: "#fff4e4", roughness: .28, metalness: .025, clearcoat: .42, clearcoatRoughness: .25, dithering: true })), "#ffe6c9", 3, .22);
   const edge = material(new T.MeshStandardMaterial({ color: "#f2dfd3", roughness: .64, dithering: true }));
-  const gold = material(new T.MeshStandardMaterial({ color: "#e6c17c", metalness: .82, roughness: .24 }));
+  // Section 7, architecture at dusk: the gold inlay carries a low warm emissive that breathes,
+  // and its glow contribution brightens on the side the low sun is on. The glow branch only
+  // runs for the meshes that joined layer 1 below, which is the merged gold of each district
+  // and the merged bridge rails.
+  const gold = studyGlow(
+    material(new T.MeshStandardMaterial({
+      color: "#e6c17c", metalness: .82, roughness: .24,
+      emissive: new T.Color("#ffcc7a"), emissiveIntensity: .12,
+    })),
+    // Corrected down from the design's .22 and .5 after the checkpoint captures: the gold runs
+    // along every rail and arch in the frame, so it is broad rather than bright, and at the
+    // design's weights it carried Expressions past the luminance the pass is allowed. A second
+    // round took it to .10 and .22 once the Sanctuary measurement isolated the glow composite.
+    "gold", "vec3(1.,.80,.48)*(.06 + .16*saturate(dot(normalize(normal), studySunView)))",
+  );
   const roseGold = material(new T.MeshStandardMaterial({ color: "#8d7462", metalness: .05, roughness: .77 }));
   // Cosmetic only. The supplied heart GLB, its geometry and its normals are never touched.
-  const rose = studyRim(material(new T.MeshPhysicalMaterial({ color: "#e05d85", roughness: .36, metalness: .04, clearcoat: .55, clearcoatRoughness: .3, sheen: .35, sheenColor: new T.Color("#ffd1dd"), emissive: new T.Color("#3a0a1c"), emissiveIntensity: .06, dithering: true })), "#ffb6c8", 2.5, .3);
+  // Section 7 gives it the warm pulse: the emissive swells on the shared five second beat and
+  // the glow branch adds the same beat plus a soft rim wherever the mesh is on the glow layer.
+  const rose = studyGlow(
+    studyRim(material(new T.MeshPhysicalMaterial({ color: "#e05d85", roughness: .36, metalness: .04, clearcoat: .55, clearcoatRoughness: .3, sheen: .35, sheenColor: new T.Color("#ffd1dd"), emissive: new T.Color("#ff5a86"), emissiveIntensity: .05, dithering: true })), "#ffb6c8", 2.5, .3),
+    "heart",
+    // Corrected down from the design's 1.4 and .35 after the checkpoint captures. The heart
+    // fills a good part of the Sanctuary frame, and at the design's weights it wrote a value
+    // near .7 across that whole silhouette into the glow target, which the five bloom mips
+    // then spread over the frame: Sanctuary rose 3.1 against a 1.5 ceiling. At .5 and .2 the
+    // pulse still reads as a warm swell. A second round took it to .32 and .13, with the halo
+    // at .12 and the orbiting sparkles at .6, which is what finally holds the ceiling.
+    "vec3(1.,.36,.53)*studyHeartPulse*.32 + vec3(1.,.72,.80)*pow(1.-saturate(dot(normalize(normal),normalize(vViewPosition))),2.5)*.13",
+  );
   const leaf = material(new T.MeshPhysicalMaterial({ color: "#8fb48c", roughness: .57, sheen: .2, side: T.DoubleSide }));
   const lawn = material(new T.MeshStandardMaterial({ color: "#c1d7ad", roughness: .9, metalness: 0 }));
-  const stone = material(studyStone());
+  // Section 7 chains the waterline caustics onto Section 5's carved rock.
+  const stone = material(studyStoneCaustic(studyStone(), time));
   const bloom = material(new T.MeshPhysicalMaterial({ color: "#ffffff", roughness: .46, sheen: .65, sheenColor: new T.Color("#ffe4e9"), sheenRoughness: .5, vertexColors: true, side: T.DoubleSide }));
   // Thin petals transmit a little broad backlight without a second scene render or transparency sorting.
   bloom.onBeforeCompile = shader => {
@@ -168,7 +199,10 @@ export function createDesignWorld(): WorldScene {
   // Verified against three 0.180 meshphysical: at `#include <lights_fragment_end>` the shader
   // carries `reflectedLight`, the perturbed view space `normal` and `vViewPosition`, and the
   // fragment prefix declares `viewMatrix`, so the world space sun folds into view space here.
-  const water = material(new T.MeshPhysicalMaterial({ color: "#6ec9cf", roughness: .14, metalness: .14, clearcoat: .55, clearcoatRoughness: .12, envMapIntensity: .95, dithering: true }));
+  // Section 7, water glory: a higher environment intensity and metalness turn the sea into a
+  // mirror of the golden hour sky rather than a tinted sheet, and the lower roughness with the
+  // stronger clearcoat keeps the reflection sharp enough to read as water.
+  const water = material(new T.MeshPhysicalMaterial({ color: "#6ec9cf", roughness: .12, metalness: .22, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.35, dithering: true }));
   water.onBeforeCompile = shader => {
     shader.uniforms.studyTime = time;
     shader.uniforms.studySunWorld = { value: new T.Vector3(...STUDY_SUN.direction) };
@@ -188,10 +222,20 @@ export function createDesignWorld(): WorldScene {
 #include <opaque_fragment>`);
   };
   water.customProgramCacheKey = () => "study-outdoor-water-v2";
+  // The sun path is the only part of the sea that reaches the glow layer, so the bloom gives
+  // the glitter its soft tails without lifting the whole surface into a bright wash.
+  //
+  // Corrected down from the design's .6 after the checkpoint captures isolated the glow
+  // composite per view. The sea fills the lower frame and the low sun draws its path straight
+  // at the viewer, so this one term was the largest single new contributor at the Sanctuary,
+  // more than the whole of the heart glory. At .3 the path still reads and the ceiling holds.
+  studyGlow(water, "glitter",
+    "vec3(1.,.93,.78) * pow(max(0., dot(reflect(-normalize(vViewPosition), normal), studySunView)), 320.) * .3");
   // Named so every merged mesh below carries a readable name a later pass can find.
   ivory.name = "ivory"; edge.name = "edge"; gold.name = "gold"; stone.name = "stone"; lawn.name = "lawn";
   leaf.name = "leaf"; rose.name = "rose"; roseGold.name = "rose gold"; bloom.name = "bloom"; water.name = "water";
   const sea = mesh(scene, geometry(new T.CircleGeometry(320, 96)), water, [0, -5, -30]); sea.rotation.x = -Math.PI / 2;
+  sea.name = "Study sea"; sea.layers.enable(1);
 
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.
@@ -256,8 +300,12 @@ export function createDesignWorld(): WorldScene {
     finish(crowns.mesh);
     contact(parent, x, z, 7 * size, 5.5 * size);
   }
-  function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number, contacts = true, detail = 80) {
+  // Every arch in the connected world hangs a lantern at its keystone. The far landmarks opt
+  // out: they sit 158 to 193 units away, where a lantern is a sub-pixel speck.
+  const archCrowns: Array<{ root: T.Group; height: number }> = [];
+  function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number, contacts = true, detail = 80, lanterns = true) {
     const root = new T.Group(); root.position.set(x, y, z); parent.add(root);
+    if (lanterns) archCrowns.push({ root, height });
     const points = Array.from({ length: 25 }, (_, i) => { const a = i / 24 * Math.PI; return new T.Vector3(Math.cos(a) * width / 2, height * .57 + Math.sin(a) * height * .43, 0); });
     tube(root, points, .31, ivory, detail); tube(root, points.map(p => p.clone().add(new T.Vector3(0, .025, .26))), .022, gold, detail);
     for (const s of [-1, 1]) {
@@ -294,8 +342,10 @@ export function createDesignWorld(): WorldScene {
     #include <colorspace_fragment>
     #include <fog_fragment>
     }` }));
+  // The plane is deliberately not registered for disposal here: all 31 of them are merged into
+  // one mesh below, which takes their place in the registrar, and the sources are released there.
   function waterfall(parent: T.Object3D, x: number, z: number, height: number, width: number, rotation: number) {
-    const o = mesh(parent, geometry(new T.PlaneGeometry(width, height, 8, 18)), fall, [x, .25 - height / 2, z]); o.rotation.y = rotation; falls.push(o);
+    const o = mesh(parent, new T.PlaneGeometry(width, height, 8, 18), fall, [x, .25 - height / 2, z]); o.rotation.y = rotation; falls.push(o);
   }
 
   const districtRoots = new Map<ZoneId, T.Group>();
@@ -351,6 +401,11 @@ export function createDesignWorld(): WorldScene {
     }
     if (!best) break; connections.push(best); connected.add(best[1]);
   }
+  // Section 7: the 13 decks become one mesh and the 26 rail tubes become one, so a corridor
+  // costs two draw calls in total instead of 39. Both are already built in world space on a
+  // scene with an identity transform, so no matrix is baked and no vertex moves.
+  const deckParts: T.BufferGeometry[] = [], railParts: T.BufferGeometry[] = [];
+  const railSamples: LanternPoint[][] = [];
   for (let i = 0; i < connections.length; i++) {
     const from = ZONES.find(z => z.id === connections[i][0])!, to = ZONES.find(z => z.id === connections[i][1])!;
     const a = new T.Vector3(...from.center).add(new T.Vector3(0, .6, 0)), b = new T.Vector3(...to.center).add(new T.Vector3(0, .6, 0));
@@ -365,8 +420,28 @@ export function createDesignWorld(): WorldScene {
       for (const sign of [-1, 1]) { const q = p.clone().addScaledVector(side, 2.15 * sign); positions.push(q.x, q.y, q.z); normals.push(0,1,0); uvs.push(j / 48, sign === 1 ? 1 : 0); rails[sign === 1 ? 1 : 0].push(q.clone().add(new T.Vector3(0, .22, 0))); }
       if (j < 48) { const n=j*2;indices.push(n,n+2,n+1,n+1,n+2,n+3); }
     }
-    const g = geometry(new T.BufferGeometry()); g.setAttribute("position",new T.Float32BufferAttribute(positions,3));g.setAttribute("normal",new T.Float32BufferAttribute(normals,3));g.setAttribute("uv",new T.Float32BufferAttribute(uvs,2));g.setIndex(indices);g.computeVertexNormals();
-    mesh(scene,g,ivory);rails.forEach(points=>tube(scene,points,.045,gold,48));
+    const g = new T.BufferGeometry(); g.setAttribute("position",new T.Float32BufferAttribute(positions,3));g.setAttribute("normal",new T.Float32BufferAttribute(normals,3));g.setAttribute("uv",new T.Float32BufferAttribute(uvs,2));g.setIndex(indices);g.computeVertexNormals();
+    deckParts.push(g);
+    rails.forEach(points => {
+      railParts.push(new T.TubeGeometry(new T.CatmullRomCurve3(points), 48, .045, 8, false));
+      railSamples.push(points.map(p => [p.x, p.y, p.z] as LanternPoint));
+    });
+  }
+  const mergedDecks = mergeGeometries(deckParts, false);
+  // The merge can only fail on mismatched attributes, which 13 copies of one builder cannot
+  // have, but the sources are registered rather than dropped if it ever does.
+  if (mergedDecks) deckParts.forEach(g => g.dispose()); else deckParts.forEach(g => { geometry(g); mesh(scene, g, ivory); });
+  if (mergedDecks) {
+    const deck = mesh(scene, geometry(mergedDecks), ivory);
+    // Named and put on the ray occluder layer here rather than by the material sweep below,
+    // so the corridor keeps blocking shafts exactly as the 13 separate decks did.
+    deck.name = "Study bridge decks"; deck.layers.enable(2);
+  }
+  const mergedRails = mergeGeometries(railParts, false);
+  if (mergedRails) railParts.forEach(g => g.dispose()); else railParts.forEach(g => { geometry(g); mesh(scene, g, gold); });
+  if (mergedRails) {
+    const rail = mesh(scene, geometry(mergedRails), gold);
+    rail.name = "Study bridge rails"; rail.layers.enable(1);
   }
 
   // A horizon that is not empty haze. Six far islands carrying domes, colonnades and arches sit
@@ -376,7 +451,7 @@ export function createDesignWorld(): WorldScene {
     geometry, ivory, edge, gold, stone, cylinder,
     underside: islandShapeFar,
     terrace: (top, bottom, height, segments) => studyTerrace(top, bottom, height, segments),
-    arch: (parent, x, y, z, width, height) => arch(parent, x, y, z, width, height, false, 28),
+    arch: (parent, x, y, z, width, height) => arch(parent, x, y, z, width, height, false, 28, false),
   });
   scene.add(landmarks);
 
@@ -391,7 +466,9 @@ export function createDesignWorld(): WorldScene {
   for (let i = 0; i < 4; i++) { mesh(sanctuary,geometry(studyTerrace(7.6-i*.8,7.9-i*.8,.28)),ivory,[0,.88+i*.28,0]);ring(sanctuary,7.6-i*.8,1.03+i*.28,.018); }
   const heartRoot = new T.Group(); heartRoot.name = "Supplied original sculpted heart"; heartRoot.userData.dynamic = true; heartRoot.position.set(0, 8.7, 0); heartRoot.rotation.y = .25; heartRoot.scale.setScalar(3.25); sanctuary.add(heartRoot);
   new GLTFLoader().load("/world-prototype/original-heart.glb", gltf => {
-    gltf.scene.traverse(o => { if (o instanceof T.Mesh) { geometries.add(o.geometry); const old = Array.isArray(o.material) ? o.material : [o.material]; old.forEach(m => m.dispose()); o.material = rose; o.castShadow = true; } });
+    // Section 7: the sculpted heart joins the glow layer here, where its meshes first exist,
+    // so the warm pulse in the rose glow branch reaches the bloom.
+    gltf.scene.traverse(o => { if (o instanceof T.Mesh) { geometries.add(o.geometry); const old = Array.isArray(o.material) ? o.material : [o.material]; old.forEach(m => m.dispose()); o.material = rose; o.castShadow = true; o.layers.enable(1); } });
     if (disposed) { gltf.scene.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); }); return; }
     heartRoot.add(gltf.scene); scene.userData.prototypeHeartReady = true; invalidate();
   }, undefined, error => { if (!disposed) { scene.userData.prototypeHeartError = "Original heart did not load"; console.error("Design study original heart", error); invalidate(); } });
@@ -494,6 +571,66 @@ export function createDesignWorld(): WorldScene {
   const sparkleDot=texture(softDot(64));
   const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,sparkleDot)));
   sparkleField.name="Study sparkles";sparkleField.frustumCulled=false;scene.add(sparkleField);
+
+  // Section 7, heart glory. A wide soft halo that lives on the glow layer alone, so it never
+  // appears in the main image and only reaches the eye as bloom behind the sculpted heart,
+  // and twelve sparkles on two tilted rings around it.
+  //
+  // Corrected down from the design's local scale 5.2 at opacity .30 after the checkpoint
+  // captures. The design did not account for heartRoot's own 3.25 scale, so 5.2 became a 17
+  // unit sprite around a 5.3 unit heart and lifted the Sanctuary average luminance by 3.3,
+  // past the 1.5 the radiance pass is allowed. 3.2 local is 10.4 units, about twice the heart.
+  const heartHalo = new T.Sprite(material(new T.SpriteMaterial({
+    map: sparkleDot, color: "#ffb3c6", transparent: true, opacity: .12,
+    blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false,
+  })));
+  heartHalo.name = "Study heart halo";
+  heartHalo.position.set(0, 0, -.3);
+  heartHalo.scale.set(3.2, 3.2, 1);
+  heartHalo.layers.set(1);
+  heartRoot.add(heartHalo);
+  const heartSparkleCount = 12;
+  const heartSparklePlaces = new Float32Array(heartSparkleCount * 3);
+  const heartSparklePhase = new Float32Array(heartSparkleCount);
+  for (let i = 0; i < heartSparkleCount; i++) heartSparklePhase[i] = i / heartSparkleCount;
+  const heartSparkleGeometry = geometry(new T.BufferGeometry());
+  heartSparkleGeometry.setAttribute("position", new T.BufferAttribute(heartSparklePlaces, 3));
+  heartSparkleGeometry.setAttribute("phase", new T.BufferAttribute(heartSparklePhase, 1));
+  const heartSparkles = new T.Points(heartSparkleGeometry, material(sparklePoints(time, .42, "#fff0d8", .6, sparkleDot)));
+  heartSparkles.name = "Study heart sparkles"; heartSparkles.frustumCulled = false;
+  heartSparkles.layers.enable(1); sanctuary.add(heartSparkles);
+  motions.push(t => {
+    // The heart's own five second breath, shared by its emissive, its glow branch and its halo.
+    STUDY_HEART_PULSE.value = .5 + .5 * Math.sin(t * 1.2566);
+    rose.emissiveIntensity = .05 + .13 * STUDY_HEART_PULSE.value;
+    gold.emissiveIntensity = .12 + .06 * (.5 + .5 * Math.sin(t * .31));
+    for (let i = 0; i < heartSparkleCount; i++) {
+      const lane = i % 2, radius = lane ? 6.6 : 5.4, tilt = lane ? .42 : -.3;
+      const a = t * (lane ? -.14 : .18) + (i / heartSparkleCount) * Math.PI * 2;
+      heartSparklePlaces[i * 3] = Math.cos(a) * radius;
+      heartSparklePlaces[i * 3 + 1] = 8.7 + Math.sin(a) * radius * Math.sin(tilt) + Math.sin(t * .6 + i) * .8;
+      heartSparklePlaces[i * 3 + 2] = Math.sin(a) * radius * Math.cos(tilt);
+    }
+    heartSparkleGeometry.getAttribute("position").needsUpdate = true;
+  });
+
+  // Section 7: the 31 waterfall planes become one mesh. Their world transforms are baked in,
+  // and the shader reads only uv, so nothing moves. The material writes no depth, so losing
+  // the per plane sort order cannot change what is in front of what.
+  scene.updateMatrixWorld(true);
+  const fallParts = falls.map(o => { const g = o.geometry.clone(); g.applyMatrix4(o.matrixWorld); return g; });
+  const mergedFalls = mergeGeometries(fallParts, false);
+  fallParts.forEach(g => g.dispose());
+  // Same guard: the 31 planes leave their own geometries registered if the merge ever fails.
+  if (!mergedFalls) falls.forEach(o => geometry(o.geometry));
+  if (mergedFalls) {
+    falls.forEach(o => { o.removeFromParent(); o.geometry.dispose(); });
+    falls.length = 0;
+    const sheet = mesh(scene, geometry(mergedFalls), fall);
+    sheet.name = "Study waterfalls";
+    falls.push(sheet);
+  }
+
   // The landmarks opt out of shadow casting: the sun shadow box covers the connected world only.
   motions.forEach(fn=>fn(0));districtRoots.forEach(root=>batch(root));batch(entry);batch(landmarks,false);
 
@@ -505,12 +642,40 @@ export function createDesignWorld(): WorldScene {
   falls.forEach(o => o.layers.enable(1));
   // The carved rock and the ivory architecture already give each district its silhouette, so the
   // thin edge bands are left out: they cost a merged draw per district and change no shaft.
+  //
+  // Section 7 adds the gold to the glow layer on the same sweep, by material identity, so the
+  // merged gold of each district lights up along the rails and the arches. Instanced meshes are
+  // skipped as before, which leaves the flower cores out of the glow: they are a fraction of a
+  // pixel each and would cost an instanced draw in the glow pass for nothing.
   const rayOccluders = new Set<T.Material>([ivory, stone]);
   scene.traverse(object => {
     if (!(object instanceof T.Mesh) || object instanceof T.InstancedMesh) return;
     const m = object.material;
-    if (!Array.isArray(m) && rayOccluders.has(m)) object.layers.enable(2);
+    if (Array.isArray(m)) return;
+    if (rayOccluders.has(m)) object.layers.enable(2);
+    if (m === gold) object.layers.enable(1);
   });
+
+  // Section 7, lanterns: one steady warm light every sixth sample along every bridge rail and
+  // one at every arch keystone in the connected world, all in a single Points draw. They are
+  // not sparkle class and not trail class, because a lantern is a lamp, not an effect.
+  const keystone = new T.Vector3();
+  const lanternKeystones: LanternPoint[] = archCrowns.map(({ root, height }) => {
+    keystone.set(0, height, 0).applyMatrix4(root.matrixWorld);
+    return [keystone.x, keystone.y, keystone.z] as LanternPoint;
+  });
+  const lanternGeometry = geometry(new T.BufferGeometry());
+  lanternGeometry.setAttribute("position", new T.BufferAttribute(lanternLayout(railSamples, lanternKeystones), 3));
+  // Opacity corrected down from the design's .9 after the checkpoint captures: about 285 of
+  // them are additive and on the glow layer, so as a set they are a broad lift, not a point.
+  // A second round took it to .58: the Sanctuary frame has the arcade keystones and several
+  // converging bridges in it at once, which is the densest lantern view in the world.
+  const lanterns = new T.Points(lanternGeometry, material(new T.PointsMaterial({
+    size: .55, sizeAttenuation: true, map: sparkleDot, color: new T.Color("#ffd9a0"),
+    transparent: true, opacity: .58, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
+  })));
+  lanterns.name = "Study lanterns"; lanterns.frustumCulled = false;
+  lanterns.layers.enable(1); scene.add(lanterns);
 
   // Living air. Four objects, one draw call each, all seeded.
   const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time }, ZONES.map(zone => zone.center));
@@ -520,12 +685,18 @@ export function createDesignWorld(): WorldScene {
     setEffects(s, t) { sparkles=s;trails=t;air.setEffects(s,t); },
     update(t,_zone,arrival){
       time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
+      heartSparkles.visible=sparkles;
       // The engine resolves the picture quality tier and publishes it on the scene in resize().
       // Low drops the sky cloud ring, which is pure overdraw near the horizon, and halves the sparkles.
       const lowTier=scene.userData.lowTier===true;
       // The engine publishes its camera on the scene under the study gate, so the motes can
       // wrap around the viewer without changing the shared WorldScene update signature.
       const viewer=scene.userData.studyCamera as T.Camera|undefined;
+      // The sun in view space. StudyRadiance refreshes this too, but the water glitter and the
+      // pearl's sun side rim are ordinary main pass shading, so they must also be right when
+      // the radiance pass is absent: on Low, and under ?radiance=off, which is what the text
+      // parity comparison captures. Refreshing it here keeps that A/B honest.
+      if(viewer)STUDY_SUN_VIEW.value.set(...STUDY_SUN.direction).transformDirection(viewer.matrixWorldInverse);
       if(viewer)air.update(t,viewer,lowTier,scene.userData.studyFocus as AirFocus);
       clouds.meshes[0].visible=!lowTier;
       sparkleGeometry.setDrawRange(0,lowTier?Math.floor(sparkleCount/2):sparkleCount);

@@ -81,6 +81,66 @@ describe("study pearl skin", () => {
     expect(named("pearl sparkles").visible).toBe(true);
     skin.dispose();
   });
+  it("hides the ring bead and every medallion glint when the sparkle effect is off", () => {
+    const { skin, named } = build();
+    skin.update(3, [1, 2], true, { ...wide, sparkles: false });
+    expect(named("pearl bead").visible).toBe(false);
+    for (const id of [1, 2, 9]) expect(named(`pearl glint ${id}`).visible).toBe(false);
+    skin.update(3, [1, 2], true, wide);
+    expect(named("pearl bead").visible).toBe(true);
+    for (const id of [1, 2, 9]) expect(named(`pearl glint ${id}`).visible).toBe(true);
+    skin.dispose();
+  });
+  it("leaves the ring bead to a resident, and travels it around the gold ring", () => {
+    const { skin, named } = build();
+    skin.update(3, [1], false, wide);
+    expect(named("pearl bead").visible).toBe(false);
+    skin.update(0, [1], true, wide);
+    const bead = named("pearl bead") as T.Points;
+    const start = Array.from(
+      (bead.geometry.getAttribute("position") as T.BufferAttribute).array,
+    );
+    skin.update(4, [1], true, wide);
+    const later = Array.from(
+      (bead.geometry.getAttribute("position") as T.BufferAttribute).array,
+    );
+    expect(later).not.toEqual(start);
+    // Five points, all of them on the outer orbit lane, so none crosses the wording.
+    expect(start).toHaveLength(15);
+    for (let i = 0; i < 5; i++) {
+      const radius = Math.hypot(later[i * 3], later[i * 3 + 1]);
+      expect(radius).toBeGreaterThan(1.2);
+      expect(radius).toBeLessThan(1.45);
+    }
+    // The same clock gives the same places, so a still frame is reproducible.
+    skin.update(4, [1], true, wide);
+    expect(
+      Array.from((bead.geometry.getAttribute("position") as T.BufferAttribute).array),
+    ).toEqual(later);
+    skin.dispose();
+  });
+  it("flashes each medallion glint briefly and out of step with its neighbours", () => {
+    const { skin, named } = build();
+    const opacities = new Set<number>();
+    let bright = 0, dim = 0;
+    for (let time = 0; time < 40; time += 0.25) {
+      skin.update(time, [1, 2, 3], true, wide);
+      const glint = named("pearl glint 1") as T.Sprite;
+      opacities.add(glint.material.opacity);
+      if (glint.material.opacity > 0.4) bright++; else dim++;
+      expect(glint.material.opacity).toBeLessThanOrEqual(0.9);
+      expect(glint.material.opacity).toBeGreaterThanOrEqual(0);
+    }
+    expect(bright).toBeGreaterThan(0);
+    // A catch of light, not a lamp: the glint is dark for most of its cycle.
+    expect(dim).toBeGreaterThan(bright * 5);
+    skin.update(2, [1, 2, 3], true, wide);
+    const one = (named("pearl glint 1") as T.Sprite).material.opacity;
+    const two = (named("pearl glint 2") as T.Sprite).material.opacity;
+    expect(one).not.toBe(two);
+    expect(opacities.size).toBeGreaterThan(10);
+    skin.dispose();
+  });
   it("keeps every symbol inside the frame on a portrait viewport", () => {
     const { skin, medallions } = build();
     // .9 is deliberately below the .94 floor the host clamps to, so this is the harsh case.
@@ -147,11 +207,44 @@ describe("study pearl radiance layers", () => {
     }
     skin.dispose();
   });
-  it("lifts the rim, the halo and the sparkles into the glow layer without leaving the world", () => {
+  it("lifts the rim, the halo, the sparkles, the bead and the glints into the glow layer without leaving the world", () => {
     const { skin } = build();
-    for (const name of ["pearl glass", "pearl halo", "pearl sparkles"]) {
+    for (const name of ["pearl glass", "pearl halo", "pearl sparkles", "pearl bead", "pearl glint 1", "pearl glint 9"]) {
       expect(skin.layerMask(name)).toBe(WORLD_AND_GLOW);
     }
+    skin.dispose();
+  });
+  /**
+   * The words themselves live on the host slot's face mesh, which the skin is handed as a
+   * sibling. Nothing the skin does may ever move that mesh onto the glow layer, or the
+   * radiance pass would blur the wording.
+   */
+  it("never touches the host slot's text face", () => {
+    const parent = new T.Group();
+    const face = new T.Mesh(new T.CircleGeometry(1, 8), new T.MeshBasicMaterial());
+    face.name = "slot face";
+    parent.add(face);
+    const skin = new StudyPearlSkin(parent, studyAssets(), 2);
+    for (const time of [0, 2.5, 9]) {
+      skin.update(time, [1, 2, 3], true, wide);
+      expect(face.layers.mask).toBe(ONLY_WORLD);
+      skin.update(time, [1, 2, 3], false, wide);
+      expect(face.layers.mask).toBe(ONLY_WORLD);
+    }
+    skin.clear();
+    expect(face.layers.mask).toBe(ONLY_WORLD);
+    skin.dispose();
+    expect(parent.children).toEqual([face]);
+    face.geometry.dispose();
+    face.material.dispose();
+  });
+  /** The protect mask is the pearl being read and nothing else, at layers 1 and 3 exactly. */
+  it("puts the occluder on the glow and protect layers only, and only while it is read", () => {
+    const { skin } = build();
+    skin.update(1, [4], true, wide);
+    expect(skin.layerMask("pearl occluder")).toBe(GLOW_AND_PROTECT);
+    skin.update(1, [4], false, wide);
+    expect(skin.layerMask("pearl occluder")).toBe(ONLY_GLOW);
     skin.dispose();
   });
   it("drops a resident out of the glow layer and puts the hero back into it", () => {

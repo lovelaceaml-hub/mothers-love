@@ -108,13 +108,16 @@ export function paintStudyPearl(
   c.restore();
 }
 
+/** The travelling bead plus the four points trailing it around the gold ring. */
+const SHIMMER_BEAD_COUNT = 5;
+
 /** No recognition strings are retained here. The existing slot owns every personal pixel. */
 export class StudyPearlSkin {
   private readonly root = new T.Group();
   private readonly geometries = new Set<T.BufferGeometry>();
   private readonly materials = new Set<T.Material>();
   private readonly orbits = new T.Group();
-  private readonly medallions: Array<{ id: number; root: T.Group }> = [];
+  private readonly medallions: Array<{ id: number; root: T.Group; glint: T.Sprite }> = [];
   private readonly clock = { value: 0 };
   private readonly orbitBeads: T.Mesh[] = [];
   private readonly orbitAxis = new T.Vector3(0, 0, 1);
@@ -124,6 +127,9 @@ export class StudyPearlSkin {
   private readonly halo: T.Mesh;
   private readonly sparkles: T.Points;
   private readonly occluder: T.Mesh;
+  private readonly shimmer: T.Points;
+  private readonly shimmerPlaces = new Float32Array(SHIMMER_BEAD_COUNT * 3);
+  private readonly shimmerScratch = new T.Vector3();
 
   constructor(parent: T.Group, assets: StudyPearlAssets, seed: number) {
     this.root.name = "Design study pearl glass, halo and exterior canonical symbols";
@@ -133,12 +139,16 @@ export class StudyPearlSkin {
     // The halo sits behind the depth writing face, so only the glow outside the disc reaches the eye.
     this.halo = new T.Mesh(this.geometry(new T.PlaneGeometry(3.6, 3.6)), this.material(new T.ShaderMaterial({
       transparent: true, depthTest: true, depthWrite: false, toneMapped: false, blending: T.AdditiveBlending,
+      uniforms: { time: this.clock },
       vertexShader: "varying vec2 haloUv;void main(){haloUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
-      fragmentShader: `varying vec2 haloUv;
+      fragmentShader: `varying vec2 haloUv;uniform float time;
         void main(){float d=length(haloUv-.5)*3.6;
+          // Section 7: a six second breath, so the pearl feels alive while it is being read.
+          // It reads the same frozen clock as everything else, so a still frame is complete.
+          float breath=.85+.15*(.5+.5*sin(time*1.0472));
           float core=pow(max(0.,1.-d/1.75),2.4);
           float outer=exp(-pow((d-1.18)*2.2,2.));
-          vec3 rgb=mix(vec3(1.,.90,.80),vec3(1.,.78,.86),smoothstep(.6,1.6,d))*core*.55+vec3(.80,.86,1.)*outer*.16;
+          vec3 rgb=(mix(vec3(1.,.90,.80),vec3(1.,.78,.86),smoothstep(.6,1.6,d))*core*.55+vec3(.80,.86,1.)*outer*.16)*breath;
           gl_FragColor=vec4(rgb,clamp(dot(rgb,vec3(.2126,.7152,.0722)),0.,1.));
           #include <colorspace_fragment>
         }`,
@@ -182,6 +192,9 @@ export class StudyPearlSkin {
       uniforms: { time: this.clock },
       vertexShader: "varying vec2 pearlUv;void main(){pearlUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
       fragmentShader: `varying vec2 pearlUv;uniform float time;
+        float pearlHash(vec2 q){return fract(sin(dot(q,vec2(127.1,311.7)))*43758.5453);}
+        float pearlNoise(vec2 q){vec2 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+          return mix(mix(pearlHash(i),pearlHash(i+vec2(1.,0.)),f.x),mix(pearlHash(i+vec2(0.,1.)),pearlHash(i+1.),f.x),f.y);}
         void main(){vec2 p=(pearlUv-.5)*2.18;float r=length(p),a=atan(p.y,p.x);
           float rim=exp(-pow((r-.998)*170.,2.));float inner=exp(-pow((r-.968)*190.,2.));
           float arc=pow(max(0.,cos(a-2.1+sin(time*.12)*.08)),10.);
@@ -193,8 +206,19 @@ export class StudyPearlSkin {
             vec2 q=p-vec2(cos(theta),sin(theta))*(1.013+sin(k*2.)*.012);
             float pulse=.3+.7*pow(.5+.5*sin(time*.7+k*3.),3.);
             sparkle+=pulse*(exp(-length(q)*220.)+exp(-abs(q.x)*1200.-abs(q.y)*100.)*.6+exp(-abs(q.y)*1200.-abs(q.x)*100.)*.6);}
-          float alpha=clamp(rim*.92+inner*.32+reflection*.52+lower*.7+sparkle,0.,1.);
+          // Section 7: a slow light play inside the glass, turning about a degree a second.
+          // It is gated to the outer annulus, r .84 to .96. The outermost text pixel sits at
+          // r .81, so no part of the wording is ever touched, and the gate caps the added
+          // alpha at .07 in a pale warm white. The gate and the colour are the whole of the
+          // change: nothing here is conditional on the radiance pass, so the words are
+          // identical with and without it.
+          float causticTurn=time*.05;
+          vec2 causticP=mat2(cos(causticTurn),-sin(causticTurn),sin(causticTurn),cos(causticTurn))*p*5.5;
+          float caustic=pearlNoise(causticP+time*.07)*pearlNoise(causticP*1.7-time*.05)*2.1;
+          caustic=pow(clamp(caustic,0.,1.),2.)*smoothstep(.84,.90,r)*(1.-smoothstep(.96,1.,r));
+          float alpha=clamp(rim*.92+inner*.32+reflection*.52+lower*.7+sparkle+caustic*.07,0.,1.);
           vec3 finalColor=mix(c,vec3(1.,.985,.93),clamp(reflection+sparkle,0.,1.));
+          finalColor=mix(finalColor,vec3(1.,.973,.902),clamp(caustic,0.,1.)*.6);
           // A soft pink, lavender and blue wash inside the glass. The centre, r below .36, is left
           // untouched so the approved wording keeps its contrast.
           float washA=smoothstep(.36,.99,r)*.16;
@@ -246,6 +270,17 @@ export class StudyPearlSkin {
     this.sparkles.name = "pearl sparkles"; this.sparkles.renderOrder = 5; this.sparkles.frustumCulled = false;
     this.sparkles.layers.enable(1);
     this.root.add(this.sparkles);
+    // One bright bead travelling the outer gold ring, with four points trailing it. The
+    // places are rewritten each frame from the shared clock, so a still frame is complete.
+    const shimmer = this.geometry(new T.BufferGeometry());
+    const shimmerPhase = new Float32Array(SHIMMER_BEAD_COUNT);
+    for (let i = 0; i < SHIMMER_BEAD_COUNT; i++) shimmerPhase[i] = i / SHIMMER_BEAD_COUNT;
+    shimmer.setAttribute("position", new T.BufferAttribute(this.shimmerPlaces, 3));
+    shimmer.setAttribute("phase", new T.BufferAttribute(shimmerPhase, 1));
+    this.shimmer = new T.Points(shimmer, this.material(sparklePoints(this.clock, .10, "#fff1c8", .95, assets.dot())));
+    this.shimmer.name = "pearl bead"; this.shimmer.renderOrder = 5; this.shimmer.frustumCulled = false;
+    this.shimmer.layers.enable(1);
+    this.root.add(this.shimmer);
     // Every canonical symbol sits inside its own little glass sphere over a tinted disc.
     const tintDisc = this.geometry(new T.CircleGeometry(.178, 40));
     const iconDisc = this.geometry(new T.CircleGeometry(.148));
@@ -261,7 +296,20 @@ export class StudyPearlSkin {
       icon.position.z = .05; icon.renderOrder = 4; root.add(icon);
       const ball = new T.Mesh(medallionGlass, glass); ball.renderOrder = 5; ball.layers.enable(1); root.add(ball);
       const rim = new T.Mesh(medallionRim, gold); rim.layers.enable(1); root.add(rim);
-      this.root.add(root); this.medallions.push({ id: expression.id, root });
+      // An occasional catch of light off the medallion's own glass, on the upper right of the
+      // little sphere. Its opacity is driven from the shared clock in update(), so it sits
+      // still in a still frame, and it is sparkle class: the owner's switch hides it.
+      const glint = new T.Sprite(this.material(new T.SpriteMaterial({
+        map: assets.dot(), color: "#fffaf0", transparent: true, opacity: 0,
+        blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false, toneMapped: false,
+      })));
+      glint.name = `pearl glint ${expression.id}`;
+      glint.position.set(.07, .09, .12);
+      glint.scale.set(.16, .16, 1);
+      glint.renderOrder = 6;
+      glint.layers.enable(1);
+      root.add(glint);
+      this.root.add(root); this.medallions.push({ id: expression.id, root, glint });
     }
   }
   private geometry<G extends T.BufferGeometry>(g: G) { this.geometries.add(g); return g; }
@@ -278,6 +326,19 @@ export class StudyPearlSkin {
     // One message at a time carries the eye, and the glow pass drops a dozen draws with it.
     if (detailed) this.shell.layers.enable(1); else this.shell.layers.disable(1);
     this.sparkles.visible = detailed && frame.sparkles;
+    // Sparkle class, like the dust: the bead and the medallion glints follow the owner's switch.
+    this.shimmer.visible = detailed && frame.sparkles;
+    if (this.shimmer.visible) {
+      for (let i = 0; i < SHIMMER_BEAD_COUNT; i++) {
+        const a = time * .42 - i * .06;
+        this.shimmerScratch.set(Math.cos(a) * 1.37, Math.sin(a) * 1.26, Math.sin(a * 2) * .12 - .08);
+        this.shimmerScratch.applyAxisAngle(this.orbitAxis, .38);
+        this.shimmerPlaces[i * 3] = this.shimmerScratch.x;
+        this.shimmerPlaces[i * 3 + 1] = this.shimmerScratch.y;
+        this.shimmerPlaces[i * 3 + 2] = this.shimmerScratch.z;
+      }
+      this.shimmer.geometry.getAttribute("position").needsUpdate = true;
+    }
     this.rings.forEach((ring, index) => { ring.visible = detailed || index === 0; });
     this.orbitBeads.forEach((bead, i) => {
       const lane = i % 2, a = i * 2.399 + time * .035;
@@ -285,7 +346,13 @@ export class StudyPearlSkin {
       bead.position.applyAxisAngle(this.orbitAxis, lane ? -.46 : .38);
     });
     const selected = this.medallions.filter(item => ids.includes(item.id));
-    this.medallions.forEach(item => { item.root.visible = detailed && ids.includes(item.id); });
+    this.medallions.forEach(item => {
+      item.root.visible = detailed && ids.includes(item.id);
+      item.glint.visible = frame.sparkles;
+      // A narrow power keeps each glint to a brief catch of light rather than a steady lamp,
+      // and the per symbol phase means no two of them flash together.
+      item.glint.material.opacity = Math.pow(Math.max(0, Math.sin(time * .55 + item.id * 1.3)), 30) * .9;
+    });
     // A narrow viewport pulls the ring in and shrinks the symbols, so none of them leaves the frame.
     const radiusX = (frame.portrait ? 1.06 : 1.36) * frame.orbitScale;
     const radiusY = (frame.portrait ? 1.44 : 1.28) * frame.orbitScale;
@@ -298,7 +365,7 @@ export class StudyPearlSkin {
   }
   clear() {
     this.medallions.forEach(item => { item.root.visible = false; });
-    this.halo.visible = this.sparkles.visible = false;
+    this.halo.visible = this.sparkles.visible = this.shimmer.visible = false;
     this.occluder.layers.disable(3);
   }
   /** Test seam: the exact layer mask of one named study object. */

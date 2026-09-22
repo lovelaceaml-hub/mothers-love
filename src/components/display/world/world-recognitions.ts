@@ -9,6 +9,7 @@ import {
   paintStudyPearl,
   type StudyPearlFrame,
 } from "./prototype/pearl-skin";
+import { StudyWaterHalo } from "./prototype/study-glory";
 import {
   RECOGNITION_ZONES,
   WORLD_EXPRESSIONS,
@@ -102,6 +103,12 @@ export class WorldRecognitionBubbles {
   private arrivalInWorld = false;
   private readonly designStudy = isWorldDesignStudy();
   private readonly studyAssets?: StudyPearlAssets;
+  /**
+   * Study only: the reflection the pearl being read lays on the sea. It lives here because
+   * this is the only place that knows which pearl that is, and it follows that pearl's world
+   * place rather than the camera, so it stays a property of the world and not of the screen.
+   */
+  private readonly waterHalo?: StudyWaterHalo;
   private readonly frameScratch = new T.Vector3();
   private readonly plainFrame: StudyPearlFrame = {
     sparkles: false,
@@ -117,6 +124,7 @@ export class WorldRecognitionBubbles {
 
   constructor(scene: T.Scene) {
     if (this.designStudy) this.studyAssets = new StudyPearlAssets(() => scene.userData.invalidate?.());
+    if (this.designStudy) this.waterHalo = new StudyWaterHalo(scene);
     this.root.name = "Recognition bubbles in the world";
     scene.add(this.root);
     for (const zone of RECOGNITION_ZONES)
@@ -499,6 +507,11 @@ export class WorldRecognitionBubbles {
     }
     if (this.focused)
       this.projection.copy(this.focused.root.position).project(camera);
+    this.waterHalo?.update(
+      this.focused?.root.visible ? this.focused.root.position : undefined,
+      camera,
+      time,
+    );
     return changed;
   }
   /**
@@ -592,6 +605,7 @@ export class WorldRecognitionBubbles {
       slot.study?.dispose();
     });
     this.records.clear();
+    this.waterHalo?.dispose();
     this.studyAssets?.dispose();
     this.focused = undefined;
     this.hitTargets.length = 0;

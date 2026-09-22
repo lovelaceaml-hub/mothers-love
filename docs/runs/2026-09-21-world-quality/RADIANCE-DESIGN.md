@@ -173,3 +173,28 @@ Draw-call accounting, paused Garden, High, worst-case frame with shadow pass (to
 - Reduced motion and Still: frozen `time` uniform, camera-only rays, finesse identity, exposure 1.0.
 - `setEffects`: sparkle-class (motes, stars, bead, glints, heart sparkles, pearl sparkles) and trail-class (petals, butterflies) gates listed per object.
 - Determinism and disposal: every layout takes a `seededRandom` seed; every object goes through the registrars or `StudyRadiance.dispose()`; every patched material has a unique `customProgramCacheKey`.
+
+## Checkpoint corrections (recorded after Sections 6 and 7 landed, 2026-09-22)
+
+The numbers above are the design's starting values. The shipped values were tuned down at the capture checkpoints because the study palette already sits near white and additive light saturated the frame; each constant carries a comment in the code saying so.
+
+| Item | Design | Shipped |
+| --- | --- | --- |
+| Composite blend | additive | screen (CustomBlending, OneMinusDstColor, One), output clamped |
+| glowStrength High / Auto | .62 / .45 | .22 / .16 |
+| Bloom strength / radius | 1.05 / .62 | .8 / .55 |
+| rayStrength / rays exposure | .5 / .32 | .12 / .20 |
+| Glow tint / ray tint | white | (1, .88, .84) / (1, .87, .74) |
+| Sky glow band opacity | .14 | .05 |
+| Sun halo sprites on the glow layer | yes | no (already additive and large) |
+| Protect mask contributors | every pearl | only the pearl being read (hero and arrival); occluder radius .985; mask softened with smoothstep(.15, .85) and LinearFilter |
+| Water glitter glow | .6 | .3 |
+| Water halo opacity | .30 | .18 |
+| Heart glow pulse / rim | 1.4 / .35 | .32 / .13 |
+| Heart halo local scale / opacity | 5.2 / .30 | 3.2 / .12 (the design missed heartRoot's own 3.25 scale) |
+| Heart sparkle opacity | .9 | .6 |
+| Gold glow | .22 + .5 sun | .06 + .16 sun |
+| Lantern opacity | .9 | .58 |
+| Stone caustic band | full at lathe y -3.2 to -2.6 | full -1.9 to -.9, fading at -2.6 and -.35; gain 2.6, exponent 3.2 (only the keel's top bulge is ever visible) |
+| Water color | #8fd3d6 | #6ec9cf (Section 5's tuned value) |
+| Caustic varying name | vWorldPosition | studyStoneWorld (avoids three's own conditional varying) |

@@ -45,6 +45,12 @@ export const STUDY_GLOW_PASS = { value: 0 };
 export const STUDY_SUN_VIEW = { value: new T.Vector3(1, 0, 0) };
 /** 0 is the ordinary twinkle. Section 8 raises it to hush the sparkles during an arrival. */
 export const STUDY_CALM = { value: 0 };
+/**
+ * The sculpted heart's five second breath, 0 to 1. Section 7 drives it from the shared study
+ * clock so the emissive, the glow branch and the halo all swell on the same beat, and so a
+ * still frame or a reduced motion frame resolves it exactly like any other frozen value.
+ */
+export const STUDY_HEART_PULSE = { value: 0 };
 
 /**
  * What this material contributes to the glow layer.
@@ -54,6 +60,10 @@ export const STUDY_CALM = { value: 0 };
  * scope because it replaces the `#include <opaque_fragment>` they re-emitted.
  *
  * At `studyGlowPass` 0 the mix is exactly `outgoingLight`, so the main image is unchanged.
+ *
+ * All three shared study uniforms are bound here, whether or not the given expression reads
+ * them, so any glow branch may use `studySunView` or `studyHeartPulse` without a second
+ * helper. A uniform no expression mentions is dropped by the GLSL compiler.
  */
 export function studyGlow<M extends T.Material>(target: M, key: string, colorGlsl: string, alphaGlsl?: string) {
   const previousCompile = target.onBeforeCompile.bind(target);
@@ -62,7 +72,8 @@ export function studyGlow<M extends T.Material>(target: M, key: string, colorGls
     previousCompile(shader, renderer);
     shader.uniforms.studyGlowPass = STUDY_GLOW_PASS;
     shader.uniforms.studySunView = STUDY_SUN_VIEW;
-    shader.fragmentShader = "uniform float studyGlowPass;\nuniform vec3 studySunView;\n" + shader.fragmentShader.replace(
+    shader.uniforms.studyHeartPulse = STUDY_HEART_PULSE;
+    shader.fragmentShader = "uniform float studyGlowPass, studyHeartPulse;\nuniform vec3 studySunView;\n" + shader.fragmentShader.replace(
       "#include <opaque_fragment>",
       `outgoingLight = mix(outgoingLight, (${colorGlsl}), studyGlowPass);
 ${alphaGlsl ? `diffuseColor.a = mix(diffuseColor.a, (${alphaGlsl}), studyGlowPass);` : ""}
@@ -162,12 +173,18 @@ export function studyGlass(opacity: number) {
     side: T.FrontSide,
   });
   glass.onBeforeCompile = shader => {
-    shader.fragmentShader = shader.fragmentShader.replace(
+    shader.uniforms.pearlSunView = STUDY_SUN_VIEW;
+    shader.fragmentShader = "uniform vec3 pearlSunView;\n" + shader.fragmentShader.replace(
       "#include <opaque_fragment>",
       `float pearlNv = saturate(dot(normalize(vViewPosition), normal));
 float pearlRim = pow(1.0 - pearlNv, 2.6);
 vec3 pearlTint = mix(vec3(.97,.55,.74), vec3(.68,.60,.94), smoothstep(-.5,.7,normal.y));
 pearlTint = mix(pearlTint, vec3(1.,.87,.60), smoothstep(.15,.95,normal.x) * .55);
+// Section 7: the side of the sphere the low sun is on takes the warm key. Both the normal
+// and the sun direction are in view space, so the warm edge stays put as the camera travels
+// instead of sliding around the pearl. It only reaches the image through pearlRim below,
+// which is near zero across the middle of the sphere, so the words keep their own contrast.
+pearlTint = mix(pearlTint, vec3(1.,.87,.60), smoothstep(-.1,.8, dot(normal, pearlSunView)) * .6);
 // The lit sphere is already near white at grazing angles, so the tint has to colour that
 // specular as well as add to it, or the rim tone maps back to plain white.
 outgoingLight = mix(outgoingLight, outgoingLight * pearlTint, pearlRim * .85);
@@ -177,7 +194,7 @@ diffuseColor.a = clamp(opacity + pearlRim * .82 + dot(totalSpecular, vec3(.2126,
     );
   };
   // clone() drops the patch above, so the key names this exact recipe.
-  glass.customProgramCacheKey = () => `study-glass-v1-${opacity}`;
+  glass.customProgramCacheKey = () => `study-glass-v2-${opacity}`;
   return glass;
 }
 
@@ -255,4 +272,61 @@ diffuseColor.rgb *= mix(vec3(.87,.70,.72), vec3(1.), smoothstep(-5.9,-1.2,studyL
   };
   stone.customProgramCacheKey = () => "study-stone-v1";
   return studyRim(stone, "#ffe1cf", 3, .25);
+}
+
+/**
+ * Section 7: light thrown back off the sea, playing across the keel of every island.
+ *
+ * It chains onto `studyStone`, so `studyLocalY` (the lathe profile, -5.9 to 0 in object
+ * space, before the per island y scale) is already declared by that patch and the band below
+ * reads it directly. The noise is sampled in world space instead, through a varying computed
+ * from `modelMatrix`, because the lathe's own xz only spans a unit circle and every island
+ * would otherwise carry the identical pattern. The islands are not batched, so `modelMatrix`
+ * is the real per island transform.
+ *
+ * Verified against three 0.180 `ShaderLib/meshphysical.glsl.js`: `position` is still object
+ * space at `#include <begin_vertex>`, and at `#include <opaque_fragment>` the fragment stage
+ * carries `outgoingLight` and the `saturate` macro from `<common>`.
+ */
+export function studyStoneCaustic<M extends T.Material>(target: M, clock: { value: number }) {
+  const previousCompile = target.onBeforeCompile.bind(target);
+  const previousKey = target.customProgramCacheKey();
+  target.onBeforeCompile = (shader, renderer) => {
+    previousCompile(shader, renderer);
+    shader.uniforms.studyCausticTime = clock;
+    shader.vertexShader = "varying vec3 studyStoneWorld;\n" + shader.vertexShader.replace(
+      "#include <begin_vertex>",
+      `#include <begin_vertex>
+studyStoneWorld = (modelMatrix * vec4(position, 1.)).xyz;`,
+    );
+    shader.fragmentShader = `varying vec3 studyStoneWorld;
+uniform float studyCausticTime;
+float studyCausticHash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float studyCausticNoise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  f = f * f * (3. - 2. * f);
+  return mix(mix(studyCausticHash(i), studyCausticHash(i + vec2(1., 0.)), f.x),
+             mix(studyCausticHash(i + vec2(0., 1.)), studyCausticHash(i + 1.), f.x), f.y);
+}
+` + shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      // The band is raised from the design's -3.2 to -2.6 window. A debug capture with the band
+// written out as flat colour showed that window landing on the last few pixels of the keel:
+// every study camera looks down at an island from above its terrace, so the only part of the
+// lathe a viewer ever sees is its widest bulge, about -1.9 to 0 in object space. The window
+// below covers that bulge and fades out before the walkable rim.
+`float studyCausticBand = smoothstep(-2.6, -1.9, studyLocalY) * (1. - smoothstep(-.9, -.35, studyLocalY));
+vec2 studyCausticP = studyStoneWorld.xz;
+// A higher gain and exponent than the design's 2.2 and 2.5: it keeps the mean light added
+// about the same, which the luminance ceiling needs, while raising the peaks so the result
+// reads as moving light play rather than a flat wash over the rock.
+float studyCaustic = pow(saturate(
+  studyCausticNoise(studyCausticP * .55 + studyCausticTime * .06)
+  * studyCausticNoise(studyCausticP * .9 - studyCausticTime * .045) * 2.6), 3.2);
+outgoingLight += vec3(.55, .88, .92) * studyCaustic * studyCausticBand * .45;
+#include <opaque_fragment>`,
+    );
+  };
+  target.customProgramCacheKey = () => `${previousKey}|study-stone-caustic-v1`;
+  return target;
 }
