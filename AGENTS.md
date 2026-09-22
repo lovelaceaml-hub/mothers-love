@@ -1,5 +1,7 @@
 ## Active correction: designs and prototypes before implementation
 
+Anthony approved a further Astra prototype refinement: smoother models, richer outdoor lighting/materials, higher definition and Atelier-level pearl ornamentation. Preserve the current wording layout exactly, including "Thank you" at the top. Do not use build-polished-apps or Stitch; Anthony explicitly rejected that workflow. Supplied references plus these corrections govern this design stage. Fable and Opus remain held until visual approval.
+
 Anthony's latest instruction is: "i want to see the designs and protos before implementing with fable & opus". Astra now owns a sample-only integrated design study using the existing world renderer and clock. Claude implementation and its P0 dispatch are held until Anthony approves the visual prototype. No Claude sign-in is needed for this design stage. Preserve the pending CI diagnosis and all existing app paths. The design study is a review artifact, not an accepted runtime upgrade or production release.
 
 ## September 21: Approved whole-world visual upgrade

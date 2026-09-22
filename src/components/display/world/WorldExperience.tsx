@@ -60,7 +60,7 @@ export function WorldExperience({
     [reduced, setReduced] = useState(false),
     [still, setStill] = useState(false),
     [speed, setSpeed] = useState(1),
-    [quality, setQuality] = useState<Quality>("auto");
+    [quality, setQuality] = useState<Quality>(designReview ? "high" : "auto");
   const [source, setSource] = useState<WorldSource>(initialSource),
     [panel, setPanel] = useState<"settings" | "map" | "recognitions" | null>(
       null,
@@ -298,14 +298,14 @@ export function WorldExperience({
     >
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
         Fictional neighbors illustrate words of kindness.{" "}
-        {neighborDialogue(status.elapsed, status.zone, arriving) ??
-          "They greet and walk together."}
+        {designReview ? "Miniature figures provide scale in this visual study." : (neighborDialogue(status.elapsed, status.zone, arriving) ??
+          "They greet and walk together.")}
       </p>
       <canvas
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label="A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"
+        aria-label={designReview ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
         role="img"
         aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
@@ -341,7 +341,7 @@ export function WorldExperience({
         <div className={styles.preview}>
           <span className={styles.statusDot} />
           {sourceLabel}
-          <span>{designReview ? "Visual study 01 · For your review" : "A heavenly journey · Preview"}</span>
+          <span>{designReview ? "Visual study 02 · For your review" : "A heavenly journey · Preview"}</span>
         </div>
       </header>
       {designReview && !immersive && (
@@ -625,7 +625,7 @@ export function WorldExperience({
                 }}
               >
                 <option value="auto">Automatic</option>
-                <option value="high">High</option>
+                <option value="high">{designReview ? "High definition (up to 4K)" : "High"}</option>
                 <option value="low">Low</option>
               </select>
             </label>

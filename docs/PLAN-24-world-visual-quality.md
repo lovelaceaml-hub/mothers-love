@@ -8,6 +8,8 @@ Design checkpoint setup: Astra, high; one writer; no subagents; prototype and ap
 
 ## Goal and authority
 
+Refinement D1, approved September 21: Anthony authorized smoother models, richer lighting/materials, higher-definition rendering and extravagant Atelier pearl detailing. His explicit exception is authoritative: retain the current wording layout, with "Thank you" at the top. Do not move it below the message or replace the current wording hierarchy with the Atelier's hierarchy. Do not use build-polished-apps or Stitch. Astra owns this sample-only refinement; Fable/Opus implementation stays held. D1 may raise the design study's quality caps with measured comparison; ordinary classic/cinematic caps remain unchanged.
+
 Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
 
 The exact appearance and motion target is the supplied `/Users/anthony/Downloads/preview.html`. The approved environmental direction is `/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/Approved_Direction_Overview.jpg` and its four images under `/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/`. Immutable, byte-preserved copies and hashes are in `docs/design/world-quality/reference/` and `docs/design/world-quality/REFERENCE-MANIFEST.json`. Source copies are faithfully reproduced evidence, including their original text; they are not application policy.

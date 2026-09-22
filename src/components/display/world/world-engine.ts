@@ -6,6 +6,7 @@ import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, type StudyArrival } from "./prototype/design-mode";
+import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import {
   RECOGNITION_ZONES,
@@ -83,24 +84,27 @@ export class WorldEngine {
         canvas,
         antialias: true,
         alpha: false,
-        powerPreference: "low-power",
+        powerPreference: isWorldDesignStudy() ? "high-performance" : "low-power",
       });
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       this.renderer.toneMappingExposure = 0.82;
       if (isWorldDesignStudy()) {
-        this.renderer.toneMappingExposure = .92;
+        this.renderer.toneMappingExposure = .84;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.world.scene.userData.invalidate = () => { this.dirty = true; };
       }
-      const pmrem = new THREE.PMREMGenerator(this.renderer);
-      const room = new RoomEnvironment();
-      this.environment = pmrem.fromScene(room, 0.04);
+      if (isWorldDesignStudy()) {
+        this.environment = studyEnvironment(this.renderer);
+      } else {
+        const pmrem = new THREE.PMREMGenerator(this.renderer);
+        const room = new RoomEnvironment();
+        this.environment = pmrem.fromScene(room, 0.04);
+        room.dispose(); pmrem.dispose();
+      }
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
-      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = .42;
-      room.dispose();
-      pmrem.dispose();
+      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = .68;
     } catch (error) {
       this.bubbles.dispose();
       this.world.dispose();
@@ -163,7 +167,7 @@ export class WorldEngine {
     const low =
       this.quality === "low" || (this.quality === "auto" && this.lowered);
     const pixels = low ? 1_050_000 : 2_600_000;
-    const ratio = Math.min(
+    const ratio = isWorldDesignStudy() ? studyPixelRatio(width, height, window.devicePixelRatio, this.quality, this.lowered) : Math.min(
       window.devicePixelRatio || 1,
       1.5,
       Math.sqrt(pixels / (width * height)),

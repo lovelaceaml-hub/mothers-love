@@ -4,13 +4,14 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ZONES, WORLD_EXPRESSIONS, seededRandom, type ZoneId } from "../world-data";
 import type { WorldScene } from "../world-scene-legacy";
 import { studyArrival } from "./design-mode";
+import { studyPetal, studyTerrace } from "./study-geometry";
 
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
 export function createDesignWorld(): WorldScene {
   const scene = new T.Scene();
-  scene.name = "Mother's Love, visual study 01";
-  scene.background = new T.Color("#eadce4");
-  scene.fog = new T.FogExp2("#eadce4", .0028);
+  scene.name = "Mother's Love, visual study 02";
+  scene.background = new T.Color("#d7deed");
+  scene.fog = new T.FogExp2("#d7deed", .0023);
   scene.userData.prototypeHeartReady = false;
   scene.userData.studyArrival = studyArrival(new URLSearchParams(window.location.search).get("entrance"));
   const geometries = new Set<T.BufferGeometry>(), materials = new Set<T.Material>(), textures = new Set<T.Texture>();
@@ -22,17 +23,23 @@ export function createDesignWorld(): WorldScene {
   const material = <M extends T.Material>(m: M) => { materials.add(m); return m; };
   const texture = <X extends T.Texture>(t: X) => { textures.add(t); return t; };
   const invalidate = () => { if (!disposed) scene.userData.invalidate?.(); };
-  const ivory = material(new T.MeshPhysicalMaterial({ color: "#fff1dc", roughness: .37, metalness: .04, clearcoat: .27, clearcoatRoughness: .3 }));
+  const ivory = material(new T.MeshPhysicalMaterial({ color: "#fff4e4", roughness: .28, metalness: .025, clearcoat: .42, clearcoatRoughness: .25 }));
   const edge = material(new T.MeshStandardMaterial({ color: "#e1cdb7", roughness: .64 }));
   const gold = material(new T.MeshStandardMaterial({ color: "#d3ae6c", metalness: .78, roughness: .27 }));
-  const roseGold = material(new T.MeshStandardMaterial({ color: "#b28b74", metalness: .3, roughness: .64 }));
+  const roseGold = material(new T.MeshStandardMaterial({ color: "#8d7462", metalness: .05, roughness: .77 }));
   const rose = material(new T.MeshPhysicalMaterial({ color: "#d9567f", roughness: .44, metalness: .04, clearcoat: .45, clearcoatRoughness: .48, sheen: .2, sheenColor: new T.Color("#ffc5d5") }));
-  const leaf = material(new T.MeshStandardMaterial({ color: "#85aa92", roughness: .85, side: T.DoubleSide }));
+  const leaf = material(new T.MeshPhysicalMaterial({ color: "#739a77", roughness: .57, sheen: .2, side: T.DoubleSide }));
   const lawn = material(new T.MeshStandardMaterial({ color: "#a8c7a8", roughness: .96, metalness: 0 }));
   const rock = material(new T.MeshStandardMaterial({ color: "#acbcb6", roughness: .95 }));
-  const bloom = material(new T.MeshPhysicalMaterial({ color: "#ffffff", roughness: .64, sheen: .7, sheenColor: new T.Color("#ffe4dd"), sheenRoughness: .85, side: T.DoubleSide }));
-  const cylinder = geometry(new T.CylinderGeometry(1, 1, 1, 16));
-  const bead = geometry(new T.SphereGeometry(1, 12, 8));
+  const bloom = material(new T.MeshPhysicalMaterial({ color: "#ffffff", roughness: .46, sheen: .65, sheenColor: new T.Color("#ffe4e9"), sheenRoughness: .5, vertexColors: true, side: T.DoubleSide }));
+  // Thin petals transmit a little broad backlight without a second scene render or transparency sorting.
+  bloom.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace("#include <opaque_fragment>", "outgoingLight += diffuseColor.rgb * (0.07 + 0.12 * pow(1.0 - abs(normal.z), 2.0));\n#include <opaque_fragment>");
+  };
+  bloom.customProgramCacheKey = () => "study-petal-backlight-v1";
+  const cylinder = geometry(new T.CylinderGeometry(1, 1, 1, 32));
+  const bead = geometry(new T.SphereGeometry(1, 24, 16));
+  const pollen = geometry(new T.SphereGeometry(1, 8, 6));
   function petalGeometry(columns: number, rows: number) {
     const g = geometry(new T.PlaneGeometry(1, 1, columns, rows));
     const pos = g.getAttribute("position"), uv = g.getAttribute("uv");
@@ -42,13 +49,15 @@ export function createDesignWorld(): WorldScene {
     }
     g.computeVertexNormals(); g.computeBoundingSphere(); return g;
   }
-  const petal = petalGeometry(8, 5);
+  const petal = geometry(studyPetal(20, 12));
+  const midPetal = geometry(studyPetal(10, 6));
+  const farPetal = geometry(studyPetal(6, 4));
   const dummy = new T.Object3D(), tint = new T.Color();
   function mesh(parent: T.Object3D, g: T.BufferGeometry, m: T.Material, p: number[] = [0, 0, 0], scale: number[] = [1, 1, 1]) {
     const o = new T.Mesh(g, m); o.position.set(p[0], p[1], p[2]); o.scale.set(scale[0], scale[1], scale[2]); o.receiveShadow = !m.transparent; parent.add(o); return o;
   }
   function tube(parent: T.Object3D, points: T.Vector3[], r: number, m: T.Material = gold, segments = 32) {
-    return mesh(parent, geometry(new T.TubeGeometry(new T.CatmullRomCurve3(points), segments, r, 6, false)), m);
+    return mesh(parent, geometry(new T.TubeGeometry(new T.CatmullRomCurve3(points), segments, r, r > .1 ? 16 : 8, false)), m);
   }
   function ring(parent: T.Object3D, r: number, y: number, thickness = .026, m: T.Material = gold) {
     const o = mesh(parent, geometry(new T.TorusGeometry(r, thickness, 6, 96)), m, [0, y, 0]); o.rotation.x = -Math.PI / 2; return o;
@@ -82,10 +91,10 @@ export function createDesignWorld(): WorldScene {
     }
   }
 
-  scene.add(new T.HemisphereLight("#fff0df", "#778a9a", .68));
+  scene.add(new T.HemisphereLight("#e0edff", "#688267", .32));
   const sun = new T.DirectionalLight("#ffe6c1", 2.7); sun.position.set(-38, 72, 38);
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = sun.shadow.camera.bottom = -95; sun.shadow.camera.right = sun.shadow.camera.top = 95; sun.shadow.camera.far = 220; sun.shadow.normalBias = .045; sun.shadow.bias = -.00018; scene.add(sun);
-  const fill = new T.DirectionalLight("#b9ceff", .9); fill.position.set(52, 35, -30); scene.add(fill);
+  const fill = new T.DirectionalLight("#b9ceff", .45); fill.position.set(52, 35, -30); scene.add(fill);
   const rim = new T.DirectionalLight("#ffc3d7", .55); rim.position.set(-30, 14, -60); scene.add(rim);
   const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, top: { value: new T.Color("#809bcf") }, horizon: { value: new T.Color("#f2c9d8") } },
     vertexShader: `varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
@@ -97,12 +106,16 @@ export function createDesignWorld(): WorldScene {
       #include <colorspace_fragment>
       }` }));
   mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
-  const water = material(new T.ShaderMaterial({ uniforms: { time },
-    vertexShader: `varying vec3 p;void main(){vec4 w=modelMatrix*vec4(position,1.);p=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
-    fragmentShader: `varying vec3 p;uniform float time;void main(){vec2 q=p.xz;float a=sin(q.x*.38+sin(q.y*.27+time*.12)*1.3),b=sin(q.y*.64-q.x*.18-time*.36);float c=sin(q.x*.87+q.y*.26+time*.22);float glint=pow(max(0.,a*b*c),12.);float lines=pow(.5+.5*sin(q.y*3.4+sin(q.x*.5+time*.18)*1.3-time*.45),18.);float horizon=smoothstep(20.,210.,length(cameraPosition.xz-q));vec3 col=mix(vec3(.15,.43,.44),vec3(.40,.69,.67),.57+a*.08+b*.04);col+=vec3(.55,.39,.20)*glint+vec3(.04,.07,.06)*lines;col=mix(col,vec3(.75,.75,.83),horizon*.65);gl_FragColor=vec4(col,1.);
-      #include <tonemapping_fragment>
-      #include <colorspace_fragment>
-      }` }));
+  const water = material(new T.MeshPhysicalMaterial({ color: "#72b9b9", roughness: .2, metalness: .36, clearcoat: .75, clearcoatRoughness: .2 }));
+  water.onBeforeCompile = shader => {
+    shader.uniforms.studyTime = time;
+    shader.vertexShader = "varying vec3 waterPosition;\n" + shader.vertexShader.replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nwaterPosition=(modelMatrix*vec4(position,1.)).xyz;");
+    shader.fragmentShader = "varying vec3 waterPosition;uniform float studyTime;\n" + shader.fragmentShader.replace("#include <normal_fragment_begin>", `#include <normal_fragment_begin>
+      vec2 q=waterPosition.xz;float dx=.034*cos(q.x*.33+q.y*.18+studyTime*.32)+.017*cos(q.x*.9-q.y*.4-studyTime*.23);
+      float dz=.028*cos(q.y*.44-q.x*.13-studyTime*.28)+.009*sin(q.x*.55+q.y*.7+studyTime*.18);
+      normal=normalize(mat3(viewMatrix)*vec3(-dx,1.,-dz));`);
+  };
+  water.customProgramCacheKey = () => "study-outdoor-water-v1";
   const sea = mesh(scene, geometry(new T.CircleGeometry(320, 96)), water, [0, -5, -30]); sea.rotation.x = -Math.PI / 2;
 
   const shadowCanvas = document.createElement("canvas"); shadowCanvas.width = shadowCanvas.height = 128;
@@ -115,22 +128,21 @@ export function createDesignWorld(): WorldScene {
     const o = mesh(parent, contactPlane, shadow, [x, y, z], [width, depth, 1]); o.rotation.x = -Math.PI / 2;
   }
 
-  function flowers(parent: T.Object3D, count: number, seed: number, base: T.Vector3, spread: number, canopy = false, color = "#f0afc9") {
-    const petalCount = canopy ? 8 : 6;
-    const rand = seededRandom(seed), petals = instance(parent, petal, bloom, count * petalCount, canopy), cores = instance(parent, bead, gold, count);
+  function flowers(parent: T.Object3D, count: number, seed: number, base: T.Vector3, spread: number, canopy = false, color = "#f0afc9", detail = 0) {
+    const petalCount = 5;
+    const rand = seededRandom(seed), petals = instance(parent, detail === 0 ? petal : detail === 1 ? midPetal : farPetal, bloom, count * petalCount, canopy), cores = instance(parent, pollen, gold, count);
     const stems = canopy ? undefined : instance(parent, cylinder, leaf, count);
     for (let i = 0; i < count; i++) {
       const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * spread;
       const p = base.clone().add(new T.Vector3(Math.cos(a) * r, canopy ? (rand() - .5) * spread * .92 + (1 - r / spread) * .85 : .45 + rand() * .8, Math.sin(a) * r));
-      const size = canopy ? .36 + rand() * .24 : .29 + rand() * .30;
+      const size = canopy ? .26 + rand() * .23 : .28 + rand() * .30;
       const normal = canopy ? p.clone().sub(base).multiply(new T.Vector3(1, .7, 1)).add(new T.Vector3(0, .7, 0)).normalize() : new T.Vector3((rand()-.5)*.6,1,(rand()-.5)*.6).normalize();
       const up = new T.Vector3(0,1,0), orientation = new T.Quaternion().setFromUnitVectors(up, normal);
       for (let j = 0; j < petalCount; j++) {
         const c = new T.Color(color).lerp(new T.Color(i % 4 ? "#ffe9dc" : "#d799ce"), rand() * .30);
-        const inner = canopy && j >= 5, scale = size * (inner ? .60 : 1);
-        const angle = inner ? (j-5)*Math.PI*2/3+a+.3 : j*Math.PI*2/(canopy?5:6)+a;
+        const scale = size, angle = j * Math.PI * 2 / petalCount + a;
         const rotation = new T.Euler().setFromQuaternion(orientation.clone().multiply(new T.Quaternion().setFromAxisAngle(up, angle)));
-        stamp(petals, i * petalCount + j, p.clone().addScaledVector(normal, inner ? size*.09 : 0), [scale, scale*(inner?1.6:1), scale], rotation, c);
+        stamp(petals, i * petalCount + j, p, [scale, scale, scale], rotation, c);
       }
       stamp(cores, i, p.clone().addScaledVector(normal, size*.10), [size * .10, size * .08, size * .10], new T.Euler().setFromQuaternion(orientation));
       if (stems) stamp(stems, i, new T.Vector3(p.x, .72 + (p.y - .72) / 2, p.z), [.022, Math.max(.08, p.y - .72), .022], new T.Euler());
@@ -147,13 +159,18 @@ export function createDesignWorld(): WorldScene {
       tube(root, [new T.Vector3(.1, 1.6 + rand(), 0), new T.Vector3(end.x * .35, y - .9, end.z * .35), end], .06, roseGold, 14);
       for (let k = 0; k < 2; k++) tube(root, [end.clone().multiplyScalar(.88), end.clone().add(new T.Vector3((rand() - .5) * 1.3, .65, (rand() - .5) * 1.3))], .022, roseGold, 8);
     }
-    flowers(root, full ? 245 : 74, seed + 73, new T.Vector3(0, 4.6, 0), 3.2, true, color);
+    const canopy = new T.LOD(); canopy.name = "Blossom canopy, three distance levels"; canopy.userData.dynamic = true; root.add(canopy);
+    for (let level = 0; level < 3; level++) {
+      const crown = new T.Group();
+      flowers(crown, full ? 230 : 135, seed + 73, new T.Vector3(0, 4.6, 0), 3.05, true, color, level);
+      canopy.addLevel(crown, [0, 18, 45][level], .12);
+    }
     contact(parent, x, z, 7 * size, 5.5 * size);
   }
   function arch(parent: T.Object3D, x: number, y: number, z: number, width: number, height: number) {
     const root = new T.Group(); root.position.set(x, y, z); parent.add(root);
     const points = Array.from({ length: 25 }, (_, i) => { const a = i / 24 * Math.PI; return new T.Vector3(Math.cos(a) * width / 2, height * .57 + Math.sin(a) * height * .43, 0); });
-    tube(root, points, .31, ivory, 40); tube(root, points.map(p => p.clone().add(new T.Vector3(0, .025, .26))), .022, gold, 40);
+    tube(root, points, .31, ivory, 80); tube(root, points.map(p => p.clone().add(new T.Vector3(0, .025, .26))), .022, gold, 80);
     for (const s of [-1, 1]) {
       mesh(root, cylinder, ivory, [s * width / 2, height * .285, 0], [.32, height * .57, .32]);
       for (const h of [.13, .36, height * .56]) mesh(root, cylinder, h === .13 ? edge : gold, [s * width / 2, h, 0], [.45, h === .13 ? .2 : .06, .45]);
@@ -161,7 +178,7 @@ export function createDesignWorld(): WorldScene {
     }
     return root;
   }
-  const islandShape = geometry(new T.LatheGeometry([new T.Vector2(0,-5.9),new T.Vector2(.25,-5.4),new T.Vector2(.42,-4.2),new T.Vector2(.62,-3.8),new T.Vector2(.73,-2.6),new T.Vector2(.96,-1.9),new T.Vector2(1,-.55),new T.Vector2(.98,0)], 72));
+  const islandShape = geometry(new T.LatheGeometry(new T.SplineCurve([new T.Vector2(0,-5.9),new T.Vector2(.25,-5.4),new T.Vector2(.42,-4.2),new T.Vector2(.62,-3.8),new T.Vector2(.73,-2.6),new T.Vector2(.96,-1.9),new T.Vector2(1,-.55),new T.Vector2(.98,0)]).getPoints(48), 96));
   const falls: T.Mesh[] = [];
   const fall = material(new T.ShaderMaterial({ transparent: true, side: T.DoubleSide, depthWrite: false, uniforms: { time },
     vertexShader: `varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
@@ -179,7 +196,7 @@ export function createDesignWorld(): WorldScene {
     const radius = i < 3 ? 17.8 : 13.8;
     mesh(root, islandShape, rock, [0, -.9, 0], [radius * 1.01, 1.25 + i % 3 * .2, radius * .97]);
     for (let layer = 0; layer < 3; layer++) {
-      mesh(root, geometry(new T.CylinderGeometry(radius - layer * .65, radius - layer * .65 + .2, .38, 96)), layer === 2 ? ivory : edge, [0, -.35 + layer * .42, 0]);
+      mesh(root, geometry(studyTerrace(radius - layer * .65, radius - layer * .65 + .2, .38)), layer === 2 ? ivory : edge, [0, -.35 + layer * .42, 0]);
       ring(root, radius - layer * .65 - .12, -.14 + layer * .42, .018);
     }
     ring(root, radius - 2.1, .69, .021); ring(root, radius - 2.4, .691, .009);
@@ -200,11 +217,11 @@ export function createDesignWorld(): WorldScene {
         stamp(foliage, j, new T.Vector3(Math.cos(a)*r, .69, -Math.sin(a)*r), [.52, .75, 1.05], new T.Euler(.45, random()*Math.PI*2, .08));
       } finish(foliage);
     }
-    tree(layout, -11.7, -1.8, i < 3 ? 1.27 : .95, 900 + i * 11, color, i < 3);
-    tree(layout, 11.5, -5.9, i < 3 ? 1.15 : .92, 980 + i * 19, color, i < 3);
+    tree(layout, -12.4, -2.8, i < 3 ? 1.16 : .95, 900 + i * 11, color, i < 3);
+    tree(layout, 12.3, -6.9, i < 3 ? 1.10 : .92, 980 + i * 19, color, i < 3);
     if (i < 3) {
       tree(layout, -9.4, -11.5, .91, 1220 + i, "#f8dbd6", true);
-      tree(layout, 12.7, 7.2, 1.10, 1290 + i, color, true);
+      tree(layout, 14.1, 6.3, .94, 1290 + i, color, true);
     }
     for (let k = 0; k < (i < 3 ? 4 : 2); k++) {
       const x = (k % 2 ? 1 : -1) * (10 + k * .5), z = 5 - Math.floor(k / 2) * 11;
@@ -251,14 +268,14 @@ export function createDesignWorld(): WorldScene {
     const arc = arch(arcade, Math.cos(a) * 12.8, .65, -Math.sin(a) * 12.8 - 1.5, 5.15, 11.8);
     arc.rotation.y = Math.PI / 2 - a;
   }
-  for (let i = 0; i < 4; i++) { mesh(sanctuary,geometry(new T.CylinderGeometry(7.6-i*.8,7.9-i*.8,.28,96)),ivory,[0,.88+i*.28,0]);ring(sanctuary,7.6-i*.8,1.03+i*.28,.018); }
+  for (let i = 0; i < 4; i++) { mesh(sanctuary,geometry(studyTerrace(7.6-i*.8,7.9-i*.8,.28)),ivory,[0,.88+i*.28,0]);ring(sanctuary,7.6-i*.8,1.03+i*.28,.018); }
   const heartRoot = new T.Group(); heartRoot.name = "Supplied original sculpted heart"; heartRoot.userData.dynamic = true; heartRoot.position.set(0, 8.7, 0); heartRoot.rotation.y = .25; heartRoot.scale.setScalar(3.25); sanctuary.add(heartRoot);
   new GLTFLoader().load("/world-prototype/original-heart.glb", gltf => {
     gltf.scene.traverse(o => { if (o instanceof T.Mesh) { geometries.add(o.geometry); const old = Array.isArray(o.material) ? o.material : [o.material]; old.forEach(m => m.dispose()); o.material = rose; o.castShadow = true; } });
     if (disposed) { gltf.scene.traverse(o => { if (o instanceof T.Mesh) o.geometry.dispose(); }); return; }
     heartRoot.add(gltf.scene); scene.userData.prototypeHeartReady = true; invalidate();
   }, undefined, error => { if (!disposed) { scene.userData.prototypeHeartError = "Original heart did not load"; console.error("Design study original heart", error); invalidate(); } });
-  const silkMat = material(new T.MeshPhysicalMaterial({ color: "#f9ded6", roughness: .47, metalness: .06, transparent: true, opacity: .38, side: T.DoubleSide, depthWrite: false, sheen: 1, sheenColor: new T.Color("#fff0bd"), sheenRoughness: .5 }));
+  const silkMat = material(new T.MeshPhysicalMaterial({ color: "#f9ded6", roughness: .36, metalness: .035, transparent: true, opacity: .31, side: T.DoubleSide, depthWrite: false, sheen: 1, sheenColor: new T.Color("#fff0df"), sheenRoughness: .38 }));
   const ribbons: T.Mesh[] = [];
   for (let index = 0; index < 4; index++) {
     const g = geometry(new T.PlaneGeometry(1,1,100,6)), o = mesh(sanctuary,g,silkMat);o.userData.dynamic=true;ribbons.push(o);
@@ -316,7 +333,7 @@ export function createDesignWorld(): WorldScene {
 
   // Arrival forms share the existing director phases and complete reading interval.
   const entry = new T.Group(); entry.name="Design study arrival stage";entry.position.set(4.138,.6,19.104);scene.add(entry);
-  mesh(entry,geometry(new T.CylinderGeometry(10.8,11,.65,96)),ivory);ring(entry,10.2,.35,.03);ring(entry,9.9,.36,.009);
+  mesh(entry,geometry(studyTerrace(10.8,11,.65)),ivory);ring(entry,10.2,.35,.03);ring(entry,9.9,.36,.009);
   const lotus=new T.Group(), portal=new T.Group(), constellation=new T.Group();entry.add(lotus,portal,constellation);
   portal.position.y=constellation.position.y=2.7;
   lotus.userData.dynamic=portal.userData.dynamic=constellation.userData.dynamic=true;
@@ -337,7 +354,7 @@ export function createDesignWorld(): WorldScene {
       }p.needsUpdate=true;g.computeVertexNormals();
     });
   }
-  const stars=instance(constellation,bead,material(new T.MeshBasicMaterial({color:"#ffedbf",toneMapped:false})),96);
+  const stars=instance(constellation,pollen,material(new T.MeshBasicMaterial({color:"#ffedbf",toneMapped:false})),96);
   for(let k=0;k<96;k++){const a=k*2.399,r=2+Math.sqrt(k/96)*8;stamp(stars,k,new T.Vector3(Math.cos(a)*r,4+k/96*16,Math.sin(a)*r),[.05,.05,.05],new T.Euler());}finish(stars);
   for(let k=0;k<3;k++){const o=mesh(constellation,geometry(new T.TorusGeometry(6.7+k*.45,.018,5,100)),gold,[0,9,0]);o.rotation.set(k*.5,.3+k*.2,k*.4);}
 
@@ -345,12 +362,14 @@ export function createDesignWorld(): WorldScene {
   function figure(parent:T.Object3D,x:number,z:number,color:string){
     const root=new T.Group();root.position.set(x,.72,z);parent.add(root);
     const dress=material(new T.MeshStandardMaterial({color,roughness:.8})),skin=material(new T.MeshStandardMaterial({color:"#deb995",roughness:.8})),hair=material(new T.MeshStandardMaterial({color:"#594339",roughness:.9}));
-    mesh(root,geometry(new T.ConeGeometry(.38,1.15,18)),dress,[0,.84,0]);mesh(root,bead,skin,[0,1.65,0],[.33,.35,.32]);mesh(root,bead,hair,[0,1.8,-.015],[.345,.23,.33]);
+    const body = geometry(new T.LatheGeometry(new T.SplineCurve([new T.Vector2(.35,0),new T.Vector2(.37,.05),new T.Vector2(.29,.4),new T.Vector2(.23,.76),new T.Vector2(.25,.92),new T.Vector2(.12,1.02)]).getPoints(22),32));
+    mesh(root,body,dress,[0,.35,0]);mesh(root,bead,skin,[0,1.65,0],[.33,.35,.32]);mesh(root,bead,hair,[0,1.8,-.035],[.34,.24,.32]);
+    for(const side of [-1,1]){const arm=mesh(root,geometry(new T.CapsuleGeometry(.087,.44,5,12)),dress,[side*.29,1.00,.03]);arm.rotation.z=side*.20;mesh(root,bead,skin,[side*.35,.71,.03],[.09,.1,.09]);}
     for(const s of [-1,1]){mesh(root,cylinder,skin,[s*.17,.28,0],[.085,.42,.085]);mesh(root,bead,hair,[s*.17,.065,.08],[.11,.07,.19]);}contact(parent,x,z,1.5,.85);
   }
   for(const id of ["garden","heart","expressions"] as const){const root=districtRoots.get(id)!;figure(root,-5,8,"#d788a9");figure(root,-3.8,8.5,"#a79ac9");}
 
-  const fireflies = instance(scene,bead,material(new T.MeshBasicMaterial({color:"#fff1ca",transparent:true,opacity:.8,toneMapped:false})),90);
+  const fireflies = instance(scene,pollen,material(new T.MeshBasicMaterial({color:"#fff1ca",transparent:true,opacity:.8,toneMapped:false})),90);
   const rand=seededRandom(455);for(let i=0;i<90;i++)stamp(fireflies,i,new T.Vector3((rand()-.5)*125,2+rand()*18,(rand()-.5)*115-15),[.026,.026,.026],new T.Euler());finish(fireflies);
   motions.forEach(fn=>fn(0));districtRoots.forEach(batch);batch(entry);
   return {

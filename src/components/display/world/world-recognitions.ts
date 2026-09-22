@@ -74,7 +74,7 @@ type Slot = {
 export class WorldRecognitionBubbles {
   readonly hitTargets: T.Mesh[] = [];
   private readonly root = new T.Group();
-  private readonly disc = new T.CircleGeometry(1, 72);
+  private readonly disc = new T.CircleGeometry(1, isWorldDesignStudy() ? 192 : 72);
   private readonly rim = new T.TorusGeometry(1, 0.012, 6, 72);
   private readonly dot = new T.SphereGeometry(0.026, 6, 4);
   private readonly rimMaterial = new T.MeshBasicMaterial({
@@ -186,7 +186,7 @@ export class WorldRecognitionBubbles {
     slot.born = time;
     slot.face.userData.recognitionId = record.id;
     slot.canvas = document.createElement("canvas");
-    slot.canvas.width = slot.canvas.height = slot.index === 0 ? 1024 : 512;
+    slot.canvas.width = slot.canvas.height = isWorldDesignStudy() ? (slot.index === 0 ? 2048 : 1024) : (slot.index === 0 ? 1024 : 512);
     slot.texture = new T.CanvasTexture(slot.canvas);
     slot.texture.colorSpace = T.SRGBColorSpace;
     slot.texture.generateMipmaps = true;

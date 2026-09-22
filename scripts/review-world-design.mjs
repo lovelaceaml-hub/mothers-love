@@ -62,7 +62,42 @@ async function visit(id, name) {
 }
 try {
   await open('design');
-  if (mode === 'tour') {
+  if (mode === 'quality') {
+    await pause();
+    await page.getByRole('button',{name:'Settings',exact:true}).click();
+    await page.getByLabel('Picture quality').selectOption('high');
+    await page.getByRole('dialog').getByRole('button',{name:/^Close /}).click();
+    report.resolutions=[];
+    for(const [width,height,label] of [[1920,1080,'hd'],[3840,2160,'4k']]) {
+      await page.setViewportSize({width,height});
+      await expect.poll(()=>page.locator('canvas[role="img"]').evaluate(c=>[c.width,c.height].join('x'))).toBe(`${width}x${height}`);
+      const resolution=await page.locator('canvas[role="img"]').evaluate(c=>({width:c.width,height:c.height,cssWidth:c.clientWidth,cssHeight:c.clientHeight,dpr:devicePixelRatio}));
+      report.resolutions.push(resolution);await shot(`high-${label}-garden`);
+      report.checks.push({test:`High tier actual ${width} by ${height} drawing buffer`,passed:true,resolution});
+    }
+    await page.getByRole('button',{name:'Settings',exact:true}).click();
+    await page.getByLabel('Picture quality').selectOption('low');
+    await page.getByRole('dialog').getByRole('button',{name:/^Close /}).click();
+    await expect.poll(()=>page.locator('canvas[role="img"]').evaluate(c=>c.width*c.height)).toBeLessThanOrEqual(1050000);
+    report.checks.push({test:'Low tier retains bounded drawing buffer at a 4K viewport',passed:true});
+    await page.setViewportSize({width:1920,height:1080});
+    await page.getByRole('button',{name:'Settings',exact:true}).click();
+    await page.getByLabel('Picture quality').selectOption('high');
+    await page.getByRole('dialog').getByRole('button',{name:/^Close /}).click();
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    await page.getByRole('button',{name:'Resume tour',exact:true}).click();
+    await expect(world).toHaveAttribute('data-motion','tour');
+    report.motionBefore=await attrs();
+    // This records actual browser frames during ordinary app motion. It does not replace the app clock.
+    report.animationFrameTimes=await page.evaluate(()=>new Promise(resolve=>{
+      const intervals=[];let previous=0;
+      const sample=now=>{if(previous)intervals.push(now-previous);previous=now;if(intervals.length<120)requestAnimationFrame(sample);else resolve(intervals);};requestAnimationFrame(sample);
+    }));
+    report.motionAfter=await attrs();
+    await page.getByRole('button',{name:'Settings',exact:true}).click();await page.getByText('Rendering details',{exact:true}).click();
+    report.renderingDetails=await page.getByRole('dialog').locator('dl').innerText();
+    report.checks.push({test:'Real animation timing with advancing app frames and clock',passed:report.animationFrameTimes.length===120&&Number(report.motionAfter['data-frames'])>Number(report.motionBefore['data-frames'])+10&&Number(report.motionAfter['data-elapsed'])>Number(report.motionBefore['data-elapsed'])});
+  } else if (mode === 'tour') {
     const started=performance.now();
     const sample=async label=>{report.cameraSamples.push({label,wallSeconds:Math.round((performance.now()-started)/100)/10,attributes:await attrs()});};
     await sample('Garden start');
