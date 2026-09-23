@@ -182,7 +182,8 @@ export function observatoryYaw() {
   return round(localSunAzimuth("status") - .518);
 }
 
-const EXPRESSION_PIECES: readonly KitAssetId[] = [
+/** The nine expression pieces in canonical order (expression 1 first). */
+export const EXPRESSION_PIECES: readonly KitAssetId[] = [
   "expression.01-hello-bubble", "expression.02-gift-box", "expression.03-mended-heart", "expression.04-comfort-cloud",
   "expression.05-open-door", "expression.06-teacup", "expression.07-candle", "expression.08-helping-hand", "expression.09-star",
 ];
@@ -211,9 +212,25 @@ function statusLayout(): ZoneLayout {
 /* 6.13 Expression Cosmos                                                                       */
 /* ------------------------------------------------------------------------------------------ */
 
-export const COSMOS_CENTER: [number, number, number] = [0, 7, 0];
+/**
+ * The ring system stands behind the hero pearl, not around it: the procedural orbits at
+ * (0, 7, 0) scribbled across the pearl's words from the tour camera (director's note 7 on the
+ * round three captures). From here every ring point stays outside the hero reading sphere at
+ * (3, 9, 5) radius 7, at least 7 units behind the disc plane (z at most -2 against the disc's
+ * z 5, so the rings frame the pearl and never cross its text), above the terrace (lowest point
+ * 2.9) and clear of the arch row at z -9.3 (gap 1.1), which `tests/world/kit-layout-far.test.ts`
+ * proves from the ring maths below.
+ */
+export const COSMOS_CENTER: [number, number, number] = [0, 10, -7];
+/** Where the selected expression rides as the sun of the cosmos: the apex of the ring system, in view above the pearl. */
+export const COSMOS_SUN: [number, number, number] = [0, 17.6, -7];
 /** The four rings, radii 5 to 7.1 like the procedural ones (the kit ring is radius 2.5). */
 export const COSMOS_RINGS = [0, 1, 2, 3].map(k => ({ k, radius: round(5 + k * .7), scale: round((5 + k * .7) / 2.5), tilt: [round(k * .55), 0] as [number, number], rotationY: round(.4 + k * .37) }));
+/** A point of ring `k` at parameter `angle`, local, for the builder's beads and the layout test. */
+export function cosmosRingPoint(k: number, angle: number): [number, number, number] {
+  const spec = COSMOS_RINGS[k];
+  return onTiltedRing(spec.radius, angle, spec.tilt, spec.rotationY, COSMOS_CENTER);
+}
 /**
  * The arc of ring `k` that lies behind the ring centre's plane, seen from the tour camera at
  * +z: with the yaw `b` and the x tilt `a`, a ring point at parameter `f` has local
@@ -251,11 +268,11 @@ function orbitLayout(): ZoneLayout {
   const placements: KitPlacement[] = [];
   for (const ring of COSMOS_RINGS) placements.push({
     id: "recognition.orbit-ring", position: [...COSMOS_CENTER], rotationY: ring.rotationY, tilt: ring.tilt, scale: ring.scale, role: "animated",
-    note: `cosmos ring ${ring.k}, radius ${ring.radius}; encircles the hero pearl by design 6.13 (the D2 composition), exempt from the reading sphere; spins on the clock`,
+    note: `cosmos ring ${ring.k}, radius ${ring.radius}; frames the hero pearl from behind (every ring point outside the reading sphere and behind the disc plane); spins on the clock`,
   });
   for (let i = 0; i < 9; i++) {
     const pose = cosmosPlanetPose(i, 0);
-    placements.push({ id: EXPRESSION_PIECES[i], position: pose.position.map(round) as [number, number, number], scale: .7, role: "animated", note: `planet on ring ${pose.ring}, back arc (cosmosPlanetPose); the selected expression moves to the centre at 1.1 as the sun` });
+    placements.push({ id: EXPRESSION_PIECES[i], position: pose.position.map(round) as [number, number, number], scale: .7, role: "animated", note: `planet on ring ${pose.ring}, back arc (cosmosPlanetPose); the selected expression moves to COSMOS_SUN at 1.1 as the sun` });
   }
   for (let i = 0; i < 9; i++) placements.push({ id: "core.pearl", position: cosmosPearlPose(i, 0).map(round) as [number, number, number], scale: .35, role: "animated", note: "between the planets (cosmosPearlPose)" });
   // Sculpted puffs 6 to 12 units under the island rim, among the study cloud collar.
@@ -431,8 +448,8 @@ export const FAR_ZONE_DRESSING: ReadonlyArray<{ zone: ZoneId; remove: string; fe
     remove: "the four procedural gold torus orbits at (0, 7, 0)",
     features: ["the procedural island lathe keel stays (the kit island base is not placed: it would interleave with the keel)"],
     dynamic: [
-      "the four rings spin on the clock (the kit spin clip, or rotation about their tilted axis at .06 + k * .01 rad a second)",
-      "planets follow cosmosPlanetPose(i, t), the pearls cosmosPearlPose(i, t); the selected expression (scene.userData.studyExpression) moves to COSMOS_CENTER at 1.1 scale with studyGlow .16 over a 2 s ease and the other eight keep orbiting",
+      "the four rings spin on the clock (rotation about their own tilted axis at .06 + k * .01 rad a second)",
+      "planets follow cosmosPlanetPose(i, t), the pearls cosmosPearlPose(i, t); the selected expression (scene.userData.studyExpression) moves to COSMOS_SUN at 1.1 scale over a 2 s ease and the other eight keep orbiting",
     ],
   },
   {

@@ -7,6 +7,7 @@ import {
   CALENDAR_GRID,
   COSMOS_CENTER,
   COSMOS_RINGS,
+  COSMOS_SUN,
   FAR_ISLAND_RADIUS,
   FAR_ZONE_BORROWED,
   FAR_ZONE_DRESSING,
@@ -19,6 +20,7 @@ import {
   calendarDayPlacements,
   cosmosPearlPose,
   cosmosPlanetPose,
+  cosmosRingPoint,
   farZoneCommonLayouts,
   farZoneLayouts,
   fountainPearlPose,
@@ -33,6 +35,7 @@ import {
   CORRIDOR_KEEP,
   FRUSTUM_MARGIN,
   ISLET_BELOW_DECK,
+  ISLET_COLOURS,
   ISLET_SIDE_OFFSET,
   ISLET_STATIONS,
   ISLET_VIEW_DISTANCE,
@@ -44,6 +47,7 @@ import {
   POST_SIDE_OFFSET,
   POST_VIEW_DISTANCE,
   SKY_LANES,
+  SOFT_CLOUD,
   bridgeCurve,
   corridorBridges,
   corridorClouds,
@@ -56,7 +60,8 @@ import {
   skyLaneStation,
   tourLegs,
 } from "@/components/display/world/prototype/kit-corridors";
-import { SMALL_SITE_RADIUS, studyCloudLayout } from "@/components/display/world/prototype/study-clouds";
+import { FAR_BUILDER_ZONES, FAR_DETAIL_DISTANCE, FAR_KEEP, farZonesEnabled } from "@/components/display/world/prototype/kit-far-zones";
+import { SMALL_SITE_RADIUS, STUDY_CLOUD_TINTS, STUDY_COLLAR_TINTS, studyCloudLayout } from "@/components/display/world/prototype/study-clouds";
 import { studyLandmarkCloudSites, studyLandmarkLayout } from "@/components/display/world/prototype/study-landmarks";
 
 /* ------------------------------------------------------------------------------------------ */
@@ -239,11 +244,12 @@ describe("far zone layouts: shape and determinism", () => {
     }
   });
 
-  it("keeps every placement on its island, except the sculpted clouds under the two floating rims", () => {
+  it("keeps every placement on its island, except the sculpted clouds under the two floating rims and the cosmos pieces on their rings", () => {
     for (const layout of ALL_FAR) for (const placement of layout.placements) {
       const radial = Math.hypot(placement.position[0], placement.position[2]);
       const cloud = placement.id.startsWith("nature.cloud-");
-      expect(radial, label(layout, placement)).toBeLessThanOrEqual(cloud ? 20 : FAR_ISLAND_RADIUS - .4);
+      const cosmos = layout.zone === "orbit" && (placement.id.startsWith("expression.") || placement.id === "core.pearl");
+      expect(radial, label(layout, placement)).toBeLessThanOrEqual(cloud || cosmos ? 20 : FAR_ISLAND_RADIUS - .4);
       if (cloud) expect(placement.position[1], label(layout, placement)).toBeLessThan(-4);
       else expect(placement.position[1], label(layout, placement)).toBeGreaterThanOrEqual(.3);
     }
@@ -272,9 +278,34 @@ describe("far zone layouts: keep out volumes (design 6.2)", () => {
     for (const layout of FAR_ZONE_LAYOUTS) expect(layout.keepOut).toEqual(readingKeepOut(layout.zone));
   });
 
-  /** The cosmos encircles the hero pearl by design (6.13); those pieces are proven by the cone test below instead. */
+  /** The cosmos pieces are thin rings and moving beads: proven point by point and by the cone test below, not by a bounding sphere. */
   const encircles = (layout: ZoneLayout, placement: KitPlacement) =>
     layout.zone === "orbit" && (placement.id === "recognition.orbit-ring" || placement.id.startsWith("expression.") || placement.id === "core.pearl");
+
+  it("stands the cosmos rings behind the hero pearl: every ring point outside the reading spheres, behind the disc plane, above the terrace, off the arches", () => {
+    const [hero, ...residents] = readingKeepOut("orbit");
+    expect(COSMOS_CENTER).toEqual([0, 10, -7]);
+    const arches = [-5.28, 0, 5.28].map(x => ({ x, z: -9.3, halfWidth: 2.75, height: 8.7 }));
+    let heroGap = Infinity, frontZ = -Infinity, low = Infinity, archGap = Infinity, residentGap = Infinity;
+    for (let k = 0; k < 4; k++) for (let i = 0; i < 720; i++) {
+      const p = cosmosRingPoint(k, (i / 720) * Math.PI * 2);
+      heroGap = Math.min(heroGap, distance(p, hero.center) - hero.radius);
+      for (const keep of residents) residentGap = Math.min(residentGap, distance(p, keep.center) - keep.radius);
+      frontZ = Math.max(frontZ, p[2]);
+      low = Math.min(low, p[1]);
+      for (const arch of arches) archGap = Math.min(archGap, Math.hypot(Math.max(Math.abs(p[0] - arch.x) - arch.halfWidth, 0), Math.max(p[1] - arch.height, 0), Math.max(Math.abs(p[2] - arch.z) - .6, 0)));
+    }
+    expect(heroGap).toBeGreaterThanOrEqual(0);
+    expect(residentGap).toBeGreaterThanOrEqual(0);
+    // The disc stands at z 5; the ring system's nearest point stays 7 units behind that plane.
+    expect(frontZ).toBeLessThanOrEqual(hero.center[2] - 7);
+    expect(low).toBeGreaterThanOrEqual(1.4);
+    expect(archGap).toBeGreaterThanOrEqual(.8);
+    // The sun's place is the apex of the system, in view above the pearl, and outside its reading sphere.
+    expect(distance(COSMOS_SUN, hero.center) - hero.radius - 1.1 * .6).toBeGreaterThanOrEqual(0);
+    expect(COSMOS_SUN[1]).toBeGreaterThan(hero.center[1] + hero.radius);
+    for (const ring of FAR_ZONE_LAYOUTS[2].placements.filter(p => p.id === "recognition.orbit-ring")) expect(ring.position).toEqual(COSMOS_CENTER);
+  });
 
   it("keeps every other bounding sphere out of the hero and resident reading spheres", () => {
     let checked = 0;
@@ -573,13 +604,16 @@ describe("corridors: islets", () => {
     expect(collars.length).toBeGreaterThanOrEqual(sites.length * 3);
     expect(collars.length).toBeLessThanOrEqual(sites.length * 4);
     for (const puff of collars) {
-      const site = sites.reduce((best, candidate) => (flat([puff.x, 0, puff.z], candidate.center) < flat([puff.x, 0, puff.z], best.center) ? candidate : best));
-      const shrink = site.radius / 13.8;
-      expect(puff.width).toBeLessThanOrEqual(16 * shrink + 1e-9);
-      expect(puff.width).toBeGreaterThanOrEqual(9 * shrink - 1e-9);
-      expect(flat([puff.x, 0, puff.z], site.center)).toBeLessThanOrEqual(site.radius + 4 * shrink + 1e-9);
-      expect(puff.y).toBeLessThan(site.center[1] - 1.5);
-      expect(puff.y).toBeGreaterThan(site.center[1] - 4.7);
+      // Out from the rock and under the grass far enough to show beside the kit island's own
+      // faceted underside: some islet owns the puff within these bounds (two islets neighbour).
+      expect(puff.width).toBeLessThanOrEqual(11 + 1e-9);
+      expect(puff.width).toBeGreaterThanOrEqual(7 - 1e-9);
+      expect(puff.alpha).toBeLessThanOrEqual(.82 + 1e-9);
+      const owner = sites.find(site => {
+        const out = flat([puff.x, 0, puff.z], site.center);
+        return out >= site.radius + 2.4 - 1e-9 && out <= site.radius + 4.6 + 1e-9 && puff.y < site.center[1] - 1.9 && puff.y > site.center[1] - 4.5;
+      });
+      expect(owner, `collar puff at ${puff.x.toFixed(1)},${puff.z.toFixed(1)}`).toBeDefined();
     }
     // A district or far landmark site is never shrunk: the same call without corridor sites is byte for byte the old layout.
     expect(studyCloudLayout(777, landmarkSites)).toEqual(before);
@@ -640,11 +674,12 @@ describe("corridors: sky lanes", () => {
   const cloudBox = assetBox("nature.cloud-c");
   const deckSamples = corridorBridges().flatMap(bridge => bridgeCurve(bridge).getSpacedPoints(24).map(point => ({ bridge: `${bridge.from}>${bridge.to}`, point })));
 
-  it("dresses the two fast legs with five and seven clouds below and beside the flight line", () => {
+  it("dresses the two fast legs with six and eight soft clouds at flight height, beside the line, their tops above it", () => {
     expect(SKY_LANES.map(lane => `${lane.from}>${lane.to}`)).toEqual(["practice>calendar", "milestone>live-feed"]);
-    expect(clouds.filter(cloud => cloud.lane === "practice>calendar")).toHaveLength(5);
-    expect(clouds.filter(cloud => cloud.lane === "milestone>live-feed")).toHaveLength(7);
+    expect(clouds.filter(cloud => cloud.lane === "practice>calendar")).toHaveLength(6);
+    expect(clouds.filter(cloud => cloud.lane === "milestone>live-feed")).toHaveLength(8);
     expect(corridorClouds()).toEqual(clouds);
+    expect(SOFT_CLOUD.opacity).toBeLessThanOrEqual(.5);
     for (const lane of SKY_LANES) {
       const curve = flightCurve(lane.from, lane.to);
       for (const spec of lane.clouds) {
@@ -653,8 +688,14 @@ describe("corridors: sky lanes", () => {
         expect(cloud, `${lane.from}>${lane.to} station ${spec.t}`).toBeDefined();
         expect(station.y - cloud.position[1]).toBeCloseTo(spec.drop, 2);
         expect(Math.hypot(cloud.position[0] - station.x, cloud.position[2] - station.z)).toBeCloseTo(Math.abs(spec.side), 2);
-        expect(spec.drop).toBeGreaterThanOrEqual(14);
-        expect(Math.abs(spec.side)).toBeLessThanOrEqual(32);
+        // Beside the line, outside the leg's own 6 unit corridor, and the puff's top reaches above the line.
+        expect(Math.abs(spec.side)).toBeGreaterThanOrEqual(9);
+        expect(Math.abs(spec.side)).toBeLessThanOrEqual(13);
+        expect(spec.drop).toBeGreaterThanOrEqual(4);
+        expect(spec.drop).toBeLessThanOrEqual(5);
+        expect(spec.scale * cloudBox.max[1] - spec.drop, `${lane.from}>${lane.to} station ${spec.t} top above the line`).toBeGreaterThan(0);
+        expect(spec.scale).toBeGreaterThanOrEqual(1.6);
+        expect(spec.scale).toBeLessThanOrEqual(2.4);
       }
       expect([...lane.clouds.map(c => c.t)]).toEqual([...lane.clouds.map(c => c.t)].sort((a, b) => a - b));
     }
@@ -665,45 +706,66 @@ describe("corridors: sky lanes", () => {
     radius: cloud.scale * Math.hypot(Math.hypot(cloudBox.max[0] - cloudBox.min[0], cloudBox.max[2] - cloudBox.min[2]) / 2, (cloudBox.max[1] - cloudBox.min[1]) / 2),
   });
 
-  it("keeps every cloud clear of the districts, the arrival stage, the decks, the islets and each other", () => {
+  it("keeps every cloud clear of the districts, the arrival stage, the far landmarks, the islets, the posts and each other (a soft cloud may hang over a deck)", () => {
     const islets = corridorIslets();
-    const treeBox = assetBox("nature.blossom-tree-a"), body = assetBox("nature.island-small");
+    const posts = corridorPosts();
+    const treeBox = assetBox("nature.blossom-tree-a"), body = assetBox("nature.island-small"), postBox = assetBox("landmark.lantern-post");
+    const landmarks = studyLandmarkLayout();
     for (const cloud of clouds) {
       const { center, radius } = cloudSphere(cloud);
       const name = `${cloud.lane} cloud at ${cloud.position.join(",")}`;
-      for (const district of ZONES) expect(flat(cloud.position, district.center) - islandRadius(district.id) - radius, `${name} against ${district.id}`).toBeGreaterThanOrEqual(1);
-      if (cloud.position[1] < ENTRY.top) expect(flat(cloud.position, ENTRY.center) - ENTRY.radius - radius, `${name} against the arrival stage`).toBeGreaterThanOrEqual(0);
-      if (cloud.position[1] < 12) for (const sample of deckSamples) expect(flat(cloud.position, [sample.point.x, 0, sample.point.z]) - radius - POST_SIDE_OFFSET, `${name} against the ${sample.bridge} deck`).toBeGreaterThanOrEqual(1);
+      for (const district of ZONES) {
+        const dy = center[1] - district.center[1];
+        const horizontal = flat(cloud.position, district.center) - islandRadius(district.id) - 2 - radius;
+        const vertical = dy > 14 ? dy - 14 - radius : dy < -6 ? -6 - dy - radius : -Infinity;
+        expect(Math.max(horizontal, vertical), `${name} against ${district.id}`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
+      }
+      if (center[1] < ENTRY.top + radius) expect(flat(cloud.position, ENTRY.center) - ENTRY.radius - radius, `${name} against the arrival stage`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
+      for (const site of landmarks) expect(flat(cloud.position, site.center) - site.radius - radius, `${name} against a far landmark`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
       for (const islet of islets) {
         const pivotY = islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale;
         const bodyRadius = islet.scale * Math.hypot(Math.hypot(body.max[0] - body.min[0], body.max[2] - body.min[2]) / 2, (body.max[1] - body.min[1]) / 2);
         const crownY = islet.tree.position[1] + (treeBox.min[1] + treeBox.max[1]) / 2 * islet.tree.scale;
         const crownRadius = islet.tree.scale * Math.hypot(Math.hypot(treeBox.max[0] - treeBox.min[0], treeBox.max[2] - treeBox.min[2]) / 2, (treeBox.max[1] - treeBox.min[1]) / 2);
-        expect(distance(center, [islet.center[0], pivotY, islet.center[2]]) - radius - bodyRadius, `${name} against the ${islet.reason} islet`).toBeGreaterThanOrEqual(0);
-        expect(distance(center, [islet.tree.position[0], crownY, islet.tree.position[2]]) - radius - crownRadius, `${name} against the ${islet.reason} islet's tree`).toBeGreaterThanOrEqual(1);
-        expect(flat(cloud.position, islet.center) - islet.radius - radius, `${name} over the ${islet.reason} islet`).toBeGreaterThanOrEqual(0);
+        expect(distance(center, [islet.center[0], pivotY, islet.center[2]]) - radius - bodyRadius, `${name} against the ${islet.reason} islet`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
+        expect(distance(center, [islet.tree.position[0], crownY, islet.tree.position[2]]) - radius - crownRadius, `${name} against the ${islet.reason} islet's tree`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
       }
-      for (const other of clouds) if (other !== cloud) expect(distance(center, cloudSphere(other).center) - radius - cloudSphere(other).radius, `${name} against the cloud at ${other.position.join(",")}`).toBeGreaterThanOrEqual(3);
+      for (const post of posts) {
+        const postRadius = 1.1 * Math.hypot(Math.hypot(postBox.max[0] - postBox.min[0], postBox.max[2] - postBox.min[2]) / 2, (postBox.max[1] - postBox.min[1]) / 2);
+        expect(distance(center, [post.position[0], post.position[1] + (postBox.min[1] + postBox.max[1]) / 2 * 1.1, post.position[2]]) - radius - postRadius, `${name} against a ${post.bridge} post`).toBeGreaterThanOrEqual(SOFT_CLOUD.solidGap);
+      }
+      for (const other of clouds) if (other !== cloud) expect(distance(center, cloudSphere(other).center), `${name} against the cloud at ${other.position.join(",")}`).toBeGreaterThanOrEqual(SOFT_CLOUD.spacing);
       expect(cloud.position[1]).toBeGreaterThan(-1.5);
     }
   });
 
-  it("keeps every cloud 6 units clear of every flight the director can make", () => {
+  it("keeps every cloud's centre 6 units from the tour legs and every arrival and return flight (soft clouds are exempt from the zone button pair flights, and say so)", () => {
     for (const cloud of clouds) {
-      const { center, radius } = cloudSphere(cloud);
-      const { gap, message } = flightGap(`${cloud.lane} cloud at ${cloud.position.join(",")}`, center, radius);
-      expect(gap, message).toBeGreaterThanOrEqual(6);
+      const { gap, message } = flightGap(`${cloud.lane} cloud at ${cloud.position.join(",")}`, cloud.position, 0, ["tour", "arrival"]);
+      expect(gap, message).toBeGreaterThanOrEqual(SOFT_CLOUD.centreClearance);
     }
+    // The relaxation is real and stated: some pair flight passes inside a soft cloud's sphere.
+    const pairGaps = clouds.map(cloud => FLIGHTS.clearance(cloud.position, 0, ["pairs"]).clearance);
+    expect(Math.min(...pairGaps)).toBeLessThan(SOFT_CLOUD.centreClearance);
+    const source = readFileSync(path.resolve(repo, "src/components/display/world/prototype/kit-corridors.ts"), "utf8");
+    expect(source).toContain("exempt from the zone button pair flights");
   });
 
-  it("never puts an opaque cloud in the arrival flight from the Garden of Days, or in the journeys the reviewer traced", () => {
-    // The stations before this fix put a cloud 3 units from the flight the calendar camera makes to the arrival view.
-    const journeys: Array<[string, CatmullRomCurve3]> = [];
-    for (const s of ARC_SAMPLES) journeys.push([`calendar arc angle ${s.angle.toFixed(2)} to the arrival view`, flightBetween(arcEye("calendar", s.angle, s.approach, s.bob), ARRIVAL_VIEW.eye)]);
-    journeys.push(["calendar to garden (zone button)", flightCurve("calendar", "garden")], ["calendar to milestone (playlist subset)", flightCurve("calendar", "milestone")], ["live-feed to peacemakers (playlist subset)", flightCurve("live-feed", "peacemakers")]);
-    for (const [name, curve] of journeys) for (const point of curve.getSpacedPoints(Math.ceil(curve.getLength() / 2))) for (const cloud of clouds) {
-      const { center, radius } = cloudSphere(cloud);
-      expect(distance(center, [point.x, point.y, point.z]) - radius, `${cloud.lane} cloud at ${cloud.position.join(",")} on the ${name} journey`).toBeGreaterThanOrEqual(6);
+  it("keeps every cloud's centre 6 units from the arrival flight from the Garden of Days, and its tops in the two fast legs' view", () => {
+    for (const s of ARC_SAMPLES) {
+      const curve = flightBetween(arcEye("calendar", s.angle, s.approach, s.bob), ARRIVAL_VIEW.eye);
+      for (const point of curve.getSpacedPoints(Math.ceil(curve.getLength() / 2))) for (const cloud of clouds) {
+        expect(distance(cloud.position, [point.x, point.y, point.z]), `${cloud.lane} cloud at ${cloud.position.join(",")} on the calendar arc ${s.angle.toFixed(2)} arrival flight`).toBeGreaterThanOrEqual(SOFT_CLOUD.centreClearance);
+      }
+    }
+    // On its own leg every cloud passes within 20 units of the camera at some point: cloud tops, not distant smears.
+    for (const lane of SKY_LANES) {
+      const samples = flightCurve(lane.from, lane.to).getSpacedPoints(300);
+      for (const cloud of clouds.filter(c => c.lane === `${lane.from}>${lane.to}`)) {
+        const nearest = samples.reduce((best, point) => Math.min(best, distance(cloud.position, [point.x, point.y, point.z])), Infinity);
+        expect(nearest, `${cloud.lane} cloud at ${cloud.position.join(",")}`).toBeLessThanOrEqual(20);
+        expect(nearest).toBeGreaterThanOrEqual(SOFT_CLOUD.centreClearance);
+      }
     }
   });
 
@@ -792,5 +854,46 @@ describe("corridors: the tour", () => {
     expect(TOUR_ORDER).toEqual(["welcome", "garden", "featured", "heart", "expressions", "peacemakers", "practice", "calendar", "status", "orbit", "milestone", "live-feed", "promise"]);
     const curve = new CatmullRomCurve3([new Vector3(0, 0, 0), new Vector3(1, 7, 0), new Vector3(2, 0, 0)], false, "centripetal");
     expect(curve.getPoint(.5).y).toBeGreaterThan(5);
+  });
+});
+
+describe("the islet look, the collar tints and the far zone builder (round four polish)", () => {
+  it("colours the islet like the districts: lawn cap, rose bushes, saucer pink rock, a gold rim", () => {
+    expect(ISLET_COLOURS.cap).toBe("#c9dfb5");
+    expect(ISLET_COLOURS.bush).toBe("#e7a3c0");
+    expect(ISLET_COLOURS.rim).toBe("gold");
+    const source = readFileSync(path.resolve(repo, "src/components/display/world/prototype/kit-corridors.ts"), "utf8");
+    expect(source).toContain("Kit corridor islet rims");
+  });
+
+  it("tints the island collar paler than the sky ring, toward the kit cloud's pale rose", () => {
+    const saturation = (hex: string) => {
+      const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      return max === min ? 0 : (max - min) / (1 - Math.abs(max + min - 1));
+    };
+    expect(STUDY_COLLAR_TINTS).toHaveLength(3);
+    STUDY_COLLAR_TINTS.forEach((tint, i) => {
+      // A third of the saturation cut, the hue and lightness kept (the same HSL model as three's Color).
+      expect(saturation(tint)).toBeLessThanOrEqual(saturation(STUDY_CLOUD_TINTS[i]) * .7);
+      expect(saturation(tint)).toBeGreaterThanOrEqual(saturation(STUDY_CLOUD_TINTS[i]) * .6);
+    });
+  });
+
+  it("gates the far zones on ?far=off only, dresses the six far zones and decimates every repeated piece it places", () => {
+    expect(farZonesEnabled("")).toBe(true);
+    expect(farZonesEnabled("?source=sample&art=design")).toBe(true);
+    expect(farZonesEnabled("?source=sample&art=design&far=off")).toBe(false);
+    expect(farZonesEnabled("?far=off&source=sample")).toBe(false);
+    expect(farZonesEnabled("?far=offline")).toBe(true);
+    expect([...FAR_BUILDER_ZONES]).toEqual([...FAR_ZONE_IDS]);
+    expect(FAR_DETAIL_DISTANCE).toEqual({ high: 140, auto: 110, low: 70 });
+    for (const layout of ALL_FAR) for (const placement of layout.placements) {
+      if (placement.role !== "instanced" || placement.id.startsWith("expression.")) continue;
+      expect(FAR_KEEP[placement.id], `${layout.zone} ${placement.id} has a decimation share`).toBeGreaterThan(0);
+      expect(FAR_KEEP[placement.id]).toBeLessThanOrEqual(.5);
+    }
+    expect(FAR_KEEP["core.pearl"]).toBeGreaterThan(0);
+    expect(FAR_KEEP["landmark.pearl-column"]).toBeGreaterThan(0);
   });
 });

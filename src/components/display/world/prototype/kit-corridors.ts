@@ -6,6 +6,7 @@ import type { WorldKit } from "../kit/kit-loader";
 import type { KitAssetId } from "../kit/kit-manifest";
 import { studyRim } from "./study-materials";
 import type { DesignKitContext, KitBuilderHandle } from "./design-world";
+import { applyKitFarZones, farZonesEnabled } from "./kit-far-zones";
 
 /**
  * The corridors between the thirteen districts (WORLD-INTEGRATION 6.17): lantern posts at the
@@ -22,7 +23,9 @@ import type { DesignKitContext, KitBuilderHandle } from "./design-world";
  *   the corridors will place, so it gets a cloud collar (`studyCloudLayout` extra sites) and a
  *   share of the drifting petals (`createStudyAir` centres) like every island.
  * - `applyKitCorridors(context)` runs with the district builder, before the static batch. It
- *   builds one instanced draw per piece per material world wide, decimated at load (below).
+ *   builds one instanced draw per piece per material world wide, decimated at load (below),
+ *   and, unless `?far=off`, hands the six far districts to `applyKitFarZones` (K3b's own
+ *   builder for its tables) so the far zones are dressed before the lanes merge.
  */
 
 export type KitCorridorSite = { center: readonly [number, number, number]; radius: number };
@@ -180,30 +183,36 @@ export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
 }
 
 /**
- * The two fast legs (149 and 197 units in 18 s) get a sky lane. Every station was placed from
- * the flight curve and checked (by the layout test) clear of the districts, the arrival stage,
- * the bridge decks, the islets and every flight the director can make, not only the two legs:
- * a zone button press flies from any parked reading arc to any zone, a playlist subset flies
- * any ordered pair, and an arrival flies from anywhere to the arrival view and back. Those
- * flights criss cross the middle of the world between y 10 and 22, and the ones from the two
- * floating districts descend through the band above that, so a cloud "14 below the flight
- * line" of a fast leg (design 6.17's figure) sits in the way of some other flight almost
- * everywhere. The stations below are the places (found by a search over every station, side
- * and drop, then kept by the layout test) that clear every flight by 6 units and stay off the
- * islets and each other: on the terrace to calendar leg five low puffs on the water the flight
- * looks down on, 14 to 22 below it and never more than 16 to the side; on the fountain leg
- * three high beside the fountain's own approach where nothing else flies, then four low over
- * the water the long descent looks down on.
+ * The two fast legs (149 and 197 units in 18 s) get a sky lane of sculpted `nature.cloud-c`
+ * puffs at flight height, 9 to 13 units to the side of the flight line and their tops 1 to 3
+ * units above it (scale 1.6 to 2.4, radius 4.8 to 7.2, dropped 4 to 5), so the camera passes
+ * through cloud tops (design 6.17) rather than over pink smears 14 to 48 units below it, which
+ * is what the first stations (kept 6 units clear of every flight in the world) read as.
+ *
+ * Sky lane clouds are soft: `SOFT_CLOUD` draws them at half opacity without depth writes, so
+ * a flight that brushes one sees a pink wash for a moment and never a wall. That buys them
+ * one relaxation of the keep out rule (6.2), decided by K3b after the director's note 3 and
+ * stated here for the coordinator: a soft cloud keeps its CENTRE 6 units from the 13 tour
+ * legs (from every departure) and from every arrival and return flight, keeps its whole
+ * sphere clear of the districts, the arrival stage, the far landmarks, the islets and the
+ * lantern posts, may hang over a bridge deck, and is exempt from the zone button pair flights,
+ * which criss cross the middle of the world so densely that nothing at flight height clears
+ * them (the round three tables proved that: every station within 6 of some pair flight).
+ * Every station below came from a search over t, side, drop and scale under those rules
+ * (`tests/world/kit-layout-far.test.ts` proves them), on the terrace to calendar leg six
+ * puffs, on the fountain leg eight along the long descent.
  */
+export const SOFT_CLOUD = { opacity: .5, centreClearance: 6, solidGap: 1, spacing: 16 } as const;
 export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "practice", to: "calendar",
     clouds: [
-      { t: .12, side: -10, drop: 14, scale: 1.5 },
-      { t: .32, side: 0, drop: 20, scale: 1.4 },
-      { t: .66, side: 16, drop: 22, scale: 1.5 },
-      { t: .76, side: 0, drop: 20, scale: 1.6 },
-      { t: .98, side: 6, drop: 16, scale: 1.6 },
+      { t: .12, side: -10, drop: 5, scale: 2.2 },
+      { t: .4, side: 13, drop: 5, scale: 1.8 },
+      { t: .72, side: 13, drop: 5, scale: 2 },
+      { t: .76, side: -12, drop: 5, scale: 2 },
+      { t: .92, side: 9, drop: 5, scale: 1.6 },
+      { t: .94, side: -13, drop: 5, scale: 1.8 },
     ],
     // Two, not the design's three: the third's natural place, south of the leg's east half, is
     // already taken by the islet beside the Garden to Grove bridge, which the flight passes.
@@ -216,13 +225,14 @@ export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "milestone", to: "live-feed",
     clouds: [
-      { t: .02, side: 0, drop: 16, scale: 1.6 },
-      { t: .1, side: 0, drop: 18, scale: 1.6 },
-      { t: .24, side: -16, drop: 14, scale: 1.4 },
-      { t: .38, side: 14, drop: 48, scale: 1.4 },
-      { t: .44, side: 32, drop: 46, scale: 1.4 },
-      { t: .7, side: 4, drop: 36, scale: 1.6 },
-      { t: .86, side: 18, drop: 22, scale: 1.5 },
+      { t: .12, side: 12, drop: 5, scale: 2.4 },
+      { t: .46, side: 13, drop: 5, scale: 2.4 },
+      { t: .58, side: -13, drop: 5, scale: 2.4 },
+      { t: .64, side: 13, drop: 5, scale: 2.4 },
+      { t: .66, side: -13, drop: 5, scale: 2.4 },
+      { t: .72, side: 13, drop: 4, scale: 2.4 },
+      { t: .74, side: -13, drop: 4, scale: 2.4 },
+      { t: .8, side: 13, drop: 5, scale: 2.4 },
     ],
     islets: [
       { center: [44.6, -.4, -38.5], scale: 1.3 },
@@ -405,16 +415,27 @@ type CorridorPalette = { ivory: T.Material; gold: T.Material; lawn: T.Material; 
  * Corridor pieces map onto the study's shared materials by the word their exported name ends
  * in: grass becomes the lawn, rock the carved stone, bark the rose gold trunks, blossom and
  * petal the corridor blossom pink, gold the gold, pearl the ivory, cotton the cloud material.
- * Anything else (the lantern's emissive glow) keeps the material the file brought.
+ * Anything else (the lantern's emissive glow) keeps the material the file brought. A piece may
+ * pass `overrides` by the same last word, which win: the islet's own cap, rock and bush.
  */
-export function corridorMaterialFor(name: string, palette: CorridorPalette, imported: T.Material | undefined) {
+export function corridorMaterialFor(name: string, palette: CorridorPalette, imported: T.Material | undefined, overrides: Partial<Record<string, T.Material>> = {}) {
   const word = name.toLowerCase().split(/[^a-z]+/).filter(Boolean).pop() ?? "";
   const table: Record<string, T.Material> = {
     grass: palette.lawn, lawn: palette.lawn, rock: palette.stone, stone: palette.stone, bark: palette.roseGold,
     blossom: palette.blossom, petal: palette.blossom, gold: palette.gold, pearl: palette.ivory, cotton: palette.cloud,
   };
-  return table[word] ?? imported ?? palette.ivory;
+  return overrides[word] ?? table[word] ?? imported ?? palette.ivory;
 }
+
+/**
+ * The islet's own colours (director's note 2 on round three: the kit island read as another
+ * game's asset beside the pearl saucers). Its cap takes the district lawn, its faceted
+ * bushes the bed rose pink with a soft sheen so they read as bushes and not crystal, and its
+ * rock the pearl saucer pink of the district keels: the study stone shader takes that pink
+ * from the lathe's local depth, which the kit island's own coordinates never reach, so the
+ * rock carries it as a plain colour instead.
+ */
+export const ISLET_COLOURS = { cap: "#c9dfb5", bush: "#e7a3c0", rock: "#ecc4bf", rim: "gold" } as const;
 
 const dummy = new T.Object3D();
 
@@ -427,12 +448,22 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     cloud: context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true }), "#fff4ea", 2.2, .34)),
   };
   palette.blossom.name = "corridor blossom"; palette.cloud.name = "corridor cloud";
+  // Sky lane clouds are soft (SOFT_CLOUD): the camera may brush them, so they draw at half
+  // opacity without writing depth; the rim is kept, the sheen softened.
+  const softCloud = context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34));
+  softCloud.name = "corridor soft cloud";
+  const islet: Partial<Record<string, T.Material>> = {
+    grass: context.material(new T.MeshStandardMaterial({ color: ISLET_COLOURS.cap, roughness: .92, metalness: 0, dithering: true })),
+    petal: context.material(new T.MeshPhysicalMaterial({ color: ISLET_COLOURS.bush, roughness: .7, sheen: .5, sheenColor: new T.Color("#ffe0ea"), sheenRoughness: .6, dithering: true })),
+    rock: context.material(studyRim(new T.MeshStandardMaterial({ color: ISLET_COLOURS.rock, roughness: .86, dithering: true }), "#ffe1cf", 3, .25)),
+  };
+  islet.grass!.name = "islet cap"; islet.petal!.name = "islet bush"; islet.rock!.name = "islet rock";
 
-  function instanced(id: KitAssetId, keep: number, name: string, count: number, shadow: boolean) {
+  function instanced(id: KitAssetId, keep: number, name: string, count: number, shadow: boolean, overrides: Partial<Record<string, T.Material>> = {}) {
     const geometry = decimatedKitGeometry(kit, id, keep, context.geometry);
     const imported = importedMaterials(kit, id);
     const names = (geometry.userData.kitMaterials as string[] | undefined) ?? [];
-    const materials = names.length ? names.map(material => corridorMaterialFor(material, palette, imported.get(material))) : [palette.ivory];
+    const materials = names.length ? names.map(material => corridorMaterialFor(material, palette, imported.get(material), overrides)) : [palette.ivory];
     const mesh = new T.InstancedMesh(geometry, materials.length === 1 ? materials[0] : materials, count);
     mesh.name = name;
     mesh.castShadow = shadow; mesh.receiveShadow = true;
@@ -487,10 +518,18 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   const islets = corridorIslets();
   if (kit.has("nature.island-small") && islets.length) {
     cullable(
-      instanced("nature.island-small", CORRIDOR_KEEP.islet[0], "Kit corridor islets", islets.length, true),
-      instanced("nature.island-small", CORRIDOR_KEEP.islet[1], "Kit corridor islets, far", islets.length, false),
+      instanced("nature.island-small", CORRIDOR_KEEP.islet[0], "Kit corridor islets", islets.length, true, islet),
+      instanced("nature.island-small", CORRIDOR_KEEP.islet[1], "Kit corridor islets, far", islets.length, false, islet),
       low => (low ? LOW_TIER_VIEW.islet : ISLET_VIEW_DISTANCE),
       islets.map(islet => ({ position: [islet.center[0], islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale, islet.center[2]] as V3, rotationY: islet.rotationY, scale: islet.scale })));
+    // A gold rim at every islet's grass edge, like the terrace rings: one torus, one draw.
+    const rimGeometry = context.geometry(new T.TorusGeometry(1, .014, 6, 72));
+    rimGeometry.rotateX(-Math.PI / 2);
+    const rim = new T.InstancedMesh(rimGeometry, palette.gold, islets.length);
+    rim.name = "Kit corridor islet rims"; rim.userData.dynamic = true; rim.receiveShadow = false; rim.layers.enable(1);
+    meshes.push(rim); scene.add(rim);
+    cullable(rim, undefined, low => (low ? LOW_TIER_VIEW.islet : ISLET_VIEW_DISTANCE),
+      islets.map(islet => ({ position: [islet.center[0], islet.center[1] - .05, islet.center[2]] as V3, rotationY: 0, scale: KIT_ISLAND.grassRadius * islet.scale })));
     if (kit.has("nature.blossom-tree-a")) {
       cullable(
         instanced("nature.blossom-tree-a", CORRIDOR_KEEP.tree[0], "Kit corridor islet trees", islets.length, true),
@@ -500,11 +539,12 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     }
   }
 
-  // The sky lane clouds: sculpted puffs the camera passes over on the two long legs. They keep
-  // more of their surface than the posts, because the camera comes within a few units.
+  // The sky lane clouds: soft sculpted puffs the camera passes through the tops of on the two
+  // long legs. They keep more of their surface than the posts, because the camera comes
+  // within a few units.
   const clouds = corridorClouds();
   if (kit.has("nature.cloud-c") && clouds.length) {
-    cullable(instanced("nature.cloud-c", CORRIDOR_KEEP.cloud, "Kit corridor sky lane clouds", clouds.length, false), undefined,
+    cullable(instanced("nature.cloud-c", CORRIDOR_KEEP.cloud, "Kit corridor sky lane clouds", clouds.length, false, { cotton: softCloud }), undefined,
       low => (low ? LOW_TIER_VIEW.cloud : CLOUD_VIEW_DISTANCE),
       clouds.map(cloud => ({ position: cloud.position, rotationY: cloud.rotationY, scale: cloud.scale })));
   }
@@ -535,8 +575,13 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
       if (piece.far) { piece.far.count = far; piece.far.instanceMatrix.needsUpdate = true; }
     }
   }
+  // The six far districts (K3b's tables) are dressed here until the coordinator wires the
+  // far builder into the design world itself; `?far=off` keeps them procedural for A/B.
+  const far = farZonesEnabled(typeof location === "undefined" ? "" : location.search) ? applyKitFarZones(context) : undefined;
+
   return {
-    update() {
+    update(time, zone, arrival) {
+      far?.update?.(time, zone, arrival);
       const camera = scene.userData.studyCamera as T.Camera | undefined;
       if (!camera) return;
       const low = scene.userData.lowTier === true;
@@ -545,7 +590,11 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
       lastCamera.copy(camera.position); lastForward.copy(forward); lastLow = low;
       recount(camera, low);
     },
+    setEffects(sparkles, trails) {
+      far?.setEffects?.(sparkles, trails);
+    },
     dispose() {
+      far?.dispose?.();
       for (const mesh of meshes) { mesh.removeFromParent(); mesh.dispose(); }
       meshes.length = 0;
     },

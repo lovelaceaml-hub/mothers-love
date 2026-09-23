@@ -38,6 +38,12 @@ export type StudyCloudLayout = { sky: StudyPuff[]; island: StudyPuff[] };
  * pass, which rendered at roughly #f1d7d1 and vanished into the golden hour sky.
  */
 export const STUDY_CLOUD_TINTS = ["#edb9d0", "#f5d2dd", "#e5a9c6"] as const;
+/**
+ * The island tier's collar puffs, paler: each sky tint with a third of its saturation cut
+ * (same hue and lightness), so the collars under the islands and the pale sculpted corridor
+ * clouds read as one material (Plan 26 K3b, the director's note 6 on round three).
+ */
+export const STUDY_COLLAR_TINTS = ["#e5c3d2", "#f0d8df", "#dcb5c7"] as const;
 
 /** The first three zones carry the wide terraces; every other island is the smaller size. */
 function zoneRadius(index: number) {
@@ -72,21 +78,24 @@ export function studyCloudLayout(seed: number, extraSites: StudyCloudSite[] = []
 
   const island: StudyPuff[] = [];
   function collar(site: StudyCloudSite, count: number) {
-    // Plan 26 K3b: a corridor islet (grass radius 5 to 6) takes puffs in proportion to its size,
-    // so its collar hugs it instead of swallowing it. Every district and far landmark site is
-    // radius 9 or more and keeps exactly the puffs it always had.
-    const shrink = site.radius < SMALL_SITE_RADIUS ? site.radius / 13.8 : 1;
+    // Plan 26 K3b: a corridor islet (grass radius 5 to 6) takes a collar sized to it. The first
+    // cut shrank the district recipe in proportion (puffs 4 to 7 wide, .6 to 1.7 out from the
+    // rim) and the islet's own faceted underside hid every puff; the collar now stands 2.4 to
+    // 4.6 units out and 2 to 4.4 under the grass, 7 to 11 wide, so it shows around the rock
+    // like the district collars do. Every district and far landmark site is radius 9 or more
+    // and keeps exactly the puffs it always had.
+    const small = site.radius < SMALL_SITE_RADIUS;
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (rand() - .5) * .6;
-      const radius = site.radius + (1.5 + rand() * 2.5) * shrink;
-      const width = (9 + rand() * 7) * shrink;
+      const radius = site.radius + (small ? 2.4 + rand() * 2.2 : 1.5 + rand() * 2.5);
+      const width = small ? 7 + rand() * 4 : 9 + rand() * 7;
       island.push({
         x: site.center[0] + Math.cos(angle) * radius,
-        y: site.center[1] - 1.6 - rand() * 3,
+        y: site.center[1] - (small ? 2 + rand() * 2.4 : 1.6 + rand() * 3),
         z: site.center[2] + Math.sin(angle) * radius,
         width,
         height: width * (.45 + rand() * .15),
-        alpha: .78 + rand() * .12,
+        alpha: small ? .7 + rand() * .12 : .78 + rand() * .12,
         tint: third(),
         variant: third(),
         phase: rand(),
@@ -155,7 +164,7 @@ void main() {
  * clock drives the drift, so a frozen clock still renders every cloud in place.
  */
 export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, time: { value: number }) {
-  const palette = STUDY_CLOUD_TINTS.map(hex => new T.Color(hex));
+  const palettes = { sky: STUDY_CLOUD_TINTS.map(hex => new T.Color(hex)), island: STUDY_COLLAR_TINTS.map(hex => new T.Color(hex)) };
   const meshes: T.InstancedMesh[] = [];
   const materials: T.ShaderMaterial[] = [];
   const geometries: T.BufferGeometry[] = [];
@@ -163,6 +172,7 @@ export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, ti
 
   const tiers: Array<[number, StudyPuff[], string]> = [[0, layout.sky, "sky"], [1, layout.island, "island"]];
   for (const [tier, puffs, name] of tiers) {
+    const palette = tier < .5 ? palettes.sky : palettes.island;
     const geometry = new T.PlaneGeometry(1, 1);
     const count = puffs.length;
     const tints = new Float32Array(count * 3);
