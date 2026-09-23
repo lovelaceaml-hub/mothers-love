@@ -446,10 +446,11 @@ const SHIMMER_BEAD_COUNT = 5;
 const PEARL_STAR_COUNT = 5;
 /**
  * Clear air every kit star keeps outside each shown medallion's orb, in medallion units. The
- * head star's lane runs up to .31 behind a medallion's icon disc where it crosses the ring,
- * and `frameFor` never brings the camera nearer than about 4.3 slot radii, so perspective can
- * pull the star at most about .1 towards the icon on screen. The icon disc sits .048 inside
- * the orb, so .08 of air keeps even that worst case off the artwork.
+ * head star's lane runs up to .31 behind a medallion's icon disc where it crosses the ring. A
+ * hero is read from about 6.7 slot radii (the Garden eye, design 3.2), and the ring only fits
+ * the frame from about 4.3 (`frameFor`), so perspective pulls the star at most about .1 towards
+ * the icon on screen. The icon disc sits .048 inside the orb, so .08 of air keeps even that
+ * worst case off the artwork.
  */
 export const PEARL_STAR_AIR = .08;
 /** Where medallion `slot` of `count` shown sits on its ellipse: one formula for the medallions and the stars between them. */
