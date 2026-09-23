@@ -183,6 +183,14 @@ export const KIT_BOUNDS: Readonly<Record<string, KitBox>> = {
   "people.teenager": { min: [-0.395, -0.7, -0.258], max: [0.395, 0.7, 0.258] },
 };
 
+/**
+ * The kit stair as delivered, kit units: a curved fan 2.2 wide at the foot, climbing toward
+ * -z from y 0 to its top landing at y 1.0 (the landing spans z -1.76 to 0); the gold rails
+ * rise to 1.29 above it. A stair's y scale is `rise / STAIR.tread` so the landing meets the
+ * floor it serves.
+ */
+export const STAIR = { tread: 1.0, landing: 1.76 } as const;
+
 /** The kit arch's authored width and height (its top is where the keystone lantern hangs). */
 export const KIT_ARCH = { width: 3.89, height: 5.19 } as const;
 
@@ -414,7 +422,7 @@ function welcomeLayout(): ZoneLayout {
   const placements: KitPlacement[] = [
     ...archRow("welcome"),
     { id: "arrival.butterfly-gate", position: [0, 1.9, -6.3], scale: 13 / 6.14, role: "static", replaces: "landmark", contact: [9.5, 3.2], note: "the gate, 13 tall, on the platform, open side to the camera" },
-    { id: "landmark.pearl-stairs", position: [0, 0.6, 1.3], scaleXYZ: [1.7, 1, 1], role: "static", contact: [5.4, 4], note: "the fan of stairs up to the platform (the stair climbs toward -z)" },
+    { id: "landmark.pearl-stairs", position: [0, 0.6, 1.1], scaleXYZ: [2, 1.3 / STAIR.tread, 1.1], role: "static", contact: [7, 4.4], note: "the fan of stairs up to the platform: its landing runs a unit into the drum at the platform's height (the stair climbs toward -z)" },
     { id: "landmark.pearl-column", position: [-7.2, 0.6, -3], scale: 1.5, role: "static", note: "column flanking the platform" },
     { id: "landmark.pearl-column", position: [7.2, 0.6, -3], scale: 1.5, role: "static", note: "column flanking the platform" },
     { id: "landmark.stone-tablet", position: [9.5, 0.7, 1], rotationY: -0.6, role: "static", note: "blank tablet; the tagline and count stay in the DOM card" },
@@ -435,7 +443,7 @@ function welcomeLayout(): ZoneLayout {
     zone: "welcome",
     placements,
     platforms: [{ center: [0, 0.6, -5.5], radius: 5.6, height: 1.3 }],
-    swarms: [{ id: "arrival.butterfly", count: 24, center: [0, 1.9, -6.3], radius: [2.2, 8], height: [3, 15], turnSeconds: 60, scale: 1.4 }],
+    swarms: [{ id: "arrival.butterfly", count: 24, center: [0, 1.9, -6.3], radius: [2.2, 8], height: [3, 15], turnSeconds: 60, scale: 2 }],
   };
 }
 
@@ -465,7 +473,7 @@ function gardenLayout(): ZoneLayout {
     { id: "nature.blossom-tree-c", position: [-14.6, 0.7, 7], rotationY: 0.4, scale: 1, role: "static", contact: [6.5, 5], note: "far left edge at scale 1, so the trunk climbs the frame edge and only the crown overhangs the headline (checkpoint note 1; the suggested spot enters the entry stage cap)" },
     { id: "nature.stepping-stones", position: [-3.65, 0.62, 12.66], rotationY: 1.2, role: "instanced", detail: true, note: "path from the forecourt, rims sunk into the floor" },
     { id: "nature.stepping-stones", position: [-2.5, 0.62, 8.0], rotationY: 1.45, role: "instanced", detail: true, note: "path to the pond rim (ends about -2.2, 5.6)" },
-    { id: "arrival.lotus-bloom", position: [0.5, 0.7, 0.8], rotationY: 0.6, scale: 1.6, role: "animated", clip: { name: "bloom", at: 1 }, under: true, footprint: "round", halo: { color: "#ffd2a4", scale: 5.5, opacity: 0.4, lift: 0.5 }, note: "open lotus under the pearl's bottom edge, lit from below" },
+    { id: "arrival.lotus-bloom", position: [-1.5, 0.66, 2.5], rotationY: 0.6, scale: 1.6, role: "animated", clip: { name: "bloom", at: 1 }, under: true, footprint: "round", halo: { color: "#ffd2a4", scale: 5.5, opacity: 0.4, lift: 0.5 }, note: "open lotus on the near left of the pond, showing under the hero disc's lower rim from the tour eye, lit from below (the arriving pearl settles 3 units behind it)" },
   ];
   // Lily pads around the pond (bearings from +x toward +z, so 90 faces the camera): the far
   // side, the right, and the near left, where the medallion reach allows them (the layout
@@ -510,31 +518,38 @@ function gardenLayout(): ZoneLayout {
  * Pearl Pavilion (design 6.6, horseshoe rule). The delivered file is the horseshoe (its
  * manifest entry lists the column bearings), so the fallback ring placement is not built.
  * The pavilion is scaled to the design's column ring radius of 9 (3.4 times the file: 23
- * tall, the ring beam at 15.7, the floor 1.5 up) and stands on the hero pearl's ground
- * point, nudged a unit toward the front left so its roof eave clears the back right resident
- * pearl's ring while every column keeps clear of the medallion reach and the pearl floats
- * inside the gazebo; its roof overhangs the island's front edge like a canopy. The stair
- * climbs to the pavilion floor from the front left forecourt (the front centre is off the
- * island); the five procedural ring arches go. The practice zone's eye sits 17 units off the
- * back right edge at y 11, so nothing tall stands there.
+ * tall, the ring beam at 15.7) and stands on the hero pearl's ground point, nudged a unit
+ * toward the front left so its roof eave clears the back right resident pearl's ring while
+ * every column keeps clear of the medallion reach and the pearl floats inside the gazebo.
+ * The file brings its own floor, a stepped drum of radius 3.35 (3.04 at its top, .44 up),
+ * which at this scale is the island's whole front plaza (radius 11.4, top at 2.1): the stair
+ * climbs onto it from the left terrace with its landing a unit into the drum, and the
+ * forecourt dressing (bench, lanterns, beds, trees) keeps to the crescent of terrace outside
+ * the drum, at the back and the sides. The practice zone's eye sits 17 units off the back
+ * right edge at y 11, so nothing tall stands there. The five procedural ring arches go.
  */
+export const PAVILION_FLOOR = { base: 3.35, top: 3.04 } as const;
 function featuredLayout(): ZoneLayout {
+  const pavilion: KitPlacement = { id: "landmark.pearl-pavilion-horseshoe", position: [2.4, 0.6, 5.6], scale: 3.4, role: "static", replaces: "landmark", footprint: "round", encloses: true, note: "the gazebo around the hero pearl, open side to the camera, columns at radius 9, its floor the front plaza" };
+  const floorTop = pavilion.position[1] + PAVILION.floor * (pavilion.scale ?? 1);
   const placements: KitPlacement[] = [
     ...archRow("featured"),
-    { id: "landmark.pearl-pavilion-horseshoe", position: [2.4, 0.6, 5.6], scale: 3.4, role: "static", replaces: "landmark", footprint: "round", encloses: true, note: "the gazebo around the hero pearl, open side to the camera, columns at radius 9" },
-    { id: "landmark.pearl-stairs", position: [-6, 0.6, 8.6], rotationY: -Math.PI / 3, scaleXYZ: [1.3, 1.16, 1], role: "static", note: "stair from the front left forecourt up to the pavilion floor" },
-    lantern(-8.6, 10.2, "post at the stair foot"),
-    lantern(-4.2, 12.4, "post at the stair foot"),
-    bench(-10.2, 1.5, 1.4, "bench at the left, facing the pearl"),
-    { id: "nature.blossom-tree-a", position: [-11.8, 0.7, 5.8], rotationY: 0.5, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "front left corner tree, under the eave" },
-    { id: "nature.blossom-tree-a", position: [13, 0.7, 3.5], rotationY: -0.6, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "front right corner tree, under the eave, clear of the hero sphere" },
+    pavilion,
+    // The stair climbs toward +x onto the drum: its landing (kit z -1.76 to 0, top at kit y 1)
+    // overlaps the drum's top edge (radius 10.3 from the pavilion) by a unit.
+    { id: "landmark.pearl-stairs", position: [-8.8, 0.6, 5.6], rotationY: -Math.PI / 2, scaleXYZ: [1.3, (floorTop - 0.6) / STAIR.tread, 1.1], role: "static", note: "stair from the left terrace up onto the pavilion floor" },
+    lantern(-11, 7.8, "post at the stair foot"),
+    lantern(-11.3, 3.0, "post at the stair foot"),
+    bench(-8.6, 9.2, 1.2, "bench at the front left, beside the stair, facing the pearl"),
+    { id: "nature.blossom-tree-a", position: [-12, 0.7, -2.5], rotationY: 0.5, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "left corner tree (design 6.6)" },
+    { id: "nature.blossom-tree-a", position: [12.5, 0.7, -1], rotationY: -0.6, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "right corner tree, on the crescent outside the floor, clear of the practice eye" },
   ];
   const roses: Array<[number, number, number, number]> = [
-    [-11, 0, 1.4, 0.3], [-10.5, -2.8, 1.4, 1.2], [-11.4, 3.2, 1.3, 2.4], [-10.8, -5.5, 1.3, 0.7], [-8.5, -8, 1.3, 1.9],
-    [11.5, -5, 1.4, 0.4], [10, -7.5, 1.3, 1.6], [8.6, 8.6, 1.3, 2.8], [7.4, 9.8, 1.2, 0.9], [-6.4, 10.8, 1.2, 2.1],
+    [-11.4, 3.4, 1.3, 0.3], [-11.8, -3.6, 1.4, 1.2], [-10.6, -6.2, 1.3, 2.4], [-8.2, -8.6, 1.3, 0.7], [-4, -7.6, 1.2, 1.9],
+    [4, -7.6, 1.2, 0.4], [8.4, -9, 1.3, 1.6], [11, -5, 1.4, 2.8], [12, -3, 1.3, 0.9], [-11.4, 5.4, 1.2, 2.1],
   ];
   roses.forEach(([x, z, scale, spin], k) => placements.push(rose(x, z, scale, spin, `rose bush ${k + 1} of ${roses.length}`)));
-  const hydrangeas: Array<[number, number, number, number]> = [[-11.6, 1.6, 1.3, 0.5], [-9.6, -4.2, 1.3, 2.2], [12.4, -2.3, 1.3, 1.1], [10.2, 6.8, 1.2, 2.9]];
+  const hydrangeas: Array<[number, number, number, number]> = [[-12.4, 1, 1.3, 0.5], [-9.6, -4.4, 1.3, 2.2], [10.2, -6.9, 1.3, 1.1], [-6.4, -9, 1.2, 2.9]];
   hydrangeas.forEach(([x, z, scale, spin], k) => placements.push(hydrangea(x, z, scale, spin, `hydrangea ${k + 1} of ${hydrangeas.length}`)));
   return { zone: "featured", placements, hideFlowers: true };
 }
@@ -549,9 +564,9 @@ function featuredLayout(): ZoneLayout {
 function heartLayout(): ZoneLayout {
   const placements: KitPlacement[] = [
     ...arcadeRow(),
-    lantern(-11, 7, "forecourt post"),
+    lantern(-12.5, 3, "forecourt post, left, above the headline"),
     lantern(11, 7, "forecourt post"),
-    bench(-10.5, 9, 0.5, "bench at the left of the forecourt"),
+    bench(10, 9.5, -0.7, "bench at the right of the forecourt (the left is the headline's)"),
   ];
   // The ring keeps a 60 degree gap toward the camera; the two front left bushes step out to
   // radius 13 because the miniature figures stand at the front left of the terraces.
@@ -609,7 +624,7 @@ function peacemakersLayout(): ZoneLayout {
     lantern(globe[0] - 3.6, 7.4, "post at the railing entrance"),
     lantern(globe[0] + 3.6, 7.4, "post at the railing entrance"),
     { id: "nature.blossom-tree-b", position: [-12, 0.7, 6], rotationY: 0.3, scale: 1.05, role: "static", contact: [7, 5.5], note: "front left tree" },
-    { id: "nature.blossom-tree-b", position: [12.5, 0.7, -4], rotationY: -0.3, scale: 1.05, role: "static", contact: [7, 5.5], note: "right tree, behind the hero pearl's sphere (the pearl sits at the right here)" },
+    { id: "nature.blossom-tree-b", position: [-12.2, 0.7, -5.6], rotationY: 0.8, scale: 1.05, role: "static", contact: [7, 5.5], note: "back left tree (design 6.9; the right of the frame is the hero pearl's, which sits at side 7 here)" },
   ];
   // Twenty five segments of pitch 2 close a ring of radius 8 (chord 2.005); three stay out
   // at the front as the entrance.
@@ -643,13 +658,13 @@ function peacemakersLayout(): ZoneLayout {
  */
 function practiceLayout(): ZoneLayout {
   const placements: KitPlacement[] = [
-    { id: "landmark.pearl-stairs", position: [-5.2, 0.6, 1.5], scaleXYZ: [1.1, 1.24, 1.1], role: "static", note: "left stair to level two" },
-    { id: "landmark.pearl-stairs", position: [5.2, 0.6, 1.5], scaleXYZ: [1.1, 1.24, 1.1], role: "static", note: "right stair to level two" },
-    { id: "landmark.pearl-stairs", position: [0, 2.3, -3.3], scaleXYZ: [1, 1.24, 1], role: "static", note: "stair from level two to level three" },
+    { id: "landmark.pearl-stairs", position: [-5.2, 0.6, 1.5], scaleXYZ: [1.1, 1.7 / STAIR.tread, 1.1], role: "static", note: "left stair to level two (landing at 2.3)" },
+    { id: "landmark.pearl-stairs", position: [5.2, 0.6, 1.5], scaleXYZ: [1.1, 1.7 / STAIR.tread, 1.1], role: "static", note: "right stair to level two (landing at 2.3)" },
+    { id: "landmark.pearl-stairs", position: [0, 2.3, -3.3], scaleXYZ: [1, 1.6 / STAIR.tread, 1], role: "static", note: "stair from level two to level three (landing at 3.9)" },
     { id: "landmark.gazebo-glass", position: [0, 3.9, -8], scale: 1.15, role: "static", footprint: "round", note: "the domed hall on level three" },
     lantern(-2.3, -2.5, "post flanking the upper stair", 2.3),
     lantern(2.3, -2.5, "post flanking the upper stair", 2.3),
-    bench(-7.5, 4, 1.1, "left bench, facing the right one", 0.7),
+    { ...bench(-7.5, 4, 1.1, "left bench, facing the right one (replaces the two procedural slabs)", 0.7), replaces: "landmark" },
     bench(7.5, 4, -1.1, "right bench, facing the left one", 0.7),
     { id: "expression.06-teacup", position: [-7.5, 1.85, 4], rotationY: 1.1, scale: 0.9, role: "static", note: "teacup on the left bench" },
     { id: "expression.07-candle", position: [7.5, 1.95, 4], rotationY: -1.1, scale: 0.9, role: "static", note: "candle on the right bench, flame kept lit" },
@@ -682,7 +697,8 @@ function practiceLayout(): ZoneLayout {
     [-6, 2.3, -3.5, degrees(25)], [0, 2.3, 1.0, 0], [6, 2.3, -3.5, degrees(-25)],
   ];
   steles.forEach(([x, y, z, yaw], k) => placements.push({ id: "landmark.stone-tablet", position: [x, y, z], rotationY: yaw, scale: 1.15, role: "static", icon: k + 1, note: `stele ${k + 1} of 9, expression ${k + 1}` }));
-  const roses: Array<[number, number, number, number]> = [[9.8, 6.5, 1.3, 0.3], [-9.8, 6.5, 1.3, 1.5], [11, 3, 1.3, 2.6], [-11, 3, 1.3, 0.9], [7, 9, 1.2, 2.1], [-7, 9, 1.2, 0.6], [4.5, 10.5, 1.1, 1.8], [-4.5, 10.5, 1.1, 2.9]];
+  // Between the steles at radius 11.6 (bearings 30, 60 and 88 either side), never in front of an icon.
+  const roses: Array<[number, number, number, number]> = [[10, 5.8, 1.3, 0.3], [-10, 5.8, 1.3, 1.5], [5.8, 10, 1.2, 2.6], [-5.8, 10, 1.2, 0.9], [11.6, 0.4, 1.3, 2.1], [-11.6, 0.4, 1.3, 0.6], [8.4, -8, 1.2, 1.8], [-8.4, -8, 1.2, 2.9]];
   roses.forEach(([x, z, scale, spin], k) => placements.push(rose(x, z, scale, spin, `rose bush ${k + 1} of ${roses.length}`)));
   const hydrangeas: Array<[number, number, number, number]> = [[11.4, -4.5, 1.2, 0.4], [-11.2, -1, 1.3, 1.9], [-9, -6, 1.2, 2.7], [10, -7, 1.2, 0.8]];
   hydrangeas.forEach(([x, z, scale, spin], k) => placements.push(hydrangea(x, z, scale, spin, `hydrangea ${k + 1} of ${hydrangeas.length}`)));

@@ -297,9 +297,11 @@ describe("near zone tables", () => {
   it("keeps bushes and furniture off the neighbors' anchor and the miniature figures' feet", () => {
     const list = violations(fail => {
       for (const layout of LAYOUTS) {
+        const onWater = (placement: KitPlacement) => (layout.pools ?? []).some(pool => Math.hypot(placement.position[0] - pool.center[0], placement.position[2] - pool.center[2]) < pool.radius);
         for (const stand of layout.stands ?? []) for (const placement of layout.placements) {
-          // A kit arch or column standing where the procedural one stood is not new dressing.
-          if (isFlat(placement) || placement.replaces === "arch" || placement.replaces === "column") continue;
+          // A kit arch or column standing where the procedural one stood is not new dressing,
+          // and a piece floating on a pool (the lotus) is water, not furniture on the terrace.
+          if (isFlat(placement) || onWater(placement) || placement.replaces === "arch" || placement.replaces === "column") continue;
           const box = localBox(layout, placement);
           if (box.max[1] - box.min[1] < 0.4) continue;
           const gap = localDistance(layout, placement, stand.center);
