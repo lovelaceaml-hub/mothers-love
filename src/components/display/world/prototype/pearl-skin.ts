@@ -442,8 +442,18 @@ export function buildPearlKitParts(kit: StudyPearlKit): StudyPearlKitParts {
 
 /** The travelling bead plus the four points trailing it around the gold ring. */
 const SHIMMER_BEAD_COUNT = 5;
-/** The shimmer's head star, and four more riding in the gaps between the medallions. */
+/** The shimmer's head star, and up to four more, each in its own gap between the medallions shown. */
 const PEARL_STAR_COUNT = 5;
+/**
+ * Clear air every kit star keeps outside each shown medallion's orb, in medallion units. The
+ * head star's lane runs up to .31 behind a medallion's icon disc where it crosses the ring,
+ * and `frameFor` never brings the camera nearer than about 4.3 slot radii, so perspective can
+ * pull the star at most about .1 towards the icon on screen. The icon disc sits .048 inside
+ * the orb, so .08 of air keeps even that worst case off the artwork.
+ */
+export const PEARL_STAR_AIR = .08;
+/** Where medallion `slot` of `count` shown sits on its ellipse: one formula for the medallions and the stars between them. */
+const medallionAngle = (time: number, slot: number, count: number) => time * .105 + slot * Math.PI * 2 / count + .8;
 /** The travelling beads' unit sphere, slot space; each draw scales it per instance. */
 const PEARL_BEAD_RADIUS = .024;
 
@@ -831,12 +841,12 @@ export class StudyPearlSkin {
     const radiusY = (frame.portrait ? 1.44 : 1.28) * frame.orbitScale;
     const size = frame.portrait ? .9 : frame.orbitScale;
     selected.forEach((item, i) => {
-      const a = time * .105 + i * Math.PI * 2 / selected.length + .8;
+      const a = medallionAngle(time, i, selected.length);
       item.root.position.set(Math.cos(a) * radiusX, Math.sin(a) * radiusY, .09 + Math.sin(a * 2) * .055);
       item.root.scale.setScalar(size);
     });
     if (dressing?.medallions) this.placeKitMedallions(dressing.medallions, detailed ? selected : []);
-    if (dressing?.stars) this.placeKitStars(dressing.stars, dressing.twinkle, time, detailed && frame.sparkles, radiusX, radiusY, size);
+    if (dressing?.stars) this.placeKitStars(dressing.stars, dressing.twinkle, time, detailed && frame.sparkles, detailed ? selected : [], radiusX, radiusY, size);
   }
   /** Every medallion shown takes the next instance of each kit draw, at its root's place and size. */
   private placeKitMedallions(kit: NonNullable<PearlKitDressing["medallions"]>, shown: readonly PearlMedallion[]) {
@@ -856,25 +866,53 @@ export class StudyPearlSkin {
     if (backs.instanceColor) backs.instanceColor.needsUpdate = true;
   }
   /**
-   * The head star rides the shimmer's place on the outer gold ring. The other four ride the
-   * medallion ellipse a little further out, halfway between medallion places, so they turn
-   * with the ring and never cross a symbol. Every pose is a function of the clock.
+   * The head star rides the shimmer's place on the outer gold ring. The others ride the
+   * medallion ellipse a little further out, each at the midpoint of a gap between two
+   * neighbouring medallions shown, with the medallions' own angle formula, so they turn with
+   * the ring and keep their gaps for the whole reading. There are as many as there are gaps,
+   * up to four, spread evenly over the gaps when there are more.
+   *
+   * No star ever paints over a canonical symbol (design 3.1). Neither the stars nor the icon
+   * disc writes depth, and the stars draw after it, so the guarantee is geometric: each star
+   * shrinks to keep its whole extent outside every shown orb plus `PEARL_STAR_AIR`, and is
+   * gone while it passes one. The gap stars always clear at full size; only the head star,
+   * whose lane crosses the medallion ring, ever dips, and it does so smoothly. Every pose is
+   * a function of the clock.
    */
-  private placeKitStars(stars: T.InstancedMesh, twinkle: StudyPearlTwinkle | undefined, time: number, shown: boolean, radiusX: number, radiusY: number, size: number) {
+  private placeKitStars(
+    stars: T.InstancedMesh, twinkle: StudyPearlTwinkle | undefined, time: number, shown: boolean,
+    medallions: readonly PearlMedallion[], radiusX: number, radiusY: number, size: number,
+  ) {
     stars.visible = shown;
     if (!shown) return;
-    for (let k = 0; k < PEARL_STAR_COUNT; k++) {
+    const count = medallions.length;
+    const gapStars = Math.min(PEARL_STAR_COUNT - 1, count);
+    stars.count = 1 + gapStars;
+    for (let k = 0; k <= gapStars; k++) {
       if (k === 0) {
         const a = time * .42;
         this.placeScratch.set(Math.cos(a) * 1.37, Math.sin(a) * 1.26, Math.sin(a * 2) * .12 - .08).applyAxisAngle(this.orbitAxis, .38);
       } else {
-        const a = time * .105 + .8 + (k - .5) * Math.PI / 2;
+        // The gap after medallion `gap`, halfway to the next one round the ring.
+        const gap = Math.floor((k - 1) * count / gapStars);
+        const a = medallionAngle(time, gap + .5, count);
         this.placeScratch.set(Math.cos(a) * radiusX * 1.07, Math.sin(a) * radiusY * 1.07, .09);
       }
       if (twinkle) twinkle(time + this.starPhases[k], this.turnScratch, this.sizeScratch);
       else { this.turnScratch.identity(); this.sizeScratch.set(1, 1, 1); }
       this.turnScratch.premultiply(this.starRolls[k]);
       this.sizeScratch.multiplyScalar(this.starSizes[k] * (k ? size : 1));
+      // The star's geometry has planar radius 1 and the twinkle and roll turn it about the view
+      // axis only, so its half extent on the pearl's plane is its largest planar scale.
+      const half = Math.max(this.sizeScratch.x, this.sizeScratch.y);
+      let room = Infinity;
+      for (const item of medallions) {
+        const reach = (MEDALLION_ORB_RADIUS + PEARL_STAR_AIR) * item.root.scale.x;
+        room = Math.min(room, Math.hypot(this.placeScratch.x - item.root.position.x, this.placeScratch.y - item.root.position.y) - reach);
+      }
+      // Full size from one and a half extents of room, nothing at none. Smoothstep's slope never
+      // passes 1.5, so the shrinking star never outgrows the room it has.
+      if (room < 1.5 * half) this.sizeScratch.multiplyScalar(T.MathUtils.smoothstep(room, 0, 1.5 * half));
       this.matrixScratch.compose(this.placeScratch, this.turnScratch, this.sizeScratch);
       stars.setMatrixAt(k, this.matrixScratch);
     }

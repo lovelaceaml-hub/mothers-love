@@ -13,6 +13,7 @@ import {
   PEARL_KIT_PEARL,
   PEARL_KIT_SPARKLE,
   PEARL_SHELL_RADIUS,
+  PEARL_STAR_AIR,
   StudyPearlAssets,
   StudyPearlSkin,
   buildPearlKitParts,
@@ -640,6 +641,93 @@ describe("study pearl skin dressed with the 3D Studio kit", () => {
     expect(lit.visible).toBe(false);
     skin.dispose();
   });
+  it("keeps every kit star off the canonical symbols for one to nine expressions, landscape and portrait", () => {
+    // The live contract allows one to nine expressions (validation.ts, public-feed.ts). The
+    // symbols ride their ellipse 360/n degrees apart; the stars must never sit on one.
+    const frames: StudyPearlFrame[] = [
+      wide, { ...wide, orbitScale: .94 },
+      { sparkles: true, portrait: true, orbitScale: 1 }, { sparkles: true, portrait: true, orbitScale: .94 },
+    ];
+    // Sixty seconds is one whole turn of the ring and three of the head star's lap round it.
+    const clocks = Array.from({ length: 240 }, (_, i) => i * .25);
+    const matrix = new T.Matrix4(), place = new T.Vector3(), turn = new T.Quaternion(), scale = new T.Vector3(), corner = new T.Vector3();
+    const wrap = (angle: number) => Math.atan2(Math.sin(angle), Math.cos(angle));
+    for (const frame of frames) {
+      // The ring's ellipse as `update` lays it out, to read each piece's angle on it.
+      const rx = (frame.portrait ? 1.06 : 1.36) * frame.orbitScale, ry = (frame.portrait ? 1.44 : 1.28) * frame.orbitScale;
+      const angleOf = (x: number, y: number) => Math.atan2(y / ry, x / rx);
+      // Four symbols leave every gap star far from any orb, so their sizes there are the unclipped ones.
+      const reference = new Map<number, number[]>();
+      for (let n = 1; n <= 9; n++) {
+        const label = `${frame.portrait ? "portrait" : "landscape"} ${frame.orbitScale}, ${n} symbols`;
+        const ids = WORLD_EXPRESSIONS.slice(0, n).map(item => item.id);
+        const { skin, named } = dressed(kit);
+        // The kit dresses the skin on its first update.
+        skin.update(0, ids, true, frame);
+        const stars = named("pearl kit stars") as T.InstancedMesh;
+        const vertices = stars.geometry.getAttribute("position");
+        // The worst of each measure over the whole sweep, in medallion units.
+        let headShown = 0, clearance = Infinity, vertexClearance = Infinity, largest = 0, gapRoomAtFour = Infinity;
+        let midpointError = 0, sizeDrift = 0, gapsMissed = 0;
+        const counts = new Set<number>();
+        for (const [sample, time] of clocks.entries()) {
+          skin.update(time, ids, true, frame);
+          expect(stars.visible).toBe(true);
+          counts.add(stars.count);
+          const roots = ids.map(id => named(`pearl medallion ${id}`)!);
+          const size = roots[0].scale.x;
+          const medallionAngles = roots.map(root => angleOf(root.position.x, root.position.y));
+          const nearestOrb = (x: number, y: number) =>
+            Math.min(...roots.map(root => Math.hypot(x - root.position.x, y - root.position.y))) / size;
+          const gaps = new Set<number>();
+          const halves: number[] = [];
+          for (let k = 0; k < stars.count; k++) {
+            stars.getMatrixAt(k, matrix);
+            matrix.decompose(place, turn, scale);
+            const half = Math.max(scale.x, scale.y) / size;
+            halves.push(half);
+            largest = Math.max(largest, half);
+            if (half > 1e-9) {
+              if (k === 0) headShown++;
+              // Every star that shows clears every shown orb by its own half size.
+              clearance = Math.min(clearance, nearestOrb(place.x, place.y) - MEDALLION_ORB_RADIUS - half);
+              // And so does every vertex of it, with the air besides, on a sample of the sweep.
+              if (sample % 8 === 0) {
+                for (let v = 0; v < vertices.count; v++) {
+                  corner.fromBufferAttribute(vertices, v).applyMatrix4(matrix);
+                  vertexClearance = Math.min(vertexClearance, nearestOrb(corner.x, corner.y) - MEDALLION_ORB_RADIUS - PEARL_STAR_AIR);
+                }
+              }
+            }
+            if (k === 0) continue;
+            // A gap star sits exactly halfway between two neighbouring symbols, one star to a gap.
+            const offsets = medallionAngles.map(angle => wrap(angleOf(place.x, place.y) - angle));
+            midpointError = Math.max(midpointError, Math.abs(Math.min(...offsets.map(Math.abs)) - Math.PI / n));
+            const gap = offsets.findIndex(offset => Math.abs(wrap(offset - Math.PI / n)) < 1e-6);
+            if (gap < 0) gapsMissed++; else gaps.add(gap);
+            if (n === 4) gapRoomAtFour = Math.min(gapRoomAtFour, nearestOrb(place.x, place.y) - MEDALLION_ORB_RADIUS - PEARL_STAR_AIR);
+          }
+          if (gaps.size !== stars.count - 1) gapsMissed++;
+          // A gap star is never clipped: it shows at the size it has with only four symbols.
+          if (n === 4) reference.set(sample, halves);
+          else if (n > 4) halves.slice(1).forEach((half, k) => { sizeDrift = Math.max(sizeDrift, Math.abs(half - reference.get(sample)![k + 1])); });
+        }
+        // The head star, and one star per gap up to four.
+        expect([...counts], label).toEqual([1 + Math.min(4, n)]);
+        expect(largest, label).toBeLessThan(.1);
+        expect(clearance, label).toBeGreaterThanOrEqual(0);
+        expect(vertexClearance, label).toBeGreaterThanOrEqual(-1e-9);
+        expect(midpointError, label).toBeLessThan(1e-6);
+        expect(gapsMissed, label).toBe(0);
+        expect(sizeDrift, label).toBeLessThan(1e-9);
+        // With four symbols no gap star comes near enough to an orb for its size to be touched.
+        if (n === 4) expect(gapRoomAtFour, label).toBeGreaterThan(1.5 * .1);
+        // The head star dips behind each symbol it passes, but it is not lost behind them.
+        expect(headShown / clocks.length, label).toBeGreaterThan(n === 1 ? .9 : .3);
+        skin.dispose();
+      }
+    }
+  }, 60_000);
   it("never names a kit object after anything in a recognition; the skin only ever receives ids", () => {
     const { skin, parent } = dressed(kit);
     skin.update(3, [2, 7, 8], true, wide);
