@@ -1,9 +1,9 @@
 {
   "version": "v1",
-  "generatedAt": "2026-09-23T01:04:42-07:00",
+  "generatedAt": "2026-09-23T01:12:52-07:00",
   "source": {
     "repo": "3d-studio",
-    "commit": "e10f2bc45b5fa1040a0067fcfbb83af722386990",
+    "commit": "a7ff19b6e31c129840297f37534ed60893a29958",
     "plan": "docs/PLAN-03-world-kit.md"
   },
   "decoder": {
@@ -1509,6 +1509,682 @@
       "clips": [],
       "lod": null,
       "budget": "ordinary"
+    },
+    {
+      "id": "neighbor.child",
+      "file": "neighbors/child.glb",
+      "sha256": "2e6d98613f247e8aaf023290e5cafa8257aabc07fdd965b3b4f164389b6be7b4",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1,
+      "pivot": "base",
+      "verts": 10712,
+      "tris": 21168,
+      "bytes": 227884,
+      "materials": [
+        "child_Top",
+        "child_Bottom",
+        "child_Skin",
+        "child_Shoes",
+        "child_Stripe",
+        "child_Hair",
+        "child_EyeWhite",
+        "child_Pupil",
+        "child_Glint",
+        "child_Blush",
+        "child_Mouth",
+        "child_Tongue",
+        "child_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.father",
+      "file": "neighbors/father.glb",
+      "sha256": "537d96128ef0c132c6b580a38a61019c4350f96bbb793a8f3f363e58b83d4210",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 9256,
+      "tris": 18292,
+      "bytes": 216192,
+      "materials": [
+        "father_Top",
+        "father_Bottom",
+        "father_Shoes",
+        "father_Skin",
+        "father_Hair",
+        "father_EyeWhite",
+        "father_Pupil",
+        "father_Glint",
+        "father_Blush",
+        "father_Mouth",
+        "father_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.grandfather",
+      "file": "neighbors/grandfather.glb",
+      "sha256": "6ee984224a79f366b8fe18f114e197ec45158b03c1b306aba3caf772b1b84758",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.5,
+      "pivot": "base",
+      "verts": 10942,
+      "tris": 21536,
+      "bytes": 225924,
+      "materials": [
+        "grandfather_Top",
+        "grandfather_Bottom",
+        "grandfather_Shoes",
+        "grandfather_Skin",
+        "grandfather_Button",
+        "grandfather_Hair",
+        "grandfather_EyeWhite",
+        "grandfather_Pupil",
+        "grandfather_Glint",
+        "grandfather_Blush",
+        "grandfather_Mouth",
+        "grandfather_Glasses",
+        "grandfather_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.grandmother",
+      "file": "neighbors/grandmother.glb",
+      "sha256": "4bac05417e62d486001b23a46676382d77eebcd0fd088ee8c237f6466803d09d",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.5,
+      "pivot": "base",
+      "verts": 9952,
+      "tris": 19596,
+      "bytes": 221308,
+      "materials": [
+        "grandmother_Top",
+        "grandmother_Skin",
+        "grandmother_Shoes",
+        "grandmother_Bottom",
+        "grandmother_Button",
+        "grandmother_Hair",
+        "grandmother_EyeWhite",
+        "grandmother_Pupil",
+        "grandmother_Glint",
+        "grandmother_Blush",
+        "grandmother_Mouth",
+        "grandmother_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.mother",
+      "file": "neighbors/mother.glb",
+      "sha256": "814246be4df49da02eaa35dcc81d4b4517a5c89be267d2a9572537b0c3f7b70d",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 9914,
+      "tris": 19560,
+      "bytes": 223880,
+      "materials": [
+        "mother_Top",
+        "mother_Skin",
+        "mother_Shoes",
+        "mother_Bottom",
+        "mother_Belt",
+        "mother_Hair",
+        "mother_EyeWhite",
+        "mother_Pupil",
+        "mother_Glint",
+        "mother_Blush",
+        "mother_Mouth",
+        "mother_Tongue",
+        "mother_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.teenager",
+      "file": "neighbors/teenager.glb",
+      "sha256": "044ddc4ef5d1e2d02ef3c2a465862f1444770e5dba9cbb03aacfaba434f23ff3",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.4,
+      "pivot": "base",
+      "verts": 10364,
+      "tris": 20304,
+      "bytes": 225000,
+      "materials": [
+        "teenager_Top",
+        "teenager_Bottom",
+        "teenager_Shoes",
+        "teenager_Skin",
+        "teenager_Pocket",
+        "teenager_String",
+        "teenager_Hair",
+        "teenager_EyeWhite",
+        "teenager_Pupil",
+        "teenager_Glint",
+        "teenager_Blush",
+        "teenager_Mouth",
+        "teenager_Tie",
+        "teenager_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
     },
     {
       "id": "expression.01-hello-bubble",
