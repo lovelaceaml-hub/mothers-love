@@ -122,15 +122,20 @@ export const NEIGHBOR_HERO_DISTANCE = 42;
  * places in each zone; `tests/world/kit-neighbors.test.ts` proves the rules that do not depend
  * on page layout.
  */
-/** `y` is the ground the pair stands on (the terrace top, .7, unless a zone says otherwise). */
-export type NeighborStage = { x: number; z: number; walk: number; card: number; y?: number; yaw?: number };
+/**
+ * `y` is the ground the pair stands on (the terrace top, .7, unless a zone says otherwise).
+ * `cardLift`, when set, puts the card beside the pair at that height above its ground, with
+ * the tail pointing sideways at the speakers, for a zone whose air above the pair is taken.
+ */
+export type NeighborStage = { x: number; z: number; walk: number; card: number; y?: number; yaw?: number; cardLift?: number };
 export const NEIGHBOR_STAGES: Readonly<Record<ZoneId, NeighborStage>> = {
   garden: { x: -4.5, z: 8.2, walk: 1.6, card: -3.2 },
   // In the gap the rose ring leaves toward the camera, just clear of the lowest step (7.9):
   // the top step itself sits inside the silk ribbons' loop, which veils anyone on it.
   heart: { x: -2.8, z: 8.1, walk: 1.3, card: -1.3 },
-  // Between the two front columns of the grove, so the card clears their icon discs.
-  expressions: { x: -1.2, z: 5.6, walk: 1.6, card: 0 },
+  // In front of the grove's column arc, the card beside the pair at body height: the nine
+  // canonical icon discs ring the air above the pair at card height, and none may be covered.
+  expressions: { x: -3, z: 10, walk: 1.4, card: 4.4, cardLift: 0.8 },
   welcome: { x: -3, z: 6.5, walk: 2, card: 0 },
   featured: { x: -5, z: 8.5, walk: 1.6, card: -3.2 },
   calendar: { x: -3, z: 9.5, walk: 2, card: 0 },
@@ -429,23 +434,27 @@ export type CardContext = Pick<CanvasRenderingContext2D,
 
 export const NEIGHBOR_CARD_LABEL = "FICTIONAL NEIGHBORS";
 
-export function paintNeighborCard(context: CardContext, text: string, accent: string, tail: number) {
+export function paintNeighborCard(context: CardContext, text: string, accent: string, tail: number, side: "down" | "left" | "right" = "down") {
   const width = NEIGHBOR_CARD.canvasWidth, height = NEIGHBOR_CARD.canvasHeight;
-  const left = 10, top = 10, right = width - 10, bottom = height - 64, radius = 58;
+  const radius = 58;
+  // Room for the tail on the side it points from: below the card, or at its left or right edge.
+  const left = side === "left" ? 64 : 10, right = side === "right" ? width - 64 : width - 10;
+  const top = side === "down" ? 10 : 34, bottom = side === "down" ? height - 64 : height - 30;
   const tip = Math.min(right - radius - 40, Math.max(left + radius + 40, tail * width));
+  const level = Math.min(bottom - radius - 30, Math.max(top + radius + 30, tail * height));
   context.clearRect(0, 0, width, height);
   const outline = () => {
     context.beginPath();
     context.moveTo(left + radius, top);
     context.lineTo(right - radius, top);
     context.quadraticCurveTo(right, top, right, top + radius);
+    if (side === "right") { context.lineTo(right, level - 30); context.lineTo(width - 8, level); context.lineTo(right, level + 30); }
     context.lineTo(right, bottom - radius);
     context.quadraticCurveTo(right, bottom, right - radius, bottom);
-    context.lineTo(tip + 34, bottom);
-    context.lineTo(tip, height - 8);
-    context.lineTo(tip - 34, bottom);
+    if (side === "down") { context.lineTo(tip + 34, bottom); context.lineTo(tip, height - 8); context.lineTo(tip - 34, bottom); }
     context.lineTo(left + radius, bottom);
     context.quadraticCurveTo(left, bottom, left, bottom - radius);
+    if (side === "left") { context.lineTo(left, level + 30); context.lineTo(8, level); context.lineTo(left, level - 30); }
     context.lineTo(left, top + radius);
     context.quadraticCurveTo(left, top, left + radius, top);
     context.closePath();
@@ -474,16 +483,17 @@ export function paintNeighborCard(context: CardContext, text: string, accent: st
   const spaced = context as CardContext & { letterSpacing?: string };
   if ("letterSpacing" in spaced) spaced.letterSpacing = "4px";
   const labelWidth = context.measureText(NEIGHBOR_CARD_LABEL).width;
+  const centre = (left + right) / 2, labelY = top + 46;
   context.fillStyle = "#8b6a80";
-  context.fillText(NEIGHBOR_CARD_LABEL, width / 2 + 12, 56);
+  context.fillText(NEIGHBOR_CARD_LABEL, centre + 12, labelY);
   if ("letterSpacing" in spaced) spaced.letterSpacing = "0px";
   context.fillStyle = accent;
   context.beginPath();
-  context.arc(width / 2 - labelWidth / 2 - 10, 56, 8, 0, Math.PI * 2);
+  context.arc(centre - labelWidth / 2 - 10, labelY, 8, 0, Math.PI * 2);
   context.fill();
   // The words: Georgia as the pearl sets them, as large as two balanced lines allow.
   const words = text.split(/\s+/).filter(Boolean);
-  const room = width - 150;
+  const room = right - left - 130;
   const measure = (line: string) => context.measureText(line).width;
   const layout = (size: number): string[] | null => {
     context.font = `500 ${size}px Georgia, "Times New Roman", serif`;
@@ -510,8 +520,8 @@ export function paintNeighborCard(context: CardContext, text: string, accent: st
     if (line) set.push(line);
   }
   context.fillStyle = "#4e2f48";
-  const middle = (bottom + 84) / 2;
-  set.forEach((line, i) => context.fillText(line, width / 2, middle + (i - (set.length - 1) / 2) * size * 1.12));
+  const middle = (bottom + top + 74) / 2;
+  set.forEach((line, i) => context.fillText(line, centre, middle + (i - (set.length - 1) / 2) * size * 1.12));
 }
 
 function cardCanvas(): { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D } | null {
@@ -752,8 +762,13 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       card.zone = pair.zone;
       if (!card.painted || !card.texture) continue;
       const speaker = card.kind === "greeting" ? pair.actors[0] : pair.actors[1];
-      const tail = 0.5 + (speaker.side * (speaker.meet + 0.2) - pair.stage.card) / NEIGHBOR_CARD.width;
-      paintNeighborCard(card.painted.context as unknown as CardContext, card.kind === "greeting" ? words.greeting : words.response, card.kind === "greeting" ? accent : "#d1aa6c", tail);
+      const beside = pair.stage.cardLift !== undefined;
+      // Beside the pair the tail points sideways at head height; above it, down at the speaker.
+      const side = !beside ? "down" : pair.stage.card > 0 ? "left" : "right";
+      const tail = beside
+        ? 1 - ((speaker.height * NEIGHBOR_SCALE * 0.82) - pair.stage.cardLift!) / CARD_HEIGHT
+        : 0.5 + (speaker.side * speaker.meet - pair.stage.card) / NEIGHBOR_CARD.width;
+      paintNeighborCard(card.painted.context as unknown as CardContext, card.kind === "greeting" ? words.greeting : words.response, card.kind === "greeting" ? accent : "#d1aa6c", tail, side);
       card.texture.needsUpdate = true;
     }
   };
@@ -872,7 +887,7 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       const on = speaking && card.kind === beat.card && !!card.texture;
       card.mesh.visible = on;
       if (!on || !camera) continue;
-      const lift = (active.top * NEIGHBOR_SCALE) + 0.3 + CARD_HEIGHT / 2;
+      const lift = (active.stage.cardLift ?? active.top * NEIGHBOR_SCALE + 0.3) + CARD_HEIGHT / 2;
       card.mesh.position.set(active.stage.card, lift, 0);
       active.root.localToWorld(card.mesh.position);
       card.mesh.quaternion.copy(camera.quaternion);
@@ -917,7 +932,7 @@ export function coversFocus(card: T.Mesh, camera: T.Camera, focus: FocusLike) {
   const aspect = (camera as T.PerspectiveCamera).aspect ?? 1;
   const radius = Math.hypot((e.x - c.x) * aspect, e.y - c.y);
   const geometry = card.geometry as T.PlaneGeometry;
-  geometry.computeBoundingBox();
+  if (!geometry.boundingBox) geometry.computeBoundingBox();
   const box = geometry.boundingBox!;
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   for (const [x, y] of [[box.min.x, box.min.y], [box.max.x, box.min.y], [box.max.x, box.max.y], [box.min.x, box.max.y]]) {

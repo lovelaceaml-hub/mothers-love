@@ -366,6 +366,23 @@ describe("kit neighbors (Plan 26 K4)", () => {
     }
   });
 
+  it("sets the Grove's card beside the pair, clear of the icon discs above it, still printed FICTIONAL NEIGHBORS", () => {
+    const world = build();
+    world.scene.userData.studyCamera = zoneCamera("expressions");
+    world.neighbors.update(meetTime(2, 3), "expressions", undefined);
+    const card = world.card("greeting");
+    expect(card.visible).toBe(true);
+    // Its bottom at the stage's lift above the ground, so its centre sits below the discs at 5.15.
+    const local = world.pair("expressions").worldToLocal(card.position.clone());
+    expect(local.y).toBeLessThan(5.15 - 0.96 - 1.2);
+    for (const side of ["left", "right"] as const) {
+      const context = recordingCanvas();
+      paintNeighborCard(context as unknown as CardContext, neighborWords(2).greeting, WORLD_EXPRESSIONS[2].color, 0.6, side);
+      expect(context.texts[0]).toBe(NEIGHBOR_CARD_LABEL);
+      expect(context.texts.slice(1).join(" ")).toBe(neighborWords(2).greeting);
+    }
+  });
+
   it("repaints its two cards per zone, never more textures than two", () => {
     const world = build();
     const cardTextures = [...world.registered.textures].filter(texture => texture instanceof T.CanvasTexture);
