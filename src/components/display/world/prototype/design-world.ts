@@ -322,8 +322,9 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   // fragment prefix declares `viewMatrix`, so the world space sun folds into view space here.
   // Section 7, water glory: a higher environment intensity and metalness turn the sea into a
   // mirror of the golden hour sky rather than a tinted sheet, and the lower roughness with the
-  // stronger clearcoat keeps the reflection sharp enough to read as water.
-  const water = material(new T.MeshPhysicalMaterial({ color: "#6ec9cf", roughness: .12, metalness: .22, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.35, dithering: true }));
+  // stronger clearcoat keeps the reflection sharp enough to read as water. Plan 26 visual
+  // review deepened the body colour one step (D2 #6ec9cf) toward the board's turquoise.
+  const water = material(new T.MeshPhysicalMaterial({ color: "#57bfd0", roughness: .12, metalness: .22, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.35, dithering: true }));
   water.onBeforeCompile = shader => {
     shader.uniforms.studyTime = time;
     shader.uniforms.studySunWorld = { value: new T.Vector3(...STUDY_SUN.direction) };
@@ -501,10 +502,13 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
         district.arches.push(archRecord(arch(layout, (k - (arches - 1) / 2) * width * 1.1, .65, -9.3, width, height), width, height));
       }
     }
-    const color = ["#e893b9", "#f0a8b8", "#bc92d9", "#edb4ba"][i % 4];
+    // One step deeper than D2's crowns (#e893b9, #f0a8b8, #bc92d9, #edb4ba), visual review 2026-09-23.
+    const color = ["#e07fb0", "#ea96ad", "#b27fd4", "#e6a0b0"][i % 4];
     const crowns: Crowns = { mesh: instance(layout, cottonSphere, cotton, (i < 3 ? 4 : 2) * 15, true), used: 0 };
     for (const side of [-1, 1]) {
-      const bed = mesh(layout, geometry(new T.RingGeometry(7.6, i < 3 ? 14.7 : 11.5, 64, 2, side === 1 ? -.75 : Math.PI - .75, 1.50)), lawn, [0, .68, 0]);
+      // The lawn sits .01 above the ivory terrace top (y .68). At .68 exactly the two were
+      // coplanar and fought for depth, which read as horizontal streaks through every bed.
+      const bed = mesh(layout, geometry(new T.RingGeometry(7.6, i < 3 ? 14.7 : 11.5, 64, 2, side === 1 ? -.75 : Math.PI - .75, 1.50)), lawn, [0, .69, 0]);
       bed.rotation.x = -Math.PI / 2; district.beds.push(bed);
       const foliage = instance(layout, midPetal, leaf, 48);
       const random = seededRandom(i * 12 + side + 50);
@@ -699,7 +703,9 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
     }else if(zone.id==="milestone"){
       for(let k=0;k<5;k++){keep(mesh(root,geometry(new T.CylinderGeometry(6-k,6.3-k,.4,64)),ivory,[0,1+k*1.6,0]));keep(ring(root,6-k,1.22+k*1.6));districts.get(zone.id)!.falls.push(keep(waterfall(root,0,5-k,3.8,3.2-k*.4,0)));}
     }else if(zone.id==="orbit"){
-      for(let k=0;k<4;k++){const orbit=keep(mesh(root,geometry(new T.TorusGeometry(5+k*.7,.035,6,96)),gold,[0,7,0]));orbit.rotation.set(k*.55,.4+k*.37,0);}
+      // Three rings, not four: with the pearl's own lanes standing down here (Plan 26 K1 visual
+      // review), the constellation reads as one orbit instead of a scribble round the words.
+      for(let k=0;k<3;k++){const orbit=keep(mesh(root,geometry(new T.TorusGeometry(5+k*.7,.035,6,96)),gold,[0,7,0]));orbit.rotation.set(k*.55,.4+k*.37,0);}
     }else if(zone.id==="calendar"){
       for(let k=0;k<7;k++)keep(mesh(root,geometry(new T.BoxGeometry(1.5,.45+(k%3)*.25,1.5)),ivory,[(k-3)*2.3,1.1,0]));
     }else if(zone.id==="welcome"){

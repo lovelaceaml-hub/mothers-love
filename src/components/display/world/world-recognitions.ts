@@ -46,6 +46,71 @@ export function wrapBubbleText(
   return lines.length ? lines : [""];
 }
 
+/**
+ * Design study only: where a zone's hero pearl stands, in the zone's frame (`outward` toward
+ * the tour eye, `side` to its right). Classic and cinematic keep side 3 (7 at the Sanctuary
+ * and the Peace Globe, 0 on phones) and outward 5.
+ *
+ * Visual review of the kit captures (Plan 26 K1, 2026-09-23) moved three of them:
+ *  - Pearl Pavilion: outward 8, so the face stands in front of the pavilion's arch ring
+ *    (radius 7 plus the columns' .32) and no column crosses the words from the tour eye.
+ *  - Heart Sanctuary and Peace Globe: side 10.5 and 11, so the sculpted heart and the globe
+ *    stand beside the pearl and its medallion ring, never through it (target 03 and the board).
+ * Phones keep side 0: the portrait frame has no room beside the landmark.
+ */
+export function studyHeroPlacement(zone: ZoneId, mobile: boolean) {
+  const side = mobile ? 0 : zone === "heart" ? 10.5 : zone === "peacemakers" ? 11 : 3;
+  return { side, outward: zone === "featured" ? 8 : 5 };
+}
+
+type ResidentPlan = {
+  place: ZoneId;
+  pool: readonly Recognition[];
+  main?: Recognition;
+  /** The records the zone's two resident slots show now, if any. */
+  current: readonly [string | undefined, string | undefined];
+};
+
+/**
+ * Design study only: which record each zone's two resident pearls show.
+ *
+ * A resident never repeats its own zone's hero or the other resident, so no record stands
+ * twice in one zone. Otherwise it takes the record shown least so far across the world,
+ * preferring, at equal use, one that is no zone's hero, starting from a different place in
+ * the pool for every zone. So the pool is spread evenly over the world instead of every zone
+ * showing its first two records (visual review, 2026-09-23: two identical residents side by
+ * side). A resident keeps its record while that record stays allowed, so nothing repaints
+ * unless it has to. With too few records a slot stays empty rather than repeat one.
+ */
+export function studyResidents(plans: readonly ResidentPlan[]) {
+  const heroes = new Set(plans.map((plan) => plan.main?.id).filter(Boolean));
+  const used = new Map<string, number>();
+  const result = new Map<ZoneId, [Recognition | undefined, Recognition | undefined]>();
+  const score = (record: Recognition) => (used.get(record.id) ?? 0) * 2 + (heroes.has(record.id) ? 1 : 0);
+  plans.forEach((plan, zoneIndex) => {
+    const chosen: [Recognition | undefined, Recognition | undefined] = [undefined, undefined];
+    const taken = new Set<string>(plan.main ? [plan.main.id] : []);
+    // Keep what is already showing, while it is allowed.
+    plan.current.forEach((id, k) => {
+      const record = id ? plan.pool.find((item) => item.id === id) : undefined;
+      if (record && !taken.has(record.id)) { chosen[k] = record; taken.add(record.id); }
+    });
+    for (let k = 0; k < 2; k++) {
+      if (chosen[k] || !plan.pool.length) continue;
+      const start = (zoneIndex * 2 + k) % plan.pool.length;
+      let best: Recognition | undefined;
+      for (let i = 0; i < plan.pool.length; i++) {
+        const record = plan.pool[(start + i) % plan.pool.length];
+        if (!taken.has(record.id) && (!best || score(record) < score(best))) best = record;
+      }
+      if (best) { chosen[k] = best; taken.add(best.id); }
+    }
+    for (const record of chosen) if (record) used.set(record.id, (used.get(record.id) ?? 0) + 1);
+    result.set(plan.place, chosen);
+  });
+  return result;
+}
+
 type Input = {
   time: number;
   camera: T.PerspectiveCamera;
@@ -114,12 +179,16 @@ export class WorldRecognitionBubbles {
     sparkles: false,
     portrait: false,
     orbitScale: 1,
+    lanes: true,
+    shield: false,
   };
   // Reused every frame so the detailed slots never allocate.
   private readonly detailedFrame: StudyPearlFrame = {
     sparkles: false,
     portrait: false,
     orbitScale: 1,
+    lanes: true,
+    shield: false,
   };
 
   /**
@@ -155,8 +224,9 @@ export class WorldRecognitionBubbles {
     lights.frustumCulled = false;
     root.add(face, ring, lights);
     // The slot ordinal seeds this pearl, so its sparkle scatter is stable and unlike its neighbours.
+    // The skin reads the 3D Studio kit off the scene lazily, on its first update (Plan 26 K1).
     const study = this.studyAssets
-      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length)
+      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length, () => this.hostScene.userData.studyKit)
       : undefined;
     root.visible = face.visible = false;
     this.root.add(root);
@@ -357,7 +427,7 @@ export class WorldRecognitionBubbles {
     const records = [...this.records.values()].filter(
       (record) => !entranceActive || record.id !== arrival.id,
     );
-    for (const place of RECOGNITION_ZONES) {
+    const plans = RECOGNITION_ZONES.map((place) => {
       let pool = records;
       if (place === "featured") {
         const featured = records.filter((r) => r.featured);
@@ -376,12 +446,20 @@ export class WorldRecognitionBubbles {
         selected ??
         pool.find((record) => record.id === slots[0].record?.id) ??
         pool[RECOGNITION_ZONES.indexOf(place) % Math.max(1, pool.length)];
+      const current = [slots[1]?.record?.id, slots[2]?.record?.id] as const;
+      return { place, pool, main, slots, current };
+    });
+    // The design study keeps the same words from standing twice in one view (visual review).
+    const residents = this.designStudy ? studyResidents(plans) : undefined;
+    for (const { place, pool, main, slots } of plans) {
       const remaining = pool.filter((record) => record.id !== main?.id);
       for (const slot of slots) {
         const record =
           slot.index === 0
             ? main
-            : remaining[(slot.index - 1) % Math.max(1, remaining.length)];
+            : residents
+              ? residents.get(place)?.[slot.index - 1]
+              : remaining[(slot.index - 1) % Math.max(1, remaining.length)];
         this.assign(slot, record, time);
         if (!slot.record) continue;
         const definition = ZONES.find((item) => item.id === place)!;
@@ -392,19 +470,22 @@ export class WorldRecognitionBubbles {
         ).normalize();
         const right = new T.Vector3(outward.z, 0, -outward.x);
         const mobile = camera.aspect < 1;
+        const hero = this.designStudy ? studyHeroPlacement(place, mobile) : undefined;
         const side =
           slot.index === 0
-            ? mobile
-              ? 0
-              : place === "heart" || place === "peacemakers"
-                ? 7
-                : 3
+            ? hero
+              ? hero.side
+              : mobile
+                ? 0
+                : place === "heart" || place === "peacemakers"
+                  ? 7
+                  : 3
             : slot.index === 1
               ? -10
               : 11;
         slot.root.position
           .fromArray(definition.target)
-          .addScaledVector(outward, [5, 1, -4][slot.index])
+          .addScaledVector(outward, slot.index === 0 && hero ? hero.outward : [5, 1, -4][slot.index])
           .addScaledVector(right, side);
         slot.root.position.y += [3, 6, 9][slot.index];
         // Movement is shared by the circle, its text, its rim and its sparks.
@@ -512,7 +593,10 @@ export class WorldRecognitionBubbles {
         time,
         arrivalSlot.record.expressionIds,
         true,
-        this.frameFor(arrivalSlot, camera, input.sparkles),
+        // While its words are readable, the arriving pearl's setting and symbols join the
+        // protect mask, so the bloom and the light column never wash over them.
+        this.frameFor(arrivalSlot, camera, input.sparkles,
+          arrival.phase === "reading" || arrival.phase === "settle"),
       );
       this.focused = arrivalSlot;
       this.arrivalInWorld = true;
@@ -555,6 +639,7 @@ export class WorldRecognitionBubbles {
     slot: Slot,
     camera: T.PerspectiveCamera,
     sparkles: boolean,
+    shield = false,
   ): StudyPearlFrame {
     const reach = slot.radius * (1.36 + 0.21);
     const distance = camera.position.distanceTo(slot.root.position);
@@ -572,6 +657,10 @@ export class WorldRecognitionBubbles {
     frame.sparkles = sparkles;
     frame.portrait = camera.aspect < 1;
     frame.orbitScale = T.MathUtils.clamp(1 - overflow * 1.6, 0.94, 1);
+    // The Expression Cosmos draws its own orbits round the pearl, so the pearl's lanes stand
+    // down there. Only the arriving pearl, while it is read, shields its setting from the glow.
+    frame.lanes = slot.zone !== "orbit";
+    frame.shield = shield;
     return frame;
   }
   private effects(

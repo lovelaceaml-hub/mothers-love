@@ -4,11 +4,18 @@
  * lighting, the halo and the tests all read one source of truth.
  */
 
-/** Apricot horizon, rose mid sky, lavender zenith. */
-export const STUDY_SKY = { zenith: "#c9c6ec", mid: "#efcfdc", horizon: "#fbe0cc" };
+/**
+ * Apricot horizon, lavender rose mid sky, sky blue lavender zenith. Plan 26 visual review
+ * (2026-09-23) found the frames a near monochrome peach haze where the board has lavender and
+ * sky blue above, so the zenith and mid sky were cooled a step (D2: #c9c6ec, #efcfdc, #fbe0cc).
+ */
+export const STUDY_SKY = { zenith: "#a9bdf2", mid: "#d8ccf0", horizon: "#f8ded6" };
 
-/** Warm haze. The color matches the sky horizon so the sea meets the sky without a seam. */
-export const STUDY_FOG = { color: "#f8dfd0", near: 22, far: 250 };
+/**
+ * Warm haze. The color matches the sky horizon so the sea meets the sky without a seam
+ * (D2: #f8dfd0, a shade warmer, with the D2 horizon).
+ */
+export const STUDY_FOG = { color: "#f8ded6", near: 22, far: 250 };
 
 function unit(x: number, y: number, z: number): [number, number, number] {
   const length = Math.sqrt(x * x + y * y + z * z);
