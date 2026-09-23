@@ -1,4 +1,5 @@
-import type { ArrivalState } from "../arrival-director";
+import type { ArrivalPhase, ArrivalState } from "../arrival-director";
+import type { StudyArrival } from "./design-mode";
 
 /**
  * The single shape every arrival study reads.
@@ -46,4 +47,38 @@ export function arrivalPose(arrival?: ArrivalState | null): ArrivalPose {
     return { active: true, gather: 1, form: 1, dissolve, calm: false, presence: 1 - dissolve };
   }
   return resting();
+}
+
+/**
+ * How far the kit lotus `bloom` clip is scrubbed (WORLD-INTEGRATION 4.2): the bud stays
+ * closed through the approach, opens with `form` through the reveal so the clip's last
+ * frame lands exactly when reading begins, and stays open through reading and settle.
+ * It is `form` by construction; naming it keeps the pose table test honest about the
+ * clip and lets the stage read one word instead of a rule.
+ */
+export function bloomFraction(pose: ArrivalPose) {
+  return pose.form;
+}
+
+/**
+ * Style cycling for live arrivals (Plan 24 P4, WORLD-INTEGRATION 4.6).
+ *
+ * The three studies take turns over newly admitted arrivals: the first arrival keeps
+ * today's default, the pearl formation, then the bloom, then the silk, and around again.
+ * An arrival keeps its style for its whole lifetime because the engine only consults
+ * this on the one edge where the director leaves `idle`. Reaction refreshes and feed
+ * reconnects never enter the director, so that edge never fires for them and the cycle
+ * never advances (proven in `tests/world/arrival-choreography.test.ts`).
+ */
+export const ARRIVAL_STYLE_CYCLE: readonly StudyArrival[] = ["constellation", "bloom", "ribbon"];
+
+/** The style of the n-th admitted arrival, n counted from 0. */
+export function arrivalStyleAt(index: number): StudyArrival {
+  const n = Math.floor(Number.isFinite(index) ? index : 0);
+  return ARRIVAL_STYLE_CYCLE[((n % 3) + 3) % 3];
+}
+
+/** True exactly when the director has just left `idle`: the one moment a style may change. */
+export function arrivalAdmitted(before: ArrivalPhase, after: ArrivalPhase) {
+  return before === "idle" && after !== "idle";
 }
