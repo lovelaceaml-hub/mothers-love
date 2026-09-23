@@ -6,6 +6,7 @@ import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, studyKit, studyRadiance, type StudyArrival } from "./prototype/design-mode";
+import { arrivalAdmitted, arrivalStyleAt, arrivalStyleCycles } from "./prototype/arrival-choreography";
 import { resolveStudyTier, StudyRadiance } from "./prototype/study-radiance";
 import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./prototype/camera-finesse";
 import {
@@ -94,6 +95,15 @@ export class WorldEngine {
   private readonly kitRequested = this.study && studyKit();
   private readonly kit?: WorldKit;
   private readonly kitStatus: KitState;
+  /**
+   * Plan 26 K2, style cycling for live (WORLD-INTEGRATION 4.6): on a live feed every admitted
+   * arrival takes the next study style in turn unless `?entrance=` fixed one for the page.
+   * Sample never cycles: it keeps the entrance or the study button choice, so the pressed
+   * button is always the style on screen. Resolved once, like the study gate.
+   */
+  private readonly entranceFixed = this.study && ["bloom", "ribbon", "constellation"]
+    .includes(new URLSearchParams(window.location.search).get("entrance") ?? "");
+  private arrivalsAdmitted = 0;
   /** Study only, and only when the context can render to a half float target. */
   private radiance?: StudyRadiance;
   /**
@@ -360,8 +370,9 @@ export class WorldEngine {
         previousArrival.id,
         this.feed.records,
       );
-    if (before === "idle" && this.arrivalState.phase !== "idle") {
+    if (arrivalAdmitted(before, this.arrivalState.phase)) {
       this.demoRequested = false;
+      this.cycleStudyArrival();
       this.director.beginArrival(this.reduced || this.sourceStill);
     }
     if (this.arrivalState.phase === "return" && before !== "return")
@@ -691,6 +702,16 @@ export class WorldEngine {
         this.feed.records.slice(0, size).map((record) => record.id),
       );
     }
+  }
+  /**
+   * The one place a live arrival's style can change: the edge where the director leaves
+   * `idle`. Reaction refreshes and feed reconnects never cross that edge, so they never
+   * advance the cycle, and an arrival keeps its style for its whole lifetime. Sample feeds
+   * never reach the cycle, so the study buttons keep their choice exactly as before.
+   */
+  private cycleStudyArrival() {
+    if (!arrivalStyleCycles(this.study, this.entranceFixed, this.feed.phase)) return;
+    this.world.scene.userData.studyArrival = arrivalStyleAt(this.arrivalsAdmitted++);
   }
   previewStudyArrival(style: StudyArrival) {
     if (!isWorldDesignStudy() || this.feed.phase !== "sample" || this.arrivalState.phase !== "idle") return;
