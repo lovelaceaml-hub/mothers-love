@@ -196,15 +196,61 @@ export const KIT_ARCH = { width: 3.89, height: 5.19 } as const;
 
 /**
  * The horseshoe pavilion as delivered (`landmark.pearl-pavilion-horseshoe`), in kit units,
- * measured from its vertices: six columns of half width .25 standing at radius 2.62 at the
- * manifest's bearings from the open side (85, 123, 161 degrees either way), the floor .44
- * up, the ring beam's underside at 4.613, the glass apex at 6.803. The layout test proves
- * the hero pearl's medallion reach clear of every column and under the apex (design 6.6).
+ * measured from its vertices by .1 bands: a stepped floor drum of radius 3.35 (3.04 at its
+ * top) up to .44, six columns of half width .25 (plinths .29 to .9) standing on the floor at
+ * radius 2.62 at the manifest's bearings from the open side (85, 123, 161 degrees either
+ * way), the capitals from 3.3, the ring beam (underside 4.613, inner radius 2.3, rim 3.04),
+ * the glass dome shell narrowing to the apex at 6.803 and the finial to 7.663. `roof` lists
+ * the beam and the dome as hollow bands so the layout test measures the residents' clearance
+ * from the outside and the medallions' from the inside of the roof as it stands.
  */
-export const PAVILION = { columnRadius: 2.62, columnHalfWidth: 0.25, floor: 0.44, beam: 4.613, apex: 6.803, columns: [85, 123, 161, 199, 237, 275] } as const;
+export const PAVILION = {
+  columnRadius: 2.62,
+  columnHalfWidth: 0.25,
+  plinthHalfWidth: 0.29,
+  plinthTop: 0.9,
+  capitalHalfWidth: 0.3,
+  floor: 0.44,
+  floorRadius: 3.35,
+  capitals: 3.3,
+  beam: 4.613,
+  apex: 6.803,
+  top: 7.663,
+  columns: [85, 123, 161, 199, 237, 275],
+  /** The ring beam and the dome shell as bands `[from, to, inner, outer]`, kit units. */
+  roof: [
+    [4.1, 4.95, 2.3, 3.04], [4.95, 5.2, 2.84, 3.03], [5.2, 5.5, 2.74, 2.9], [5.5, 5.8, 2.63, 2.86], [5.8, 6.0, 2.35, 2.72],
+    [6.0, 6.2, 2.05, 2.47], [6.2, 6.4, 1.66, 2.2], [6.4, 6.6, 1.2, 1.98], [6.6, 6.8, 0, 1.5], [6.8, 7.663, 0, 0.65],
+  ],
+} as const;
 
 /** The hero pearl's radius and the reach of its medallion ring, world units (design 6.2). */
 export const HERO_PEARL = { radius: 4.4, reach: 6.9 } as const;
+
+/** The top of every district's terrace (`design-world.ts`: the third ivory drum's top face). */
+export const TERRACE_TOP = 0.68;
+/** A kit floor this close above the terrace is an inlay on it, not a step (the pavilion's drum). */
+export const INLAY_TOLERANCE = 0.05;
+
+/**
+ * The hero pearl's expression medallions as `pearl-skin.ts` moves them and `world-recognitions.ts`
+ * places the pearl (the layout test pins every number here to those two files' source): the
+ * ring is an ellipse in the pearl's billboard plane, radii in pearl radii, with a wobble toward
+ * the camera; each medallion's rim is .205 pearl radii times its size. The pearl's radius is 4.4
+ * (1.06 times that on a phone), its centre `target + 3` lifted to at least `.9 + 1.46 r` above
+ * the district, with a .22 sway and a .18 bob, and on a phone it sits at side 0.
+ */
+export const MEDALLION = {
+  landscape: { radiusX: 1.36, radiusY: 1.28, size: 1, pearl: 4.4 },
+  portrait: { radiusX: 1.06, radiusY: 1.44, size: 0.9, pearl: 4.4 * 1.06 },
+  rim: 0.205,
+  wobble: [0.09, 0.055],
+  guard: [0.9, 1.46],
+  sway: 0.22,
+  bob: 0.18,
+} as const;
+export type MedallionLayout = keyof Pick<typeof MEDALLION, "landscape" | "portrait">;
+export type Sphere = { center: [number, number, number]; radius: number };
 
 export function zoneById(id: ZoneId): WorldZone {
   const zone = ZONES.find(item => item.id === id);
@@ -249,7 +295,7 @@ export function readingKeepOut(id: ZoneId): KeepOutSphere[] {
   const lift = zone.target[1] - zone.center[1];
   const side = id === "heart" || id === "peacemakers" ? 7 : 3;
   return [
-    { center: [side, Math.max(lift + 3, 7.32), 5], radius: 7 },
+    { center: [side, Math.max(lift + 3, MEDALLION.guard[0] + MEDALLION.guard[1] * MEDALLION.landscape.pearl), 5], radius: 7 },
     { center: [-10, lift + 6, 1], radius: 3.2 },
     { center: [11, lift + 9, -4], radius: 3 },
   ];
@@ -306,24 +352,95 @@ export function placementCylinder(placement: KitPlacement, bounds: KitBox = KIT_
   return { center: placement.position, radius, minY: placement.position[1] + bounds.min[1] * sy, maxY: placement.position[1] + bounds.max[1] * sy };
 }
 
+/** A vertical cylinder, hollow inside `inner` when that is set (a ring beam, a dome shell). */
+export type Cylinder = { center: readonly [number, number, number]; radius: number; minY: number; maxY: number; inner?: number };
+export type PavilionPart = Cylinder & { kind: "floor" | "column" | "roof" };
+
 /**
- * The horseshoe pavilion as it stands, in its own frame: six column cylinders from the base
- * to the ring beam, then the roof (beam to apex) as one cylinder of the file's full reach.
- * The layout test measures the residents' clearance against these, not the bounding cylinder,
- * because the pavilion surrounds the hero pearl by design.
+ * The horseshoe pavilion as it stands, in its own frame: the floor drum, six column cylinders
+ * (plinths and capitals a little wider) from the floor to the beam, then the ring beam and
+ * the dome shell as the measured hollow bands. The layout test measures the residents' and
+ * the medallions' clearance against these, not a bounding cylinder, because the pavilion
+ * surrounds the hero pearl by design. A non uniform scale is honoured (`scaleXYZ`).
  */
-export function pavilionParts(placement: KitPlacement) {
-  const scale = placement.scale ?? 1, yaw = placement.rotationY ?? 0;
+export function pavilionParts(placement: KitPlacement): PavilionPart[] {
+  const [sx, sy, sz] = placement.scaleXYZ ?? [placement.scale ?? 1, placement.scale ?? 1, placement.scale ?? 1];
+  const s = Math.max(sx, sz), yaw = placement.rotationY ?? 0;
   const [x, y, z] = placement.position;
-  const parts: Array<{ center: readonly [number, number, number]; radius: number; minY: number; maxY: number }> = [];
+  const parts: PavilionPart[] = [{ kind: "floor", center: [x, y, z], radius: PAVILION.floorRadius * s, minY: y, maxY: y + PAVILION.floor * sy }];
   for (const angle of PAVILION.columns) {
     const a = (angle * Math.PI) / 180 + yaw;
-    parts.push({ center: [x + Math.sin(a) * PAVILION.columnRadius * scale, y, z + Math.cos(a) * PAVILION.columnRadius * scale], radius: PAVILION.columnHalfWidth * scale, minY: y, maxY: y + PAVILION.beam * scale });
+    const center: [number, number, number] = [x + Math.sin(a) * PAVILION.columnRadius * s, y, z + Math.cos(a) * PAVILION.columnRadius * s];
+    parts.push({ kind: "column", center, radius: PAVILION.plinthHalfWidth * s, minY: y + PAVILION.floor * sy, maxY: y + PAVILION.plinthTop * sy });
+    parts.push({ kind: "column", center, radius: PAVILION.columnHalfWidth * s, minY: y + PAVILION.plinthTop * sy, maxY: y + PAVILION.capitals * sy });
+    parts.push({ kind: "column", center, radius: PAVILION.capitalHalfWidth * s, minY: y + PAVILION.capitals * sy, maxY: y + PAVILION.roof[0][0] * sy });
   }
-  const bounds = KIT_BOUNDS["landmark.pearl-pavilion-horseshoe"];
-  parts.push({ center: [x, y, z], radius: Math.max(bounds.max[0], bounds.max[2]) * scale, minY: y + PAVILION.beam * scale, maxY: y + PAVILION.apex * scale });
+  for (const [from, to, inner, outer] of PAVILION.roof) parts.push({ kind: "roof", center: [x, y, z], radius: outer * s, inner: inner * s, minY: y + from * sy, maxY: y + to * sy });
   return parts;
 }
+
+/**
+ * The reading arc of design 6.2 as `camera-director.ts` flies it: the eye swung up to 27.5
+ * degrees either side of the authored eye about the target, approach .9 to 1.1, bob 1.6,
+ * sampled at 9 angles. World space.
+ */
+export function readingArc(zone: WorldZone): Array<[number, number, number]> {
+  const samples: Array<[number, number, number]> = [];
+  const dx = zone.eye[0] - zone.target[0], dz = zone.eye[2] - zone.target[2];
+  for (let i = 0; i < 9; i++) {
+    const angle = -0.48 + (0.96 * i) / 8;
+    for (const approach of [0.9, 1, 1.1]) for (const bob of [-1.6, 1.6]) samples.push([
+      zone.target[0] + (dx * Math.cos(angle) - dz * Math.sin(angle)) * approach,
+      zone.eye[1] + bob,
+      zone.target[2] + (dx * Math.sin(angle) + dz * Math.cos(angle)) * approach,
+    ]);
+  }
+  return samples;
+}
+
+/** The hero pearl's centre in a recognition zone's district frame for one screen layout, with its sway and bob. */
+export function heroPearlAt(id: ZoneId, layout: MedallionLayout, sway = 0, bob = 0): [number, number, number] | undefined {
+  if (!RECOGNITION_ZONES.includes(id)) return undefined;
+  const zone = zoneById(id);
+  const lift = zone.target[1] - zone.center[1];
+  const side = layout === "portrait" ? 0 : id === "heart" || id === "peacemakers" ? 7 : 3;
+  const pearl = MEDALLION[layout].pearl;
+  return [side + sway, Math.max(lift + 3 + bob, MEDALLION.guard[0] + MEDALLION.guard[1] * pearl), 5];
+}
+
+/**
+ * Every place a hero medallion can be, district frame, throughout the reading arc: the ring
+ * ellipse in the billboard plane of each arc camera (which looks at the zone target), the
+ * pearl's sway and bob, 36 ring angles. Empty outside the recognition zones.
+ */
+export function medallionSweep(id: ZoneId, layout: MedallionLayout): Sphere[] {
+  if (!RECOGNITION_ZONES.includes(id)) return [];
+  const zone = zoneById(id);
+  const ring = MEDALLION[layout];
+  const radius = MEDALLION.rim * ring.size * ring.pearl;
+  const spheres: Sphere[] = [];
+  const target = toLocal(zone, zone.target);
+  for (const eye of readingArc(zone).map(sample => toLocal(zone, sample))) {
+    const f = normalize([target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]]);
+    const r = normalize(cross(f, [0, 1, 0]));
+    const u = cross(r, f);
+    for (const sway of [-MEDALLION.sway, MEDALLION.sway]) for (const bob of [-MEDALLION.bob, MEDALLION.bob]) {
+      const hero = heroPearlAt(id, layout, sway, bob)!;
+      for (let k = 0; k < 36; k++) {
+        const a = (k / 36) * Math.PI * 2;
+        const x = Math.cos(a) * ring.radiusX * ring.pearl, y = Math.sin(a) * ring.radiusY * ring.pearl;
+        const back = (MEDALLION.wobble[0] + Math.sin(a * 2) * MEDALLION.wobble[1]) * ring.pearl;
+        spheres.push({
+          center: [hero[0] + r[0] * x + u[0] * y - f[0] * back, hero[1] + r[1] * x + u[1] * y - f[1] * back, hero[2] + r[2] * x + u[2] * y - f[2] * back],
+          radius,
+        });
+      }
+    }
+  }
+  return spheres;
+}
+const cross = (a: readonly number[], b: readonly number[]): [number, number, number] => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const normalize = (a: readonly number[]): [number, number, number] => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
 
 /** Distance from a point to a box, zero inside. */
 export function boxDistance(box: KitBox, point: readonly [number, number, number]) {
@@ -335,9 +452,10 @@ export function boxDistance(box: KitBox, point: readonly [number, number, number
   return Math.sqrt(sum);
 }
 
-/** Distance from a point to a vertical cylinder, zero inside. */
-export function cylinderDistance(cylinder: { center: readonly [number, number, number]; radius: number; minY: number; maxY: number }, point: readonly [number, number, number]) {
-  const horizontal = Math.max(0, Math.hypot(point[0] - cylinder.center[0], point[2] - cylinder.center[2]) - cylinder.radius);
+/** Distance from a point to a vertical cylinder (or its hollow wall), zero inside the solid. */
+export function cylinderDistance(cylinder: Cylinder, point: readonly [number, number, number]) {
+  const r = Math.hypot(point[0] - cylinder.center[0], point[2] - cylinder.center[2]);
+  const horizontal = Math.max(0, r - cylinder.radius, cylinder.inner ? cylinder.inner - r : 0);
   const vertical = Math.max(cylinder.minY - point[1], 0, point[1] - cylinder.maxY);
   return Math.hypot(horizontal, vertical);
 }
@@ -450,7 +568,8 @@ function welcomeLayout(): ZoneLayout {
 /**
  * Garden of Kindness (design 6.5), after the coordinator's checkpoint notes. The lily pond
  * sits at the island centre under the arriving pearl's landing (world 26, 5, 16 is local 0,
- * 5, 0) with a large lit lotus just under the pearl's bottom edge and pads around it; one
+ * 5, 0) with a large lit lotus at its left, under the pearl's lower left rim, and pads
+ * around it (the medallion ring sweeps the water under the pearl itself); one
  * continuous stone path leads from the front left forecourt to the pond rim; the blossom
  * tree climbs the far left edge so only its crown overhangs the headline; both benches face
  * the pond; rose bushes fill both bed arcs and a low hedge frames the pond from below, with
@@ -473,12 +592,12 @@ function gardenLayout(): ZoneLayout {
     { id: "nature.blossom-tree-c", position: [-14.6, 0.7, 7], rotationY: 0.4, scale: 1, role: "static", contact: [6.5, 5], note: "far left edge at scale 1, so the trunk climbs the frame edge and only the crown overhangs the headline (checkpoint note 1; the suggested spot enters the entry stage cap)" },
     { id: "nature.stepping-stones", position: [-3.65, 0.62, 12.66], rotationY: 1.2, role: "instanced", detail: true, note: "path from the forecourt, rims sunk into the floor" },
     { id: "nature.stepping-stones", position: [-2.5, 0.62, 8.0], rotationY: 1.45, role: "instanced", detail: true, note: "path to the pond rim (ends about -2.2, 5.6)" },
-    { id: "arrival.lotus-bloom", position: [-1.5, 0.66, 2.5], rotationY: 0.6, scale: 1.6, role: "animated", clip: { name: "bloom", at: 1 }, under: true, footprint: "round", halo: { color: "#ffd2a4", scale: 5.5, opacity: 0.4, lift: 0.5 }, note: "open lotus on the near left of the pond, showing under the hero disc's lower rim from the tour eye, lit from below (the arriving pearl settles 3 units behind it)" },
+    { id: "arrival.lotus-bloom", position: [-3.5, 0.66, 1.0], rotationY: 0.6, scale: 1.6, role: "animated", clip: { name: "bloom", at: 1 }, under: true, footprint: "round", halo: { color: "#ffd2a4", scale: 5.5, opacity: 0.4, lift: 0.5 }, note: "open lotus on the left of the pond, its petals reaching to the hero disc's lower left rim from the tour eye, lit from below; the medallion ring sweeps down to .88 a unit right of it (the layout test governs)" },
   ];
   // Lily pads around the pond (bearings from +x toward +z, so 90 faces the camera): the far
-  // side, the right, and the near left, where the medallion reach allows them (the layout
-  // test governs); the near right is the pearl's own water.
-  for (const [k, bearingDegrees] of [114, 148, 186, 226, 268, 310, 350].entries()) {
+  // side, the right, and the left, where the medallion reach allows them (the layout test
+  // governs); the near right is the pearl's own water and the lotus takes the near left.
+  for (const [k, bearingDegrees] of [114, 186, 226, 268, 310, 350].entries()) {
     const bearing = degrees(bearingDegrees);
     placements.push({
       id: "nature.lily-pads",
@@ -488,7 +607,7 @@ function gardenLayout(): ZoneLayout {
       tint: "#e8f2c9",
       role: "instanced",
       detail: true,
-      note: `lily pads ${k + 1} of 7`,
+      note: `lily pads ${k + 1} of 6`,
     });
   }
   const roses: Array<[number, number, number, number]> = [
@@ -517,30 +636,45 @@ function gardenLayout(): ZoneLayout {
 /**
  * Pearl Pavilion (design 6.6, horseshoe rule). The delivered file is the horseshoe (its
  * manifest entry lists the column bearings), so the fallback ring placement is not built.
- * The pavilion is scaled to the design's column ring radius of 9 (3.4 times the file: 23
- * tall, the ring beam at 15.7) and stands on the hero pearl's ground point, nudged a unit
- * toward the front left so its roof eave clears the back right resident pearl's ring while
- * every column keeps clear of the medallion reach and the pearl floats inside the gazebo.
- * The file brings its own floor, a stepped drum of radius 3.35 (3.04 at its top, .44 up),
- * which at this scale is the island's whole front plaza (radius 11.4, top at 2.1): the stair
- * climbs onto it from the left terrace with its landing a unit into the drum, and the
- * forecourt dressing (bench, lanterns, beds, trees) keeps to the crescent of terrace outside
- * the drum, at the back and the sides. The practice zone's eye sits 17 units off the back
- * right edge at y 11, so nothing tall stands there. The five procedural ring arches go.
+ * The pavilion stands on the hero pearl's ground point, nudged toward the front left, with
+ * its column ring at the design's radius 9 (3.5 times the file) and its height stretched to
+ * 3.9 times (the ring beam's underside at 17, the glass apex at 25.5, the concept frame's
+ * tall bullet dome), the two numbers that let its six columns keep clear of the medallion
+ * reach on a TV and on a phone while its beam clears the back right resident pearl's ring.
+ *
+ * The file brings its own floor, a stepped drum .44 up (radius 3.35, 3.04 at its top) with
+ * gold rings and a blush inlay on top: the pavilion is sunk so that top lies .04 above the
+ * terrace, the design's inlaid floor, and the drum's sides hide inside the island. The hero
+ * pearl's medallions orbit down to .88 above the district in landscape, so no floor may
+ * rise higher than the terrace it replaces (the layout test sweeps the ring through the
+ * whole reading arc in both screen layouts). With the floor flush there is no rise for the
+ * design's stair, so it is not placed; the bench sits on the floor at the front left facing
+ * the pearl, lantern posts flank the forecourt, and the beds and trees keep to the crescent
+ * of terrace outside the floor. The practice zone's eye sits 17 units off the back right
+ * edge at y 11, so nothing tall stands there. The five procedural ring arches go.
  */
 export const PAVILION_FLOOR = { base: 3.35, top: 3.04 } as const;
+/** The pavilion's placement: column ring radius 9.2, height 3.9 times the file, floor top .04 above the terrace. */
+export const PAVILION_PLACEMENT = { x: 2.1, z: 5.6, scaleXZ: 3.5, scaleY: 3.9, floorTop: TERRACE_TOP + 0.04 } as const;
 function featuredLayout(): ZoneLayout {
-  const pavilion: KitPlacement = { id: "landmark.pearl-pavilion-horseshoe", position: [2.4, 0.6, 5.6], scale: 3.4, role: "static", replaces: "landmark", footprint: "round", encloses: true, note: "the gazebo around the hero pearl, open side to the camera, columns at radius 9, its floor the front plaza" };
-  const floorTop = pavilion.position[1] + PAVILION.floor * (pavilion.scale ?? 1);
+  const { x, z, scaleXZ, scaleY, floorTop } = PAVILION_PLACEMENT;
+  const pavilion: KitPlacement = {
+    id: "landmark.pearl-pavilion-horseshoe",
+    position: [x, floorTop - PAVILION.floor * scaleY, z],
+    scaleXYZ: [scaleXZ, scaleY, scaleXZ],
+    role: "static",
+    replaces: "landmark",
+    footprint: "round",
+    encloses: true,
+    note: "the gazebo around the hero pearl, open side to the camera, columns at radius 9.2, sunk so its floor drum's top is the inlaid floor .04 above the terrace",
+  };
   const placements: KitPlacement[] = [
     ...archRow("featured"),
     pavilion,
-    // The stair climbs toward +x onto the drum: its landing (kit z -1.76 to 0, top at kit y 1)
-    // overlaps the drum's top edge (radius 10.3 from the pavilion) by a unit.
-    { id: "landmark.pearl-stairs", position: [-8.8, 0.6, 5.6], rotationY: -Math.PI / 2, scaleXYZ: [1.3, (floorTop - 0.6) / STAIR.tread, 1.1], role: "static", note: "stair from the left terrace up onto the pavilion floor" },
-    lantern(-11, 7.8, "post at the stair foot"),
-    lantern(-11.3, 3.0, "post at the stair foot"),
-    bench(-8.6, 9.2, 1.2, "bench at the front left, beside the stair, facing the pearl"),
+    lantern(-11, 7.8, "forecourt post, left"),
+    lantern(-11.3, 3.0, "forecourt post, left, at the floor's edge"),
+    lantern(11.4, 7.6, "forecourt post, right"),
+    bench(-8.4, 9.2, 1.2, "bench on the pavilion floor at the front left, facing the pearl", floorTop),
     { id: "nature.blossom-tree-a", position: [-12, 0.7, -2.5], rotationY: 0.5, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "left corner tree (design 6.6)" },
     { id: "nature.blossom-tree-a", position: [12.5, 0.7, -1], rotationY: -0.6, scale: 1.1, role: "static", contact: [6.5, 5.5], note: "right corner tree, on the crescent outside the floor, clear of the practice eye" },
   ];
@@ -587,14 +721,22 @@ function heartLayout(): ZoneLayout {
  * (Plan 24 protects the disc) and the Plan 01 expression piece above it. The nine pieces
  * share one draw; the selected one rises and turns and carries a halo. The five arches stay
  * as kit arches; the grove's four cotton trees are its trees.
+ *
+ * The pieces float at y 11.4 at scale 1.4 rather than the design's 6.9 at 1.6: from the
+ * tour eye the grove reads in perspective, so a piece just above a front column projected
+ * over the discs of the columns behind it (the design's own numbers cover three discs, the
+ * first of them the default expression's). At 11.4 every piece clears every disc for every
+ * reading arc camera, including its own bob and the selected piece's rise, which the
+ * layout test proves by projection (`GROVE_PIECES`).
  */
+export const GROVE_PIECES = { y: 11.4, scale: 1.4, yaw: 0.48 } as const;
 function expressionsLayout(): ZoneLayout {
   const placements: KitPlacement[] = [...archRow("expressions")];
   const pieces = ["expression.01-hello-bubble", "expression.02-gift-box", "expression.03-mended-heart", "expression.04-comfort-cloud", "expression.05-open-door", "expression.06-teacup", "expression.07-candle", "expression.08-helping-hand", "expression.09-star"];
   for (let i = 0; i < 9; i++) {
     const a = -Math.PI * 0.9 + (i / 8) * Math.PI * 1.6, x = Math.cos(a) * 10.5, z = Math.sin(a) * 9.3;
     placements.push({ id: "landmark.pearl-column", position: [x, 0.675, z], scaleXYZ: [1.1, 4.25 / 4, 1.1], role: "static", replaces: "column", column: i, frame: "root", note: `grove column ${i + 1} of 9` });
-    placements.push({ id: pieces[i], position: [x, 7.15, z], rotationY: 0.48, scale: 1.6, role: "static", frame: "root", slot: i + 1, halo: { color: "#ffe2b0", scale: 4.2, opacity: 0.45 }, note: `expression piece ${i + 1} on its column` });
+    placements.push({ id: pieces[i], position: [x, GROVE_PIECES.y, z], rotationY: GROVE_PIECES.yaw, scale: GROVE_PIECES.scale, role: "static", frame: "root", slot: i + 1, halo: { color: "#ffe2b0", scale: 4.2, opacity: 0.45 }, note: `expression piece ${i + 1} above its column` });
   }
   placements.push(lantern(-13, 9, "forecourt post"), lantern(13, 9, "forecourt post"));
   // The common bed dressing (design 6.3): roses along the lawn ring outside the columns,
