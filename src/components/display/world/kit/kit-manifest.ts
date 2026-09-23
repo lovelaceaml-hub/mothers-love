@@ -64,6 +64,14 @@ export type KitLod = { far: KitAssetId; cullDistance: number };
 export type KitVector3 = [number, number, number];
 /** A blank face a builder may put the app's own canonical artwork on (the stone tablet). */
 export type KitTextFace = { normal: KitVector3; centre: KitVector3; width: number; height: number };
+/** Plain data only: numbers, short strings, flags, lists and small objects of the same. */
+export type KitLayoutValue = number | string | boolean | KitLayoutValue[] | { [key: string]: KitLayoutValue };
+/**
+ * Placement facts a studio lane authored for one piece, carried as written (snake case keys,
+ * glTF coordinates): the horseshoe pavilion's `hero_slot` and `column_angles_from_open_centre_deg`,
+ * a portal's `clear_opening`, the railing's `tiling`. The sync copies only the keys it knows.
+ */
+export const KIT_LAYOUT_KEYS = ["hero_slot", "column_angles_from_open_centre_deg", "open_side", "tiling", "clear_opening", "columns", "anchors"] as const;
 
 export type KitManifestEntry = {
   id: KitAssetId;
@@ -90,6 +98,7 @@ export type KitManifestEntry = {
   /** Petal uv orientation for the lotus glow patch (design 4.2). */
   uv?: "base-to-tip";
   textFace?: KitTextFace;
+  layout?: Record<string, KitLayoutValue>;
 };
 
 export type KitDecoder = {
@@ -151,6 +160,29 @@ export function isKitAssetId(value: unknown): value is KitAssetId {
   const dot = value.indexOf(".");
   if (dot < 1) return false;
   return (KIT_FEATURES as readonly string[]).includes(value.slice(0, dot)) && SLUG.test(value.slice(dot + 1));
+}
+
+function parseLayoutValue(value: unknown, depth: number): KitLayoutValue | undefined {
+  if (depth > 4) return undefined;
+  if (typeof value === "boolean") return value;
+  if (isFiniteNumber(value)) return value;
+  if (typeof value === "string") return value.length <= 500 ? value : undefined;
+  if (Array.isArray(value)) {
+    if (value.length > 64) return undefined;
+    const items = value.map(item => parseLayoutValue(item, depth + 1));
+    return items.every(item => item !== undefined) ? items as KitLayoutValue[] : undefined;
+  }
+  if (isObject(value)) {
+    const out: Record<string, KitLayoutValue> = {};
+    for (const [key, item] of Object.entries(value)) {
+      if (!/^[a-z][a-z0-9_]*$/.test(key)) return undefined;
+      const parsed = parseLayoutValue(item, depth + 1);
+      if (parsed === undefined) return undefined;
+      out[key] = parsed;
+    }
+    return out;
+  }
+  return undefined;
 }
 
 function parseClip(value: unknown): KitClip | null {
@@ -220,6 +252,12 @@ function parseEntry(value: unknown): KitManifestEntry | null {
     const face = value.textFace;
     if (!isObject(face) || !isVector3(face.normal) || !isVector3(face.centre) || !isFiniteNumber(face.width) || !isFiniteNumber(face.height) || face.width <= 0 || face.height <= 0) return null;
     entry.textFace = { normal: [...face.normal], centre: [...face.centre], width: face.width, height: face.height };
+  }
+  if (value.layout !== undefined) {
+    if (!isObject(value.layout) || !Object.keys(value.layout).every(key => (KIT_LAYOUT_KEYS as readonly string[]).includes(key))) return null;
+    const layout = parseLayoutValue(value.layout, 0);
+    if (layout === undefined) return null;
+    entry.layout = layout as Record<string, KitLayoutValue>;
   }
   return entry;
 }

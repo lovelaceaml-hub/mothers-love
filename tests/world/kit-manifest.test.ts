@@ -123,6 +123,20 @@ describe("kit manifest schema", () => {
     expect(parseKitManifest(manifest([entry({ clips: [{ name: "give_heart", seconds: 4, loop: false, handoffAt: 2.4 }], skinned: true, bones: 22, hands: ["hand.L", "hand.R"] })]))!.assets[0].clips[0].handoffAt).toBe(2.4);
   });
 
+  it("carries authored placement facts as plain data, and nothing else", () => {
+    const hero = { hero_slot: { centre: [0, 2.526, 0], free_radius: 2.086, note: "Where the hero pearl floats." }, column_angles_from_open_centre_deg: [85, 123, 161, 199, 237, 275] };
+    expect(parseKitManifest(manifest([entry({ layout: hero })]))!.assets[0].layout).toEqual(hero);
+    for (const layout of [
+      { description: "not a placement key" },
+      { hero_slot: { centre: [0, Number.NaN, 0] } },
+      { hero_slot: { Centre: [0, 1, 0] } },
+      { tiling: { note: "x".repeat(501) } },
+      { anchors: { a: { b: { c: { d: { e: 1 } } } } } },
+      { clear_opening: [3.21, null] },
+      "hero",
+    ]) expect(parseKitManifest(manifest([entry({ layout })])), JSON.stringify(layout).slice(0, 60)).toBeNull();
+  });
+
   it("names the thirteen zones exactly as the world does", () => {
     expect([...KIT_ZONE_IDS].sort()).toEqual(ZONES.map(zone => zone.id).sort());
   });
@@ -192,6 +206,9 @@ describe("the synced kit in public/world-kit", () => {
     const ids = new Set(parsed!.assets.map(asset => asset.id));
     for (const id of ["recognition.recognition-pearl", "recognition.orbit-ring", "recognition.medallion-01", "recognition.medallion-09", "recognition.constellation-sparkle", "landmark.pearl-arch", "core.pearl", "expression.01-hello-bubble", "people.mother"])
       expect(ids.has(id as never), id).toBe(true);
+    // The horseshoe pavilion's hero slot is what the featured zone's containment rule reads (design 6.6).
+    const horseshoe = parsed!.assets.find(asset => asset.id === "landmark.pearl-pavilion-horseshoe");
+    if (horseshoe) expect((horseshoe.layout?.hero_slot as { centre: number[] }).centre).toHaveLength(3);
   });
 });
 

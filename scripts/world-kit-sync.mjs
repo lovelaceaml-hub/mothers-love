@@ -34,7 +34,7 @@ process.emitWarning = (warning, ...rest) => {
   return emitWarning.call(process, warning, ...rest);
 };
 const {
-  KIT_BUDGETS, KIT_DECODER_FILES, KIT_DECODER_RELATIVE, KIT_FEATURE_PRIORITY, KIT_VERSION, KIT_ZONE_IDS,
+  KIT_BUDGETS, KIT_DECODER_FILES, KIT_DECODER_RELATIVE, KIT_FEATURE_PRIORITY, KIT_LAYOUT_KEYS, KIT_VERSION, KIT_ZONE_IDS,
   budgetProblem, parseKitManifest,
 } = await import("../src/components/display/world/kit/kit-manifest.ts");
 process.emitWarning = emitWarning;
@@ -254,6 +254,10 @@ function entryFor({ file, bytes, group, feature, budget, piece, groupManifest })
   if (piece?.uv !== undefined) entry.uv = piece.uv;
   const face = piece?.textFace ?? piece?.text_face;
   if (face) entry.textFace = { normal: face.normal, centre: face.centre ?? face.center, width: face.width, height: face.height };
+  // Placement facts the lane authored for this piece (a pavilion's hero slot, a portal's clear
+  // opening), carried as written; descriptions and notes about the file itself stay behind.
+  const layout = Object.fromEntries(KIT_LAYOUT_KEYS.filter(key => piece?.[key] !== undefined).map(key => [key, piece[key]]));
+  if (Object.keys(layout).length) entry.layout = layout;
   const problem = budgetProblem(entry);
   if (problem) fail(`over budget: ${problem}`);
   return entry;
