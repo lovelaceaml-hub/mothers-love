@@ -1,13 +1,13 @@
 ---
 lane: LK2
 title: arrivals
-state: landed, polish round applied, review finding closed and re verified on the retry run (run 5), awaiting the coordinator's review
+state: merged
 model: Claude Fable 5.1 (writer)
 runner: coordinator chat, background lane
 worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k2 (branch world-kit/k2, base 2ef8c41)
 review: independent reviewer's style cycle finding fixed in 68bf836 and re verified in run 5; visual director round one applied (13 notes, see Result); coordinator review pending
 depends_on: K0 sockets (merged at 2ef8c41)
-updated: 2026-09-23T16:00Z
+updated: 2026-09-23T16:15Z
 ---
 
 # LK2: arrivals
