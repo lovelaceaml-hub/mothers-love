@@ -7,7 +7,7 @@ import {
   type Quality,
   type ZoneId,
 } from "./world-data";
-import { neighborDialogue } from "./neighbor-dialogue";
+import { legacyNeighborDialogue, neighborDialogue } from "./neighbor-dialogue";
 import { useWorldFeed } from "./use-world-feed";
 import { readingSeconds, type WorldSource } from "./world-feed";
 import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
@@ -321,14 +321,23 @@ export function WorldExperience({
     >
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
         Fictional neighbors illustrate words of kindness.{" "}
-        {designReview ? "Miniature figures provide scale in this visual study." : (neighborDialogue(status.elapsed, status.zone, arriving) ??
-          "They greet and walk together.")}
+        {/* The design study's rigged neighbors read the same schedule as their speech cards;
+            without them the study keeps its miniature figures. In the Grove they speak the
+            expression the panel shows, as their card does. Classic and cinematic keep the
+            rule their own procedural cards follow. */}
+        {designReview
+          ? status.kitNeighbors
+            ? (neighborDialogue(status.elapsed, status.zone, arriving, expressionId) ??
+              "They greet, walk together and share a heart.")
+            : "Miniature figures provide scale in this visual study."
+          : (legacyNeighborDialogue(status.elapsed, status.zone, arriving) ??
+            "They greet and walk together.")}
       </p>
       <canvas
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label={designReview ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
+        aria-label={designReview && !status.kitNeighbors ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
         role="img"
         aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
