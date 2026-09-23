@@ -8,6 +8,7 @@ import { RecognitionDirector } from "./recognition-director";
 import { isWorldDesignStudy, studyKit, studyRadiance, type StudyArrival } from "./prototype/design-mode";
 import { arrivalAdmitted, arrivalStyleAt, arrivalStyleCycles } from "./prototype/arrival-choreography";
 import { resolveStudyTier, StudyRadiance } from "./prototype/study-radiance";
+import { applyStudyDetail, type StudyDetailEntry } from "./prototype/study-budget";
 import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./prototype/camera-finesse";
 import {
   StudyMood,
@@ -37,6 +38,8 @@ export type WorldStatus = {
   fps: number;
   calls: number;
   triangles: number;
+  textures: number;
+  geometries: number;
   quality: string;
   frames: number;
   arrival: ArrivalState;
@@ -51,6 +54,8 @@ export type WorldStatus = {
   kitMissing?: number;
   /** Kit assets that arrived. */
   kitLoaded?: number;
+  /** Kit assets loaded and requested, when a kit object is present. */
+  kitCounts?: { loaded: number; total: number };
   /** True once kit neighbors stand in the design world in place of the miniature figures. */
   kitNeighbors?: boolean;
 };
@@ -276,7 +281,10 @@ export class WorldEngine {
       height = Math.max(1, this.canvas.clientHeight);
     const tier = resolveStudyTier(this.quality, this.lowered);
     const low = tier === "low";
-    if (isWorldDesignStudy()) this.studyTier(low);
+    if (isWorldDesignStudy()) {
+      this.world.scene.userData.studyTier = tier;
+      this.studyTier(low);
+    }
     const pixels = low ? 1_050_000 : 2_600_000;
     const ratio = isWorldDesignStudy() ? studyPixelRatio(width, height, window.devicePixelRatio, this.quality, this.lowered) : Math.min(
       window.devicePixelRatio || 1,
@@ -491,6 +499,15 @@ export class WorldEngine {
           this.renderer.shadowMap.needsUpdate ||
           !moving ||
           this.frameCount % 6 === 0;
+      if (this.study) {
+        const entries = this.world.scene.userData.studyDetailGroups;
+        if (Array.isArray(entries))
+          applyStudyDetail(
+            entries as StudyDetailEntry[],
+            this.camera.position,
+            resolveStudyTier(this.quality, this.lowered),
+          );
+      }
       if (this.radiance) this.radiance.render(this.world.scene, this.camera);
       else this.renderer.render(this.world.scene, this.camera);
       this.frameCount++;
@@ -506,6 +523,7 @@ export class WorldEngine {
       else this.slowWindows = 0;
       if (this.quality === "auto" && !this.lowered && this.slowWindows >= 3) {
         this.lowered = true;
+        if (this.study) this.world.scene.userData.studyTier = "low";
         this.resize();
       }
       this.reportAt = now;
@@ -562,6 +580,8 @@ export class WorldEngine {
       frames: this.frameCount,
       calls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
+      textures: this.renderer.info.memory.textures,
+      geometries: this.renderer.info.memory.geometries,
       quality:
         this.quality === "low" || (this.lowered && this.quality === "auto")
           ? "Low"
@@ -575,6 +595,9 @@ export class WorldEngine {
       kit: this.kitStatus,
       kitMissing: this.kit?.missing.length ?? 0,
       kitLoaded: this.kit?.loaded ?? 0,
+      kitCounts: this.kit
+        ? { loaded: this.kit.loaded, total: this.kit.loaded + this.kit.missing.length }
+        : undefined,
       kitNeighbors: this.world.scene.userData.studyNeighbors === true,
     });
   }
@@ -796,6 +819,8 @@ export class WorldEngine {
     this.quality = quality;
     this.lowered = false;
     this.slowWindows = 0;
+    if (this.study)
+      this.world.scene.userData.studyTier = resolveStudyTier(quality, false);
     this.resize();
     this.report();
   }

@@ -8,8 +8,36 @@ import { studyCanopyPuffs } from "../../src/components/display/world/prototype/s
 import { studyCloudLayout } from "../../src/components/display/world/prototype/study-clouds";
 import { ZONES } from "../../src/components/display/world/world-data";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "../../src/components/display/world/prototype/study-palette";
+import { applyStudyDetail, STUDY_DETAIL_DISTANCE, studyCanvasSize, studyDetailDistance } from "../../src/components/display/world/prototype/study-budget";
+import { resolveStudyTier, type StudyTier } from "../../src/components/display/world/prototype/study-radiance";
 
 describe("sample study quality", () => {
+  it.each([
+    { focused: true, tier: "high", size: 2048 },
+    { focused: false, tier: "high", size: 1024 },
+    { focused: true, tier: "auto", size: 1024 },
+    { focused: false, tier: "auto", size: 512 },
+    { focused: true, tier: "low", size: 1024 },
+    { focused: false, tier: "low", size: 512 },
+  ] as const)("uses a $size pixel canvas when focused is $focused at $tier", ({ focused, tier, size }) => {
+    expect(studyCanvasSize(focused, tier)).toBe(size);
+  });
+  it("defines the detail distance for every tier", () => {
+    const expected: Record<StudyTier, number> = { high: 140, auto: 110, low: 70 };
+    expect(STUDY_DETAIL_DISTANCE).toEqual(expected);
+    for (const tier of Object.keys(expected) as StudyTier[])
+      expect(studyDetailDistance(tier)).toBe(expected[tier]);
+  });
+  it("hides an Auto detail at 111 units and shows it on High", () => {
+    const entry = { object: { visible: true }, centre: { x: 111, y: 0, z: 0 } };
+    expect(applyStudyDetail([entry], { x: 0, y: 0, z: 0 }, "auto")).toBe(0);
+    expect(entry.object.visible).toBe(false);
+    expect(applyStudyDetail([entry], { x: 0, y: 0, z: 0 }, "high")).toBe(1);
+    expect(entry.object.visible).toBe(true);
+  });
+  it("keeps a lowered Automatic tier on Low", () => {
+    expect(resolveStudyTier("auto", true)).toBe("low");
+  });
   it("allows a native 4K image in High", () => {
     expect(studyPixelRatio(3840, 2160, 1, "high", false)).toBe(1);
   });

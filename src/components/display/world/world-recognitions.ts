@@ -10,6 +10,7 @@ import {
   type StudyPearlFrame,
 } from "./prototype/pearl-skin";
 import { StudyWaterHalo } from "./prototype/study-glory";
+import { studyCanvasSize, type StudyTier } from "./prototype/study-budget";
 import {
   RECOGNITION_ZONES,
   WORLD_EXPRESSIONS,
@@ -283,7 +284,19 @@ export class WorldRecognitionBubbles {
     ]);
   }
   private assign(slot: Slot, record: Recognition | undefined, time: number) {
-    if (slot.record?.id === record?.id) return;
+    if (!this.designStudy && slot.record?.id === record?.id) return;
+    const publishedTier = this.hostScene.userData.studyTier;
+    const tier: StudyTier = publishedTier === "auto" || publishedTier === "low"
+      ? publishedTier
+      : "high";
+    const canvasSize = this.designStudy
+      ? studyCanvasSize(slot.index === 0, tier)
+      : (slot.index === 0 ? 1024 : 512);
+    if (
+      this.designStudy &&
+      slot.record?.id === record?.id &&
+      (!record || slot.canvas?.width === canvasSize)
+    ) return;
     this.clear(slot);
     if (!record) return;
     slot.record = record;
@@ -291,7 +304,7 @@ export class WorldRecognitionBubbles {
     slot.born = time;
     slot.face.userData.recognitionId = record.id;
     slot.canvas = document.createElement("canvas");
-    slot.canvas.width = slot.canvas.height = isWorldDesignStudy() ? (slot.index === 0 ? 2048 : 1024) : (slot.index === 0 ? 1024 : 512);
+    slot.canvas.width = slot.canvas.height = canvasSize;
     slot.texture = new T.CanvasTexture(slot.canvas);
     slot.texture.colorSpace = T.SRGBColorSpace;
     slot.texture.generateMipmaps = true;
@@ -310,7 +323,9 @@ export class WorldRecognitionBubbles {
           (readingSeconds(record.message, minimum) / pages.length),
       ),
     );
-    const key = `${page}:${minimum}`;
+    const key = this.designStudy
+      ? `${page}:${minimum}:${slot.canvas.width}`
+      : `${page}:${minimum}`;
     if (slot.pageKey === key) return false;
     slot.pageKey = key;
     if (this.designStudy) {
