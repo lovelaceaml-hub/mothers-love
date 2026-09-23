@@ -11,10 +11,13 @@ import {
   RIBBON_SWAY,
   STAGE_KIT,
   STAGE_PLACEMENT,
+  arrivalScreen,
   bloomStage,
+  constellationPoint,
   constellationStage,
   extractJointGeometry,
   pearlClearance,
+  pearlTopLocal,
   petalCoordinates,
   ribbonSilkCentre,
   ribbonStage,
@@ -129,6 +132,12 @@ function sparkleModel(): KitModel {
   const clip = new T.AnimationClip("twinkle", 2, [new T.VectorKeyframeTrack("ConstellationSparkle.scale", [0, 1, 2], [1, 1, 1, 1.3, 1.3, 1.3, 1, 1, 1])]);
   return { scene, animations: [clip] };
 }
+function pearlModel(): KitModel {
+  const scene = new T.Group();
+  const mesh = new T.Mesh(new T.SphereGeometry(.425, 12, 8), new T.MeshStandardMaterial({ name: "PearlSkin" }));
+  mesh.name = "Sphere"; scene.add(mesh);
+  return { scene, animations: [] };
+}
 function asset(id: KitAssetId, model: KitModel): KitAsset {
   model.scene.name = id;
   model.scene.updateMatrixWorld(true);
@@ -141,7 +150,7 @@ function asset(id: KitAssetId, model: KitModel): KitAsset {
 function fakeKit(ids: KitAssetId[] = Object.values(STAGE_KIT)): WorldKit {
   const models: Record<string, () => KitModel> = {
     [STAGE_KIT.lotus]: lotusModel, [STAGE_KIT.portal]: portalModel, [STAGE_KIT.butterfly]: butterflyModel,
-    [STAGE_KIT.petals]: petalsModel, [STAGE_KIT.sparkle]: sparkleModel,
+    [STAGE_KIT.petals]: petalsModel, [STAGE_KIT.sparkle]: sparkleModel, [STAGE_KIT.pearl]: pearlModel,
   };
   const assets = new Map<KitAssetId, KitAsset>();
   for (const id of ids) assets.set(id, asset(id, models[id]()));
@@ -157,6 +166,8 @@ function instancedMeshes(root: T.Object3D) {
   root.traverse(o => { if ((o as T.InstancedMesh).isInstancedMesh) found.push(o as T.InstancedMesh); });
   return found;
 }
+/** Whether a material takes the scene fog (`fog` is declared per material class in three's typings). */
+const fogOf = (material: T.Material) => (material as T.Material & { fog?: boolean }).fog;
 const matrix = new T.Matrix4(), position = new T.Vector3(), quaternion = new T.Quaternion(), scale = new T.Vector3();
 function instanceAt(mesh: T.InstancedMesh, i: number) {
   mesh.getMatrixAt(i, matrix);
@@ -210,6 +221,19 @@ describe("arrival stage geometry helpers", () => {
     expect(behind.front).toBeLessThan(0);
     const inFront = pearlClearance(ARRIVAL_EYE_LOCAL.clone().lerp(new T.Vector3(0, ARRIVAL_PEARL.y, 0), .7));
     expect(inFront.front).toBeGreaterThan(0);
+  });
+
+  it("projects local points through the engine's arrival lens", () => {
+    // The pearl's centre sits a little below the middle of the frame, its top well inside it,
+    // and a point far above the pearl is off the top edge (which is where the string of lights
+    // and the arch crown are allowed to be).
+    const centre = arrivalScreen(new T.Vector3(0, ARRIVAL_PEARL.y, 0));
+    expect(Math.abs(centre.x)).toBeLessThan(.15);
+    expect(Math.abs(centre.y)).toBeLessThan(.2);
+    const top = arrivalScreen(pearlTopLocal());
+    expect(top.y).toBeGreaterThan(centre.y + .3);
+    expect(top.y).toBeLessThan(.85);
+    expect(arrivalScreen(new T.Vector3(0, 30, 0)).y).toBeGreaterThan(1);
   });
 });
 
@@ -282,6 +306,39 @@ describe("petal bloom stage", () => {
     stage.dispose();
   });
 
+  it("leans the kit lotus toward the arrival camera and keeps the open flower under the words", () => {
+    const ctx = context(fakeKit());
+    const stage = bloomStage(ctx);
+    const root = named(stage.group, STAGE_KIT.lotus);
+    const up = new T.Vector3(0, 1, 0).applyQuaternion(root.quaternion);
+    const toward = new T.Vector3(ARRIVAL_EYE_LOCAL.x, 0, ARRIVAL_EYE_LOCAL.z).normalize();
+    expect(up.angleTo(new T.Vector3(0, 1, 0))).toBeCloseTo(STAGE_PLACEMENT.lotus.tilt, 6);
+    expect(up.dot(toward)).toBeGreaterThan(0);
+    // The file's petal tips (height 1.188 from a base pivot) stay over a unit under the disc's
+    // bottom edge at the polished scale, so the core reads below the words, not behind them.
+    expect(STAGE_PLACEMENT.lotus.y + 1.188 * STAGE_PLACEMENT.lotus.scale).toBeLessThan(ARRIVAL_PEARL.y - ARRIVAL_PEARL.radius - 1);
+    // Every kit material of the lotus ignores the scene fog.
+    root.traverse(o => { const m = (o as T.Mesh).material as T.Material | undefined; if (m) expect(fogOf(m)).toBe(false); });
+    stage.dispose();
+  });
+
+  it("starts the petal drift before the reveal and dims the entrance light", () => {
+    const ctx = context(fakeKit());
+    const stage = bloomStage(ctx);
+    const drift = instancedMeshes(stage.group)[0];
+    const opacity = () => (drift.material as T.Material).opacity;
+    stage.update(pose("approach", .4), 0, on);
+    expect(opacity()).toBe(0);
+    stage.update(pose("approach", .8), 1, on);
+    expect(opacity()).toBeGreaterThan(.2);
+    stage.update(pose("reveal", 1), 2, on);
+    expect(opacity()).toBeCloseTo(1, 6);
+    const sprites: T.Sprite[] = [];
+    stage.group.traverse(o => { if ((o as T.Sprite).isSprite) sprites.push(o as T.Sprite); });
+    expect(sprites.map(s => s.material.opacity).sort((a, b) => a - b)).toEqual([.12, .18]);
+    stage.dispose();
+  });
+
   it("never lets a kit petal drift across the words", () => {
     const ctx = context(fakeKit());
     const stage = bloomStage(ctx);
@@ -322,22 +379,43 @@ describe("silk unveiling stage", () => {
     expect(nearestAnywhere).toBeGreaterThan(ARRIVAL_PEARL.radius);
   });
 
-  it("stands the kit portal behind the pearl, scaled from its base with gather and fading with presence", () => {
+  it("frames the pearl with the kit portal, scaled from its base with gather and fading with presence", () => {
     const ctx = context(fakeKit());
     const stage = ribbonStage(ctx);
     const arch = named(stage.group, STAGE_KIT.portal);
-    expect(arch.position.z).toBe(STAGE_PLACEMENT.portal.z);
-    // No point of the arch approaches the words from the front: whatever the camera sees ahead
-    // of the disc plane keeps the full clearance, and the opening's own edges sit behind the pearl.
+    // Behind the pearl along the camera's own line, facing the camera: its +z axis points at
+    // the eye's azimuth, and its centre is `behind` units from the pearl's axis.
+    expect(Math.hypot(arch.position.x, arch.position.z)).toBeCloseTo(STAGE_PLACEMENT.portal.behind, 6);
+    const facing = new T.Vector3(0, 0, 1).applyQuaternion(arch.quaternion);
+    const toEye = new T.Vector3(ARRIVAL_EYE_LOCAL.x, 0, ARRIVAL_EYE_LOCAL.z).normalize();
+    expect(facing.dot(toEye)).toBeCloseTo(1, 6);
+    expect(arch.position.clone().normalize().dot(toEye)).toBeCloseTo(-1, 6);
+    // The real file's extents: no point of the arch approaches the words from the front, so
+    // whatever the camera sees ahead of the disc plane keeps the full clearance, including the
+    // opening's own edges at the front of the satin tails. Inside the opening below its top
+    // there is no geometry, so those samples are skipped.
     const half = { x: 3.791, z: 1.453, y: 5.958 }, opening = { x: 1.605, y: 4.47 };
-    let nearestInFront = Infinity;
-    for (const x of [-half.x, -opening.x, 0, opening.x, half.x]) for (const y of [0, 2.2, opening.y, half.y]) for (const z of [-half.z, 0, half.z]) {
-      const point = new T.Vector3(x, y, z).multiplyScalar(STAGE_PLACEMENT.portal.scale).add(arch.position);
-      const clearance = pearlClearance(point);
+    const local = (x: number, y: number, z: number) => new T.Vector3(x, y, z).multiplyScalar(STAGE_PLACEMENT.portal.scale).applyQuaternion(arch.quaternion).add(arch.position);
+    let nearestInFront = Infinity, sampled = 0;
+    for (const x of [-half.x, -opening.x, 0, opening.x, half.x]) for (const y of [0, 2.2, 3.4, opening.y, half.y]) for (const z of [-half.z, 0, half.z]) {
+      if (Math.abs(x) < opening.x && y < opening.y) continue;
+      sampled++;
+      const clearance = pearlClearance(local(x, y, z));
       if (clearance.front >= 0) nearestInFront = Math.min(nearestInFront, clearance.distance);
-      if (Math.abs(x) === opening.x) expect(clearance.front).toBeLessThan(0);
     }
+    expect(sampled).toBeGreaterThan(40);
     expect(nearestInFront).toBeGreaterThanOrEqual(ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance);
+    // And the arch frames the pearl as the board shows it: the opening's top edge draws above
+    // the disc's top, its side edges outside the disc on both sides, at 1920 by 1080.
+    const top = arrivalScreen(pearlTopLocal());
+    expect(arrivalScreen(local(0, opening.y, 0)).y).toBeGreaterThan(top.y + .1);
+    expect(arrivalScreen(local(0, opening.y, 0)).y).toBeLessThan(1);
+    const centre = arrivalScreen(new T.Vector3(0, ARRIVAL_PEARL.y, 0));
+    const discHalfWidth = (top.y - centre.y) * 9 / 16;
+    // The opening's side edges at the pearl's height (file y is the local height over the scale).
+    const atPearlHeight = ARRIVAL_PEARL.y / STAGE_PLACEMENT.portal.scale;
+    expect(arrivalScreen(local(-opening.x, atPearlHeight, 0)).x).toBeLessThan(centre.x - discHalfWidth - .03);
+    expect(arrivalScreen(local(opening.x, atPearlHeight, 0)).x).toBeGreaterThan(centre.x + discHalfWidth + .03);
     stage.update(pose("approach", 0), 0, on);
     expect(arch.scale.x).toBeCloseTo(STAGE_PLACEMENT.portal.scale * .72, 6);
     stage.update(pose("reading"), 1, on);
@@ -345,12 +423,30 @@ describe("silk unveiling stage", () => {
     const materials = new Set<T.Material>();
     arch.traverse(o => { const m = (o as T.Mesh).material as T.Material | undefined; if (m) materials.add(m); });
     expect(materials.size).toBe(4);
-    for (const m of materials) { expect(m.transparent).toBe(true); expect(m.opacity).toBeGreaterThan(0); }
+    for (const m of materials) { expect(m.transparent).toBe(true); expect(m.opacity).toBeGreaterThan(0); expect(fogOf(m)).toBe(false); }
     // The kit's own imported materials were never handed out: every one is the stage's copy.
     for (const m of materials) expect(ctx.materials.has(m)).toBe(true);
+    // The satin keeps the file's two tones (COLOR_0) at the .85 ceiling.
+    const satin = [...materials].find(m => (m as T.MeshPhysicalMaterial).vertexColors) as T.MeshPhysicalMaterial | undefined;
+    expect(satin).toBeDefined();
+    expect(satin!.opacity).toBeCloseTo(.85, 6);
     stage.update(pose("settle", 1), 2, on);
     for (const m of materials) expect(m.opacity).toBe(0);
     expect(arch.visible).toBe(false);
+    stage.dispose();
+  });
+
+  it("thins the silk and lights its fold crests", () => {
+    const ctx = context(fakeKit());
+    const stage = ribbonStage(ctx);
+    const silk = stage.group.children.find(o => (o as T.Mesh).isMesh && (o as T.Mesh).geometry.getAttribute("fold")) as T.Mesh;
+    expect(silk).toBeDefined();
+    stage.update(pose("reading"), 1, on);
+    const fold = silk.geometry.getAttribute("fold");
+    let lit = 0;
+    for (let i = 0; i < fold.count; i++) { expect(fold.getX(i)).toBeGreaterThanOrEqual(0); expect(fold.getX(i)).toBeLessThanOrEqual(1); if (fold.getX(i) > .5) lit++; }
+    expect(lit).toBeGreaterThan(fold.count / 8);
+    expect(fogOf(silk.material as T.Material)).toBe(false);
     stage.dispose();
   });
 
@@ -399,6 +495,34 @@ describe("silk unveiling stage", () => {
     }
   });
 
+  it("keeps every kit butterfly out of the words and out of the top of the frame while reading", () => {
+    const ctx = context(fakeKit());
+    const stage = ribbonStage(ctx);
+    const flyers = stage.group.children.filter(o => o.name === STAGE_KIT.butterfly);
+    const limit = ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance;
+    let nearest = Infinity, highest = -Infinity, inFront = 0;
+    // A full orbit at the calm rate takes about 80 s; sample a little over one.
+    for (let time = 0; time < 90; time += .25) {
+      stage.update(pose("reading"), time, on);
+      for (const flyer of flyers) {
+        const clearance = pearlClearance(flyer.position);
+        if (clearance.front > -.6) { inFront++; nearest = Math.min(nearest, clearance.distance); }
+        highest = Math.max(highest, arrivalScreen(flyer.position).y);
+      }
+    }
+    expect(inFront).toBeGreaterThan(0);
+    expect(nearest).toBeGreaterThanOrEqual(limit);
+    // The top 15 percent of the frame is normalised y above .7.
+    expect(highest).toBeLessThanOrEqual(.7);
+    // Pale wings, gold edge, no fog.
+    const wing = named(flyers[0], "butterfly") as T.Mesh;
+    const material = wing.material as T.MeshStandardMaterial;
+    expect(material.vertexColors).toBe(false);
+    expect(material.color.getHexString()).toBe("fbe9f4");
+    expect(fogOf(material)).toBe(false);
+    stage.dispose();
+  });
+
   it("keeps the procedural wings and no arch without the kit", () => {
     const ctx = context();
     const stage = ribbonStage(ctx);
@@ -415,19 +539,91 @@ describe("pearl formation stage", () => {
     expect(clearance.distance).toBeGreaterThanOrEqual(ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance);
   });
 
-  it("keeps 96 points of light without the kit", () => {
+  it("sends the string of lights down a path that never crosses the words", () => {
+    // The helix's one crossing in front of the disc happens high above it, the rest passes
+    // beside and behind it, and no point, even hidden behind the disc, reaches the disc.
+    const limit = ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance;
+    const point = new T.Vector3();
+    let nearestInFront = Infinity, nearestAnywhere = Infinity, crossings = 0, wasInFront = false;
+    for (let s = 0; s <= 1 + 1e-9; s += 1 / 800) {
+      const clearance = pearlClearance(constellationPoint(Math.min(1, s), point));
+      nearestAnywhere = Math.min(nearestAnywhere, clearance.distance);
+      const inFront = clearance.front > -.6;
+      if (inFront) nearestInFront = Math.min(nearestInFront, clearance.distance);
+      if (inFront && !wasInFront) crossings++;
+      wasInFront = inFront;
+    }
+    expect(nearestInFront).toBeGreaterThanOrEqual(limit);
+    expect(nearestAnywhere).toBeGreaterThan(ARRIVAL_PEARL.radius + .2);
+    expect(crossings).toBeGreaterThanOrEqual(1);
+    // It starts about 30 units above the pearl's centre, off the top of the frame, and ends
+    // exactly on the landing.
+    expect(constellationPoint(0, point).y).toBeCloseTo(ARRIVAL_PEARL.y + 30, 0);
+    expect(arrivalScreen(constellationPoint(0, point)).y).toBeGreaterThan(1);
+    expect(constellationPoint(1, point).distanceTo(CONSTELLATION_LANDING)).toBeLessThan(1e-6);
+    // The real lights, once placed, obey the same rule.
+    const ctx = context(fakeKit());
+    const stage = constellationStage(ctx);
+    stage.update(pose("reading"), 0, on);
+    for (const mesh of instancedMeshes(stage.group)) {
+      if (mesh.name === "ring pearls") continue;
+      for (let i = 0; i < mesh.count; i++) {
+        const { position: at } = instanceAt(mesh, i);
+        const clearance = pearlClearance(at);
+        if (clearance.front > -.6) expect(clearance.distance).toBeGreaterThanOrEqual(limit);
+        expect(clearance.distance).toBeGreaterThan(ARRIVAL_PEARL.radius + .2);
+      }
+    }
+    stage.dispose();
+  });
+
+  it("keeps 200 points of light without the kit", () => {
     const ctx = context();
     const stage = constellationStage(ctx);
-    expect(instancedMeshes(stage.group).map(o => o.count)).toEqual([96]);
+    expect(instancedMeshes(stage.group).map(o => o.count)).toEqual([200]);
     stage.update(pose("reading"), 0, on);
     stage.dispose();
   });
 
-  it("gives every third light the kit star and turns the landing star on with the flash", () => {
+  it("forms eight kit pearls on the ring as the string lands and holds them through reading", () => {
+    const ctx = context(fakeKit());
+    const stage = constellationStage(ctx);
+    const pearls = named(stage.group, "ring pearls") as T.InstancedMesh;
+    expect(pearls.count).toBe(STAGE_PLACEMENT.ringPearl.count);
+    const limit = ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance;
+    const sizes = () => Array.from({ length: pearls.count }, (_, i) => instanceAt(pearls, i).scale);
+    stage.update(pose("approach", 1), 0, on);
+    for (const size of sizes()) expect(size).toBeLessThanOrEqual(.0002);
+    stage.update(pose("reveal", .3), 1, on);
+    const early = sizes();
+    expect(early[0]).toBeGreaterThan(early[pearls.count - 1]);
+    // A reduced motion first frame at reading shows every pearl formed, and a frozen clock keeps it.
+    const fresh = constellationStage(context(fakeKit()));
+    const freshPearls = named(fresh.group, "ring pearls") as T.InstancedMesh;
+    fresh.update(pose("reading"), 0, on);
+    const formed = Array.from({ length: freshPearls.count }, (_, i) => instanceAt(freshPearls, i));
+    for (const { scale: size, position: at } of formed) {
+      expect(size).toBeGreaterThan(STAGE_PLACEMENT.ringPearl.scale * .9);
+      expect(pearlClearance(at).distance).toBeGreaterThanOrEqual(limit);
+      // On the ring's circle, in the plane facing the camera.
+      expect(at.distanceTo(new T.Vector3(0, ARRIVAL_PEARL.y, 0))).toBeCloseTo(Math.hypot(STAGE_PLACEMENT.ringPearl.radius, STAGE_PLACEMENT.ringPearl.lift), 5);
+    }
+    const before = Array.from(freshPearls.instanceMatrix.array);
+    fresh.update(pose("reading"), 0, on);
+    expect(Array.from(freshPearls.instanceMatrix.array)).toEqual(before);
+    stage.update(pose("settle", 1), 5, on);
+    for (const size of sizes()) expect(size).toBeLessThanOrEqual(.0002);
+    expect(fogOf(pearls.material as T.Material)).toBe(false);
+    stage.dispose(); fresh.dispose();
+  });
+
+  it("gives every third light the kit star and holds the landing star through the reading", () => {
     const ctx = context(fakeKit());
     const stage = constellationStage(ctx);
     const counts = instancedMeshes(stage.group).map(o => o.count).sort((a, b) => a - b);
-    expect(counts).toEqual([32, 64]);
+    expect(counts).toEqual([8, 67, 133]);
+    const stars = instancedMeshes(stage.group).find(o => o.count === 67)!;
+    for (const m of Array.isArray(stars.material) ? stars.material : [stars.material]) expect(m.blending).toBe(T.AdditiveBlending);
     const star = named(stage.group, STAGE_KIT.sparkle);
     stage.update(pose("approach", .5), 0, on);
     expect(star.visible).toBe(false);
@@ -436,7 +632,7 @@ describe("pearl formation stage", () => {
     stage.update(pose("reading"), 2, on);
     stage.update(pose("reading"), 4, on);
     expect(star.visible).toBe(true);
-    expect(star.scale.x).toBeCloseTo(STAGE_PLACEMENT.sparkle.scale * (.45 + .55 * .35), 6);
+    expect(star.scale.x).toBeCloseTo(STAGE_PLACEMENT.sparkle.scale, 6);
     const clearance = pearlClearance(star.position);
     expect(clearance.distance).toBeGreaterThanOrEqual(ARRIVAL_PEARL.radius + ARRIVAL_PEARL.clearance);
     // Its twinkle only advances with the clock.

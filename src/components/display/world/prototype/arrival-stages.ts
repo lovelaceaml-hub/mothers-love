@@ -12,16 +12,22 @@ import { softDot, sparklePoints, studyGlow, studySilk } from "./study-materials"
  * Every position here is local to the entry group. During reading the arrival
  * pearl sits at local (0, 11.4, 0) with radius 5.4, which is where the text
  * band lives, so each stage keeps its own geometry clear of that band: the bloom
- * beam is gated out of it, the silk orbits at radius 7.3 and the descending
+ * beam is gated out of it, the silk orbits at radius 8.4 and the descending
  * string lands on the upper left of the pearl's own ring.
  *
  * Plan 26 (WORLD-INTEGRATION section 4): with the 3D Studio kit present each stage
  * dresses itself from it, the lotus that blooms, the ribbon portal, the kit
- * butterflies, the drifting kit petal and the constellation sparkle. Every clip is
- * driven by the pose or the world clock, never wall time, so a frozen clock is a
- * frozen stage and a reduced motion first frame is the finished formation. Without
- * a kit, or when a piece is missing, the procedural piece below stands unchanged,
- * which is what `?kit=off` draws.
+ * butterflies, the drifting kit petal, the constellation sparkle and the small pearls
+ * that form on the ring. Every clip is driven by the pose or the world clock, never
+ * wall time, so a frozen clock is a frozen stage and a reduced motion first frame is
+ * the finished formation. Without a kit, or when a piece is missing, the procedural
+ * piece below stands unchanged, which is what `?kit=off` draws.
+ *
+ * Polish round (visual director, K2 report): the stage's own kit materials ignore the
+ * scene fog so the lotus, the arch and the butterflies keep their colour under the
+ * arrival haze, the entrance light sprites and the beam run at about half their first
+ * weights, and every placement below is measured against the fixed arrival camera by
+ * `pearlClearance` and `arrivalScreen` in `tests/world/arrival-stages.test.ts`.
  */
 
 export type StageEffects = { sparkles: boolean; trails: boolean };
@@ -60,6 +66,8 @@ const PEARL_CENTRE = new T.Vector3(0, PEARL_Y, 0);
 const PEARL_VIEW = ARRIVAL_EYE_LOCAL.clone().sub(PEARL_CENTRE);
 const PEARL_DISTANCE = PEARL_VIEW.length();
 PEARL_VIEW.normalize();
+/** The arrival camera's azimuth around the pearl, in the orbit parametrisation `(cos a, y, sin a)`. */
+const CAMERA_AZIMUTH = Math.atan2(ARRIVAL_EYE_LOCAL.z, ARRIVAL_EYE_LOCAL.x);
 const clearanceOffset = new T.Vector3(), clearancePerp = new T.Vector3();
 /**
  * How the arrival camera sees a local point against the reading pearl: `distance` is its
@@ -77,6 +85,31 @@ export function pearlClearance(point: T.Vector3, out = { distance: 0, front: 0 }
   return out;
 }
 
+/**
+ * Where the fixed arrival camera draws a local point on a 1920 by 1080 frame, as normalised
+ * device coordinates (x and y in -1 to 1, y up), through the engine's own landscape lens
+ * (`PerspectiveCamera(43, ...)` parked at `ARRIVAL_VIEW` with a plain `lookAt`). The framing
+ * rules below (the arch above the pearl, butterflies out of the top of the frame) are
+ * measured with it.
+ */
+const screenCamera = new T.PerspectiveCamera(43, 16 / 9, .1, 450);
+screenCamera.position.set(...ARRIVAL_VIEW.eye);
+screenCamera.lookAt(new T.Vector3(...ARRIVAL_VIEW.target));
+screenCamera.updateMatrixWorld(true);
+screenCamera.updateProjectionMatrix();
+const screenPoint = new T.Vector3();
+export function arrivalScreen(point: T.Vector3, out = { x: 0, y: 0 }) {
+  screenPoint.copy(point).add(ENTRY_POSITION).project(screenCamera);
+  out.x = screenPoint.x;
+  out.y = screenPoint.y;
+  return out;
+}
+/** The top of the reading disc as the arrival camera sees it, for the framing tests. */
+export function pearlTopLocal(out = new T.Vector3()) {
+  out.copy(UP).addScaledVector(PEARL_VIEW, -UP.dot(PEARL_VIEW)).normalize().multiplyScalar(PEARL_R).add(PEARL_CENTRE);
+  return out;
+}
+
 /** Kit ids the stages look for; a missing one keeps its procedural piece. */
 export const STAGE_KIT = {
   lotus: "arrival.lotus-bloom",
@@ -84,27 +117,42 @@ export const STAGE_KIT = {
   butterfly: "arrival.butterfly",
   petals: "arrival.petal-drift",
   sparkle: "recognition.constellation-sparkle",
+  pearl: "core.pearl",
 } as const;
 
 /**
- * Placement, decided by eye against the approved targets (report of lane K2).
+ * Placement, decided by eye against the approved targets and re measured after the visual
+ * director's polish notes (report of lane K2).
  *
- * Lotus: the file spans 2.975 across when open; 4.3 makes the open flower 12.8 across, a
- * little wider than the pearl as `02_Arrival_Bloom_Target.jpeg` shows it, with the petal
- * tips (file height 1.188) reaching y 5.5, half a unit under the pearl's bottom edge (6.0).
+ * Lotus: the file spans 2.975 across when open; 3.7 makes the open flower 11 across, wider
+ * than the pearl as `02_Arrival_Bloom_Target.jpeg` shows it, with the petal tips (file
+ * height 1.188) reaching about y 4.8, over a unit under the pearl's bottom edge (6.0) so the
+ * glowing core reads below the disc, and the lower petals clearing the button row at 1080p.
+ * `tilt` leans the flower toward the arrival camera (about 12 degrees) so its open face and
+ * seed pod show.
  *
- * Portal: the file's clear opening is 3.21 of its 7.58 width, so no scale both keeps the
- * design's 16.2 height and lets the 10.8 pearl float inside the opening; the arch stands
- * behind the pearl instead, its front face a full pearl clearance behind the disc plane,
- * and the silk winds around the pearl in front of it as the target shows. Butterflies fly
- * the existing orbit at 9.2; the file's wingspan is .356.
+ * Portal: the file's clear opening is 3.21 by 4.47 of its 7.58 by 5.96 frame. At 4.4 the
+ * opening is 14.1 wide and 19.7 tall, so the 10.8 pearl floats inside it with the gold band
+ * framing it above and the pillars to both sides, as `03_Ribbon_Portal_Target.jpeg` shows.
+ * The arch stands `behind` units behind the pearl along the camera's own line and faces the
+ * camera squarely (the camera sits 24 degrees off the entry's z axis; an arch on that axis
+ * drew its left pillar 70 px inside the disc and its right one 120 px outside). Measured on
+ * the file's decoded vertices: the nearest point the camera sees in front of the disc is
+ * 8.6 units out, and the opening's edges draw 71 and 95 px outside the disc at 1080p.
+ * Butterflies fly a wider orbit at 11 so they clear the medallion ring, dipping low in front
+ * of the pearl and rising behind it (`dip`), which keeps them out of the words and out of
+ * the top of the frame; the file's wingspan is .356.
+ *
+ * Constellation: the kit star on every third light at full size, and eight small kit
+ * pearls that form on the pearl's ring as the string lands.
  */
 export const STAGE_PLACEMENT = {
-  lotus: { y: .4, scale: 4.3 },
-  portal: { z: -9.2, scale: 2.7, yaw: 0 },
-  butterfly: { scale: 4.2, radius: 9.2 },
+  lotus: { y: .4, scale: 3.7, tilt: .2 },
+  portal: { behind: 3.5, scale: 4.4 },
+  butterfly: { scale: 4.2, radius: 11, height: 12.8, dip: 4.5 },
   sparkle: { scale: 3.2, outward: .4 },
-  lightSparkle: .6,
+  lightSparkle: 1,
+  ringPearl: { count: 8, scale: .5, radius: 7.45, lift: .3 },
 } as const;
 
 function smooth(x: number, low: number, high: number) {
@@ -113,6 +161,11 @@ function smooth(x: number, low: number, high: number) {
 }
 function frac(x: number) {
   return x - Math.floor(x);
+}
+/** A material of the stage's own that ignores the scene fog, so it keeps its colour under the arrival haze. */
+function unfogged<M extends T.Material>(material: M): M {
+  (material as T.Material & { fog?: boolean }).fog = false;
+  return material;
 }
 
 /**
@@ -146,14 +199,15 @@ function ticker() {
 }
 
 /**
- * A sculpted lotus petal that carries its own warm light at the base.
+ * A sculpted lotus petal that carries its own warm light at the base; `strength` scales
+ * that light (.45 for the study's cheap petals, .9 for the kit lotus after the polish round).
  *
  * Verified against three 0.180 `ShaderLib/meshphysical.glsl.js`: `attribute vec2 uv`
  * is declared unconditionally in the vertex prefix, `#include <uv_vertex>` opens
  * `main()`, and `vec3 totalEmissiveRadiance` exists before `<emissivemap_fragment>`
  * and is still summed into `outgoingLight` afterwards.
  */
-function studyLotus(color: string, glow: { value: number }) {
+function studyLotus(color: string, glow: { value: number }, strength = .45) {
   const petal = new T.MeshPhysicalMaterial({
     color, roughness: .38, sheen: 1, sheenColor: new T.Color("#fff0df"),
     sheenRoughness: .4, clearcoat: .25, side: T.DoubleSide,
@@ -167,10 +221,10 @@ function studyLotus(color: string, glow: { value: number }) {
     shader.fragmentShader = "varying float petalU;\nuniform float lotusGlow;\n" + shader.fragmentShader.replace(
       "#include <emissivemap_fragment>",
       `#include <emissivemap_fragment>
-totalEmissiveRadiance += vec3(1., .62, .74) * lotusGlow * pow(1. - petalU, 2.2) * .45;`,
+totalEmissiveRadiance += vec3(1., .62, .74) * lotusGlow * pow(1. - petalU, 2.2) * ${strength.toFixed(3)};`,
     );
   };
-  petal.customProgramCacheKey = () => "study-lotus-glow-v1";
+  petal.customProgramCacheKey = () => `study-lotus-glow-v2-${strength.toFixed(3)}`;
   return petal;
 }
 
@@ -271,10 +325,11 @@ type Fading = { material: T.Material; base: number };
 function fadeAll(list: Fading[], presence: number) {
   for (const { material, base } of list) material.opacity = base * presence;
 }
-/** A copy of an imported kit material the stage owns, made transparent so it can fade. */
-function fadingCopy(ctx: StageContext, source: T.Material, fading: Fading[]) {
-  const copy = ctx.material(source.clone());
+/** A copy of an imported kit material the stage owns, made transparent so it can fade, unfogged. */
+function fadingCopy(ctx: StageContext, source: T.Material, fading: Fading[], ceiling?: number) {
+  const copy = unfogged(ctx.material(source.clone()));
   copy.transparent = true;
+  if (ceiling !== undefined) copy.opacity = ceiling;
   fading.push({ material: copy, base: copy.opacity });
   return copy;
 }
@@ -300,23 +355,21 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
   group.add(lotus);
 
   // The kit lotus (WORLD-INTEGRATION 4.2): every petal material becomes the study's lit
-  // petal, the gold keeps the study gold, the glowing seed pod keeps its own light, and the
-  // `bloom` clip is scrubbed by the pose so the last frame lands exactly when reading begins.
+  // petal at the polish round's deeper tints and doubled base light, the gold keeps the
+  // study gold, the glowing seed pod keeps the light the file authored (emissive strength
+  // 4, no clamp), and the `bloom` clip is scrubbed by the pose so the last frame lands
+  // exactly when reading begins. Nothing of it takes the scene fog.
   let kitLotus: { root: T.Object3D; clip: ScrubbedClip } | undefined;
   const kit = ctx.kit;
   const lotusClip = kit?.has(STAGE_KIT.lotus) ? kit.asset(STAGE_KIT.lotus)?.clips.get("bloom") : undefined;
   if (kit && lotusClip) {
-    const tints: Record<string, string> = { petal: "#f4b3c8", petalpearl: "#f9d0da", petalinnerglow: "#ffdccb" };
+    const tints: Record<string, string> = { petal: "#f09ab8", petalpearl: "#f5c3d3", petalinnerglow: "#ffd1bd" };
     const remap = cachedRemap((name, imported) => {
       const words = kitMaterialWords(name);
-      if (words.includes("petal")) return ctx.material(studyLotus(tints[words.join("")] ?? tints.petal, glow));
-      if (words.includes("gold") && words.includes("glow")) {
-        const kept = ctx.material(imported.clone()) as T.MeshStandardMaterial;
-        if (typeof kept.emissiveIntensity === "number") kept.emissiveIntensity = Math.min(kept.emissiveIntensity, 2.5);
-        return kept;
-      }
-      if (words.includes("gold")) return ctx.gold;
-      return ctx.material(imported.clone());
+      if (words.includes("petal")) return unfogged(ctx.material(studyLotus(tints[words.join("")] ?? tints.petal, glow, .9)));
+      if (words.includes("gold") && words.includes("glow")) return unfogged(ctx.material(imported.clone()));
+      if (words.includes("gold")) return unfogged(ctx.material(ctx.gold.clone()));
+      return unfogged(ctx.material(imported.clone()));
     });
     const root = kit.instance(STAGE_KIT.lotus, remap);
     root.traverse(object => {
@@ -325,6 +378,10 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
     });
     settleKitMeshes(root);
     root.position.set(0, STAGE_PLACEMENT.lotus.y, 0);
+    // Leaned toward the arrival camera about the horizontal axis square to it, so the open
+    // face and the seed pod read below the disc instead of hiding behind it.
+    const toward = new T.Vector3(ARRIVAL_EYE_LOCAL.x, 0, ARRIVAL_EYE_LOCAL.z).normalize();
+    root.quaternion.setFromAxisAngle(new T.Vector3(toward.z, 0, -toward.x), STAGE_PLACEMENT.lotus.tilt);
     lotus.add(root);
     kitLotus = { root, clip: scrubbed(root, lotusClip) };
     kitLotus.clip.set(0);
@@ -376,7 +433,7 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
           float streaks = .75 + .25 * sin(beamUv.y * 38. - flow + beamUv.x * 12.6);
           float gate = smoothstep(0., 1.6, abs(beamY - pearlY) - pearlR * .90);
           vec3 color = mix(vec3(1., .93, .80), vec3(1., .76, .86), beamUv.y);
-          gl_FragColor = vec4(color * shaft * vertical * streaks * gate * form * presence * .20, 1.);
+          gl_FragColor = vec4(color * shaft * vertical * streaks * gate * form * presence * .12, 1.);
           #include <colorspace_fragment>
         }`,
     })),
@@ -409,6 +466,7 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
     }
   }
   const kitPetals = driftGeometry !== ctx.farPetal;
+  if (kitPetals) unfogged(driftMaterial);
   const drift = ctx.instance(group, driftGeometry, driftMaterial, driftCount);
   drift.receiveShadow = false;
   drift.frustumCulled = false;
@@ -454,8 +512,8 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
         lotus.scale.setScalar(.15 + .85 * pose.gather);
       }
       glow.value = (.25 * pose.gather + .75 * pose.form) * (1 - pose.dissolve);
-      halo.material.opacity = .22 * pose.presence * (.3 + .7 * pose.form);
-      core.material.opacity = .32 * pose.presence * pose.form;
+      halo.material.opacity = .12 * pose.presence * (.3 + .7 * pose.form);
+      core.material.opacity = .18 * pose.presence * pose.form;
       beamUniforms.flow.value = beamFlow.advance(time, pose.calm ? .35 : 1.2);
       beamUniforms.form.value = pose.form;
       beamUniforms.presence.value = pose.presence;
@@ -483,7 +541,10 @@ export function bloomStage(ctx: StageContext): ArrivalStage {
           drift.setMatrixAt(i, dummy.matrix);
         }
         drift.instanceMatrix.needsUpdate = true;
-        driftMaterial.opacity = pose.presence * pose.form;
+        // The petals begin to rise about two seconds before the reveal (gather .6 is three
+        // seconds into the five second approach) so the air above the opening bud is not
+        // empty, then fill in with the bloom.
+        driftMaterial.opacity = pose.presence * Math.min(1, .6 * smooth(pose.gather, .6, 1) + .4 * pose.form);
       }
     },
     dispose() {
@@ -509,6 +570,33 @@ export function ribbonSilkCentre(s: number, turn: number, out: T.Vector3) {
 }
 /** The bounded sway: `turn` never leaves this range, so the loop never accumulates onto the words. */
 export const RIBBON_SWAY = .12;
+/** The silk's half width at its broadest, thinned about 30 percent in the polish round (was 2.05). */
+export const RIBBON_WIDTH = 1.45;
+
+/**
+ * The study silk with a fold highlight on its broad face: the `fold` attribute (0 to 1,
+ * the crest of each fold the stage writes with the positions) lifts a soft ivory light on
+ * the crests, so the folds read on the face and not only at the grazing edges `studySilk`
+ * already lights. Inserted before the glow pass mix `studyGlow` adds afterwards, so the
+ * glow layer is unchanged.
+ */
+function foldedSilk() {
+  const silk = studySilk();
+  const previous = silk.onBeforeCompile.bind(silk), key = silk.customProgramCacheKey();
+  silk.onBeforeCompile = (shader, renderer) => {
+    previous(shader, renderer);
+    shader.vertexShader = "attribute float fold;\nvarying float silkFold;\n" + shader.vertexShader.replace(
+      "#include <begin_vertex>",
+      "#include <begin_vertex>\nsilkFold = fold;",
+    );
+    shader.fragmentShader = "varying float silkFold;\n" + shader.fragmentShader.replace(
+      "#include <opaque_fragment>",
+      "outgoingLight += vec3(1., .94, .97) * pow(silkFold, 3.) * .34;\n#include <opaque_fragment>",
+    );
+  };
+  silk.customProgramCacheKey = () => `${key}|silk-fold-v1`;
+  return silk;
+}
 
 /** Silk unveiling: one broad tapered ribbon, a thin gold ring and a few butterflies. */
 export function ribbonStage(ctx: StageContext): ArrivalStage {
@@ -528,10 +616,12 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
   faint.rotation.set(-.06, .35, .1);
   group.add(ring, faint);
 
-  // The kit ribbon portal (WORLD-INTEGRATION 4.3) stands behind the pearl: its gold takes
-  // the study gold, its pearl the study ivory, its silk tails the study silk, and the glowing
-  // finials keep their own light. Every material is the stage's own transparent copy so the
-  // whole arch fades with presence while it scales up from its base with gather.
+  // The kit ribbon portal (WORLD-INTEGRATION 4.3) frames the pearl from behind: its gold
+  // takes the study gold, its pearl the study ivory, its satin tails the study silk with the
+  // file's own two tones (COLOR_0, pink and white) showing through at an .85 ceiling, and
+  // the glowing finials keep their own light. Every material is the stage's own transparent,
+  // unfogged copy so the whole arch fades with presence while it scales up from its base
+  // with gather.
   const kit = ctx.kit;
   const fading: Fading[] = [];
   let arch: T.Object3D | undefined;
@@ -540,24 +630,35 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
       const words = kitMaterialWords(name);
       if (words.includes("gold") && words.includes("glow")) return fadingCopy(ctx, imported, fading);
       if (words.includes("gold")) return fadingCopy(ctx, ctx.gold, fading);
-      if (words.includes("silk") || words.includes("ribbon")) return fadingCopy(ctx, studySilk(), fading);
+      if (words.includes("silk") || words.includes("ribbon")) {
+        const satin = studySilk();
+        satin.vertexColors = true;
+        satin.color.set("#fff2f6");
+        satin.emissive.set("#f6b6cc");
+        satin.emissiveIntensity = .1;
+        return fadingCopy(ctx, satin, fading, .85);
+      }
       if (words.includes("pearl") || words.includes("ivory")) return fadingCopy(ctx, ctx.ivory, fading);
       return fadingCopy(ctx, imported, fading);
     });
     arch = kit.instance(STAGE_KIT.portal, remap);
     settleKitMeshes(arch);
-    arch.position.set(0, 0, STAGE_PLACEMENT.portal.z);
-    arch.rotation.y = STAGE_PLACEMENT.portal.yaw;
+    // Behind the pearl along the camera's line, its face (the file's +z) turned to the camera.
+    arch.position.set(-Math.cos(CAMERA_AZIMUTH) * STAGE_PLACEMENT.portal.behind, 0, -Math.sin(CAMERA_AZIMUTH) * STAGE_PLACEMENT.portal.behind);
+    arch.rotation.y = Math.PI / 2 - CAMERA_AZIMUTH;
     group.add(arch);
   }
 
   const columns = 241, rows = 11;
   const silkGeometry = ctx.geometry(new T.PlaneGeometry(1, 1, columns - 1, rows - 1));
+  const foldAttribute = new T.BufferAttribute(new Float32Array(columns * rows), 1);
+  foldAttribute.setUsage(T.DynamicDrawUsage);
+  silkGeometry.setAttribute("fold", foldAttribute);
   // `silkF` is the grazing angle term studySilk leaves in scope, so the glow layer receives the
-  // lit folded edges of the ribbon and not its broad face.
-  const silk = new T.Mesh(silkGeometry, ctx.material(
-    studyGlow(studySilk(), "silk", "vec3(1., .80, .88) * silkF * .55", "silkF * .6"),
-  ));
+  // lit folded edges of the ribbon and not its broad face; the fold crests light the face itself.
+  const silk = new T.Mesh(silkGeometry, unfogged(ctx.material(
+    studyGlow(foldedSilk(), "silk", "vec3(1., .80, .88) * silkF * .55", "silkF * .6"),
+  )));
   silk.userData.dynamic = true;
   silk.frustumCulled = false;
   silk.layers.enable(1);
@@ -572,8 +673,8 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
   const silkAngle = ribbonSilkAngle, silkCenter = ribbonSilkCentre;
 
   // Butterflies: six kit butterflies on their `flap` loop when the file is present, each on
-  // its own mixer advanced by the world clock (6 Hz in flight, .55 of that at calm); else
-  // three pairs of the study's cheap petal wings.
+  // its own mixer advanced by the world clock (6 Hz in flight, .55 of that at calm), pale
+  // pink wings with the file's gold edge; else three pairs of the study's cheap petal wings.
   const wings = 6;
   const butterflyMaterial = ctx.material(new T.MeshPhysicalMaterial({
     color: "#fff7f0", sheen: 1, sheenColor: new T.Color("#ffe9f2"),
@@ -586,6 +687,16 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
     const remap = cachedRemap((name, imported) => {
       const words = kitMaterialWords(name);
       if (words.includes("gold")) return fadingCopy(ctx, ctx.gold, fading);
+      if (words.includes("wing")) {
+        // The file's wing is a flat lavender through COLOR_0; the board's butterflies are pale
+        // pink with a gold edge, so the copy drops the vertex tint for its own.
+        const wing = fadingCopy(ctx, imported, fading) as T.MeshStandardMaterial;
+        wing.vertexColors = false;
+        wing.color.set("#fbe9f4");
+        wing.emissive.set("#f7d6ea");
+        wing.emissiveIntensity = .3;
+        return wing;
+      }
       return fadingCopy(ctx, imported, fading);
     });
     for (let k = 0; k < wings; k++) {
@@ -603,6 +714,17 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
   }
   const orbitFlow = flow(), flapFlow = flow(), tick = ticker();
   const ahead = new T.Vector3();
+  /**
+   * A kit butterfly's place on the orbit: radius 11 around the pearl, low where the orbit
+   * passes in front of the pearl and high behind it (`dip`), so that at reading no flyer
+   * ever enters the pearl's clearance ring or the top 15 percent of the frame; each has its
+   * own height and a small bob, and `entering` lifts the whole flock during the approach.
+   */
+  function flyerPlace(b: number, k: number, time: number, entering: number, out: T.Vector3) {
+    const { radius, height, dip } = STAGE_PLACEMENT.butterfly;
+    const y = height - dip * Math.cos(b - CAMERA_AZIMUTH) + .5 * Math.sin(k * 2.1) + .3 * Math.sin(time * .9 + k) + entering;
+    return out.set(Math.cos(b) * radius, y, Math.sin(b) * radius);
+  }
 
   const glowSprite = new T.Sprite(ctx.material(new T.SpriteMaterial({
     map: ctx.texture(softDot(64)), blending: T.AdditiveBlending, depthWrite: false,
@@ -635,7 +757,7 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
       for (let i = 0; i < columns; i++) {
         const u = i / (columns - 1);
         const s = Math.max(Math.min(u, pose.gather * 1.02), pose.dissolve);
-        widths[i] = 2.05 * Math.pow(Math.max(0, Math.sin(Math.PI * s)), .55)
+        widths[i] = RIBBON_WIDTH * Math.pow(Math.max(0, Math.sin(Math.PI * s)), .55)
           * (1 - smooth(u, pose.gather - .08, pose.gather)) * smooth(u, pose.dissolve, pose.dissolve + .08);
         silkCenter(s, turn, c0);
         silkCenter(s + .0015, turn, c1);
@@ -655,7 +777,8 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
         for (let i = 0; i < columns; i++) {
           const u = i / (columns - 1);
           const s = Math.max(Math.min(u, pose.gather * 1.02), pose.dissolve);
-          const lift = .07 * Math.sin(s * 140 + v * 9 + fold) * (1 - pose.form * .45)
+          const crest = Math.sin(s * 140 + v * 9 + fold);
+          const lift = .07 * crest * (1 - pose.form * .45)
             + .18 * Math.sin(s * 22 + time * .3) * v;
           const w = v * widths[i], k = i * 3;
           position.setXYZ(
@@ -664,25 +787,25 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
             centers[k + 1] + widthAxis[k + 1] * w + foldAxis[k + 1] * lift,
             centers[k + 2] + widthAxis[k + 2] * w + foldAxis[k + 2] * lift,
           );
+          foldAttribute.setX(j * columns + i, Math.max(0, crest));
         }
       }
       position.needsUpdate = true;
+      foldAttribute.needsUpdate = true;
       silkGeometry.computeVertexNormals();
 
       const orbit = orbitFlow.advance(time, pose.calm ? .08 : .16);
       const entering = (1 - pose.form) * 18 + 14 * pose.dissolve;
       if (flyers.length) {
         const step = tick(time) * (pose.calm ? 1.65 : 3);
-        const radius = STAGE_PLACEMENT.butterfly.radius;
         flyers.forEach((flyer, k) => {
           flyer.root.visible = effects.trails && pose.presence > 0;
           const b = orbit + k * Math.PI * 2 / wings;
-          const cy = PEARL_Y + 7.5 + 2.5 * Math.sin(k * 2.1) + .6 * Math.sin(time * .9 + k) + entering;
-          flyer.root.position.set(Math.cos(b) * radius, cy, Math.sin(b) * radius);
+          flyerPlace(b, k, time, entering, flyer.root.position);
           // The head points +z in the file, so looking a little ahead along the orbit flies it forward.
           // `ahead` is in the stage's own frame and lookAt takes a world point, so the stage group
           // (which sits under the entry group, well away from the world origin) converts it first.
-          ahead.set(Math.cos(b + .05) * radius, cy + .4 * Math.cos(time * .9 + k), Math.sin(b + .05) * radius);
+          flyerPlace(b + .05, k, time, entering, ahead);
           flyer.root.lookAt(group.localToWorld(ahead));
           if (step > 0) flyer.mixer.update(step);
         });
@@ -706,7 +829,8 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
         butterflyMaterial.opacity = .95 * pose.presence;
         butterflies.visible = effects.trails;
       }
-      glowSprite.material.opacity = .28 * pose.presence;
+      // Capped at .15 so the arch's interior is a glow, not a white blowout, through the reveal.
+      glowSprite.material.opacity = .15 * pose.presence;
     },
     dispose() {
       for (const flyer of flyers) { flyer.mixer.stopAllAction(); flyer.mixer.uncacheRoot(flyer.root); }
@@ -716,6 +840,25 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
 
 /** Where the string of lights lands: the upper left of the pearl's own ring, outside the words. */
 export const CONSTELLATION_LANDING = new T.Vector3(-5.534, 16.07, 1.525);
+const LANDING_AZIMUTH = Math.atan2(CONSTELLATION_LANDING.z, CONSTELLATION_LANDING.x);
+const LANDING_RADIUS = Math.hypot(CONSTELLATION_LANDING.x, CONSTELLATION_LANDING.z);
+/**
+ * The string's path (polish round): a helix of one and a quarter turns that starts 30 units
+ * above the pearl's centre at radius 12 and tightens onto the landing, arcing over the front
+ * of the pearl high in the frame, swinging right and behind it on a four unit plateau (the
+ * pass directly behind the pearl lies on the camera's line of sight, so only height keeps it
+ * clear of the disc), then dropping along the ring's upper left into the landing. `s` 0 is
+ * the top, 1 the landing. Measured against the words by the test: every point the camera
+ * sees in front of the disc keeps the full clearance, no point, even behind, reaches the
+ * disc itself, and about half of the string is inside the 1080p frame while reading.
+ */
+export function constellationPoint(s: number, out: T.Vector3) {
+  const remaining = 1 - s;
+  const a = LANDING_AZIMUTH + 2.5 * Math.PI * remaining;
+  const r = LANDING_RADIUS + (12 - LANDING_RADIUS) * Math.pow(remaining, .35);
+  const y = CONSTELLATION_LANDING.y + 25 * Math.pow(remaining, 2.5) + 4 * smooth(s, .5, .7) * (1 - smooth(s, .86, 1));
+  return out.set(Math.cos(a) * r, y, Math.sin(a) * r);
+}
 
 /** Pearl formation: a string of small lights descending from the sky into the pearl's ring. */
 export function constellationStage(ctx: StageContext): ArrivalStage {
@@ -723,23 +866,19 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
   group.name = "Arrival study, pearl formation";
   group.userData.dynamic = true;
 
-  // Measured against the fixed arrival camera at 1920 by 1080: the string enters
-  // beyond the top left corner, descends across the sky and lands on the upper
-  // left of the pearl's own ring, never inside the pearl's text band.
-  const points: T.Vector3[] = [];
+  // Sampled evenly along the helix's arc so the lights sit at one spacing from the top of
+  // the frame to the landing, which the analytic parameter alone would not give.
   const landing = CONSTELLATION_LANDING.clone();
-  for (let k = 0; k < 10; k++) {
-    const s = k / 9, y = 26 - s * (26 - landing.y), r = 16 - s * 8.6, a = s * Math.PI * 2 * .9 + 2.4;
-    points.push(new T.Vector3(Math.cos(a) * r, y, Math.sin(a) * r));
-  }
-  points[9].copy(landing);
-  const curve = new T.CatmullRomCurve3(points);
+  const samples = Array.from({ length: 96 }, (_, i) => constellationPoint(i / 95, new T.Vector3()));
+  samples[samples.length - 1].copy(landing);
+  const curve = new T.CatmullRomCurve3(samples);
 
-  const count = 96;
+  const count = 200;
   const kit = ctx.kit;
   // The kit sparkle (WORLD-INTEGRATION 4.4): every third light, the gold one, becomes the
-  // kit's star on its own instanced mesh (one draw per material), and the landing flash
-  // gains the same star on its `twinkle` loop. The string itself stays points of light.
+  // kit's star on its own instanced mesh (one draw per material), additive so the string
+  // glows, and the landing flash gains the same star on its `twinkle` loop. The string
+  // itself stays points of light.
   const sparkleGeometry = kit?.has(STAGE_KIT.sparkle) ? kit.geometry(STAGE_KIT.sparkle) : undefined;
   const starred = !!sparkleGeometry && sparkleGeometry.getAttribute("position")?.count > 0;
   const isStar = (i: number) => starred && i % 3 === 0;
@@ -756,8 +895,8 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
     const materials = names.map(name => {
       const halo = kitMaterialWords(name).includes("halo");
       return ctx.material(new T.MeshBasicMaterial({
-        color: "#ffffff", toneMapped: false,
-        ...(halo ? { transparent: true, opacity: .45, depthWrite: false } : {}),
+        color: "#fff1cf", toneMapped: false, transparent: true, depthWrite: false,
+        blending: T.AdditiveBlending, opacity: halo ? .45 : 1,
       }));
     });
     stars = ctx.instance(group, sparkleGeometry, materials[0], starCount);
@@ -781,7 +920,7 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
     curve.getPointAt(i / (count - 1), point);
     places[i * 3] = point.x; places[i * 3 + 1] = point.y; places[i * 3 + 2] = point.z;
     phases[i] = random();
-    sizes[i] = isStar(i) ? STAGE_PLACEMENT.lightSparkle : i % 3 === 0 ? .075 : .055;
+    sizes[i] = isStar(i) ? STAGE_PLACEMENT.lightSparkle : i % 3 === 0 ? .1 : .075;
     base.push((i % 3 === 0 ? gold : pearl).clone());
     // Written for every instance in the builder, so instanceColor exists before the first update.
     (isStar(i) ? stars! : lights).setColorAt(slot[i], base[i]);
@@ -793,7 +932,7 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
   glowGeometry.setAttribute("position", new T.BufferAttribute(places, 3));
   glowGeometry.setAttribute("phase", new T.BufferAttribute(phases, 1));
   const dot = ctx.texture(softDot(32));
-  const glow = new T.Points(glowGeometry, ctx.material(sparklePoints(ctx.time, .9, "#fff0cc", .55, dot)));
+  const glow = new T.Points(glowGeometry, ctx.material(sparklePoints(ctx.time, 1.5, "#fff0cc", .85, dot)));
   glow.frustumCulled = false;
   glow.layers.enable(1);
   group.add(glow);
@@ -823,6 +962,35 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
     group.add(root);
     landingStar = { root, mixer: looping(root, twinkle, 1) };
   }
+
+  // Pearls forming on the ring (polish round): eight small kit pearls on the circle the
+  // landing lies on, in the plane facing the arrival camera, a little in front of it so they
+  // sit on the orbit, growing in one after another as the pulse runs down the string and
+  // holding through the reading. The ring's radius keeps them outside the clearance ring.
+  const ringPearls = kit?.has(STAGE_KIT.pearl) ? (() => {
+    const { count: pearls, radius } = STAGE_PLACEMENT.ringPearl;
+    const geometry = kit.geometry(STAGE_KIT.pearl);
+    if (!(geometry.getAttribute("position")?.count > 0)) return undefined;
+    const material = unfogged(ctx.material(new T.MeshPhysicalMaterial({
+      color: "#fff4e8", roughness: .14, metalness: .06, clearcoat: 1, clearcoatRoughness: .12,
+      iridescence: .45, iridescenceIOR: 1.3, sheen: .4, sheenColor: new T.Color("#ffd9e6"),
+      emissive: new T.Color("#ffe8f0"), emissiveIntensity: .08,
+    })));
+    const mesh = ctx.instance(group, geometry, material, pearls);
+    mesh.name = "ring pearls";
+    mesh.receiveShadow = false;
+    mesh.frustumCulled = false;
+    const u = landing.clone().sub(PEARL_CENTRE);
+    u.addScaledVector(PEARL_VIEW, -u.dot(PEARL_VIEW)).normalize();
+    const v = new T.Vector3().crossVectors(PEARL_VIEW, u);
+    const at: T.Vector3[] = [];
+    for (let k = 0; k < pearls; k++) {
+      const theta = (k + .5) * Math.PI * 2 / pearls;
+      at.push(PEARL_CENTRE.clone().addScaledVector(u, Math.cos(theta) * radius).addScaledVector(v, Math.sin(theta) * radius)
+        .addScaledVector(PEARL_VIEW, STAGE_PLACEMENT.ringPearl.lift));
+    }
+    return { mesh, at };
+  })() : undefined;
   const tick = ticker();
 
   // Reading starts with the last reveal pulse still fading, so the calm twinkle is
@@ -862,11 +1030,12 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
           : Math.sin(Math.PI * Math.max(0, Math.min(1, (pose.form - .85) / .15)));
       flash.material.opacity = flashing;
       if (landingStar) {
-        // Turns on with the flash and stays at .35 through the reading.
+        // Turns on with the flash and holds at full strength through the reading, its slow
+        // twinkle (the clip at .55 speed) the only motion.
         const strength = pose.calm
-          ? .35 * settled + (1 - settled) * Math.max(0, Math.min(1, (pose.form - .85) / .15))
+          ? 1
           : pose.dissolve > 0
-            ? .35 * (1 - pose.dissolve)
+            ? 1 - pose.dissolve
             : Math.max(0, Math.min(1, (pose.form - .85) / .15));
         landingStar.root.visible = strength > .001;
         landingStar.root.scale.setScalar(STAGE_PLACEMENT.sparkle.scale * (.45 + .55 * strength));
@@ -874,6 +1043,20 @@ export function constellationStage(ctx: StageContext): ArrivalStage {
         const step = tick(time) * (pose.calm ? .55 : 1);
         if (step > 0 && landingStar.root.visible) landingStar.mixer.update(step);
       } else tick(time);
+      if (ringPearls) {
+        const { count: pearls, scale: full } = STAGE_PLACEMENT.ringPearl;
+        for (let k = 0; k < pearls; k++) {
+          const start = k / pearls * .55;
+          const formed = pose.calm ? 1 : smooth(pose.form, start, start + .45);
+          const size = full * formed * (1 - smooth(pose.dissolve, 0, .6)) * (1 + .05 * Math.sin(time * 1.1 + k));
+          dummy.position.copy(ringPearls.at[k]);
+          dummy.quaternion.identity();
+          dummy.scale.setScalar(Math.max(.0001, size));
+          dummy.updateMatrix();
+          ringPearls.mesh.setMatrixAt(k, dummy.matrix);
+        }
+        ringPearls.mesh.instanceMatrix.needsUpdate = true;
+      }
     },
     dispose() {
       if (landingStar) { landingStar.mixer.stopAllAction(); landingStar.mixer.uncacheRoot(landingStar.root); }
