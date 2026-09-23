@@ -374,6 +374,31 @@ describe("silk unveiling stage", () => {
     stage.dispose();
   });
 
+  it("flies every kit butterfly forward along its orbit from the entry group's own place in the world", () => {
+    // The world parents the stage under the entry group at ENTRY_POSITION, far from the origin;
+    // a heading computed in stage space would aim every butterfly at a point about 20 units
+    // off and half the flock would fly backward or sideways.
+    const forward = new T.Vector3(), tangent = new T.Vector3();
+    for (const offset of [ENTRY_POSITION, new T.Vector3(0, 0, 0)]) {
+      const ctx = context(fakeKit());
+      const stage = ribbonStage(ctx);
+      const entry = new T.Group();
+      entry.position.copy(offset);
+      entry.add(stage.group);
+      stage.update(pose("reading"), .1, on);
+      entry.updateMatrixWorld(true);
+      const flyers = stage.group.children.filter(o => o.name === STAGE_KIT.butterfly);
+      expect(flyers).toHaveLength(6);
+      for (const flyer of flyers) {
+        // The orbit tangent at the flyer's angle b is (-sin b, 0, cos b), read off its own position.
+        tangent.set(-flyer.position.z, 0, flyer.position.x).normalize();
+        flyer.getWorldDirection(forward);
+        expect(forward.dot(tangent)).toBeGreaterThan(.7);
+      }
+      stage.dispose();
+    }
+  });
+
   it("keeps the procedural wings and no arch without the kit", () => {
     const ctx = context();
     const stage = ribbonStage(ctx);

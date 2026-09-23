@@ -680,8 +680,10 @@ export function ribbonStage(ctx: StageContext): ArrivalStage {
           const cy = PEARL_Y + 7.5 + 2.5 * Math.sin(k * 2.1) + .6 * Math.sin(time * .9 + k) + entering;
           flyer.root.position.set(Math.cos(b) * radius, cy, Math.sin(b) * radius);
           // The head points +z in the file, so looking a little ahead along the orbit flies it forward.
+          // `ahead` is in the stage's own frame and lookAt takes a world point, so the stage group
+          // (which sits under the entry group, well away from the world origin) converts it first.
           ahead.set(Math.cos(b + .05) * radius, cy + .4 * Math.cos(time * .9 + k), Math.sin(b + .05) * radius);
-          flyer.root.lookAt(ahead);
+          flyer.root.lookAt(group.localToWorld(ahead));
           if (step > 0) flyer.mixer.update(step);
         });
       } else if (butterflies) {
