@@ -27,6 +27,8 @@ export type StudyPuff = {
 
 /** An extra island-like place that also deserves a cloud collar, such as a travel corridor landing. */
 export type StudyCloudSite = { center: [number, number, number]; radius: number };
+/** Sites under this radius (the corridor islets) take a collar scaled to their size. */
+export const SMALL_SITE_RADIUS = 9;
 
 export type StudyCloudLayout = { sky: StudyPuff[]; island: StudyPuff[] };
 
@@ -70,10 +72,14 @@ export function studyCloudLayout(seed: number, extraSites: StudyCloudSite[] = []
 
   const island: StudyPuff[] = [];
   function collar(site: StudyCloudSite, count: number) {
+    // Plan 26 K3b: a corridor islet (grass radius 5 to 6) takes puffs in proportion to its size,
+    // so its collar hugs it instead of swallowing it. Every district and far landmark site is
+    // radius 9 or more and keeps exactly the puffs it always had.
+    const shrink = site.radius < SMALL_SITE_RADIUS ? site.radius / 13.8 : 1;
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (rand() - .5) * .6;
-      const radius = site.radius + 1.5 + rand() * 2.5;
-      const width = 9 + rand() * 7;
+      const radius = site.radius + (1.5 + rand() * 2.5) * shrink;
+      const width = (9 + rand() * 7) * shrink;
       island.push({
         x: site.center[0] + Math.cos(angle) * radius,
         y: site.center[1] - 1.6 - rand() * 3,
