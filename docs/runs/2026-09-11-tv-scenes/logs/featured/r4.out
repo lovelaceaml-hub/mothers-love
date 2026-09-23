@@ -1,0 +1,15 @@
+Round r4 correction complete: replaced the unexposed `window.V` read with a 900 ms behavioral check in the remount test.
+
+The `V` variable is declared with `let` in the top level of a classic script, so it does not attach to `window`. The test now waits 900 ms (`page.waitForTimeout(900)`) after the remount and verifies that the expression name remains unchanged and neither `flip-out` nor `flip-in` is present on the panel.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Run the Playwright test suite for the featured scene via coordinator or terminal:
+`npm test -- tests/color-polish-scenes/featured.spec.ts`
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md)

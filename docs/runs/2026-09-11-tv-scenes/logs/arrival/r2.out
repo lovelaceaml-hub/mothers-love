@@ -1,0 +1,17 @@
+The ES module harness imports and folder path resolution in [`arrival.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) are updated, and the lane record is updated.
+
+The spec harness now imports `dirname` and `resolve` from `node:path` and resolves the worktree root folder using `dirname(fileURLToPath(import.meta.url))`. All harness imports remain strictly static ES module imports with no CommonJS `require` or `createRequire` calls. The lane execution record at [`docs/runs/2026-09-11-tv-scenes/lanes/arrival.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md) now includes the Round 2 result entry.
+
+### What now works
+[`arrival.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) loads in ES module scope with static imports and standard URL path resolution.
+
+## COMPLETION
+Files changed:
+1. [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts)
+2. [`/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md)
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step
+Have the coordinator run the Playwright verification suite on the arrival lane.

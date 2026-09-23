@@ -1,0 +1,65 @@
+
+> mothers-love@0.1.0 build
+> next build
+
+▲ Next.js 16.3.4 (Turbopack)
+✓ Running next.config.ts took 153ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 15.8s
+  Running TypeScript ...
+  Finished TypeScript in 13.3s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/36) ...
+  Generating static pages using 9 workers (9/36) 
+  Generating static pages using 9 workers (18/36) 
+  Generating static pages using 9 workers (27/36) 
+✓ Generating static pages using 9 workers (36/36) in 726ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/display
+├ ○ /admin/insights
+├ ○ /admin/login
+├ ○ /admin/mfa
+├ ○ /admin/recognitions
+├ ƒ /admin/recognitions/[id]
+├ ○ /admin/review
+├ ○ /admin/set-password
+├ ○ /admin/settings
+├ ƒ /api/admin/devices
+├ ƒ /api/admin/devices/[id]
+├ ƒ /api/admin/members
+├ ƒ /api/admin/members/[id]
+├ ƒ /api/admin/overview
+├ ƒ /api/admin/recognitions
+├ ƒ /api/admin/recognitions/[id]
+├ ƒ /api/admin/reports
+├ ƒ /api/admin/reports/export
+├ ƒ /api/admin/session
+├ ƒ /api/admin/settings
+├ ƒ /api/config
+├ ƒ /api/display/ack
+├ ƒ /api/display/color-polish
+├ ƒ /api/display/daily
+├ ƒ /api/display/pair
+├ ƒ /api/display/snapshot
+├ ƒ /api/feed
+├ ƒ /api/reactions
+├ ƒ /api/reactions/[id]
+├ ƒ /api/recognitions
+├ ○ /api/tv-v6
+├ ○ /display
+├ ○ /display-legacy
+├ ○ /display-v6
+├ ○ /expressions
+├ ○ /privacy
+└ ○ /recognize
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

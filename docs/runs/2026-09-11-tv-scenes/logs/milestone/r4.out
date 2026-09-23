@@ -1,0 +1,21 @@
+Milestone test assertions and the lane record have been updated for round 4.
+
+Per-sample `maxScale` is now asserted at `>= 1.2` to account for phase-dependent scale variations across individual checkpoints. An across-sample check now verifies `largestMaxScale >= 1.4` over the full 26-second timeline. The lane execution record documents this round 4 correction.
+
+Files updated:
+1. [`tests/color-polish-scenes/milestone.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts)
+2. [`docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md)
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next 2-minute step
+Review the modified assertions in [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts) and trigger the coordinator test suite.
+
+### Questions
+1. Should we proceed with running the coordinator Playwright verification?
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`

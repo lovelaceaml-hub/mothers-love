@@ -1,0 +1,42 @@
+
+> mothers-love@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3109
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3109
+- Network:       http://127.0.0.1:3109
+✓ Ready in 366ms
+✓ Running next.config.ts took 107ms
+
+ GET / 200 in 303ms (next.js: 158ms, application-code: 145ms)
+ GET /admin/login 200 in 226ms (next.js: 30ms, application-code: 196ms)
+ GET /admin/login 200 in 243ms (next.js: 47ms, application-code: 196ms)
+ GET /admin/login 200 in 90ms (next.js: 15ms, application-code: 75ms)
+ GET /admin/login 200 in 98ms (next.js: 24ms, application-code: 74ms)
+ GET /admin/login 200 in 74ms (next.js: 5ms, application-code: 69ms)
+ GET /admin 200 in 121ms (next.js: 63ms, application-code: 59ms)
+ GET /admin 200 in 32ms (next.js: 17ms, application-code: 16ms)
+ GET /admin 200 in 397ms (next.js: 89ms, application-code: 308ms)
+ GET /admin/display 200 in 429ms (next.js: 85ms, application-code: 344ms)
+ GET /admin 200 in 259ms (next.js: 47ms, application-code: 212ms)
+ GET /admin 200 in 264ms (next.js: 27ms, application-code: 237ms)
+ GET /admin/display 200 in 301ms (next.js: 17ms, application-code: 283ms)
+ GET /admin/display 200 in 260ms (next.js: 33ms, application-code: 227ms)
+ GET /admin/display 200 in 226ms (next.js: 15ms, application-code: 211ms)
+ GET /admin/display 200 in 229ms (next.js: 52ms, application-code: 176ms)
+ GET /admin/login 200 in 3.8s (next.js: 2.1s, application-code: 1692ms)
+ GET /admin/login 200 in 558ms (next.js: 30ms, application-code: 528ms)
+ GET /admin/login 200 in 494ms (next.js: 25ms, application-code: 469ms)
+ GET /admin/login 200 in 499ms (next.js: 34ms, application-code: 464ms)
+ GET /admin 200 in 23ms (next.js: 9ms, application-code: 14ms)
+ GET /admin/display 200 in 26ms (next.js: 4ms, application-code: 21ms)
+ GET /admin/login 200 in 42ms (next.js: 3ms, application-code: 38ms)
+ GET /admin 200 in 15ms (next.js: 4ms, application-code: 10ms)
+ GET /admin/display 200 in 25ms (next.js: 1.6ms, application-code: 23ms)
+ GET /admin/login 200 in 21ms (next.js: 2.0ms, application-code: 19ms)
+ GET /admin 200 in 13ms (next.js: 1.7ms, application-code: 11ms)
+ GET /admin/display 200 in 19ms (next.js: 1.2ms, application-code: 18ms)
+ GET /admin/login 200 in 19ms (next.js: 2ms, application-code: 17ms)
+ GET /admin 200 in 18ms (next.js: 7ms, application-code: 10ms)
+ GET /admin/display 200 in 33ms (next.js: 4ms, application-code: 29ms)
+[?25h

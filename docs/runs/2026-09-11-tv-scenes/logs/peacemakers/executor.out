@@ -1,0 +1,22 @@
+Section 6 (We Are Peacemakers depth layers) is implemented and ready for coordinator verification.
+
+Three depth layers (far, mid, and near) are configured for scene 8 with distinct scale, blur, and pace settings. Floater lifecycle hooks (`mount`, `integrate`, and `place`) manage layer assignment, physics continuation, and DOM style application without changing layout coordinates, keep-out bounds, replacement cadence, or circular geometry.
+
+### What now works
+1. [peacemakers.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js) assigns `far` (scale 0.84, blur 0.9px, pace 0.75, z 40), `mid` (scale 0.93, blur 0.35px, pace 0.9, z 60), and `near` (scale 1.0, blur 0px, pace 1.1, z 80) across floater actors, preserving layer identity across replacements.
+2. [peacemakers.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css) retains only the scoped header comment as no scene-specific CSS overrides were needed.
+3. [peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts) defines 5 Playwright tests covering circularity, boundary overflow, staggered population, depth layers and blur distribution, and reduced motion still mode.
+4. [peacemakers.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) records the lane execution, files changed, and closed gap items.
+
+### What Anthony must do
+Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)
+
+Anything not done and why:
+Nothing; all work order requirements are complete. No shell commands were run per hard rule 3.

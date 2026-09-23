@@ -1,0 +1,17 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+public/color-polish/scenes/welcome.js syntax ok
+scoped rules: 1
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  3 failed
+  10 passed (1.6m)
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  3) [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+DONE
+isolated rerun after load-related timeouts: helpers.spec plus welcome.spec 7 passed (logs/welcome/spec-rerun.out); hygiene sweep clean

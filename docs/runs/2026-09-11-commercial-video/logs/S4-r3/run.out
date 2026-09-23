@@ -1,0 +1,65 @@
+All six review findings are resolved and verified in [assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) and [cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html).
+
+The decode check now monitors process exit status and stderr via `spawnSync`, card JSON injection is safely escaped with browser page errors trapped, and rendered card elements are measured for overflow and 40 px margin bounds. Segment building for 9:16 now branches on `beat.portrait` with explicit failure guards, the narration audio mix uses the dynamic timeline length, and frame rate parameters reference the single `FPS` constant.
+
+### Verification outputs
+
+1. `node --check scripts/video/assemble.mjs`
+```text
+(exit 0, no output)
+```
+
+2. `grep -n "spawnSync\|u003c\|pageerror\|beat.portrait\|b.portrait\|inputs=\${\|TARGET_URL\|FPS" scripts/video/assemble.mjs`
+```text
+3:import { execFileSync, spawnSync } from 'node:child_process';
+11:const TARGET_URL = 'https://mothers-love.vercel.app/recognize';
+15:    .replaceAll('<', '\\u003c')
+67:  const FPS = 30;
+96:      portrait: beat.portrait,
+128:  const qrDataUrl = await QRCode.toDataURL(TARGET_URL, {
+149:    page.on('pageerror', err => {
+170:      url: TARGET_URL,
+224:      url: TARGET_URL,
+281:        url: TARGET_URL,
+345:          const filter = `[0:v]scale=${variant.width}:${variant.height},fps=${FPS}[v]`;
+358:            '-r', String(FPS),
+367:          let baseFilter = `scale=1920:1080,fps=${FPS}`;
+387:            '-r', String(FPS),
+393:        // 9:16 segment builder: decide by beat.portrait
+394:        if (b.portrait === 'card') {
+396:          const filter = `[0:v]scale=${variant.width}:${variant.height},fps=${FPS}[v]`;
+409:            '-r', String(FPS),
+413:        } else if (b.portrait === 'phone') {
+421:          let baseFilter = `scale=1080:1920,fps=${FPS}`;
+441:            '-r', String(FPS),
+445:        } else if (b.portrait === 'crop') {
+458:          let clipFilter = `scale=1080:608,fps=${FPS}`;
+472:            '-i', `color=c=0xfffdf6:s=1080x1920:r=${FPS}:d=${L_i.toFixed(3)}`,
+480:            '-r', String(FPS),
+485:          console.error(`Unknown portrait mode '${b.portrait}' for beat ${b.n}`);
+542:    `${mixInputs}amix=inputs=${timeline.length}:normalize=0:dropout_transition=0[narration_raw]`,
+587:      '-r', String(FPS),
+646:    if (v.r_frame_rate !== `${FPS}/1`) {
+647:      console.error(`Frame rate mismatch in ${mp4Path}: expected ${FPS}/1, got ${v.r_frame_rate}`);
+663:    const result = spawnSync(FFMPEG, [
+706:    `expected = ${JSON.stringify(TARGET_URL)}`,
+```
+
+3. `grep -n "fps=30\|'-r', '30'\|\"-r\", \"30\"\|inputs=7" scripts/video/assemble.mjs`
+```text
+(exit 1, no output)
+```
+
+4. `grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/assemble.mjs scripts/video/cards.html`
+```text
+scripts/video/assemble.mjs:0
+scripts/video/cards.html:0
+```
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
+
+### What Anthony must do
+Nothing, you're clear.

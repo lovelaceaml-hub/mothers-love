@@ -1,0 +1,282 @@
+
+Running 16 tests using 5 workers
+
+  ✘   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (18.1s)
+  ✘   5 [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s (19.5s)
+  ✓   7 [chromium] › tests/color-polish-scenes/welcome.spec.ts:131:5 › reduced motion renders the welcome scene still (2.9s)
+  ✓   8 [chromium] › tests/color-polish-scenes/welcome.spec.ts:183:5 › at 2000 ms actors count is at least 5 unless in reader mode (1.7s)
+  ✓   6 [chromium] › tests/color-polish-scenes/welcome.spec.ts:95:5 › bubbles stay circular through motion (22.4s)
+  ✓   9 [chromium] › tests/color-polish-scenes/welcome.spec.ts:195:5 › scene replaces at least one bubble within 30 s (17.7s)
+  ✘   2 [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers (36.8s)
+  ✘   4 [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s (37.6s)
+  ✘   3 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (39.1s)
+  ✓  10 [chromium] › tests/color-polish-scenes/welcome.spec.ts:221:5 › entering bubble has non-zero rotate angle in slot transform (6.9s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (38.0s)
+  ✘  11 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (35.9s)
+  ✘  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.5m)
+  ✘  15 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (1.0m)
+  ✘  16 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (59.3s)
+  ✘  14 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.0m)
+
+
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3121/admin/display", waiting until "load"[22m
+
+
+       at color-polish-scenes/helpers.ts:288
+
+      286 |   await mockCommon(page);
+      287 |   await signInAs(page);
+    > 288 |   await page.goto('/admin/display');
+          |              ^
+      289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:288:14)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3121/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    6 × unexpected value "http://127.0.0.1:3121/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3121/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    5 × unexpected value "http://127.0.0.1:3121/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-welcom-094e0-les-and-no-overflow-at-14-s-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('color-polish-studio')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('color-polish-studio')[22m
+
+
+       at color-polish-scenes/helpers.ts:289
+
+      287 |   await signInAs(page);
+      288 |   await page.goto('/admin/display');
+    > 289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+          |                                                         ^
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+      292 |   const selector = page.getByLabel('Color Polish preview scene');
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:25:21
+
+    Error Context: test-results/color-polish-scenes-welcom-9013c-d-and-span-two-depth-layers-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('color-polish-studio')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('color-polish-studio')[22m
+
+
+       at color-polish-scenes/helpers.ts:289
+
+      287 |   await signInAs(page);
+      288 |   await page.goto('/admin/display');
+    > 289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+          |                                                         ^
+      290 |
+      291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+      292 |   const selector = page.getByLabel('Color Polish preview scene');
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
+
+    Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('iframe').first().contentFrame().getByText('Appreciation, all around us.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('iframe').first().contentFrame().getByText('Appreciation, all around us.')[22m
+
+
+      228 |   await expect(selector.locator('option')).toHaveCount(10);
+      229 |   await selector.selectOption('garden');
+    > 230 |   await expect(page.frameLocator('iframe').first().getByText('Appreciation, all around us.')).toBeVisible();
+          |                                                                                               ^
+      231 |   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
+      232 |   await expect(selector).toHaveValue('garden');
+      233 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:230:95
+
+    Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
+
+  7) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+    Call Log:
+    - Test timeout of 30000ms exceeded
+
+      240 |   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+      241 |
+    > 242 |   await expect.poll(() => page.frames().some(f => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+          |   ^
+      243 |   const tvFrame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
+      244 |   if (!tvFrame) throw new Error('color-polish renderer frame not found on /display');
+      245 |   await tvFrame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:242:3
+
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByText('temporarily unavailable')
+    Expected: [32m0[39m
+    Received: [31mundefined[39m
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByText('temporarily unavailable')[22m
+
+
+      285 |   await expect(page.locator('[data-testid="color-polish-display"]')).toBeVisible({ timeout: 12000 });
+      286 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+    > 287 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+          |                                                           ^
+      288 | });
+      289 |
+      290 | async function findRendererFrame(page: Page) {
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:287:59
+
+    Error Context: test-results/color-polish-usable-usable-7a3aa-or-polish-stays-unavailable-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: frame.evaluate: Test timeout of 30000ms exceeded.
+
+      308 |
+      309 |   const readCountdown = async () => {
+    > 310 |     const state = await tvFrame.evaluate(() => (window as any).colorPolishRuntime.getState());
+          |                                 ^
+      311 |     const number = await tvFrame.locator('#scene-countdown-number').textContent();
+      312 |     return { scene: state.scene as number, dwell: state.visual.dwell[state.scene] as number, number: Number(number) };
+      313 |   };
+        at readCountdown (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:310:33)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:315:24
+
+    Error Context: test-results/color-polish-usable-usable-be7b0-nd-resets-on-manual-advance-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  10 failed
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  6 passed (5.2m)

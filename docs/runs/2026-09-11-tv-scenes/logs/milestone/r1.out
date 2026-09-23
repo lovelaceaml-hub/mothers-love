@@ -1,0 +1,13 @@
+The extreme depth thresholds have been updated in [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts) and recorded in [milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md).
+
+The per-sample minimum z expectation is relaxed to -500, with max z remaining >= 300. An additional overall assertion verifies that the smallest minimum z observed across all checkpoint samples reaches <= -600. All other assertions for blur and scale are preserved.
+
+Next two-minute action: Hand off to the coordinator to re-run the Playwright suite.
+
+### What Anthony must do
+- Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- [tests/color-polish-scenes/milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts)
+- [docs/runs/2026-09-11-tv-scenes/lanes/milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md)

@@ -1,0 +1,7 @@
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:27:5 › peacemakers renders circular bubbles and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:59:5 › bubble count never zero and at most one actor exiting at fresh opens 
+  3) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  3 failed
+  12 passed (1.4m)
+DONE

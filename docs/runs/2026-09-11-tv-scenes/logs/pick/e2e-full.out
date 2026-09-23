@@ -1,0 +1,2002 @@
+
+Running 229 tests using 5 workers
+
+  ✓    5 [chromium] › tests/admin/admin.spec.ts:154:7 › synthetic admin browser workflows › invalid setup link gives recovery guidance without a password form (1.6s)
+  ✓    2 [chromium] › tests/admin/admin.spec.ts:163:7 › synthetic admin browser workflows › error callback does not fall back to a different persisted account session (2.4s)
+  ✓    4 [chromium] › tests/admin/admin.spec.ts:128:7 › synthetic admin browser workflows › invitation magic link keeps password setup after Supabase clears the callback hash (2.4s)
+  ✓    6 [chromium] › tests/admin/admin.spec.ts:175:7 › synthetic admin browser workflows › setup page keeps password save disabled when getUser rejects the session (966ms)
+  ✓    8 [chromium] › tests/admin/admin.spec.ts:208:7 › synthetic admin browser workflows › login makes invited account recovery explicit (620ms)
+  ✓    7 [chromium] › tests/admin/admin.spec.ts:190:7 › synthetic admin browser workflows › password setup updates the provider and enters admin after campaign verification (701ms)
+  ✓    3 [chromium] › tests/admin/admin.spec.ts:142:7 › synthetic admin browser workflows › setup page waits for a provider session before enabling password save (3.4s)
+  ✓    1 [chromium] › tests/admin/admin.spec.ts:106:7 › synthetic admin browser workflows › mobile login is accessible and owner sign in enters admin without an authenticator step (4.3s)
+  ✓   10 [chromium] › tests/admin/admin.spec.ts:244:7 › synthetic admin browser workflows › owner settings show member controls and the direct TV View link (1.4s)
+  ✓   11 [chromium] › tests/admin/admin.spec.ts:264:7 › synthetic admin browser workflows › overview shows global TV View settings without device tracking (1.5s)
+  ✓   14 [chromium] › tests/admin/admin.spec.ts:319:7 › synthetic admin browser workflows › sign out failure checks local session state before deciding the next view (900ms)
+  ✓   12 [chromium] › tests/admin/admin.spec.ts:279:7 › synthetic admin browser workflows › sidebar sign out clears the stored session and returns to login (2.5s)
+  ✓    9 [chromium] › tests/admin/admin.spec.ts:224:7 › synthetic admin browser workflows › moderator sees permission limits for invitations and collection control (3.5s)
+  ✓   13 [chromium] › tests/admin/admin.spec.ts:299:7 › synthetic admin browser workflows › topbar sign out clears the stored session and returns to login (1.9s)
+  ✓   15 [chromium] › tests/admin/admin.spec.ts:334:7 › synthetic admin browser workflows › cleanup status turns attention when cleanup becomes stale while open (1.9s)
+  ✓   16 [chromium] › tests/admin/admin.spec.ts:346:7 › synthetic admin browser workflows › cleanup status stays healthy when a background refresh advances cleanup (1.4s)
+  ✓   17 [chromium] › tests/admin/admin.spec.ts:366:7 › synthetic admin browser workflows › cleanup status explains when cleanup has never run (1.3s)
+  ✓   20 [chromium] › tests/admin/admin.spec.ts:427:7 › synthetic admin browser workflows › already expired GET is cleared before private fields render (4.7s)
+  ✓   21 [chromium] › tests/admin/admin.spec.ts:443:7 › synthetic admin browser workflows › expired conflict response clears the open editor before adoption (4.5s)
+  ✓   22 [chromium] › tests/admin/admin.spec.ts:471:7 › synthetic admin browser workflows › expired PATCH response clears the editor before private fields render (4.1s)
+  ✓   18 [chromium] › tests/admin/admin.spec.ts:374:7 › synthetic admin browser workflows › editor reconciles a 409 with the newer copy before saving (5.7s)
+  ✓   19 [chromium] › tests/admin/admin.spec.ts:412:7 › synthetic admin browser workflows › editor clears personal fields when the recognition expires while open (5.6s)
+  ✘   26 [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-phone (885ms)
+  ✘   27 [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-desktop (1.0s)
+  ✓   24 [chromium] › tests/admin/admin.spec.ts:533:7 › synthetic admin browser workflows › owner can distinguish multiple moderators before revoking access (1.6s)
+  ✓   23 [chromium] › tests/admin/admin.spec.ts:497:7 › synthetic admin browser workflows › display settings show current global settings without device acknowledgement (2.0s)
+  ✓   25 [chromium] › tests/admin/admin.spec.ts:562:7 › synthetic admin browser workflows › aggregate export downloads server CSV without personal fields (2.0s)
+  ✘   32 [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-phone (639ms)
+  ✘   31 [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-desktop (692ms)
+  ✘   29 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: featured (5.4s)
+  ✘   30 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: impact (5.4s)
+  ✘   28 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: garden (5.8s)
+  ✘   34 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: shared-expression (5.3s)
+  ✘   33 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: expressions (5.5s)
+  ✘   35 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: daily-practice (5.5s)
+  ✘   37 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: one-kind-word (5.5s)
+  ✘   36 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: spotlight (5.5s)
+  ✘   40 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 1 (1.2s)
+  ✘   38 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: everyday-peace (5.3s)
+  ✘   42 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 2 (1.1s)
+  ✘   39 [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: peace-promise (5.3s)
+  ✓   41 [chromium] › tests/color-polish/color-polish.spec.ts:35:5 › supporting guides and sign in keep all content (1.4s)
+  ✘   43 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 7 (1.1s)
+  ✘   44 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 3 (1.1s)
+  ✘   45 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 4 (1.2s)
+  ✘   46 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 5 (1.2s)
+  ✘   47 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 6 (1.1s)
+  ✘   48 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 8 (1.2s)
+  ✘   49 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 9 (1.2s)
+  ✘   50 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 10 (1.2s)
+  ✘   51 [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 11 (1.2s)
+  ✘   52 [chromium] › tests/color-polish/color-polish.spec.ts:44:5 › V6 celebration styles and motion are preserved (1.1s)
+  ✓   53 [chromium] › tests/color-polish-scenes/arrival.spec.ts:189:5 › single and group entrance styles cycle in the recorded order (11.3s)
+  ✓   55 [chromium] › tests/color-polish-scenes/arrival.spec.ts:332:5 › every arriving orb stays circular mid-entrance (16.1s)
+  ✓   54 [chromium] › tests/color-polish-scenes/arrival.spec.ts:230:5 › the four reworked entrances start deep and resolve flat (16.8s)
+  ✓   57 [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s (16.0s)
+  ✓   58 [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count (9.0s)
+  ✓   60 [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › reduced motion renders the calendar still with no pulse (4.5s)
+  ✓   56 [chromium] › tests/color-polish-scenes/arrival.spec.ts:386:5 › a screenshot per style at the entrance midpoint (26.3s)
+  ✓   61 [chromium] › tests/color-polish-scenes/calendar.spec.ts:146:5 › the same holds at 3840 (9.0s)
+  ✓   62 [chromium] › tests/color-polish-scenes/expressions.spec.ts:110:5 › expressions renders with circular medallions and no overflow at 14 s (11.2s)
+  ✓   59 [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle (15.8s)
+  ✓   63 [chromium] › tests/color-polish-scenes/expressions.spec.ts:141:5 › grid cards fit with slack (11.2s)
+  ✓   65 [chromium] › tests/color-polish-scenes/expressions.spec.ts:163:5 › the focused card is balanced (7.3s)
+  ✓   64 [chromium] › tests/color-polish-scenes/expressions.spec.ts:153:5 › compact cards fit (7.4s)
+  ✓   67 [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › reduced motion renders the scene still (5.3s)
+  ✓   66 [chromium] › tests/color-polish-scenes/expressions.spec.ts:172:5 › every expression can be the focused one (7.5s)
+  ✓   69 [chromium] › tests/color-polish-scenes/featured.spec.ts:10:5 › featured renders circular bubbles and no overflow at 14 s (4.6s)
+  ✓   71 [chromium] › tests/color-polish-scenes/featured.spec.ts:36:5 › bubbles span two depth layers (3.8s)
+  ✓   73 [chromium] › tests/color-polish-scenes/featured.spec.ts:67:5 › reduced motion renders the featured scene still (3.7s)
+  ✓   68 [chromium] › tests/color-polish-scenes/expressions.spec.ts:219:5 › the same holds at 3840 (10.3s)
+  ✓   74 [chromium] › tests/color-polish-scenes/garden.spec.ts:10:5 › garden renders circular bubbles and no overflow at 14 s (5.1s)
+  ✓   76 [chromium] › tests/color-polish-scenes/garden.spec.ts:68:5 › petals are carried, not dropped (4.8s)
+  ✓   75 [chromium] › tests/color-polish-scenes/garden.spec.ts:25:5 › the garden fills over a minute with one replacement at a time (6.0s)
+  ✓   77 [chromium] › tests/color-polish-scenes/garden.spec.ts:106:5 › bubbles span two depth layers (4.7s)
+  ✓   79 [chromium] › tests/color-polish-scenes/garden.spec.ts:143:5 › reduced motion renders the garden still (3.9s)
+  ✓   72 [chromium] › tests/color-polish-scenes/featured.spec.ts:56:5 › bubbles stay circular during an exit (15.2s)
+  ✓   70 [chromium] › tests/color-polish-scenes/featured.spec.ts:24:5 › the scene stays populated and replaces one bubble at a time (19.2s)
+  ✓   80 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (3.5s)
+  ✓   81 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (3.1s)
+  ✓   82 [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s (8.4s)
+  ✓   83 [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual (9.4s)
+  ✓   85 [chromium] › tests/color-polish-scenes/milestone.spec.ts:178:5 › reduced motion renders the milestone still (7.8s)
+  ✓   86 [chromium] › tests/color-polish-scenes/orbit.spec.ts:10:5 › orbit renders circular planets and no overflow at 14 s (5.7s)
+  ✓   84 [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth (13.0s)
+  ✓   87 [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate (5.6s)
+  ✓   88 [chromium] › tests/color-polish-scenes/orbit.spec.ts:119:5 › the far planet is blurred and dim, the near planet sharp with a shadow (5.4s)
+  ✓   78 [chromium] › tests/color-polish-scenes/garden.spec.ts:134:5 › bubbles stay circular through sprout, swell and burst (22.2s)
+  ✓   89 [chromium] › tests/color-polish-scenes/orbit.spec.ts:182:5 › planets stay circular through the orbit (3.3s)
+  ✓   90 [chromium] › tests/color-polish-scenes/orbit.spec.ts:204:5 › reduced motion renders the orbit still (3.1s)
+  ✓   91 [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:10:5 › peace in practice renders circular bubbles and no overflow at 14 s (3.7s)
+  ✓   92 [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:46:5 › a bubble pops into hearts, peace signs and glow within 60 s (3.9s)
+  ✓   93 [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:129:5 › bubbles span two depth layers (3.0s)
+  ✓   95 [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:193:5 › reduced motion renders the scene still (2.9s)
+  ✓   94 [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:165:5 › bubbles stay circular through swell and burst (3.4s)
+  ✓   96 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:27:5 › peacemakers renders circular bubbles and no overflow at 14 s (3.2s)
+  ✓   98 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:61:5 › bubbles span two depth layers with blur only on deeper layers (3.3s)
+  ✓  100 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:133:5 › reduced motion renders the peacemakers scene still (2.9s)
+  ✓  102 [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies (4.4s)
+  ✓  101 [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s (17.1s)
+  ✓   99 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:123:5 › bubbles stay circular during replacement (48.9s)
+  ✓  104 [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed (44.6s)
+  ✘  103 [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms (49.0s)
+  ✓   97 [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:42:5 › the scene stays populated with staggered replacement (54.9s)
+  ✓  106 [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s (3.7s)
+  ✓  107 [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers (2.5s)
+  ✓  109 [chromium] › tests/color-polish-scenes/welcome.spec.ts:131:5 › reduced motion renders the welcome scene still (1.8s)
+  ✓  112 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (3.2s)
+  ✓  113 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (836ms)
+  ✓  105 [chromium] › tests/color-polish-scenes/status.spec.ts:242:5 › no icon exceeds the motion envelope over 30 seconds (42.9s)
+  ✓  114 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (1.8s)
+  ✓  108 [chromium] › tests/color-polish-scenes/welcome.spec.ts:95:5 › bubbles stay circular through motion (10.8s)
+  ✓  111 [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s (7.3s)
+  ✓  110 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (10.7s)
+  ✘  117 [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 1 fixture without unsafe sample content (5.5s)
+  ✘  118 [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 0 fixture without unsafe sample content (5.5s)
+  ✘  119 [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 2 fixture without unsafe sample content (5.3s)
+  ✘  121 [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 20 fixture without unsafe sample content (5.6s)
+  ✘  120 [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the long fixture without unsafe sample content (5.5s)
+  ✘  123 [chromium] › tests/display/display.e2e.spec.ts:193:7 › Bubble Board display synthetic fixtures › retries a temporary startup failure without asking for a code (5.6s)
+  ✘  124 [chromium] › tests/display/display.e2e.spec.ts:213:7 › Bubble Board display synthetic fixtures › aborts a hung initial snapshot and opens after the next poll without pair or acknowledgement (6.4s)
+  ✓  115 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (24.1s)
+  ✘  122 [chromium] › tests/display/display.e2e.spec.ts:178:7 › Bubble Board display synthetic fixtures › opens directly without a pairing form (15.5s)
+  ✘  126 [chromium] › tests/display/display.e2e.spec.ts:288:7 › Bubble Board display synthetic fixtures › keeps garden bubbles circular and shows the direct live rail on other screens (5.4s)
+  ✘  127 [chromium] › tests/display/display.e2e.spec.ts:278:7 › Bubble Board display synthetic fixtures › honors trail and constellation flags and only links shared expressions (5.5s)
+  ✘  129 [chromium] › tests/display/display.e2e.spec.ts:381:7 › Bubble Board display synthetic fixtures › keeps live rail excerpts on grapheme boundaries (5.4s)
+  ✘  128 [chromium] › tests/display/display.e2e.spec.ts:343:7 › Bubble Board display synthetic fixtures › adds a newly polled recognition to a paused Garden without advancing rotation (10.4s)
+  ✘  130 [chromium] › tests/display/display.e2e.spec.ts:397:7 › Bubble Board display synthetic fixtures › reads hearts for an older active arrival outside the newest 30 rail records (5.5s)
+  ✘  125 [chromium] › tests/display/display.e2e.spec.ts:252:7 › Bubble Board display synthetic fixtures › shows a concise startup state, then clears content after an unauthorized resync (15.5s)
+  ✘  131 [chromium] › tests/display/display.e2e.spec.ts:440:7 › Bubble Board display synthetic fixtures › keeps cluster content clear of its expression panel at TV sizes (5.4s)
+  ✘  132 [chromium] › tests/display/display.e2e.spec.ts:487:7 › Bubble Board display synthetic fixtures › keeps all-nine expression cards clear of the QR dock at TV sizes (5.4s)
+  ✘  133 [chromium] › tests/display/display.e2e.spec.ts:528:7 › Bubble Board display synthetic fixtures › removes the live rail and personal counts in neutral mode (5.4s)
+  ✘  134 [chromium] › tests/display/display.e2e.spec.ts:537:7 › Bubble Board display synthetic fixtures › renders the quiet message with a literal apostrophe (5.5s)
+  ✘  135 [chromium] › tests/display/display.e2e.spec.ts:543:7 › Bubble Board display synthetic fixtures › gives each rotating screen its own motion composition (5.4s)
+  ✘  136 [chromium] › tests/display/display.e2e.spec.ts:568:7 › Bubble Board display synthetic fixtures › keeps the monthly impact total separate from a readable 3x3 counter board (5.4s)
+  ✘  138 [chromium] › tests/display/display.e2e.spec.ts:649:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for a milestone screen (5.5s)
+  ✘  139 [chromium] › tests/display/display.e2e.spec.ts:664:7 › Bubble Board display synthetic fixtures › keeps garden bubbles inside the board and long excerpts readable at TV sizes (5.4s)
+  ✘  137 [chromium] › tests/display/display.e2e.spec.ts:634:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for an arrival screen (15.8s)
+  ✓  116 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.0m)
+  -  143 [chromium] › tests/display/display.e2e.spec.ts:830:7 › Bubble Board display synthetic fixtures › captures fallback, quiet, and neutral safety screens
+  -  144 [chromium] › tests/display/display.e2e.spec.ts:853:7 › Bubble Board display synthetic fixtures › captures arrival and milestone screens from synthetic snapshots
+  ✓  145 [chromium] › tests/feed/feed.spec.ts:46:5 › shows the campaign home with safe feed cards and public navigation (979ms)
+  ✓  146 [chromium] › tests/feed/feed.spec.ts:76:5 › replaces the feed on polling and removes old messages on an error (625ms)
+  ✓  148 [chromium] › tests/feed/feed.spec.ts:103:5 › clears personal content while hidden and rechecks immediately on return (631ms)
+  -  147 [chromium] › tests/display/display.e2e.spec.ts:815:7 › Bubble Board display synthetic fixtures › captures the current multi-record garden, featured, all-nine, and cluster screens
+  ✓  149 [chromium] › tests/feed/feed.spec.ts:131:5 › uses verified server time for initial suppression and monotonic expiry (888ms)
+  ✓  150 [chromium] › tests/feed/feed.spec.ts:148:5 › removes each item at its own expiry without waiting for polling (1.2s)
+  ✓  151 [chromium] › tests/feed/feed.spec.ts:170:5 › clears the feed when a request exceeds the deadline (989ms)
+  ✓  152 [chromium] › tests/feed/feed.spec.ts:186:5 › ignores a stale response after a visibility refresh (1.2s)
+  ✓  153 [chromium] › tests/feed/feed.spec.ts:217:5 › bounds home to 30 items and keeps the list keyboard-scrollable (743ms)
+  ✓  154 [chromium] › tests/feed/feed.spec.ts:232:5 › shows the form only on the recognize page, with no live campaign feed (783ms)
+  ✘  140 [chromium] › tests/display/display.e2e.spec.ts:689:7 › Bubble Board display synthetic fixtures › paginates the full long featured recognition at 1920 and 3840 widths (15.4s)
+  ✓  155 [chromium] › tests/feed/home-design.spec.ts:56:7 › Home composition, navigation and accessibility at desktop (2.1s)
+  ✓  156 [chromium] › tests/feed/home-design.spec.ts:56:7 › Home composition, navigation and accessibility at tablet (1.6s)
+  ✓  159 [chromium] › tests/feed/home-design.spec.ts:80:5 › 500 characters, all nine phrases, long Unicode name and markup are complete (593ms)
+  ✓  157 [chromium] › tests/feed/home-design.spec.ts:56:7 › Home composition, navigation and accessibility at narrow-phone (1.3s)
+  ✘  141 [chromium] › tests/display/display.e2e.spec.ts:729:7 › Bubble Board display synthetic fixtures › paginates the full long arrival recognition at TV widths (15.5s)
+  ✓  161 [chromium] › tests/feed/home-design.spec.ts:118:5 › polling preserves the reading anchor and focus; removed records never linger (1.3s)
+  ✓  160 [chromium] › tests/feed/home-design.spec.ts:98:5 › loading, unavailable, retry and empty states preserve working controls (1.8s)
+  -  163 [chromium] › tests/feed/home-design.spec.ts:197:5 › supporting routes preserve baseline content and geometry after color polish
+  ✓  158 [chromium] › tests/feed/home-design.spec.ts:56:7 › Home composition, navigation and accessibility at phone (2.0s)
+  ✓  164 [chromium] › tests/feed/reactions.spec.ts:14:5 › loads confirmed heart counts and toggles with server state (786ms)
+  ✓  165 [chromium] › tests/feed/reactions.spec.ts:48:5 › toggles off with the server-confirmed count (768ms)
+  ✓  166 [chromium] › tests/feed/reactions.spec.ts:74:5 › does not let an older poll overwrite a confirmed PUT (871ms)
+  ✓  168 [chromium] › tests/feed/reactions.spec.ts:128:5 › recovers from an unavailable reaction write after retrying the read (868ms)
+  ✘  142 [chromium] › tests/display/display.e2e.spec.ts:779:7 › Bubble Board display synthetic fixtures › bounds a legal dense line-break message while preserving every segment (15.6s)
+  ✓  169 [chromium] › tests/feed/reactions.spec.ts:159:5 › keeps a throttled heart disabled through the Retry-After window (1.0s)
+  ✓  170 [chromium] › tests/feed/reactions.spec.ts:197:5 › keeps cookie guidance until an explicit read retry succeeds (1.3s)
+  ✓  171 [chromium] › tests/feed/reactions.spec.ts:260:5 › does not resurrect an expired item after a pending write returns (1.0s)
+  ✓  172 [chromium] › tests/feed/reactions.spec.ts:300:5 › does not invent a count before the reaction read succeeds (634ms)
+  ✓  162 [chromium] › tests/feed/home-design.spec.ts:182:5 › unmodified routes contain no Home theme and have no unexpected browser errors (4.1s)
+  ✓  167 [chromium] › tests/feed/home-design.spec.ts:145:5 › keyboard access, independent circular motion, pause and reduced motion (3.3s)
+  ✘  175 [chromium] › tests/interview/integration-browser.spec.ts:49:5 › the actual Nine Expressions screen unfolds from a radial flower into readable cards (5.7s)
+  ✘  174 [chromium] › tests/interview/integration-browser.spec.ts:23:5 › rich Garden motion remains bounded at both TV sizes and records rendering evidence (5.7s)
+  ✘  173 [chromium] › tests/interview/integration-browser.spec.ts:5:5 › full circle messages pan automatically and the owner can pause all motion (5.9s)
+  ✓  176 [chromium] › tests/feed/reactions.spec.ts:232:5 › does not resurrect a hidden item after a pending write returns (2.5s)
+  ✘  177 [chromium] › tests/interview/integration-browser.spec.ts:73:7 › shared-expression plays its approved reveal sequence (6.6s)
+  ✘  178 [chromium] › tests/interview/integration-browser.spec.ts:97:7 › one-kind-word shows the timed teaching journey (5.8s)
+  ✘  180 [chromium] › tests/interview/integration-browser.spec.ts:73:7 › impact plays its approved reveal sequence (5.9s)
+  ✘  179 [chromium] › tests/interview/integration-browser.spec.ts:97:7 › spotlight shows the timed teaching journey (5.7s)
+  ✘  181 [chromium] › tests/interview/integration-browser.spec.ts:97:7 › daily-practice shows the timed teaching journey (5.8s)
+  ✘  185 [chromium] › tests/interview/submission-experience.spec.ts:87:7 › interview completion submission experience › makes each expression a single full-card pointer and keyboard target (3.4s)
+  ✓  186 [chromium] › tests/interview/submission-experience.spec.ts:148:7 › interview completion submission experience › keeps synthetic held and published receipts honest while showing the seed journey (4.4s)
+  ✘  182 [chromium] › tests/interview/integration-browser.spec.ts:97:7 › everyday-peace shows the timed teaching journey (5.3s)
+  ✘  183 [chromium] › tests/interview/integration-browser.spec.ts:97:7 › peace-promise shows the timed teaching journey (5.4s)
+  ✓  187 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:46:7 › phone shell is stationary and feed remains usable at 390x844 (2.1s)
+  ✘  184 [chromium] › tests/interview/studio-browser.spec.ts:105:5 › studio renders real sample and approved previews and saves settings (6.7s)
+  ✓  188 [chromium] › tests/interview/submission-experience.spec.ts:179:7 › interview completion submission experience › keeps one expression per row inside phone bounds and passes axe at phone and desktop sizes (2.1s)
+  ✓  189 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:46:7 › phone shell is stationary and feed remains usable at 320x568 (2.2s)
+  ✓  191 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:67:5 › phone expression motion is independent, circular, pausable and reduced-motion aware (2.5s)
+  ✓  190 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:46:7 › phone shell is stationary and feed remains usable at 430x932 (2.3s)
+  ✘  196 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:110:5 › motion walkthrough and published receipt with synthetic responses only (167ms)
+  ✓  195 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:97:5 › submission prevents duplicate sends and malformed receipts remain unconfirmed (1.2s)
+  ✓  193 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:81:7 › submission composition, complete catalog and accessibility at 768 (2.5s)
+  ✓  197 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:151:5 › phone recognition cards compact to at most 90% of the measured pre-polish height without truncating the message (965ms)
+  ✓  192 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:81:7 › submission composition, complete catalog and accessibility at 390 (2.2s)
+  ✓  194 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:81:7 › submission composition, complete catalog and accessibility at 1440 (2.9s)
+  ✓  198 [chromium] › tests/mobile-recognition/preview-focus.spec.ts:6:7 › public preview restores focus and preserves the draft at 390px (1.1s)
+  ✓  200 [chromium] › tests/mobile-recognition/preview-focus.spec.ts:6:7 › public preview restores focus and preserves the draft at 768px (990ms)
+  ✓  201 [chromium] › tests/mobile-recognition/preview-focus.spec.ts:6:7 › public preview restores focus and preserves the draft at 1440px (885ms)
+  ✘  205 [chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:13:7 › Plan 08 submission garden › keeps nine catalog choices while growing a bouquet from distinct selections (1.2s)
+  ✓  199 [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:120:5 › phone dominant action overlaps and outranks the medallions with a periodic pulse, honoring reduced motion (2.0s)
+  ✓  206 [chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:84:7 › Plan 08 submission garden › turns off scene and bouquet animation under reduced motion (454ms)
+  ✓  207 [chromium] › tests/submission/submission.spec.ts:79:5 › publishes a normal recognition and resets all fields for a new recognition (894ms)
+  ✘  202 [chromium] › tests/plan08/tv-garden-verification.spec.ts:70:7 › Plan 08 TV Garden synthetic browser coverage › keeps the fixed registry, official destinations, and direct display access explicit (5.3s)
+  -  210 [chromium] › tests/plan08/tv-garden-verification.spec.ts:95:7 › Plan 08 TV Garden synthetic browser coverage › does not navigate to an untrusted QR destination or expose it as a link
+  -  211 [chromium] › tests/plan08/tv-garden-verification.spec.ts:112:7 › Plan 08 TV Garden synthetic browser coverage › renders nine waiting buds in the empty Garden without personal content
+  -  212 [chromium] › tests/plan08/tv-garden-verification.spec.ts:122:7 › Plan 08 TV Garden synthetic browser coverage › shows a safe startup reconnecting state after a temporary snapshot failure
+  -  213 [chromium] › tests/plan08/tv-garden-verification.spec.ts:146:7 › Plan 08 TV Garden synthetic browser coverage › keeps approved Garden content moving and labels the temporary reconnect after a prior success
+  -  214 [chromium] › tests/plan08/tv-garden-verification.spec.ts:178:7 › Plan 08 TV Garden synthetic browser coverage › maps reduced motion to still composition and removes CSS animation
+  -  215 [chromium] › tests/plan08/tv-garden-verification.spec.ts:187:7 › Plan 08 TV Garden synthetic browser coverage › keeps owner-selected Lively TV motion and effects active when the browser requests reduced motion
+  -  216 [chromium] › tests/plan08/tv-garden-verification.spec.ts:202:7 › Plan 08 TV Garden synthetic browser coverage › keeps a large active set bounded and chunks reaction requests at thirty IDs
+  -  217 [chromium] › tests/plan08/tv-garden-verification.spec.ts:213:7 › Plan 08 TV Garden synthetic browser coverage › keeps the Garden inside 1920 by 1080 and 3840 by 2160 viewports
+  -  218 [chromium] › tests/plan08/tv-garden-verification.spec.ts:255:7 › Plan 08 TV Garden synthetic browser coverage › paginates a synthetic long reading without overflow
+  ✓  209 [chromium] › tests/submission/submission.spec.ts:104:5 › submits full and single names through the intercepted API (1.4s)
+  ✘  203 [chromium] › tests/plan08/tv-garden-verification.spec.ts:283:7 › Plan 08 central screen composition › maps a saved fixed Spotlight screen to its composed teaching view (5.1s)
+  ✓  208 [chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:45:7 › Plan 08 submission garden › keeps receipt wording truthful for published and held statuses (1.5s)
+  ✘  204 [chromium] › tests/plan08/tv-garden-verification.spec.ts:289:7 › Plan 08 central screen composition › labels the only two invitation destinations as official external forms (5.2s)
+  ✓  219 [chromium] › tests/submission/submission.spec.ts:137:5 › keeps the same draft and retries with the same key after an unconfirmed response (923ms)
+  ✓  220 [chromium] › tests/submission/submission.spec.ts:170:5 › public preview excludes the submitted name and is keyboard reachable (852ms)
+  ✓  223 [chromium] › tests/submission/submission.spec.ts:221:5 › keeps the privacy page within the 390px horizontal viewport (310ms)
+  ✓  221 [chromium] › tests/submission/submission.spec.ts:215:5 › has no automated accessibility violations on the open form (903ms)
+  ✓  225 [chromium] › tests/submission/submission.spec.ts:234:5 › shows all nine expressions and everyday examples on phone and desktop (658ms)
+  ✓  227 [chromium] › tests/submission/submission.spec.ts:272:5 › keeps the expressions guide reachable when collection sharing is closed (542ms)
+  ✓  224 [chromium] › tests/submission/submission.spec.ts:160:5 › keeps collection unavailable without showing a fake success (828ms)
+  ✓  222 [chromium] › tests/submission/submission.spec.ts:126:5 › shows a held receipt without promising display publication (1.0s)
+  ✓  228 [chromium] › tests/submission/submission.spec.ts:282:5 › keeps open form selection behavior while showing the everyday example (863ms)
+  ✓  226 [chromium] › tests/submission/submission.spec.ts:190:5 › shows every expression explanation and lets selection buttons toggle independently (1.0s)
+  ✘  229 [chromium] › tests/submission/submission.spec.ts:293:5 › has no automated accessibility violations on the expressions guide (1.2s)
+
+
+  1) [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-phone 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3102/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3102/", waiting until "load"[22m
+
+
+      16 |   await page.setViewportSize({width,height});await page.emulateMedia({reducedMotion:'reduce'});await mock(page);await page.goto(path);
+      17 |   if(path==='/')await expect(page.locator('[data-recognition-id]')).toHaveCount(9);else await expect(page.getByLabel('Your name',{exact:true})).toBeVisible();
+    > 18 |   const baseline=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});await mock(baseline);await baseline.goto(`http://127.0.0.1:3102${path}`);
+         |                                                                                                                              ^
+      19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
+      20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
+      21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:18:126
+
+    Error Context: test-results/color-polish-color-polish--354e2-try-and-contrast-home-phone-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-desktop 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3102/
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3102/", waiting until "load"[22m
+
+
+      16 |   await page.setViewportSize({width,height});await page.emulateMedia({reducedMotion:'reduce'});await mock(page);await page.goto(path);
+      17 |   if(path==='/')await expect(page.locator('[data-recognition-id]')).toHaveCount(9);else await expect(page.getByLabel('Your name',{exact:true})).toBeVisible();
+    > 18 |   const baseline=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});await mock(baseline);await baseline.goto(`http://127.0.0.1:3102${path}`);
+         |                                                                                                                              ^
+      19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
+      20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
+      21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:18:126
+
+    Error Context: test-results/color-polish-color-polish--b531d-y-and-contrast-home-desktop-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-phone 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3102/recognize
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3102/recognize", waiting until "load"[22m
+
+
+      16 |   await page.setViewportSize({width,height});await page.emulateMedia({reducedMotion:'reduce'});await mock(page);await page.goto(path);
+      17 |   if(path==='/')await expect(page.locator('[data-recognition-id]')).toHaveCount(9);else await expect(page.getByLabel('Your name',{exact:true})).toBeVisible();
+    > 18 |   const baseline=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});await mock(baseline);await baseline.goto(`http://127.0.0.1:3102${path}`);
+         |                                                                                                                              ^
+      19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
+      20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
+      21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:18:126
+
+    Error Context: test-results/color-polish-color-polish--29a87-d-contrast-submission-phone-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-desktop 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3102/recognize
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3102/recognize", waiting until "load"[22m
+
+
+      16 |   await page.setViewportSize({width,height});await page.emulateMedia({reducedMotion:'reduce'});await mock(page);await page.goto(path);
+      17 |   if(path==='/')await expect(page.locator('[data-recognition-id]')).toHaveCount(9);else await expect(page.getByLabel('Your name',{exact:true})).toBeVisible();
+    > 18 |   const baseline=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});await mock(baseline);await baseline.goto(`http://127.0.0.1:3102${path}`);
+         |                                                                                                                              ^
+      19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
+      20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
+      21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:18:126
+
+    Error Context: test-results/color-polish-color-polish--d7707-contrast-submission-desktop-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: garden 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-garden-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: featured 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-featured-chromium/error-context.md
+
+  7) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: impact 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-impact-chromium/error-context.md
+
+  8) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: expressions 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--3325a--TV-color-scene-expressions-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: shared-expression 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--b4c3c-lor-scene-shared-expression-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: spotlight 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--76989-pp-TV-color-scene-spotlight-chromium/error-context.md
+
+  11) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: daily-practice 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--76bde--color-scene-daily-practice-chromium/error-context.md
+
+  12) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: one-kind-word 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--60c37-V-color-scene-one-kind-word-chromium/error-context.md
+
+  13) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: everyday-peace 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--24f13--color-scene-everyday-peace-chromium/error-context.md
+
+  14) [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: peace-promise 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: not [32m"fallback"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "not toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      31 |  snapshot.recognitions=snapshot.recognitions.map((r,i)=>({...r,recipient:sampleNames[i],message:sampleMessages[i%3],expressionIds:[i+1],featured:id==='featured'}));snapshot.aggregate.expressionCounts=Array(9).fill(1);snapshot.aggregate.expressionTotal=9;
+      32 |  if(id==='shared-expression')snapshot.recognitions.forEach(r=>{r.expressionIds=[...new Set([2,...r.expressionIds])];});
+    > 33 |  await page.route('**/api/display/snapshot**',r=>r.fulfill({json:snapshot}));await page.goto('/display');const app=page.getByTestId('display-app');await expect(app).not.toHaveAttribute('data-screen','fallback');await expect(page.getByTestId('display-screen-heading')).toBeVisible();await page.waitForTimeout(500);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1920);await capture(page,`app-tv-${id}`);
+         |                                                                                                                                                                          ^
+      34 | });}
+      35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:33:170
+
+    Error Context: test-results/color-polish-color-polish--37ad4-V-color-scene-peace-promise-chromium/error-context.md
+
+  15) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 1 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=1
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=1", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  16) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 2 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=2
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=2", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  17) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 3 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=3
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=3", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  18) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 4 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=4
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=4", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  19) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 5 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=5
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=5", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  20) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 6 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=8
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=8", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  21) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 7 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=6
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=6", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  22) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 8 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=7
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=7", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  23) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 9 ─────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=9
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=9", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  24) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 10 ────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=10
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=10", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  25) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 11 ────
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=11
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=11", waiting until "load"[22m
+
+
+      36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
+      37 | for(const [index,id] of sceneIds.entries()){test(`V6 reference color screen ${index+1}`,async({page})=>{
+    > 38 |  await page.setViewportSize({width:1920,height:1080});await page.goto(`http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture&still&screen=${id}`);await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
+      40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
+      41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:38:66
+
+  26) [chromium] › tests/color-polish/color-polish.spec.ts:44:5 › V6 celebration styles and motion are preserved 
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture", waiting until "load"[22m
+
+
+      43 | });}
+      44 | test('V6 celebration styles and motion are preserved',async({page})=>{
+    > 45 |  await page.setViewportSize({width:1920,height:1080});await page.goto('http://127.0.0.1:3103/color-review-evidence/Mothers_Love_TV_Color_Polish.html?capture');await page.waitForFunction(()=>Boolean((window as any).preview));
+         |                                                                  ^
+      46 |  for(const n of [1,10]){const state=await page.evaluate(n=>{const p=(window as any).preview;p.reset();p.freeze(true);p.add(n);p.step(6500);p.draw();return {active:p.getState().active,single:p.visualState().singleStyles,group:p.visualState().groupStyles};},n);expect(state.single).toHaveLength(6);expect(state.group).toHaveLength(5);expect(state.active.ids).toHaveLength(n);await capture(page,`v6-arrival-${n}`);}
+      47 | });
+      48 |
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish/color-polish.spec.ts:45:66
+
+  27) [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m0.8[39m
+    Received:   [31m0.36580999999999997[39m
+
+      179 |       const ys = icon.samples.map((s) => s.y);
+      180 |       const yDelta = Math.max(...ys) - Math.min(...ys);
+    > 181 |       expect(yDelta).toBeGreaterThan(0.8);
+          |                      ^
+      182 |       for (const sample of icon.samples) {
+      183 |         expect(Math.abs(sample.rot)).toBeLessThanOrEqual(3.5);
+      184 |       }
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:181:22
+
+    Error Context: test-results/color-polish-scenes-status-9643b--follow-different-waveforms-chromium/error-context.md
+
+  28) [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 0 fixture without unsafe sample content 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:169:7
+
+    Error Context: test-results/display-display.e2e-Bubble-1555d-thout-unsafe-sample-content-chromium/error-context.md
+
+  29) [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 1 fixture without unsafe sample content 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:169:7
+
+    Error Context: test-results/display-display.e2e-Bubble-2e614-thout-unsafe-sample-content-chromium/error-context.md
+
+  30) [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 2 fixture without unsafe sample content 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:169:7
+
+    Error Context: test-results/display-display.e2e-Bubble-5974a-thout-unsafe-sample-content-chromium/error-context.md
+
+  31) [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 20 fixture without unsafe sample content 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:169:7
+
+    Error Context: test-results/display-display.e2e-Bubble-0d2b3-thout-unsafe-sample-content-chromium/error-context.md
+
+  32) [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the long fixture without unsafe sample content 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:169:7
+
+    Error Context: test-results/display-display.e2e-Bubble-2d621-thout-unsafe-sample-content-chromium/error-context.md
+
+  33) [chromium] › tests/display/display.e2e.spec.ts:178:7 › Bubble Board display synthetic fixtures › opens directly without a pairing form 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"fixture-1"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      185 |     });
+      186 |     await page.goto('/display');
+    > 187 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 15_000 });
+          |                                                   ^
+      188 |     await expect(page.getByLabel('Display code')).toHaveCount(0);
+      189 |     await expect(page.getByRole('button', { name: /Connect this display/ })).toHaveCount(0);
+      190 |     expect(forbiddenRequests).toEqual([]);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:187:51
+
+    Error Context: test-results/display-display.e2e-Bubble-911d9-ctly-without-a-pairing-form-chromium/error-context.md
+
+  34) [chromium] › tests/display/display.e2e.spec.ts:193:7 › Bubble Board display synthetic fixtures › retries a temporary startup failure without asking for a code 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'The display is temporarily unavailable.' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'The display is temporarily unavailable.' })[22m
+
+
+      206 |     });
+      207 |     await page.goto('/display');
+    > 208 |     await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible();
+          |                                                                                                  ^
+      209 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 12_000 });
+      210 |     expect(forbiddenRequests).toEqual([]);
+      211 |   });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:208:98
+
+    Error Context: test-results/display-display.e2e-Bubble-822d7-e-without-asking-for-a-code-chromium/error-context.md
+
+  35) [chromium] › tests/display/display.e2e.spec.ts:213:7 › Bubble Board display synthetic fixtures › aborts a hung initial snapshot and opens after the next poll without pair or acknowledgement 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"fixture-1"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      245 |     await expect.poll(() => failedSnapshotRequests.length).toBeGreaterThan(0);
+      246 |     await page.clock.runFor(5_000);
+    > 247 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 5_000 });
+          |                                                   ^
+      248 |     expect(snapshotCalls).toBeGreaterThanOrEqual(2);
+      249 |     expect(forbiddenRequests).toEqual([]);
+      250 |   });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:247:51
+
+    Error Context: test-results/display-display.e2e-Bubble-bace5-out-pair-or-acknowledgement-chromium/error-context.md
+
+  36) [chromium] › tests/display/display.e2e.spec.ts:252:7 › Bubble Board display synthetic fixtures › shows a concise startup state, then clears content after an unauthorized resync 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"2"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      271 |     await page.goto('/display');
+      272 |     await expect(page.getByRole('heading', { name: 'The display is connecting.' })).toBeVisible();
+    > 273 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '2', { timeout: 15_000 });
+          |                                                   ^
+      274 |     await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible({ timeout: 15_000 });
+      275 |     expect(forbiddenRequests).toEqual([]);
+      276 |   });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:273:51
+
+    Error Context: test-results/display-display.e2e-Bubble-7c5e9-fter-an-unauthorized-resync-chromium/error-context.md
+
+  37) [chromium] › tests/display/display.e2e.spec.ts:278:7 › Bubble Board display synthetic fixtures › honors trail and constellation flags and only links shared expressions 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:279:5
+
+    Error Context: test-results/display-display.e2e-Bubble-2d08e-ly-links-shared-expressions-chromium/error-context.md
+
+  38) [chromium] › tests/display/display.e2e.spec.ts:288:7 › Bubble Board display synthetic fixtures › keeps garden bubbles circular and shows the direct live rail on other screens 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:291:5
+
+    Error Context: test-results/display-display.e2e-Bubble-f084e--live-rail-on-other-screens-chromium/error-context.md
+
+  39) [chromium] › tests/display/display.e2e.spec.ts:343:7 › Bubble Board display synthetic fixtures › adds a newly polled recognition to a paused Garden without advancing rotation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"garden"[39m
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 10000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      367 |
+      368 |     await page.goto('/display');
+    > 369 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-screen', 'garden', { timeout: 10_000 });
+          |                                                   ^
+      370 |     await expect(page.getByTestId('garden-bubble')).toHaveCount(4);
+      371 |
+      372 |     allowNewRecognition = true;
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:369:51
+
+    Error Context: test-results/display-display.e2e-Bubble-5a5a3--without-advancing-rotation-chromium/error-context.md
+
+  40) [chromium] › tests/display/display.e2e.spec.ts:381:7 › Bubble Board display synthetic fixtures › keeps live rail excerpts on grapheme boundaries 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:386:5
+
+    Error Context: test-results/display-display.e2e-Bubble-abc90-rpts-on-grapheme-boundaries-chromium/error-context.md
+
+  41) [chromium] › tests/display/display.e2e.spec.ts:397:7 › Bubble Board display synthetic fixtures › reads hearts for an older active arrival outside the newest 30 rail records 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"0"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      424 |     await page.goto('/display');
+      425 |     await page.clock.runFor(1);
+    > 426 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-rail-count', '0');
+          |                                                   ^
+      427 |     let railSeen = false;
+      428 |     for (let step = 0; step < 60; step += 1) {
+      429 |       if (await page.getByTestId('display-app').getAttribute('data-rail-count') === '30') railSeen = true;
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:426:51
+
+    Error Context: test-results/display-display.e2e-Bubble-b4cfd--the-newest-30-rail-records-chromium/error-context.md
+
+  42) [chromium] › tests/display/display.e2e.spec.ts:440:7 › Bubble Board display synthetic fixtures › keeps cluster content clear of its expression panel at TV sizes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:444:5
+
+    Error Context: test-results/display-display.e2e-Bubble-55f6a-xpression-panel-at-TV-sizes-chromium/error-context.md
+
+  43) [chromium] › tests/display/display.e2e.spec.ts:487:7 › Bubble Board display synthetic fixtures › keeps all-nine expression cards clear of the QR dock at TV sizes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:491:5
+
+    Error Context: test-results/display-display.e2e-Bubble-2da6b--of-the-QR-dock-at-TV-sizes-chromium/error-context.md
+
+  44) [chromium] › tests/display/display.e2e.spec.ts:528:7 › Bubble Board display synthetic fixtures › removes the live rail and personal counts in neutral mode 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:529:5
+
+    Error Context: test-results/display-display.e2e-Bubble-05d91-onal-counts-in-neutral-mode-chromium/error-context.md
+
+  45) [chromium] › tests/display/display.e2e.spec.ts:537:7 › Bubble Board display synthetic fixtures › renders the quiet message with a literal apostrophe 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:538:5
+
+    Error Context: test-results/display-display.e2e-Bubble-40ae3-e-with-a-literal-apostrophe-chromium/error-context.md
+
+  46) [chromium] › tests/display/display.e2e.spec.ts:543:7 › Bubble Board display synthetic fixtures › gives each rotating screen its own motion composition 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:547:5
+
+    Error Context: test-results/display-display.e2e-Bubble-80924--its-own-motion-composition-chromium/error-context.md
+
+  47) [chromium] › tests/display/display.e2e.spec.ts:568:7 › Bubble Board display synthetic fixtures › keeps the monthly impact total separate from a readable 3x3 counter board 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:572:5
+
+    Error Context: test-results/display-display.e2e-Bubble-4b570--readable-3x3-counter-board-chromium/error-context.md
+
+  48) [chromium] › tests/display/display.e2e.spec.ts:634:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for an arrival screen 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"1"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      160 |   });
+      161 |   await page.goto('/display');
+    > 162 |   await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '1', { timeout: 15_000 });
+          |                                                 ^
+      163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      164 | }
+      165 |
+        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:162:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:638:5
+
+    Error Context: test-results/display-display.e2e-Bubble-eba70-otion-for-an-arrival-screen-chromium/error-context.md
+
+  49) [chromium] › tests/display/display.e2e.spec.ts:649:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for a milestone screen 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:653:5
+
+    Error Context: test-results/display-display.e2e-Bubble-10842-tion-for-a-milestone-screen-chromium/error-context.md
+
+  50) [chromium] › tests/display/display.e2e.spec.ts:664:7 › Bubble Board display synthetic fixtures › keeps garden bubbles inside the board and long excerpts readable at TV sizes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      135 |   });
+      136 |   await page.goto('/display');
+    > 137 |   await expect(page.getByTestId('display-app')).toBeVisible();
+          |                                                 ^
+      138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      139 | }
+      140 |
+        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:137:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:665:5
+
+    Error Context: test-results/display-display.e2e-Bubble-a1dfa-cerpts-readable-at-TV-sizes-chromium/error-context.md
+
+  51) [chromium] › tests/display/display.e2e.spec.ts:689:7 › Bubble Board display synthetic fixtures › paginates the full long featured recognition at 1920 and 3840 widths 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"1"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      160 |   });
+      161 |   await page.goto('/display');
+    > 162 |   await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '1', { timeout: 15_000 });
+          |                                                 ^
+      163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      164 | }
+      165 |
+        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:162:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:693:5
+
+    Error Context: test-results/display-display.e2e-Bubble-d6b63-ion-at-1920-and-3840-widths-chromium/error-context.md
+
+  52) [chromium] › tests/display/display.e2e.spec.ts:729:7 › Bubble Board display synthetic fixtures › paginates the full long arrival recognition at TV widths 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"1"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      160 |   });
+      161 |   await page.goto('/display');
+    > 162 |   await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '1', { timeout: 15_000 });
+          |                                                 ^
+      163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      164 | }
+      165 |
+        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:162:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:733:5
+
+    Error Context: test-results/display-display.e2e-Bubble-6c94e-al-recognition-at-TV-widths-chromium/error-context.md
+
+  53) [chromium] › tests/display/display.e2e.spec.ts:779:7 › Bubble Board display synthetic fixtures › bounds a legal dense line-break message while preserving every segment 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: [32m"1"[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      160 |   });
+      161 |   await page.goto('/display');
+    > 162 |   await expect(page.getByTestId('display-app')).toHaveAttribute('data-eligible-count', '1', { timeout: 15_000 });
+          |                                                 ^
+      163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
+      164 | }
+      165 |
+        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:162:49)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/display/display.e2e.spec.ts:785:5
+
+    Error Context: test-results/display-display.e2e-Bubble-29f9d-le-preserving-every-segment-chromium/error-context.md
+
+  54) [chromium] › tests/interview/integration-browser.spec.ts:5:5 › full circle messages pan automatically and the owner can pause all motion 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-message-complete="true"]').first()
+    Expected: [32m"Long message line 1 remains readable.[39m
+    [32mLong message line 2 remains readable.[39m
+    [32mLong message line 3 remains readable.[39m
+    [32mLong message line 4 remains readable.[39m
+    [32mLong message line 5 remains readable.[39m
+    [32mLong message line 6 remains readable.[39m
+    [32mLong message line 7 remains readable.[39m
+    [32mLong message line 8 remains readable.[39m
+    [32mLong message line 9 remains readable.[39m
+    [32mLong message line 10 remains readable.[39m
+    [32mLong message line 11 remains readable.[39m
+    [32mLong message line 12 remains readable.[39m
+    [32mLong message line 13 remains readable.[39m
+    [32mLo"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-message-complete="true"]').first()[22m
+
+
+      10 |   await page.goto('/display');
+      11 |   const message = page.locator('[data-message-complete="true"]').first();
+    > 12 |   await expect(message).toHaveText(snapshot.recognitions[0].message);
+         |                         ^
+      13 |   await expect(message).toHaveAttribute('data-scrolling', 'true');
+      14 |   const metrics = await message.evaluate(node => ({ travel: node.style.getPropertyValue('--message-travel'), animation: getComputedStyle(node.firstElementChild!).animationName }));
+      15 |   expect(parseFloat(metrics.travel)).toBeGreaterThan(0);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:12:25
+
+    Error Context: test-results/interview-integration-brow-009c6--owner-can-pause-all-motion-chromium/error-context.md
+
+  55) [chromium] › tests/interview/integration-browser.spec.ts:23:5 › rich Garden motion remains bounded at both TV sizes and records rendering evidence 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  getByTestId('garden-card')
+    Expected: [32m12[39m
+    Received: [31m0[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('garden-card')[22m
+    [2m    8 × locator resolved to 0 elements[22m
+    [2m      - unexpected value "0"[22m
+
+
+      29 |     await page.setViewportSize(size);
+      30 |     await page.goto('/display');
+    > 31 |     await expect(page.getByTestId('garden-card')).toHaveCount(12);
+         |                                                   ^
+      32 |     await page.waitForTimeout(2_000); // Measure steady motion after the entrance finishes.
+      33 |     const frames = await page.evaluate(() => new Promise<{ frames: number; maxGapMs: number; averageGapMs: number }>(resolve => {
+      34 |       const gaps: number[] = []; let last = performance.now(); const start = last;
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:31:51
+
+    Error Context: test-results/interview-integration-brow-56dc2--records-rendering-evidence-chromium/error-context.md
+
+  56) [chromium] › tests/interview/integration-browser.spec.ts:49:5 › the actual Nine Expressions screen unfolds from a radial flower into readable cards 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('nine-radial-flower')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('nine-radial-flower')[22m
+
+
+      56 |   await page.goto('/display');
+      57 |   const flower = page.getByTestId('nine-radial-flower');
+    > 58 |   await expect(flower).toBeVisible();
+         |                        ^
+      59 |   await expect(page.locator('[data-story-role="radial-petal"]')).toHaveCount(9);
+      60 |   await page.clock.runFor(2_000);
+      61 |   await page.screenshot({ path: testInfo.outputPath('nine-opening.png') });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:58:24
+
+    Error Context: test-results/interview-integration-brow-74e5e--flower-into-readable-cards-chromium/error-context.md
+
+  57) [chromium] › tests/interview/integration-browser.spec.ts:73:7 › shared-expression plays its approved reveal sequence 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('shared-expression')
+    Expected: [32m"opening"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('shared-expression')[22m
+
+
+      80 |     await page.goto('/display');
+      81 |     const scene = page.getByTestId(screen === 'impact' ? 'monthly-impact' : screen);
+    > 82 |     await expect(scene).toHaveAttribute('data-story-phase', 'opening');
+         |                         ^
+      83 |     if (screen === 'shared-expression') await expect(page.getByTestId('connected-recognition')).toHaveCount(4);
+      84 |     else await expect(page.getByTestId('monthly-impact-total')).toContainText('12');
+      85 |     await page.screenshot({ path: testInfo.outputPath(`${screen}-opening.png`) });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:82:25
+
+    Error Context: test-results/interview-integration-brow-01276-ts-approved-reveal-sequence-chromium/error-context.md
+
+  58) [chromium] › tests/interview/integration-browser.spec.ts:73:7 › impact plays its approved reveal sequence 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('monthly-impact')
+    Expected: [32m"opening"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('monthly-impact')[22m
+
+
+      80 |     await page.goto('/display');
+      81 |     const scene = page.getByTestId(screen === 'impact' ? 'monthly-impact' : screen);
+    > 82 |     await expect(scene).toHaveAttribute('data-story-phase', 'opening');
+         |                         ^
+      83 |     if (screen === 'shared-expression') await expect(page.getByTestId('connected-recognition')).toHaveCount(4);
+      84 |     else await expect(page.getByTestId('monthly-impact-total')).toContainText('12');
+      85 |     await page.screenshot({ path: testInfo.outputPath(`${screen}-opening.png`) });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:82:25
+
+    Error Context: test-results/interview-integration-brow-a1149-ts-approved-reveal-sequence-chromium/error-context.md
+
+  59) [chromium] › tests/interview/integration-browser.spec.ts:97:7 › spotlight shows the timed teaching journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('expression-spotlight')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('expression-spotlight')[22m
+
+
+      104 |     await page.goto('/display');
+      105 |     const scene = page.getByTestId(screen === 'spotlight' ? 'expression-spotlight' : screen);
+    > 106 |     await expect(scene).toBeVisible();
+          |                         ^
+      107 |     if (screen === 'everyday-peace') {
+      108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
+      109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:106:25
+
+    Error Context: test-results/interview-integration-brow-e355d--the-timed-teaching-journey-chromium/error-context.md
+
+  60) [chromium] › tests/interview/integration-browser.spec.ts:97:7 › daily-practice shows the timed teaching journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('daily-practice')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('daily-practice')[22m
+
+
+      104 |     await page.goto('/display');
+      105 |     const scene = page.getByTestId(screen === 'spotlight' ? 'expression-spotlight' : screen);
+    > 106 |     await expect(scene).toBeVisible();
+          |                         ^
+      107 |     if (screen === 'everyday-peace') {
+      108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
+      109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:106:25
+
+    Error Context: test-results/interview-integration-brow-a6120--the-timed-teaching-journey-chromium/error-context.md
+
+  61) [chromium] › tests/interview/integration-browser.spec.ts:97:7 › one-kind-word shows the timed teaching journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('one-kind-word')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('one-kind-word')[22m
+
+
+      104 |     await page.goto('/display');
+      105 |     const scene = page.getByTestId(screen === 'spotlight' ? 'expression-spotlight' : screen);
+    > 106 |     await expect(scene).toBeVisible();
+          |                         ^
+      107 |     if (screen === 'everyday-peace') {
+      108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
+      109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:106:25
+
+    Error Context: test-results/interview-integration-brow-10017--the-timed-teaching-journey-chromium/error-context.md
+
+  62) [chromium] › tests/interview/integration-browser.spec.ts:97:7 › everyday-peace shows the timed teaching journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('everyday-peace')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('everyday-peace')[22m
+
+
+      104 |     await page.goto('/display');
+      105 |     const scene = page.getByTestId(screen === 'spotlight' ? 'expression-spotlight' : screen);
+    > 106 |     await expect(scene).toBeVisible();
+          |                         ^
+      107 |     if (screen === 'everyday-peace') {
+      108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
+      109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:106:25
+
+    Error Context: test-results/interview-integration-brow-b14a5--the-timed-teaching-journey-chromium/error-context.md
+
+  63) [chromium] › tests/interview/integration-browser.spec.ts:97:7 › peace-promise shows the timed teaching journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('peace-promise')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('peace-promise')[22m
+
+
+      104 |     await page.goto('/display');
+      105 |     const scene = page.getByTestId(screen === 'spotlight' ? 'expression-spotlight' : screen);
+    > 106 |     await expect(scene).toBeVisible();
+          |                         ^
+      107 |     if (screen === 'everyday-peace') {
+      108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
+      109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/integration-browser.spec.ts:106:25
+
+    Error Context: test-results/interview-integration-brow-82f73--the-timed-teaching-journey-chromium/error-context.md
+
+  64) [chromium] › tests/interview/studio-browser.spec.ts:105:5 › studio renders real sample and approved previews and saves settings 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m390[39m
+    Received:    [31m674[39m
+
+      123 |   await page.setViewportSize({ width: 390, height: 844 });
+      124 |   await expect(page.getByTestId('preview-canvas')).toBeVisible();
+    > 125 |   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+          |                                                                           ^
+      126 |   await page.getByTestId('preview-canvas').screenshot({ path: info.outputPath('preview-phone.png') });
+      127 |   await page.screenshot({ path: info.outputPath('studio-phone.png'), fullPage: true });
+      128 |   expect(saves).toBe(0);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/studio-browser.spec.ts:125:75
+
+    Error Context: test-results/interview-studio-browser-s-2570b-previews-and-saves-settings-chromium/error-context.md
+
+  65) [chromium] › tests/interview/submission-experience.spec.ts:87:7 › interview completion submission experience › makes each expression a single full-card pointer and keyboard target 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"rgb[7m(255, 253, 246[27m)"[39m
+    Received: [31m"rgb[7ma(0, 0, 0, 0[27m)"[39m
+
+      118 |       return { backgroundColor: style.backgroundColor, backgroundImage: style.backgroundImage };
+      119 |     });
+    > 120 |     expect(unselectedStyles.backgroundColor).toBe('rgb(255, 253, 246)');
+          |                                              ^
+      121 |     expect(unselectedStyles.backgroundImage).toBe('none');
+      122 |
+      123 |     await firstChoice.click({ position: { x: 24, y: 56 } });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/interview/submission-experience.spec.ts:120:46
+
+    Error Context: test-results/interview-submission-exper-14242-pointer-and-keyboard-target-chromium/error-context.md
+
+  66) [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:110:5 › motion walkthrough and published receipt with synthetic responses only 
+
+    Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+    Call log:
+    [2m  - navigating to "/", waiting until "load"[22m
+
+
+      111 |   test.setTimeout(60000);mkdirSync(out,{recursive:true});
+      112 |   const context=await browser.newContext({baseURL:process.env.PLAYWRIGHT_BASE_URL,viewport:{width:390,height:844},recordVideo:{dir:out,size:{width:390,height:844}}});
+    > 113 |   const page=await context.newPage();await mock(page);await page.goto('/');await expect(page.locator('[data-recognition-id]').first()).toBeVisible();await page.waitForTimeout(6000);
+          |                                                                  ^
+      114 |   await page.getByRole('region',{name:'Recent recognitions',exact:true}).evaluate(el=>{el.scrollTop=175;});await page.waitForTimeout(1500);
+      115 |   await page.getByRole('link',{name:'Share a recognition',exact:true}).click();await fill(page);await page.getByTestId('expression-card-2').scrollIntoViewIfNeeded();await page.waitForTimeout(1800);
+      116 |   await page.getByRole('button',{name:'Preview public message'}).click();await page.waitForTimeout(1800);await page.keyboard.press('Escape');
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/mobile-recognition/mobile-recognition.spec.ts:113:66
+
+  67) [chromium] › tests/plan08/tv-garden-verification.spec.ts:70:7 › Plan 08 TV Garden synthetic browser coverage › keeps the fixed registry, official destinations, and direct display access explicit 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      50 |   await page.goto('/display', { waitUntil: 'commit' });
+      51 |   const display = page.getByTestId('display-app');
+    > 52 |   await expect(display).toBeVisible();
+         |                         ^
+      53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
+      54 |     ? response.cursor
+      55 |     : null;
+        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:89:20
+
+    Error Context: test-results/plan08-tv-garden-verificat-fbf92-ect-display-access-explicit-chromium/error-context.md
+
+  68) [chromium] › tests/plan08/tv-garden-verification.spec.ts:283:7 › Plan 08 central screen composition › maps a saved fixed Spotlight screen to its composed teaching view 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      50 |   await page.goto('/display', { waitUntil: 'commit' });
+      51 |   const display = page.getByTestId('display-app');
+    > 52 |   await expect(display).toBeVisible();
+         |                         ^
+      53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
+      54 |     ? response.cursor
+      55 |     : null;
+        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:284:5
+
+    Error Context: test-results/plan08-tv-garden-verificat-128bf--its-composed-teaching-view-chromium/error-context.md
+
+  69) [chromium] › tests/plan08/tv-garden-verification.spec.ts:289:7 › Plan 08 central screen composition › labels the only two invitation destinations as official external forms 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('display-app')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('display-app')[22m
+
+
+      50 |   await page.goto('/display', { waitUntil: 'commit' });
+      51 |   const display = page.getByTestId('display-app');
+    > 52 |   await expect(display).toBeVisible();
+         |                         ^
+      53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
+      54 |     ? response.cursor
+      55 |     : null;
+        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/plan08/tv-garden-verification.spec.ts:296:7
+
+    Error Context: test-results/plan08-tv-garden-verificat-07785--as-official-external-forms-chromium/error-context.md
+
+  70) [chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:13:7 › Plan 08 submission garden › keeps nine catalog choices while growing a bouquet from distinct selections 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected substring: [32m"rgb(255, 242, 200)"[39m
+    Received string:    [31m"linear-gradient(120deg, rgb(255, 233, 164), rgb(255, 245, 211) 65%, rgb(255, 224, 139))"[39m
+
+      36 |     const selectedCardBackground = await first.evaluate((card) => getComputedStyle(card).backgroundImage);
+      37 |     expect(selectedCardBackground).toContain('linear-gradient');
+    > 38 |     expect(selectedCardBackground).toContain('rgb(255, 242, 200)');
+         |                                    ^
+      39 |
+      40 |     await first.getByRole('button', { name: /^Selected expression 01:/ }).click();
+      41 |     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '2');
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/submission/plan08/submission-form-refresh.spec.ts:38:36
+
+    Error Context: test-results/submission-plan08-submissi-91cc4-et-from-distinct-selections-chromium/error-context.md
+
+  71) [chromium] › tests/submission/submission.spec.ts:293:5 › has no automated accessibility violations on the expressions guide 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  -  1[39m
+    [31m+ Received  + 58[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   Object {[39m
+    [31m+     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",[39m
+    [31m+     "help": "Elements must meet minimum color contrast ratio thresholds",[39m
+    [31m+     "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",[39m
+    [31m+     "id": "color-contrast",[39m
+    [31m+     "impact": "serious",[39m
+    [31m+     "nodes": Array [[39m
+    [31m+       Object {[39m
+    [31m+         "all": Array [],[39m
+    [31m+         "any": Array [[39m
+    [31m+           Object {[39m
+    [31m+             "data": Object {[39m
+    [31m+               "bgColor": "#ef747b",[39m
+    [31m+               "contrastRatio": 3.62,[39m
+    [31m+               "expectedContrastRatio": "4.5:1",[39m
+    [31m+               "fgColor": "#2d463e",[39m
+    [31m+               "fontSize": "13.4pt (17.92px)",[39m
+    [31m+               "fontWeight": "normal",[39m
+    [31m+               "messageKey": null,[39m
+    [31m+             },[39m
+    [31m+             "id": "color-contrast",[39m
+    [31m+             "impact": "serious",[39m
+    [31m+             "message": "Element has insufficient color contrast of 3.62 (foreground color: #2d463e, background color: #ef747b, font size: 13.4pt (17.92px), font weight: normal). Expected contrast ratio of 4.5:1",[39m
+    [31m+             "relatedNodes": Array [[39m
+    [31m+               Object {[39m
+    [31m+                 "html": "<article class=\"expressions-module__WnYq9q__expressionCard expressions-module__WnYq9q__card5\">",[39m
+    [31m+                 "target": Array [[39m
+    [31m+                   ".expressions-module__WnYq9q__card5",[39m
+    [31m+                 ],[39m
+    [31m+               },[39m
+    [31m+             ],[39m
+    [31m+           },[39m
+    [31m+         ],[39m
+    [31m+         "failureSummary": "Fix any of the following:[39m
+    [31m+   Element has insufficient color contrast of 3.62 (foreground color: #2d463e, background color: #ef747b, font size: 13.4pt (17.92px), font weight: normal). Expected contrast ratio of 4.5:1",[39m
+    [31m+         "html": "<h3>“<!-- -->Please, after you.<!-- -->”</h3>",[39m
+    [31m+         "impact": "serious",[39m
+    [31m+         "none": Array [],[39m
+    [31m+         "target": Array [[39m
+    [31m+           ".expressions-module__WnYq9q__card5 > h3",[39m
+    [31m+         ],[39m
+    [31m+       },[39m
+    [31m+     ],[39m
+    [31m+     "tags": Array [[39m
+    [31m+       "cat.color",[39m
+    [31m+       "wcag2aa",[39m
+    [31m+       "wcag143",[39m
+    [31m+       "TTv5",[39m
+    [31m+       "TT13.c",[39m
+    [31m+       "EN-301-549",[39m
+    [31m+       "EN-9.1.4.3",[39m
+    [31m+       "ACT",[39m
+    [31m+       "RGAAv4",[39m
+    [31m+       "RGAA-3.2.1",[39m
+    [31m+     ],[39m
+    [31m+   },[39m
+    [31m+ ][39m
+
+      296 |     await page.goto('/expressions');
+      297 |     const results = await new AxeBuilder({ page: page as never }).analyze();
+    > 298 |     expect(results.violations).toEqual([]);
+          |                                ^
+      299 |   }
+      300 | });
+      301 |
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/submission/submission.spec.ts:298:32
+
+    Error Context: test-results/submission-submission-has--1849b-ns-on-the-expressions-guide-chromium/error-context.md
+
+  71 failed
+    [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-phone 
+    [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-desktop 
+    [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-phone 
+    [chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-desktop 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: garden ─
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: featured 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: impact ─
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: expressions 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: shared-expression 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: spotlight 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: daily-practice 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: one-kind-word 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: everyday-peace 
+    [chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: peace-promise 
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 1 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 2 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 3 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 4 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 5 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 6 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 7 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 8 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 9 ───────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 10 ──────
+    [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 11 ──────
+    [chromium] › tests/color-polish/color-polish.spec.ts:44:5 › V6 celebration styles and motion are preserved 
+    [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms 
+    [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 0 fixture without unsafe sample content 
+    [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 1 fixture without unsafe sample content 
+    [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 2 fixture without unsafe sample content 
+    [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 20 fixture without unsafe sample content 
+    [chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the long fixture without unsafe sample content 
+    [chromium] › tests/display/display.e2e.spec.ts:178:7 › Bubble Board display synthetic fixtures › opens directly without a pairing form 
+    [chromium] › tests/display/display.e2e.spec.ts:193:7 › Bubble Board display synthetic fixtures › retries a temporary startup failure without asking for a code 
+    [chromium] › tests/display/display.e2e.spec.ts:213:7 › Bubble Board display synthetic fixtures › aborts a hung initial snapshot and opens after the next poll without pair or acknowledgement 
+    [chromium] › tests/display/display.e2e.spec.ts:252:7 › Bubble Board display synthetic fixtures › shows a concise startup state, then clears content after an unauthorized resync 
+    [chromium] › tests/display/display.e2e.spec.ts:278:7 › Bubble Board display synthetic fixtures › honors trail and constellation flags and only links shared expressions 
+    [chromium] › tests/display/display.e2e.spec.ts:288:7 › Bubble Board display synthetic fixtures › keeps garden bubbles circular and shows the direct live rail on other screens 
+    [chromium] › tests/display/display.e2e.spec.ts:343:7 › Bubble Board display synthetic fixtures › adds a newly polled recognition to a paused Garden without advancing rotation 
+    [chromium] › tests/display/display.e2e.spec.ts:381:7 › Bubble Board display synthetic fixtures › keeps live rail excerpts on grapheme boundaries 
+    [chromium] › tests/display/display.e2e.spec.ts:397:7 › Bubble Board display synthetic fixtures › reads hearts for an older active arrival outside the newest 30 rail records 
+    [chromium] › tests/display/display.e2e.spec.ts:440:7 › Bubble Board display synthetic fixtures › keeps cluster content clear of its expression panel at TV sizes 
+    [chromium] › tests/display/display.e2e.spec.ts:487:7 › Bubble Board display synthetic fixtures › keeps all-nine expression cards clear of the QR dock at TV sizes 
+    [chromium] › tests/display/display.e2e.spec.ts:528:7 › Bubble Board display synthetic fixtures › removes the live rail and personal counts in neutral mode 
+    [chromium] › tests/display/display.e2e.spec.ts:537:7 › Bubble Board display synthetic fixtures › renders the quiet message with a literal apostrophe 
+    [chromium] › tests/display/display.e2e.spec.ts:543:7 › Bubble Board display synthetic fixtures › gives each rotating screen its own motion composition 
+    [chromium] › tests/display/display.e2e.spec.ts:568:7 › Bubble Board display synthetic fixtures › keeps the monthly impact total separate from a readable 3x3 counter board 
+    [chromium] › tests/display/display.e2e.spec.ts:634:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for an arrival screen 
+    [chromium] › tests/display/display.e2e.spec.ts:649:7 › Bubble Board display synthetic fixtures › uses a distinct computed motion for a milestone screen 
+    [chromium] › tests/display/display.e2e.spec.ts:664:7 › Bubble Board display synthetic fixtures › keeps garden bubbles inside the board and long excerpts readable at TV sizes 
+    [chromium] › tests/display/display.e2e.spec.ts:689:7 › Bubble Board display synthetic fixtures › paginates the full long featured recognition at 1920 and 3840 widths 
+    [chromium] › tests/display/display.e2e.spec.ts:729:7 › Bubble Board display synthetic fixtures › paginates the full long arrival recognition at TV widths 
+    [chromium] › tests/display/display.e2e.spec.ts:779:7 › Bubble Board display synthetic fixtures › bounds a legal dense line-break message while preserving every segment 
+    [chromium] › tests/interview/integration-browser.spec.ts:5:5 › full circle messages pan automatically and the owner can pause all motion 
+    [chromium] › tests/interview/integration-browser.spec.ts:23:5 › rich Garden motion remains bounded at both TV sizes and records rendering evidence 
+    [chromium] › tests/interview/integration-browser.spec.ts:49:5 › the actual Nine Expressions screen unfolds from a radial flower into readable cards 
+    [chromium] › tests/interview/integration-browser.spec.ts:73:7 › shared-expression plays its approved reveal sequence 
+    [chromium] › tests/interview/integration-browser.spec.ts:73:7 › impact plays its approved reveal sequence 
+    [chromium] › tests/interview/integration-browser.spec.ts:97:7 › spotlight shows the timed teaching journey 
+    [chromium] › tests/interview/integration-browser.spec.ts:97:7 › daily-practice shows the timed teaching journey 
+    [chromium] › tests/interview/integration-browser.spec.ts:97:7 › one-kind-word shows the timed teaching journey 
+    [chromium] › tests/interview/integration-browser.spec.ts:97:7 › everyday-peace shows the timed teaching journey 
+    [chromium] › tests/interview/integration-browser.spec.ts:97:7 › peace-promise shows the timed teaching journey 
+    [chromium] › tests/interview/studio-browser.spec.ts:105:5 › studio renders real sample and approved previews and saves settings 
+    [chromium] › tests/interview/submission-experience.spec.ts:87:7 › interview completion submission experience › makes each expression a single full-card pointer and keyboard target 
+    [chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:110:5 › motion walkthrough and published receipt with synthetic responses only 
+    [chromium] › tests/plan08/tv-garden-verification.spec.ts:70:7 › Plan 08 TV Garden synthetic browser coverage › keeps the fixed registry, official destinations, and direct display access explicit 
+    [chromium] › tests/plan08/tv-garden-verification.spec.ts:283:7 › Plan 08 central screen composition › maps a saved fixed Spotlight screen to its composed teaching view 
+    [chromium] › tests/plan08/tv-garden-verification.spec.ts:289:7 › Plan 08 central screen composition › labels the only two invitation destinations as official external forms 
+    [chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:13:7 › Plan 08 submission garden › keeps nine catalog choices while growing a bouquet from distinct selections 
+    [chromium] › tests/submission/submission.spec.ts:293:5 › has no automated accessibility violations on the expressions guide 
+  4 skipped
+  9 did not run
+  145 passed (4.8m)

@@ -1,0 +1,389 @@
+<title>2026-09-18-tv-fit lane board</title>
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --panel-bg: #ffffff;
+    --border: #d8d8dd;
+    --text: #1b1b1f;
+    --text-muted: #5b5b63;
+    --accent: #3355dd;
+    --arrow-color: #6b6b76;
+    --state-planned: #8a8a94;
+    --state-running: #2a7de1;
+    --state-landed: #2f9e5a;
+    --state-reviewed: #b8860b;
+    --state-merged: #7a4fd1;
+    --state-deployed: #178a7a;
+    --state-blocked: #cc3333;
+    --state-unknown: #9a9aa2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17171b;
+      --panel-bg: #202024;
+      --border: #3a3a41;
+      --text: #ececef;
+      --text-muted: #a7a7b1;
+      --accent: #7d9bff;
+      --arrow-color: #9a9aa5;
+      --state-planned: #9d9da8;
+      --state-running: #5aa4f2;
+      --state-landed: #4fc27f;
+      --state-reviewed: #e0b23c;
+      --state-merged: #a785ea;
+      --state-deployed: #3fc3b0;
+      --state-blocked: #f26161;
+      --state-unknown: #b3b3bd;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17171b;
+    --panel-bg: #202024;
+    --border: #3a3a41;
+    --text: #ececef;
+    --text-muted: #a7a7b1;
+    --accent: #7d9bff;
+    --arrow-color: #9a9aa5;
+    --state-planned: #9d9da8;
+    --state-running: #5aa4f2;
+    --state-landed: #4fc27f;
+    --state-reviewed: #e0b23c;
+    --state-merged: #a785ea;
+    --state-deployed: #3fc3b0;
+    --state-blocked: #f26161;
+    --state-unknown: #b3b3bd;
+  }
+
+  body { background: var(--bg); }
+
+  .board {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    padding: 16px;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  .board * { box-sizing: border-box; }
+
+  .coordinator-box {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .coordinator-box h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+  }
+  .coordinator-box dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 12px;
+    margin: 0 0 10px 0;
+    font-size: 0.85rem;
+  }
+  .coordinator-box dt { color: var(--text-muted); }
+  .coordinator-box dd { margin: 0; word-break: break-word; }
+
+  .baselines-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    display: block;
+    overflow-x: auto;
+  }
+  .baselines-table th, .baselines-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 4px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .lanes-wrap { margin-bottom: 24px; }
+
+  /* The lane columns, the arrows gap, and the integration bar share one
+     horizontally scrolling container so narrow viewports scroll this
+     region instead of squeezing every lane column unreadably thin. The
+     page body itself never scrolls horizontally. */
+  .lanes-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .lanes-inner { width: 100%; }
+
+  .lanes-row {
+    display: grid;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .lane-col { min-width: 0; }
+
+  .lane-card, .integration-lane {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--state-unknown);
+    border-radius: 8px;
+    padding: 12px 14px;
+    height: 100%;
+  }
+
+  .lane-card.state-planned, .integration-lane.state-planned { border-left-color: var(--state-planned); }
+  .lane-card.state-running, .integration-lane.state-running { border-left-color: var(--state-running); }
+  .lane-card.state-landed, .integration-lane.state-landed { border-left-color: var(--state-landed); }
+  .lane-card.state-reviewed, .integration-lane.state-reviewed { border-left-color: var(--state-reviewed); }
+  .lane-card.state-merged, .integration-lane.state-merged { border-left-color: var(--state-merged); }
+  .lane-card.state-deployed, .integration-lane.state-deployed { border-left-color: var(--state-deployed); }
+  .lane-card.state-blocked, .integration-lane.state-blocked { border-left-color: var(--state-blocked); }
+  .lane-card.state-unknown, .integration-lane.state-unknown { border-left-color: var(--state-unknown); }
+
+  .lane-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .lane-id { font-weight: 700; color: var(--text); }
+
+  .lane-title {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    word-break: break-word;
+  }
+
+  .lane-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 3px 10px;
+    margin: 0;
+    font-size: 0.76rem;
+  }
+  .lane-meta dt { color: var(--text-muted); }
+  .lane-meta dd { margin: 0; word-break: break-word; }
+  .lane-meta-row { grid-template-columns: repeat(4, max-content 1fr); }
+  @media (max-width: 720px) {
+    .lane-meta-row { grid-template-columns: max-content 1fr; }
+  }
+
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; }
+
+  .arrows-gap { width: 100%; height: 46px; }
+  .arrows-svg { width: 100%; height: 100%; display: block; }
+  .dep-arrow { stroke: var(--arrow-color); stroke-width: 1.4; }
+  .dep-arrowhead { fill: var(--arrow-color); }
+
+  .integration-lane { border-left-width: 6px; }
+  .integration-lane .lane-title { font-size: 1rem; }
+
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px) {
+    .panels { grid-template-columns: 1fr 1fr; }
+  }
+
+  .decisions-panel, .event-log {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    overflow-x: auto;
+  }
+  .decisions-panel h2, .event-log h2 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+  }
+
+  .decision-card {
+    border-top: 1px solid var(--border);
+    padding: 8px 0;
+  }
+  .decision-card:first-of-type { border-top: none; padding-top: 0; }
+  .decision-card h4 { margin: 0 0 4px 0; font-size: 0.85rem; }
+  .decision-card p { margin: 0 0 4px 0; font-size: 0.8rem; color: var(--text-muted); }
+
+  .event-log { list-style: none; }
+  .event-log ul, .event-log li { margin: 0; padding: 0; }
+  .log-entry {
+    list-style: none;
+    border-top: 1px solid var(--border);
+    padding: 8px 0;
+  }
+  .log-entry:first-child { border-top: none; padding-top: 0; }
+  .log-entry strong { display: block; font-size: 0.85rem; margin: 2px 0 4px 0; }
+  .log-entry p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+
+  .file-tag {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .empty-note { color: var(--text-muted); font-size: 0.82rem; margin: 0; }
+
+  .lane-note {
+    margin: 8px 0 0 0;
+    font-size: 0.72rem;
+    color: var(--state-blocked);
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+  }
+</style>
+<div class="board">
+  <div class="coordinator-box">
+    <h1>2026-09-18-tv-fit</h1>
+    <dl>
+      <dt>Plan</dt><dd class="mono">/Users/anthony/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md</dd>
+      <dt>Runner</dt><dd>coordinator</dd>
+      <dt>Coordinator</dt><dd>Claude Opus 5 (high), kickoff chat</dd>
+    </dl>
+    
+      <table class="baselines-table">
+        <thead><tr><th>Repo</th><th>Path</th><th>Branch</th><th>Baseline HEAD</th></tr></thead>
+        <tbody>
+          <tr><td>mothers-love</td><td class="mono">/Users/anthony/Projects/mothers-love-worktrees/tv17-base</td><td>tv17/base</td><td class="mono">5a24f0b336038b2dc128d20bac4881d09b127e54</td></tr>
+          <tr><td>mothers-love (production)</td><td class="mono">n/a</td><td>codex/mothers-love</td><td class="mono">b7d92a07f20ee27351d8af254b3f5e36f52f40c8</td></tr>
+        </tbody>
+      </table>
+  </div>
+
+  <div class="lanes-wrap">
+    <div class="lanes-scroll">
+      <div class="lanes-inner" style="min-width: 800px;">
+        <div class="lanes-row" style="grid-template-columns: repeat(4, 1fr);">
+
+    <div class="lane-col " data-lane="L0">
+      <div class="lane-card state-running">
+        <div class="lane-head">
+          <span class="lane-id">L0</span>
+          <span class="lane-state">running</span>
+        </div>
+        <h3 class="lane-title">Plan critique</h3>
+        <dl class="lane-meta">
+          <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
+          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-critic</dd>
+          <dt>Review</dt><dd>none</dd>
+          <dt>Depends on</dt><dd>none</dd>
+          <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
+        </dl>
+        
+      </div>
+    </div>
+
+    <div class="lane-col " data-lane="L1">
+      <div class="lane-card state-running">
+        <div class="lane-head">
+          <span class="lane-id">L1</span>
+          <span class="lane-state">running</span>
+        </div>
+        <h3 class="lane-title">Bubble fit (Welcome, Orbit, Goal)</h3>
+        <dl class="lane-meta">
+          <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
+          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-fit</dd>
+          <dt>Review</dt><dd>sonnet-5-high</dd>
+          <dt>Depends on</dt><dd>tv17/base</dd>
+          <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
+        </dl>
+        
+      </div>
+    </div>
+
+    <div class="lane-col " data-lane="L2">
+      <div class="lane-card state-running">
+        <div class="lane-head">
+          <span class="lane-id">L2</span>
+          <span class="lane-state">running</span>
+        </div>
+        <h3 class="lane-title">Words that bring peace edges</h3>
+        <dl class="lane-meta">
+          <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
+          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-expressions</dd>
+          <dt>Review</dt><dd>sonnet-5-high</dd>
+          <dt>Depends on</dt><dd>tv17/base</dd>
+          <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
+        </dl>
+        
+      </div>
+    </div>
+
+    <div class="lane-col " data-lane="L3">
+      <div class="lane-card state-running">
+        <div class="lane-head">
+          <span class="lane-id">L3</span>
+          <span class="lane-state">running</span>
+        </div>
+        <h3 class="lane-title">Restore live Peacemakers and Peace in Practice</h3>
+        <dl class="lane-meta">
+          <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
+          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-restore</dd>
+          <dt>Review</dt><dd>sonnet-5-high</dd>
+          <dt>Depends on</dt><dd>tv17/base</dd>
+          <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
+        </dl>
+        
+      </div>
+    </div>
+        </div>
+        
+    <div class="arrows-gap">
+      <svg class="arrows-svg" aria-hidden="true">
+        <defs>
+          <marker id="arrowhead" viewBox="0 0 10 10" refX="5" refY="8" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto">
+            <path d="M0,0 L10,0 L5,10 z" class="dep-arrowhead" />
+          </marker>
+        </defs>
+        <line x1="12.5%" y1="4%" x2="12.5%" y2="96%" vector-effect="non-scaling-stroke" class="dep-arrow" marker-end="url(#arrowhead)" />
+        <line x1="37.5%" y1="4%" x2="37.5%" y2="96%" vector-effect="non-scaling-stroke" class="dep-arrow" marker-end="url(#arrowhead)" />
+        <line x1="62.5%" y1="4%" x2="62.5%" y2="96%" vector-effect="non-scaling-stroke" class="dep-arrow" marker-end="url(#arrowhead)" />
+        <line x1="87.5%" y1="4%" x2="87.5%" y2="96%" vector-effect="non-scaling-stroke" class="dep-arrow" marker-end="url(#arrowhead)" />
+      </svg>
+    </div>
+        
+    <div class="integration-lane state-planned" data-lane="SZ">
+      <div class="lane-head">
+        <span class="lane-id">SZ</span>
+        <span class="lane-state">planned</span>
+      </div>
+      <h3 class="lane-title">Integration, preview, release (integration)</h3>
+      <dl class="lane-meta lane-meta-row">
+        <dt>Model</dt><dd>claude-opus-5-high</dd>
+        <dt>Review</dt><dd>sonnet-5-high</dd>
+        <dt>Depends on</dt><dd>L0, L1, L2, L3</dd>
+        <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
+      </dl>
+      
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <section class="decisions-panel">
+      <h2>Decisions</h2>
+      <p class="empty-note">No decisions recorded yet.</p>
+    </section>
+    <section class="event-log">
+      <h2>Event log</h2>
+      <ul>
+        
+        <li class="log-entry">
+          <span class="file-tag mono">2026-09-18T19-15Z-L0-launch-lanes-0-to-3.md</span>
+          <strong>2026-09-18T19:15Z L0 launch lanes 0 to 3</strong>
+          <p>Launched L0 (critic), L1, L2, L3 together at 2026-09-18T19:15Z on Gemini 3.8 Flash (High) via agy, headless accept-edits, 45 minute timeout. Preflight status.json 2026-09-18T19:14:38Z: codex primary 100 (so Gemini per the plan&#39;s writer rule), gemini_bucket 0 expired on a fresh state_vscdb entry (reads as reset, unprobed; these launches are the probe). Deviation: lane worktrees are /Users/anthony/.claude/worktrees/mothers-love-tv17-{fit,expressions,restore,critic} instead of /Users/anthony/Projects/mothers-love-worktrees/tv17-&lt;lane&gt;, because the agy headless permission gate (~/.gemini/antigravity-cli/settings.json) allows writes only under /Users/anthony/.claude/worktrees/**. Branch names unchanged. tv17/base worktree is at the plan&#39;s path. Each writer lane has an untracked .tv17/verify.sh running Playwright against its own dev server (ports 3171, 3172, 3173) because playwright.config.ts reuses any server on 3100, which would let lanes test each other&#39;s code.</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
