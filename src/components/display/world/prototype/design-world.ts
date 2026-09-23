@@ -322,8 +322,9 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   // fragment prefix declares `viewMatrix`, so the world space sun folds into view space here.
   // Section 7, water glory: a higher environment intensity and metalness turn the sea into a
   // mirror of the golden hour sky rather than a tinted sheet, and the lower roughness with the
-  // stronger clearcoat keeps the reflection sharp enough to read as water.
-  const water = material(new T.MeshPhysicalMaterial({ color: "#6ec9cf", roughness: .12, metalness: .22, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.35, dithering: true }));
+  // stronger clearcoat keeps the reflection sharp enough to read as water. Plan 26 visual
+  // review deepened the body colour one step (D2 #6ec9cf) toward the board's turquoise.
+  const water = material(new T.MeshPhysicalMaterial({ color: "#57bfd0", roughness: .12, metalness: .22, clearcoat: .85, clearcoatRoughness: .12, envMapIntensity: 1.35, dithering: true }));
   water.onBeforeCompile = shader => {
     shader.uniforms.studyTime = time;
     shader.uniforms.studySunWorld = { value: new T.Vector3(...STUDY_SUN.direction) };
@@ -501,7 +502,8 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
         district.arches.push(archRecord(arch(layout, (k - (arches - 1) / 2) * width * 1.1, .65, -9.3, width, height), width, height));
       }
     }
-    const color = ["#e893b9", "#f0a8b8", "#bc92d9", "#edb4ba"][i % 4];
+    // One step deeper than D2's crowns (#e893b9, #f0a8b8, #bc92d9, #edb4ba), visual review 2026-09-23.
+    const color = ["#e07fb0", "#ea96ad", "#b27fd4", "#e6a0b0"][i % 4];
     const crowns: Crowns = { mesh: instance(layout, cottonSphere, cotton, (i < 3 ? 4 : 2) * 15, true), used: 0 };
     for (const side of [-1, 1]) {
       // The lawn sits .01 above the ivory terrace top (y .68). At .68 exactly the two were
