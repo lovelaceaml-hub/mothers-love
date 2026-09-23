@@ -83,3 +83,4 @@ Coordinator: merges, docs, handoff, index, private push, new draft PR.
 
 - 2026-09-23: Plan written by the coordinator (Opus 5.5). Record tree
   `docs/runs/2026-09-23-world-kit-integration/`. K0 launching.
+- 2026-09-23: K0 merged (7efdacd), kit re-synced twice (neighbors, nature v2), base 2ef8c41. Anthony asleep with ultracode and complete approval; finish line is the 3D world page, not the TV View. Workflow wf_590b2fe1-fe1 launched: K1 (Opus), K2, K3a, K3b (Fable), K4 (Opus) plus 3D Studio lane U0 (Unreal foundation), each with an Opus landing review, a Fable visual review, and a closing Flash second opinion into /Users/anthony/Projects/3d-studio/docs/runs/2026-09-23-night-log.md. Coordinator rulings: K1 may change one hunk of world-recognitions.ts for a lazy kit read; K3b writes tests/world/kit-layout-far.test.ts; K3a and K3b share a structural ZoneLayout table format and the coordinator wires FAR_ZONE_LAYOUTS into the builder at integration.

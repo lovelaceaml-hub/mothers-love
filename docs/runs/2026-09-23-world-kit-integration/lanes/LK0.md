@@ -1,13 +1,13 @@
 ---
 lane: LK0
 title: sockets
-state: planned
-model: pending
-runner: pending
-worktree: pending
-review: pending
-depends_on: pending
-updated: 2026-09-23T07:24Z
+state: merged
+model: opus-5.5
+runner: coordinator
+worktree: /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/../world-kit-k0
+review: "acceptance, coordinator"
+depends_on: none
+updated: 2026-09-23T08:17Z
 ---
 
 # LK0: sockets

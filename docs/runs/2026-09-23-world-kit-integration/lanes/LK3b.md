@@ -1,13 +1,13 @@
 ---
 lane: LK3b
 title: far zones and corridors
-state: planned
-model: pending
-runner: pending
-worktree: pending
-review: pending
-depends_on: pending
-updated: 2026-09-23T07:24Z
+state: running
+model: fable
+runner: workflow
+worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k3b
+review: "opus-5.5 landing, fable visual"
+depends_on: LK0
+updated: 2026-09-23T08:17Z
 ---
 
 # LK3b: far zones and corridors
