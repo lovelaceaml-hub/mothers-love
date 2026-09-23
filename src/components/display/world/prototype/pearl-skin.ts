@@ -211,8 +211,9 @@ export const PEARL_FILM_ALPHA = { base: .46, fringe: .34 } as const;
  * The medallion orb's glass over the canonical icon, kit only: a pastel veil strong enough to
  * take about forty percent of the saturation out of the flat campaign icons, so their blue
  * and teal sit inside the pastel world. The icon disc itself is untouched (design 3.1).
+ * Measured on the Garden captures: .40 took 27 percent, .55 took 55 to 67 percent.
  */
-export const MEDALLION_VEIL_OPACITY = .55;
+export const MEDALLION_VEIL_OPACITY = .48;
 /** The two orbit lanes, exactly the procedural tubes' and the travelling beads': radii, saddle phase, roll. */
 const ORBIT_LANES = [
   { rx: 1.37, ry: 1.26, phase: 0, roll: .38 },
