@@ -8,19 +8,28 @@ import { loadWorldKit, type KitIO, type WorldKit } from "../../src/components/di
 import type { KitAssetId } from "../../src/components/display/world/kit/kit-manifest";
 import {
   MEDALLION_ORB_RADIUS,
+  MEDALLION_VEIL_OPACITY,
+  PEARL_FILM_INNER,
+  PEARL_FILM_OUTER,
   PEARL_KIT_MEDALLIONS,
   PEARL_KIT_ORBIT,
   PEARL_KIT_PEARL,
   PEARL_KIT_SPARKLE,
+  PEARL_RIM_BEAD_STRIDE,
   PEARL_SHELL_RADIUS,
   PEARL_STAR_AIR,
+  PEARL_WIRE_RADIUS,
+  STUDY_CAPTION_SIZE,
   StudyPearlAssets,
   StudyPearlSkin,
   buildPearlKitParts,
+  paintStudyPearl,
   type StudyPearlFrame,
   type StudyPearlKit,
 } from "../../src/components/display/world/prototype/pearl-skin";
 import { SAMPLE_RECOGNITIONS, WORLD_EXPRESSIONS } from "../../src/components/display/world/world-data";
+import { wrapBubbleText } from "../../src/components/display/world/world-recognitions";
+import type { Recognition } from "@/lib/contracts";
 
 /**
  * The study pearl skin is plain Three.js object construction, so it needs no
@@ -281,6 +290,60 @@ describe("study pearl radiance layers", () => {
   });
 });
 
+/**
+ * The face painter against a recording 2D context: every string it writes, with its font and
+ * place. Only sizes may change on the frozen layout, never where a line stands.
+ */
+function paintedFace(message: string, pages = 1, page = 0) {
+  const writes: { text: string; font: string; x: number; y: number }[] = [];
+  let font = "";
+  const gradient = { addColorStop() {} };
+  const context = new Proxy({} as Record<string, unknown>, {
+    get(_, key) {
+      if (key === "font") return font;
+      if (key === "fillText") return (text: string, x: number, y: number) => writes.push({ text, font, x, y });
+      if (key === "measureText") return (text: string) => ({ width: text.length * (Number(/(\d+(\.\d+)?)px/.exec(font)?.[1]) || 10) * .5 });
+      if (key === "createRadialGradient" || key === "createLinearGradient") return () => gradient;
+      return () => undefined;
+    },
+    set(_, key, value) { if (key === "font") font = value; return true; },
+  });
+  const canvas = { width: 2048, height: 2048, getContext: () => context } as unknown as HTMLCanvasElement;
+  // A fictional sample record, shaped as the app hands it to the painter.
+  const record = { id: "sample-face", recipient: SAMPLE_RECOGNITIONS[0].name, message, expressionIds: [SAMPLE_RECOGNITIONS[0].expressionId] } as unknown as Recognition;
+  paintStudyPearl(canvas, record, message, page, pages, wrapBubbleText);
+  return { writes, record };
+}
+
+describe("study pearl face", () => {
+  it("keeps the frozen layout: the heart, the caption, Thank you, at the top, then the name and the words", () => {
+    const { writes, record } = paintedFace(SAMPLE_RECOGNITIONS[0].message);
+    const at = (text: string) => writes.find(item => item.text === text)!;
+    expect(writes[0].text).toBe("\u2661");
+    expect(at("A KINDNESS WORTH RECOGNIZING").y).toBe(169);
+    expect(at("Thank you,").y).toBe(217);
+    expect(writes.findIndex(item => item.text === "Thank you,")).toBe(2);
+    expect(writes[3].text.length).toBeGreaterThan(0);
+    expect(record.recipient.startsWith(writes[3].text)).toBe(true);
+    expect(at("Thank you,").y).toBeLessThan(writes[3].y);
+    expect(at("RECOGNIZED WITH LOVE").y).toBe(889);
+    for (const item of writes) expect(item.x).toBe(512);
+  });
+  it("draws the two small caps lines a fifth larger than D2's 18 and 17, and nothing else larger", () => {
+    expect(STUDY_CAPTION_SIZE.top).toBeCloseTo(18 * 1.2, 6);
+    expect(STUDY_CAPTION_SIZE.bottom).toBeCloseTo(17 * 1.2, 6);
+    const single = paintedFace(SAMPLE_RECOGNITIONS[0].message).writes;
+    expect(single.find(item => item.text === "A KINDNESS WORTH RECOGNIZING")!.font).toBe(`${STUDY_CAPTION_SIZE.top}px Arial, sans-serif`);
+    expect(single.find(item => item.text === "RECOGNIZED WITH LOVE")!.font).toBe(`${STUDY_CAPTION_SIZE.bottom}px Arial, sans-serif`);
+    expect(single.find(item => item.text === "Thank you,")!.font).toBe("italic 63px Georgia, serif");
+    const paged = paintedFace(SAMPLE_RECOGNITIONS[0].message, 3, 1).writes;
+    const footer = paged[paged.length - 1];
+    expect(footer.text.startsWith("2 OF 3")).toBe(true);
+    expect(footer.font).toBe(`${STUDY_CAPTION_SIZE.bottom}px Arial, sans-serif`);
+    expect(footer.y).toBe(889);
+  });
+});
+
 /*
  * Plan 26 K1: the 3D Studio kit on the pearl, proven on the real kit files.
  *
@@ -457,8 +520,11 @@ describe("study pearl skin dressed with the 3D Studio kit", () => {
       const nearest = Math.min(...curve.map(lane => Math.min(...lane.map(c => c.distanceTo(point)))));
       worst = Math.max(worst, nearest);
     }
-    // The dots are the widest part of the wire: .024 kit units, about .014 on the lane.
-    expect(worst).toBeLessThan(.03);
+    // The wire is drawn as a hairline and carries no dots (visual review: one bead element per
+    // pearl), so every vertex is within the hairline plus the sampled curve's own chord error.
+    expect(worst).toBeLessThan(PEARL_WIRE_RADIUS + .008);
+    expect(parts.facts.wireRadius).toBeLessThanOrEqual(PEARL_WIRE_RADIUS * 1.0001);
+    expect(parts.facts.wireRadiusInFile).toBeGreaterThanOrEqual(parts.facts.wireRadius!);
     // And nothing of the orbit comes near the face.
     expect(planarRadii(orbit).low).toBeGreaterThan(1.1);
     parts.dispose();
@@ -519,9 +585,10 @@ describe("study pearl skin dressed with the 3D Studio kit", () => {
       expect(icon.position.z).toBeCloseTo(.05, 5);
       expect(icon.material.map).toBeInstanceOf(T.Texture);
     }
+    // Rim band, rim pearls, film, orbit, medallion backs, orbs, bezels and stars.
     let meshes = 0;
     parent.traverse(object => { if (object.name.startsWith("pearl kit")) meshes++; });
-    expect(meshes).toBe(6);
+    expect(meshes).toBe(8);
     skin.dispose();
   });
   it("shows exactly the selected medallions as kit instances, and none when none was selected", () => {
@@ -561,7 +628,8 @@ describe("study pearl skin dressed with the 3D Studio kit", () => {
       skin.update(3, ids, true, wide);
       return mainPassDraws(parent, face);
     });
-    expect(counts).toEqual([16, 18, 20]);
+    // The rim's pearl beads and the thin film are one draw each since visual review.
+    expect(counts).toEqual([18, 20, 22]);
     for (const count of counts) {
       expect(count).toBeGreaterThanOrEqual(15);
       expect(count).toBeLessThanOrEqual(23);
@@ -581,6 +649,102 @@ describe("study pearl skin dressed with the 3D Studio kit", () => {
     expect(procedural).toBe(27);
     expect(mainPassDraws(kitted.parent, kitted.face)).toBeLessThan(procedural);
     plain.skin.dispose(); kitted.skin.dispose();
+  });
+  it("strings the rim band as the pearl's one bead element: every other bead, pearl and gold in turn", () => {
+    const parts = buildPearlKitParts(kit);
+    const { rimBeadsInFile, rimPearlBeads, rimGoldBeads } = parts.facts;
+    expect(rimBeadsInFile).toBeGreaterThan(20);
+    expect(rimPearlBeads! + rimGoldBeads!).toBe(Math.ceil(rimBeadsInFile! / PEARL_RIM_BEAD_STRIDE));
+    expect(Math.abs(rimPearlBeads! - rimGoldBeads!)).toBeLessThanOrEqual(1);
+    // The pearls lie in the gold band's own ring, outside the face.
+    const pearls = planarRadii(parts.rimPearls!);
+    expect(pearls.low).toBeGreaterThan(1);
+    expect(pearls.high).toBeLessThan(1.2);
+    parts.dispose();
+    const { skin, named } = dressed(kit);
+    skin.update(3, [2], true, wide);
+    const pearlBand = named("pearl kit rim pearls") as T.Mesh;
+    const goldBand = named("pearl kit rim band") as T.Mesh;
+    // The band's pearls wear the travelling pearls' white pearl, with its specular.
+    expect(pearlBand.material).toBe((named("pearl orbit pearl beads") as T.Mesh).material);
+    // The gold is solid polished metal, not the translucent medallion rim recipe.
+    const gold = goldBand.material as T.MeshPhysicalMaterial;
+    expect(gold.metalness).toBe(1);
+    expect(gold.roughness).toBeLessThan(.25);
+    expect(gold.transparent).toBe(false);
+    expect(pearlBand.visible && goldBand.visible).toBe(true);
+    skin.update(3, [2], false, wide);
+    expect(pearlBand.visible || goldBand.visible).toBe(false);
+    skin.dispose();
+  });
+  it("lays the thin film outside the words, in front of the face and behind the gold setting", () => {
+    const { skin, named } = dressed(kit);
+    skin.update(3, [2, 7, 8], true, wide);
+    const film = named("pearl kit film") as T.Mesh<T.RingGeometry, T.ShaderMaterial>;
+    // The words are checked for parity inside .95 of the face radius; the film starts beyond it.
+    expect(PEARL_FILM_INNER).toBeGreaterThan(.95);
+    expect(film.geometry.parameters.innerRadius).toBe(PEARL_FILM_INNER);
+    expect(film.geometry.parameters.outerRadius).toBe(PEARL_FILM_OUTER);
+    expect(planarRadii(film.geometry).low).toBeCloseTo(PEARL_FILM_INNER, 6);
+    expect(film.position.z).toBeGreaterThan(0);
+    // The gold setting's plane is .045 in front of the face.
+    expect(film.position.z).toBeLessThan(.045);
+    expect(film.material.transparent && !film.material.depthWrite).toBe(true);
+    expect(film.layers.mask).toBe(0b0001);
+    expect(film.visible).toBe(true);
+    skin.update(3, [2, 7, 8], false, wide);
+    expect(film.visible).toBe(false);
+    skin.dispose();
+  });
+  it("sees the canonical icon through a pastel veil on the kit orb, and leaves the icon disc as it is", () => {
+    const { skin, named } = dressed(kit);
+    skin.update(3, [2, 7, 8], true, wide);
+    const orbs = named("pearl kit medallion orbs") as T.InstancedMesh;
+    const veil = orbs.material as T.MeshPhysicalMaterial;
+    expect(veil.opacity).toBe(MEDALLION_VEIL_OPACITY);
+    expect(veil.opacity).toBeGreaterThan(.4);
+    // A pale warm pastel, so the symbol's own hue still reads through it.
+    const hsl = veil.color.getHSL({ h: 0, s: 0, l: 0 });
+    expect(hsl.l).toBeGreaterThan(.8);
+    const icon = named("pearl medallion 7")!.children[0] as T.Mesh<T.CircleGeometry, T.MeshBasicMaterial>;
+    expect(icon.geometry.parameters.radius).toBeCloseTo(.148, 5);
+    expect(icon.position.z).toBeCloseTo(.05, 5);
+    expect(icon.material.map).toBeInstanceOf(T.Texture);
+    skin.dispose();
+  });
+  it("stands the two lanes and their beads down where the zone draws its own orbits", () => {
+    for (const source of [kit, undefined]) {
+      const { skin, named } = dressed(source);
+      skin.update(3, [2, 7, 8], true, { ...wide, lanes: false });
+      expect(named("pearl orbits")!.visible).toBe(false);
+      // The medallions and the setting stay.
+      expect(named("pearl medallion 7")!.visible).toBe(true);
+      if (source) expect(named("pearl kit rim band")!.visible).toBe(true);
+      skin.update(3, [2, 7, 8], true, wide);
+      expect(named("pearl orbits")!.visible).toBe(true);
+      skin.dispose();
+    }
+  });
+  it("shields the arriving pearl's setting and symbols from the glow while it is read, and nothing else", () => {
+    const { skin, face, named } = dressed(kit);
+    const shielded = ["pearl kit rim band", "pearl kit rim pearls", "pearl kit medallion orbs", "pearl kit medallion bezels"];
+    const open = ["pearl kit film", "pearl kit orbit", "pearl kit medallion backs", "pearl kit stars"];
+    skin.update(3, [2, 7, 8], true, { ...wide, shield: true });
+    for (const name of shielded) expect(named(name)!.layers.isEnabled(3), name).toBe(true);
+    for (const name of open) expect(named(name)!.layers.isEnabled(3), name).toBe(false);
+    expect(skin.layerMask("pearl occluder")).toBe(0b1010);
+    expect(face.layers.mask).toBe(0b0001);
+    // The same pearl without the shield, as a resident, and after it is cleared.
+    skin.update(4, [2, 7, 8], true, wide);
+    for (const name of shielded) expect(named(name)!.layers.isEnabled(3), name).toBe(false);
+    skin.update(5, [2, 7, 8], true, { ...wide, shield: true });
+    skin.update(6, [2, 7, 8], false, { ...wide, shield: true });
+    for (const name of shielded) expect(named(name)!.layers.isEnabled(3), name).toBe(false);
+    skin.update(7, [2, 7, 8], true, { ...wide, shield: true });
+    skin.clear();
+    for (const name of shielded) expect(named(name)!.layers.isEnabled(3), name).toBe(false);
+    expect(face.layers.mask).toBe(0b0001);
+    skin.dispose();
   });
   it("keeps the layer rules: the face alone, the occluder on 1 and 3 only while read, no kit piece on the protect layer", () => {
     const { skin, face, named, parent } = dressed(kit);

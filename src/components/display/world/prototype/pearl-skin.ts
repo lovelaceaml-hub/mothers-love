@@ -13,6 +13,18 @@ export type StudyPearlFrame = {
   sparkles: boolean;
   portrait: boolean;
   orbitScale: number;
+  /**
+   * False where the zone draws orbits of its own (the Expression Cosmos), so the pearl's two
+   * gold lanes and their travelling beads stand down and the constellation reads as one orbit.
+   * Absent means true.
+   */
+  lanes?: boolean;
+  /**
+   * True for the arriving pearl. Its kit rim, bead band, medallion orbs and bezels then join
+   * the protect mask with the occluder, so the arrival's bloom and light column never wash
+   * over the canonical symbols. Absent means false.
+   */
+  shield?: boolean;
 };
 
 export class StudyPearlAssets {
@@ -48,6 +60,9 @@ export class StudyPearlAssets {
     this.kitCache?.parts.dispose(); this.kitCache = undefined;
   }
 }
+
+/** The face's two small caps lines, canvas pixels of the 1024 face: D2's 18 and 17, a fifth larger. */
+export const STUDY_CAPTION_SIZE = { top: 21.6, bottom: 20.4 } as const;
 
 /** Appearance study only. Pagination and reading age remain owned by the app. */
 export function paintStudyPearl(
@@ -91,7 +106,10 @@ export function paintStudyPearl(
   c.restore();
   c.textAlign = "center"; c.textBaseline = "top";
   c.font = "52px Georgia, serif"; c.fillStyle = "#b4897c"; c.fillText("♡", 512, 103);
-  c.font = "18px Arial, sans-serif"; c.fillStyle = "#92745e";
+  // The two small caps lines are a fifth larger than D2 drew them (visual review, 2026-09-23:
+  // at 18 and 17 they were about 10 px on a 1080p TV). Size only: every position is the
+  // approved layout's.
+  c.font = `${STUDY_CAPTION_SIZE.top}px Arial, sans-serif`; c.fillStyle = "#92745e";
   c.fillText("A KINDNESS WORTH RECOGNIZING", 512, 169);
   c.font = "italic 63px Georgia, serif"; c.fillStyle = "#a56c82"; c.fillText("Thank you,", 512, 217);
   let nameSize = 75, names: string[] = [];
@@ -120,7 +138,7 @@ export function paintStudyPearl(
   c.fillStyle = "#455a52";
   lines.forEach(line => { c.fillText(line, 512, y); y += bodySize * 1.35; });
   c.font = "26px Georgia, serif"; c.fillStyle = "#b27b8c"; c.fillText("♡", 512, 844);
-  c.font = "17px Arial, sans-serif"; c.fillStyle = "#8e765a";
+  c.font = `${STUDY_CAPTION_SIZE.bottom}px Arial, sans-serif`; c.fillStyle = "#8e765a";
   c.fillText(pages > 1 ? `${page + 1} OF ${pages}  ·  CONTINUED` : "RECOGNIZED WITH LOVE", 512, 889);
   c.restore();
 }
@@ -128,10 +146,14 @@ export function paintStudyPearl(
 /*
  * The 3D Studio kit on the pearl (Plan 26 K1, WORLD-INTEGRATION section 3).
  *
- * What the kit brings, all of it outside the face disc: the shell file's gold rim ring and
- * bead band, the orbit ring's gold wire and dots laid on the two existing orbit lanes, each
- * medallion's glass orb, back bowl and gold bezel with its studs, and the four point star
- * with its twinkle clip.
+ * What the kit brings, all of it outside the words: the shell file's gold rim ring and its
+ * bead band, thinned to every other bead and strung pearl, gold, pearl as target 01 strings
+ * its orbit; a thin film of rainbow colour at the bubble's edge; the orbit ring's gold wire,
+ * drawn as a hairline, laid on the two existing orbit lanes; each medallion's glass orb,
+ * back bowl and gold bezel with its studs; and the four point star with its twinkle clip.
+ *
+ * Visual review (2026-09-23) asked for one bead element, not four: the band keeps its beads,
+ * the wire loses its dots, and the ten travelling pearls stay as the orbit's few pearls.
  *
  * What it never touches: the face disc, `paintStudyPearl`, the occluder, the halo plane, the
  * finishing plane, the dust inside the glass and the layer rules. The glass shell over the
@@ -165,6 +187,32 @@ export const PEARL_SHELL_RADIUS = 1.02;
 export const MEDALLION_ORB_RADIUS = .196;
 /** The plane the gold rings sit in, just in front of the face. */
 const PEARL_RING_Z = .045;
+/**
+ * The bead band keeps one bead in this many, so the setting reads as a string of pearls
+ * rather than a marquee (visual review: the full band of eighty was busy at every size).
+ */
+export const PEARL_RIM_BEAD_STRIDE = 2;
+/** The orbit wire's radius on the lane, slot space: a hairline, as target 01 draws its orbits. */
+export const PEARL_WIRE_RADIUS = .0032;
+/**
+ * The thin film at the bubble's edge, slot space. Its inner edge stays outside .955 of the
+ * face radius, so the words and the engraved frame around them are never touched (the text
+ * parity rule is checked inside .95); it fades out by the outer edge, over the scenery.
+ */
+export const PEARL_FILM_INNER = .955;
+export const PEARL_FILM_OUTER = 1.16;
+/**
+ * The film's strength: its alpha is `base` plus `fringe` times the travelling fringe (0 to 1).
+ * Visual review asked for target 01's strength, where lavender, mint and peach read at the rim;
+ * the first pass (.30 plus .28) was lost against the pastel sky.
+ */
+export const PEARL_FILM_ALPHA = { base: .46, fringe: .34 } as const;
+/**
+ * The medallion orb's glass over the canonical icon, kit only: a pastel veil strong enough to
+ * take about forty percent of the saturation out of the flat campaign icons, so their blue
+ * and teal sit inside the pastel world. The icon disc itself is untouched (design 3.1).
+ */
+export const MEDALLION_VEIL_OPACITY = .55;
 /** The two orbit lanes, exactly the procedural tubes' and the travelling beads': radii, saddle phase, roll. */
 const ORBIT_LANES = [
   { rx: 1.37, ry: 1.26, phase: 0, roll: .38 },
@@ -174,8 +222,10 @@ const ORBIT_LANES = [
 export type StudyPearlTwinkle = (time: number, rotation: T.Quaternion, scale: T.Vector3) => void;
 /** Shared by every skin; built once per kit by `StudyPearlAssets.kitParts`. */
 export type StudyPearlKitParts = {
-  /** The shell file's gold rim ring and bead band, slot space, at the ring plane. One gold draw. */
+  /** The shell file's gold rim ring and the band's gold beads, slot space, at the ring plane. One gold draw. */
   rim?: T.BufferGeometry;
+  /** The band's pearl beads, alternating with the gold ones round the ring. One pearl draw. */
+  rimPearls?: T.BufferGeometry;
   /** Both orbit lanes in one geometry: the kit's gold wire and dots on the procedural lanes. */
   orbit?: T.BufferGeometry;
   /** One kit medallion's orb glass, back bowl and gold bezel with studs, medallion space. */
@@ -193,7 +243,14 @@ export type StudyPearlKitParts = {
     shellRadius?: number;
     rimInner?: number;
     rimOuter?: number;
+    /** Beads in the file's band, and how many the setting keeps as pearls and as gold. */
+    rimBeadsInFile?: number;
+    rimPearlBeads?: number;
+    rimGoldBeads?: number;
     orbitCentre?: number;
+    /** The wire's own radius on the lane before and after it is drawn as a hairline. */
+    wireRadiusInFile?: number;
+    wireRadius?: number;
     beadPearlRadius?: number;
     beadGoldRadius?: number;
     medallionScale?: number;
@@ -271,6 +328,79 @@ const named = (name: string, ...words: string[]) => {
   return words.some(word => own.includes(word));
 };
 
+/** Indexed geometries with positions and normals, joined into one. */
+function joined(parts: readonly T.BufferGeometry[]) {
+  const positions: number[] = [], normals: number[] = [], indices: number[] = [];
+  for (const part of parts) {
+    const p = part.getAttribute("position"), n = part.getAttribute("normal"), index = part.index!;
+    const base = positions.length / 3;
+    for (let i = 0; i < p.count; i++) {
+      positions.push(p.getX(i), p.getY(i), p.getZ(i));
+      normals.push(n.getX(i), n.getY(i), n.getZ(i));
+    }
+    for (let i = 0; i < index.count; i++) indices.push(index.getX(i) + base);
+  }
+  const geometry = new T.BufferGeometry();
+  geometry.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("normal", new T.Float32BufferAttribute(normals, 3));
+  geometry.setIndex(indices);
+  return geometry;
+}
+
+/**
+ * A band of separate beads, split into its beads (connected pieces), ordered round the ring
+ * by the angle of each bead's centre, then dealt out by `deal(ordinal)`: 0 and 1 name the two
+ * geometries a bead joins, anything else leaves it out. Both results are compact and indexed.
+ */
+function dealBeads(band: T.BufferGeometry, deal: (ordinal: number) => number) {
+  const p = band.getAttribute("position"), n = band.getAttribute("normal"), index = band.index!;
+  const parent = Array.from({ length: p.count }, (_, i) => i);
+  const find = (x: number): number => { while (parent[x] !== x) x = parent[x] = parent[parent[x]]; return x; };
+  for (let i = 0; i < index.count; i += 3) {
+    const a = find(index.getX(i));
+    parent[find(index.getX(i + 1))] = a;
+    parent[find(index.getX(i + 2))] = a;
+  }
+  const beads = new Map<number, { x: number; y: number; triangles: number[] }>();
+  for (let i = 0; i < index.count; i += 3) {
+    const root = find(index.getX(i));
+    let bead = beads.get(root);
+    if (!bead) beads.set(root, bead = { x: 0, y: 0, triangles: [] });
+    bead.triangles.push(i);
+  }
+  for (let v = 0; v < p.count; v++) {
+    const bead = beads.get(find(v));
+    if (bead) { bead.x += p.getX(v); bead.y += p.getY(v); }
+  }
+  const ordered = [...beads.values()].sort((a, b) => Math.atan2(a.y, a.x) - Math.atan2(b.y, b.x));
+  const build = (pick: number) => {
+    const remap = new Map<number, number>();
+    const positions: number[] = [], normals: number[] = [], indices: number[] = [];
+    let count = 0;
+    ordered.forEach((bead, ordinal) => {
+      if (deal(ordinal) !== pick) return;
+      count++;
+      for (const t of bead.triangles) for (let k = 0; k < 3; k++) {
+        const vertex = index.getX(t + k);
+        let target = remap.get(vertex);
+        if (target === undefined) {
+          target = remap.size; remap.set(vertex, target);
+          positions.push(p.getX(vertex), p.getY(vertex), p.getZ(vertex));
+          normals.push(n.getX(vertex), n.getY(vertex), n.getZ(vertex));
+        }
+        indices.push(target);
+      }
+    });
+    if (!count) return undefined;
+    const geometry = new T.BufferGeometry();
+    geometry.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("normal", new T.Float32BufferAttribute(normals, 3));
+    geometry.setIndex(indices);
+    return { geometry, count };
+  };
+  return { beads: ordered.length, first: build(0), second: build(1) };
+}
+
 /**
  * The kit ring's wire, laid onto both procedural lanes.
  *
@@ -296,11 +426,17 @@ function layOrbit(wire: T.BufferGeometry, facts: StudyPearlKitParts["facts"]) {
   const centre = (low + high) / 2;
   if (!(centre > 0)) return undefined;
   facts.orbitCentre = centre;
+  // The file's wire, laid at the inner lane's scale, is a little heavier than target 01's
+  // hairline orbits, so its cross section is drawn thinner; its path is unchanged.
+  const radius = (high - low) / 2 * ((ORBIT_LANES[0].rx + ORBIT_LANES[0].ry) / 2 / centre);
+  const thin = radius > 0 ? Math.min(1, PEARL_WIRE_RADIUS / radius) : 1;
+  facts.wireRadiusInFile = radius;
+  facts.wireRadius = radius * thin;
   const count = p.count, lanes = ORBIT_LANES.length;
   const positions = new Float32Array(count * 3 * lanes), normals = new Float32Array(count * 3 * lanes);
   const indices = new (count * lanes > 65535 ? Uint32Array : Uint16Array)(index.count * lanes);
   ORBIT_LANES.forEach((lane, l) => {
-    const k = (lane.rx + lane.ry) / 2 / centre;
+    const k = (lane.rx + lane.ry) / 2 / centre * thin;
     const cos = Math.cos(lane.roll), sin = Math.sin(lane.roll);
     for (let i = 0; i < count; i++) {
       const a0 = p.getComponent(i, u), b0 = p.getComponent(i, v), w = p.getComponent(i, axis);
@@ -366,26 +502,41 @@ export function buildPearlKitParts(kit: StudyPearlKit): StudyPearlKitParts {
   const pearl = kitGroups(kit, PEARL_KIT_PEARL);
   if (pearl) {
     const glass = kitPiece(pearl, name => kitMaterialRole(name) === "glass");
-    const gold = kitPiece(pearl, name => kitMaterialRole(name) === "gold");
+    const ring = kitPiece(pearl, name => kitMaterialRole(name) === "gold" && !named(name, "bead"));
+    const band = kitPiece(pearl, name => kitMaterialRole(name) === "gold" && named(name, "bead"));
     const radius = glass ? farthest(glass) : 0;
-    if (gold && radius > 0) {
+    if ((ring || band) && radius > 0) {
       const scale = PEARL_SHELL_RADIUS / radius;
-      gold.scale(scale, scale, scale).translate(0, 0, PEARL_RING_Z);
-      const inner = nearestPlanar(gold);
+      for (const g of [ring, band]) g?.scale(scale, scale, scale).translate(0, 0, PEARL_RING_Z);
+      // Every other bead of the band is kept; of those, the first is a pearl, the next gold,
+      // and so on round the ring. The gold ones join the rim ring's draw.
+      const dealt = band
+        ? dealBeads(band, ordinal => ordinal % PEARL_RIM_BEAD_STRIDE ? -1 : (ordinal / PEARL_RIM_BEAD_STRIDE) % 2)
+        : undefined;
+      const gold = joined([ring, dealt?.second?.geometry].filter((g): g is T.BufferGeometry => !!g));
+      const pearls = dealt?.first?.geometry;
+      dealt?.second?.geometry.dispose();
+      const inner = Math.min(nearestPlanar(gold), pearls ? nearestPlanar(pearls) : Infinity);
       // The words are sacred ground: a rim that would reach inside the face is not worn at all.
-      if (inner > 1) {
+      if (inner > 1 && gold.getAttribute("position").count) {
         parts.rim = keep(gold);
-        Object.assign(parts.facts, { shellScale: scale, shellRadius: radius * scale, rimInner: inner, rimOuter: farthest(gold, true) });
-      } else gold.dispose();
-    } else gold?.dispose();
-    glass?.dispose();
+        if (pearls) parts.rimPearls = keep(pearls);
+        Object.assign(parts.facts, {
+          shellScale: scale, shellRadius: radius * scale, rimInner: inner,
+          rimOuter: Math.max(farthest(gold, true), pearls ? farthest(pearls, true) : 0),
+          rimBeadsInFile: dealt?.beads ?? 0, rimPearlBeads: dealt?.first?.count ?? 0, rimGoldBeads: dealt?.second?.count ?? 0,
+        });
+      } else { gold.dispose(); pearls?.dispose(); }
+    }
+    ring?.dispose(); band?.dispose(); glass?.dispose();
   }
   const ring = kitGroups(kit, PEARL_KIT_ORBIT);
   if (ring) {
-    // The wire and its small dots. The ring's own pearls and larger gold beads stay out: the two
-    // travelling instanced bead draws are this orbit's pearls, and a bead fixed to the wire
+    // The wire alone. Its small dots stay out since visual review (one bead element per pearl:
+    // the rim band keeps its beads), and so do the ring's own pearls and larger gold beads: the
+    // two travelling instanced bead draws are this orbit's pearls, and a bead fixed to the wire
     // would collide with them as they pass.
-    const wire = kitPiece(ring, name => kitMaterialRole(name) === "gold" && !named(name, "bead"));
+    const wire = kitPiece(ring, name => kitMaterialRole(name) === "gold" && !named(name, "bead", "dot"));
     if (wire) {
       parts.orbit = keep(layOrbit(wire, parts.facts));
       wire.dispose();
@@ -462,6 +613,8 @@ type PearlMedallion = { id: number; root: T.Group; glint: T.Sprite; tint: T.Colo
 
 type PearlKitDressing = {
   rim?: T.Mesh;
+  rimPearls?: T.Mesh;
+  film?: T.Mesh;
   orbit?: T.Mesh;
   medallions?: { backs: T.InstancedMesh; orbs: T.InstancedMesh; bezels: T.InstancedMesh };
   stars?: T.InstancedMesh;
@@ -500,6 +653,8 @@ export class StudyPearlSkin {
   /** The medallion rim recipe: the orbit tubes, the beads, the medallion rims and every kit gold. */
   private readonly gold: T.Material;
   private readonly medallionGlass: T.Material;
+  /** The travelling pearl beads' white pearl; the rim band's pearls wear it too. */
+  private readonly beadPearl: T.Material;
   private readonly assets: StudyPearlAssets;
   private readonly kitSource?: StudyPearlKitSource;
   private kitResolved = false;
@@ -638,7 +793,7 @@ export class StudyPearlSkin {
       orbit.rotation.z = i ? -.46 : .38; this.orbits.add(orbit); this.orbitTubes.push(orbit);
     }
     const beadGeometry = this.geometry(new T.SphereGeometry(PEARL_BEAD_RADIUS, 20, 12));
-    const beadPearl = this.material(new T.MeshPhysicalMaterial({ color: "#fff0dc", roughness: .2, metalness: .18, clearcoat: 1, clearcoatRoughness: .15, iridescence: .35, iridescenceIOR: 1.3 }));
+    const beadPearl = this.beadPearl = this.material(new T.MeshPhysicalMaterial({ color: "#fff0dc", roughness: .2, metalness: .18, clearcoat: 1, clearcoatRoughness: .15, iridescence: .35, iridescenceIOR: 1.3 }));
     // Section 8: the ten beads travelling the two gold orbits become two instanced draws,
     // one for the six pearl beads and one for the four gold ones, in place of ten meshes.
     // Each instance keeps the ordinal it stands in for, so its lane, phase and size are
@@ -733,9 +888,45 @@ export class StudyPearlSkin {
     if (parts.rim) {
       // The shell file's gold rim ring and bead band: a setting for the pearl, outside the face.
       // Rings 1 and 2 give way to it; ring 0 stays, since a resident shows it alone.
-      const rim = new T.Mesh(parts.rim, this.gold);
+      //
+      // Visual review found the band dull khaki and flat lit in the translucent medallion rim
+      // gold, so the setting is solid: a polished gold that takes the environment's light, and
+      // the travelling pearls' own white pearl for every other bead.
+      const rimGold = this.material(new T.MeshPhysicalMaterial({
+        color: "#f2cb80", metalness: 1, roughness: .17, clearcoat: .6, clearcoatRoughness: .12, envMapIntensity: 1.45,
+      }));
+      const rim = new T.Mesh(parts.rim, rimGold);
       rim.name = "pearl kit rim band"; rim.visible = false;
       this.root.add(rim); dressing.rim = rim;
+      if (parts.rimPearls) {
+        const pearls = new T.Mesh(parts.rimPearls, this.beadPearl);
+        pearls.name = "pearl kit rim pearls"; pearls.visible = false;
+        this.root.add(pearls); dressing.rimPearls = pearls;
+      }
+      // The thin film at the edge of the bubble: blue violet at ten o'clock, mint below it,
+      // peach at four and rose above it, in fine fringes that drift with the clock. It lies
+      // between the face and the gold setting, so the beads sit on it, and it never reaches
+      // inside PEARL_FILM_INNER of the face, so no pixel of the words or their frame changes.
+      const film = new T.Mesh(this.geometry(new T.RingGeometry(PEARL_FILM_INNER, PEARL_FILM_OUTER, 160, 3)), this.material(new T.ShaderMaterial({
+        transparent: true, depthTest: true, depthWrite: false, toneMapped: false,
+        uniforms: { time: this.clock },
+        vertexShader: "varying vec2 filmP;void main(){filmP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+        fragmentShader: `varying vec2 filmP;uniform float time;
+          float filmLobe(float t, float at){return pow(max(0., cos(t - at)), 2.);}
+          void main(){float r=length(filmP),a=atan(filmP.y,filmP.x);
+            float inside=smoothstep(${PEARL_FILM_INNER.toFixed(3)},.995,r);
+            float outside=1.-smoothstep(1.02,${PEARL_FILM_OUTER.toFixed(3)},r);
+            float t=a+sin((r-1.)*38.+time*.12)*.45;
+            float violet=filmLobe(t,2.618),mint=filmLobe(t,4.189),peach=filmLobe(t,-.524),rose=filmLobe(t,1.047);
+            vec3 film=(vec3(.40,.36,1.)*violet+vec3(.28,.88,.58)*mint+vec3(1.,.54,.28)*peach+vec3(1.,.40,.70)*rose)
+              /max(.001,violet+mint+peach+rose);
+            float fringe=.5+.5*sin((r-1.)*70.-time*.4+sin(a*3.+time*.1)*.8);
+            gl_FragColor=vec4(film,inside*outside*(${PEARL_FILM_ALPHA.base.toFixed(2)}+${PEARL_FILM_ALPHA.fringe.toFixed(2)}*fringe));
+            #include <colorspace_fragment>
+          }`,
+      })));
+      film.name = "pearl kit film"; film.position.z = .02; film.renderOrder = 4; film.visible = false;
+      this.root.add(film); dressing.film = film;
     }
     if (parts.orbit) {
       // The kit wire and its dots on both lanes, one draw in place of the two tubes.
@@ -756,7 +947,11 @@ export class StudyPearlSkin {
       })), WORLD_EXPRESSIONS.length);
       backs.name = "pearl kit medallion backs"; backs.renderOrder = 3;
       this.medallions.forEach((item, slot) => backs.setColorAt(slot, item.tint));
-      const orbs = new T.InstancedMesh(parts.medallion.glass, this.medallionGlass, WORLD_EXPRESSIONS.length);
+      // The orb glass over the canonical icon is a pastel veil (visual review: the flat campaign
+      // icons read as hard emoji on the pearl orbs), so the icon is seen through tinted glass.
+      const veil = studyGlow(studyGlass(MEDALLION_VEIL_OPACITY), "medallion", "vec3(1., .93, .86) * pearlRim * 1.15", "pearlRim * .9");
+      veil.color.set("#f6e7f1");
+      const orbs = new T.InstancedMesh(parts.medallion.glass, this.material(veil), WORLD_EXPRESSIONS.length);
       orbs.name = "pearl kit medallion orbs"; orbs.renderOrder = 5; orbs.layers.enable(1);
       const bezels = new T.InstancedMesh(parts.medallion.bezel, this.gold, WORLD_EXPRESSIONS.length);
       bezels.name = "pearl kit medallion bezels"; bezels.layers.enable(1);
@@ -791,7 +986,9 @@ export class StudyPearlSkin {
     if (!this.kitResolved) this.dress();
     this.clock.value = time;
     // A resident pearl keeps only its glass shell and one gold ring: two extra draws.
-    this.orbits.visible = this.finish.visible = this.halo.visible = detailed;
+    this.finish.visible = this.halo.visible = detailed;
+    // Where the zone draws its own orbits, the pearl's lanes and their beads stand down.
+    this.orbits.visible = detailed && frame.lanes !== false;
     // The occluder always blocks the glow layer behind this disc. Only the pearl being read
     // joins the protect mask, which carries no scene depth of its own.
     this.occluder.visible = true;
@@ -815,7 +1012,12 @@ export class StudyPearlSkin {
     }
     const dressing = this.dressing;
     this.rings.forEach((ring, index) => { ring.visible = index === 0 || (detailed && !dressing?.rim); });
-    if (dressing?.rim) dressing.rim.visible = detailed;
+    for (const part of [dressing?.rim, dressing?.rimPearls, dressing?.film]) if (part) part.visible = detailed;
+    // The arriving pearl's setting and symbols join the protect mask with its occluder, so the
+    // arrival's glow never lands on them. Every other pearl keeps them off that layer.
+    const shield = detailed && frame.shield === true;
+    const shielded = [dressing?.rim, dressing?.rimPearls, dressing?.medallions?.orbs, dressing?.medallions?.bezels];
+    for (const part of shielded) if (part) { if (shield) part.layers.enable(3); else part.layers.disable(3); }
     this.orbitBeads.forEach((beads, group) => {
       const size = this.beadScales[group];
       this.orbitBeadIndices[group].forEach((i, slot) => {
@@ -924,8 +1126,9 @@ export class StudyPearlSkin {
     this.halo.visible = this.sparkles.visible = this.shimmer.visible = false;
     this.occluder.layers.disable(3);
     const kit = this.dressing?.medallions;
-    if (kit) for (const mesh of [kit.backs, kit.orbs, kit.bezels]) { mesh.visible = false; mesh.count = 0; }
+    if (kit) for (const mesh of [kit.backs, kit.orbs, kit.bezels]) { mesh.visible = false; mesh.count = 0; mesh.layers.disable(3); }
     if (this.dressing?.stars) this.dressing.stars.visible = false;
+    for (const part of [this.dressing?.rim, this.dressing?.rimPearls]) part?.layers.disable(3);
   }
   /** Test seam: the exact layer mask of one named study object. */
   layerMask(name: string) {
