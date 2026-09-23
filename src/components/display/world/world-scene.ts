@@ -2,11 +2,15 @@ import { createWorldScene as createLegacyWorldScene } from "./world-scene-legacy
 import { attachCinematicArt } from "./world-cinematic-art";
 import { isWorldDesignStudy } from "./prototype/design-mode";
 import { createDesignWorld } from "./prototype/design-world";
+import type { WorldKit } from "./kit/kit-loader";
 export type { WorldScene } from "./world-scene-legacy";
 
-/** Preview-only art pass. The existing public data, camera and reading contracts are unchanged. */
-export function createWorldScene() {
-  if (isWorldDesignStudy()) return createDesignWorld();
+/**
+ * Preview-only art pass. The existing public data, camera and reading contracts are unchanged.
+ * The 3D Studio kit only ever reaches the design study; classic and cinematic never see it.
+ */
+export function createWorldScene(kit?: WorldKit) {
+  if (isWorldDesignStudy()) return createDesignWorld(kit);
   const world = createLegacyWorldScene();
   // Simple, explicit visual rollback for comparison on the preview branch.
   if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("art") === "classic") return world;

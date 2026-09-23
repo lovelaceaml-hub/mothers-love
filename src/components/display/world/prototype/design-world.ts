@@ -1,8 +1,13 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { ZONES, WORLD_EXPRESSIONS, seededRandom, type ZoneId } from "../world-data";
+import { ZONES, WORLD_EXPRESSIONS, seededRandom, type WorldZone, type ZoneId } from "../world-data";
 import type { WorldScene } from "../world-scene-legacy";
+import type { ArrivalState } from "../arrival-director";
+import type { WorldKit } from "../kit/kit-loader";
+import { applyKitDistricts } from "./kit-districts";
+import { applyKitCorridors, kitCorridorSites } from "./kit-corridors";
+import { createKitNeighbors, type KitNeighbors } from "../kit/kit-neighbors";
 import { studyArrival } from "./design-mode";
 import { studyCanopyPuffs, studyCottonMaterial } from "./study-canopy";
 import { createStudyClouds, studyCloudAtlas, studyCloudLayout } from "./study-clouds";
@@ -19,14 +24,124 @@ import { createStudyAir, type AirFocus } from "./study-air";
 import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
 
+/**
+ * What a kit builder may hand back: per frame work on the world clock, the owner's effect
+ * switches, and its own disposal. The design world calls each part it finds.
+ */
+export type KitBuilderHandle = {
+  update?(time: number, zone: ZoneId, arrival: ArrivalState | undefined): void;
+  setEffects?(sparkles: boolean, trails: boolean): void;
+  dispose?(): void;
+};
+/** One procedural arch as the study built it, so a builder can replace it in place. */
+export type DesignKitArch = {
+  root: T.Group;
+  parent: T.Object3D;
+  width: number;
+  height: number;
+  /** Its keystone lantern in `archCrowns`, or null where the arch opted out of lanterns. */
+  crown: { root: T.Group; height: number } | null;
+};
+/** One of the thirteen districts, in the frame of section 6.1 of the design. */
+export type DesignKitDistrict = {
+  zone: WorldZone;
+  /** Index in `ZONES`; the first three are the large islands. */
+  index: number;
+  /** At `zone.center`. */
+  root: T.Group;
+  /** The district local frame: `root` turned by `facing`, +z toward the tour eye, +x to its right. */
+  layout: T.Group;
+  radius: number;
+  facing: number;
+  /**
+   * Every procedural arch in the district: the row at local z -9.3 in `layout` (three, five at
+   * the grove, none at the Sanctuary, whose arcade is `sanctuary.arches`), then the welcome
+   * portal or the featured ring of five, which `landmark` lists too.
+   */
+  arches: DesignKitArch[];
+  /** Cotton crowned tree roots (trunks and branches; the crowns are one instanced draw per district). */
+  trees: T.Group[];
+  /** The two lawn bed arcs. */
+  beds: T.Mesh[];
+  /**
+   * Waterfall planes in this district: the two off the back edge, then the milestone's five
+   * tier falls (also in `landmark`). `removeFall` takes one out before the falls merge.
+   */
+  falls: T.Mesh[];
+  /** The zone's own procedural landmark pieces (globe and rings, tiers, orbits, boxes, portal, pavilion arches, drums, slabs). */
+  landmark: T.Object3D[];
+  /** The two miniature figures (garden, heart and expressions only). */
+  figures: T.Group[];
+};
+export type DesignKitBridge = {
+  from: ZoneId;
+  to: ZoneId;
+  /** The deck centre line in world space, from `start` at the first island's edge to `end`. */
+  curve: T.CatmullRomCurve3;
+  start: T.Vector3;
+  end: T.Vector3;
+};
+/**
+ * Everything the design world hands the kit builders (Plan 26 lanes K3a, K3b and K4), so
+ * they can place kit pieces, replace procedural ones in place and register every geometry,
+ * material and texture for disposal, without editing this file. Builders run once, after the
+ * whole procedural world exists and before the falls merge and the static batch, so whatever
+ * they add is merged by material identity like the rest. They are called only with a kit;
+ * with `?kit=off` or a failed kit none of this is built.
+ */
+export type DesignKitContext = {
+  kit: WorldKit;
+  scene: T.Scene;
+  /** The shared study clock uniform. */
+  time: { value: number };
+  geometry: <G extends T.BufferGeometry>(g: G) => G;
+  material: <M extends T.Material>(m: M) => M;
+  texture: <X extends T.Texture>(t: X) => X;
+  instance: (parent: T.Object3D, g: T.BufferGeometry, m: T.Material, count: number, shadow?: boolean) => T.InstancedMesh;
+  stamp: (target: T.InstancedMesh, i: number, p: T.Vector3, s: number[], rotation: T.Euler, color?: T.Color | string) => void;
+  finish: (o: T.InstancedMesh) => void;
+  mesh: (parent: T.Object3D, g: T.BufferGeometry, m: T.Material, p?: number[], scale?: number[]) => T.Mesh;
+  ring: (parent: T.Object3D, r: number, y: number, thickness?: number, m?: T.Material) => T.Mesh;
+  tube: (parent: T.Object3D, points: T.Vector3[], r: number, m?: T.Material, segments?: number) => T.Mesh;
+  /** A procedural arch, lantern crowned unless told otherwise. */
+  arch: (parent: T.Object3D, x: number, y: number, z: number, width: number, height: number, contacts?: boolean, detail?: number, lanterns?: boolean) => T.Group;
+  contact: (parent: T.Object3D, x: number, z: number, width: number, depth: number, y?: number) => void;
+  /** A waterfall plane on the study shader; it joins the one merged falls mesh. */
+  waterfall: (parent: T.Object3D, x: number, z: number, height: number, width: number, rotation: number) => void;
+  /** Take a procedural waterfall plane out of the world before the merge. */
+  removeFall: (plane: T.Mesh) => void;
+  /** A per frame motion on the world clock, run once at 0 before batching. */
+  motion: (fn: (time: number) => void) => void;
+  /** The study's shared materials; the kit remap maps onto these (`kit-materials.ts`). */
+  palette: {
+    ivory: T.Material; edge: T.Material; gold: T.Material; rose: T.Material; roseGold: T.Material;
+    leaf: T.Material; lawn: T.Material; stone: T.Material; bloom: T.Material; water: T.Material;
+    silk: T.Material; cotton: T.Material; shadow: T.Material; fall: T.Material;
+  };
+  districts: ReadonlyMap<ZoneId, DesignKitDistrict>;
+  /** Keystone lanterns, read after batching: push a crown for a new arch, splice out a removed one. */
+  archCrowns: Array<{ root: T.Group; height: number }>;
+  bridges: readonly DesignKitBridge[];
+  /** The arrival stage platform at `(4.138, .6, 19.104)`. */
+  entry: T.Group;
+  /** The six far horizon islands. */
+  landmarks: T.Group;
+  grove: { root: T.Group; sites: ReadonlyArray<{ x: number; z: number; group: T.Group; column: T.Mesh }> };
+  sanctuary: { root: T.Group; arcade: T.Group; arches: DesignKitArch[]; heart: T.Group };
+  sparkleDot: T.Texture;
+  farPetal: T.BufferGeometry;
+};
+
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
-export function createDesignWorld(): WorldScene {
+export function createDesignWorld(kit?: WorldKit): WorldScene {
   const scene = new T.Scene();
   scene.name = "Mother's Love, visual study 02";
   scene.background = new T.Color(STUDY_FOG.color);
   scene.fog = new T.Fog(STUDY_FOG.color, STUDY_FOG.near, STUDY_FOG.far);
   scene.userData.prototypeHeartReady = false;
   scene.userData.studyArrival = studyArrival(new URLSearchParams(window.location.search).get("entrance"));
+  // The kit, for the pieces built outside this file (the pearl skin reads it from here).
+  if (kit) scene.userData.studyKit = kit;
   const geometries = new Set<T.BufferGeometry>(), materials = new Set<T.Material>(), textures = new Set<T.Texture>();
   const instances = new Set<T.InstancedMesh>();
   const motions: Array<(time: number) => void> = [];
@@ -246,7 +361,11 @@ export function createDesignWorld(): WorldScene {
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.
   const landmarkLayout = studyLandmarkLayout();
-  const clouds = createStudyClouds(studyCloudLayout(777, studyLandmarkCloudSites(landmarkLayout)), texture(studyCloudAtlas()), time);
+  // The corridor islets (K3b) earn cloud collars and petals like every island. Empty without a kit.
+  const corridorSites = kit ? kitCorridorSites(kit) : [];
+  const cloudSites = studyLandmarkCloudSites(landmarkLayout);
+  cloudSites.push(...corridorSites.map(site => ({ center: [...site.center] as [number, number, number], radius: site.radius })));
+  const clouds = createStudyClouds(studyCloudLayout(777, cloudSites), texture(studyCloudAtlas()), time);
   clouds.geometries.forEach(geometry); clouds.materials.forEach(material);
   clouds.meshes.forEach(o => { instances.add(o); scene.add(o); });
 
@@ -305,6 +424,7 @@ export function createDesignWorld(): WorldScene {
     crowns.mesh.count = crowns.used;
     finish(crowns.mesh);
     contact(parent, x, z, 7 * size, 5.5 * size);
+    return root;
   }
   // Every arch in the connected world hangs a lantern at its keystone. The far landmarks opt
   // out: they sit 158 to 193 units away, where a lantern is a sub-pixel speck.
@@ -352,9 +472,15 @@ export function createDesignWorld(): WorldScene {
   // one mesh below, which takes their place in the registrar, and the sources are released there.
   function waterfall(parent: T.Object3D, x: number, z: number, height: number, width: number, rotation: number) {
     const o = mesh(parent, new T.PlaneGeometry(width, height, 8, 18), fall, [x, .25 - height / 2, z]); o.rotation.y = rotation; falls.push(o);
+    return o;
+  }
+  // The kit builders' view of every procedural arch: which lantern crown belongs to which arch.
+  function archRecord(root: T.Group, width: number, height: number): DesignKitArch {
+    return { root, parent: root.parent!, width, height, crown: archCrowns.find(crown => crown.root === root) ?? null };
   }
 
   const districtRoots = new Map<ZoneId, T.Group>();
+  const districts = new Map<ZoneId, DesignKitDistrict>();
   ZONES.forEach((zone, i) => {
     const root = new T.Group(); root.name = `Design district: ${zone.id}`; root.position.fromArray(zone.center); scene.add(root); districtRoots.set(zone.id, root);
     const radius = i < 3 ? 17.8 : 13.8;
@@ -366,15 +492,20 @@ export function createDesignWorld(): WorldScene {
     ring(root, radius - 2.1, .69, .021); ring(root, radius - 2.4, .691, .009);
     const facing = Math.atan2(zone.eye[0] - zone.center[0], zone.eye[2] - zone.center[2]);
     const layout = new T.Group(); layout.rotation.y = facing; root.add(layout);
+    const district: DesignKitDistrict = { zone, index: i, root, layout, radius, facing, arches: [], trees: [], beds: [], falls: [], landmark: [], figures: [] };
+    districts.set(zone.id, district);
     if (zone.id !== "heart") {
       const arches = zone.id === "expressions" ? 5 : 3, width = zone.id === "expressions" ? 3.8 : 4.8;
-      for (let k = 0; k < arches; k++) arch(layout, (k - (arches - 1) / 2) * width * 1.1, .65, -9.3, width, i < 3 ? 10.3 + (k === 1 ? 1.2 : 0) : 8.4);
+      for (let k = 0; k < arches; k++) {
+        const height = i < 3 ? 10.3 + (k === 1 ? 1.2 : 0) : 8.4;
+        district.arches.push(archRecord(arch(layout, (k - (arches - 1) / 2) * width * 1.1, .65, -9.3, width, height), width, height));
+      }
     }
     const color = ["#e893b9", "#f0a8b8", "#bc92d9", "#edb4ba"][i % 4];
     const crowns: Crowns = { mesh: instance(layout, cottonSphere, cotton, (i < 3 ? 4 : 2) * 15, true), used: 0 };
     for (const side of [-1, 1]) {
       const bed = mesh(layout, geometry(new T.RingGeometry(7.6, i < 3 ? 14.7 : 11.5, 64, 2, side === 1 ? -.75 : Math.PI - .75, 1.50)), lawn, [0, .68, 0]);
-      bed.rotation.x = -Math.PI / 2;
+      bed.rotation.x = -Math.PI / 2; district.beds.push(bed);
       const foliage = instance(layout, midPetal, leaf, 48);
       const random = seededRandom(i * 12 + side + 50);
       for (let j = 0; j < 48; j++) {
@@ -382,18 +513,18 @@ export function createDesignWorld(): WorldScene {
         stamp(foliage, j, new T.Vector3(Math.cos(a)*r, .69, -Math.sin(a)*r), [.52, .75, 1.05], new T.Euler(.45, random()*Math.PI*2, .08));
       } finish(foliage);
     }
-    tree(layout, -12.4, -2.8, i < 3 ? 1.16 : .95, 900 + i * 11, color, crowns);
-    tree(layout, 12.3, -6.9, i < 3 ? 1.10 : .92, 980 + i * 19, color, crowns);
+    district.trees.push(tree(layout, -12.4, -2.8, i < 3 ? 1.16 : .95, 900 + i * 11, color, crowns));
+    district.trees.push(tree(layout, 12.3, -6.9, i < 3 ? 1.10 : .92, 980 + i * 19, color, crowns));
     if (i < 3) {
-      tree(layout, -9.4, -11.5, .91, 1220 + i, "#f8dbd6", crowns);
-      tree(layout, 14.1, 6.3, .94, 1290 + i, color, crowns);
+      district.trees.push(tree(layout, -9.4, -11.5, .91, 1220 + i, "#f8dbd6", crowns));
+      district.trees.push(tree(layout, 14.1, 6.3, .94, 1290 + i, color, crowns));
     }
     for (let k = 0; k < (i < 3 ? 4 : 2); k++) {
       const x = (k % 2 ? 1 : -1) * (10 + k * .5), z = 5 - Math.floor(k / 2) * 11;
       flowers(layout, i < 3 ? 26 : 15, 1440 + i * 17 + k, new T.Vector3(x, .68, z), 2.1, k % 2 ? "#dcbde3" : "#f4b9c9");
     }
-    waterfall(layout, -4.8, -radius + .35, Math.max(5.6, zone.center[1] + 5.3), 3.6, 0);
-    waterfall(layout, 6.7, -radius + 1.4, Math.max(5.6, zone.center[1] + 5.3), 2.1, -.15);
+    district.falls.push(waterfall(layout, -4.8, -radius + .35, Math.max(5.6, zone.center[1] + 5.3), 3.6, 0));
+    district.falls.push(waterfall(layout, 6.7, -radius + 1.4, Math.max(5.6, zone.center[1] + 5.3), 2.1, -.15));
   });
 
   // Wide, continuously connected bridges, with a flat surface and thin metal rails.
@@ -412,6 +543,7 @@ export function createDesignWorld(): WorldScene {
   // scene with an identity transform, so no matrix is baked and no vertex moves.
   const deckParts: T.BufferGeometry[] = [], railParts: T.BufferGeometry[] = [];
   const railSamples: LanternPoint[][] = [];
+  const bridges: DesignKitBridge[] = [];
   for (let i = 0; i < connections.length; i++) {
     const from = ZONES.find(z => z.id === connections[i][0])!, to = ZONES.find(z => z.id === connections[i][1])!;
     const a = new T.Vector3(...from.center).add(new T.Vector3(0, .6, 0)), b = new T.Vector3(...to.center).add(new T.Vector3(0, .6, 0));
@@ -420,6 +552,7 @@ export function createDesignWorld(): WorldScene {
     b.addScaledVector(direction, ZONES.indexOf(to) < 3 ? -16.2 : -12.2);
     const mid = a.clone().lerp(b, .5); mid.y += 2.4; mid.x += (i % 2 ? 1 : -1) * 4;
     const curve = new T.CatmullRomCurve3([a, mid, b]), positions: number[] = [], normals: number[] = [], uvs: number[] = [], indices: number[] = [];
+    bridges.push({ from: from.id, to: to.id, curve, start: a, end: b });
     const rails: T.Vector3[][] = [[], []];
     for (let j = 0; j <= 48; j++) {
       const p = curve.getPoint(j / 48), tangent = curve.getTangent(j / 48), side = new T.Vector3(tangent.z, 0, -tangent.x).normalize();
@@ -464,10 +597,12 @@ export function createDesignWorld(): WorldScene {
   // Sanctuary silhouette: curved ivory arcade, original sculpted heart, independent silk.
   const sanctuary = districtRoots.get("heart")!;
   const arcade = new T.Group(); arcade.rotation.y = Math.atan2(14,28); sanctuary.add(arcade);
+  const arcadeArches: DesignKitArch[] = [];
   for (let i = 0; i < 7; i++) {
     const a = Math.PI * .05 + i / 6 * Math.PI * .90;
     const arc = arch(arcade, Math.cos(a) * 12.8, .65, -Math.sin(a) * 12.8 - 1.5, 5.15, 11.8);
     arc.rotation.y = Math.PI / 2 - a;
+    arcadeArches.push(archRecord(arc, 5.15, 11.8));
   }
   for (let i = 0; i < 4; i++) { mesh(sanctuary,geometry(studyTerrace(7.6-i*.8,7.9-i*.8,.28)),ivory,[0,.88+i*.28,0]);ring(sanctuary,7.6-i*.8,1.03+i*.28,.018); }
   const heartRoot = new T.Group(); heartRoot.name = "Supplied original sculpted heart"; heartRoot.userData.dynamic = true; heartRoot.position.set(0, 8.7, 0); heartRoot.rotation.y = .25; heartRoot.scale.setScalar(3.25); sanctuary.add(heartRoot);
@@ -522,16 +657,16 @@ export function createDesignWorld(): WorldScene {
   // the glow layer here instead, exactly where the nine separate toruses used to be put.
   groveRims.layers.enable(1);
   const groveSpin = new T.Euler(0, .48, 0), groveAt = new T.Vector3();
-  const groveSites: Array<{ x: number; z: number; group: T.Group }> = [];
+  const groveSites: Array<{ x: number; z: number; group: T.Group; column: T.Mesh }> = [];
   WORLD_EXPRESSIONS.forEach((expression,i)=>{
     const a=-Math.PI*.9+i/8*Math.PI*1.6, x=Math.cos(a)*10.5,z=Math.sin(a)*9.3;
-    mesh(grove,cylinder,ivory,[x,2.8,z],[.48,4.25,.48]);ring(grove,3.7,.71,.015);
+    const column=mesh(grove,cylinder,ivory,[x,2.8,z],[.48,4.25,.48]);ring(grove,3.7,.71,.015);
     const group=new T.Group();group.position.set(x,5.15,z);group.rotation.y=.48;grove.add(group);
     const map=texture(new T.TextureLoader().load(`/home-art/icon${expression.id}.webp`,invalidate));map.colorSpace=T.SRGBColorSpace;
     const iconMat=material(new T.MeshBasicMaterial({map,transparent:true,toneMapped:false,side:T.DoubleSide}));
     mesh(group,groveIcon,iconMat,[0,0,.37]);group.userData.dynamic=true;
     groveSurrounds.setColorAt(i, tint.set(expression.color).lerp(new T.Color("#fff0e5"), .66));
-    groveSites.push({ x, z, group });
+    groveSites.push({ x, z, group, column });
   });
   if (groveSurrounds.instanceColor) groveSurrounds.instanceColor.needsUpdate = true;
   let groveBounded = false;
@@ -551,29 +686,32 @@ export function createDesignWorld(): WorldScene {
   });
 
   // Distinct distant landmarks keep every destination legible throughout a continuous tour.
+  // Every piece is also recorded on its district, so a kit builder can replace it in place.
   for (const zone of ZONES.slice(3)) {
-    const root=districtRoots.get(zone.id)!;
+    const root=districtRoots.get(zone.id)!, piece=districts.get(zone.id)!.landmark;
+    const keep=<O extends T.Object3D>(o:O)=>{piece.push(o);return o;};
     if(zone.id==="peacemakers"||zone.id==="status"){
       const globeMat=material(new T.MeshPhysicalMaterial({color:zone.id==="peacemakers"?"#91c9c5":"#b0bcdd",roughness:.2,metalness:.17,transparent:true,opacity:.68,depthWrite:false}));
-      const globe=mesh(root,geometry(new T.SphereGeometry(4,48,32)),globeMat,[0,7,0]);
-      for(let k=0;k<5;k++){const r=mesh(root,geometry(new T.TorusGeometry(4.06,.024,6,72)),gold,[0,7,0]);r.rotation.y=k*Math.PI/5;}
-      for(let k=-2;k<=2;k++){const y=k*1.2, r=ring(root,Math.sqrt(16-y*y),7+y,.022);r.position.z=.01;}
+      const globe=keep(mesh(root,geometry(new T.SphereGeometry(4,48,32)),globeMat,[0,7,0]));
+      for(let k=0;k<5;k++){const r=keep(mesh(root,geometry(new T.TorusGeometry(4.06,.024,6,72)),gold,[0,7,0]));r.rotation.y=k*Math.PI/5;}
+      for(let k=-2;k<=2;k++){const y=k*1.2, r=keep(ring(root,Math.sqrt(16-y*y),7+y,.022));r.position.z=.01;}
       globe.userData.dynamic=true;
     }else if(zone.id==="milestone"){
-      for(let k=0;k<5;k++){mesh(root,geometry(new T.CylinderGeometry(6-k,6.3-k,.4,64)),ivory,[0,1+k*1.6,0]);ring(root,6-k,1.22+k*1.6);waterfall(root,0,5-k,3.8,3.2-k*.4,0);}
+      for(let k=0;k<5;k++){keep(mesh(root,geometry(new T.CylinderGeometry(6-k,6.3-k,.4,64)),ivory,[0,1+k*1.6,0]));keep(ring(root,6-k,1.22+k*1.6));districts.get(zone.id)!.falls.push(keep(waterfall(root,0,5-k,3.8,3.2-k*.4,0)));}
     }else if(zone.id==="orbit"){
-      for(let k=0;k<4;k++){const orbit=mesh(root,geometry(new T.TorusGeometry(5+k*.7,.035,6,96)),gold,[0,7,0]);orbit.rotation.set(k*.55,.4+k*.37,0);}
+      for(let k=0;k<4;k++){const orbit=keep(mesh(root,geometry(new T.TorusGeometry(5+k*.7,.035,6,96)),gold,[0,7,0]));orbit.rotation.set(k*.55,.4+k*.37,0);}
     }else if(zone.id==="calendar"){
-      for(let k=0;k<7;k++)mesh(root,geometry(new T.BoxGeometry(1.5,.45+(k%3)*.25,1.5)),ivory,[(k-3)*2.3,1.1,0]);
+      for(let k=0;k<7;k++)keep(mesh(root,geometry(new T.BoxGeometry(1.5,.45+(k%3)*.25,1.5)),ivory,[(k-3)*2.3,1.1,0]));
     }else if(zone.id==="welcome"){
-      const portal=arch(root,0,.6,0,9.5,13);portal.rotation.y=.45;
+      const portal=keep(arch(root,0,.6,0,9.5,13));portal.rotation.y=.45;
+      districts.get(zone.id)!.arches.push(archRecord(portal,9.5,13));
       for(let side=-1;side<=1;side+=2){const wing=mesh(portal,petal,rose,[side*.25,11,0],[3.5,4.2,3.5]);wing.rotation.set(Math.PI/2,side*.7,side*.65);}
     }else if(zone.id==="featured"){
-      for(let k=0;k<5;k++){const a=k/5*Math.PI*2;arch(root,Math.cos(a)*7,.6,Math.sin(a)*7,5,10).rotation.y=-a-Math.PI/2;}
+      for(let k=0;k<5;k++){const a=k/5*Math.PI*2;const ring5=keep(arch(root,Math.cos(a)*7,.6,Math.sin(a)*7,5,10));ring5.rotation.y=-a-Math.PI/2;districts.get(zone.id)!.arches.push(archRecord(ring5,5,10));}
     }else if(zone.id==="live-feed"){
-      for(let k=0;k<6;k++){const a=k*.72;mesh(root,cylinder,ivory,[Math.cos(a)*8,1+k*.22,Math.sin(a)*6],[1.5,.3,1.5]);}
+      for(let k=0;k<6;k++){const a=k*.72;keep(mesh(root,cylinder,ivory,[Math.cos(a)*8,1+k*.22,Math.sin(a)*6],[1.5,.3,1.5]));}
     }else if(zone.id==="practice"||zone.id==="promise"){
-      for(const s of [-1,1])mesh(root,geometry(new T.BoxGeometry(4.2,.32,1.15)),ivory,[s*5,1.45,1]);
+      for(const s of [-1,1])keep(mesh(root,geometry(new T.BoxGeometry(4.2,.32,1.15)),ivory,[s*5,1.45,1]));
     }
   }
 
@@ -583,7 +721,8 @@ export function createDesignWorld(): WorldScene {
   // Each study is an independent stage on the entry platform, built from the shared
   // registrars so dispose() still covers every geometry, material and texture.
   const lotusShape=petalGeometry(40,24);
-  const stageContext:StageContext={geometry,material,texture,instance,gold,ivory,farPetal,pollen,lotusShape,time,seededRandom};
+  // The kit rides along for the arrival lane (K2), which adds `kit` to StageContext itself.
+  const stageContext:StageContext&{kit?:WorldKit}={geometry,material,texture,instance,gold,ivory,farPetal,pollen,lotusShape,time,seededRandom,kit};
   const stages={bloom:bloomStage(stageContext),ribbon:ribbonStage(stageContext),constellation:constellationStage(stageContext)} as const;
   const stageStyles=["bloom","ribbon","constellation"] as const;
   for(const key of stageStyles){stages[key].group.visible=false;entry.add(stages[key].group);}
@@ -608,8 +747,9 @@ export function createDesignWorld(): WorldScene {
     mesh(root,figureBody,dress,[0,.35,0]);mesh(root,bead,figureSkin,[0,1.65,0],[.33,.35,.32]);mesh(root,bead,figureHair,[0,1.8,-.035],[.34,.24,.32]);
     for(const side of [-1,1]){const arm=mesh(root,figureArm,dress,[side*.29,1.00,.03]);arm.rotation.z=side*.20;mesh(root,bead,figureSkin,[side*.35,.71,.03],[.09,.1,.09]);}
     for(const s of [-1,1]){mesh(root,cylinder,figureSkin,[s*.17,.28,0],[.085,.42,.085]);mesh(root,bead,figureHair,[s*.17,.065,.08],[.11,.07,.19]);}contact(parent,x,z,1.5,.85);
+    return root;
   }
-  for(const id of ["garden","heart","expressions"] as const){const root=districtRoots.get(id)!;figure(root,-5,8,"#d788a9");figure(root,-3.8,8.5,"#a79ac9");}
+  for(const id of ["garden","heart","expressions"] as const){const root=districtRoots.get(id)!,figures=districts.get(id)!.figures;figures.push(figure(root,-5,8,"#d788a9"));figures.push(figure(root,-3.8,8.5,"#a79ac9"));}
 
   // Soft glowing dots that breathe, in place of the old solid firefly cubes.
   const sparkleCount=140,sparklePlaces=new Float32Array(sparkleCount*3),sparklePhase=new Float32Array(sparkleCount);
@@ -665,6 +805,40 @@ export function createDesignWorld(): WorldScene {
     }
     heartSparkleGeometry.getAttribute("position").needsUpdate = true;
   });
+
+  // Plan 26: the 3D Studio kit dresses the world here, once every procedural piece exists and
+  // before the falls merge and the static batch, so kit pieces merge by material identity like
+  // the rest. Only with a kit: under `?kit=off`, or when the kit failed, nothing below runs and
+  // the world is exactly the procedural study.
+  const kitHandles: KitBuilderHandle[] = [];
+  if (kit) {
+    const kitContext: DesignKitContext = {
+      kit, scene, time, geometry, material, texture, instance, stamp, finish, mesh, ring, tube, arch, contact,
+      waterfall: (parent, x, z, height, width, rotation) => { waterfall(parent, x, z, height, width, rotation); },
+      removeFall: plane => {
+        const at = falls.indexOf(plane);
+        if (at < 0) return;
+        falls.splice(at, 1); plane.removeFromParent(); plane.geometry.dispose();
+        districts.forEach(district => {
+          for (const list of [district.falls, district.landmark]) { const own = list.indexOf(plane); if (own >= 0) list.splice(own, 1); }
+        });
+      },
+      motion: fn => { motions.push(fn); },
+      palette: { ivory, edge, gold, rose, roseGold, leaf, lawn, stone, bloom, water, silk: silkMat, cotton, shadow, fall },
+      districts, archCrowns, bridges, entry, landmarks,
+      grove: { root: grove, sites: groveSites },
+      sanctuary: { root: sanctuary, arcade, arches: arcadeArches, heart: heartRoot },
+      sparkleDot, farPetal,
+    };
+    const districtHandle = applyKitDistricts(kitContext);
+    if (districtHandle) kitHandles.push(districtHandle);
+    // Neighbors stand in for the miniature figures; the engine reports it so the host can
+    // switch its accessible sentence from the figures to the dialogue.
+    const neighbors: KitNeighbors | undefined = createKitNeighbors(kitContext);
+    if (neighbors) { kitHandles.push(neighbors); scene.userData.studyNeighbors = true; }
+    const corridorHandle = applyKitCorridors(kitContext);
+    if (corridorHandle) kitHandles.push(corridorHandle);
+  }
 
   // Section 7: the 31 waterfall planes become one mesh. Their world transforms are baked in,
   // and the shader reads only uv, so nothing moves. The material writes no depth, so losing
@@ -730,11 +904,11 @@ export function createDesignWorld(): WorldScene {
   lanterns.layers.enable(1); scene.add(lanterns);
 
   // Living air. Four objects, one draw call each, all seeded.
-  const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time }, ZONES.map(zone => zone.center));
+  const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time }, [...ZONES.map(zone => zone.center), ...corridorSites.map(site => site.center)]);
   return {
     scene, anchors: WORLD_EXPRESSIONS.map((_,i)=>new T.Vector3(14+Math.cos(i)*10,5,-45+Math.sin(i)*10)), recognitionPearls: [],
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
-    setEffects(s, t) { sparkles=s;trails=t;air.setEffects(s,t); },
+    setEffects(s, t) { sparkles=s;trails=t;air.setEffects(s,t);kitHandles.forEach(handle=>handle.setEffects?.(s,t)); },
     update(t,_zone,arrival){
       time.value=t;motions.forEach(fn=>fn(t));clouds.update(t);ribbons.forEach(o=>{o.visible=trails;});sparkleField.visible=sparkles;sparkleField.rotation.y=Math.sin(t*.016)*.04;
       heartSparkles.visible=sparkles;
@@ -767,7 +941,8 @@ export function createDesignWorld(): WorldScene {
         stages[key].group.visible=visible;
         if(visible)stages[key].update(pose,t,stageEffects);
       }
+      for(const handle of kitHandles)handle.update?.(t,_zone,arrival);
     },
-    dispose(){disposed=true;air.dispose();instances.forEach(o=>o.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();shadowCanvas.width=shadowCanvas.height=1;scene.clear();},
+    dispose(){disposed=true;kitHandles.forEach(handle=>handle.dispose?.());air.dispose();instances.forEach(o=>o.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();shadowCanvas.width=shadowCanvas.height=1;scene.clear();},
   };
 }

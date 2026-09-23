@@ -9,19 +9,24 @@ import path from 'node:path';
 const origin = process.env.DESIGN_REVIEW_ORIGIN || 'http://127.0.0.1:32743';
 const output = process.env.DESIGN_REVIEW_OUTPUT || '/private/tmp/mothers-love-design-study-01';
 const mode = process.env.DESIGN_REVIEW_MODE || 'stills';
+// Plan 26: the 3D Studio kit dresses the design study by default. DESIGN_REVIEW_KIT=off runs the
+// same captures on `&kit=off`, the fully procedural study, for A/B and byte comparison.
+const kitOff = process.env.DESIGN_REVIEW_KIT === 'off';
+// An installed browser channel (for example `chrome`) when the pinned Playwright build is absent.
+const channel = process.env.DESIGN_REVIEW_CHANNEL || undefined;
 const args = process.env.DESIGN_REVIEW_SOFTWARE === '1'
   ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
   : ['--use-gl=angle', '--use-angle=metal'];
 await mkdir(output, { recursive: true });
 const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-const applicationPaths = execFileSync('git', ['ls-files', 'src/components/display/world', 'src/app/display/world-preview', 'public/world-prototype'], { encoding: 'utf8' }).trim().split('\n');
+const applicationPaths = execFileSync('git', ['ls-files', 'src/components/display/world', 'src/app/display/world-preview', 'public/world-prototype', 'public/world-kit'], { encoding: 'utf8' }).trim().split('\n');
 const sourceFiles = [];
 for (const file of applicationPaths) sourceFiles.push({ file, sha256: createHash('sha256').update(await readFile(file)).digest('hex') });
-const browser = await chromium.launch({ headless: true, args });
+const browser = await chromium.launch({ headless: true, args, ...(channel ? { channel } : {}) });
 // A frame timing taken while the rest of the machine is busy says nothing about the world,
 // so every run records the load it was taken at and every timing carries its own reading.
 const load = () => loadavg().map(value => Math.round(value * 100) / 100);
-const report = { sourceSha, origin, mode, sourceFiles, browser: browser.version(), platform: process.platform, args,
+const report = { sourceSha, origin, mode, kit: kitOff ? 'off' : 'on', channel: channel ?? 'playwright chromium', sourceFiles, browser: browser.version(), platform: process.platform, args,
   machine: { cores: cpus().length, loadAverageAtStart: load() },
   renderingDetailsMeaning: 'The study turns renderer.info.autoReset off and resets once per presented frame, so Draw calls and Triangles sum every pass of that frame: the main pass, the sun shadow map on the frames that refresh it, the glow, protect and ray mask passes, the thirteen bloom quads, the ray blur and the composite. They are not a main pass figure.',
   checks: [], errors: [], consoleMessages: [], failedRequests: [], apiRequests: [], cameraSamples: [], limitations: ['Design review only. P0 and physical device acceptance remain open.', 'All records are fictional. This is not a real-data test.'] };
@@ -32,25 +37,65 @@ const context = await browser.newContext({
 });
 const page = await context.newPage();
 page.on('pageerror', e => report.errors.push(e.message));
-page.on('console', m => { if (['warning', 'error'].includes(m.type())) report.consoleMessages.push({ type: m.type(), text: m.text() }); });
-page.on('requestfailed', r => report.failedRequests.push({ url: r.url(), failure: r.failure()?.errorText }));
+page.on('console', m => {
+  if (!['warning', 'error'].includes(m.type())) return;
+  // The browser's own notice for a request the fault mode aborted is not a page problem.
+  if (m.type() === 'error' && isDeliberate(m.location()?.url ?? '') && /Failed to load resource/.test(m.text())) return;
+  report.consoleMessages.push({ type: m.type(), text: m.text() });
+});
+// Requests the fault mode fails on purpose are recorded apart, so every other failure still counts.
+const deliberate = [];
+const isDeliberate = url => deliberate.some(pattern => url.includes(pattern));
+report.deliberateFailures = [];
+page.on('requestfailed', r => (isDeliberate(r.url()) ? report.deliberateFailures : report.failedRequests).push({ url: r.url(), failure: r.failure()?.errorText }));
 await page.route('**/api/**', route => { report.apiRequests.push(route.request().url()); return route.abort('blockedbyclient'); });
 page.setDefaultTimeout(10000);
 const world = page.getByTestId('world-preview');
 const attrs = () => world.evaluate(el => Object.fromEntries([...el.attributes].filter(a => a.name.startsWith('data-')).map(a => [a.name, a.value])));
-async function open(art) {
+/**
+ * Opens one art mode on sample data. The design study waits for its kit state as well: `ready`
+ * by default, `off` under DESIGN_REVIEW_KIT=off, or whatever a fault run expects; classic and
+ * cinematic never load the kit and must say `off`.
+ */
+async function open(art, { kit = art === 'design' && !kitOff ? 'ready' : 'off', label = art } = {}) {
   const start = performance.now();
-  await page.goto(`${origin}/display/world-preview?source=sample&art=${art}`, { waitUntil: 'domcontentloaded' });
+  const query = art === 'design' && kitOff ? '&kit=off' : '';
+  await page.goto(`${origin}/display/world-preview?source=sample&art=${art}${query}`, { waitUntil: 'domcontentloaded' });
   await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+  const readyElapsedMs = Math.round(performance.now() - start);
+  // The kit loads before the engine, so its state is published with the first report; allow
+  // it ten seconds past data-ready and record how long it actually took.
+  await expect(world).toHaveAttribute('data-kit', kit, { timeout: 10000 });
+  const kitElapsedMs = Math.round(performance.now() - start);
   await expect.poll(async () => Number(await world.getAttribute('data-frames'))).toBeGreaterThan(0);
   await expect(world).toHaveAttribute('data-source', 'sample');
   if (art === 'design') await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
-  report.checks.push({ test: `${art} rendered with explicit sample content`, passed: true, readyElapsedMs: Math.round(performance.now()-start), attributes: await attrs() });
+  report.checks.push({ test: `${label} rendered with explicit sample content, kit ${kit}`, passed: true, readyElapsedMs, kitElapsedMs,
+    kitAfterReadyMs: kitElapsedMs - readyElapsedMs, attributes: await attrs() });
 }
 async function shot(name) {
   await expect(world).toHaveAttribute('data-source', 'sample');
-  await page.screenshot({ path: path.join(output, `${name}.png`), fullPage: true });
+  const bytes = await page.screenshot({ path: path.join(output, `${name}.png`), fullPage: true });
   console.log(JSON.stringify({ captured: name, attributes: await attrs() }));
+  return bytes;
+}
+/** Byte equality first; when two captures differ, how many pixels and where, decoded in the page. */
+async function compareShots(a, b) {
+  if (Buffer.compare(a, b) === 0) return { identical: true, differingPixels: 0 };
+  const detail = await page.evaluate(async ([left, right]) => {
+    const load = src => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; });
+    const [x, y] = await Promise.all([load(left), load(right)]);
+    if (x.width !== y.width || x.height !== y.height) return { sizeMismatch: [x.width, x.height, y.width, y.height] };
+    const read = image => { const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height; const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, image.width, image.height).data; };
+    const p = read(x), q = read(y);
+    let count = 0, box = null;
+    for (let i = 0; i < p.length; i += 4) if (p[i] !== q[i] || p[i + 1] !== q[i + 1] || p[i + 2] !== q[i + 2]) {
+      count++; const px = (i / 4) % x.width, py = Math.floor(i / 4 / x.width);
+      box = box ? [Math.min(box[0], px), Math.min(box[1], py), Math.max(box[2], px), Math.max(box[3], py)] : [px, py, px, py];
+    }
+    return { differingPixels: count, box };
+  }, [`data:image/png;base64,${a.toString('base64')}`, `data:image/png;base64,${b.toString('base64')}`]);
+  return { identical: false, ...detail };
 }
 async function pause() { const button=page.getByRole('button',{name:'Pause tour',exact:true}); if (await button.count()) await button.click(); }
 const zones = [
@@ -122,8 +167,51 @@ async function measure(label,width,height,quality) {
   report.checks.push({test:`Real animation timing with advancing app frames and clock at ${label}`,passed:advanced,...stats,loadAverage1Min:loadAfter[0],loadPolluted:polluted});
 }
 try {
-  await open('design');
-  if (mode === 'quality') {
+  if (mode !== 'kit-faults') await open('design');
+  if (mode === 'kit-faults') {
+    // Plan 26 K0: the kit fails soft. Three paused Garden captures on the same run: the
+    // procedural study (`kit=off`), the study with the Draco decoder refused (every asset
+    // fails, so `data-kit="failed"`), and the study with one asset refused (`partial`, one
+    // missing). While the district, neighbor and corridor builders are K0 stubs, both fault
+    // captures must be byte identical to the procedural one.
+    const pixels = process.env.DESIGN_REVIEW_FAULT_PIXELS !== 'off';
+    const partialAsset = process.env.DESIGN_REVIEW_PARTIAL_ASSET || 'landmarks/pearl-arch.glb';
+    // The study opens parked at the Garden, which is where every capture here is taken.
+    const garden = async name => { await pause(); await expect(world).toHaveAttribute('data-zone', 'garden'); return shot(name); };
+    // The procedural reference is always `&kit=off`, whatever DESIGN_REVIEW_KIT says.
+    await page.goto(`${origin}/display/world-preview?source=sample&art=design&kit=off`, { waitUntil: 'domcontentloaded' });
+    await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+    await expect(world).toHaveAttribute('data-kit', 'off', { timeout: 10000 });
+    await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
+    report.checks.push({ test: 'Procedural reference opened with kit=off', passed: true, attributes: await attrs() });
+    const reference = await garden('kit-off-garden');
+    const faultRun = async ({ pattern, expected, missing, name }) => {
+      deliberate.push(pattern);
+      const handler = route => route.abort('failed');
+      await page.route(`**/${pattern}`, handler);
+      const start = performance.now();
+      await page.goto(`${origin}/display/world-preview?source=sample&art=design`, { waitUntil: 'domcontentloaded' });
+      await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+      await expect(world).toHaveAttribute('data-kit', expected, { timeout: 10000 });
+      const readyElapsedMs = Math.round(performance.now() - start);
+      await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
+      const attributes = await attrs();
+      const capture = await garden(name);
+      await page.unroute(`**/${pattern}`, handler);
+      const comparison = await compareShots(reference, capture);
+      const missingOk = missing === undefined || attributes['data-kit-missing'] === String(missing);
+      report.checks.push({ test: `Kit ${expected} when ${pattern} is refused: procedural world stands`, passed: missingOk && (!pixels || comparison.identical),
+        aborted: pattern, readyElapsedMs, attributes, comparedWith: 'kit-off-garden', ...comparison, pixelAssertion: pixels });
+    };
+    await faultRun({ pattern: 'world-kit/draco/draco_decoder.wasm', expected: 'failed', name: 'kit-failed-garden' });
+    await faultRun({ pattern: `world-kit/v1/${partialAsset}`, expected: 'partial', missing: 1, name: 'kit-partial-garden' });
+    // And the healthy kit, for the record: every asset, within ten seconds of data-ready.
+    await open('design', { kit: 'ready', label: 'design kit on' });
+    const healthy = await garden('kit-on-garden');
+    const healthyComparison = await compareShots(reference, healthy);
+    report.checks.push({ test: 'Kit ready: stub builders draw the procedural world', passed: !pixels || healthyComparison.identical,
+      comparedWith: 'kit-off-garden', ...healthyComparison, pixelAssertion: pixels });
+  } else if (mode === 'quality') {
     await pause();
     await setQuality('high');
     report.resolutions=[];
@@ -142,7 +230,7 @@ try {
     // its calls and triangles now sum every pass of that frame, the shadow pass included.
     await page.emulateMedia({reducedMotion:'no-preference'});
     report.measurements=[];
-    for(const [label,width,height,quality] of [['1920x1080 High',1920,1080,'high'],['3840x2160 High',3840,2160,'high'],['1920x1080 Low',1920,1080,'low']]) {
+    for(const [label,width,height,quality] of [['1920x1080 High',1920,1080,'high'],['3840x2160 High',3840,2160,'high'],['1920x1080 Auto',1920,1080,'auto'],['1920x1080 Low',1920,1080,'low']]) {
       await measure(label,width,height,quality);
     }
     report.renderingDetails=report.measurements[0]?.pausedGardenRenderingDetails;
@@ -209,6 +297,7 @@ try {
   if(await world.getAttribute('data-source').catch(()=>null)==='sample') await shot(`${mode}-failure`).catch(()=>{});
 } finally {
   report.checks.push({test:'No page errors, error console messages or API requests',passed:!report.errors.length&&!report.consoleMessages.some(m=>m.type==='error')&&!report.apiRequests.length});
+  report.checks.push({test:'No failed requests',passed:!report.failedRequests.length,failedRequests:report.failedRequests.length,deliberateFailures:report.deliberateFailures.length});
   report.machine.loadAverageAtEnd=load();
   await context.close();
   if(mode==='tour') report.video=await page.video().path();
