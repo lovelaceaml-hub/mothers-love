@@ -184,8 +184,8 @@ export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
 
 /**
  * The two fast legs (149 and 197 units in 18 s) get a sky lane of sculpted `nature.cloud-c`
- * puffs at flight height, 9 to 13 units to the side of the flight line and their tops 1 to 3
- * units above it (scale 1.6 to 2.4, radius 4.8 to 7.2, dropped 4 to 5), so the camera passes
+ * puffs at flight height, 9 to 13 units to the side of the flight line and their tops just
+ * above it (scale 1.6 to 2.4, radius 4.8 to 7.2, dropped 2 to 3), so the camera passes
  * through cloud tops (design 6.17) rather than over pink smears 14 to 48 units below it, which
  * is what the first stations (kept 6 units clear of every flight in the world) read as.
  *
@@ -202,17 +202,17 @@ export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
  * (`tests/world/kit-layout-far.test.ts` proves them), on the terrace to calendar leg six
  * puffs, on the fountain leg eight along the long descent.
  */
-export const SOFT_CLOUD = { opacity: .5, centreClearance: 6, solidGap: 1, spacing: 16 } as const;
+export const SOFT_CLOUD = { opacity: .5, centreClearance: 6, solidGap: 1, spacing: 9 } as const;
 export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "practice", to: "calendar",
     clouds: [
-      { t: .12, side: -10, drop: 5, scale: 2.2 },
-      { t: .4, side: 13, drop: 5, scale: 1.8 },
-      { t: .72, side: 13, drop: 5, scale: 2 },
-      { t: .76, side: -12, drop: 5, scale: 2 },
-      { t: .92, side: 9, drop: 5, scale: 1.6 },
-      { t: .94, side: -13, drop: 5, scale: 1.8 },
+      { t: .125, side: -13, drop: 2, scale: 1.6 },
+      { t: .185, side: -13, drop: 2, scale: 1.6 },
+      { t: .735, side: 13, drop: 2, scale: 1.6 },
+      { t: .79, side: 9, drop: 2, scale: 1.6 },
+      { t: .95, side: 10, drop: 2, scale: 1.6 },
+      { t: .96, side: -13, drop: 2, scale: 1.6 },
     ],
     // Two, not the design's three: the third's natural place, south of the leg's east half, is
     // already taken by the islet beside the Garden to Grove bridge, which the flight passes.
@@ -225,14 +225,14 @@ export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "milestone", to: "live-feed",
     clouds: [
-      { t: .12, side: 12, drop: 5, scale: 2.4 },
-      { t: .46, side: 13, drop: 5, scale: 2.4 },
-      { t: .58, side: -13, drop: 5, scale: 2.4 },
-      { t: .64, side: 13, drop: 5, scale: 2.4 },
-      { t: .66, side: -13, drop: 5, scale: 2.4 },
-      { t: .72, side: 13, drop: 4, scale: 2.4 },
-      { t: .74, side: -13, drop: 4, scale: 2.4 },
-      { t: .8, side: 13, drop: 5, scale: 2.4 },
+      { t: .17, side: 9, drop: 2, scale: 1.6 },
+      { t: .585, side: 13, drop: 2, scale: 1.6 },
+      { t: .59, side: -13, drop: 2, scale: 1.6 },
+      { t: .63, side: 12, drop: 2, scale: 1.6 },
+      { t: .635, side: -13, drop: 2, scale: 1.6 },
+      { t: .675, side: 11.5, drop: 2, scale: 1.6 },
+      { t: .68, side: -13, drop: 2, scale: 1.6 },
+      { t: .72, side: 11, drop: 2, scale: 1.6 },
     ],
     islets: [
       { center: [44.6, -.4, -38.5], scale: 1.3 },

@@ -297,7 +297,8 @@ describe("near zone tables", () => {
     expect(pearls).toContain(`Math.sin(phase) * (slot.index ? 0.65 : ${MEDALLION.sway}),`);
     expect(pearls).toContain(`Math.sin(phase * 0.8) * (slot.index ? 0.45 : ${MEDALLION.bob});`);
     expect(pearls).toContain("slot.root.position.y += [3, 6, 9][slot.index];");
-    expect(pearls).toContain("? mobile\n              ? 0\n              : place === \"heart\" || place === \"peacemakers\"\n                ? 7\n                : 3");
+    expect(pearls).toContain('const side = mobile ? 0 : zone === "heart" ? 10.5 : zone === "peacemakers" ? 11 : 3;');
+    expect(pearls).toContain('return { side, outward: zone === "featured" ? 8 : 5 };');
     // The reading spheres of design 6.2 centre on the same pearl.
     for (const id of RECOGNITION_ZONES) expect(heroPearlAt(id, "landscape")).toEqual(heroPearl(id));
   });

@@ -44,7 +44,7 @@ import { studyGlass, studyGlow, studyRim } from "./study-materials";
  * it. Kit assets carry no text: the only words in the world stay on the pearl's face disc.
  */
 
-/** Every zone table the builder places. Lane K3b's far zones join here: `...FAR_ZONE_LAYOUTS`. */
+/** Every near zone table the builder places. The six far zones render through applyKitFarZones in kit-far-zones.ts (coordinator ruling at integration, 2026-09-23), so each zone renders exactly once. */
 export const KIT_ZONE_LAYOUTS: readonly ZoneLayout[] = [...CORE_ZONE_LAYOUTS];
 
 /** Kit detail groups hide past this distance from their district centre (design 7.2). */

@@ -293,9 +293,10 @@ export function readingKeepOut(id: ZoneId): KeepOutSphere[] {
   if (!RECOGNITION_ZONES.includes(id)) return [];
   const zone = zoneById(id);
   const lift = zone.target[1] - zone.center[1];
-  const side = id === "heart" || id === "peacemakers" ? 7 : 3;
+  const side = id === "heart" ? 10.5 : id === "peacemakers" ? 11 : 3;
+  const outward = id === "featured" ? 8 : 5;
   return [
-    { center: [side, Math.max(lift + 3, MEDALLION.guard[0] + MEDALLION.guard[1] * MEDALLION.landscape.pearl), 5], radius: 7 },
+    { center: [side, Math.max(lift + 3, MEDALLION.guard[0] + MEDALLION.guard[1] * MEDALLION.landscape.pearl), outward], radius: 7 },
     { center: [-10, lift + 6, 1], radius: 3.2 },
     { center: [11, lift + 9, -4], radius: 3 },
   ];
@@ -403,9 +404,10 @@ export function heroPearlAt(id: ZoneId, layout: MedallionLayout, sway = 0, bob =
   if (!RECOGNITION_ZONES.includes(id)) return undefined;
   const zone = zoneById(id);
   const lift = zone.target[1] - zone.center[1];
-  const side = layout === "portrait" ? 0 : id === "heart" || id === "peacemakers" ? 7 : 3;
+  const side = layout === "portrait" ? 0 : id === "heart" ? 10.5 : id === "peacemakers" ? 11 : 3;
+  const outward = id === "featured" ? 8 : 5;
   const pearl = MEDALLION[layout].pearl;
-  return [side + sway, Math.max(lift + 3 + bob, MEDALLION.guard[0] + MEDALLION.guard[1] * pearl), 5];
+  return [side + sway, Math.max(lift + 3 + bob, MEDALLION.guard[0] + MEDALLION.guard[1] * pearl), outward];
 }
 
 /**
@@ -704,7 +706,7 @@ function heartLayout(): ZoneLayout {
   const placements: KitPlacement[] = [
     ...arcadeRow(),
     lantern(-12.5, 3, "forecourt post, left, above the headline"),
-    lantern(11, 7, "forecourt post"),
+    lantern(11, 9, "forecourt post"),
     bench(10, 9.5, -0.7, "bench at the right of the forecourt (the left is the headline's)"),
   ];
   // The ring keeps a 60 degree gap toward the camera; the two front left bushes step out to
@@ -713,7 +715,7 @@ function heartLayout(): ZoneLayout {
     const bearing = degrees(bearingDegrees);
     placements.push(rose(Math.sin(bearing) * radius, Math.cos(bearing) * radius, 1.3 + (k % 3) * 0.1, k * 0.9, `rose bush ${k + 1} of 12 on the terrace ring`));
   }
-  const hearts: Array<[number, number, number]> = [[-8, 7, 3], [-9.5, 8.5, 5.5], [-7, 6, -2], [9.5, 6, -3], [10.5, 6.5, -1.5]];
+  const hearts: Array<[number, number, number]> = [[-8, 7, 3], [-9.5, 8.5, 5.5], [-7, 6, -2], [9.5, 6, -3], [10.5, 6.5, -2]];
   hearts.forEach(([x, y, z], k) => placements.push({
     id: "core.heart", position: [x, y, z], rotationY: k * 1.3, scale: 0.6, role: "instanced", effect: "sparkles", bob: { amplitude: 0.35, rate: 0.5 + k * 0.07, phase: k * 1.7 }, note: `floating heart ${k + 1} of 5`,
   }));
@@ -771,7 +773,7 @@ function peacemakersLayout(): ZoneLayout {
     lantern(globe[0] - 3.6, 7.4, "post at the railing entrance"),
     lantern(globe[0] + 3.6, 7.4, "post at the railing entrance"),
     { id: "nature.blossom-tree-b", position: [-12, 0.7, 6], rotationY: 0.3, scale: 1.05, role: "static", contact: [7, 5.5], note: "front left tree" },
-    { id: "nature.blossom-tree-b", position: [-12.2, 0.7, -5.6], rotationY: 0.8, scale: 1.05, role: "static", contact: [7, 5.5], note: "back left tree (design 6.9; the right of the frame is the hero pearl's, which sits at side 7 here)" },
+    { id: "nature.blossom-tree-b", position: [-12.2, 0.7, -5.6], rotationY: 0.8, scale: 1.05, role: "static", contact: [7, 5.5], note: "back left tree (design 6.9; the right of the frame is the hero pearl's, which sits at side 11 here)" },
   ];
   // Twenty five segments of pitch 2 close a ring of radius 8 (chord 2.005); three stay out
   // at the front as the entrance.

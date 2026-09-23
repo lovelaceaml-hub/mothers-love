@@ -40,9 +40,7 @@ import { studyGlass, studyRim } from "./study-materials";
  * builder so the far zones are dressed, judged and captured on this lane (the director's
  * note 1 on the round three captures: the far zones were still the procedural study).
  * `?far=off` keeps the far districts procedural while the corridors stay dressed, for A/B.
- * At integration the coordinator picks one of the two: this builder, called once from the
- * design world after `applyKitDistricts` (it carries the clock work the tables describe in
- * `FAR_ZONE_DRESSING`), or K3a's generic table renderer for the statics alone.
+ * At integration the coordinator chose this builder for the six far zones (2026-09-23), because it carries the clock work the tables describe in FAR_ZONE_DRESSING; K3a's table renderer places the seven near zones.
  *
  * Cost shape (design 7.2, 7.4): static pieces are clones on the study's shared materials
  * placed straight into the district frame, so the study batcher merges them per material

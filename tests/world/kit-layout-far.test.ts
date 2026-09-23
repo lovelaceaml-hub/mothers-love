@@ -691,8 +691,8 @@ describe("corridors: sky lanes", () => {
         // Beside the line, outside the leg's own 6 unit corridor, and the puff's top reaches above the line.
         expect(Math.abs(spec.side)).toBeGreaterThanOrEqual(9);
         expect(Math.abs(spec.side)).toBeLessThanOrEqual(13);
-        expect(spec.drop).toBeGreaterThanOrEqual(4);
-        expect(spec.drop).toBeLessThanOrEqual(5);
+        expect(spec.drop).toBeGreaterThanOrEqual(2);
+        expect(spec.drop).toBeLessThanOrEqual(3);
         expect(spec.scale * cloudBox.max[1] - spec.drop, `${lane.from}>${lane.to} station ${spec.t} top above the line`).toBeGreaterThan(0);
         expect(spec.scale).toBeGreaterThanOrEqual(1.6);
         expect(spec.scale).toBeLessThanOrEqual(2.4);
