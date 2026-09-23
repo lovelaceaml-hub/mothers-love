@@ -1,4 +1,6 @@
-# Plan 25: Promote the heavenly world to the live Mother's Love app
+# Plan 27: Promote the heavenly world to the live Mother's Love app
+
+Numbering and standing, added 2026-09-23: this plan was Plan 25 until Anthony ruled that plans renumber by date, which made it Plan 27. The text below keeps the number it was written under. [Plan 28](PLAN-28-repository-refactor.md) supersedes its gate G5 (the TV is never pointed at the world, which becomes its own surface at `/world`) and folds the rest of it into Plan 28's Section 5. Draft PR #8 named below was replaced by draft PR #10 on 2026-09-23.
 
 Drafted 2026-09-22 by Fable after Anthony's ruling "1" on 2026-09-21: plan the promotion right after the visual sections land. Status: draft, awaiting Anthony's approval after Section 8 of Plan 24 pass D2 lands. Nothing in this plan runs until he approves it.
 

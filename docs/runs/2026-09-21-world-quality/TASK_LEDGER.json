@@ -1,0 +1,197 @@
+{
+  "plan": "docs/PLAN-24-world-visual-quality.md",
+  "baseline": "b324b81cabe947592f6723425c58f14307b58083",
+  "branch": "feature/world-cinematic-art-pass",
+  "pullRequest": "https://github.com/lovelaceaml-hub/mothers-love/pull/8",
+  "updatedUtc": "2026-09-22T11:18:33.079848+00:00",
+  "phases": [
+    {
+      "id": "P0",
+      "status": "held_for_visual_approval",
+      "owner": "Claude Opus high",
+      "evidence": [
+        "docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md",
+        "docs/runs/2026-09-21-world-quality/BASELINE-OPTIMIZED.json",
+        "docs/runs/2026-09-21-world-quality/BASELINE-DEV-HARNESS.json"
+      ],
+      "notes": "Six unchanged baseline cases passed locally. Historical CI readiness cause remains unresolved. Claude implementation is held until Anthony reviews and approves Astra designs. Authentication alone must not resume it. 2026-09-22: still open; owned by Plan 25 G3 after pass D2 landed the visual work."
+    },
+    {
+      "id": "P1",
+      "status": "queued",
+      "owner": "Astra high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P2",
+      "status": "queued",
+      "owner": "Claude Fable high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P3",
+      "status": "queued",
+      "owner": "Claude Fable high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P4",
+      "status": "queued",
+      "owner": "Claude Fable high then Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P5",
+      "status": "queued",
+      "owner": "Claude Fable high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P6",
+      "status": "queued",
+      "owner": "Claude Opus high",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "P7",
+      "status": "queued",
+      "owner": "Claude Opus high with fresh nonauthor Opus review",
+      "evidence": [],
+      "notes": ""
+    }
+  ],
+  "runs": [
+    {
+      "phase": "preparation",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "complete",
+      "tools": [
+        "shell",
+        "git",
+        "gh",
+        "apply_patch"
+      ],
+      "sourceChanges": false,
+      "independentReview": false
+    },
+    {
+      "phase": "P0",
+      "runtime": "Claude Code native background session",
+      "requestedModel": "opus",
+      "displayedModel": "Opus 5",
+      "exactResponseModelId": null,
+      "effort": "high",
+      "sessionId": "c2da192f-e083-47be-9d94-47402e9aa117",
+      "status": "blocked_authentication",
+      "sourceChanges": false,
+      "independentReview": false,
+      "notes": "Stopped idle session after verification; conversation preserved for authenticated resume."
+    },
+    {
+      "phase": "P0-baseline-validation",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "status": "partial",
+      "sourceChanges": false,
+      "independentReview": false,
+      "tools": [
+        "npm ci",
+        "TypeScript",
+        "Vitest",
+        "Next build and servers",
+        "Playwright",
+        "esbuild",
+        "view_image"
+      ],
+      "results": "40 unit tests, typecheck, build, and six local render cases passed. Historical CI configuration differs; P0 incomplete."
+    },
+    {
+      "phase": "D0",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "ready_for_visual_review",
+      "sourceChanges": true,
+      "independentReview": false,
+      "tools": [
+        "shell",
+        "apply_patch",
+        "Three.js procedural meshes",
+        "original supplied GLB",
+        "CUA browser",
+        "TypeScript",
+        "Vitest",
+        "Next build"
+      ],
+      "notes": "One Astra writer. No Claude implementation, subagent, Blender asset authoring, or image generation ran.",
+      "results": "Final optimized build and TypeScript pass; 47 world unit tests pass; 23 final still/browser checks pass. Normal camera tour and receipt saved separately. No independent review or Claude implementation ran.",
+      "sourceSha": "9dc7e455047f7eebb8ebfcc1affd125f3b591d3c"
+    },
+    {
+      "phase": "D1",
+      "runtime": "Codex",
+      "model": "gpt-6-astra",
+      "effort": "high as planned; runtime effort not independently queried",
+      "status": "ready_for_visual_review",
+      "sourceChanges": true,
+      "independentReview": false,
+      "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+      "tools": [
+        "shell",
+        "apply_patch",
+        "Three.js",
+        "Next build",
+        "Vitest",
+        "Playwright capture",
+        "CUA",
+        "FFmpeg"
+      ],
+      "results": "Build and TypeScript pass; 52 unit tests and 32 browser checks pass. Hosted sample inspected. No Claude, subagents, Blender or image generation."
+    }
+  ],
+  "designCheckpoint": {
+    "id": "D1",
+    "status": "ready_for_visual_review",
+    "owner": "Astra",
+    "purpose": "Authorized smoother HD prototype and Atelier ornamentation, preserving current wording with Thank you at top.",
+    "route": "/display/world-preview?source=sample&art=design",
+    "approval": "pending_visual_review",
+    "sourceBoundary": "Explicit sample-only study. Classic/cinematic and production paths retained.",
+    "evidence": [
+      "docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md",
+      "docs/runs/2026-09-21-world-quality/D1-RECEIPT.json"
+    ],
+    "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+    "previewUrl": "https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design"
+  },
+  "passes": [
+    {
+      "id": "D2",
+      "status": "landed",
+      "owner": "Fable coordinator, Opus 5 writers, Sonnet 5 landing reviews",
+      "head": "2ad95b07f1338c387fccc075fc30b38152bdcb9e",
+      "preview": "https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design",
+      "record": "docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md",
+      "design": "docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md",
+      "sections": [
+        "78eeb15 light and air",
+        "c6df983 the pearl",
+        "b6ef137 clouds and canopies",
+        "05ec18f three arrivals",
+        "23702fa islands water landmarks",
+        "582d563 radiance",
+        "35c58c1 finesse",
+        "2ad95b0 smoothness and tiers"
+      ],
+      "notes": "Sample-only art=design path. P0, P7 and production promotion move to Plan 25."
+    }
+  ]
+}

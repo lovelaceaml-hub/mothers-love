@@ -1,8 +1,10 @@
-# Plan 26: Clean up and refactor the Mother's Love repository
+# Plan 28: Clean up and refactor the Mother's Love repository
 
 Drafted 2026-09-22 by Claude after Anthony said: "All of this needs to be cleaned up. What is the latest version? even branches should be renamed. i want all of it refactored. As of now, the 3d world is not to replace but separate/alongside the tv view."
 
-Status: draft, awaiting Anthony's approval. Nothing in this plan runs until he approves it.
+Status: approved by Anthony on 2026-09-22 and running in Steps mode, one section per chat. The Build log records where each section stands.
+
+Numbering: this plan was Plan 26 until 2026-09-23, when Anthony ruled that plans renumber by date and it became Plan 28 (see the Build log). Its plan id `2026-09-22-repo-refactor`, its run tree and its `record/*` tags carry no plan number and did not change.
 
 ## Goal
 
@@ -10,7 +12,7 @@ Leave one obvious latest version, a small set of clearly named branches, one pla
 
 ## Authority
 
-Anthony's instruction above is the current authority. It supersedes one thing in [Plan 25](PLAN-25-world-promotion.md): gate G5 there pointed the TV at the world as the new TV destination. From now on the world is a separate surface and `/display` stays the TV view, unchanged. The rest of Plan 25 (make the design look the default, the real TV check, close the CI failure, the completion review, Anthony merges) is folded into Section 5 of this plan.
+Anthony's instruction above is the current authority. It supersedes one thing in [Plan 27](PLAN-27-world-promotion.md), the world promotion plan (numbered 25 until 2026-09-23): gate G5 there pointed the TV at the world as the new TV destination. From now on the world is a separate surface and `/display` stays the TV view, unchanged. The rest of Plan 27 (make the design look the default, the real TV check, close the CI failure, the completion review, Anthony merges) is folded into Section 5 of this plan.
 
 ## Where things stand, verified 2026-09-22
 
@@ -41,7 +43,7 @@ Branch positions against production `1b4c31a`:
 
 Two worktrees live outside `~/Projects`, under `/Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/`. One of them is on a detached HEAD.
 
-Documents are split across branches. Production carries `PLAN-01` through `PLAN-18` but not `PLAN-14` or `PLAN-19` through `PLAN-25`; those exist only on the world and pearl branches.
+Documents are split across branches. Production carries `PLAN-01` through `PLAN-18` but not `PLAN-14` or `PLAN-19` through `PLAN-25`; those exist only on the world and pearl branches. (Section 3 brought every plan into `docs/` on one branch; see the Build log.)
 
 Dead routes still shipping in production source: `src/app/display-legacy/page.tsx` and `src/app/display-v6/page.tsx`.
 
@@ -72,7 +74,7 @@ Anthony's routing ruling, 2026-09-22: "Use Opus xhigh for the entire plan. flash
 
 | Role | Model and effort | Notes |
 | --- | --- | --- |
-| Writer, every section | Claude Opus 5, xhigh | One fresh chat per section, Steps mode. |
+| Writer, every section | Claude Opus 5, xhigh (Opus 5.5 from Section 3 on, the Opus the app now runs) | One fresh chat per section, Steps mode. |
 | Mechanical rows | Gemini 3.8 Flash, medium | Branch inventory tables, evidence hashing, link sweeps, bulk listing. Anything that is counting or copying, not judging. |
 | Advisor | Fable 5.1 | Consulted for a routing or sequencing question only. It authors nothing, because its weekly pool is at 97 percent utilization. |
 | Hygiene sweep | Haiku 4.5, low | Before each section's review: dead links, missing files, Build log and trailer format. |
@@ -118,9 +120,9 @@ Acceptance: `git status` in the main checkout reports a clean tree on the produc
 
 ### Section 3: One documentation set (Opus 5 xhigh, 40 minutes)
 
-Bring `PLAN-14` and `PLAN-19` through `PLAN-26` onto the production branch so every plan lives in one place. Rewrite `docs/HANDOFF.md` as one current page with the history moved to `docs/HISTORY.md`, because the handoff is now 40 screens of stacked releases. Refresh `README.md` quick links, `USER-MANUAL.md`, `AGENTS.md`, and the project's line in `/Users/anthony/Projects/README.md`.
+Bring `PLAN-14` and `PLAN-19` through `PLAN-28` (numbers per Anthony's 2026-09-23 ruling) onto the production branch through a pull request Anthony merges, so every plan lives in one place. Rewrite `docs/HANDOFF.md` as one current page with the history moved to `docs/HISTORY.md`, because the handoff is now 40 screens of stacked releases. Refresh `README.md` quick links, `USER-MANUAL.md`, `AGENTS.md`, and the project's line in `/Users/anthony/Projects/README.md`.
 
-Acceptance: every plan number from 01 to 26 present once on the production branch, and the handoff opens with the current state in the first paragraph.
+Acceptance: every plan number from 01 to 28 present once on the production branch (29, the 3D Studio kit, arrives with its own branch), and the handoff opens with the current state in the first paragraph.
 
 ### Section 4: Worktrees (Opus 5 xhigh, 20 minutes)
 
@@ -130,7 +132,7 @@ Acceptance: one worktree per live branch, no copies outside `~/Projects`, and th
 
 ### Section 5: The 3D world as its own surface (Opus 5 xhigh, about 2 hours)
 
-This replaces Plan 25's gates G1 and G5 and keeps its G2, G3 and G4.
+This replaces Plan 27's gates G1 and G5 and keeps its G2, G3 and G4.
 
 - Move the world to `/world`, its own top level surface, with `/display/world-preview` redirecting there so existing links keep working.
 - Make the design look the default for both live and sample sources, keep `art=classic` and `art=cinematic` as explicit fallbacks, and remove the sample expression override from every live path.
@@ -138,7 +140,8 @@ This replaces Plan 25's gates G1 and G5 and keeps its G2, G3 and G4.
 - `/display` and its eleven 2D screens are untouched. The world is reached by its own URL, and it does not enter the TV playlist.
 - Add a quiet link from the admin display page so the operator can find the world without typing a URL.
 - Privacy: the world reads only the existing public TV projection endpoint, no new fields, no submitted names. Every privacy state clears every pearl immediately.
-- Merge the 16 production commits the world branch is missing, then rebase the branch so PR #8 targets the production branch directly.
+- Merge the 16 production commits the world branch is missing, then rebase the branch so PR #10 (which replaced PR #8, see the Build log) targets the production branch directly.
+- Before the world branch merges, bring its documents in line with `main`, which holds them since Section 3. Delete the world branch's `docs/PLAN-25-world-promotion.md`, because `main` carries that plan as `docs/PLAN-27-world-promotion.md` and git would otherwise add the old number back as a second file. Where both sides added the same document with different text (`docs/PLAN-24-world-visual-quality.md` and `docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md`, whose Plan 25 links Section 3 repointed at Plan 27), keep `main`'s wording and carry over anything newer from the branch.
 
 Acceptance: typecheck, unit tests, build, the world harness in stills and tour modes, the pearl text parity check, the world safety tests, and a live mode browser run against a preview deployment that asserts attributes only and stores no screenshots of real records.
 
@@ -182,7 +185,7 @@ Every removed branch is a tag, so any of them is restored with one command. The 
 
 ## What Anthony must do
 
-1. Approve this plan.
+1. Done 2026-09-22: approved this plan.
 2. Done 2026-09-23: the Vercel production branch setting reads `main`, changed by the Section 1 chat at Anthony's request.
 3. The 10 minute check of the world on the real TV, and tell us the TV make and browser.
 4. Click Merge on the pull request.

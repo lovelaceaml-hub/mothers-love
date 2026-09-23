@@ -1,0 +1,609 @@
+{
+  "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+  "origin": "http://127.0.0.1:32743",
+  "mode": "stills",
+  "sourceFiles": [
+    {
+      "file": "public/world-prototype/README.md",
+      "sha256": "1938cd7d9b250afc7c0b3626b24194285b350c16fb127a9a472ee406a62ecd50"
+    },
+    {
+      "file": "public/world-prototype/original-heart.glb",
+      "sha256": "6e8a43b05db30e56fe40ad78e7f83a5bdfc9012be9eaa27346e96f87ac4862c0"
+    },
+    {
+      "file": "src/app/display/world-preview/page.tsx",
+      "sha256": "d0a243efa2185d35f9db04195393f089fca0ac5162b1cc1257dd9d99afcdc963"
+    },
+    {
+      "file": "src/components/display/world/WorldContent.tsx",
+      "sha256": "e6fd4a4749ba61aaca5b83ddfaddcd8e6b7053af2f410d9f0883303cd1c767e2"
+    },
+    {
+      "file": "src/components/display/world/WorldExperience.module.css",
+      "sha256": "bc75916cb3d9d1602d4676f0b63539fe1543a2437bfc822d46cfd85806811512"
+    },
+    {
+      "file": "src/components/display/world/WorldExperience.tsx",
+      "sha256": "ff5b5293b2edb2fb767e4a9aad1822b8a7147fbb5f4b4cccc015b9b7cc246a0a"
+    },
+    {
+      "file": "src/components/display/world/arrival-director.ts",
+      "sha256": "3f2468aa7c3a21b0cd1c5a4245989b20c6b4fa52edf9e0c972748ec67daeb9f2"
+    },
+    {
+      "file": "src/components/display/world/camera-director.ts",
+      "sha256": "2fa30007d1f97b1069edb865f1c89306b4b39f344873ef5d8b5300c17402f546"
+    },
+    {
+      "file": "src/components/display/world/neighbor-dialogue.ts",
+      "sha256": "67528283ffdcaf7eb4ed1786c3f5457d744b680e8e36e4d1a2d44ef8e65aa423"
+    },
+    {
+      "file": "src/components/display/world/prototype/design-mode.ts",
+      "sha256": "c4472734e1d8652507d9efc68676bebf89339486ca847f1c28c6240bf60c31e3"
+    },
+    {
+      "file": "src/components/display/world/prototype/design-world.ts",
+      "sha256": "6cac8b2e54609bfc02f1327794b0e05218c5a214fe876d797ecc81e3a49fdc4f"
+    },
+    {
+      "file": "src/components/display/world/prototype/pearl-skin.ts",
+      "sha256": "9b8acabef8102c24ffc57f6be71d075d9111a76e231cf94c936d03ee752e3c5e"
+    },
+    {
+      "file": "src/components/display/world/prototype/study-geometry.ts",
+      "sha256": "6cd1533bb50ee3f5cd215a83dfdd346b60a6d529914aad06ec4edd202bf16d88"
+    },
+    {
+      "file": "src/components/display/world/prototype/study-lighting.ts",
+      "sha256": "fc22d4b594fb1bde0661b4594aa0395ee14b4f70b842d291ac2b27839cfba90a"
+    },
+    {
+      "file": "src/components/display/world/reading.ts",
+      "sha256": "88444767607bce007d0a5b1ef4e1edfedbf5a75e66e0282096aa42e194c17084"
+    },
+    {
+      "file": "src/components/display/world/recognition-director.ts",
+      "sha256": "488b2af9069a46d631ed42298085f0a5eb6e15459a67f30b1424ac161d54c169"
+    },
+    {
+      "file": "src/components/display/world/static-batch.ts",
+      "sha256": "768196ef421b46c6bd6b2e2cffbbf603255f44369fdbbec09ad5933d7f754ce5"
+    },
+    {
+      "file": "src/components/display/world/use-world-feed.ts",
+      "sha256": "e2ad82230533d36a6d51491baa9e230a6a4a6e59ba0a7d5782b3c9f0f1a12807"
+    },
+    {
+      "file": "src/components/display/world/world-cinematic-art.ts",
+      "sha256": "dbf048e392a906335b0125f6a7703635dc76a2cf9e454cdffa1d187dd6e502df"
+    },
+    {
+      "file": "src/components/display/world/world-data.ts",
+      "sha256": "c325964d70c9e34263c66621be690f75647c3d05f3df5070b3f709c92262f120"
+    },
+    {
+      "file": "src/components/display/world/world-districts.ts",
+      "sha256": "4082dd300fefb7df9e00ced9645f544f9f99c9feb37f18f6cb627fe988653c76"
+    },
+    {
+      "file": "src/components/display/world/world-engine.ts",
+      "sha256": "5338b5c88e27502206b53acaa2024b0df5d1b6e0df266266c405bcb0fee7616b"
+    },
+    {
+      "file": "src/components/display/world/world-feed.ts",
+      "sha256": "a98233e5fd45d660b80dd443185b72d4406aea6619cb4f229ab71dad32f67b6a"
+    },
+    {
+      "file": "src/components/display/world/world-neighbors.ts",
+      "sha256": "f8320dd7c36e5f9bca7ec6376fd2ebdf765d2255fa7f611bc6c9f53676f3487e"
+    },
+    {
+      "file": "src/components/display/world/world-recognitions.ts",
+      "sha256": "1fb35706b57ee75ab1d3de4849bab2cdf885701c7af0e8623e4459a809ccce27"
+    },
+    {
+      "file": "src/components/display/world/world-scene-legacy.ts",
+      "sha256": "4fa286c32d3c133112f90240ca5b6ef53eab74753129764ee0d2bb0407c192f9"
+    },
+    {
+      "file": "src/components/display/world/world-scene.ts",
+      "sha256": "a964c96a41b9d28bcd3805bf9c9507ed59c2e386235a959aedf9106c30349ce7"
+    }
+  ],
+  "browser": "145.0.7632.6",
+  "platform": "darwin",
+  "args": [
+    "--use-gl=angle",
+    "--use-angle=metal"
+  ],
+  "checks": [
+    {
+      "test": "design rendered with explicit sample content",
+      "passed": true,
+      "readyElapsedMs": 1818,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "4",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "19.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,7.324,18.650",
+        "data-world-bubble-screen": "0.183,0.304,0.992"
+      }
+    },
+    {
+      "test": "Resident destination Garden of Kindness",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "4",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.95",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,7.324,18.650",
+        "data-world-bubble-screen": "0.183,0.304,0.992"
+      }
+    },
+    {
+      "test": "Resident destination Heart Sanctuary",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "heart",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "5",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-13.000,12.000,19.000",
+        "data-world-bubble-position": "-18.503,10.000,-7.658",
+        "data-world-bubble-screen": "0.380,0.210,0.993"
+      }
+    },
+    {
+      "test": "Resident destination Nine Expressions Grove",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "expressions",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "6",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "31.000,12.000,-17.000"
+      }
+    },
+    {
+      "test": "Resident destination Butterfly Gate",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "welcome",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "7",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "15.000,10.000,89.000"
+      }
+    },
+    {
+      "test": "Resident destination Pearl Pavilion",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "featured",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "8",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-46.000,10.000,52.000",
+        "data-world-bubble-position": "-60.574,7.324,28.134",
+        "data-world-bubble-screen": "0.154,0.216,0.993"
+      }
+    },
+    {
+      "test": "Resident destination Garden of Days",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "calendar",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "9",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "88.000,15.000,11.000"
+      }
+    },
+    {
+      "test": "Resident destination Peace Globe",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "peacemakers",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "10",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-47.000,12.000,-31.000",
+        "data-world-bubble-position": "-58.407,10.000,-61.593",
+        "data-world-bubble-screen": "0.314,0.183,0.994"
+      }
+    },
+    {
+      "test": "Resident destination Love Observatory",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "status",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "11",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "94.000,14.000,-53.000"
+      }
+    },
+    {
+      "test": "Resident destination Expression Cosmos",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "orbit",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "12",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "29.000,38.000,-81.000",
+        "data-world-bubble-position": "13.288,35.000,-109.543",
+        "data-world-bubble-screen": "0.132,0.170,0.994"
+      }
+    },
+    {
+      "test": "Resident destination Fountain of Kindness",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "milestone",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "13",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-23.000,40.000,-81.000"
+      }
+    },
+    {
+      "test": "Resident destination River of Recognitions",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "live-feed",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "14",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "91.000,12.000,77.000",
+        "data-world-bubble-position": "75.362,7.324,50.290",
+        "data-world-bubble-screen": "0.138,0.176,0.994"
+      }
+    },
+    {
+      "test": "Resident destination Daily Practice Terrace",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "practice",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "15",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-61.000,11.000,10.000"
+      }
+    },
+    {
+      "test": "Resident destination Peace Promise",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "promise",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "16",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "-17.000,10.000,95.000"
+      }
+    },
+    {
+      "test": "Pearl formation reading in the world",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "102",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "17",
+        "data-arrival-in-world": "true",
+        "data-world-textures": "17",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "reading",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "15.000,17.000,43.000",
+        "data-world-bubble-position": "4.138,12.000,19.104",
+        "data-world-bubble-screen": "-0.000,0.006,0.993"
+      }
+    },
+    {
+      "test": "Silk unveiling reading in the world",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "219",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "17",
+        "data-arrival-in-world": "true",
+        "data-world-textures": "17",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "reading",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "15.000,17.000,43.000",
+        "data-world-bubble-position": "4.138,12.000,19.104",
+        "data-world-bubble-screen": "-0.000,0.006,0.993"
+      }
+    },
+    {
+      "test": "Petal bloom reading in the world",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "338",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "20.00",
+        "data-world-bubbles": "17",
+        "data-arrival-in-world": "true",
+        "data-world-textures": "17",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "reading",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "15.000,17.000,43.000",
+        "data-world-bubble-position": "4.138,12.000,19.104",
+        "data-world-bubble-screen": "-0.000,0.006,0.993"
+      }
+    },
+    {
+      "test": "390 by 844 phone without horizontal page overflow",
+      "passed": true
+    },
+    {
+      "test": "classic rendered with explicit sample content",
+      "passed": true,
+      "readyElapsedMs": 1552,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.99",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      }
+    },
+    {
+      "test": "classic comparison excludes design controls",
+      "passed": true
+    },
+    {
+      "test": "cinematic rendered with explicit sample content",
+      "passed": true,
+      "readyElapsedMs": 1765,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.99",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      }
+    },
+    {
+      "test": "cinematic comparison excludes design controls",
+      "passed": true
+    },
+    {
+      "test": "No page errors, error console messages or API requests",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "consoleMessages": [],
+  "failedRequests": [],
+  "apiRequests": [],
+  "cameraSamples": [],
+  "limitations": [
+    "Design review only. P0 and physical device acceptance remain open.",
+    "All records are fictional. This is not a real-data test."
+  ],
+  "renderingDetails": "Renderer\nWebGL 2\nFrame rate\n0 fps\nQuality\nHigh\nDraw calls\n429\nTriangles\n3,444,348"
+}
