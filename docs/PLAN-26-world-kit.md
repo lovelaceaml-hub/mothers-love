@@ -20,6 +20,14 @@ when available" (quoted verbatim). He also asked that everything serve this worl
 feed, journey, displaying recognitions". Anthony's physical TV check (Plan 25 G2) stays
 his.
 
+## Finish line (Anthony, 2026-09-23)
+
+"This is not for the TV View. It is for the 3d world" (quoted). The deliverable is the
+finished 3D world page `/display/world-preview` on its own deployment link. The TV View
+`/display` is untouched, and Plan 25's TV promotion is out of scope for this plan.
+Anthony granted complete approval within the Mother's Love project, ultracode, up to 15
+agents, Opus 5.5 and Fable, Sol and Astra when available, Gemini Flash as reviewer.
+
 ## Design and rulings
 
 - Design (authoritative for this plan):
