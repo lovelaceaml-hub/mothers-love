@@ -1,13 +1,13 @@
 ---
 lane: LK2
 title: arrivals
-state: landed, polish round applied, awaiting the coordinator's review
+state: landed, polish round applied, review finding closed and re verified on the retry run (run 5), awaiting the coordinator's review
 model: Claude Fable 5.1 (writer)
 runner: coordinator chat, background lane
 worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k2 (branch world-kit/k2, base 2ef8c41)
-review: visual director round one applied (13 notes, see Result); coordinator review pending
+review: independent reviewer's style cycle finding fixed in 68bf836 and re verified in run 5; visual director round one applied (13 notes, see Result); coordinator review pending
 depends_on: K0 sockets (merged at 2ef8c41)
-updated: 2026-09-23T12:00Z
+updated: 2026-09-23T16:00Z
 ---
 
 # LK2: arrivals
@@ -51,6 +51,20 @@ Files: `src/components/display/world/prototype/arrival-stages.ts`,
 `tests/world/arrival-stages.test.ts` (new), `tests/world/arrival-choreography.test.ts`,
 this record.
 
+### Review finding, closed
+
+The independent reviewer found that `cycleStudyArrival` also cycled sample demonstrations,
+so after a study button the next Preview grand entrance played the next style while that
+button still reported `aria-pressed="true"` (WCAG 4.1.2), and the chosen style was replaced
+after one arrival. 68bf836 limits the cycle to live feeds through the pure gate
+`arrivalStyleCycles(study, entranceFixed, phase)`: `study && !entranceFixed && phase !==
+"sample"`, which is the reviewer's prescribed condition; the pinned flag is gone and
+`previewStudyArrival` and `finishStudyArrival` are their base text again. Of the other
+feed phases only `live` and `reconnecting` can hold records, so they are the only ones the
+cycle serves in practice. The retry run (run 5 below, on head 27d981f) re proves it: the
+reviewer's exact journey, `?source=sample&art=design`, Petal bloom, then Preview grand
+entrance, keeps Petal bloom pressed and on screen (`journey5/5-grand-entrance-after-bloom.png`).
+
 ### What the stages do now
 
 - Bloom: `arrival.lotus-bloom` with its `bloom` clip scrubbed by `bloomFraction(pose)`
@@ -90,27 +104,42 @@ pearl is entry local (0, 11.4, 0), radius 5.4, clearance ring 6.6.
 
 ### Verification evidence
 
-Commands (2026-09-23, worktree above): `npm run typecheck` clean; `npx vitest run
-tests/world` 258 passed (14 files); `npm run build` exit 0 under the build lock (lock taken
-04:51:37, released 04:52:47); the review harness against `next start -p 32745` in stills
-mode with `DESIGN_REVIEW_CHANNEL=chrome`, kit on and `DESIGN_REVIEW_KIT=off`: errors 0,
-failed requests 0, API requests 0 in both `stills-report.json`; classic and cinematic
-garden and heart byte identical (`cmp`) to `/private/tmp/mothers-love-k0/baseline-stills`
-in both runs; the journey (`journey.mjs`) 7 of 7 style matches, no errors, no API
-requests; twelve normal motion frames per style (`motion-frames.mjs`), no errors.
+Run 5 (2026-09-23, the retry, head 27d981f, worktree clean, script
+`/private/tmp/mothers-love-k2/scripts/acceptance5.sh`): `npm run typecheck` exit 0; `npx
+vitest run tests/world` exit 0, 258 passed (14 files); `npm run build` exit 0 under the
+build lock (lock taken 08:56:34, released 08:58:01, the lock was free on arrival); the
+review harness against `next start -p 32745` in stills mode with
+`DESIGN_REVIEW_CHANNEL=chrome`, kit on (`data-kit="ready"`, 0 missing) and
+`DESIGN_REVIEW_KIT=off` (`data-kit="off"`): 24 checks each, none failed, page errors 0,
+console errors 0, failed requests 0, API requests 0 in both `stills-report.json`, both
+naming `sourceSha` 27d981f; `classic-garden`, `classic-heart`, `cinematic-garden` and
+`cinematic-heart` byte identical (`cmp`) to `/private/tmp/mothers-love-k0/baseline-stills`
+in both runs (8 of 8); the journey (`journey.mjs`) 7 of 7 style matches, no errors, no
+failed requests, no API requests; twelve normal motion frames per style
+(`motion-frames.mjs`, 36 frames): idle at .5 s, approach over frames 2 to 5, reveal over 6
+to 9, reading from frame 10 (about 11.6 s) for every style, no errors. The server was
+stopped at 08:59:40. The one minute load average during the captures was 71 to 92 (other
+lanes and the generator); the stills are unaffected, every kit on arrival and phone still
+of run 5 is byte identical to run 4's, and no timing was measured.
 
-Captures (all under `/private/tmp/mothers-love-k2/`): `stills4-kit-on/` and
-`stills4-kit-off/` (arrival-bloom, arrival-ribbon, arrival-constellation, phone-bloom,
-phone-ribbon, the zone stills, classic and cinematic), `motion4/` (36 frames),
-`journey4/` (7 stills and `journey-report.json`), contact sheets in `sheets4/`, logs
-`acceptance4.log`, `build4.log`, `stills4-kit-on.log`, `stills4-kit-off.log`,
-`journey4.log`, `motion4.log`. The first round's captures stay in `stills3-*`, `motion3`,
-`journey3` and `sheets3`.
+Run 4 (04:51 to 04:54) gave the same numbers, but its harness reports carry `sourceSha`
+68bf836 because the polish commit d2ef5d6 landed after that run; run 5 is the evidence for
+the committed head.
+
+Captures (all under `/private/tmp/mothers-love-k2/`): `stills5-kit-on/` and
+`stills5-kit-off/` (arrival-bloom, arrival-ribbon, arrival-constellation, phone-bloom,
+phone-ribbon, phone-garden, the thirteen zone stills, classic and cinematic), `motion5/`
+(36 frames), `journey5/` (7 stills and `journey-report.json`), contact sheets in
+`sheets5/` (kit on and kit off zones, classic and cinematic, journey, motion per style),
+logs `acceptance5.log`, `typecheck5.log`, `vitest5.log`, `build5.log`,
+`stills5-kit-on.log`, `stills5-kit-off.log`, `journey5.log`, `motion5.log`, hashes in
+`run5.sha256`. Earlier rounds stay in `stills3-*`, `stills4-*`, `motion3`, `motion4`,
+`journey3`, `journey4`, `sheets3` and `sheets4`.
 
 ### Disc parity, stated plainly
 
 The reading disc (centre 960, 537, radius 270 at 1080p) against the K0 baseline stills,
-words untouched in every case:
+words untouched in every case (run 5 numbers, equal to run 4's):
 
 - bloom, kit on 1485 px and kit off 1413 px, max delta 4 of 255, rows 267 to 281 and 732
   to 805 only: the disc's top and bottom caps, where the beam's text band gate fades in
