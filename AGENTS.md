@@ -1,3 +1,12 @@
+## Active state: Plan 26, the 3D Studio kit inside the world (September 23)
+
+Anthony granted the 3D Studio coordinator full creative design and admin authority for
+the 3D world. [Plan 26](docs/PLAN-26-world-kit.md) is active: lanes K0 to K6 in their own
+worktrees, merged here by the coordinator. The design is
+`/Users/anthony/Projects/3d-studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
+section below still binds. One writer per worktree; do not write in this checkout while
+a K lane is merging.
+
 ## Active state: pass D2 landed, promotion plan awaiting approval
 
 Anthony reviewed the D1 prototype against the approved direction board on 2026-09-21, asked Fable to bring it closer to his vision, ruled "Mostly Opus but Fable can be used" and "keep going, show me after each section", then raised the bar to "spectacular, jaw-dropping, amazing, smooth, finesse, radiant, glory. Do not hold back." Pass D2 landed eight sections on this branch (head `2ad95b0`), all in the sample-only `?source=sample&art=design` path: see [docs/HANDOFF.md](docs/HANDOFF.md), the [D2 record](docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md) and the [Radiance design](docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md). Still binding: the wording layout with "Thank you" at the top, no build-polished-apps or Stitch, no personal pixels outside the depth-tested slot, `art=classic` and `art=cinematic` byte-identical to D1, no production promotion or merge without Anthony. [Plan 25](docs/PLAN-25-world-promotion.md) is the drafted promotion path (gate flip to live data, Anthony's TV check, P0 and the completion review, the merge Anthony clicks, the TV URL); it does not run until he approves it. The previous design-checkpoint text below is history.
