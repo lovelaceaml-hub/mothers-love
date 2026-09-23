@@ -1,13 +1,13 @@
 ---
 lane: LK3a
 title: near zones
-state: running
+state: merged
 model: fable
 runner: workflow
 worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k3a
-review: "opus-5.5 landing, fable visual"
+review: stopped at Anthony's 09:12 ruling; final review at section end
 depends_on: LK0
-updated: 2026-09-23T08:17Z
+updated: 2026-09-23T17:30Z
 ---
 
 # LK3a: near zones
