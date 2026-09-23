@@ -10,17 +10,19 @@ Coordinator: Claude Opus 5 (xhigh), this chat for Section 0
 
 | Repo | Path | Branch | Baseline HEAD |
 |---|---|---|---|
-| mothers-love (production) | https://github.com/lovelaceaml-hub/mothers-love | origin/codex/mothers-love | 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a |
+| mothers-love (production) | https://github.com/lovelaceaml-hub/mothers-love | origin/main (renamed from origin/codex/mothers-love by S1) | 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a |
 | mothers-love (main checkout) | /Users/anthony/Projects/mothers-love | codex/color-polish-v6 | e5ffa3ac95b9d977eefead42a4adaee26f821a5f |
 
 Pre plan state, read live 2026-09-23 after `git fetch --prune`: 128 local branches, 102 remote branches, 137 distinct branch names, 8 worktrees, 0 modified tracked files anywhere. Safety net: 133 annotated `archive/*` tags on GitHub, listed in [research/branch-inventory.md](research/branch-inventory.md).
+
+After Section 1, read live 2026-09-23T05:11Z: **8 local branches and 5 remote branches**, 8 worktrees, 0 modified tracked files anywhere, production unmoved at `1b4c31a` and now named `main`. The 8 local refs are the 5 keepers plus `codex/color-polish-v6`, `change/heart-ribbons-3d` and `tv17/pick`, which a worktree holds and Section 4 removes.
 
 ## Lanes
 
 | Lane | Title | State | Model | Worktree | Review | Depends on |
 |---|---|---|---|---|---|---|
 | S0 | Safety net (Opus 5 xhigh, 20 minutes) | complete | claude-opus-5 xhigh | /Users/anthony/Projects/mothers-love (main checkout) | Haiku 4.5 sweep, Sonnet 5 high read only | none |
-| S1 | Rename and reduce the branches (Opus 5 xhigh, 45 minutes) | planned | pending | pending | pending | pending |
+| S1 | Rename and reduce the branches (Opus 5 xhigh, 45 minutes) | complete | claude-opus-5 xhigh | /Users/anthony/Projects/mothers-love (main checkout) | Haiku 4.5 sweep, Sonnet 5 high read only | S0 |
 | S2 | Fix the main working copy (Opus 5 xhigh, 30 minutes) | planned | pending | pending | pending | pending |
 | S3 | One documentation set (Opus 5 xhigh, 40 minutes) | planned | pending | pending | pending | pending |
 | S4 | Worktrees (Opus 5 xhigh, 20 minutes) | planned | pending | pending | pending | pending |
@@ -44,7 +46,7 @@ Pre plan state, read live 2026-09-23 after `git fetch --prune`: 128 local branch
 - Branch inventory: [research/branch-inventory.md](research/branch-inventory.md) and [research/branch-inventory.json](research/branch-inventory.json)
 
 <!-- lane: S0 state: complete model: claude-opus-5-xhigh worktree: /Users/anthony/Projects/mothers-love review: sonnet-5-high updated: 2026-09-23T01:35Z -->
-<!-- lane: S1 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
+<!-- lane: S1 state: complete model: claude-opus-5-xhigh worktree: /Users/anthony/Projects/mothers-love review: sonnet-5-high updated: 2026-09-23T05:11Z -->
 <!-- lane: S2 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
 <!-- lane: S3 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
 <!-- lane: S4 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
