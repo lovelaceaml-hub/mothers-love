@@ -362,7 +362,7 @@ function promiseLayout(): ZoneLayout {
     { id: "arrival.ribbon-portal", position: PROMISE_PORTAL.position, scale: PROMISE_PORTAL.scale, role: "static", note: "the sculpture, about 10 tall; replaces the two procedural box slabs" },
     { id: "core.ribbon", position: PROMISE_RIBBONS[0].position, rotationY: PROMISE_RIBBONS[0].yaw, scale: 1.7, role: "animated", note: "inside the loop, low left; turns .025 rad a second (promiseRibbonYaw)" },
     { id: "core.ribbon", position: PROMISE_RIBBONS[1].position, rotationY: PROMISE_RIBBONS[1].yaw, scale: 1.7, role: "animated", note: "inside the loop, high right; turns the other way (promiseRibbonYaw)" },
-    { id: "landmark.stone-tablet", position: at(8, TERRACE_Y, 2), scale: 1.6, role: "static", note: "blank, face toward the camera" },
+    { id: "landmark.stone-tablet", position: at(8, TERRACE_Y, 2), scale: 1.3, role: "static", note: "blank, face toward the camera" },
     { id: "landmark.garden-bench", position: at(-8, TERRACE_Y, 4), rotationY: .6, scale: 1.3, role: "static", note: "faces the sculpture" },
     { id: "nature.blossom-tree-c", position: at(-8.6, TERRACE_Y, 8.6), rotationY: 2.3, scale: 1, role: "static" },
     { id: "nature.blossom-tree-a", position: at(11.4, TERRACE_Y, -1.5), rotationY: -.4, scale: 1.05, role: "static" },

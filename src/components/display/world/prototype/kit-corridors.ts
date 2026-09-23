@@ -349,7 +349,7 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   const palette: CorridorPalette = {
     ivory: context.palette.ivory, gold: context.palette.gold, lawn: context.palette.lawn, stone: context.palette.stone, roseGold: context.palette.roseGold,
     blossom: context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f0a8b8", roughness: .52, sheen: .8, sheenColor: new T.Color("#ffe4ec"), sheenRoughness: .5, dithering: true }), "#fff0e0", 2.2, .3)),
-    cloud: context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f6d4df", roughness: .92, sheen: .5, sheenColor: new T.Color("#fff3f6"), sheenRoughness: .6, dithering: true }), "#fff4ea", 2.4, .28)),
+    cloud: context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true }), "#fff4ea", 2.2, .34)),
   };
   palette.blossom.name = "corridor blossom"; palette.cloud.name = "corridor cloud";
 
@@ -389,11 +389,11 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   // Islets beside the long bridges and along the sky lanes, each with a blossom tree.
   const islets = corridorIslets();
   if (kit.has("nature.island-small") && islets.length) {
-    const mesh = instanced("nature.island-small", .3, "Kit corridor islets", islets.length, true);
+    const mesh = instanced("nature.island-small", .38, "Kit corridor islets", islets.length, true);
     islets.forEach((islet, i) => place(mesh, i, [islet.center[0], islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale, islet.center[2]], islet.rotationY, islet.scale));
     finish(mesh);
     if (kit.has("nature.blossom-tree-a")) {
-      const trees = instanced("nature.blossom-tree-a", .28, "Kit corridor islet trees", islets.length, true);
+      const trees = instanced("nature.blossom-tree-a", .3, "Kit corridor islet trees", islets.length, true);
       islets.forEach((islet, i) => place(trees, i, islet.tree.position, islet.tree.rotationY, islet.tree.scale));
       finish(trees);
     }
@@ -402,7 +402,8 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   // The sky lane clouds: sculpted puffs the camera passes over on the two long legs.
   const clouds = corridorClouds();
   if (kit.has("nature.cloud-c") && clouds.length) {
-    const mesh = instanced("nature.cloud-c", .14, "Kit corridor sky lane clouds", clouds.length, false);
+    // The camera passes right over these, so they keep more of their surface than the other pieces.
+    const mesh = instanced("nature.cloud-c", .4, "Kit corridor sky lane clouds", clouds.length, false);
     clouds.forEach((cloud, i) => place(mesh, i, cloud.position, cloud.rotationY, cloud.scale));
     finish(mesh);
   }
