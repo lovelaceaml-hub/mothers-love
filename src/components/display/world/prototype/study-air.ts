@@ -1,5 +1,5 @@
 import * as T from "three";
-import { seededRandom } from "../world-data";
+import { ZONES, seededRandom } from "../world-data";
 import { STUDY_GLOW_PASS, sparklePoints, studyRim } from "./study-materials";
 
 /**
@@ -29,14 +29,21 @@ export type PetalSeed = {
 
 const PETAL_TINTS = ["#f7b8cc", "#fbd3dc", "#e9a7c4"] as const;
 
+/** How fast a rising petal climbs, units a second (WORLD-INTEGRATION 6.7: the Sanctuary lifts its petals). */
+export const PETAL_RISE = .25;
+
 /**
  * Petals scattered in an annulus around each supplied centre.
  *
  * The inner radius keeps them clear of the column of air each district's hero pearl
  * occupies, and the band is low enough that they read as blossom over the flower beds
  * rather than confetti across the message.
+ *
+ * `rising` names the centres (by index) whose petals climb instead of fall: their `fall` is
+ * negative, which the vertex patch below reads as a reversed cycle. The random draws are the
+ * same either way, so every other petal keeps its place.
  */
-export function petalField(seed: number, count: number, centers: readonly (readonly [number, number, number])[]): PetalSeed[] {
+export function petalField(seed: number, count: number, centers: readonly (readonly [number, number, number])[], rising: ReadonlySet<number> = new Set()): PetalSeed[] {
   const random = seededRandom(seed);
   const petals: PetalSeed[] = [];
   const places = centers.length || 1;
@@ -46,19 +53,37 @@ export function petalField(seed: number, count: number, centers: readonly (reado
     const radius = PETAL_BAND.innerRadius + random() * (PETAL_BAND.outerRadius - PETAL_BAND.innerRadius);
     const span = PETAL_BAND.spanLow + random() * (PETAL_BAND.spanHigh - PETAL_BAND.spanLow);
     const tint = new T.Color(PETAL_TINTS[i % PETAL_TINTS.length]);
+    const size = .28 + random() * .27;
+    const phase = random();
+    const fallDraw = random();
     petals.push({
       x: center[0] + Math.cos(angle) * radius,
       y: center[1] + PETAL_BAND.low + span / 2,
       z: center[2] + Math.sin(angle) * radius,
-      size: .28 + random() * .27,
-      phase: random(),
-      fall: .25 + random() * .30,
+      size,
+      phase,
+      fall: rising.has(i % places) ? -(PETAL_RISE + fallDraw * .08) : .25 + fallDraw * .30,
       spin: .4 + random() * .8,
       span,
       tint: [tint.r, tint.g, tint.b],
     });
   }
   return petals;
+}
+
+/**
+ * Which of the supplied centres rise: the Heart Sanctuary's, once the kit dresses the world
+ * (Plan 26 K3a). Without the kit the field is exactly the procedural study's.
+ */
+export function risingCenters(centers: readonly (readonly [number, number, number])[], kitOn: boolean): Set<number> {
+  const out = new Set<number>();
+  if (!kitOn) return out;
+  const heart = ZONES.find(zone => zone.id === "heart");
+  if (!heart) return out;
+  centers.forEach((center, i) => {
+    if (center[0] === heart.center[0] && center[1] === heart.center[1] && center[2] === heart.center[2]) out.add(i);
+  });
+  return out;
 }
 
 /** Mote starting places inside one `MOTE_SPAN` cube. The shader wraps them around the camera. */
@@ -146,8 +171,8 @@ const PETAL_COUNT = 560, LOW_PETAL_COUNT = 160, MOTE_COUNT = 200, STAR_COUNT = 3
 export function createStudyAir(scene: T.Scene, ctx: AirContext, centers: readonly (readonly [number, number, number])[]): StudyAir {
   const clock = ctx.time;
 
-  // Petals.
-  const petals = petalField(3313, PETAL_COUNT, centers);
+  // Petals. The Sanctuary's rise once the kit is in (the design world publishes it on the scene).
+  const petals = petalField(3313, PETAL_COUNT, centers, risingCenters(centers, !!scene.userData.studyKit));
   // farPetal is shared with the arrival studies, so the instanced seed attribute goes on a copy.
   const petalGeometry = ctx.geometry(ctx.farPetal.clone());
   const seeds = new Float32Array(PETAL_COUNT * 4);
