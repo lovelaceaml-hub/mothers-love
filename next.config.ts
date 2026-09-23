@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
         ],
       },
+      {
+        // The 3D Studio kit and its Draco decoder. Every kit version is its own folder
+        // (`/world-kit/v1`, then `v2`), so a TV never refetches a file between visits.
+        source: "/world-kit/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
     ];
   },
   async rewrites() {

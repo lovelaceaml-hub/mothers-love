@@ -13,7 +13,12 @@ import { readingSeconds, type WorldSource } from "./world-feed";
 import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
 import type { WorldEngine, WorldStatus } from "./world-engine";
 import styles from "./WorldExperience.module.css";
-import { studyArrival, type StudyArrival } from "./prototype/design-mode";
+import {
+  isWorldDesignStudy,
+  studyArrival,
+  studyKit,
+  type StudyArrival,
+} from "./prototype/design-mode";
 
 const INITIAL: WorldStatus = {
   zone: "garden",
@@ -105,9 +110,20 @@ export function WorldExperience({
     media.addEventListener("change", motion);
     async function start() {
       try {
-        const { WorldEngine } = await import("./world-engine");
-        if (cancelled || !canvas.current) return;
+        // The design study loads the 3D Studio kit alongside the engine, so its first frame
+        // is already dressed. Every other page skips the loader chunk and every kit request.
+        const [{ WorldEngine }, kit] = await Promise.all([
+          import("./world-engine"),
+          isWorldDesignStudy() && studyKit()
+            ? import("./kit/kit-loader").then((module) => module.loadStudyKit())
+            : Promise.resolve(undefined),
+        ]);
+        if (cancelled || !canvas.current) {
+          kit?.dispose();
+          return;
+        }
         const instance = new WorldEngine(canvas.current, {
+          kit,
           reducedMotion: media.matches || settings.current.reduced,
           onSelection: () => setHeld(true),
           onStatus: (next) => {
@@ -300,6 +316,8 @@ export function WorldExperience({
       data-source={source}
       data-feed-phase={feed.phase}
       data-arrival={arrival.phase}
+      data-kit={status.kit}
+      data-kit-missing={status.kit ? status.kitMissing : undefined}
     >
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
         Fictional neighbors illustrate words of kindness.{" "}

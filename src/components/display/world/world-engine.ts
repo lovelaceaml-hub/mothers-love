@@ -5,7 +5,7 @@ import { createWorldScene } from "./world-scene";
 import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
-import { isWorldDesignStudy, studyRadiance, type StudyArrival } from "./prototype/design-mode";
+import { isWorldDesignStudy, studyKit, studyRadiance, type StudyArrival } from "./prototype/design-mode";
 import { resolveStudyTier, StudyRadiance } from "./prototype/study-radiance";
 import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./prototype/camera-finesse";
 import {
@@ -18,6 +18,8 @@ import { STUDY_CALM, STUDY_EXPOSURE } from "./prototype/study-materials";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
 import { STUDY_FOG, STUDY_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
+import type { WorldKit } from "./kit/kit-loader";
+import { kitState, type KitState } from "./kit/kit-manifest";
 import {
   RECOGNITION_ZONES,
   TOUR_ORDER,
@@ -42,12 +44,25 @@ export type WorldStatus = {
   cameraPosition?: number[];
   worldBubbles?: ReturnType<WorldRecognitionBubbles["inspect"]>;
   prototypeHeartReady?: boolean;
+  /** `off` outside the study or under `?kit=off`; `ready`, `partial` or `failed` inside it. */
+  kit?: KitState;
+  /** Kit ids that did not arrive; each keeps its procedural piece. */
+  kitMissing?: number;
+  /** Kit assets that arrived. */
+  kitLoaded?: number;
+  /** True once kit neighbors stand in the design world in place of the miniature figures. */
+  kitNeighbors?: boolean;
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
   onFailure: () => void;
   reducedMotion: boolean;
   onSelection?: () => void;
+  /**
+   * The 3D Studio kit, loaded before the engine by `loadStudyKit()`; the engine owns it from
+   * here and disposes it with the world. Only the design study ever passes one.
+   */
+  kit?: WorldKit;
 };
 export class WorldEngine {
   readonly renderer: THREE.WebGLRenderer;
@@ -64,12 +79,21 @@ export class WorldEngine {
   private ownerTempo = 1;
   private arrivalState: ArrivalState = this.arrivals.state();
   private readonly camera = new THREE.PerspectiveCamera(43, 1, 0.1, 450);
-  private readonly world = createWorldScene();
-  private readonly bubbles = new WorldRecognitionBubbles(this.world.scene);
+  /**
+   * Built first thing in the constructor, in the same order the field initializers used, so
+   * the scene can receive the kit from the options. Nothing created between the camera and
+   * the world allocates a scene object, so every id and draw order is unchanged.
+   */
+  private readonly world: ReturnType<typeof createWorldScene>;
+  private readonly bubbles: WorldRecognitionBubbles;
   private readonly observer: ResizeObserver;
   private readonly environment: THREE.WebGLRenderTarget;
   /** Resolved once: the tick runs sixty times a second and must not reparse the URL. */
   private readonly study = isWorldDesignStudy();
+  /** Resolved once with the study gate: whether this page asked for the kit at all. */
+  private readonly kitRequested = this.study && studyKit();
+  private readonly kit?: WorldKit;
+  private readonly kitStatus: KitState;
   /** Study only, and only when the context can render to a half float target. */
   private radiance?: StudyRadiance;
   /**
@@ -118,6 +142,17 @@ export class WorldEngine {
     private readonly canvas: HTMLCanvasElement,
     private readonly options: EngineOptions,
   ) {
+    this.kit = options.kit;
+    this.kitStatus = kitState(this.kitRequested, this.kit);
+    try {
+      this.world = createWorldScene(this.kit);
+      this.bubbles = new WorldRecognitionBubbles(this.world.scene);
+    } catch (error) {
+      this.kit?.dispose();
+      throw error;
+    }
+    // Study only: the expression the DOM picker shows, for the grove and the terrace steles.
+    if (this.study) this.world.scene.userData.studyExpression = this.expressionId;
     this.reduced = options.reducedMotion;
     try {
       this.renderer = new THREE.WebGLRenderer({
@@ -172,6 +207,7 @@ export class WorldEngine {
       this.radiance?.dispose();
       this.bubbles.dispose();
       this.world.dispose();
+      this.kit?.dispose();
       throw error;
     }
     canvas.addEventListener("webglcontextlost", this.contextLost);
@@ -525,6 +561,10 @@ export class WorldEngine {
         this.feed.records,
         this.feed.snapshot?.settings.readingSeconds ?? 24,
       ),
+      kit: this.kitStatus,
+      kitMissing: this.kit?.missing.length ?? 0,
+      kitLoaded: this.kit?.loaded ?? 0,
+      kitNeighbors: this.world.scene.userData.studyNeighbors === true,
     });
   }
   setFeed(feed: WorldFeed) {
@@ -550,6 +590,12 @@ export class WorldEngine {
           : 1;
     // Readable world bubbles replace the old empty Garden markers.
     this.world.setRecognitions([]);
+    // Study only: the public aggregate insights (counts, never a name or a message) for the
+    // kit's data driven dressing, cleared with every unsafe state exactly as the records are.
+    if (this.study)
+      this.world.scene.userData.studyInsights = safe
+        ? (feed.snapshot?.insights ?? null)
+        : null;
     this.bubbles.setRecords(safe ? feed.records : []);
     this.world.setEffects(
       settings?.effects?.sparkles !== false,
@@ -623,6 +669,11 @@ export class WorldEngine {
   }
   setExpression(id: number) {
     this.expressionId = id;
+    if (this.study) {
+      this.world.scene.userData.studyExpression = id;
+      // A kit piece may follow the selected expression, so a paused world redraws once.
+      if (this.kit) this.dirty = true;
+    }
     this.recognitions.update(
       0,
       this.readingPool(),
@@ -737,6 +788,8 @@ export class WorldEngine {
     this.radiance?.dispose();
     this.world.dispose();
     this.bubbles.dispose();
+    // After the world: its placements share the kit's geometry, and the kit ends the decoder.
+    this.kit?.dispose();
     this.environment.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
