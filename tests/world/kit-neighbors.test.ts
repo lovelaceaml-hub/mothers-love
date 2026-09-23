@@ -7,7 +7,11 @@ import {
   NEIGHBOR_CAST,
   NEIGHBOR_EXCHANGE,
   NEIGHBOR_FACTS,
+  NEIGHBOR_GARMENTS,
+  NEIGHBOR_HEART_FORWARD,
+  NEIGHBOR_HEART_HEIGHT,
   NEIGHBOR_PEOPLE,
+  NEIGHBOR_PORTRAIT_ASPECT,
   NEIGHBOR_SCALE,
   NEIGHBOR_STAGES,
   NEIGHBOR_STANCE,
@@ -18,6 +22,7 @@ import {
   neighborAssetIds,
   neighborMaterial,
   neighborPlacement,
+  neighborStagePoint,
   neighborStroll,
   neighborWeights,
   paintNeighborCard,
@@ -27,6 +32,7 @@ import {
   NEIGHBOR_BEATS,
   NEIGHBOR_CLIPS,
   NEIGHBOR_CYCLE_SECONDS,
+  NEIGHBOR_EXPRESSION_GESTURES,
   neighborDialogue,
   neighborSchedule,
   neighborWords,
@@ -470,24 +476,27 @@ describe("kit neighbors (Plan 26 K4)", () => {
   });
 
   it("stands every pair on its island, clear of the reading pearls, the lawn beds and flower patches", () => {
-    for (const zone of ZONES) {
+    for (const zone of ZONES) for (const portrait of [false, true]) {
       const stage = NEIGHBOR_STAGES[zone.id];
+      const point = neighborStagePoint(stage, portrait);
       const radius = ZONES.indexOf(zone) < 3 ? 17.8 : 13.8;
       const [first, second] = NEIGHBOR_CAST[zone.id].map(person => NEIGHBOR_FACTS[person]);
       const gap = 0.15 * first.height;
       const reach = [(first.reach + gap / 2) * NEIGHBOR_SCALE + stage.walk, (second.reach + gap / 2) * NEIGHBOR_SCALE + stage.walk];
-      const ends = [stage.x - reach[0], stage.x, stage.x + reach[1]];
+      const ends = [point.x - reach[0], point.x, point.x + reach[1]];
       const beds = ZONES.indexOf(zone) < 3 ? 14.7 : 11.5;
       for (const x of ends) {
-        const r = Math.hypot(x, stage.z);
+        const r = Math.hypot(x, point.z);
         expect(r).toBeLessThan(radius - 2);
         // The two lawn beds are ring arcs 1.5 rad wide on either side (design-world.ts);
         // their foliage and the kit's bushes start at radius 9.
-        const fromSide = Math.min(Math.abs(Math.atan2(-stage.z, x)), Math.PI - Math.abs(Math.atan2(-stage.z, x)));
-        expect({ zone: zone.id, x, inBedFoliage: r > 9 && r < beds && fromSide < 0.75 }).toEqual({ zone: zone.id, x, inBedFoliage: false });
-        for (const [fx, fz] of [[-10, 5], [10.5, 5]]) expect(Math.hypot(x - fx, stage.z - fz)).toBeGreaterThan(2.5);
+        const fromSide = Math.min(Math.abs(Math.atan2(-point.z, x)), Math.PI - Math.abs(Math.atan2(-point.z, x)));
+        expect({ zone: zone.id, portrait, x, inBedFoliage: r > 9 && r < beds && fromSide < 0.75 }).toEqual({ zone: zone.id, portrait, x, inBedFoliage: false });
+        for (const [fx, fz] of [[-10, 5], [10.5, 5]]) expect(Math.hypot(x - fx, point.z - fz)).toBeGreaterThan(2.5);
       }
-      if (!RECOGNITION_ZONES.includes(zone.id)) continue;
+      // The reading spheres below are the wide screen's (a phone centres its pearl above the
+      // pair instead, which the phone captures check); the portrait step is checked above.
+      if (portrait || !RECOGNITION_ZONES.includes(zone.id)) continue;
       // Section 6.2: the hero reading sphere and the two resident spheres, against a 2.4 unit person.
       const side = zone.id === "heart" || zone.id === "peacemakers" ? 7 : 3;
       const yHero = Math.max(zone.target[1] - zone.center[1] + 3, 7.32);
@@ -495,9 +504,105 @@ describe("kit neighbors (Plan 26 K4)", () => {
         [side, yHero, 5, 7], [-10, zone.target[1] - zone.center[1] + 6, 1, 3.2], [11, zone.target[1] - zone.center[1] + 9, -4, 3],
       ];
       for (const x of ends) for (const y of [0.7, 1.9, 3.1]) for (const [sx, sy, sz, sr] of spheres) {
-        expect(Math.hypot(x - sx, y - sy, stage.z - sz)).toBeGreaterThan(sr);
+        expect(Math.hypot(x - sx, y - sy, point.z - sz)).toBeGreaterThan(sr);
       }
     }
+  });
+
+  it("steps the wide set pairs toward the middle of a portrait screen, and back on a wide one", () => {
+    const world = build();
+    const stepped = ZONES.filter(zone => NEIGHBOR_STAGES[zone.id].portrait).map(zone => zone.id);
+    expect(stepped).toEqual(["garden", "featured", "orbit"]);
+    const phone = 390 / 844;
+    expect(phone).toBeLessThan(NEIGHBOR_PORTRAIT_ASPECT);
+    for (const [index, zone] of ZONES.entries()) {
+      const root = world.pair(zone.id);
+      const layout = (world.context.districts.get(zone.id)!.layout as T.Object3D);
+      layout.updateWorldMatrix(true, false);
+      const inverse = layout.matrixWorld.clone().invert();
+      const local = () => root.position.clone().applyMatrix4(inverse);
+      world.scene.userData.studyCamera = zoneCamera(zone.id);
+      world.neighbors.update(meetTime(index, 3), zone.id, undefined);
+      const wide = local();
+      world.scene.userData.studyCamera = zoneCamera(zone.id, phone);
+      world.neighbors.update(meetTime(index, 3), zone.id, undefined);
+      const tall = local();
+      const [dx, dz] = NEIGHBOR_STAGES[zone.id].portrait ?? [0, 0];
+      expect(tall.x - wide.x).toBeCloseTo(dx, 6);
+      expect(tall.z - wide.z).toBeCloseTo(dz, 6);
+      expect(wide.x).toBeCloseTo(NEIGHBOR_STAGES[zone.id].x, 6);
+      world.scene.userData.studyCamera = zoneCamera(zone.id);
+      world.neighbors.update(meetTime(index, 3), zone.id, undefined);
+      expect(local().distanceTo(wide)).toBeLessThan(1e-6);
+    }
+  });
+
+  it("floats the shared heart between the pair at their mean chest height, in front of them, not on the taller one's hair", () => {
+    const world = build();
+    world.scene.userData.studyCamera = zoneCamera("garden");
+    const hearts = world.group.getObjectByName("Neighbor floating hearts") as T.InstancedMesh;
+    const [mother, child] = NEIGHBOR_CAST.garden.map(person => NEIGHBOR_FACTS[person].height);
+    for (const age of [20, 22.5, 25]) {
+      world.neighbors.update(meetTime(0, age), "garden", undefined);
+      expect(hearts.count).toBeGreaterThanOrEqual(1);
+      const matrix = new T.Matrix4();
+      hearts.getMatrixAt(0, matrix);
+      // The fallback heart is a sphere about its origin, so the instance sits at the heart's centre.
+      const at = world.pair("garden").worldToLocal(new T.Vector3().setFromMatrixPosition(matrix));
+      const rest = ((mother + child) / 2) * NEIGHBOR_HEART_HEIGHT * NEIGHBOR_SCALE + 0.45;
+      expect(rest).toBeCloseTo(1.62, 2);
+      expect(Math.abs(at.y - rest)).toBeLessThanOrEqual(0.1 + 1e-6);
+      expect(at.z).toBeCloseTo(NEIGHBOR_HEART_FORWARD, 4);
+      // Below the mother's forehead (her head is the top fifth of her 2.4 units), above the child's.
+      expect(at.y).toBeLessThan(mother * NEIGHBOR_SCALE * 0.8);
+      expect(at.y).toBeGreaterThan(child * NEIGHBOR_SCALE * 0.8);
+    }
+  });
+
+  it("in the Grove, speaks and gestures the expression the panel shows, and repaints its cards when it changes", () => {
+    const world = build();
+    const grove = ZONES.findIndex(zone => zone.id === "expressions");
+    const [speaker] = world.pair("expressions").children.filter(child => child.name.startsWith("Neighbor "));
+    const lastPaint = (canvas: ReturnType<typeof recordingCanvas>) => canvas.texts.slice(canvas.texts.lastIndexOf(NEIGHBOR_CARD_LABEL) + 1).join(" ");
+    world.scene.userData.studyCamera = zoneCamera("expressions");
+    for (const id of [1, 5, 9, 1]) {
+      world.scene.userData.studyExpression = id;
+      world.neighbors.update(meetTime(grove, 3), "expressions", undefined);
+      expect(world.card("greeting").visible).toBe(true);
+      expect(lastPaint(world.canvases[0])).toBe(WORLD_EXPRESSIONS[id - 1].phrase);
+      expect(neighborDialogue(meetTime(grove, 3), "expressions", false, id)).toBe(WORLD_EXPRESSIONS[id - 1].phrase);
+      world.neighbors.update(meetTime(grove, 6), "expressions", undefined);
+      expect(hipsAngle(speaker)).toBeCloseTo(clipAngle(NEIGHBOR_EXPRESSION_GESTURES[id - 1]), 4);
+    }
+    // Every other zone keeps its own expression whatever the Grove shows.
+    world.scene.userData.studyExpression = 5;
+    world.scene.userData.studyCamera = zoneCamera("garden");
+    world.neighbors.update(meetTime(0, 3), "garden", undefined);
+    expect(lastPaint(world.canvases[0])).toBe(WORLD_EXPRESSIONS[0].phrase);
+  });
+
+  it("keeps the Fountain's pair on its forecourt, up from the frame's edge and outside both fountains, through its whole walk", () => {
+    const stage = NEIGHBOR_STAGES.milestone;
+    const [first, second] = NEIGHBOR_CAST.milestone.map(person => NEIGHBOR_FACTS[person]);
+    const gap = 0.15 * first.height;
+    const left = stage.x - ((first.reach + gap / 2) * NEIGHBOR_SCALE + stage.walk);
+    const right = stage.x + ((second.reach + gap / 2) * NEIGHBOR_SCALE + stage.walk);
+    // The five procedural tiers (base radius 6.3, design-world.ts) stand until K3b's kit fountain
+    // (about 3.5 at its base) replaces them; the walk clears the larger.
+    for (let x = left; x <= right + 1e-9; x += 0.05) expect(Math.hypot(x, stage.z)).toBeGreaterThan(6.3);
+    expect(stage.z).toBeLessThan(7.6 - 1);
+  });
+
+  it("bakes the grandfather's cardigan in sage and every other garment in the file's own colour", () => {
+    const kit = kitWith(["neighbor.grandfather", "neighbor.mother"]);
+    const top = (id: string) => {
+      const merged = mergeNeighborRig(kit.asset(id as KitAssetId)!.template, neighborMaterial())!;
+      const color = merged.geometry.getAttribute("color");
+      return [0, 1, 2].map(k => color.getComponent(0, k));
+    };
+    expect(NEIGHBOR_GARMENTS).toEqual({ grandfather_Top: expect.any(String) });
+    top("neighbor.grandfather").forEach((value, k) => expect(value).toBeCloseTo(new T.Color(NEIGHBOR_GARMENTS.grandfather_Top).toArray()[k], 6));
+    top("neighbor.mother").forEach((value, k) => expect(value).toBeCloseTo(new T.Color("#ff6f5a").toArray()[k], 6));
   });
 });
 

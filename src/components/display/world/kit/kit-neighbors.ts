@@ -10,6 +10,7 @@ import {
   NEIGHBOR_HEART_START,
   NEIGHBOR_LOOPS,
   NEIGHBOR_STAGE_SECONDS,
+  neighborExpression,
   neighborSchedule,
   neighborWords,
   type NeighborBeat,
@@ -112,6 +113,13 @@ export const NEIGHBOR_VISIBLE_PAIRS = { high: 4, auto: 4, low: 1 } as const;
 export const NEIGHBOR_VIEW_DISTANCE = 115;
 /** The hero rig plays when its pair is the active one and the camera is closer than this. */
 export const NEIGHBOR_HERO_DISTANCE = 42;
+/**
+ * The floating heart's rest height as a share of the pair's mean height (before the .45 lift),
+ * and how far in front of the pair it floats, world units: a mother and child share a heart
+ * centred about 1.6 units up, between them and clear of their hair.
+ */
+export const NEIGHBOR_HEART_HEIGHT = 0.6;
+export const NEIGHBOR_HEART_FORWARD = 0.6;
 
 /**
  * Where each zone's pair stands, in the district layout frame (design 6.1: origin at the zone
@@ -126,10 +134,19 @@ export const NEIGHBOR_HERO_DISTANCE = 42;
  * `y` is the ground the pair stands on (the terrace top, .7, unless a zone says otherwise).
  * `cardLift`, when set, puts the card beside the pair at that height above its ground, with
  * the tail pointing sideways at the speakers, for a zone whose air above the pair is taken.
+ * `portrait`, when set, is how far (x, z) the pair steps toward the middle of a portrait
+ * screen (camera aspect under `NEIGHBOR_PORTRAIT_ASPECT`): a phone centres the pearl and sees
+ * much less to either side, so a pair set wide of the pearl for a TV would stand on the frame's
+ * edge. It also lifts the pair clear of the location caption the phone sets below the pearl.
  */
-export type NeighborStage = { x: number; z: number; walk: number; card: number; y?: number; yaw?: number; cardLift?: number };
+export type NeighborStage = {
+  x: number; z: number; walk: number; card: number; y?: number; yaw?: number; cardLift?: number;
+  portrait?: readonly [number, number];
+};
+/** Below this camera aspect a pair takes its `portrait` step (a phone held upright, 390 by 844, is .46). */
+export const NEIGHBOR_PORTRAIT_ASPECT = 0.8;
 export const NEIGHBOR_STAGES: Readonly<Record<ZoneId, NeighborStage>> = {
-  garden: { x: -4.5, z: 8.2, walk: 1.6, card: -3.2 },
+  garden: { x: -4.5, z: 8.2, walk: 1.6, card: -3.2, portrait: [1.5, -1.5] },
   // In the gap the rose ring leaves toward the camera, just clear of the lowest step (7.9):
   // the top step itself sits inside the silk ribbons' loop, which veils anyone on it.
   heart: { x: -2.8, z: 8.1, walk: 1.3, card: -1.3 },
@@ -137,13 +154,17 @@ export const NEIGHBOR_STAGES: Readonly<Record<ZoneId, NeighborStage>> = {
   // canonical icon discs ring the air above the pair at card height, and none may be covered.
   expressions: { x: -3, z: 10, walk: 1.4, card: 4.4, cardLift: 0.8 },
   welcome: { x: -3, z: 6.5, walk: 2, card: 0 },
-  featured: { x: -5, z: 8.5, walk: 1.6, card: -3.2 },
+  featured: { x: -5, z: 8.5, walk: 1.6, card: -3.2, portrait: [1.5, -1.5] },
   calendar: { x: -3, z: 9.5, walk: 2, card: 0 },
   peacemakers: { x: -3, z: 7, walk: 2, card: -2.6 },
   status: { x: 0, z: 6, walk: 1.6, card: 0 },
-  orbit: { x: -4, z: 7.5, walk: 1.6, card: -3.2 },
-  // The kit fountain scales to about 6.9 units across its base; the forecourt keeps clear of it.
-  milestone: { x: -3.5, z: 7.6, walk: 1.4, card: 0 },
+  // The Cosmos camera sets its pair lower on a phone, so it steps further back to clear the caption.
+  orbit: { x: -4, z: 7.5, walk: 1.6, card: -3.2, portrait: [1.5, -2.5] },
+  // Up the forecourt on the terrace in front of the tiers, not on the frame's bottom edge. The
+  // walk keeps outside both fountains: the kit fountain (about 3.5 units in radius at its base,
+  // K3b) and the five procedural tiers it replaces (6.3), which stand while that lane is apart
+  // or its piece is missing, so no foot ever steps into a basin.
+  milestone: { x: -3.5, z: 6.2, walk: 1.3, card: 0 },
   // Between the stepping piers (design 6.15) and behind the canal the front third becomes.
   "live-feed": { x: -3.6, z: 3, walk: 0.7, card: -3.2 },
   practice: { x: -2.5, z: 6.2, walk: 1.6, card: 0 },
@@ -322,6 +343,16 @@ export type NeighborRig = {
 };
 
 /**
+ * Garments recoloured as they are baked, by the file's material name (sRGB). The grandfather's
+ * mustard cardigan was the one garment outside the pearl pastels; in sage it sits beside the
+ * lavender, coral and rose of the others. Every other material keeps the file's own colour, and
+ * the kit's file is not changed (a later LW5 export in these colours makes the entry a no op).
+ */
+export const NEIGHBOR_GARMENTS: Readonly<Record<string, string>> = {
+  grandfather_Top: "#a3c6a1",
+};
+
+/**
  * One skinned draw from a rigged kit file: every primitive of the skinned mesh merged into one
  * geometry, each primitive's colour, roughness and emission written into its vertices, bound
  * to the same skeleton. The kit's own geometry is never changed; the merged one is new.
@@ -361,7 +392,8 @@ export function mergeNeighborRig(source: T.Object3D, material: T.Material): { ro
       if (geometry.index) piece.setIndex(Array.from(geometry.index.array as ArrayLike<number>));
       if (geometry !== source) geometry.dispose();
       const standard = surface as T.MeshStandardMaterial | undefined;
-      const color = standard?.color ?? new T.Color(1, 1, 1);
+      const garment = standard ? NEIGHBOR_GARMENTS[standard.name] : undefined;
+      const color = garment ? new T.Color(garment) : standard?.color ?? new T.Color(1, 1, 1);
       const emissive = (standard?.emissive ?? new T.Color(0, 0, 0)).clone().multiplyScalar(standard?.emissiveIntensity ?? 1);
       const roughness = standard?.roughness ?? 0.6;
       const colors = new Float32Array(count * 3), surfaces = new Float32Array(count * 4);
@@ -559,8 +591,14 @@ type Pair = {
   actors: [Actor, Actor];
   handoffAt: number;
   centre: T.Vector3;
-  /** Kit units: the taller of the two, for the card and the floating heart. */
+  /** The district's layout frame, which the stage's `x, z` (and its portrait step) are in. */
+  layout: T.Matrix4;
+  /** Whether the pair stands at its portrait step now. */
+  portrait: boolean;
+  /** Kit units: the taller of the two, for the card. */
   top: number;
+  /** Kit units: the mean height of the two, for the heart they share. */
+  mean: number;
   /** The frame this pair was last posed, for the Auto cadence. */
   posed: number;
 };
@@ -571,6 +609,17 @@ const _sphere = new T.Sphere();
 const _vector = new T.Vector3();
 const _corner = new T.Vector3();
 const _dummy = new T.Object3D();
+
+/** Where a stage puts its pair in the district's layout frame, with its portrait step or without. */
+export function neighborStagePoint(stage: NeighborStage, portrait: boolean) {
+  const [dx, dz] = portrait && stage.portrait ? stage.portrait : [0, 0];
+  return { x: stage.x + dx, y: stage.y ?? 0.7, z: stage.z + dz };
+}
+
+function standAt(root: T.Object3D, stage: NeighborStage, layout: T.Matrix4, portrait: boolean) {
+  const point = neighborStagePoint(stage, portrait);
+  root.position.set(point.x, point.y, point.z).applyMatrix4(layout);
+}
 
 export function createKitNeighbors(context: DesignKitContext): KitNeighbors | undefined {
   const { kit, scene } = context;
@@ -603,10 +652,11 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
     const stage = NEIGHBOR_STAGES[zone.id];
     const cast = NEIGHBOR_CAST[zone.id];
     district.layout.updateWorldMatrix(true, false);
+    const layout = district.layout.matrixWorld.clone();
     const root = new T.Group();
     root.name = `Neighbors: ${zone.id}`;
-    root.position.set(stage.x, stage.y ?? 0.7, stage.z).applyMatrix4(district.layout.matrixWorld);
-    root.quaternion.setFromRotationMatrix(district.layout.matrixWorld).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), stage.yaw ?? 0));
+    standAt(root, stage, layout, false);
+    root.quaternion.setFromRotationMatrix(layout).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), stage.yaw ?? 0));
     root.visible = false;
     group.add(root);
     const facts = cast.map(person => NEIGHBOR_FACTS[person]);
@@ -643,7 +693,10 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       zone: zone.id, index, root, stage, actors,
       handoffAt: give?.handoffAt ?? NEIGHBOR_HANDOFF_AT,
       centre: root.position.clone(),
+      layout,
+      portrait: false,
       top: Math.max(facts[0].height, facts[1].height),
+      mean: (facts[0].height + facts[1].height) / 2,
       posed: -Infinity,
     };
   });
@@ -752,14 +805,18 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
     // The protect mask keeps the bloom off the words, as it does for the pearl being read.
     mesh.layers.enable(3);
     group.add(mesh);
-    return { kind, mesh, painted, texture, zone: null as ZoneId | null };
+    return { kind, mesh, painted, texture, key: null as string | null };
   });
-  const paintCards = (pair: Pair) => {
-    const words = neighborWords(pair.index);
-    const accent = WORLD_EXPRESSIONS[pair.index % WORLD_EXPRESSIONS.length].color;
+  // The Grove's pair speaks the expression its panel shows, so its cards repaint when the
+  // selection changes; every other zone's words depend on the zone alone.
+  const paintCards = (pair: Pair, selected: number | undefined) => {
+    const expression = neighborExpression(pair.index, selected);
+    const words = neighborWords(pair.index, selected);
+    const accent = WORLD_EXPRESSIONS[expression].color;
+    const key = `${pair.zone} ${expression}`;
     for (const card of cards) {
-      if (card.zone === pair.zone) continue;
-      card.zone = pair.zone;
+      if (card.key === key) continue;
+      card.key = key;
       if (!card.painted || !card.texture) continue;
       const speaker = card.kind === "greeting" ? pair.actors[0] : pair.actors[1];
       const beside = pair.stage.cardLift !== undefined;
@@ -784,6 +841,16 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
     const celebrating = !!arrival && arrival.phase !== "idle";
     const activeIndex = Math.max(0, ZONES.findIndex(item => item.id === zone));
     const active = pairs[activeIndex];
+    const selected = scene.userData.studyExpression as number | undefined;
+
+    // A portrait screen steps the wide set pairs toward its middle (the stage's `portrait`).
+    const portrait = !!camera && camera.aspect < NEIGHBOR_PORTRAIT_ASPECT;
+    for (const pair of pairs) {
+      if (pair.portrait === portrait || !pair.stage.portrait) continue;
+      pair.portrait = portrait;
+      standAt(pair.root, pair.stage, pair.layout, portrait);
+      pair.centre.copy(pair.root.position);
+    }
 
     // Which pairs to show: in view, near enough, the active one first, then the nearest.
     visibleNow.length = 0;
@@ -810,7 +877,7 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
 
     let contactCount = 0, heartCount = 0, sparkleUsed = 0;
     for (const pair of visibleNow) {
-      const beat = neighborSchedule(time, pair.index, pair.handoffAt);
+      const beat = neighborSchedule(time, pair.index, pair.handoffAt, selected);
       const isActive = pair === active;
       // Auto: the active pair every frame, the rest on alternate frames (design 5.3); a pair
       // that has just come into view is posed at once.
@@ -847,15 +914,17 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
         }
       }
       // The heart the pair shared, rising between them once it has been taken to heart, and
-      // fading as they part.
+      // fading as they part. It floats at chest height of the pair's mean (about 1.6 units for a
+      // mother and child), a little in front of them, so it reads as theirs, not as a thought
+      // balloon on the taller one's hair.
       const into = beat.stage === "meet" ? beat.age - NEIGHBOR_HEART_START - NEIGHBOR_ABSORBED_AT : -1;
       const leaving = beat.stage === "part" ? beat.age : -1;
       const grow = beat.heart === "floating" ? smooth(into / 0.8) : leaving >= 0 ? 1 - smooth(leaving / 0.9) : 0;
       if (grow > 0.001 && heartCount < NEIGHBOR_VISIBLE_PAIRS.high) {
         const rise = beat.stage === "part" ? leaving * 0.6 : 0;
-        const base = (pair.top * 0.72 + 0.1) * NEIGHBOR_SCALE;
+        const base = pair.mean * NEIGHBOR_HEART_HEIGHT * NEIGHBOR_SCALE;
         const lift = beat.stage === "part" ? 1 : smooth(into / 1.4);
-        _vector.set(Math.sin(time * 0.8 + pair.index) * 0.22, base + 0.45 * lift + Math.sin(time * 1.4 + pair.index) * 0.1 + rise, 0.35);
+        _vector.set(Math.sin(time * 0.8 + pair.index) * 0.22, base + 0.45 * lift + Math.sin(time * 1.4 + pair.index) * 0.1 + rise, NEIGHBOR_HEART_FORWARD);
         pair.root.localToWorld(_vector);
         const size = (0.85 / heartSize) * grow;
         _dummy.position.copy(_vector).sub(_corner.copy(heartCentre).multiplyScalar(size));
@@ -880,9 +949,9 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
     sparkles.visible = sparklesOn && sparkleUsed > 0;
 
     // The speech card: the active pair only, while its schedule says someone is speaking.
-    const beat = neighborSchedule(time, active.index, active.handoffAt);
+    const beat = neighborSchedule(time, active.index, active.handoffAt, selected);
     const speaking = !celebrating && active.root.visible && beat.card !== null;
-    if (speaking) paintCards(active);
+    if (speaking) paintCards(active, selected);
     for (const card of cards) {
       const on = speaking && card.kind === beat.card && !!card.texture;
       card.mesh.visible = on;

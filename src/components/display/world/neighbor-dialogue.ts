@@ -6,9 +6,27 @@ export function neighborMotion(time: number, index: number) {
   return { distance: 1.25 + approaching * 1.3, walking: approaching > 0.08 };
 }
 
-export function neighborWords(index: number) {
+/** The zone whose pair acts out the expression its own panel shows (design 6.3). */
+export const NEIGHBOR_SELECTED_ZONE: ZoneId = "expressions";
+
+/**
+ * Which of the nine expressions a zone's pair speaks, as a position in `WORLD_EXPRESSIONS`: the
+ * zone index modulo nine, except in the Nine Expressions Grove, where the pair acts out the
+ * expression the Grove's panel shows (`selected`, the catalog id 1 to 9 that the DOM picker and
+ * the engine's `studyExpression` hold), so the words on screen agree with the panel beside them.
+ * Without a selection the Grove keeps the modulo cast, as every other zone does.
+ */
+export function neighborExpression(index: number, selected?: number) {
+  if (selected !== undefined && ZONES[index]?.id === NEIGHBOR_SELECTED_ZONE) {
+    const chosen = WORLD_EXPRESSIONS.findIndex((item) => item.id === selected);
+    if (chosen >= 0) return chosen;
+  }
+  return ((index % WORLD_EXPRESSIONS.length) + WORLD_EXPRESSIONS.length) % WORLD_EXPRESSIONS.length;
+}
+
+export function neighborWords(index: number, selected?: number) {
   return {
-    greeting: WORLD_EXPRESSIONS[index % WORLD_EXPRESSIONS.length].phrase,
+    greeting: WORLD_EXPRESSIONS[neighborExpression(index, selected)].phrase,
     response:
       index % 2
         ? "Thank you for being here."
@@ -149,13 +167,13 @@ export type NeighborBeat = {
   previous: readonly [NeighborClip, NeighborClip];
 };
 
-/** The zone's expression gesture: zone index modulo nine, as `neighborWords` picks the phrase. */
-export function neighborGesture(index: number): NeighborClip {
-  return NEIGHBOR_EXPRESSION_GESTURES[((index % 9) + 9) % 9];
+/** The zone's expression gesture, for the expression `neighborWords` picks the phrase from. */
+export function neighborGesture(index: number, selected?: number): NeighborClip {
+  return NEIGHBOR_EXPRESSION_GESTURES[neighborExpression(index, selected)];
 }
 
-function resolveAct(act: NeighborAct, index: number): NeighborClip {
-  if (act === "gesture") return neighborGesture(index);
+function resolveAct(act: NeighborAct, index: number, selected?: number): NeighborClip {
+  if (act === "gesture") return neighborGesture(index, selected);
   if (act === "thanks") return index % 2 ? "bow" : "cheer";
   return act;
 }
@@ -179,13 +197,15 @@ function heartAt(stage: NeighborStage, age: number, handoffAt: number): Neighbor
 }
 
 /**
- * The one schedule. Pure: the same `time` and `index` always give the same beat, so a paused
- * clock is a still moment and a scrubbed clock replays exactly.
+ * The one schedule. Pure: the same `time`, `index` and `selected` always give the same beat, so
+ * a paused clock is a still moment and a scrubbed clock replays exactly. `selected` (the Grove's
+ * expression, see `neighborExpression`) only changes which gesture the Grove's speaker makes.
  */
 export function neighborSchedule(
   time: number,
   index: number,
   handoffAt: number = NEIGHBOR_HANDOFF_AT,
+  selected?: number,
 ): NeighborBeat {
   const { stage, age } = neighborStage(time, index);
   let row = 0;
@@ -197,7 +217,7 @@ export function neighborSchedule(
   const next = NEIGHBOR_BEATS[row + 1];
   const end = next && next.stage === stage ? next.start : NEIGHBOR_STAGE_SECONDS[stage];
   const before = NEIGHBOR_BEATS[(row + NEIGHBOR_BEATS.length - 1) % NEIGHBOR_BEATS.length];
-  const acts = [resolveAct(current.acts[0], index), resolveAct(current.acts[1], index)] as const;
+  const acts = [resolveAct(current.acts[0], index, selected), resolveAct(current.acts[1], index, selected)] as const;
   const heart = heartAt(stage, age, handoffAt);
   const speaker = current.speaker ?? (heart === "giving" ? 0 : null);
   return {
@@ -212,7 +232,7 @@ export function neighborSchedule(
     card: current.card ?? null,
     staging: current.staging,
     acts,
-    previous: [resolveAct(before.acts[0], index), resolveAct(before.acts[1], index)],
+    previous: [resolveAct(before.acts[0], index, selected), resolveAct(before.acts[1], index, selected)],
   };
 }
 
@@ -220,17 +240,20 @@ export function neighborSchedule(
  * What the design world's neighbors are saying right now, for the accessible sentence: the
  * greeting while the greeting card shows, the response while the response card shows, else
  * null. Arrivals take the stage, so a celebrating world has no dialogue, and no card shows.
+ * `selected` is the expression the Grove's panel shows (the host's picker state), which the
+ * Grove's pair speaks, as its card does.
  */
 export function neighborDialogue(
   time: number,
   zone: ZoneId,
   celebrating = false,
+  selected?: number,
 ) {
   if (celebrating) return null;
   const index = ZONES.findIndex((item) => item.id === zone);
   if (index < 0) return null;
-  const { card } = neighborSchedule(time, index);
+  const { card } = neighborSchedule(time, index, NEIGHBOR_HANDOFF_AT, selected);
   if (!card) return null;
-  const words = neighborWords(index);
+  const words = neighborWords(index, selected);
   return card === "greeting" ? words.greeting : words.response;
 }

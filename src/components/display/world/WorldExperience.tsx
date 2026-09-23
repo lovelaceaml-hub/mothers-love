@@ -322,11 +322,12 @@ export function WorldExperience({
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
         Fictional neighbors illustrate words of kindness.{" "}
         {/* The design study's rigged neighbors read the same schedule as their speech cards;
-            without them the study keeps its miniature figures. Classic and cinematic keep the
+            without them the study keeps its miniature figures. In the Grove they speak the
+            expression the panel shows, as their card does. Classic and cinematic keep the
             rule their own procedural cards follow. */}
         {designReview
           ? status.kitNeighbors
-            ? (neighborDialogue(status.elapsed, status.zone, arriving) ??
+            ? (neighborDialogue(status.elapsed, status.zone, arriving, expressionId) ??
               "They greet, walk together and share a heart.")
             : "Miniature figures provide scale in this visual study."
           : (legacyNeighborDialogue(status.elapsed, status.zone, arriving) ??

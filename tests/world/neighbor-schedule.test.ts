@@ -7,9 +7,11 @@ import {
   NEIGHBOR_EXPRESSION_GESTURES,
   NEIGHBOR_HANDOFF_AT,
   NEIGHBOR_HEART_START,
+  NEIGHBOR_SELECTED_ZONE,
   NEIGHBOR_STAGE_SECONDS,
   legacyNeighborDialogue,
   neighborDialogue,
+  neighborExpression,
   neighborGesture,
   neighborMotion,
   neighborSchedule,
@@ -160,6 +162,35 @@ describe("the neighbor schedule (Plan 26 K4, WORLD-INTEGRATION 5.2)", () => {
     expect(neighborSchedule(0, 0).age).toBeCloseTo(0.667, 3);
     expect(meetTime(0, 3)).toBeCloseTo(2.333, 3);
     expect(neighborDialogue(meetTime(0, 3), "garden")).toBe("How Are You?");
+  });
+
+  it("lets the Grove's pair act out the expression its panel shows; every other zone keeps the modulo cast", () => {
+    const grove = ZONES.findIndex(zone => zone.id === NEIGHBOR_SELECTED_ZONE);
+    expect(ZONES[grove].id).toBe("expressions");
+    for (const expression of WORLD_EXPRESSIONS) {
+      const position = WORLD_EXPRESSIONS.indexOf(expression);
+      expect(neighborExpression(grove, expression.id)).toBe(position);
+      expect(neighborWords(grove, expression.id).greeting).toBe(expression.phrase);
+      // The gesture follows the phrase, and the card, the sentence and the pose all agree.
+      expect(neighborGesture(grove, expression.id)).toBe(NEIGHBOR_EXPRESSION_GESTURES[position]);
+      expect(neighborSchedule(meetTime(grove, 6), grove, NEIGHBOR_HANDOFF_AT, expression.id).acts[0]).toBe(NEIGHBOR_EXPRESSION_GESTURES[position]);
+      expect(neighborDialogue(meetTime(grove, 3), "expressions", false, expression.id)).toBe(expression.phrase);
+      for (let time = 0; time < NEIGHBOR_CYCLE_SECONDS; time += 0.5) {
+        const { card } = neighborSchedule(time, grove, NEIGHBOR_HANDOFF_AT, expression.id);
+        const words = neighborWords(grove, expression.id);
+        expect(neighborDialogue(time, "expressions", false, expression.id)).toBe(card === "greeting" ? words.greeting : card === "response" ? words.response : null);
+      }
+      // The other twelve zones ignore the selection.
+      ZONES.forEach((zone, index) => {
+        if (index === grove) return;
+        expect(neighborExpression(index, expression.id)).toBe(index % 9);
+        expect(neighborDialogue(meetTime(index, 3), zone.id, false, expression.id)).toBe(WORLD_EXPRESSIONS[index % 9].phrase);
+      });
+    }
+    // No selection, or one outside the catalog, keeps the modulo cast in the Grove too.
+    expect(neighborExpression(grove)).toBe(grove % 9);
+    expect(neighborExpression(grove, 0)).toBe(grove % 9);
+    expect(neighborExpression(grove, 10)).toBe(grove % 9);
   });
 
   it("is pure: the same clock gives the same beat", () => {
