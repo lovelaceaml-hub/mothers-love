@@ -13,8 +13,10 @@ import type { DesignKitContext, KitBuilderHandle } from "./design-world";
  *
  * Owned by lane K3b. The tables are pure (no Three.js objects, only its curve maths), so
  * `tests/world/kit-layout-far.test.ts` proves every islet, post and cloud clear of the
- * districts, the arrival stage, every bridge deck and the camera's travel corridor without a
- * browser. Two entry points, both called by the design world only with a kit:
+ * districts, the arrival stage, every bridge deck and every flight the camera director can
+ * make (the tour legs, every ordered zone pair from every point of the reading arc, and the
+ * arrival flights to the arrival view and back) without a browser. Two entry points, both
+ * called by the design world only with a kit:
  *
  * - `kitCorridorSites(kit)` runs first, before the clouds and the air are built: every islet
  *   the corridors will place, so it gets a cloud collar (`studyCloudLayout` extra sites) and a
@@ -55,8 +57,11 @@ export type CorridorCloud = { position: V3; rotationY: number; scale: number; la
 export type SkyLane = {
   from: ZoneId;
   to: ZoneId;
-  /** Fraction along the flight, and a world xz offset and a drop below the flight line. */
-  clouds: Array<{ t: number; offset: [number, number]; drop: number; scale: number }>;
+  /**
+   * Fraction along the flight, a signed distance to the side of the flight line in xz (positive
+   * to the flight's right), and a drop below the flight line at that station.
+   */
+  clouds: Array<{ t: number; side: number; drop: number; scale: number }>;
   /** Placed by hand beside the flight line (20 to 40 units off it in xz), world space grass top. */
   islets: Array<{ center: V3; scale: number }>;
 };
@@ -140,62 +145,84 @@ export function tourLegs(): Array<{ from: ZoneId; to: ZoneId }> {
 }
 
 /**
- * The camera's travel curve for a leg, as `CameraDirector.move` builds it from the authored
- * eyes: a centripetal spline through the start, a middle raised 7 above the higher eye, and the
- * end. `startAngle` swings the start eye about its target the way the reading arc does, so the
- * corridor can be sampled from every departure the director can make (up to 27.5 degrees).
+ * The curve `CameraDirector.move` flies between any two points: a centripetal spline through
+ * the start, a middle raised 7 above the higher end, and the end. Every travel the director
+ * makes is one of these, whether a tour leg, a zone button press from wherever the camera is
+ * parked (or mid flight), an arrival flight to `ARRIVAL_VIEW.eye`, or the return from it.
  */
-export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
-  const a = zone(from), b = zone(to);
-  const dx = a.eye[0] - a.target[0], dz = a.eye[2] - a.target[2];
-  const start = new T.Vector3(
-    a.target[0] + dx * Math.cos(startAngle) - dz * Math.sin(startAngle),
-    a.eye[1],
-    a.target[2] + dx * Math.sin(startAngle) + dz * Math.cos(startAngle),
-  );
-  const end = new T.Vector3(...b.eye);
-  const middle = start.clone().lerp(end, .5);
-  middle.y = Math.max(start.y, end.y) + 7;
-  return new T.CatmullRomCurve3([start, middle, end], false, "centripetal");
+export function flightBetween(start: readonly [number, number, number], end: readonly [number, number, number]) {
+  const a = new T.Vector3(...start), b = new T.Vector3(...end);
+  const middle = a.clone().lerp(b, .5);
+  middle.y = Math.max(a.y, b.y) + 7;
+  return new T.CatmullRomCurve3([a, middle, b], false, "centripetal");
 }
 
 /**
- * The two fast legs (149 and 197 units in 18 s) get a sky lane. Every station was placed by
- * hand from the flight curve and checked (by the layout test) clear of the districts, the
- * arrival stage, the bridge decks and the travel corridor: the leg from the terrace to the
- * calendar crosses the whole connected world, so its four clouds sit only over the open water
- * of its first and last quarters and none over the Garden it passes; the leg from the fountain
- * descends from 40 to 12, so its clouds ride high over the middle of the world and step down.
+ * The parked camera at one point of its reading arc (camera-director.ts line 209): the eye
+ * swung `angle` about the zone target, pushed in or out by `approach`, lifted by `bob`.
+ */
+export function readingArcEye(id: ZoneId, angle: number, approach = 1, bob = 0): V3 {
+  const z = zone(id), dx = z.eye[0] - z.target[0], dz = z.eye[2] - z.target[2];
+  return [
+    z.target[0] + (dx * Math.cos(angle) - dz * Math.sin(angle)) * approach,
+    z.eye[1] + bob,
+    z.target[2] + (dx * Math.sin(angle) + dz * Math.cos(angle)) * approach,
+  ];
+}
+
+/**
+ * The camera's travel curve for a leg from the authored eyes. `startAngle` swings the start
+ * eye about its target the way the reading arc does, so the corridor can be sampled from every
+ * departure the director can make (up to 27.5 degrees).
+ */
+export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
+  return flightBetween(readingArcEye(from, startAngle), zone(to).eye);
+}
+
+/**
+ * The two fast legs (149 and 197 units in 18 s) get a sky lane. Every station was placed from
+ * the flight curve and checked (by the layout test) clear of the districts, the arrival stage,
+ * the bridge decks, the islets and every flight the director can make, not only the two legs:
+ * a zone button press flies from any parked reading arc to any zone, a playlist subset flies
+ * any ordered pair, and an arrival flies from anywhere to the arrival view and back. Those
+ * flights criss cross the middle of the world between y 10 and 22, and the ones from the two
+ * floating districts descend through the band above that, so a cloud "14 below the flight
+ * line" of a fast leg (design 6.17's figure) sits in the way of some other flight almost
+ * everywhere. The stations below are the places (found by a search over every station, side
+ * and drop, then kept by the layout test) that clear every flight by 6 units and stay off the
+ * islets and each other: on the terrace to calendar leg five low puffs on the water the flight
+ * looks down on, 14 to 22 below it and never more than 16 to the side; on the fountain leg
+ * three high beside the fountain's own approach where nothing else flies, then four low over
+ * the water the long descent looks down on.
  */
 export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "practice", to: "calendar",
     clouds: [
-      // The Sanctuary to Pavilion bridge crosses this leg's first quarter at z 10: both puffs sit south of it.
-      { t: .03, offset: [0, -9], drop: 14, scale: 1.5 },
-      { t: .075, offset: [0, -9], drop: 14, scale: 1.7 },
-      // Nothing in the middle third: the flight passes the Sanctuary's parked camera, the
-      // arrival stage and the Garden there, and the Garden's own cloud collar is the cloud.
-      { t: .75, offset: [0, 0], drop: 14, scale: 1.6 },
-      { t: .92, offset: [0, 0], drop: 14, scale: 1.5 },
+      { t: .12, side: -10, drop: 14, scale: 1.5 },
+      { t: .32, side: 0, drop: 20, scale: 1.4 },
+      { t: .66, side: 16, drop: 22, scale: 1.5 },
+      { t: .76, side: 0, drop: 20, scale: 1.6 },
+      { t: .98, side: 6, drop: 16, scale: 1.6 },
     ],
     // Two, not the design's three: the third's natural place, south of the leg's east half, is
     // already taken by the islet beside the Garden to Grove bridge, which the flight passes.
+    // Both stand where the Pavilion's, the Sanctuary's and the Garden's cameras never fly.
     islets: [
-      { center: [-45, -.6, 38], scale: 1.3 },
-      { center: [16, .2, 44], scale: 1.2 },
+      { center: [-16, -.6, 38], scale: 1.3 },
+      { center: [11, .2, 44], scale: 1.2 },
     ],
   },
   {
     from: "milestone", to: "live-feed",
     clouds: [
-      { t: .08, offset: [0, 0], drop: 14, scale: 1.7 },
-      { t: .2, offset: [-14, 0], drop: 14, scale: 1.6 },
-      { t: .32, offset: [22, 4], drop: 14, scale: 1.5 },
-      { t: .44, offset: [0, 0], drop: 14, scale: 1.7 },
-      { t: .56, offset: [10, -8], drop: 14, scale: 1.6 },
-      { t: .68, offset: [0, 0], drop: 14, scale: 1.5 },
-      { t: .8, offset: [-18, 12], drop: 14, scale: 1.6 },
+      { t: .02, side: 0, drop: 16, scale: 1.6 },
+      { t: .1, side: 0, drop: 18, scale: 1.6 },
+      { t: .24, side: -16, drop: 14, scale: 1.4 },
+      { t: .38, side: 14, drop: 48, scale: 1.4 },
+      { t: .44, side: 32, drop: 46, scale: 1.4 },
+      { t: .7, side: 4, drop: 36, scale: 1.6 },
+      { t: .86, side: 18, drop: 22, scale: 1.5 },
     ],
     islets: [
       { center: [44.6, -.4, -38.5], scale: 1.3 },
@@ -205,11 +232,32 @@ export const SKY_LANES: readonly SkyLane[] = [
 ];
 
 /**
- * Which side of its bridge a long bridge's islet takes: away from the world's centre, except
- * the Garden to Sanctuary bridge, whose outer side is the arrival stage's reserved cylinder;
- * its islet sits in the lagoon between the three first districts instead.
+ * Where a long bridge's islet stands: `along` is the fraction of the deck (the middle by
+ * default), `side` its distance off the deck centre line (`ISLET_SIDE_OFFSET` by default),
+ * `flip` swaps the side. The side is away from the world's centre, except the Garden to
+ * Sanctuary bridge, whose outer side is the arrival stage's reserved cylinder; its islet sits in
+ * the lagoon between the three first districts instead. Two islets leave the middle: the Grove
+ * camera's reading arc parks over the middle of the Garden to Grove bridge and the Garden
+ * camera's over the middle of the Garden to River bridge, so those islets stand nearer the
+ * Garden end and a little farther out, where every flight clears them by 6 units.
  */
-const ISLET_SIDE: Partial<Record<string, 1 | -1>> = { "garden>heart": -1 };
+export const ISLET_STATIONS: Readonly<Partial<Record<string, { along?: number; side?: number; flip?: boolean }>>> = {
+  "garden>heart": { flip: true },
+  "garden>expressions": { along: .2, side: 26 },
+  "garden>live-feed": { along: .55, side: 26 },
+};
+
+/**
+ * Two bridge ends carry no lantern posts: a neighbouring zone's parked camera swings over each
+ * on its reading arc (the terrace camera over the Pavilion end of the Pavilion to terrace
+ * bridge, the Pavilion camera over the Promise end of the Pavilion to Promise bridge), within
+ * 5.6 and 5 units of a post's top, and no station along that deck clears the arc by the 6
+ * units every flight must keep until the deck's middle. The rail lanterns light those ends.
+ */
+export const POST_FREE_ENDS: Readonly<Partial<Record<string, "start" | "end">>> = {
+  "featured>practice": "start",
+  "featured>promise": "end",
+};
 
 function laneKey(lane: { from: ZoneId; to: ZoneId }) { return `${lane.from}>${lane.to}`; }
 
@@ -219,11 +267,12 @@ export function corridorIslets(): CorridorIslet[] {
   const point = new T.Vector3(), tangent = new T.Vector3();
   corridorBridges().forEach((bridge, i) => {
     if (!bridge.long) return;
+    const station = ISLET_STATIONS[laneKey(bridge)] ?? {};
     const curve = bridgeCurve(bridge);
-    curve.getPoint(.5, point); curve.getTangent(.5, tangent);
+    curve.getPoint(station.along ?? .5, point); curve.getTangent(station.along ?? .5, tangent);
     const side = new T.Vector3(tangent.z, 0, -tangent.x).normalize();
     const away = Math.sign(side.x * (point.x - WORLD_CENTRE[0]) + side.z * (point.z - WORLD_CENTRE[1])) || 1;
-    side.multiplyScalar(away * (ISLET_SIDE[laneKey(bridge)] ?? 1) * ISLET_SIDE_OFFSET);
+    side.multiplyScalar(away * (station.flip ? -1 : 1) * (station.side ?? ISLET_SIDE_OFFSET));
     const scale = 1.5;
     const center: V3 = [round(point.x + side.x), round(point.y - ISLET_BELOW_DECK), round(point.z + side.z)];
     islets.push({
@@ -245,13 +294,15 @@ export function corridorIslets(): CorridorIslet[] {
   return islets;
 }
 
-/** Two lantern posts at each end of every bridge, 2.6 off the deck centre line, on the deck. */
+/** Two lantern posts at each end of every bridge (`POST_FREE_ENDS` aside), on the deck just inside the rail. */
 export function corridorPosts(): CorridorPost[] {
   const posts: CorridorPost[] = [];
   const point = new T.Vector3(), tangent = new T.Vector3();
   for (const bridge of corridorBridges()) {
     const curve = bridgeCurve(bridge);
+    const free = POST_FREE_ENDS[laneKey(bridge)];
     for (const t of [.03, .97]) {
+      if ((t < .5 && free === "start") || (t > .5 && free === "end")) continue;
       curve.getPoint(t, point); curve.getTangent(t, tangent);
       const side = new T.Vector3(tangent.z, 0, -tangent.x).normalize();
       const yaw = Math.atan2(tangent.x, tangent.z);
@@ -261,15 +312,20 @@ export function corridorPosts(): CorridorPost[] {
   return posts;
 }
 
-/** The sky lane clouds, world space, each 14 below the flight line at its station. */
+/** A sky lane cloud's place, world space: the station on the leg's flight line, off to the side, dropped. */
+export function skyLaneStation(lane: SkyLane, spec: SkyLane["clouds"][number]): V3 {
+  const curve = flightCurve(lane.from, lane.to);
+  const point = curve.getPoint(spec.t), tangent = curve.getTangent(spec.t);
+  const side = new T.Vector3(tangent.z, 0, -tangent.x).normalize().multiplyScalar(spec.side);
+  return [round(point.x + side.x), round(point.y - spec.drop), round(point.z + side.z)];
+}
+
+/** The sky lane clouds, world space. */
 export function corridorClouds(): CorridorCloud[] {
   const clouds: CorridorCloud[] = [];
-  const point = new T.Vector3();
   SKY_LANES.forEach((lane, l) => {
-    const curve = flightCurve(lane.from, lane.to);
     lane.clouds.forEach((spec, i) => {
-      curve.getPoint(spec.t, point);
-      clouds.push({ position: [round(point.x + spec.offset[0]), round(point.y - spec.drop), round(point.z + spec.offset[1])], rotationY: round(((l * 7 + i) * 1.3) % (Math.PI * 2)), scale: spec.scale, lane: laneKey(lane) });
+      clouds.push({ position: skyLaneStation(lane, spec), rotationY: round(((l * 7 + i) * 1.3) % (Math.PI * 2)), scale: spec.scale, lane: laneKey(lane) });
     });
   });
   return clouds;

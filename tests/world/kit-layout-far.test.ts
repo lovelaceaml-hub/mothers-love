@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { CatmullRomCurve3, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
-import { RECOGNITION_ZONES, ZONES, TOUR_ORDER, type ZoneId } from "@/components/display/world/world-data";
+import { ARRIVAL_VIEW, RECOGNITION_ZONES, ZONES, TOUR_ORDER, type ZoneId } from "@/components/display/world/world-data";
 import {
   CALENDAR_GRID,
   COSMOS_CENTER,
@@ -34,11 +34,13 @@ import {
   FRUSTUM_MARGIN,
   ISLET_BELOW_DECK,
   ISLET_SIDE_OFFSET,
+  ISLET_STATIONS,
   ISLET_VIEW_DISTANCE,
   KIT_ISLAND,
   LOD_NEAR,
   LONG_BRIDGE,
   LOW_TIER_VIEW,
+  POST_FREE_ENDS,
   POST_SIDE_OFFSET,
   POST_VIEW_DISTANCE,
   SKY_LANES,
@@ -47,8 +49,11 @@ import {
   corridorClouds,
   corridorIslets,
   corridorPosts,
+  flightBetween,
   flightCurve,
   kitCorridorSites,
+  readingArcEye,
+  skyLaneStation,
   tourLegs,
 } from "@/components/display/world/prototype/kit-corridors";
 import { SMALL_SITE_RADIUS, studyCloudLayout } from "@/components/display/world/prototype/study-clouds";
@@ -127,16 +132,73 @@ function arcEye(id: ZoneId, angle: number, approach: number, bob: number): [numb
 const ARC_ANGLES = Array.from({ length: 9 }, (_, i) => -.48 + (i / 8) * .96);
 const ARC_SAMPLES = ARC_ANGLES.flatMap(angle => [.9, 1, 1.1].flatMap(approach => [-1.6, 0, 1.6].map(bob => ({ angle, approach, bob }))));
 const START_ANGLES = [-.48, 0, .48];
-/** Every travel corridor sample: the 13 legs from three departures each, every 4 units. */
-function travelSamples() {
-  const samples: Array<{ leg: string; point: Vector3 }> = [];
-  for (const leg of tourLegs()) for (const angle of START_ANGLES) {
-    const curve = flightCurve(leg.from, leg.to, angle);
-    for (const point of curve.getSpacedPoints(Math.ceil(curve.getLength() / 4))) samples.push({ leg: `${leg.from}>${leg.to}`, point });
+
+/**
+ * Every flight `CameraDirector.move` can make, sampled every 4 units along the raised
+ * centripetal curve it builds (camera-director.ts lines 70 to 86), kept in a coarse grid so a
+ * bounding sphere can be held clear of all of them at once:
+ *
+ * - the 13 tour legs from three departures each (the corridor of design 6.2);
+ * - every ordered zone pair from every point of the reading arc, which is what a zone button
+ *   press or a playlist subset flies (`visit` moves from wherever the camera is parked);
+ * - the arrival flights: from every reading arc point of every zone, and from a few mid leg
+ *   points, to `ARRIVAL_VIEW.eye` (`beginArrival`, 5 s) and back (`endArrival`, 6 s).
+ */
+type FlightSample = { flight: string; x: number; y: number; z: number };
+type FlightSet = "tour" | "pairs" | "arrival";
+const FLIGHT_CELL = 12;
+class FlightField {
+  readonly cells = new Map<string, FlightSample[]>();
+  readonly curves: Record<FlightSet, number> = { tour: 0, pairs: 0, arrival: 0 };
+  samples = 0;
+  add(set: FlightSet, name: string, curve: CatmullRomCurve3) {
+    this.curves[set]++;
+    for (const point of curve.getSpacedPoints(Math.ceil(curve.getLength() / 4))) {
+      const key = `${set}:${Math.floor(point.x / FLIGHT_CELL)},${Math.floor(point.y / FLIGHT_CELL)},${Math.floor(point.z / FLIGHT_CELL)}`;
+      let cell = this.cells.get(key);
+      if (!cell) this.cells.set(key, cell = []);
+      cell.push({ flight: name, x: point.x, y: point.y, z: point.z });
+      this.samples++;
+    }
   }
-  return samples;
+  /** The smallest gap between a sphere and any sample of the sets, and the flight that sets it (exact for gaps under 8). */
+  clearance(center: readonly number[], radius: number, sets: readonly FlightSet[] = ["tour", "pairs", "arrival"]) {
+    const span = Math.ceil((radius + 8) / FLIGHT_CELL);
+    const cx = Math.floor(center[0] / FLIGHT_CELL), cy = Math.floor(center[1] / FLIGHT_CELL), cz = Math.floor(center[2] / FLIGHT_CELL);
+    let best = Infinity, flight = "none within reach";
+    for (const set of sets) for (let i = -span; i <= span; i++) for (let j = -span; j <= span; j++) for (let k = -span; k <= span; k++) {
+      const cell = this.cells.get(`${set}:${cx + i},${cy + j},${cz + k}`);
+      if (!cell) continue;
+      for (const sample of cell) {
+        const gap = Math.hypot(sample.x - center[0], sample.y - center[1], sample.z - center[2]) - radius;
+        if (gap < best) { best = gap; flight = sample.flight; }
+      }
+    }
+    return { clearance: best, flight };
+  }
 }
-const TRAVEL = travelSamples();
+function flightField() {
+  const field = new FlightField();
+  for (const leg of tourLegs()) for (const angle of START_ANGLES) field.add("tour", `tour leg ${leg.from}>${leg.to} from arc angle ${angle}`, flightCurve(leg.from, leg.to, angle));
+  for (const from of ZONES) for (const to of ZONES) {
+    if (from.id === to.id) continue;
+    for (const s of ARC_SAMPLES) field.add("pairs", `${from.id}>${to.id} from arc angle ${s.angle.toFixed(2)} approach ${s.approach} bob ${s.bob}`, flightBetween(arcEye(from.id, s.angle, s.approach, s.bob), to.eye));
+  }
+  const starts: Array<{ name: string; point: [number, number, number] }> = [];
+  for (const z of ZONES) for (const s of ARC_SAMPLES) starts.push({ name: `${z.id} arc angle ${s.angle.toFixed(2)} approach ${s.approach} bob ${s.bob}`, point: arcEye(z.id, s.angle, s.approach, s.bob) });
+  for (const leg of tourLegs()) for (const t of [.25, .5, .75]) { const p = flightCurve(leg.from, leg.to).getPoint(t); starts.push({ name: `mid leg ${leg.from}>${leg.to} at ${t}`, point: [p.x, p.y, p.z] }); }
+  for (const start of starts) {
+    field.add("arrival", `arrival flight from ${start.name}`, flightBetween(start.point, ARRIVAL_VIEW.eye));
+    field.add("arrival", `return flight to ${start.name}`, flightBetween(ARRIVAL_VIEW.eye, start.point));
+  }
+  return field;
+}
+const FLIGHTS = flightField();
+/** The gap a piece keeps from every flight of the sets; the message names the nearest flight. */
+function flightGap(what: string, center: readonly number[], radius: number, sets?: readonly FlightSet[]) {
+  const { clearance, flight } = FLIGHTS.clearance(center, radius, sets);
+  return { gap: clearance, message: `${what} against the ${flight} flight (gap ${clearance.toFixed(2)})` };
+}
 const islandRadius = (id: ZoneId) => (ZONES.indexOf(zone(id)) < 3 ? 17.8 : FAR_ISLAND_RADIUS);
 const ENTRY = { center: [4.138, 0, 19.104], radius: 12, top: 30 };
 const ALL_FAR: ZoneLayout[] = [...FAR_ZONE_LAYOUTS, ...farZoneCommonLayouts()];
@@ -263,12 +325,44 @@ describe("far zone layouts: keep out volumes (design 6.2)", () => {
     }
   });
 
-  it("keeps every far placement 6 units clear of every travel corridor sample", () => {
+  it("keeps every far placement 6 units clear of the tour legs from every departure", () => {
     for (const layout of ALL_FAR) for (const placement of layout.placements) {
       const sphere = placementSphere(placement);
-      const world = toWorld(layout.zone, sphere.center);
-      for (const sample of TRAVEL) expect(distance(world, [sample.point.x, sample.point.y, sample.point.z]) - sphere.radius, `${label(layout, placement)} against the ${sample.leg} corridor`).toBeGreaterThanOrEqual(6);
+      const { gap, message } = flightGap(label(layout, placement), toWorld(layout.zone, sphere.center), sphere.radius, ["tour"]);
+      expect(gap, message).toBeGreaterThanOrEqual(6);
     }
+  });
+
+  it("keeps every far placement 6 units clear of every zone pair, arrival and return flight, except the known Pavilion departures over the Promise", () => {
+    // The Pavilion's authored eye (-46, 10, 52) parks 5 units off the Promise island's rim, so a
+    // flight from its reading arc (swung toward the Promise, approach 1.1, bob -1.6) to the
+    // River, the gate, the Promise or the arrival view crosses the back of the Promise island at
+    // y 9 to 12: through the island's arch row (which the design world builds today, kit or not)
+    // and, on the flight to the River, the top of the 10.7 tall ribbon portal (box clearance 0).
+    // The eyes are design 6.1 facts outside this lane, so those three pieces are pinned here with
+    // their numbers and reported as an open issue; every other far placement holds the 6 units
+    // against every one of these flights, and nothing else may join this list.
+    const known = new Map<string, number>([
+      ["promise arrival.ribbon-portal at 0,0.6,-5", -2.6],
+      ["promise core.ribbon at 1,7.4,-5.4", 2.44],
+      ["promise nature.blossom-tree-a at 11.4,0.7,-1.5", 4.72],
+    ]);
+    const failures = new Map<string, { gap: number; flight: string }>();
+    for (const layout of ALL_FAR) for (const placement of layout.placements) {
+      const sphere = placementSphere(placement);
+      const key = `${layout.zone} ${placement.id} at ${placement.position.join(",")}`;
+      const { clearance, flight } = FLIGHTS.clearance(toWorld(layout.zone, sphere.center), sphere.radius, ["pairs", "arrival"]);
+      if (clearance < 6) failures.set(key, { gap: clearance, flight });
+    }
+    expect([...failures.keys()].sort()).toEqual([...known.keys()].sort());
+    for (const [key, { gap, flight }] of failures) {
+      expect(gap, key).toBeCloseTo(known.get(key)!, 1);
+      expect(flight, key).toMatch(/^(featured>(live-feed|welcome|promise)|arrival flight from featured arc angle|return flight to featured arc angle) .*approach 1\.1 bob -1\.6$/);
+    }
+    // And even there the arrival flights themselves pass above the portal's bounding sphere's top by more than 2 units.
+    const portal = FAR_ZONE_LAYOUTS[5].placements.find(p => p.id === "arrival.ribbon-portal")!;
+    const sphere = placementSphere(portal);
+    expect(FLIGHTS.clearance(toWorld("promise", sphere.center), sphere.radius, ["arrival"]).clearance).toBeGreaterThan(2);
   });
 });
 
@@ -415,18 +509,27 @@ describe("corridors: islets", () => {
     return [{ center: [islet.center[0], pivotY, islet.center[2]], radius: bodyRadius }, { center: [islet.tree.position[0], crownY, islet.tree.position[2]], radius: crownRadius }];
   }
 
-  it("places one islet beside each of the eight long bridges, 22 to the side and 4 below the deck, plus four along the sky lanes", () => {
+  it("places one islet beside each of the eight long bridges at its station, 4 below the deck, plus four along the sky lanes", () => {
     expect(islets).toHaveLength(12);
     expect(corridorIslets()).toEqual(islets);
     const long = bridges.filter(b => b.long);
     long.forEach((bridge, i) => {
       const islet = islets[i];
       expect(islet.reason).toBe(`bridge ${bridge.from}>${bridge.to}`);
-      const mid = bridgeCurve(bridge).getPoint(.5);
-      expect(Math.hypot(islet.center[0] - mid.x, islet.center[2] - mid.z)).toBeCloseTo(ISLET_SIDE_OFFSET, 2);
-      expect(islet.center[1]).toBeCloseTo(mid.y - ISLET_BELOW_DECK, 2);
+      const station = ISLET_STATIONS[`${bridge.from}>${bridge.to}`] ?? {};
+      const point = bridgeCurve(bridge).getPoint(station.along ?? .5);
+      expect(Math.hypot(islet.center[0] - point.x, islet.center[2] - point.z)).toBeCloseTo(station.side ?? ISLET_SIDE_OFFSET, 2);
+      expect(islet.center[1]).toBeCloseTo(point.y - ISLET_BELOW_DECK, 2);
       expect(islet.radius).toBeCloseTo(KIT_ISLAND.grassRadius * islet.scale, 5);
     });
+    // Six islets keep the design's middle of the bridge and 22 units; the two under a parked camera's arc move, never off the bridge's flank.
+    expect(Object.keys(ISLET_STATIONS).sort()).toEqual(["garden>expressions", "garden>heart", "garden>live-feed"]);
+    for (const [bridge, station] of Object.entries(ISLET_STATIONS)) {
+      expect(long.some(b => `${b.from}>${b.to}` === bridge), bridge).toBe(true);
+      if (station?.along !== undefined) expect(station.along).toBeGreaterThanOrEqual(.2);
+      if (station?.along !== undefined) expect(station.along).toBeLessThanOrEqual(.8);
+      if (station?.side !== undefined) expect(station.side).toBeLessThanOrEqual(ISLET_SIDE_OFFSET + 4);
+    }
     expect(islets.slice(8).map(islet => islet.reason)).toEqual(["sky lane practice>calendar", "sky lane practice>calendar", "sky lane milestone>live-feed", "sky lane milestone>live-feed"]);
     for (const islet of islets) expect(Math.hypot(islet.tree.position[0] - islet.center[0], islet.tree.position[2] - islet.center[2])).toBeLessThan(islet.radius * .5);
   });
@@ -448,9 +551,11 @@ describe("corridors: islets", () => {
     }
   });
 
-  it("keeps every islet and its tree 6 units clear of every travel corridor sample", () => {
-    for (const islet of islets) for (const sphere of isletSpheres(islet)) for (const sample of TRAVEL)
-      expect(distance(sphere.center, [sample.point.x, sample.point.y, sample.point.z]) - sphere.radius, `${islet.reason} islet at ${islet.center.join(",")} against the ${sample.leg} corridor`).toBeGreaterThanOrEqual(6);
+  it("keeps every islet and its tree 6 units clear of every flight the director can make", () => {
+    for (const islet of islets) for (const [part, sphere] of isletSpheres(islet).map((sphere, k) => [k ? "crown" : "body", sphere] as const)) {
+      const { gap, message } = flightGap(`${islet.reason} islet ${part} at ${islet.center.join(",")}`, sphere.center, sphere.radius);
+      expect(gap, message).toBeGreaterThanOrEqual(6);
+    }
   });
 
   it("offers the islets as cloud collar sites only when the kit has the island, and leaves every existing puff unchanged", () => {
@@ -486,12 +591,17 @@ describe("corridors: lantern posts", () => {
   const posts = corridorPosts();
   const bridges = corridorBridges();
 
-  it("stands two posts at each end of every bridge, on the deck, 2.6 off its centre line", () => {
-    expect(posts).toHaveLength(bridges.length * 4);
+  it("stands two posts at each end of every bridge, on the deck, just inside the rail, except the two ends under a parked camera", () => {
+    expect(Object.entries(POST_FREE_ENDS)).toEqual([["featured>practice", "start"], ["featured>promise", "end"]]);
+    expect(posts).toHaveLength(bridges.length * 4 - 4);
     expect(corridorPosts()).toEqual(posts);
     for (const bridge of bridges) {
       const own = posts.filter(post => post.bridge === `${bridge.from}>${bridge.to}`);
-      expect(own).toHaveLength(4);
+      const free = POST_FREE_ENDS[`${bridge.from}>${bridge.to}`];
+      expect(own).toHaveLength(free ? 2 : 4);
+      const at = (end: [number, number, number]) => own.filter(post => Math.hypot(post.position[0] - end[0], post.position[2] - end[2]) < 5).length;
+      expect(at(bridge.start)).toBe(free === "start" ? 0 : 2);
+      expect(at(bridge.end)).toBe(free === "end" ? 0 : 2);
       const samples = bridgeCurve(bridge).getSpacedPoints(400);
       for (const post of own) {
         const nearest = samples.reduce((best, point) => Math.min(best, Math.hypot(point.x - post.position[0], point.z - post.position[2])), Infinity);
@@ -503,12 +613,24 @@ describe("corridors: lantern posts", () => {
     }
   });
 
-  it("keeps every post 6 units clear of every travel corridor sample", () => {
+  it("keeps every post 6 units clear of every flight the director can make, and could not at the two free ends", () => {
     const box = assetBox("landmark.lantern-post");
     const radius = 1.1 * Math.hypot(Math.hypot(box.max[0] - box.min[0], box.max[2] - box.min[2]) / 2, (box.max[1] - box.min[1]) / 2);
+    const center = (position: readonly number[]) => [position[0], position[1] + (box.max[1] + box.min[1]) / 2 * 1.1, position[2]];
     for (const post of posts) {
-      const center = [post.position[0], post.position[1] + (box.max[1] + box.min[1]) / 2 * 1.1, post.position[2]];
-      for (const sample of TRAVEL) expect(distance(center, [sample.point.x, sample.point.y, sample.point.z]) - radius, `post on ${post.bridge} at ${post.position.join(",")} against the ${sample.leg} corridor`).toBeGreaterThanOrEqual(6);
+      const { gap, message } = flightGap(`post on ${post.bridge} at ${post.position.join(",")}`, center(post.position), radius);
+      expect(gap, message).toBeGreaterThanOrEqual(6);
+    }
+    // The omitted pairs would stand under the terrace and Pavilion cameras' reading arcs: the
+    // arc itself is the start of every flight from there, and it comes within 5.6 units.
+    for (const [key, end] of Object.entries(POST_FREE_ENDS)) {
+      const bridge = bridges.find(b => `${b.from}>${b.to}` === key)!;
+      const curve = bridgeCurve(bridge), t = end === "start" ? .03 : .97;
+      const point = curve.getPoint(t), tangent = curve.getTangent(t);
+      const side = new Vector3(tangent.z, 0, -tangent.x).normalize();
+      const gaps = [-1, 1].map(sign => flightGap(key, center([point.x + side.x * POST_SIDE_OFFSET * sign, point.y + .02, point.z + side.z * POST_SIDE_OFFSET * sign]), radius).gap);
+      expect(Math.min(...gaps), `${key} ${end}`).toBeLessThan(6);
+      expect(Math.min(...gaps), `${key} ${end}`).toBeGreaterThan(4.5);
     }
   });
 });
@@ -518,32 +640,70 @@ describe("corridors: sky lanes", () => {
   const cloudBox = assetBox("nature.cloud-c");
   const deckSamples = corridorBridges().flatMap(bridge => bridgeCurve(bridge).getSpacedPoints(24).map(point => ({ bridge: `${bridge.from}>${bridge.to}`, point })));
 
-  it("dresses the two fast legs with four and seven clouds under the flight line", () => {
+  it("dresses the two fast legs with five and seven clouds below and beside the flight line", () => {
     expect(SKY_LANES.map(lane => `${lane.from}>${lane.to}`)).toEqual(["practice>calendar", "milestone>live-feed"]);
-    expect(clouds.filter(cloud => cloud.lane === "practice>calendar")).toHaveLength(4);
+    expect(clouds.filter(cloud => cloud.lane === "practice>calendar")).toHaveLength(5);
     expect(clouds.filter(cloud => cloud.lane === "milestone>live-feed")).toHaveLength(7);
     expect(corridorClouds()).toEqual(clouds);
     for (const lane of SKY_LANES) {
       const curve = flightCurve(lane.from, lane.to);
       for (const spec of lane.clouds) {
         const station = curve.getPoint(spec.t);
-        const cloud = clouds.find(c => c.lane === `${lane.from}>${lane.to}` && Math.abs(c.position[0] - station.x - spec.offset[0]) < 1e-2)!;
+        const cloud = clouds.find(c => c.lane === `${lane.from}>${lane.to}` && c.position.every((v, k) => Math.abs(v - skyLaneStation(lane, spec)[k]) < 1e-9))!;
         expect(cloud, `${lane.from}>${lane.to} station ${spec.t}`).toBeDefined();
         expect(station.y - cloud.position[1]).toBeCloseTo(spec.drop, 2);
+        expect(Math.hypot(cloud.position[0] - station.x, cloud.position[2] - station.z)).toBeCloseTo(Math.abs(spec.side), 2);
         expect(spec.drop).toBeGreaterThanOrEqual(14);
+        expect(Math.abs(spec.side)).toBeLessThanOrEqual(32);
       }
       expect([...lane.clouds.map(c => c.t)]).toEqual([...lane.clouds.map(c => c.t)].sort((a, b) => a - b));
     }
   });
 
-  it("keeps every cloud clear of the districts, the arrival stage, the decks and every travel corridor", () => {
+  const cloudSphere = (cloud: (typeof clouds)[number]): Sphere => ({
+    center: [cloud.position[0], cloud.position[1] + (cloudBox.min[1] + cloudBox.max[1]) / 2 * cloud.scale, cloud.position[2]],
+    radius: cloud.scale * Math.hypot(Math.hypot(cloudBox.max[0] - cloudBox.min[0], cloudBox.max[2] - cloudBox.min[2]) / 2, (cloudBox.max[1] - cloudBox.min[1]) / 2),
+  });
+
+  it("keeps every cloud clear of the districts, the arrival stage, the decks, the islets and each other", () => {
+    const islets = corridorIslets();
+    const treeBox = assetBox("nature.blossom-tree-a"), body = assetBox("nature.island-small");
     for (const cloud of clouds) {
-      const radius = cloud.scale * Math.hypot(Math.hypot(cloudBox.max[0] - cloudBox.min[0], cloudBox.max[2] - cloudBox.min[2]) / 2, (cloudBox.max[1] - cloudBox.min[1]) / 2);
-      for (const district of ZONES) expect(flat(cloud.position, district.center) - islandRadius(district.id) - radius, `${cloud.lane} cloud at ${cloud.position.join(",")} against ${district.id}`).toBeGreaterThanOrEqual(1);
-      if (cloud.position[1] < ENTRY.top) expect(flat(cloud.position, ENTRY.center) - ENTRY.radius - radius, `${cloud.lane} cloud against the arrival stage`).toBeGreaterThanOrEqual(0);
-      if (cloud.position[1] < 12) for (const sample of deckSamples) expect(flat(cloud.position, [sample.point.x, 0, sample.point.z]) - radius - POST_SIDE_OFFSET, `${cloud.lane} cloud against the ${sample.bridge} deck`).toBeGreaterThanOrEqual(1);
-      for (const sample of TRAVEL) expect(distance(cloud.position, [sample.point.x, sample.point.y, sample.point.z]) - radius, `${cloud.lane} cloud at ${cloud.position.join(",")} against the ${sample.leg} corridor`).toBeGreaterThanOrEqual(6);
-      expect(cloud.position[1]).toBeGreaterThan(-4);
+      const { center, radius } = cloudSphere(cloud);
+      const name = `${cloud.lane} cloud at ${cloud.position.join(",")}`;
+      for (const district of ZONES) expect(flat(cloud.position, district.center) - islandRadius(district.id) - radius, `${name} against ${district.id}`).toBeGreaterThanOrEqual(1);
+      if (cloud.position[1] < ENTRY.top) expect(flat(cloud.position, ENTRY.center) - ENTRY.radius - radius, `${name} against the arrival stage`).toBeGreaterThanOrEqual(0);
+      if (cloud.position[1] < 12) for (const sample of deckSamples) expect(flat(cloud.position, [sample.point.x, 0, sample.point.z]) - radius - POST_SIDE_OFFSET, `${name} against the ${sample.bridge} deck`).toBeGreaterThanOrEqual(1);
+      for (const islet of islets) {
+        const pivotY = islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale;
+        const bodyRadius = islet.scale * Math.hypot(Math.hypot(body.max[0] - body.min[0], body.max[2] - body.min[2]) / 2, (body.max[1] - body.min[1]) / 2);
+        const crownY = islet.tree.position[1] + (treeBox.min[1] + treeBox.max[1]) / 2 * islet.tree.scale;
+        const crownRadius = islet.tree.scale * Math.hypot(Math.hypot(treeBox.max[0] - treeBox.min[0], treeBox.max[2] - treeBox.min[2]) / 2, (treeBox.max[1] - treeBox.min[1]) / 2);
+        expect(distance(center, [islet.center[0], pivotY, islet.center[2]]) - radius - bodyRadius, `${name} against the ${islet.reason} islet`).toBeGreaterThanOrEqual(0);
+        expect(distance(center, [islet.tree.position[0], crownY, islet.tree.position[2]]) - radius - crownRadius, `${name} against the ${islet.reason} islet's tree`).toBeGreaterThanOrEqual(1);
+        expect(flat(cloud.position, islet.center) - islet.radius - radius, `${name} over the ${islet.reason} islet`).toBeGreaterThanOrEqual(0);
+      }
+      for (const other of clouds) if (other !== cloud) expect(distance(center, cloudSphere(other).center) - radius - cloudSphere(other).radius, `${name} against the cloud at ${other.position.join(",")}`).toBeGreaterThanOrEqual(3);
+      expect(cloud.position[1]).toBeGreaterThan(-1.5);
+    }
+  });
+
+  it("keeps every cloud 6 units clear of every flight the director can make", () => {
+    for (const cloud of clouds) {
+      const { center, radius } = cloudSphere(cloud);
+      const { gap, message } = flightGap(`${cloud.lane} cloud at ${cloud.position.join(",")}`, center, radius);
+      expect(gap, message).toBeGreaterThanOrEqual(6);
+    }
+  });
+
+  it("never puts an opaque cloud in the arrival flight from the Garden of Days, or in the journeys the reviewer traced", () => {
+    // The stations before this fix put a cloud 3 units from the flight the calendar camera makes to the arrival view.
+    const journeys: Array<[string, CatmullRomCurve3]> = [];
+    for (const s of ARC_SAMPLES) journeys.push([`calendar arc angle ${s.angle.toFixed(2)} to the arrival view`, flightBetween(arcEye("calendar", s.angle, s.approach, s.bob), ARRIVAL_VIEW.eye)]);
+    journeys.push(["calendar to garden (zone button)", flightCurve("calendar", "garden")], ["calendar to milestone (playlist subset)", flightCurve("calendar", "milestone")], ["live-feed to peacemakers (playlist subset)", flightCurve("live-feed", "peacemakers")]);
+    for (const [name, curve] of journeys) for (const point of curve.getSpacedPoints(Math.ceil(curve.getLength() / 2))) for (const cloud of clouds) {
+      const { center, radius } = cloudSphere(cloud);
+      expect(distance(center, [point.x, point.y, point.z]) - radius, `${cloud.lane} cloud at ${cloud.position.join(",")} on the ${name} journey`).toBeGreaterThanOrEqual(6);
     }
   });
 
@@ -597,6 +757,33 @@ describe("corridors: view distances, tiers and the triangle budget (design 7.2, 
       for (const cloud of clouds) if (near(cloud.position) <= CLOUD_VIEW_DISTANCE) total += tris("nature.cloud-c") * CORRIDOR_KEEP.cloud;
       expect(total, `${zone.id}: ${Math.round(total)} triangles in range`).toBeLessThan(200000);
     }
+  });
+});
+
+describe("corridors: every flight the director makes (camera-director.ts move, visit, beginArrival, endArrival)", () => {
+  it("builds the flights the way the director does: a centripetal curve through the start, a middle raised 7 above the higher end, and the end", () => {
+    const start: [number, number, number] = [88, 15, 11], end = ARRIVAL_VIEW.eye;
+    const curve = flightBetween(start, end);
+    expect(curve.curveType).toBe("centripetal");
+    expect(curve.closed).toBe(false);
+    curve.getPoint(0).toArray().forEach((v, k) => expect(v).toBeCloseTo(start[k], 6));
+    curve.getPoint(1).toArray().forEach((v, k) => expect(v).toBeCloseTo(end[k], 6));
+    expect(curve.points[1].toArray()).toEqual([(88 + 15) / 2, Math.max(15, 17) + 7, (11 + 43) / 2]);
+    // The reviewer's trace: the flight from the calendar eye to the arrival view passes near (51.5, 24, 27).
+    const nearest = curve.getSpacedPoints(200).reduce((best, point) => Math.min(best, point.distanceTo(new Vector3(51.5, 24, 27))), Infinity);
+    expect(nearest).toBeLessThan(1);
+  });
+
+  it("mirrors the director's reading arc for every sample and covers the tour, every ordered pair and the arrivals", () => {
+    for (const zone of ZONES) for (const s of ARC_SAMPLES) readingArcEye(zone.id, s.angle, s.approach, s.bob).forEach((v, k) => expect(v).toBeCloseTo(arcEye(zone.id, s.angle, s.approach, s.bob)[k], 9));
+    expect(FLIGHTS.curves).toEqual({ tour: 13 * START_ANGLES.length, pairs: 13 * 12 * ARC_SAMPLES.length, arrival: 2 * (13 * ARC_SAMPLES.length + 13 * 3) });
+    expect(ARC_SAMPLES).toHaveLength(81);
+    expect(FLIGHTS.samples).toBeGreaterThan(300000);
+    // A sphere on the arrival view itself is reached by an arrival flight; one far above the world by nothing.
+    expect(FLIGHTS.clearance(ARRIVAL_VIEW.eye, 1).clearance).toBeLessThan(0);
+    expect(FLIGHTS.clearance(ARRIVAL_VIEW.eye, 1, ["arrival"]).flight).toMatch(/arrival flight|return flight/);
+    expect(FLIGHTS.clearance(ARRIVAL_VIEW.eye, 1, ["tour"]).clearance).toBeGreaterThan(0);
+    expect(FLIGHTS.clearance([0, 200, 0], 1).clearance).toBe(Infinity);
   });
 });
 
