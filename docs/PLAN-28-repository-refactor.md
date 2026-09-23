@@ -1,0 +1,225 @@
+# Plan 26: Clean up and refactor the Mother's Love repository
+
+Drafted 2026-09-22 by Claude after Anthony said: "All of this needs to be cleaned up. What is the latest version? even branches should be renamed. i want all of it refactored. As of now, the 3d world is not to replace but separate/alongside the tv view."
+
+Status: draft, awaiting Anthony's approval. Nothing in this plan runs until he approves it.
+
+## Goal
+
+Leave one obvious latest version, a small set of clearly named branches, one place for documents, one working copy per live piece of work, and the 3D world installed as its own permanent surface that sits alongside the existing TV view instead of replacing it. No change to the database, the API, the public contract, or anyone's privacy.
+
+## Authority
+
+Anthony's instruction above is the current authority. It supersedes one thing in [Plan 25](PLAN-25-world-promotion.md): gate G5 there pointed the TV at the world as the new TV destination. From now on the world is a separate surface and `/display` stays the TV view, unchanged. The rest of Plan 25 (make the design look the default, the real TV check, close the CI failure, the completion review, Anthony merges) is folded into Section 5 of this plan.
+
+## Where things stand, verified 2026-09-22
+
+Latest version of the app: `origin/codex/mothers-love` at `1b4c31a`, which is what production serves at https://mothers-love.vercel.app. Nothing else contains newer application code. Everything below was read from the repository, not from memory.
+
+| Fact | Number |
+| --- | --- |
+| Local branches | 125 |
+| Remote branches on GitHub | 110 |
+| Worktrees (checked-out copies) | 8 |
+| Disk used by those copies | 12.6 GB (7.8 GB main, 4.8 GB worktrees) |
+| Untracked files in the main working copy | 2,242 files, which `git status` reports as 1,596 entries because it collapses a whole untracked folder into one line; 2,206 are run evidence under `docs/runs/2026-09-11-tv-scenes/logs/` and 36 sit elsewhere |
+| Modified tracked files anywhere | 0 |
+
+Branch positions against production `1b4c31a`:
+
+| Branch | Ahead | Behind | What it holds |
+| --- | --- | --- | --- |
+| `origin/codex/mothers-love` | production | production | The live app |
+| `feature/world-cinematic-art-pass` | 25 | 16 | The 3D world, pass D1 and D2, draft PR #8 |
+| `feature/tv-3d-world-prototype-01` | 5 | 16 | The world's base, 4 real commits, PR #8's current base |
+| `codex/tv-pearl-sequence` | 19 | 16 | Pearl sequence and Expression Cosmos prototypes |
+| `codex/tv-pearl-design-study` | 2 | 0 | The 2D TV pearl design study, sample only |
+| `tv17/pick` | 2 | 16 | Documents only, no code production lacks |
+| `codex/color-polish-v6` | 37 | 182 | The branch the main working copy is stuck on, stale |
+| `change/heart-ribbons-3d` | 1 | 12 | Already merged as PR #6, the extra commit is documents |
+| `release/feed-100`, `tv15/pick`, `tv/pick`, and about 100 others | 0 | 100 to 190 | Fully contained in production, safe to archive |
+
+Two worktrees live outside `~/Projects`, under `/Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/`. One of them is on a detached HEAD.
+
+Documents are split across branches. Production carries `PLAN-01` through `PLAN-18` but not `PLAN-14` or `PLAN-19` through `PLAN-25`; those exist only on the world and pearl branches.
+
+Dead routes still shipping in production source: `src/app/display-legacy/page.tsx` and `src/app/display-v6/page.tsx`.
+
+## Decisions Anthony made, 2026-09-22
+
+1. Rename the production branch `codex/mothers-love` to `main`. Approved. The Vercel production branch setting changes with it. Done: Section 1 renamed the branch, and on 2026-09-23 the Section 1 chat changed the Vercel setting to `main` at Anthony's request (see the Build log).
+2. Archive then delete the roughly 100 finished branches. Approved. Every one is first pushed as a permanent tag `archive/<old-branch-name>`, so any can be restored in a minute.
+3. Move the untracked run evidence, 2,242 files, to the Drive folder that already holds this project's outputs, and add them to `.gitignore`. Approved.
+4. The 3D world's permanent address is `/world`, a top level surface of its own, with `/display/world-preview` kept as a redirect so existing links keep working. Approved.
+5. Split the oversized files while we are in here. Approved 2026-09-22 in answer to Anthony's question about splitting sections and scenes. Scope is fixed in Section 7, which lists exactly which files and why. The eleven TV scenes are already one file each and are not re-split.
+
+## Proposed branch naming scheme
+
+| Kind | Name | Example |
+| --- | --- | --- |
+| Production | `main` | `main` |
+| Active work | `feat/<area>-<subject>` | `feat/world-live-data` |
+| Fix | `fix/<area>-<subject>` | `fix/world-ci-readiness` |
+| Retired work | tag only, no branch | `archive/codex/tv15-full-preview` |
+
+Areas are `app` (campaign and form), `tv` (the 2D TV view), `world` (the 3D world), `admin`, and `infra`.
+
+Target after this plan: `main` plus at most four live branches.
+
+## Models, effort, agents, review
+
+Anthony's routing ruling, 2026-09-22: "Use Opus xhigh for the entire plan. flash when applicable. Fable can be an advisor since its at 97%." That overrides the Codex lane this plan was first drafted with, and it is logged rather than re-argued.
+
+| Role | Model and effort | Notes |
+| --- | --- | --- |
+| Writer, every section | Claude Opus 5, xhigh | One fresh chat per section, Steps mode. |
+| Mechanical rows | Gemini 3.8 Flash, medium | Branch inventory tables, evidence hashing, link sweeps, bulk listing. Anything that is counting or copying, not judging. |
+| Advisor | Fable 5.1 | Consulted for a routing or sequencing question only. It authors nothing, because its weekly pool is at 97 percent utilization. |
+| Hygiene sweep | Haiku 4.5, low | Before each section's review: dead links, missing files, Build log and trailer format. |
+| Landing review | Sonnet 5, high, read only | One round per section, findings corrected before the section closes. |
+| Completion review | Fresh non author Claude Opus 5, xhigh, read only | The whole diff before the merge, carrying Plan 24's P7 privacy and behavior list. |
+| Decisions and hands | Anthony | The TV check and the merge clicks. The Vercel production branch setting is done (2026-09-23, see the Build log). |
+
+Mode: Steps. One fresh chat per section, in order, each starting from the plan and its Build log.
+
+Pool facts at drafting, read live from the usage dashboard at 2026-09-23T01:22Z: Claude 5 hour 4 percent, Claude weekly 88 percent resetting today at 10:59 PM, Fable weekly 97 percent, Gemini weekly 78 percent, Codex primary 96 percent. Opus xhigh across eight sections may run the Claude weekly pool out before the reset. If that happens, the section in flight finishes and the next one waits for 10:59 PM rather than silently downgrading.
+
+Spill order if the Claude pool is exhausted mid plan: Gemini 3.8 Flash for mechanical sections, then wait for the reset for the code sections. Never Fable as a writer while it sits at 97 percent.
+
+## Sections
+
+### Section 0: Safety net (Opus 5 xhigh, 20 minutes)
+
+Before anything is renamed or deleted. Fetch and prune. Push a tag `archive/<branch-name>` for every local and remote branch that is not one of the five keepers. Write the complete inventory (branch, tag, SHA, ahead and behind counts) to the run record. Confirm every tag exists on GitHub. Nothing is deleted in this section.
+
+Acceptance: a tag on GitHub for every branch that will later be removed, and the inventory file listing all of them.
+
+### Section 1: Rename and reduce the branches (Opus 5 xhigh, 45 minutes)
+
+Rename the keepers to the scheme. Delete the archived branches locally and on GitHub. Update the open pull requests to the new names. If Anthony approved the `main` rename, do that one last, and stop before the Vercel production branch setting, which he changes himself. (Section 1 did stop there. The setting was changed afterwards, see the Build log for 2026-09-23.)
+
+Keepers, with proposed new names:
+
+| Old | New |
+| --- | --- |
+| `codex/mothers-love` | `main` (if approved) |
+| `feature/world-cinematic-art-pass` | `feat/world-cinematic` |
+| `feature/tv-3d-world-prototype-01` | folded into `feat/world-cinematic`, then archived |
+| `codex/tv-pearl-design-study` | `feat/tv-pearl-design` |
+| `codex/tv-pearl-sequence` | `feat/tv-pearl-sequence` |
+
+Acceptance: `git branch -a` shows at most six branches, every removed name resolves as a tag, and no open pull request points at a missing branch.
+
+### Section 2: Fix the main working copy (Opus 5 xhigh, 30 minutes)
+
+Move `/Users/anthony/Projects/mothers-love` onto the production branch. Copy the 2,242 untracked evidence files to the project's Drive folder with SHA-256 receipts before removing them. Add the evidence paths to `.gitignore`. Leave the checkout clean.
+
+Acceptance: `git status` in the main checkout reports a clean tree on the production branch, and the Drive copy is verified by hash.
+
+### Section 3: One documentation set (Opus 5 xhigh, 40 minutes)
+
+Bring `PLAN-14` and `PLAN-19` through `PLAN-26` onto the production branch so every plan lives in one place. Rewrite `docs/HANDOFF.md` as one current page with the history moved to `docs/HISTORY.md`, because the handoff is now 40 screens of stacked releases. Refresh `README.md` quick links, `USER-MANUAL.md`, `AGENTS.md`, and the project's line in `/Users/anthony/Projects/README.md`.
+
+Acceptance: every plan number from 01 to 26 present once on the production branch, and the handoff opens with the current state in the first paragraph.
+
+### Section 4: Worktrees (Opus 5 xhigh, 20 minutes)
+
+Remove the worktrees whose branches were archived. Move the two copies under `/Users/anthony/Documents/Codex/...` into `/Users/anthony/Projects/mothers-love-worktrees/` or remove them once their commits are tagged. Delete `_saved-evidence`, `backup`, and `remove-old-copies.sh` from the worktrees folder after confirming their contents are already in Git or Drive. Run `git worktree prune`.
+
+Acceptance: one worktree per live branch, no copies outside `~/Projects`, and the recovered disk space recorded.
+
+### Section 5: The 3D world as its own surface (Opus 5 xhigh, about 2 hours)
+
+This replaces Plan 25's gates G1 and G5 and keeps its G2, G3 and G4.
+
+- Move the world to `/world`, its own top level surface, with `/display/world-preview` redirecting there so existing links keep working.
+- Make the design look the default for both live and sample sources, keep `art=classic` and `art=cinematic` as explicit fallbacks, and remove the sample expression override from every live path.
+- Picture quality defaults to Auto, with High and Low still selectable in Settings.
+- `/display` and its eleven 2D screens are untouched. The world is reached by its own URL, and it does not enter the TV playlist.
+- Add a quiet link from the admin display page so the operator can find the world without typing a URL.
+- Privacy: the world reads only the existing public TV projection endpoint, no new fields, no submitted names. Every privacy state clears every pearl immediately.
+- Merge the 16 production commits the world branch is missing, then rebase the branch so PR #8 targets the production branch directly.
+
+Acceptance: typecheck, unit tests, build, the world harness in stills and tour modes, the pearl text parity check, the world safety tests, and a live mode browser run against a preview deployment that asserts attributes only and stores no screenshots of real records.
+
+### Section 6: Retire the dead code (Opus 5 xhigh, 45 minutes)
+
+Remove `src/app/display-legacy` and `src/app/display-v6` and anything only they use, after confirming nothing links to them. Fix the Linux CI readiness failure that Plan 24 recorded as P0. Run the full suite.
+
+Acceptance: CI green on the fixed head, no route removed that anything still references, and the live TV unchanged.
+
+### Section 7: Split the oversized files (Opus 5 xhigh, about 2 hours)
+
+The eleven TV scenes are already split, one file each under `public/color-polish/scenes/` with a shared `core/`, from the Plan 13 refactor. That structure is the target shape and it is not touched. Five files never got the same treatment:
+
+| File | Lines | Split into |
+| --- | --- | --- |
+| `src/components/display/world/prototype/design-world.ts` | 773 | One module per world location, matching how the TV scenes are laid out |
+| `src/components/display/world/WorldExperience.tsx` | 789 | The React shell, the settings panel and the reading overlay |
+| `src/components/display/world/world-engine.ts` | 744 | Scene construction, the frame loop and disposal |
+| `src/components/display/world/world-districts.ts` | 633 | One module per district, sharing a single district type |
+| `src/lib/display/coordinator.ts` | 935 | Polling, snapshot bridging and rotation |
+
+Also rename the world's `prototype/` folder, which holds 17 files and is no longer a prototype, to `art/`, so the folder name matches what it is.
+
+Rules: this section moves code, it does not change behavior. No rendering, timing, privacy or public contract change. Every split is a move plus imports, reviewed as such.
+
+Acceptance: no source file over roughly 400 lines in the world or coordinator, typecheck, unit tests, build and the world harness all pass unchanged, and the captures stay byte-identical to the ones taken before the split.
+
+### Section 8: Verify, review, back up, report (Opus 5 xhigh, 1 hour)
+
+Completion review by a fresh non author Opus 5 over the whole diff, carrying Plan 24's P7 privacy and behavior list. Correct findings. Stage the pull request for Anthony to merge. After the merge, verify the live campaign page, `/display`, the new world surface, and admin sign in. Push everything privately, record the production deployment ID and the rollback deployment, and update the Projects index.
+
+## Interfaces and acceptance
+
+No database, API, authentication, catalog, or public contract change. No new public fields. Submitted names stay private. The live campaign page and the eleven 2D TV screens behave exactly as they do today, and switching the TV back is never needed because the TV is never switched.
+
+Completion requires: the branch inventory tagged, the branch list reduced, the main checkout clean, one documentation set, one worktree per live branch, the world reachable at its own address with live data, the dead routes gone, the oversized files split, CI green, the completion review passed with findings corrected, the pull request merged by Anthony, production verified, and the rollback deployment recorded.
+
+## Rollback
+
+Every removed branch is a tag, so any of them is restored with one command. The application change is one pull request, so production rolls back with one click on the previous Vercel deployment. The TV view is never touched, so it cannot regress.
+
+## What Anthony must do
+
+1. Approve this plan.
+2. Done 2026-09-23: the Vercel production branch setting reads `main`, changed by the Section 1 chat at Anthony's request.
+3. The 10 minute check of the world on the real TV, and tell us the TV make and browser.
+4. Click Merge on the pull request.
+5. Click Merge on Section 3's documentation pull request. Since 2026-09-23 a push to `main` is a production deployment, so documents reach `main` through a pull request he merges.
+
+## Build log
+
+- 2026-09-22: Drafted by Claude Opus 5 after a full read only survey of 125 local branches, 110 remote branches, 8 worktrees and 12.6 GB of working copies. Not yet approved. No branch, tag, worktree, file or deployment was changed.
+- 2026-09-22: Anthony answered all four decisions (rename to `main`, archive then delete, evidence to Drive, `/world`) and asked whether to split sections and scenes. Section 7 added after checking the source: the TV scenes are already one file each, five other files are oversized. Still no branch, tag, worktree, file or deployment changed.
+- 2026-09-22: Anthony approved the plan, chose Steps mode, kept `coordinator.ts` in the Section 7 split, and ruled the routing: Opus 5 xhigh for every section, Gemini 3.8 Flash for mechanical rows, Fable as advisor only at 97 percent utilization. Plan id `2026-09-22-repo-refactor`. Section 0 handed to a fresh chat.
+- 2026-09-23: **Section 0 complete** (Claude Opus 5, xhigh). Fetched and pruned, then pushed 133 annotated `archive/<branch-name>` tags to GitHub, one for every distinct non keeper branch name plus `archive/detached-world-bubbles` for the detached commit `bb03f79`. All 133 verified present on GitHub, annotated, and pointing at the recorded commits; every archived branch tip, local and remote, is reachable from its tag. Inventory written to [docs/runs/2026-09-22-repo-refactor/research/branch-inventory.md](runs/2026-09-22-repo-refactor/research/branch-inventory.md) and `.json`. Nothing deleted, renamed, merged or deployed; production unmoved at `1b4c31a`; 0 modified tracked files in the main checkout and all 8 worktrees.
+- 2026-09-23: Section 0 corrected three numbers in this plan's survey table by reading the repository live. The true counts are **128 local branches** (not 125) and **102 remote branches** (not 110; there are 103 refs under `refs/remotes/origin`, one of which is the `origin/HEAD` symref). Worktrees, 8, and modified tracked files, 0, were confirmed correct. The keeper ahead and behind figures in the plan's branch table all matched.
+- 2026-09-23: Three facts Section 1 must act on, found while building the inventory. (1) The **local `codex/mothers-love` is stale at `554234a`, 24 commits behind production**, though it is a strict ancestor so nothing is lost; fast forward it to origin before renaming it to `main`, or the rename carries production backwards. (2) **Open PRs #4 and #1 are headed by branches slated for deletion** (`codex/mothers-love-promo-commercial`, `codex/mothers-love-color-polish`); deleting either head closes its pull request automatically, so close them deliberately. PR #8's two branches are both keepers. (3) `tv17/fit` had diverged, local `0ec1bbf` 2 ahead of remote `71bf3f8`; the tag points at the local tip and both stay recoverable.
+- 2026-09-23: The Section 0 record was committed to `codex/color-polish-v6`, the branch the main checkout sits on, so `archive/codex/color-polish-v6` points at `e5ffa3a`, the tip before that commit, and does not contain these documents. A second tag, `record/2026-09-22-repo-refactor-section-0`, was pushed at the record commit. Section 1 must run `git rev-parse record/2026-09-22-repo-refactor-section-0` and confirm it resolves before deleting anything, rather than assuming it, and must then re-cut `archive/codex/color-polish-v6` at the current tip or let Section 3 move these documents to production first.
+- 2026-09-23: Section 0 landing review by Sonnet 5 (high, read only), after a Haiku 4.5 low hygiene sweep that passed all six checks. Verdict: pass with findings, two findings, both accepted and corrected in the same commit. (1) The record tag was described as an accomplished fact while the record was still uncommitted; the wording now tells Section 1 to verify the tag rather than assume it, and the tag is pushed as part of closing this section. (2) The inventory totals stated 137 distinct branch names beside 138 rows without saying why; the totals now carry the row count and a note that the extra row is the detached commit, which is not a branch. The reviewer independently reproduced the 133 tags, the 220 non keeper refs all reachable from their tags, the 128 and 102 branch counts, production at `1b4c31a`, and all four findings.
+- 2026-09-23: A second Sonnet 5 read only reviewer, dispatched after the first stalled, completed later and also returned pass with findings. It rebuilt the ref set independently and matched every number, spot checked five tags through the GitHub API, and confirmed restorability on two random branches. Its three findings are accepted and corrected: the record was uncommitted while it asserted its own record tag as fact, so future sections commit the record before the review starts; the provenance of the transcribed review sections is now stated in the lane record, naming both reviewers and the fact that the writer transcribed rather than graded; and one verification row paired "102 remote branches" with a command that returns 103 refs, now separated. A useful figure it surfaced is now published: 72 of the 133 archived branches hold commits production does not have, and 61 are fully contained in production.
+- 2026-09-23: **Anthony's decisions.** Close pull requests #4 and #1 as part of Section 1, deliberately and with a closing comment naming each head's archive tag, rather than letting branch deletion close them silently. Start Section 1 immediately rather than waiting for the 10:59 PM Claude pool reset. He also ruled that Section 1 leaves the three checked out branches (`codex/color-polish-v6`, `change/heart-ribbons-3d`, `tv17/pick`) for Section 4, deleting only their remote counterparts, because git refuses to delete a branch a worktree holds and Section 4 removes the worktrees anyway. Section 4's lane record now states what it inherits.
+- 2026-09-23: **Section 1 complete** (Claude Opus 5, xhigh). The branch list went from 128 local and 102 remote to **8 local and 5 remote**. Production did not move: `origin/main` is `1b4c31a`, the same commit `origin/codex/mothers-love` held, GitHub's default branch is now `main`, and the live site still answers HTTP 200 on `/` and `/display`. Renames: `codex/mothers-love` to `main` (done last), `feature/world-cinematic-art-pass` to `feat/world-cinematic`, `feature/tv-3d-world-prototype-01` to `feat/world-base`, `codex/tv-pearl-design-study` to `feat/tv-pearl-design`, `codex/tv-pearl-sequence` to `feat/tv-pearl-sequence`. Deleted 120 local and 97 remote branches. All 132 distinct removed names still resolve as `archive/*` tags on GitHub at the SHAs Section 0 recorded, 0 missing and 0 mismatched, and restoration was proved by recreating 5 randomly chosen branches from their tags (`codex/mothers-love-form-compact`, `codex/mothers-love-garden-read-recovery`, `tv17/entrance`, `codex/color-polish-visual`, `codex/mothers-love-backend`). The Section 0 record tag was verified to resolve before anything was deleted, not assumed. Record at [docs/runs/2026-09-22-repo-refactor/lanes/S1.md](runs/2026-09-22-repo-refactor/lanes/S1.md).
+- 2026-09-23: Section 1 **fast forwarded the local `codex/mothers-love` from `554234a` to `1b4c31a` before renaming it**, using `git fetch . origin/codex/mothers-love:codex/mothers-love`, which refuses a non fast forward. Without that step the rename would have carried production backwards by 24 commits. Section 1 also **closed pull requests #4 and #1 deliberately**, per Anthony's ruling, each with a comment naming the archive tag that preserves its head (`archive/codex/mothers-love-promo-commercial` at `8125bc0`, `archive/codex/mothers-love-color-polish` at `4a8f43e`) and the exact restore command. Both tag SHAs were confirmed equal to the live remote head SHAs before the comments were posted.
+- 2026-09-23: Section 1 **left exactly three local branch refs in place**: `codex/color-polish-v6` (`14accf4`, held by the main checkout), `change/heart-ribbons-3d` (`e29955b`) and `tv17/pick` (`f94fe94`). Git refuses to delete a branch a worktree holds, and Anthony ruled these belong to Section 4, which removes the worktrees first. Their remote counterparts were deleted and all three are preserved as `archive/*` tags. The acceptance line "at most six branches" therefore reads as 5 remote plus these 3 local, and the real numbers are recorded rather than forced. No tag was moved or re-cut: `archive/codex/color-polish-v6` still points at `e5ffa3a`, and the documents committed after it are covered by `record/2026-09-22-repo-refactor-section-0` at `14accf4` plus a new annotated tag `record/2026-09-22-repo-refactor-section-1`, cut at the final Section 1 record commit and pushed to GitHub before `origin/codex/color-polish-v6` was deleted, so Section 4 can remove the local ref without stranding these documents.
+- 2026-09-23: **Finding, and a change to what Section 5 targets.** GitHub's branch rename API retargets a pull request whose **base** is renamed but does **not** follow one whose **head** is renamed. Renaming `feature/world-cinematic-art-pass` closed draft PR #8, which then could not be reopened because its head branch name no longer existed. Nothing was lost: the head commit `e8e0c47` stayed on `feat/world-cinematic` throughout, and PR #8 held 0 review comments and 1 issue comment. The work continues as **draft PR #10**, `feat/world-cinematic` into `feat/world-base`, carrying PR #8's exact title and body plus a provenance note, with #8 cross linked to it. **Section 5 targets PR #10, not PR #8.**
+- 2026-09-23: **Section 1 renamed `feature/tv-3d-world-prototype-01` rather than folding and archiving it**, a deliberate deviation from this plan's Section 1 table. The fold is a code merge that Section 5 already owns, together with the test suite that verifies it, and archiving the branch in Section 1 would have deleted the base of the open world pull request, which Section 1's own acceptance line forbids. Section 0 had already classified it a keeper and cut no tag for it. It is now `feat/world-base` at `07cb3f6`, and Section 5 still folds and archives it as planned.
+- 2026-09-23: **Anthony's remaining action for Section 1: change the Vercel production branch setting from `codex/mothers-love` to `main`.** Section 1 stopped before it as instructed. The currently live deployment is unaffected and still serving, but Vercel will not build a new production deployment from pushes to `main` until that setting changes.
+- 2026-09-23: Section 1 hygiene sweep (Haiku 4.5, low) returned pass on five of six checks and one finding: `[Plan 25](PLAN-25-world-promotion.md)` at line 13 of this file is a dead link. It was introduced by Section 0 (`1d2c094`), not by Section 1, and `PLAN-25-world-promotion.md` exists only on `feat/world-cinematic`. That is the document split **Section 3** already owns, so Section 1 left the link in place rather than deleting a real reference. **Section 3 must confirm this link resolves after it brings the plans onto `main`.**
+- 2026-09-23: Section 1 landing review (Sonnet 5, high, read only). Verdict **pass with findings**: two accepted and corrected, two notes accepted and recorded. (1) The record claimed 5 remote branches while the live count was 6, because the writer asserted the end state before the close out delete of `origin/codex/color-polish-v6` had run. That branch was held back deliberately so this section's record had somewhere to live; the record now describes the close out sequence instead of asserting its result early, the close out ran, and the upstream tracking on the leftover local refs was unset so no later push can recreate the remote. (2) The record named a tag `record/2026-09-22-repo-refactor-section-1` that did not exist yet, which would have left this section's record covered by no permanent tag once Section 4 removes the local branch; the tag is now cut at the final record commit and pushed before the remote branch was deleted. (3) **Note for Section 2: the plan's figure of 1,596 untracked evidence files is stale. The live count is 2,242**, the extra 646 mostly under `docs/runs/2026-09-11-tv-scenes/`, all predating Plan 26; Section 1 touched none of them, and the plan text still says 1,596 in three places. (4) The restoration spot check now names the five branches it used. The reviewer independently reproduced production unmoved at `1b4c31a`, the 8 local refs, all 133 archive tags at their recorded SHAs, the fast forward, the pull request state, the worktrees, the untouched Vercel setting and the live site.
+- 2026-09-23: **Section 2 complete** (Claude Opus 5, xhigh). The main checkout at `/Users/anthony/Projects/mothers-love` is on `main` at `1b4c31a` with a clean tree: 0 modified tracked files and 0 untracked files, read with `git status --porcelain --untracked-files=all`. All 2,242 untracked files left the working copy. 2,241 were copied to the project's Drive folder and every one was verified by SHA-256 against its original before any original was moved; the 2,242nd, `tests/receipt-feed/receipt-feed.spec.ts`, was proved byte identical to the copy already tracked on `main` (`615f4f4d...`) and was restored by the branch switch. Originals went to `~/.Trash/mothers-love-plan26-section-2/` with their repository relative paths intact, per this Mac's established practice, so Anthony empties the Trash himself and the move stays reversible until he does. Production did not move: `origin/main` is still `1b4c31a` on GitHub. Record at [docs/runs/2026-09-22-repo-refactor/lanes/S2.md](runs/2026-09-22-repo-refactor/lanes/S2.md).
+- 2026-09-23: **The plan's 1,596 and the Section 1 review's 2,242 are both correct readings of the same tree, in different units.** Section 2 reproduced both live, one second apart, before moving anything: `git status --porcelain` reports **1,596** entries because it collapses an entirely untracked folder into a single line, and `git status --porcelain --untracked-files=all` reports **2,242** files. Nothing appeared between Section 0 and Section 2, and the Section 1 review's explanation that 646 files were added is not what happened. The three figures in this plan are corrected to 2,242 files with the collapse explained, rather than recorded as an error by Section 0.
+- 2026-09-23: The evidence went to two folders under `Project Outputs/The Words of Mother's Love` in the `Anthony Mac Storage` Drive folder, read from `/Users/anthony/Projects/docs/STORAGE-PATHS.json`. **2,206 files, 5,172,916,663 bytes**, the whole `docs/runs/2026-09-11-tv-scenes/logs/` tree, went to `Verification/2026-09-11-tv-scenes/`, which matches the two run folders the 2026-09-21 Mac sweep already put there. **35 files, 19,338,421 bytes** went to a new `2026-09-22-main-checkout-loose-files/`: three review evidence folders that had collected at the repository root, a 4.5 MB A4 poster image that is not repository content, and a 94 KB prototype HTML page saved under a broken generated filename. Each folder carries a `RECOVERY-MANIFEST.json` with the SHA-256, byte count and original path of every file, and a `SHA256SUMS.txt`.
+- 2026-09-23: The `.gitignore` rules were committed **on `main` as local commit `ccea482`, which was not pushed**, so `origin/main` is untouched and local `main` sits 1 commit ahead of production. Section 3 pushes it with the documents. The rules were proved live rather than asserted: recreating a capture PNG, a `probe-r*` result file and a root evidence folder leaves `git status` reporting 0 untracked files. They cover 2,218 of the 2,242 moved paths and shadow 30 paths that `main` already tracks, which changes nothing for those files because `.gitignore` never untracks. Of the 24 uncovered paths, 21 are per lane process scratch of the same kinds production deliberately tracks (`result.json`, `started.txt`, `executor.err`, `*.out`), so ignoring them by pattern would hide real records; the other 3 are the root poster image and the prototype HTML page, one off strays, and the test file `main` already tracks (breakdown corrected after the Section 2 review).
+- 2026-09-23: **Two facts for Section 4, found while fixing the checkout.** (1) Local `main` was tracking `origin/codex/mothers-love`, which Section 1 deleted, and git said so on the branch switch. Section 2 repointed it with `git branch --set-upstream-to=origin/main main`. (2) The same stale tracking survives on branches other lanes hold in their own worktrees and Section 2 left them alone: `feat/tv-pearl-design`, `feat/world-base` and `feat/world-cinematic` still track deleted `origin/` names, and `feat/tv-pearl-sequence` tracks nothing although `origin/feat/tv-pearl-sequence` exists. Fix each with `git branch --set-upstream-to=origin/<name> <name>`. The three branches Anthony left for Section 4 keep no upstream, as Section 1 ruled.
+- 2026-09-23: Moving the checkout from `codex/color-polish-v6` to `main` removed 1,076 files from the working copy that exist only on that branch: 1,070 files under `docs/`, of which only 16 (`PLAN-14`, this plan and this run's record tree) were in Section 3's scope, while 1,054 are the tracked records of four earlier runs (`2026-09-11-tv-scenes` 829, `2026-09-18-tv-fit` 111, `2026-09-11-commercial-video` 71, `2026-09-12-tv-next-level` 41) and 2 files under `docs/video/`, which no section had been given (corrected after the Section 2 review; Section 3 now records their disposition), and **6 files that are not documents**, `public/color-polish/renderer.js` and five files under `scripts/video/`. Nothing was lost; they are reachable from `record/2026-09-22-repo-refactor-section-1` and `archive/codex/color-polish-v6`. Section 3 or Section 6 should decide whether the video scripts belong on `main`, because no section currently owns that question.
+- 2026-09-23: **Section 2 paused, then resumed on a newer model.** After the record commit `5fd0ddd` and its tag were pushed, Anthony paused this chat to update the Claude app, and it resumed at 07:35Z on Claude Opus 5.5 rather than Opus 5. The evidence move, the branch switch and the first record ran on Opus 5; the corrections, the hygiene sweep, the review and the handoff ran on Opus 5.5. Anthony's routing ruling for this plan is Opus at xhigh for every section, so Section 3 onward names Opus 5.5, the Opus the app now runs. The mechanical rows the setup line offered to Gemini 3.8 Flash, hashing and copying, ran as plain shell commands, so no fallback was used. The setup line was right on model and review; its 30 minute estimate was not, because copying and twice hashing 5.19 GB took most of an hour.
+- 2026-09-23: **The Vercel production branch now reads `main`, so Anthony no longer owes that click.** The Section 1 chat reports that Anthony could not find the setting, which Vercel has moved off Settings > Git, and told it "do it. i always approve this. save this instruction."; it changed the setting through Vercel's API and re-verified that `link.productionBranch` is `main` and the production environment's branch matcher is `equals main`. Section 2 did not hear Anthony say this and cannot read that field, because Vercel's MCP tools do not expose it, so it records the change as reported and corroborates what it can: the Vercel project record was modified at 05:51Z, no deployment followed it (the newest is from 05:29Z), `origin/main` is still `1b4c31a`, and the live site answers 200 on `/` and `/display`. The four forward looking places in this plan that named the click as Anthony's (decision 1, the Decisions and hands row, the Section 1 text, and item 2 of What Anthony must do) now say it is done. The Section 1 Build log entry above that named it as his remaining action is left as written, because it was true when written, and this entry supersedes it. The Section 1 chat also saved a standing approval for Claude to change provider console settings directly, excluding deploys, spending and credentials, to that project's auto memory; Anthony should confirm that rule himself before other chats rely on it.
+- 2026-09-23: **A push to `main` is now a production deployment.** With the production branch on `main`, and `vercel.json` disabling deployment only for `codex/home-tv-family`, every push to `main` builds and promotes production. That changes Section 3, which was drafted when a push to `main` deployed nothing: Section 3 brings the documents onto `main` through a pull request that Anthony merges, never by pushing `main`, and verifies the production deployment that the merge produces. It also means the local unpushed commit `ccea482` would deploy on a bare `git push` from the main checkout, which has tracked `origin/main` since Section 2 repaired it, so nobody should run one there. Section 3 carries `ccea482` in its pull request branch. Item 5 of What Anthony must do records the extra merge click.
+- 2026-09-23: **The originals are gone and Drive holds the only copy, verified again after the fact.** The Trash, including `~/.Trash/mothers-love-plan26-section-2/`, was emptied at 07:34Z while this chat was paused. Section 2 did not empty it and cannot say who did. By 07:37Z all 2,245 files in the two Drive folders (the 2,241 copies, two manifests and two checksum files) carried Google Drive's upload stamp, and at 07:39Z every copy was hashed again through the Drive mount against its `SHA256SUMS.txt`: 2,206 of 2,206 and 35 of 35 match.
+- 2026-09-23: **Three plans are numbered 26 and two are numbered 25, so Section 3's acceptance line cannot be met as written, and the numbering is Anthony's decision.** Found while resuming, by listing every `docs/PLAN-*` file on every branch. Plan 26: `PLAN-26-pearl-sequence.md`, the Expression Cosmos prototype, first committed 2026-09-22T07:32Z on `feat/tv-pearl-sequence`; this plan, first committed 2026-09-23T01:50Z; and `PLAN-26-world-kit.md`, the 3D Studio kit inside the heavenly world, first committed 2026-09-23T07:24Z. Plan 25: `PLAN-25-live-tv-pearl-study.md`, 2026-09-22T05:15Z on `feat/tv-pearl-design`, and `PLAN-25-world-promotion.md`, 2026-09-22T11:18Z on `feat/world-cinematic`. `PLAN-24-world-visual-quality.md` also exists in two diverged copies under one name, the `feat/world-cinematic` copy being the newer, and `PLAN-14-commercial-video.md` now lives only on `codex/color-polish-v6` and its tags. Plans 19 to 23 are identical wherever they appear. The original survey saw none of the duplicates.
+- 2026-09-23: **Another coordinator is writing on the world branch under Anthony's grant.** The 3D Studio kit plan's commit `4fe7613`, made at 07:24Z, advanced the local `feat/world-cinematic` from `e8e0c47` to `4fe7613` (the GitHub copy is still `e8e0c47`), created the local branch `world-kit/k0` and the worktree `/Users/anthony/Projects/mothers-love-worktrees/world-kit-k0`, added an Active state section to that branch's `AGENTS.md`, and names lanes K0 to K6 in their own worktrees. So the counts Section 2 read before the pause, 8 local branches and 8 worktrees, are now 9 and 9, none of them created by Section 2. Sections 4, 5 and 7 plan to change the same branch, worktrees and world files that coordinator is writing, which is a sequencing question for Anthony before Section 4 starts.
+- 2026-09-23: Section 2 pre-review facts. Review as declared: a Haiku 4.5 low hygiene sweep, then a Sonnet 5 high read only review, results recorded in [lanes/S2.md](runs/2026-09-22-repo-refactor/lanes/S2.md) and in this log. The six non-document files that left the working copy with the branch switch are now owned: Section 3 lists them in `docs/HISTORY.md` with the tag that preserves them and does not move them onto `main` unless Anthony asks. Section 3's kickoff is [lanes/S3-kickoff.md](runs/2026-09-22-repo-refactor/lanes/S3-kickoff.md); it opens by asking Anthony the numbering question.
+- 2026-09-23: Section 2 hygiene sweep (Haiku 4.5, low) passed five of six checks; its one finding, a file grouping in the record that did not visibly reconcile with the Drive table, was corrected before the review. Section 2 landing review (Sonnet 5, high, read only): **pass with findings**, two should fix findings, both accepted and corrected, neither blocking. (1) The record said all 24 moved paths the ignore rules leave uncovered were per lane scratch; 21 are, 2 are the root poster and the prototype page, and 1 is the test file `main` already tracks. (2) This log said the 1,070 document files that left the working copy were Section 3's to bring onto `main`; only 16 were in its scope, and the other 1,054, the tracked records of four earlier runs plus `docs/video/`, had no owner. Section 3's kickoff now requires a recorded disposition for them before Section 4 deletes `codex/color-polish-v6`. The reviewer independently reproduced the clean checkout, production unmoved at `1b4c31a`, `ccea482` touching only `.gitignore`, both Drive folders' counts and bytes, a fresh re-hash of all 35 loose files and 25 random large folder files, the ignore rules hiding nothing tracked, the refs and record tag, the 9 worktrees with the ninth traced to the 3D Studio kit, the plan text diff, the plan number collision to the second, the live site at 200 and no em or en dash, and judged every call it was asked to test sound. Record at [lanes/S2.md](runs/2026-09-22-repo-refactor/lanes/S2.md). **Section 2 complete.**
+- 2026-09-23: **Anthony ruled the plan numbering, in the message that started Section 3, so the kickoff's question was not asked again.** Renumber by date: the oldest plan keeps each number and newer ones move to the next free numbers. **25** Live TV pearl study (`PLAN-25-live-tv-pearl-study.md`, on `feat/tv-pearl-design`, unchanged); **26** Expression Cosmos prototype (`PLAN-26-pearl-sequence.md`, on `feat/tv-pearl-sequence`, unchanged); **27** World promotion (was `PLAN-25-world-promotion.md`, on `feat/world-cinematic`); **28** this repository refactor (was `PLAN-26-repository-refactor.md`); **29** 3D Studio kit (was `PLAN-26-world-kit.md`, which its own coordinator renames; this section only records the number). Renaming this plan mid flight is expected: the plan id `2026-09-22-repo-refactor`, the run tree path and the `record/*` tags carry no plan number, so nothing that points at them breaks. From this entry on, this file is `docs/PLAN-28-repository-refactor.md` and this plan is Plan 28; earlier entries keep the name they were written under.
