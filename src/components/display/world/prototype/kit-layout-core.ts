@@ -574,19 +574,20 @@ function welcomeLayout(): ZoneLayout {
  * tree climbs the far left edge so only its crown overhangs the headline; both benches face
  * the pond; rose bushes fill both bed arcs and a low hedge frames the pond from below, with
  * the procedural disc flowers hidden so one flower vocabulary reads. Bushes and furniture
- * stay 2.5 units off the neighbors' anchor and off the miniature figures' feet.
+ * stay 2.5 units off the neighbors' anchor and off the miniature figures' feet, and no bush
+ * stands behind the headline column from the tour eye (the kit off lawn read cleanly there).
  *
  * The island's back left quarter lies inside the entry stage reservation (6.2: 12 units
  * around the arrival stage, which is 22 units from the Garden centre), so the tree stands at
  * the front left edge rather than the design's (-13.5, .7, 1), and the left bed keeps to the
- * front half.
+ * strip of lawn between the stage's cylinder and the figures.
  */
 function gardenLayout(): ZoneLayout {
   const pond: [number, number, number] = [-0.6, 0.7, -0.6];
   const placements: KitPlacement[] = [
     ...archRow("garden"),
     bench(-5.8, 9.6, 0.9, "left bench, in front of the figures and right of the headline, facing the pond"),
-    bench(9.5, 7.5, -1.0, "right bench, angled to the pond, clear of the control cluster"),
+    bench(9.3, 6.8, -1.0, "right bench, angled to the pond, its seat above 1080p y 740 and clear of the control cluster"),
     lantern(-6.3, 13.3, "forecourt post, left of the stone path"),
     lantern(14, 5, "forecourt post"),
     { id: "nature.blossom-tree-c", position: [-14.6, 0.7, 7], rotationY: 0.4, scale: 1, role: "static", contact: [6.5, 5], note: "far left edge at scale 1, so the trunk climbs the frame edge and only the crown overhangs the headline (checkpoint note 1; the suggested spot enters the entry stage cap)" },
@@ -613,15 +614,19 @@ function gardenLayout(): ZoneLayout {
   const roses: Array<[number, number, number, number]> = [
     // Right arc.
     [13, -5, 1.4, 0.3], [12.5, 0.5, 1.5, 2.1], [12.8, 2.2, 1.4, 1.1], [10.5, 4, 1.4, 0.6], [9.6, 1.2, 1.6, 0.3], [8, 10.8, 1.3, 1.9], [9.4, 12.6, 1.3, 2.7],
-    // Left arc: the back left quarter is the entry stage's, and the figures stand at the
-    // front, so the arc runs from the front left edge in to the lawn behind the tree.
-    [-10, 0, 1.4, 0.4], [-12, 3.8, 1.4, 2.6], [-7.6, -1.8, 1.4, 1.7], [-12.4, 7, 1.3, 1.5], [-8.3, 9.3, 1.3, 2.2], [-10.6, 9.6, 1.3, 0.9],
-    // The low hedge along the near edge, either side of the stone path.
-    [4.4, 13.2, 0.9, 0.5], [6.2, 13.9, 0.9, 1.7], [8.0, 13.0, 0.9, 2.9], [-9.6, 12.4, 0.9, 1.2], [-8.2, 13.6, 0.9, 2.4], [-11, 11, 0.9, 0.2],
+    // Left arc: the back left quarter is the entry stage's, the figures stand at the front,
+    // and the headline column (1080p x 60 to 460, y 700 to 930 from the tour eye) stays
+    // clear of bushes, so the bed sits on the back left lawn above the eyebrow line (local z
+    // under 2.5 there), one bush right of the title beside the figures, and two along the
+    // far edge of the pond.
+    [-10, 0, 1.4, 0.4], [-12.4, 2.4, 1.4, 2.6], [-7.6, -1.8, 1.4, 1.7], [-10.9, 1.4, 1.3, 1.5], [-8.3, 9.3, 1.3, 2.2], [-3.6, -7.0, 1.3, 0.9],
+    // The low hedge along the near edge, either side of the stone path; the left three land
+    // below the subtitle line, behind the navigation row's scrim.
+    [4.4, 13.2, 0.9, 0.5], [6.2, 13.9, 0.9, 1.7], [8.0, 13.0, 0.9, 2.9], [-10.2, 13.4, 0.9, 1.2], [-8.2, 13.6, 0.9, 2.4], [-12.0, 12.2, 0.9, 0.2],
   ];
   roses.forEach(([x, z, scale, spin], k) => placements.push(rose(x, z, scale, spin, `rose bush ${k + 1} of ${roses.length}`)));
   const hydrangeas: Array<[number, number, number, number]> = [
-    [11.2, -2.6, 1.4, 0.5], [9.4, -8.2, 1.3, 2.8], [12.2, 7.2, 1.3, 1.6], [-7.2, -4.2, 1.3, 0.9], [-13.5, 9.5, 1.3, 0.2],
+    [11.2, -2.6, 1.4, 0.5], [9.4, -8.2, 1.3, 2.8], [12.2, 7.2, 1.3, 1.6], [-7.2, -4.2, 1.3, 0.9], [-5.4, -6.4, 1.3, 0.2],
   ];
   hydrangeas.forEach(([x, z, scale, spin], k) => placements.push(hydrangea(x, z, scale, spin, `hydrangea ${k + 1} of ${hydrangeas.length}`)));
   return {
