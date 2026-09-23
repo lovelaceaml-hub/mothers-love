@@ -29,11 +29,18 @@ import {
   type ZoneLayout,
 } from "@/components/display/world/prototype/kit-layout-far";
 import {
+  CLOUD_VIEW_DISTANCE,
+  CORRIDOR_KEEP,
+  FRUSTUM_MARGIN,
   ISLET_BELOW_DECK,
   ISLET_SIDE_OFFSET,
+  ISLET_VIEW_DISTANCE,
   KIT_ISLAND,
+  LOD_NEAR,
   LONG_BRIDGE,
+  LOW_TIER_VIEW,
   POST_SIDE_OFFSET,
+  POST_VIEW_DISTANCE,
   SKY_LANES,
   bridgeCurve,
   corridorBridges,
@@ -552,6 +559,44 @@ describe("corridors: sky lanes", () => {
       }
     }
     for (const islet of laneIslets) expect(islet.center[1]).toBeGreaterThan(-1);
+  });
+});
+
+describe("corridors: view distances, tiers and the triangle budget (design 7.2, 7.5, 7.6)", () => {
+  type Tris = { id: string; tris: number };
+  const tris = (id: string) => (manifest.assets as unknown as Tris[]).find(entry => entry.id === id)!.tris;
+
+  it("draws corridor pieces inside the Auto detail distance, hides the clouds and stops the islets at 90 on Low", () => {
+    expect(POST_VIEW_DISTANCE).toBeLessThanOrEqual(110);
+    expect(LOW_TIER_VIEW.post).toBeLessThanOrEqual(70);
+    expect(LOW_TIER_VIEW.islet).toBe(90);
+    expect(LOW_TIER_VIEW.cloud).toBe(0);
+    expect(LOD_NEAR).toBeLessThan(ISLET_VIEW_DISTANCE);
+    // Between two recounts the camera moves two units or turns two degrees: the margin covers that sweep at the farthest piece.
+    expect(FRUSTUM_MARGIN).toBeGreaterThanOrEqual(2 + .035 * CLOUD_VIEW_DISTANCE);
+    expect(CORRIDOR_KEEP.islet[1]).toBeLessThan(CORRIDOR_KEEP.islet[0]);
+    expect(CORRIDOR_KEEP.tree[1]).toBeLessThan(CORRIDOR_KEEP.tree[0]);
+  });
+
+  it("keeps the corridor triangles in range of every parked camera under 200k before the frustum test", () => {
+    // The decimated geometry keeps about `keep` of the file's triangles. Counting every piece in
+    // range, whether or not it is on screen, bounds what the main pass can draw at a parked zone;
+    // the frustum test then removes the pieces behind and beside the camera.
+    const posts = corridorPosts(), islets = corridorIslets(), clouds = corridorClouds();
+    for (const zone of ZONES) {
+      const eye = zone.eye;
+      const near = (point: readonly number[]) => Math.hypot(point[0] - eye[0], point[1] - eye[1], point[2] - eye[2]);
+      let total = 0;
+      for (const post of posts) if (near(post.position) <= POST_VIEW_DISTANCE) total += tris("landmark.lantern-post") * CORRIDOR_KEEP.post;
+      for (const islet of islets) {
+        const d = near(islet.center);
+        if (d > ISLET_VIEW_DISTANCE) continue;
+        const level = d > LOD_NEAR ? 1 : 0;
+        total += tris("nature.island-small") * CORRIDOR_KEEP.islet[level] + tris("nature.blossom-tree-a") * CORRIDOR_KEEP.tree[level];
+      }
+      for (const cloud of clouds) if (near(cloud.position) <= CLOUD_VIEW_DISTANCE) total += tris("nature.cloud-c") * CORRIDOR_KEEP.cloud;
+      expect(total, `${zone.id}: ${Math.round(total)} triangles in range`).toBeLessThan(200000);
+    }
   });
 });
 

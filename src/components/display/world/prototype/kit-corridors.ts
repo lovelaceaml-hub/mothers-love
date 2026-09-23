@@ -72,10 +72,27 @@ export const ISLET_BELOW_DECK = 4;
 export const POST_SIDE_OFFSET = 1.8;
 /** The kit island's grass sits about 2.5 above its centre pivot; its grass radius is 4. */
 export const KIT_ISLAND = { grassAbovePivot: 2.5, grassRadius: 4 } as const;
-/** Corridor pieces beyond these distances from the camera are not drawn (a post is small, an islet is not). */
+/**
+ * Corridor pieces are drawn only inside these distances from the camera (a post is small, an
+ * islet is not), under the tier's kit detail distance of design 7.2. On the Low tier the sky
+ * lane clouds hide and the islets stop at 90 units (design 7.6).
+ */
 export const POST_VIEW_DISTANCE = 96;
 export const ISLET_VIEW_DISTANCE = 150;
 export const CLOUD_VIEW_DISTANCE = 170;
+export const LOW_TIER_VIEW = { post: 70, islet: 90, cloud: 0 } as const;
+/** An islet or its tree nearer than this uses its finer geometry; beyond it, the far level. */
+export const LOD_NEAR = 80;
+/**
+ * A piece whose sphere lies this far outside the view is still drawn, so the frustum's sweep
+ * between two recounts (two units of travel or two degrees of turn) never pops one in at the edge.
+ */
+export const FRUSTUM_MARGIN = 12;
+/**
+ * The share of each piece's vertices its instanced geometry keeps (see `decimatedKitGeometry`):
+ * one level for the posts and clouds, a near and a far level for the islets and their trees.
+ */
+export const CORRIDOR_KEEP = { post: .18, islet: [.3, .1], tree: [.25, .1], cloud: .3 } as const;
 
 const zone = (id: ZoneId) => ZONES.find(item => item.id === id)!;
 const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -378,63 +395,99 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   function finish(mesh: T.InstancedMesh) { mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere(); }
 
   /**
-   * One world wide instanced mesh per piece, culled by distance from the camera: the instances
-   * are kept sorted nearest first and `count` cuts the far ones, so a piece the camera is nowhere
-   * near costs no triangles. Re sorted when the camera has moved two units, which a still frame
-   * after a jump always has.
+   * One piece world wide: an instanced mesh per level of detail and the table of its places.
+   * An instanced mesh has one bounding sphere for all its instances, so left alone every islet
+   * in the world is drawn whenever any of them is on screen. Each recount therefore keeps only
+   * the places inside `range` of the camera whose own sphere, widened by `FRUSTUM_MARGIN`,
+   * meets the view frustum; of those, the ones nearer than `LOD_NEAR` fill the near mesh and
+   * the rest the far mesh when the piece has one. `count` cuts the others, and a mesh whose
+   * count is 0 costs no draw. The meshes never rely on three's own frustum test, which would
+   * see only the sphere of the instances currently placed.
    */
-  type Culled = { mesh: T.InstancedMesh; range: number; places: Array<{ position: V3; rotationY: number; scale: number }>; order: number[]; distance: Float32Array };
+  type Piece = { position: V3; rotationY: number; scale: number };
+  type Culled = { near: T.InstancedMesh; far?: T.InstancedMesh; places: Piece[]; radius: number; centerY: number; range: (low: boolean) => number };
   const culled: Culled[] = [];
-  function cullable(mesh: T.InstancedMesh, range: number, places: Culled["places"]) {
-    places.forEach((place, i) => placeAt(mesh, i, place.position, place.rotationY, place.scale));
-    finish(mesh);
-    culled.push({ mesh, range, places, order: places.map((_, i) => i), distance: new Float32Array(places.length) });
+  function cullable(near: T.InstancedMesh, far: T.InstancedMesh | undefined, range: (low: boolean) => number, places: Piece[]) {
+    // Until the first recount (which the first frame with a camera makes) everything is placed
+    // in the near mesh, so a world without a published camera is complete.
+    places.forEach((place, i) => placeAt(near, i, place.position, place.rotationY, place.scale));
+    finish(near);
+    near.frustumCulled = false;
+    if (far) { far.count = 0; far.frustumCulled = false; }
+    const sphere = near.geometry.boundingSphere ?? new T.Sphere(new T.Vector3(), 1);
+    culled.push({ near, far, places, radius: sphere.radius, centerY: sphere.center.y, range });
   }
 
   // Lantern posts: four per bridge.
   const postTable = corridorPosts();
   if (kit.has("landmark.lantern-post") && postTable.length) {
-    cullable(instanced("landmark.lantern-post", .18, "Kit corridor lantern posts", postTable.length, false), POST_VIEW_DISTANCE,
+    cullable(instanced("landmark.lantern-post", CORRIDOR_KEEP.post, "Kit corridor lantern posts", postTable.length, false), undefined,
+      low => (low ? LOW_TIER_VIEW.post : POST_VIEW_DISTANCE),
       postTable.map(post => ({ position: post.position, rotationY: post.rotationY, scale: 1.1 })));
   }
 
-  // Islets beside the long bridges and along the sky lanes, each with a blossom tree.
+  // Islets beside the long bridges and along the sky lanes, each with a blossom tree. The far
+  // level keeps a tenth of the surface and casts no shadow: past 80 units its shadow is a speck.
   const islets = corridorIslets();
   if (kit.has("nature.island-small") && islets.length) {
-    cullable(instanced("nature.island-small", .3, "Kit corridor islets", islets.length, true), ISLET_VIEW_DISTANCE,
+    cullable(
+      instanced("nature.island-small", CORRIDOR_KEEP.islet[0], "Kit corridor islets", islets.length, true),
+      instanced("nature.island-small", CORRIDOR_KEEP.islet[1], "Kit corridor islets, far", islets.length, false),
+      low => (low ? LOW_TIER_VIEW.islet : ISLET_VIEW_DISTANCE),
       islets.map(islet => ({ position: [islet.center[0], islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale, islet.center[2]] as V3, rotationY: islet.rotationY, scale: islet.scale })));
     if (kit.has("nature.blossom-tree-a")) {
-      cullable(instanced("nature.blossom-tree-a", .25, "Kit corridor islet trees", islets.length, true), ISLET_VIEW_DISTANCE,
+      cullable(
+        instanced("nature.blossom-tree-a", CORRIDOR_KEEP.tree[0], "Kit corridor islet trees", islets.length, true),
+        instanced("nature.blossom-tree-a", CORRIDOR_KEEP.tree[1], "Kit corridor islet trees, far", islets.length, false),
+        low => (low ? LOW_TIER_VIEW.islet : ISLET_VIEW_DISTANCE),
         islets.map(islet => ({ position: islet.tree.position, rotationY: islet.tree.rotationY, scale: islet.tree.scale })));
     }
   }
 
   // The sky lane clouds: sculpted puffs the camera passes over on the two long legs. They keep
-  // more of their surface than the other pieces, because the camera comes within a few units.
+  // more of their surface than the posts, because the camera comes within a few units.
   const clouds = corridorClouds();
   if (kit.has("nature.cloud-c") && clouds.length) {
-    cullable(instanced("nature.cloud-c", .3, "Kit corridor sky lane clouds", clouds.length, false), CLOUD_VIEW_DISTANCE,
+    cullable(instanced("nature.cloud-c", CORRIDOR_KEEP.cloud, "Kit corridor sky lane clouds", clouds.length, false), undefined,
+      low => (low ? LOW_TIER_VIEW.cloud : CLOUD_VIEW_DISTANCE),
       clouds.map(cloud => ({ position: cloud.position, rotationY: cloud.rotationY, scale: cloud.scale })));
   }
 
-  const lastCamera = new T.Vector3(Number.NaN, 0, 0);
+  // A recount happens when the camera has moved two units or turned two degrees, or the tier
+  // changed. A still frame after a jump always has, and the engine runs this update after the
+  // camera's matrices are final on a still frame, so a capture is the recounted world.
+  const lastCamera = new T.Vector3(Number.NaN, 0, 0), lastForward = new T.Vector3(), forward = new T.Vector3();
+  let lastLow: boolean | undefined;
+  const frustum = new T.Frustum(), projected = new T.Matrix4(), sphere = new T.Sphere();
+  function recount(camera: T.Camera, low: boolean) {
+    projected.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustum.setFromProjectionMatrix(projected);
+    const eye = camera.position;
+    for (const piece of culled) {
+      const range = piece.range(low);
+      let near = 0, far = 0;
+      for (const place of piece.places) {
+        const distance = Math.hypot(place.position[0] - eye.x, place.position[1] - eye.y, place.position[2] - eye.z);
+        if (distance > range) continue;
+        sphere.center.set(place.position[0], place.position[1] + piece.centerY * place.scale, place.position[2]);
+        sphere.radius = piece.radius * place.scale + FRUSTUM_MARGIN;
+        if (!frustum.intersectsSphere(sphere)) continue;
+        if (piece.far && distance > LOD_NEAR) placeAt(piece.far, far++, place.position, place.rotationY, place.scale);
+        else placeAt(piece.near, near++, place.position, place.rotationY, place.scale);
+      }
+      piece.near.count = near; piece.near.instanceMatrix.needsUpdate = true;
+      if (piece.far) { piece.far.count = far; piece.far.instanceMatrix.needsUpdate = true; }
+    }
+  }
   return {
     update() {
       const camera = scene.userData.studyCamera as T.Camera | undefined;
-      if (!camera || camera.position.distanceToSquared(lastCamera) < 4) return;
-      lastCamera.copy(camera.position);
-      for (const { mesh, range, places, order, distance } of culled) {
-        places.forEach((place, i) => { distance[i] = Math.hypot(place.position[0] - camera.position.x, place.position[1] - camera.position.y, place.position[2] - camera.position.z); });
-        order.sort((a, b) => distance[a] - distance[b]);
-        let near = 0;
-        order.forEach((index, slot) => {
-          const place = places[index];
-          placeAt(mesh, slot, place.position, place.rotationY, place.scale);
-          if (distance[index] <= range) near = slot + 1;
-        });
-        mesh.count = near;
-        mesh.instanceMatrix.needsUpdate = true;
-      }
+      if (!camera) return;
+      const low = scene.userData.lowTier === true;
+      camera.getWorldDirection(forward);
+      if (low === lastLow && camera.position.distanceToSquared(lastCamera) < 4 && forward.angleTo(lastForward) < .035) return;
+      lastCamera.copy(camera.position); lastForward.copy(forward); lastLow = low;
+      recount(camera, low);
     },
     dispose() {
       for (const mesh of meshes) { mesh.removeFromParent(); mesh.dispose(); }
