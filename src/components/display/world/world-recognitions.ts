@@ -155,8 +155,9 @@ export class WorldRecognitionBubbles {
     lights.frustumCulled = false;
     root.add(face, ring, lights);
     // The slot ordinal seeds this pearl, so its sparkle scatter is stable and unlike its neighbours.
+    // The skin reads the 3D Studio kit off the scene lazily, on its first update (Plan 26 K1).
     const study = this.studyAssets
-      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length)
+      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length, () => this.hostScene.userData.studyKit)
       : undefined;
     root.visible = face.visible = false;
     this.root.add(root);
