@@ -322,7 +322,8 @@ describe("kit gate", () => {
     expect(fetch.mock.calls.map(call => String(call[0]))).toContain("/world-kit/v1/manifest.json");
   });
 
-  it("stub corridors add no islets, so the procedural world is unchanged", () => {
-    expect(kitCorridorSites({ has: () => true })).toEqual([]);
+  it("corridor islets exist only when the kit can place them, so a kit without the island leaves the procedural world unchanged", () => {
+    expect(kitCorridorSites({ has: () => false })).toEqual([]);
+    expect(kitCorridorSites({ has: () => true })).toHaveLength(12);
   });
 });
