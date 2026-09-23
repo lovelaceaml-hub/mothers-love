@@ -1,13 +1,13 @@
 ---
 lane: LK1
 title: pearl
-state: landed
+state: merged
 model: opus-5.5
 runner: coordinator
 worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k1
 review: "fable capture review (visual director, round 1 done), opus-5.5 landing review pending"
 depends_on: LK0
-updated: 2026-09-23T11:45Z
+updated: 2026-09-23T15:53Z
 ---
 
 # LK1: pearl

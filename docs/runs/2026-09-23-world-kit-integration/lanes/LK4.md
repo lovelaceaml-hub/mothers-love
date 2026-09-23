@@ -1,13 +1,13 @@
 ---
 lane: LK4
 title: neighbors
-state: landed
+state: merged
 model: Claude Opus 5.5 (writer, assigned by the coordinator's workflow)
 runner: coordinator workflow, background lane
 worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k4 (branch world-kit/k4, base 2ef8c41)
 review: visual director polish round applied (notes 1 to 6); coordinator review pending
 depends_on: LK0 (sockets, merged at 2ef8c41)
-updated: 2026-09-23T11:35Z
+updated: 2026-09-23T15:53Z
 ---
 
 # LK4: neighbors
