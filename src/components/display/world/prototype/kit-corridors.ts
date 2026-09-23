@@ -72,8 +72,10 @@ export const ISLET_BELOW_DECK = 4;
 export const POST_SIDE_OFFSET = 1.8;
 /** The kit island's grass sits about 2.5 above its centre pivot; its grass radius is 4. */
 export const KIT_ISLAND = { grassAbovePivot: 2.5, grassRadius: 4 } as const;
-/** Corridor lantern posts beyond this distance from the camera are not drawn. */
+/** Corridor pieces beyond these distances from the camera are not drawn (a post is small, an islet is not). */
 export const POST_VIEW_DISTANCE = 96;
+export const ISLET_VIEW_DISTANCE = 150;
+export const CLOUD_VIEW_DISTANCE = 170;
 
 const zone = (id: ZoneId) => ZONES.find(item => item.id === id)!;
 const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -366,7 +368,7 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     meshes.push(mesh); scene.add(mesh);
     return mesh;
   }
-  function place(mesh: T.InstancedMesh, i: number, position: V3, rotationY: number, scale: number) {
+  function placeAt(mesh: T.InstancedMesh, i: number, position: V3, rotationY: number, scale: number) {
     dummy.position.set(position[0], position[1], position[2]);
     dummy.rotation.set(0, rotationY, 0);
     dummy.scale.setScalar(scale);
@@ -375,59 +377,64 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   }
   function finish(mesh: T.InstancedMesh) { mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere(); }
 
-  // Lantern posts: four per bridge, one draw per material world wide, culled by distance below.
-  let posts: T.InstancedMesh | undefined;
+  /**
+   * One world wide instanced mesh per piece, culled by distance from the camera: the instances
+   * are kept sorted nearest first and `count` cuts the far ones, so a piece the camera is nowhere
+   * near costs no triangles. Re sorted when the camera has moved two units, which a still frame
+   * after a jump always has.
+   */
+  type Culled = { mesh: T.InstancedMesh; range: number; places: Array<{ position: V3; rotationY: number; scale: number }>; order: number[]; distance: Float32Array };
+  const culled: Culled[] = [];
+  function cullable(mesh: T.InstancedMesh, range: number, places: Culled["places"]) {
+    places.forEach((place, i) => placeAt(mesh, i, place.position, place.rotationY, place.scale));
+    finish(mesh);
+    culled.push({ mesh, range, places, order: places.map((_, i) => i), distance: new Float32Array(places.length) });
+  }
+
+  // Lantern posts: four per bridge.
   const postTable = corridorPosts();
-  const postOrder = postTable.map((_, i) => i);
-  const postDistance = new Float32Array(postTable.length);
   if (kit.has("landmark.lantern-post") && postTable.length) {
-    posts = instanced("landmark.lantern-post", .22, "Kit corridor lantern posts", postTable.length, false);
-    postTable.forEach((post, i) => place(posts!, i, post.position, post.rotationY, 1.1));
-    finish(posts);
+    cullable(instanced("landmark.lantern-post", .18, "Kit corridor lantern posts", postTable.length, false), POST_VIEW_DISTANCE,
+      postTable.map(post => ({ position: post.position, rotationY: post.rotationY, scale: 1.1 })));
   }
 
   // Islets beside the long bridges and along the sky lanes, each with a blossom tree.
   const islets = corridorIslets();
   if (kit.has("nature.island-small") && islets.length) {
-    const mesh = instanced("nature.island-small", .38, "Kit corridor islets", islets.length, true);
-    islets.forEach((islet, i) => place(mesh, i, [islet.center[0], islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale, islet.center[2]], islet.rotationY, islet.scale));
-    finish(mesh);
+    cullable(instanced("nature.island-small", .3, "Kit corridor islets", islets.length, true), ISLET_VIEW_DISTANCE,
+      islets.map(islet => ({ position: [islet.center[0], islet.center[1] - KIT_ISLAND.grassAbovePivot * islet.scale, islet.center[2]] as V3, rotationY: islet.rotationY, scale: islet.scale })));
     if (kit.has("nature.blossom-tree-a")) {
-      const trees = instanced("nature.blossom-tree-a", .3, "Kit corridor islet trees", islets.length, true);
-      islets.forEach((islet, i) => place(trees, i, islet.tree.position, islet.tree.rotationY, islet.tree.scale));
-      finish(trees);
+      cullable(instanced("nature.blossom-tree-a", .25, "Kit corridor islet trees", islets.length, true), ISLET_VIEW_DISTANCE,
+        islets.map(islet => ({ position: islet.tree.position, rotationY: islet.tree.rotationY, scale: islet.tree.scale })));
     }
   }
 
-  // The sky lane clouds: sculpted puffs the camera passes over on the two long legs.
+  // The sky lane clouds: sculpted puffs the camera passes over on the two long legs. They keep
+  // more of their surface than the other pieces, because the camera comes within a few units.
   const clouds = corridorClouds();
   if (kit.has("nature.cloud-c") && clouds.length) {
-    // The camera passes right over these, so they keep more of their surface than the other pieces.
-    const mesh = instanced("nature.cloud-c", .4, "Kit corridor sky lane clouds", clouds.length, false);
-    clouds.forEach((cloud, i) => place(mesh, i, cloud.position, cloud.rotationY, cloud.scale));
-    finish(mesh);
+    cullable(instanced("nature.cloud-c", .3, "Kit corridor sky lane clouds", clouds.length, false), CLOUD_VIEW_DISTANCE,
+      clouds.map(cloud => ({ position: cloud.position, rotationY: cloud.rotationY, scale: cloud.scale })));
   }
 
   const lastCamera = new T.Vector3(Number.NaN, 0, 0);
   return {
     update() {
-      // Posts are drawn nearest first, and only within POST_VIEW_DISTANCE of the camera: the
-      // instance list is reordered so `count` cuts the far ones. Re sorted when the camera has
-      // moved two units, which a still frame after a jump always has.
-      if (!posts) return;
       const camera = scene.userData.studyCamera as T.Camera | undefined;
       if (!camera || camera.position.distanceToSquared(lastCamera) < 4) return;
       lastCamera.copy(camera.position);
-      postTable.forEach((post, i) => { postDistance[i] = Math.hypot(post.position[0] - camera.position.x, post.position[1] - camera.position.y, post.position[2] - camera.position.z); });
-      postOrder.sort((a, b) => postDistance[a] - postDistance[b]);
-      let near = 0;
-      postOrder.forEach((index, slot) => {
-        const post = postTable[index];
-        place(posts!, slot, post.position, post.rotationY, 1.1);
-        if (postDistance[index] <= POST_VIEW_DISTANCE) near = slot + 1;
-      });
-      posts.count = near;
-      posts.instanceMatrix.needsUpdate = true;
+      for (const { mesh, range, places, order, distance } of culled) {
+        places.forEach((place, i) => { distance[i] = Math.hypot(place.position[0] - camera.position.x, place.position[1] - camera.position.y, place.position[2] - camera.position.z); });
+        order.sort((a, b) => distance[a] - distance[b]);
+        let near = 0;
+        order.forEach((index, slot) => {
+          const place = places[index];
+          placeAt(mesh, slot, place.position, place.rotationY, place.scale);
+          if (distance[index] <= range) near = slot + 1;
+        });
+        mesh.count = near;
+        mesh.instanceMatrix.needsUpdate = true;
+      }
     },
     dispose() {
       for (const mesh of meshes) { mesh.removeFromParent(); mesh.dispose(); }
