@@ -124,10 +124,11 @@ async function renderingDetails() {
   await page.getByRole('dialog').getByRole('button',{name:/^Close /}).click();
   return text;
 }
-/** The two numbers out of one rendering details panel, so a report can be read at a glance. */
+/** The rendering details out of one panel, so a report can be read at a glance. */
 function renderingNumbers(text) {
   const read=label=>{const m=String(text).match(new RegExp(`${label}\\n([\\d,]+)`));return m?Number(m[1].replace(/,/g,'')):null;};
-  return { calls: read('Draw calls'), triangles: read('Triangles'), meaning: 'every pass of one presented frame' };
+  const raw=label=>String(text).match(new RegExp(`${label}\\n([^\\n]+)`))?.[1]??null;
+  return { calls: read('Draw calls'), triangles: read('Triangles'), textures: read('Textures'), geometries: read('Geometries'), kit: raw('Kit'), meaning: 'every pass of one presented frame' };
 }
 function intervalStats(intervals) {
   const sorted=[...intervals].sort((a,b)=>a-b);

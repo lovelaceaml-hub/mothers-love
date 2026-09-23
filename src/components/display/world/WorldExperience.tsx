@@ -28,6 +28,8 @@ const INITIAL: WorldStatus = {
   fps: 0,
   calls: 0,
   triangles: 0,
+  textures: 0,
+  geometries: 0,
   quality: "High",
   frames: 0,
   arrival: {
@@ -719,6 +721,27 @@ export function WorldExperience({
                   <dt>Triangles</dt>
                   <dd>{status.triangles.toLocaleString()}</dd>
                 </div>
+                {designReview && (
+                  <>
+                    <div>
+                      <dt>Textures</dt>
+                      <dd>{status.textures}</dd>
+                    </div>
+                    <div>
+                      <dt>Geometries</dt>
+                      <dd>{status.geometries}</dd>
+                    </div>
+                    <div>
+                      <dt>Kit</dt>
+                      <dd>
+                        {status.kit ?? "off"}
+                        {status.kitCounts
+                          ? ` ${status.kitCounts.loaded} of ${status.kitCounts.total}`
+                          : ""}
+                      </dd>
+                    </div>
+                  </>
+                )}
               </dl>
             </details>
             <p>
