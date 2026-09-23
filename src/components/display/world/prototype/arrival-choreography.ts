@@ -1,4 +1,5 @@
 import type { ArrivalPhase, ArrivalState } from "../arrival-director";
+import type { FeedPhase } from "../world-feed";
 import type { StudyArrival } from "./design-mode";
 
 /**
@@ -81,4 +82,13 @@ export function arrivalStyleAt(index: number): StudyArrival {
 /** True exactly when the director has just left `idle`: the one moment a style may change. */
 export function arrivalAdmitted(before: ArrivalPhase, after: ArrivalPhase) {
   return before === "idle" && after !== "idle";
+}
+
+/**
+ * Whether the cycle drives this feed at all (WORLD-INTEGRATION 4.6). It serves live feeds;
+ * sample keeps the explicit `?entrance=` choice and the three study buttons, whose pressed
+ * state is the style on screen, and a fixed entrance keeps its style on every feed.
+ */
+export function arrivalStyleCycles(study: boolean, entranceFixed: boolean, phase: FeedPhase) {
+  return study && !entranceFixed && phase !== "sample";
 }

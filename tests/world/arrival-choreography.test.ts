@@ -5,6 +5,7 @@ import {
   arrivalAdmitted,
   arrivalPose,
   arrivalStyleAt,
+  arrivalStyleCycles,
   bloomFraction,
 } from "../../src/components/display/world/prototype/arrival-choreography";
 import { sampleWorldFeed } from "../../src/components/display/world/world-feed";
@@ -122,6 +123,15 @@ describe("style cycling for live (WORLD-INTEGRATION 4.6)", () => {
     expect([0, 1, 2, 3, 4, 5].map(arrivalStyleAt)).toEqual(["constellation", "bloom", "ribbon", "constellation", "bloom", "ribbon"]);
     expect(arrivalStyleAt(-1)).toBe("ribbon");
     expect(arrivalStyleAt(Number.NaN)).toBe("constellation");
+  });
+
+  it("serves live feeds only: sample keeps its entrance or study button choice, a fixed entrance never cycles", () => {
+    expect(arrivalStyleCycles(true, false, "live")).toBe(true);
+    expect(arrivalStyleCycles(true, false, "reconnecting")).toBe(true);
+    expect(arrivalStyleCycles(true, false, "sample")).toBe(false);
+    expect(arrivalStyleCycles(true, true, "live")).toBe(false);
+    expect(arrivalStyleCycles(true, true, "sample")).toBe(false);
+    expect(arrivalStyleCycles(false, false, "live")).toBe(false);
   });
 
   it("only the idle edge admits an arrival", () => {
