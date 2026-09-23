@@ -1,9 +1,9 @@
 {
   "version": "v1",
-  "generatedAt": "2026-09-23T01:12:52-07:00",
+  "generatedAt": "2026-09-23T01:15:19-07:00",
   "source": {
     "repo": "3d-studio",
-    "commit": "a7ff19b6e31c129840297f37534ed60893a29958",
+    "commit": "546ff10362c6d1011bec1900ef46be4d38fe8e0b",
     "plan": "docs/PLAN-03-world-kit.md"
   },
   "decoder": {
@@ -1016,7 +1016,7 @@
     {
       "id": "nature.blossom-tree-a",
       "file": "nature/blossom-tree-a.glb",
-      "sha256": "b3c1ec7ad53e2ea5dcff550b1559627bf1b24b84965e41beb07c2dd23a3567e8",
+      "sha256": "bc35addf005edfe7b98bac3b30a410becfe8b8854254e5ac48c0afb8db571c54",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1036,9 +1036,9 @@
       ],
       "size": 5,
       "pivot": "base",
-      "verts": 4350,
-      "tris": 8684,
-      "bytes": 37652,
+      "verts": 7770,
+      "tris": 15516,
+      "bytes": 72212,
       "materials": [
         "blossom-tree-a-bark",
         "blossom-tree-a-blossom"
@@ -1050,7 +1050,7 @@
     {
       "id": "nature.blossom-tree-b",
       "file": "nature/blossom-tree-b.glb",
-      "sha256": "bfb6c16cf86d9947b4721628f0e69112b0a56a3cd3e4164fc9a4fec83f23098e",
+      "sha256": "0d2b18b1d358f822ff183256c85cbae67e36d683cf83a28877efded5fefa88ef",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1070,9 +1070,9 @@
       ],
       "size": 6,
       "pivot": "base",
-      "verts": 3792,
-      "tris": 7564,
-      "bytes": 33880,
+      "verts": 7026,
+      "tris": 14028,
+      "bytes": 64604,
       "materials": [
         "blossom-tree-b-bark",
         "blossom-tree-b-blossom"
@@ -1084,7 +1084,7 @@
     {
       "id": "nature.blossom-tree-c",
       "file": "nature/blossom-tree-c.glb",
-      "sha256": "129d6ee238ae06c8aad0c5c30f26b0b6360f88782c5669c51a5a68a5952c4bf7",
+      "sha256": "d8a24772a777581620072ede578f63e4ad0fb470d14257b33931c4ad3ffb1793",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1102,11 +1102,11 @@
         "orbit",
         "milestone"
       ],
-      "size": 5.138,
+      "size": 4.671,
       "pivot": "base",
-      "verts": 4784,
-      "tris": 9544,
-      "bytes": 38688,
+      "verts": 5876,
+      "tris": 11728,
+      "bytes": 55360,
       "materials": [
         "blossom-tree-c-bark",
         "blossom-tree-c-blossom"
@@ -1118,7 +1118,7 @@
     {
       "id": "nature.cloud-a",
       "file": "nature/cloud-a.glb",
-      "sha256": "cdf53cc60b9d63c6c8c098e5ea3c672066b27db04d4f17dd5be5d6e1730fa233",
+      "sha256": "66fe409f92899ee7b5ebec3f9f6ec4e3780beeab192a3f0315f4e97f1fe8b612",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1140,7 +1140,7 @@
       "pivot": "center",
       "verts": 6934,
       "tris": 13864,
-      "bytes": 47108,
+      "bytes": 47112,
       "materials": [
         "cloud-a-cotton"
       ],
@@ -1151,7 +1151,7 @@
     {
       "id": "nature.cloud-b",
       "file": "nature/cloud-b.glb",
-      "sha256": "b81bf3dccafc60ce6c58f3631d63ae5c483f1be3a1487fbf813f254caf3b148d",
+      "sha256": "a913e35ce4c4ecc6d897b51508327d0a7e436d4bd737c4434d8b70f306eab97e",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1184,7 +1184,7 @@
     {
       "id": "nature.cloud-c",
       "file": "nature/cloud-c.glb",
-      "sha256": "51a539f77aa3c9d8904e664aeefe210a7f2e13a64bbb3d951b95841c5ffb5e3e",
+      "sha256": "ec255a4269ebb269a8268ac1ccee6de0d50f3083ec60950a053066c1f256a41a",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1292,7 +1292,7 @@
     {
       "id": "nature.hydrangea-bush",
       "file": "nature/hydrangea-bush.glb",
-      "sha256": "bf0a9cb30251af36221e318ed43317172390440ef1cb1490b4acbda701601e8e",
+      "sha256": "9604b4d036d4cc4c486d29b7849fa114c0259210931d3a7ccb6689ee88e16f45",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1307,7 +1307,7 @@
       "pivot": "base",
       "verts": 9040,
       "tris": 17436,
-      "bytes": 74980,
+      "bytes": 75300,
       "materials": [
         "hydrangea-bush-leaves",
         "hydrangea-bush-florets"
@@ -1319,7 +1319,7 @@
     {
       "id": "nature.island-large",
       "file": "nature/island-large.glb",
-      "sha256": "65d6064a605b2a8f782c0296c175c2848fbd591940d90ad1b4c87ec095e628a4",
+      "sha256": "474db8cc441082815a29eb922e6a8c5800558c2481720d2a8fa85db22021117f",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1339,16 +1339,18 @@
       ],
       "size": 20,
       "pivot": "center",
-      "verts": 10982,
-      "tris": 21072,
-      "bytes": 61492,
+      "verts": 21704,
+      "tris": 42160,
+      "bytes": 159404,
       "materials": [
         "island-large-grass",
         "island-large-rock",
-        "island-large-rose",
-        "island-large-pearl",
-        "island-large-gold",
-        "island-large-lavender"
+        "island-large-water",
+        "island-large-waterfall-mist",
+        "island-large-bark",
+        "island-large-blossom",
+        "island-large-petal",
+        "island-large-gold"
       ],
       "clips": [],
       "lod": null,
@@ -1357,7 +1359,7 @@
     {
       "id": "nature.island-medium",
       "file": "nature/island-medium.glb",
-      "sha256": "12453c665a42e048caee69b0f56d197a950fd69b7d38ea9e4c539d752c0387fc",
+      "sha256": "df9637cc688533f76b9c0ed785b2d5a768847e40767642d64effe29a497fd90d",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1377,16 +1379,16 @@
       ],
       "size": 14,
       "pivot": "center",
-      "verts": 6808,
-      "tris": 13048,
-      "bytes": 43692,
+      "verts": 9636,
+      "tris": 18740,
+      "bytes": 79972,
       "materials": [
         "island-medium-grass",
         "island-medium-rock",
-        "island-medium-rose",
-        "island-medium-pearl",
-        "island-medium-gold",
-        "island-medium-lavender"
+        "island-medium-bark",
+        "island-medium-blossom",
+        "island-medium-petal",
+        "island-medium-gold"
       ],
       "clips": [],
       "lod": null,
@@ -1395,7 +1397,7 @@
     {
       "id": "nature.island-small",
       "file": "nature/island-small.glb",
-      "sha256": "3ff2699d428868d30a48932b9bfe97722b1e0854bbca10fe362dda3dc0d6ba4b",
+      "sha256": "a9fbd7b19962bbc917be4be696ff02db2f2dae089dc5ffed15885579bc3605e7",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1415,16 +1417,14 @@
       ],
       "size": 8,
       "pivot": "center",
-      "verts": 4062,
-      "tris": 7760,
-      "bytes": 31388,
+      "verts": 6928,
+      "tris": 13384,
+      "bytes": 56652,
       "materials": [
         "island-small-grass",
         "island-small-rock",
-        "island-small-rose",
-        "island-small-pearl",
-        "island-small-gold",
-        "island-small-lavender"
+        "island-small-petal",
+        "island-small-gold"
       ],
       "clips": [],
       "lod": null,
@@ -1433,7 +1433,7 @@
     {
       "id": "nature.lily-pads",
       "file": "nature/lily-pads.glb",
-      "sha256": "1a30c11d30c9200432caacf6ba6d9d7a67e7623e1ddc15c4d26053c015faaded",
+      "sha256": "1fb4b73a6b4ddb7ba7ced891dd2e9a6781f93e6336a40d91138aeaac60a44ec7",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1444,7 +1444,7 @@
       "pivot": "base",
       "verts": 3026,
       "tris": 5996,
-      "bytes": 23448,
+      "bytes": 23568,
       "materials": [
         "lily-pads-pad",
         "lily-pads-stem",
@@ -1457,7 +1457,7 @@
     {
       "id": "nature.rose-bush",
       "file": "nature/rose-bush.glb",
-      "sha256": "cc75172227c0b8856ec781a5cc286de1146957c2e1016c7f0004e0d18485ebf2",
+      "sha256": "f48ac3aec844b15863c443bd6d16e9172ea356894fa78899c782ee422e8e459a",
       "group": "nature",
       "feature": "nature",
       "zones": [
@@ -1472,7 +1472,7 @@
       "pivot": "base",
       "verts": 8634,
       "tris": 16112,
-      "bytes": 83628,
+      "bytes": 83696,
       "materials": [
         "rose-bush-leaves",
         "rose-bush-rose0",
