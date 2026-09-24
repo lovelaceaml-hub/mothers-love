@@ -7,7 +7,7 @@ This branch turns the approved V6 standalone prototype into the real `/display` 
 - Visual target: `Mothers_Love_TV_Prototype_v6.html` from the September 10 design review.
 - Production data/runtime target: the existing `DisplayExperience`, `DisplaySnapshot`, and display coordinator.
 - Production `/display` remains unchanged until the V6 staging route reaches parity.
-- Staging route during migration: `/display-v6`.
+- Staging route during migration: `/display-v6`. Retired 2026-09-24 in Plan 28 Section 6, together with `/display-legacy`. `V6DisplayExperience` stays, as the live `/display` fallback.
 
 ## Required scene order and target dwell
 

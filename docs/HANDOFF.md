@@ -40,7 +40,7 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 3. `database/014_color_polish_live_feed.sql` was never run and is not needed, because Live Recognitions uses its defaults. Its number collides with the applied `014_recognition_archive.sql`, so renumber it before it is ever run.
 4. The saved TV playlist keeps its old durations. Plan 17's 60 seconds per screen (Garden unchanged) and Welcome's 40 seconds are code defaults that wait for Anthony to save them live.
 5. Never checked on real hardware: the church TV at viewing distance, one real arrival on the church TV, a phone scanning the TV's QR code, a real Owner sign in, and the Android install and kiosk mode on a real device.
-6. Known test debt, as last recorded: one lint error in `src/components/admin/color-polish/ColorPolishStudio.tsx` (2026-09-20), and 26 journeys in `tests/display/display.e2e.spec.ts` that look for a legacy test id nothing renders any more (2026-09-10). Plan 28 Section 6 fixes the Linux CI readiness failure.
+6. Known test debt, as last recorded: `npx eslint src` reports 16 errors and 3 warnings in `ColorPolishStudio.tsx`, `DisplayKioskControl.tsx`, `V6DisplayExperience.tsx` and `ColorPolishHost.tsx` (counted 2026-09-24), and 26 journeys in `tests/display/display.e2e.spec.ts` look for a legacy test id nothing renders any more (2026-09-10). The Linux CI readiness failure (Plan 24 P0) was diagnosed in Plan 28 Section 6: the review opened `127.0.0.1` while `next dev` serves `localhost`, so Next.js 16 refused its dev socket. The fix is [pull request #16](https://github.com/lovelaceaml-hub/mothers-love/pull/16) into `feat/world-cinematic`.
 
 ## Where things are
 
