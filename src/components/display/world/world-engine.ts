@@ -29,6 +29,7 @@ import {
   planWorldBubbles,
   studyTvPage,
   tvRecords,
+  tvStartPlace,
   worldHoldSeconds,
   type WorldBubblePlan,
 } from "./prototype/tv-page";
@@ -128,6 +129,8 @@ export class WorldEngine {
   private readonly study = isWorldDesignStudy();
   /** Resolved once: the TV page (`?view=tv`) inside the study. */
   private readonly tv = studyTvPage();
+  /** Where the tour stops to read: every place on the TV page (step 5), the six recognition places elsewhere. */
+  private readonly readingZones: readonly ZoneId[] = this.tv ? TOUR_ORDER : RECOGNITION_ZONES;
   private readonly holdFor: HoldSeconds = this.tv ? placeHold(this.director) : readingSeconds;
   private readonly pacer = new ArrivalPacer();
   private tvPlan?: WorldBubblePlan;
@@ -139,6 +142,8 @@ export class WorldEngine {
   private tvWasTraveling = false;
   private sampleArrivalAt = SAMPLE_ARRIVAL_FIRST;
   private sampleArrivalIndex = 0;
+  /** Bound once, so the per frame bubble update allocates no closure. */
+  private readonly tvLoop = (place: ZoneId) => this.tvVisits.get(place) ?? 0;
   /** TV page: Peace and Joy (the placeholder until the lamb files land, `HOSTS_READY`). */
   private hosts?: TvHosts;
   /** Resolved once with the study gate: whether this page asked for the kit at all. */
@@ -216,6 +221,8 @@ export class WorldEngine {
     // TV page: a narrower reading arc, so the held bubble keeps its reading size.
     if (this.tv) {
       this.director.arc = { ...TV_ARC };
+      const start = tvStartPlace();
+      if (start) this.director.visit(start, true);
       this.hosts = new TvHosts(this.world.scene);
     }
     this.reduced = options.reducedMotion;
@@ -445,7 +452,7 @@ export class WorldEngine {
       this.finishArrival(true);
     const arriving = this.arrivalState.phase !== "idle";
     const readingBeforeCamera =
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
       !this.director.traveling;
     if (readingBeforeCamera && !arriving)
       this.recognitions.update(
@@ -491,7 +498,7 @@ export class WorldEngine {
     )
       this.recognitions.finishReading();
     const readingVisible =
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
       !this.director.traveling &&
       !arriving;
     const changedZone = this.director.zone !== this.lastReadingZone;
@@ -542,7 +549,8 @@ export class WorldEngine {
           this.feed.snapshot?.settings.effects?.trails ??
           this.feed.snapshot?.settings.showTrails ??
           true,
-        tvLoop: this.tv ? (place) => this.tvVisits.get(place) ?? 0 : undefined,
+        tvLoop: this.tv ? this.tvLoop : undefined,
+        destination: this.director.destination,
         hold: this.holdFor,
       }) || this.dirty;
     if (this.hosts) {
@@ -775,7 +783,7 @@ export class WorldEngine {
       this.readingPool(),
       settings?.readingSeconds ?? 24,
       true,
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
         !this.director.traveling &&
         this.arrivalState.phase === "idle",
       feed.records,
@@ -785,7 +793,7 @@ export class WorldEngine {
   }
   private isReadingComplete(delta: number, minimum: number) {
     if (
-      !RECOGNITION_ZONES.includes(this.director.zone) ||
+      !this.readingZones.includes(this.director.zone) ||
       this.director.traveling
     )
       return true;
@@ -830,7 +838,7 @@ export class WorldEngine {
       this.readingPool(),
       24,
       true,
-      RECOGNITION_ZONES.includes(this.director.zone),
+      this.readingZones.includes(this.director.zone),
       this.feed.records,
     );
     this.report();
@@ -871,7 +879,7 @@ export class WorldEngine {
     );
     const destination = ZONES.find(
       (zone) =>
-        RECOGNITION_ZONES.includes(zone.id) &&
+        this.readingZones.includes(zone.id) &&
         (!this.feed.snapshot || enabled.has(zone.scene)),
     );
     if (

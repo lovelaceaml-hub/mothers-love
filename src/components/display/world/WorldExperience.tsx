@@ -14,6 +14,7 @@ import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
 import type { WorldEngine, WorldStatus } from "./world-engine";
 import styles from "./WorldExperience.module.css";
 import { WorldTvOverlay } from "./WorldTvOverlay";
+import tvStyles from "./WorldTv.module.css";
 import { TV_TOUR_SPEED } from "./prototype/tv-page";
 import { useDisplayChimes } from "../use-display-chimes";
 import {
@@ -503,7 +504,7 @@ export function WorldExperience({
           </section>}
           {(fallback || !RECOGNITION_ZONES.includes(status.zone)) && (
             <aside
-              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}`}
+              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""} ${tvPage ? tvStyles.panel : ""}`}
               aria-label="World content"
             >
               <WorldContent

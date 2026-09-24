@@ -50,6 +50,81 @@ export const TV_PLACE_LAYOUT: readonly TvBubbleSpec[] = [
   { role: "small", ndc: [-1.3, 0.55], distance: 32, diameter: 270 },
 ];
 
+/**
+ * Places that keep a feature panel (step 7) show it on the left, between the title and the QR
+ * code, so their second big bubble and one small one stand in the middle and the other small
+ * ones stand round the island.
+ */
+export const TV_PANEL_LAYOUT: readonly TvBubbleSpec[] = [
+  { role: "held", ndc: [0.4, -0.02], distance: 15, diameter: 740 },
+  { role: "second", ndc: [-0.1875, 0.444], distance: 26, diameter: 360 },
+  { role: "small", ndc: [-0.1875, -0.296], distance: 18, diameter: 270 },
+  { role: "small", ndc: [1.55, 0.15], distance: 30, diameter: 280 },
+  { role: "small", ndc: [-1.6, 0.05], distance: 30, diameter: 280 },
+  { role: "small", ndc: [1.3, -0.35], distance: 30, diameter: 280 },
+  { role: "small", ndc: [-1.3, 0.55], distance: 32, diameter: 270 },
+  { role: "small", ndc: [-1.25, -0.5], distance: 28, diameter: 270 },
+  { role: "small", ndc: [1.4, 0.6], distance: 32, diameter: 270 },
+  { role: "small", ndc: [-1.5, -0.2], distance: 26, diameter: 270 },
+];
+
+/**
+ * The River of Recognitions (step 6): the held big bubble on the right as everywhere, the
+ * second big one high in the middle, and eight small bubbles drifting down the river toward the
+ * viewer in two columns (the idea of the TV's Live Recognitions screen). Each river bubble
+ * runs from `ndc` far up the river to `to` near the viewer over `TV_RIVER_SECONDS`, then
+ * starts again at the top; a column's four are a quarter of the run apart.
+ */
+export const TV_RIVER_SECONDS = 48;
+export type TvRiverSpec = TvBubbleSpec & { to: readonly [number, number]; toDistance: number; offset: number };
+export const TV_RIVER_LAYOUT: readonly (TvBubbleSpec | TvRiverSpec)[] = [
+  { role: "held", ndc: [0.4, -0.02], distance: 15, diameter: 740 },
+  { role: "second", ndc: [0, 0.62], distance: 32, diameter: 260 },
+  // Each run starts above the top of the frame, so at most three of a column's four are in
+  // view at once, a bubble's height apart (260 px bubbles on a 1080 px screen).
+  ...[-0.78, -0.36].flatMap((x, column) => [0, 0.25, 0.5, 0.75].map((offset): TvRiverSpec => ({
+    role: "small", ndc: [x + 0.06, 1.42], distance: 40, diameter: 260,
+    to: [x - 0.03, -0.6], toDistance: 17, offset: offset + column * 0.125,
+  }))),
+];
+
+export function isRiverSpec(spec: TvBubbleSpec): spec is TvRiverSpec {
+  return "to" in spec;
+}
+
+/** The layout a place's bubbles use on the TV page. */
+export function tvLayoutFor(zone: ZoneId, panelPlaces: readonly ZoneId[]): readonly TvBubbleSpec[] {
+  if (zone === "live-feed") return TV_RIVER_LAYOUT;
+  return panelPlaces.includes(zone) ? TV_PANEL_LAYOUT : TV_PLACE_LAYOUT;
+}
+
+/**
+ * A river bubble's run, sampled evenly on screen from its top to its end (a straight lerp in
+ * the world would bunch the far part up under perspective), each sample a world place and
+ * the radius that keeps the bubble at its diameter there.
+ */
+export type TvRiverPath = Array<{ position: T.Vector3; radius: number }>;
+export function tvRiverPath(zone: Pick<WorldZone, "eye" | "target">, spec: TvRiverSpec, samples = 33): TvRiverPath {
+  return Array.from({ length: samples }, (_, i) => {
+    const t = i / (samples - 1);
+    return tvBubblePlacement(zone, {
+      ...spec,
+      ndc: [spec.ndc[0] + (spec.to[0] - spec.ndc[0]) * t, spec.ndc[1] + (spec.to[1] - spec.ndc[1]) * t],
+      distance: spec.distance + (spec.toDistance - spec.distance) * t,
+    });
+  });
+}
+
+/** Where a river bubble is at `time`: its place and radius on the way down, and how present it is (0 to 1). */
+export function tvRiverAt(path: TvRiverPath, offset: number, time: number, out: T.Vector3) {
+  const t = (((time / TV_RIVER_SECONDS + offset) % 1) + 1) % 1;
+  const at = t * (path.length - 1), i = Math.min(path.length - 2, Math.floor(at)), f = at - i;
+  out.copy(path[i].position).lerp(path[i + 1].position, f);
+  // Grow in at the top of the run and fade out at the end, so the wrap is never seen.
+  const presence = Math.min(1, t / 0.06, (1 - t) / 0.06);
+  return { t, radius: path[i].radius + (path[i + 1].radius - path[i].radius) * f, presence };
+}
+
 /** The tour camera for a place, as the director parks it with no reading arc. */
 export function tvTourCamera(zone: Pick<WorldZone, "eye" | "target">, aspect = TV_ASPECT) {
   const camera = new T.PerspectiveCamera(TV_FOV, aspect, 0.1, 450);

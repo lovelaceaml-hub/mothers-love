@@ -1,5 +1,5 @@
 import type { Recognition } from "@/lib/contracts";
-import { TOUR_ORDER, type ZoneId } from "../world-data";
+import { RECOGNITION_ZONES, TOUR_ORDER, type ZoneId } from "../world-data";
 import { isWorldDesignStudy } from "./design-mode";
 
 /*
@@ -21,10 +21,28 @@ export function studyTvPage(search?: string) {
   return query.getAll("view").length === 1 && query.get("view") === "tv";
 }
 
+/**
+ * Review aid, TV page only: `&place=<id>` starts the tour at that place instead of the Garden,
+ * so each place can be opened directly on a preview link. Unknown ids are ignored.
+ */
+export function tvStartPlace(search?: string): ZoneId | undefined {
+  const source = search ?? (typeof window === "undefined" ? "" : window.location.search);
+  const place = new URLSearchParams(source).get("place");
+  return TOUR_ORDER.find((id) => id === place);
+}
+
 /** Step 8: the TV tour runs at the settings panel's fastest speed, and the panel is hidden. */
 export const TV_TOUR_SPEED = 2;
-/** Step 5: the places that show the new bubbles so far. The Garden first (step 10). */
-export const TV_BUBBLE_PLACES: readonly ZoneId[] = ["garden"];
+/**
+ * Step 5: the places that show the new bubbles: the Garden first (step 10), then, after
+ * Anthony's yes on 2026-09-24, all thirteen.
+ */
+export const TV_BUBBLE_PLACES: readonly ZoneId[] = TOUR_ORDER;
+/**
+ * The places that also keep a TV feature panel (step 7: welcome and QR, the nine expressions,
+ * practice, calendar, impact, weekly goal, promise). Their bubbles leave the panel's side clear.
+ */
+export const TV_PANEL_PLACES: readonly ZoneId[] = TOUR_ORDER.filter((place) => !RECOGNITION_ZONES.includes(place));
 /** The TV draws from the latest 100 (AGENTS.md product invariants). */
 export const TV_RECORD_LIMIT = 100;
 

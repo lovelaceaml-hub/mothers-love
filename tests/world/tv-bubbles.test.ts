@@ -13,9 +13,16 @@ import {
   contrastRatio,
   heartLabel,
   tvBubblePlacement,
+  TV_RIVER_SECONDS,
+  isRiverSpec,
   tvCorridorLegs,
+  tvLayoutFor,
+  tvRiverAt,
+  tvRiverPath,
+  tvTourCamera,
   tvScrollFraction,
 } from "@/components/display/world/prototype/tv-bubbles";
+import { TV_PANEL_PLACES } from "@/components/display/world/prototype/tv-page";
 import { ARRIVAL_VIEW, TOUR_ORDER } from "@/components/display/world/world-data";
 
 const garden = ZONES.find((zone) => zone.id === "garden")!;
@@ -131,5 +138,97 @@ describe("TV bubble text", () => {
   });
   it("puts corridor bubbles on the legs into and out of the Garden", () => {
     expect(tvCorridorLegs(TOUR_ORDER, ["garden"])).toEqual([["welcome", "garden"], ["garden", "featured"]]);
+  });
+});
+
+describe("TV bubbles at all thirteen places", () => {
+  /** The hold camera at any place, with the TV page's arc. */
+  function placeCamera(zone: (typeof ZONES)[number], age: number) {
+    const angle = Math.sin(age * 0.035) * TV_ARC.swing;
+    const approach = 1 - Math.sin(age * 0.03) * TV_ARC.approach;
+    const dx = zone.eye[0] - zone.target[0], dz = zone.eye[2] - zone.target[2];
+    const camera = new T.PerspectiveCamera(TV_FOV, 16 / 9, 0.1, 450);
+    camera.position.set(
+      zone.target[0] + (dx * Math.cos(angle) - dz * Math.sin(angle)) * approach,
+      zone.eye[1] + Math.sin(age * 0.045) * 1.6,
+      zone.target[2] + (dx * Math.sin(angle) + dz * Math.cos(angle)) * approach,
+    );
+    camera.lookAt(new T.Vector3(...zone.target));
+    camera.updateMatrixWorld();
+    return camera;
+  }
+  const eyes = [ARRIVAL_VIEW.eye, ...ZONES.map((zone) => zone.eye)].map((eye) => new T.Vector3(...eye));
+
+  for (const place of TOUR_ORDER) {
+    const zone = ZONES.find((item) => item.id === place)!;
+    const layout = tvLayoutFor(place, TV_PANEL_PLACES);
+    // A river bubble is checked at the top, the middle and the end of its run.
+    const points = layout.flatMap((spec) => {
+      const from = tvBubblePlacement(zone, spec);
+      if (!isRiverSpec(spec)) return [{ spec, ...from }];
+      void from;
+      return tvRiverPath(zone, spec, 9).map((point) => ({ spec, ...point }));
+    });
+
+    it(`${place}: 1 held and 1 second big bubble and 8 small ones`, () => {
+      expect(layout.filter((spec) => spec.role === "held")).toHaveLength(1);
+      expect(layout.filter((spec) => spec.role === "second")).toHaveLength(1);
+      expect(layout.filter((spec) => spec.role === "small")).toHaveLength(8);
+    });
+
+    it(`${place}: held body 34 px or more through the arc, every other in frame word 22 px or more`, () => {
+      const held = points.find((item) => item.spec.role === "held")!;
+      for (let age = 0; age <= 120; age += 2) {
+        const seen = onScreen(placeCamera(zone, age), held.position, held.radius);
+        expect((TV_BIG.body / TV_BIG.canvas) * seen.diameter).toBeGreaterThanOrEqual(34);
+      }
+      const camera = placeCamera(zone, 0);
+      const smallest = Math.min(TV_SMALL.body, TV_SMALL.heart, TV_SMALL.nameMin);
+      for (const { spec, position, radius } of points.filter((item) => item.spec.role !== "held")) {
+        const seen = onScreen(camera, position, radius);
+        if (Math.abs(seen.ndc.x) > 1.1 || Math.abs(seen.ndc.y) > 1.1) continue;
+        expect((smallest / TV_SMALL.canvas) * seen.diameter, `${spec.role} at ${spec.ndc}`).toBeGreaterThanOrEqual(22);
+      }
+    });
+
+    it(`${place}: every bubble stays clear of every camera eye`, () => {
+      for (const { spec, position, radius } of points)
+        for (const eye of eyes) expect(position.distanceTo(eye) - radius, `${spec.role} at ${spec.ndc}`).toBeGreaterThan(6);
+    });
+
+    if (TV_PANEL_PLACES.includes(place))
+      it(`${place}: bubbles in view leave the feature panel on the left clear`, () => {
+        // The panel on a 1920 by 1080 screen: x 58 to 576, y 190 to 820 (WorldTv.module.css).
+        const camera = placeCamera(zone, 0);
+        for (const { spec, position, radius } of points) {
+          const seen = onScreen(camera, position, radius);
+          const cx = (seen.ndc.x + 1) * 960, cy = (1 - seen.ndc.y) * 540, r = seen.diameter / 2;
+          const nx = Math.max(58, Math.min(576, cx)), ny = Math.max(190, Math.min(820, cy));
+          expect(Math.hypot(cx - nx, cy - ny), `${spec.role} at ${spec.ndc}`).toBeGreaterThan(r);
+        }
+      });
+  }
+});
+
+describe("the River of Recognitions", () => {
+  it("keeps the river bubbles in view from overlapping, in two columns, as they drift", () => {
+    const zone = ZONES.find((item) => item.id === "live-feed")!;
+    const layout = tvLayoutFor("live-feed", TV_PANEL_PLACES).filter(isRiverSpec);
+    expect(new Set(layout.map((spec) => spec.ndc[0])).size).toBe(2);
+    const camera = tvTourCamera(zone);
+    const runs = layout.map((spec) => ({ spec, path: tvRiverPath(zone, spec) }));
+    const out = new T.Vector3();
+    for (let time = 0; time < TV_RIVER_SECONDS; time += 0.5) {
+      const shown = runs.map(({ spec, path }) => {
+        const run = tvRiverAt(path, spec.offset, time, out);
+        const seen = onScreen(camera, out, run.radius);
+        return { x: (seen.ndc.x + 1) * 960, y: (1 - seen.ndc.y) * 540, r: (seen.diameter / 2) * run.presence };
+      }).filter((item) => item.y + item.r > 0 && item.y - item.r < 1080 && item.r > 1);
+      for (let i = 0; i < shown.length; i++)
+        for (let j = i + 1; j < shown.length; j++) {
+          const a = shown[i], b = shown[j];
+          expect(Math.hypot(a.x - b.x, a.y - b.y), `t ${time}`).toBeGreaterThan((a.r + b.r) * 0.9);
+        }
+    }
   });
 });

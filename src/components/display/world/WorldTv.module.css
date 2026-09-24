@@ -77,6 +77,21 @@
   }
 }
 
+/*
+ * A place's feature panel (welcome, expressions, practice, calendar, impact, weekly goal,
+ * promise) on the TV page: on the left between the title and the QR code, where the bubble
+ * layout keeps the view clear. Its own QR codes (daily practice, peace promise) stay.
+ */
+.panel {
+  left: 3vw !important;
+  right: auto !important;
+  top: 19vh !important;
+  bottom: auto !important;
+  width: 26vw !important;
+  max-height: 57vh !important;
+  z-index: 2;
+}
+
 .share {
   position: absolute;
   z-index: 2;

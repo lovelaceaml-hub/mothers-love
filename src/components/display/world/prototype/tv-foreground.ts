@@ -38,7 +38,7 @@ const LAYOUTS: Partial<Record<ZoneId, () => ZoneLayout>> = { garden: tvGardenBlo
 
 /** Ringed pearls per place, and drifting petals per place. */
 export const TV_PEARLS = 9;
-export const TV_PETALS = 90;
+export const TV_PETALS = 60;
 const PETAL_COLORS = ["#ffd6e4", "#f9c6dc", "#e9d8ff", "#fff1c9", "#d8f1e6", "#ffe0d0"];
 
 export function applyTvForeground(context: DesignKitContext): KitBuilderHandle | undefined {
