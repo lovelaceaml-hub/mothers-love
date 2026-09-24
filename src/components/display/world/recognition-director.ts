@@ -1,7 +1,12 @@
 import type { Recognition } from "@/lib/contracts";
 import { readingSeconds } from "./world-feed";
 
+/** How long a message is held, in seconds, given the owner's minimum. */
+export type HoldSeconds = (message: string, minimum: number) => number;
+
 export class RecognitionDirector {
+  /** The TV page passes its own hold rule; every other page keeps `readingSeconds`. */
+  constructor(private readonly holdFor: HoldSeconds = readingSeconds) {}
   id: string | null = null;
   age = 0;
   private shown = new Map<string, number>();
@@ -49,7 +54,7 @@ export class RecognitionDirector {
       this.age = 0;
     this.readingFingerprint = fingerprint;
     if (!hold) this.age += delta;
-    if (!hold && this.age >= readingSeconds(current.message, minimum))
+    if (!hold && this.age >= this.holdFor(current.message, minimum))
       this.next(records);
   }
   noteCompletedArrival(id: string, records: readonly Recognition[]) {
@@ -90,7 +95,7 @@ export class RecognitionDirector {
   remaining(records: readonly Recognition[], minimum: number) {
     const current = records.find((record) => record.id === this.id);
     return current
-      ? Math.max(0, readingSeconds(current.message, minimum) - this.age)
+      ? Math.max(0, this.holdFor(current.message, minimum) - this.age)
       : 0;
   }
 }

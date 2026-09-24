@@ -23,6 +23,8 @@ import { lanternLayout, type LanternPoint } from "./study-glory";
 import { createStudyAir, type AirFocus } from "./study-air";
 import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
 import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
+import { applyTvForeground, applyTvPalette } from "./tv-foreground";
+import { studyTvPage } from "./tv-page";
 
 /**
  * What a kit builder may hand back: per frame work on the world clock, the owner's effect
@@ -844,7 +846,14 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
     if (neighbors) { kitHandles.push(neighbors); scene.userData.studyNeighbors = true; }
     const corridorHandle = applyKitCorridors(kitContext);
     if (corridorHandle) kitHandles.push(corridorHandle);
+    // PLAN-01 Section 5 step 3: the TV page's denser foreground, the Garden first.
+    if (studyTvPage()) {
+      const tvHandle = applyTvForeground(kitContext);
+      if (tvHandle) kitHandles.push(tvHandle);
+    }
   }
+  // The TV page's pearl white stone, gold and pastel blossom, on the shared materials.
+  if (studyTvPage()) applyTvPalette({ ivory, edge, gold, rose, roseGold, leaf, lawn, stone, bloom, water, silk: silkMat, cotton, shadow, fall });
 
   // Section 7: the 31 waterfall planes become one mesh. Their world transforms are baked in,
   // and the shader reads only uv, so nothing moves. The material writes no depth, so losing

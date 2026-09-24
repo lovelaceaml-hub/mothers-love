@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function WorldPreviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ source?: string; art?: string; entrance?: string }>;
+  searchParams: Promise<{ source?: string; art?: string; entrance?: string; view?: string }>;
 }) {
   const query = await searchParams;
   return (
@@ -19,6 +19,7 @@ export default async function WorldPreviewPage({
       initialSource={query.source === "sample" ? "sample" : "live"}
       designReview={query.art === "design" && query.source === "sample"}
       initialStudyArrival={query.entrance}
+      tvPage={query.art === "design" && query.source === "sample" && query.view === "tv"}
     />
   );
 }

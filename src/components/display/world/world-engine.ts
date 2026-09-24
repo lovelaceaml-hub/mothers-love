@@ -23,6 +23,27 @@ import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import type { WorldKit } from "./kit/kit-loader";
 import { kitState, type KitState } from "./kit/kit-manifest";
 import {
+  ArrivalPacer,
+  TV_BUBBLE_PLACES,
+  heldBig,
+  planWorldBubbles,
+  studyTvPage,
+  tvRecords,
+  worldHoldSeconds,
+  type WorldBubblePlan,
+} from "./prototype/tv-page";
+import { TV_ARC } from "./prototype/tv-bubbles";
+import { TvHosts } from "./prototype/tv-hosts";
+import type { HoldSeconds } from "./recognition-director";
+
+/** The TV page's hold rule (step 4). It sets its own floor, so the owner minimum is not read. */
+const tvHold: HoldSeconds = (message) => worldHoldSeconds(message);
+/** TV page, sample mode: a fictional arrival every 90 s after the first 45, to show the pacing. */
+const SAMPLE_ARRIVAL_FIRST = 45;
+const SAMPLE_ARRIVAL_EVERY = 90;
+/** How long an arrival stays marked new in the ticker. */
+const FRESH_SECONDS = 90;
+import {
   RECOGNITION_ZONES,
   TOUR_ORDER,
   ZONES,
@@ -58,6 +79,8 @@ export type WorldStatus = {
   kitCounts?: { loaded: number; total: number };
   /** True once kit neighbors stand in the design world in place of the miniature figures. */
   kitNeighbors?: boolean;
+  /** TV page: records that arrived in the last 90 s, newest last, for the ticker. */
+  tvArrivals?: string[];
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -73,8 +96,8 @@ export type EngineOptions = {
 export class WorldEngine {
   readonly renderer: THREE.WebGLRenderer;
   readonly director = new CameraDirector();
-  readonly arrivals = new ArrivalDirector();
-  readonly recognitions = new RecognitionDirector();
+  readonly arrivals = new ArrivalDirector(studyTvPage() ? tvHold : undefined);
+  readonly recognitions = new RecognitionDirector(studyTvPage() ? tvHold : undefined);
   private feed: WorldFeed = emptyFeed();
   private readingHeld = false;
   private lastReadingZone: ZoneId = "garden";
@@ -96,6 +119,21 @@ export class WorldEngine {
   private readonly environment: THREE.WebGLRenderTarget;
   /** Resolved once: the tick runs sixty times a second and must not reparse the URL. */
   private readonly study = isWorldDesignStudy();
+  /** Resolved once: the TV page (`?view=tv`) inside the study. */
+  private readonly tv = studyTvPage();
+  private readonly holdFor: HoldSeconds = this.tv ? tvHold : readingSeconds;
+  private readonly pacer = new ArrivalPacer();
+  private tvPlan?: WorldBubblePlan;
+  /** How many times the tour has left each place: picks the place's held big bubble. */
+  private readonly tvVisits = new Map<ZoneId, number>();
+  private tvFresh: Array<{ id: string; at: number }> = [];
+  private tvClock = 0;
+  private tvStart = -1;
+  private tvWasTraveling = false;
+  private sampleArrivalAt = SAMPLE_ARRIVAL_FIRST;
+  private sampleArrivalIndex = 0;
+  /** TV page: Peace and Joy (the placeholder until the lamb files land, `HOSTS_READY`). */
+  private hosts?: TvHosts;
   /** Resolved once with the study gate: whether this page asked for the kit at all. */
   private readonly kitRequested = this.study && studyKit();
   private readonly kit?: WorldKit;
@@ -168,6 +206,11 @@ export class WorldEngine {
     }
     // Study only: the expression the DOM picker shows, for the grove and the terrace steles.
     if (this.study) this.world.scene.userData.studyExpression = this.expressionId;
+    // TV page: a narrower reading arc, so the held bubble keeps its reading size.
+    if (this.tv) {
+      this.director.arc = { ...TV_ARC };
+      this.hosts = new TvHosts(this.world.scene);
+    }
     this.reduced = options.reducedMotion;
     try {
       this.renderer = new THREE.WebGLRenderer({
@@ -353,6 +396,7 @@ export class WorldEngine {
       this.feed.phase === "live" ||
       this.feed.phase === "reconnecting";
     const minimum = this.feed.snapshot?.settings.readingSeconds ?? 24;
+    if (this.tv) this.tvPacing(now, safe);
     const previousArrival = this.arrivalState;
     const before = previousArrival.phase;
     const canStart =
@@ -361,6 +405,11 @@ export class WorldEngine {
       (this.rotationPaused ||
         this.demoRequested ||
         this.isReadingComplete(delta, minimum));
+    // TV page: at most one arrival interrupts the tour per minute (step 5).
+    if (this.tv && canStart && previousArrival.phase === "idle" && safe && !this.feed.snapshot?.settings.pauseArrivals) {
+      const id = this.pacer.next(this.tvClock);
+      if (id) this.arrivals.enqueue([id]);
+    }
     this.arrivalState = this.arrivals.update(
       this.paused ? 0 : delta,
       this.feed.records,
@@ -413,6 +462,14 @@ export class WorldEngine {
         !moving,
       );
       if (previousZone !== this.director.zone) this.dirty = true;
+    }
+    // TV page: a departure after a full hold completes the place.
+    if (this.tv) {
+      if (!this.tvWasTraveling && this.director.traveling && !arriving) {
+        this.tvVisits.set(departingZone, (this.tvVisits.get(departingZone) ?? 0) + 1);
+        this.pacer.placeCompleted();
+      }
+      this.tvWasTraveling = this.director.traveling;
     }
     if (this.mood) this.applyStudyMood(this.paused ? 0 : delta, moving);
     if (moving || arriving || before !== "idle") {
@@ -478,7 +535,20 @@ export class WorldEngine {
           this.feed.snapshot?.settings.effects?.trails ??
           this.feed.snapshot?.settings.showTrails ??
           true,
+        tvLoop: this.tv ? (place) => this.tvVisits.get(place) ?? 0 : undefined,
+        hold: this.holdFor,
       }) || this.dirty;
+    if (this.hosts) {
+      this.hosts.update({
+        time: this.elapsed,
+        dt: this.paused ? 0 : delta,
+        camera: this.camera,
+        phase: this.arrivalState.phase,
+        traveling: this.director.traveling,
+        bubble: this.bubbles.arrivalBubble(),
+        still: !moving,
+      });
+    }
     // Study only: the focal pearl's place in the world, so the drifting petals can keep clear
     // of the words. Read on the next frame, which at these speeds is well inside the guard's margin.
     if (this.study)
@@ -599,7 +669,31 @@ export class WorldEngine {
         ? { loaded: this.kit.loaded, total: this.kit.loaded + this.kit.missing.length }
         : undefined,
       kitNeighbors: this.world.scene.userData.studyNeighbors === true,
+      tvArrivals: this.tv ? this.tvFresh.map((item) => item.id) : undefined,
     });
+  }
+  /**
+   * TV page: the pacing clock, the fresh marks for the ticker and, in sample mode, a
+   * fictional arrival now and then so the lotus, the hosts and the pacing can be seen.
+   */
+  private tvPacing(now: number, safe: boolean) {
+    if (this.tvStart < 0) this.tvStart = now;
+    this.tvClock = (now - this.tvStart) / 1000;
+    this.tvFresh = this.tvFresh.filter((item) => this.tvClock - item.at < FRESH_SECONDS);
+    if (!safe || this.feed.phase !== "sample" || this.tvClock < this.sampleArrivalAt) return;
+    this.sampleArrivalAt += SAMPLE_ARRIVAL_EVERY;
+    const pool = tvRecords(this.feed.records);
+    if (!pool.length) return;
+    const id = pool[this.sampleArrivalIndex++ % pool.length].id;
+    this.pacer.forget(id);
+    this.pacer.offer([id]);
+    this.noteFresh([id]);
+  }
+  private noteFresh(ids: readonly string[]) {
+    for (const id of ids) {
+      this.tvFresh = this.tvFresh.filter((item) => item.id !== id);
+      this.tvFresh.push({ id, at: this.tvClock });
+    }
   }
   setFeed(feed: WorldFeed) {
     if ((feed.phase === "sample") !== (this.feed.phase === "sample")) {
@@ -630,7 +724,8 @@ export class WorldEngine {
       this.world.scene.userData.studyInsights = safe
         ? (feed.snapshot?.insights ?? null)
         : null;
-    this.bubbles.setRecords(safe ? feed.records : []);
+    this.bubbles.setRecords(safe ? feed.records : [], feed.phase === "sample");
+    if (this.tv) this.tvPlan = planWorldBubbles(safe ? feed.records : []);
     this.world.setEffects(
       settings?.effects?.sparkles !== false,
       settings?.effects?.trails ?? settings?.showTrails ?? true,
@@ -657,6 +752,15 @@ export class WorldEngine {
       this.arrivals.cancel();
       this.finishArrival(true);
       this.arrivalState = this.arrivals.state();
+      this.pacer.clear();
+      if (!safe) this.tvFresh = [];
+    } else if (this.tv) {
+      // New arrivals join the ticker at once; their lotus waits for the pacer.
+      this.pacer.prune(new Set(feed.records.map((record) => record.id)));
+      this.pacer.offer(feed.arrivals);
+      this.noteFresh(feed.arrivals);
+      const ids = new Set(feed.records.map((record) => record.id));
+      this.tvFresh = this.tvFresh.filter((item) => ids.has(item.id));
     } else this.arrivals.enqueue(feed.arrivals);
     this.recognitions.update(
       0,
@@ -682,7 +786,7 @@ export class WorldEngine {
     );
     return (
       !current ||
-      this.recognitions.age + delta >= readingSeconds(current.message, minimum)
+      this.recognitions.age + delta >= this.holdFor(current.message, minimum)
     );
   }
   private readingPool(includeHeld = true) {
@@ -691,6 +795,11 @@ export class WorldEngine {
     );
     if (includeHeld && this.readingHeld && held) return [held];
     const zone = this.director.zone;
+    // TV page: each visit holds on the place's big bubble for this loop (step 5).
+    if (this.tv && this.tvPlan && TV_BUBBLE_PLACES.includes(zone)) {
+      const record = heldBig(this.tvPlan, zone, this.tvVisits.get(zone) ?? 0);
+      return record ? [record] : [];
+    }
     if (zone === "featured") {
       const featured = this.feed.records.filter((record) => record.featured);
       return featured.length ? featured : this.feed.records;
@@ -832,6 +941,7 @@ export class WorldEngine {
     this.canvas.removeEventListener("webglcontextlost", this.contextLost);
     this.canvas.removeEventListener("click", this.selectPearl);
     this.radiance?.dispose();
+    this.hosts?.dispose();
     this.world.dispose();
     this.bubbles.dispose();
     // After the world: its placements share the kit's geometry, and the kit ends the decoder.

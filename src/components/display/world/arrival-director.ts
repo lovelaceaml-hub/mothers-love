@@ -1,5 +1,6 @@
 import { readingSeconds } from "./world-feed";
 import type { Recognition } from "@/lib/contracts";
+import type { HoldSeconds } from "./recognition-director";
 export type ArrivalPhase =
   | "idle"
   | "approach"
@@ -16,6 +17,8 @@ export type ArrivalState = {
   waveSize: number;
 };
 export class ArrivalDirector {
+  /** The TV page passes its own hold rule; every other page keeps `readingSeconds`. */
+  constructor(private readonly holdFor: HoldSeconds = readingSeconds) {}
   private queue: string[] = [];
   private wave: string[] = [];
   private index = 0;
@@ -45,7 +48,7 @@ export class ArrivalDirector {
         (record) => record.id === this.wave[this.index],
       );
       if (current)
-        this.begin("reading", readingSeconds(current.message, minimumReading));
+        this.begin("reading", this.holdFor(current.message, minimumReading));
       else {
         this.preserveRemaining(records);
         this.begin("return", 0.1);
@@ -97,7 +100,7 @@ export class ArrivalDirector {
       this.begin(
         reduced ? "reading" : "approach",
         reduced
-          ? readingSeconds(available.get(this.wave[0])!.message, minimumReading)
+          ? this.holdFor(available.get(this.wave[0])!.message, minimumReading)
           : 5,
       );
     } else if (this.phase !== "idle") {
@@ -107,7 +110,7 @@ export class ArrivalDirector {
         else if (this.phase === "reveal")
           this.begin(
             "reading",
-            readingSeconds(
+            this.holdFor(
               available.get(this.wave[this.index])?.message ?? "",
               minimumReading,
             ),
@@ -125,7 +128,7 @@ export class ArrivalDirector {
             this.begin(
               reduced ? "reading" : "reveal",
               reduced
-                ? readingSeconds(
+                ? this.holdFor(
                     available.get(this.wave[this.index])!.message,
                     minimumReading,
                   )
@@ -160,7 +163,7 @@ export class ArrivalDirector {
     }
     this.readingFingerprint = fingerprint;
     if (this.phase === "reading")
-      this.duration = readingSeconds(record.message, minimum);
+      this.duration = this.holdFor(record.message, minimum);
   }
   private preserveRemaining(records: readonly Recognition[]) {
     const eligible = new Set(records.map((record) => record.id));

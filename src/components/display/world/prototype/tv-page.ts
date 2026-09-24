@@ -154,6 +154,10 @@ export class ArrivalPacer {
     if (this.presented.size > 512) this.presented = new Set([...this.presented].slice(-256));
     return id;
   }
+  /** Sample mode only: let a fictional record arrive again. */
+  forget(id: string) {
+    this.presented.delete(id);
+  }
   /** The tour finished a place on its own, so the interruption streak starts over. */
   placeCompleted() {
     this.streak = 0;
