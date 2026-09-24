@@ -9,6 +9,21 @@ import {
 } from "./world-data";
 
 export class CameraDirector {
+  /**
+   * How a travel is paced, from 0 at its start to 1 at its end.
+   *
+   * The default is the app's own `smoothstep`, which is what every path and every test of
+   * this class uses; the sample-only design study swaps in a gentler curve from its own
+   * module. Nothing else in this class reads it, so replacing it changes the pacing of a
+   * travel and nothing whatever besides.
+   */
+  ease: (t: number) => number = smoothstep;
+  /**
+   * The reading arc: how far the camera swings round a place (radians) and how much it
+   * breathes in and out (a fraction of the eye distance). The TV page narrows both so a big
+   * bubble keeps its reading size; every other page keeps these defaults.
+   */
+  arc = { swing: 0.48, approach: 0.1 };
   readonly position = new Vector3(...ZONES[0].eye);
   readonly target = new Vector3(...ZONES[0].target);
   zone: ZoneId = "garden";
@@ -171,7 +186,7 @@ export class CameraDirector {
     if (hold && !this.special) return;
     this.age += Math.max(0, delta);
     if (this.traveling && this.path && this.lookPath) {
-      const t = smoothstep(this.age / this.duration);
+      const t = this.ease(this.age / this.duration);
       this.path.getPoint(t, this.position);
       this.lookPath.getPoint(t, this.target);
       if (this.age >= this.duration) {
@@ -199,8 +214,8 @@ export class CameraDirector {
     // Fly a broad, slow arc among the world-space bubbles throughout reading.
     if (!instant && !this.special && !this.traveling) {
       const zone = ZONES[zoneIndex(this.zone)];
-      const angle = Math.sin(this.age * 0.035) * 0.48;
-      const approach = 1 - Math.sin(this.age * 0.03) * 0.1;
+      const angle = Math.sin(this.age * 0.035) * this.arc.swing;
+      const approach = 1 - Math.sin(this.age * 0.03) * this.arc.approach;
       const dx = zone.eye[0] - zone.target[0],
         dz = zone.eye[2] - zone.target[2];
       this.position.set(

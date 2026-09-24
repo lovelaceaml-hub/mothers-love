@@ -1,3 +1,17 @@
+# Mother’s Love visual review
+
+Anthony requested designs and prototypes before Fable/Opus implementation. The [Astra prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) is ready for [visual review](docs/runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md), with a [same-build classic comparison](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=classic). Refinement 02 adds smoother models, richer pearl detail and higher-definition output, preserving Thank you at the top. It uses fictional records and the supplied sculpted heart. Garden, Sanctuary and Expressions are the first connected composition; all 13 locations and three arrival studies remain available.
+
+[Plan 24](docs/PLAN-24-world-visual-quality.md) and [draft PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8) remain the continuation. Fable/Opus implementation is held for visual approval. The [baseline checkpoint](docs/runs/2026-09-21-world-quality/BASELINE-CHECKPOINT.md) records six passing local render comparisons; the historical CI readiness failure is unresolved. This prototype is not a completed whole-world upgrade or a production release.
+
+Storage: [verified review media and tour](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2>) ([copy manifest](docs/runs/2026-09-21-world-quality/D1-RECOVERY-MANIFEST.json)).
+
+## September 22: Pass D2, the world made radiant
+
+[Latest preview](https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design) (branch alias: [newest push](https://mothers-love-git-feature-world-cinematic-art-pass-lvzion.vercel.app/display/world-preview?source=sample&art=design)). Eight sections since D1: golden-hour light, glass pearl, pink clouds and cotton-candy trees, three rebuilt arrivals, sculpted islands with glittering water and hazy landmarks, a real glow pass with light shafts and living air, finesse on water, pearl, heart and gold, and camera finesse with tiers. Wording layout, privacy, and the classic and cinematic paths unchanged (byte-identical). [Record](docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md), [Radiance design](docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md), [Plan 25 promotion draft](docs/PLAN-25-world-promotion.md) awaiting Anthony's approval.
+
+Storage: [pass D2 evidence](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0>) ([manifest](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0/RECOVERY-MANIFEST.json>)).
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
@@ -29,6 +43,9 @@ The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.verc
 The missing interview sequences, whole-card selection, true screen previews, and fair teaching rotation are implemented. Current work: [Plan 12](docs/PLAN-12-tv-stability-countdown-and-home-action.md). Live and verified at https://mothers-love.vercel.app. All 14 integrated browser checks and three production smoke checks passed. Latest instructions use Luna max lanes plus controller corrections, no Terra.
 
 ## Quick links
+
+- [Plan 25: promote the world to the live TV (draft)](docs/PLAN-25-world-promotion.md)
+- [Pass D2 record](docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md) and [Radiance design](docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md)
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), with [Share a recognition](https://mothers-love.vercel.app/recognize).
 - **Status:** Live Garden-led TV playlist, animated ribbons and expression scenes, flexible Display Studio controls, and nine matching submission expression cards.

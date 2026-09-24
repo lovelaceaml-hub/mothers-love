@@ -1,3 +1,30 @@
+## September 23: this checkout moved to the one home
+
+This checkout now lives at `/Users/anthony/Projects/mothers-love-world/web` (it was
+`/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`). The project
+home is `/Users/anthony/Projects/mothers-love-world/START-HERE.md`; the active plan is
+`/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`.
+3D Studio moved to `/Users/anthony/Projects/mothers-love-world/studio`, and
+`scripts/world-kit-sync.mjs --studio` now defaults there.
+
+## September 22: Pass D2, the world made radiant
+
+[Latest preview](https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `2ad95b07f1338c387fccc075fc30b38152bdcb9e` (the [branch alias](https://mothers-love-git-feature-world-cinematic-art-pass-lvzion.vercel.app/display/world-preview?source=sample&art=design) always shows the newest push). Eight sections landed on `feature/world-cinematic-art-pass` since D1: golden-hour light and air, a glass pearl with halo and sparkles, pink clouds and cotton-candy canopies, the three rebuilt arrivals (lit lotus with a beam, one silk ribbon with butterflies, a descending light string), sculpted rose-ivory islands with glittering water and hazy landmark domes, a real glow pass with light shafts and living air, water and pearl and heart finesse with gold and lanterns at dusk, and camera finesse with an arrival flourish, travel haze, tiers and a shadow cadence.
+
+Unchanged and proven on every section: the frozen wording layout on the pearl (0 differing pixels with the glow on and off), no personal pixels outside the depth-tested slot, and `art=classic` and `art=cinematic` byte-identical to Codex's D1 captures. Production, API and database untouched; PR #8 stays draft.
+
+Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-25-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
+
+## September 21: Show designs before Claude implementation
+
+Current D1: [refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `80586a20b2aaee166bbd48d26ac8bd3f0c5daa29` is ready for [visual review](runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md). Preserve the wording layout and Thank you at the top. Anthony rejected build-polished-apps and Stitch; do not use them. Build/TypeScript, 52 unit tests and 32 browser checks pass. Fable/Opus remain held until visual approval; P0 and physical-device acceptance remain open.
+
+Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
+
+Previous D0 checkpoint, superseded for current visual review: [Astra sample prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) was delivered with [references and a real tour](runs/2026-09-21-world-quality/VISUAL-REVIEW.md). Source: `9dc7e455047f7eebb8ebfcc1affd125f3b591d3c`. The final build, TypeScript, 47 world unit tests and 23 local still/browser checks pass. It includes Garden, Sanctuary, Expressions, the supplied original heart, pearl typography and canonical exterior symbols, and three arrival studies. All 13 locations remain accessible; the other ten are early visual sketches.
+
+[Plan 24](PLAN-24-world-visual-quality.md), [execution record](runs/2026-09-21-world-quality/RECORD.md), and [ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json) record this design gate. Claude implementation is held for Anthony's visual approval. Do not resume the stopped Claude session because authentication changes. Draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8) remains draft. The historical CI readiness failure is still unresolved, and P0 is incomplete. Production, API and database behavior remain outside this task.
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.

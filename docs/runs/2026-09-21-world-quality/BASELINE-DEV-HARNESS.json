@@ -1,0 +1,138 @@
+{
+  "sourceSha": "9a6bbf8bf34f04b5885b6ede39732f026baab488",
+  "applicationSourceSha": "b324b81cabe947592f6723425c58f14307b58083",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "reducedMotion": "reduce",
+  "headless": true,
+  "args": [
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--ignore-gpu-blocklist"
+  ],
+  "browser": "145.0.7632.6",
+  "platform": "darwin",
+  "checks": [
+    {
+      "runtime": "dev",
+      "art": "classic",
+      "url": "http://127.0.0.1:32742/display/world-preview?source=sample&art=classic",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "19.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      },
+      "readyElapsedMs": 8655,
+      "errors": [],
+      "consoleMessages": [
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x12c001a5000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x12c001a5000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x12c001a5000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x12c001a5000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+        }
+      ],
+      "failedRequests": []
+    },
+    {
+      "runtime": "dev",
+      "art": "cinematic",
+      "url": "http://127.0.0.1:32742/display/world-preview?source=sample",
+      "passed": true,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "19.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      },
+      "readyElapsedMs": 6927,
+      "errors": [],
+      "consoleMessages": [],
+      "failedRequests": []
+    },
+    {
+      "runtime": "harness",
+      "art": "classic",
+      "url": "http://127.0.0.1:52740/scene-review.html?source=none&art=classic",
+      "passed": true,
+      "scene": {
+        "ready": true,
+        "elapsedMs": 3440.7000000029802,
+        "art": false,
+        "calls": 269,
+        "triangles": 434252,
+        "geometries": 81,
+        "textures": 14
+      },
+      "readyElapsedMs": 3489,
+      "errors": [],
+      "consoleMessages": [],
+      "failedRequests": []
+    },
+    {
+      "runtime": "harness",
+      "art": "cinematic",
+      "url": "http://127.0.0.1:52740/scene-review.html?source=none",
+      "passed": true,
+      "scene": {
+        "ready": true,
+        "elapsedMs": 5634.19999999553,
+        "art": true,
+        "calls": 397,
+        "triangles": 884308,
+        "geometries": 104,
+        "textures": 16
+      },
+      "readyElapsedMs": 5675,
+      "errors": [],
+      "consoleMessages": [],
+      "failedRequests": []
+    }
+  ],
+  "limitations": [
+    "Baseline diagnosis only; no runtime fix or historical cause established.",
+    "Headless macOS differs from historical headed Linux CI.",
+    "No-data harness intentionally omits React and recognitions."
+  ]
+}

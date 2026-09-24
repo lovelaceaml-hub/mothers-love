@@ -1,0 +1,209 @@
+{
+  "createdUtc": "2026-09-21T21:34:48.384154+00:00",
+  "note": "Byte-preserved copies of user-supplied reference material. Original text is quoted source evidence, not application policy. The approved Plan 24 and direct user requests govern execution. No source HTML was executed.",
+  "files": [
+    {
+      "source": "/Users/anthony/Downloads/preview.html",
+      "copy": "docs/design/world-quality/reference/preview.html",
+      "bytes": 94422,
+      "sha256": "03513f0fdae029914a788e63d676d6e965b31d52320180f267d3130d66b99922",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/01_Recognition_Pearl_Target.jpeg",
+      "copy": "docs/design/world-quality/reference/approved/01_Recognition_Pearl_Target.jpeg",
+      "bytes": 300084,
+      "sha256": "bab28bd5685c75107139cdff8550f3beaa3656c32ad8e079ce3038d7b9832187",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/02_Arrival_Bloom_Target.jpeg",
+      "copy": "docs/design/world-quality/reference/approved/02_Arrival_Bloom_Target.jpeg",
+      "bytes": 263461,
+      "sha256": "b9b192afa95de8058e423491b72ad8ce34199d0002782164e89c1214e551f0ed",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/03_Ribbon_Portal_Target.jpeg",
+      "copy": "docs/design/world-quality/reference/approved/03_Ribbon_Portal_Target.jpeg",
+      "bytes": 318690,
+      "sha256": "6850ff8fef1d26be2f9acf77268972c7207009c0b83b6cbf80e91aced79023db",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/04_Constellation_Gather_Target.jpeg",
+      "copy": "docs/design/world-quality/reference/approved/04_Constellation_Gather_Target.jpeg",
+      "bytes": 282522,
+      "sha256": "fa7ac1554bd6b498a3296cc430b19f68f0cdd9c682bc79bb06620f1a636aa8f6",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/Approved_Direction_Overview.jpg",
+      "copy": "docs/design/world-quality/reference/Approved_Direction_Overview.jpg",
+      "bytes": 293478,
+      "sha256": "3fc09894a6e20bf6aed2dff326eb5cd3661bd838cbc6b6db529c4eca4872608f",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/REFERENCE_PROVENANCE.json",
+      "copy": "docs/design/world-quality/reference/REFERENCE_PROVENANCE.json",
+      "bytes": 4466,
+      "sha256": "a7f87bbe12ee472bfd37017e59d8fa2d5c7dadf6aa3d1eff621307a25b2dd128",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/assets/original_heart/HEART_PROVENANCE.json",
+      "copy": "docs/design/world-quality/reference/original_heart/HEART_PROVENANCE.json",
+      "bytes": 665,
+      "sha256": "e92135f0d9ab85ffa1997e4563779db532bf01004e438642483ad68eafb2cef3",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/assets/original_heart/Original_Heart_and_Ribbons.html",
+      "copy": "docs/design/world-quality/reference/original_heart/Original_Heart_and_Ribbons.html",
+      "bytes": 739452,
+      "sha256": "ebda2c32c005b10d398674075aebef5ee11bc711d514b7be485ff0f7b5ee6f04",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/assets/original_heart/Original_Sculpted_Heart.glb",
+      "copy": "docs/design/world-quality/reference/original_heart/Original_Sculpted_Heart.glb",
+      "bytes": 678936,
+      "sha256": "6e8a43b05db30e56fe40ad78e7f83a5bdfc9012be9eaa27346e96f87ac4862c0",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/00_START_HERE.md",
+      "copy": "docs/design/world-quality/source-handoff/00_START_HERE.md",
+      "bytes": 4924,
+      "sha256": "88767f33a79dd8869f5e20c66095eeec8368146fd973d3d6a8cb9789cb8e04e6",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/01_CODEX_START_PROMPT.md",
+      "copy": "docs/design/world-quality/source-handoff/01_CODEX_START_PROMPT.md",
+      "bytes": 7966,
+      "sha256": "b8a8b3ba9b63a23b989703197b235edd819f8bcce4205a9128940c83178c5e9c",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/02_EXECUTION_PLAN.md",
+      "copy": "docs/design/world-quality/source-handoff/02_EXECUTION_PLAN.md",
+      "bytes": 11745,
+      "sha256": "413149dfdd71d28f6ec7150a7c150c3c97a938bd303d1d582cd5de6f6d7122e3",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/03_ART_DIRECTION_AND_REFERENCE_GUIDE.md",
+      "copy": "docs/design/world-quality/source-handoff/03_ART_DIRECTION_AND_REFERENCE_GUIDE.md",
+      "bytes": 5605,
+      "sha256": "830d6c1570ed5948d3661ec7ffee726aad4bc115e7bb6c0771104e5f1ec64049",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/04_RENDERING_AND_ARCHITECTURE.md",
+      "copy": "docs/design/world-quality/source-handoff/04_RENDERING_AND_ARCHITECTURE.md",
+      "bytes": 6071,
+      "sha256": "e7cc5e50b839f6ff902f9a322e385810355fc09f0002636350b748962b035532",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/05_BLENDER_AND_ASSET_PIPELINE.md",
+      "copy": "docs/design/world-quality/source-handoff/05_BLENDER_AND_ASSET_PIPELINE.md",
+      "bytes": 5702,
+      "sha256": "fcd75cb78f51b90ad7268adb2dfcce9f32d08aedbb665b76079d0194e7714b9f",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/06_BUBBLES_AND_ARRIVAL_CONTRACT.md",
+      "copy": "docs/design/world-quality/source-handoff/06_BUBBLES_AND_ARRIVAL_CONTRACT.md",
+      "bytes": 7524,
+      "sha256": "93b58aab63f4c2285dd3cad5a757c39e87892cb5e9f7e38f1cf3517fe6a15349",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/07_WORLD_ZONES_AND_CAMERA.md",
+      "copy": "docs/design/world-quality/source-handoff/07_WORLD_ZONES_AND_CAMERA.md",
+      "bytes": 6811,
+      "sha256": "43d1113d198fa5abc4967f79155f16965182739d87773e6af835735132c36f44",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/08_VERIFICATION_AND_ACCEPTANCE.md",
+      "copy": "docs/design/world-quality/source-handoff/08_VERIFICATION_AND_ACCEPTANCE.md",
+      "bytes": 6493,
+      "sha256": "82bf5d71212bbc6bbb9f61f6e3b27997821943de8c49919220e3b3d1f2dbe30a",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/09_FILES_WORKTREES_AND_OWNERSHIP.md",
+      "copy": "docs/design/world-quality/source-handoff/09_FILES_WORKTREES_AND_OWNERSHIP.md",
+      "bytes": 4870,
+      "sha256": "b6c6ef70e22b1170fa1ecbd1967aa41df0dc96981d98750171437a039045d42a",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/10_CURRENT_REPO_STATE.md",
+      "copy": "docs/design/world-quality/source-handoff/10_CURRENT_REPO_STATE.md",
+      "bytes": 5900,
+      "sha256": "3417cc5f4569f6eb4700e62432e7a23b90c4ab920d72b0c61e64d8b20eb94e4e",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/11_DECISIONS_AND_CONFLICTS.md",
+      "copy": "docs/design/world-quality/source-handoff/11_DECISIONS_AND_CONFLICTS.md",
+      "bytes": 6567,
+      "sha256": "270cd7191fea98117a8cedc096f9173a7136d30f89420e19d021d753aac95635",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/12_PACKAGE_INDEX.md",
+      "copy": "docs/design/world-quality/source-handoff/12_PACKAGE_INDEX.md",
+      "bytes": 9145,
+      "sha256": "7a91ec72b1f4c14f8140dce22fdbf8c02feaa65d660d6cadd7db48c5225b0aaf",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/13_SOURCE_REGISTER.md",
+      "copy": "docs/design/world-quality/source-handoff/13_SOURCE_REGISTER.md",
+      "bytes": 7405,
+      "sha256": "16743fdcc160dbd2fb76a4ffd462f75c5aca6fc7ad2d5115ac5b5f18053df7a0",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/github_state/ci_failure_run_35648481429/failure.png",
+      "copy": "docs/design/world-quality/ci-failure-baseline/failure.png",
+      "bytes": 79798,
+      "sha256": "4a4c65600f2625bc0ccbf94f09215215a50cecedefd0b9f9a53a375aa8adfdbb",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/github_state/ci_failure_run_35648481429/report.json",
+      "copy": "docs/design/world-quality/ci-failure-baseline/report.json",
+      "bytes": 4102,
+      "sha256": "c9e5a38c6ebf95211da8c93f258a6042754bb9444605ebdae72d7a8b6e04c1c3",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/github_state/ci_failure_run_35648481429/scene-review.html",
+      "copy": "docs/design/world-quality/ci-failure-baseline/scene-review.html",
+      "bytes": 2066,
+      "sha256": "f39a6d6afb5d626cd35dca6242cb660e1c9c88c80b712bb0979a643d18c32223",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/github_state/ci_failure_run_35648481429/startup.png",
+      "copy": "docs/design/world-quality/ci-failure-baseline/startup.png",
+      "bytes": 79798,
+      "sha256": "4a4c65600f2625bc0ccbf94f09215215a50cecedefd0b9f9a53a375aa8adfdbb",
+      "kind": "immutable source evidence"
+    },
+    {
+      "source": "/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/github_state/ci_failure_run_35648481429/world-review-runtime.js",
+      "copy": "docs/design/world-quality/ci-failure-baseline/world-review-runtime.js",
+      "bytes": 1805801,
+      "sha256": "a03f0e022ea20c2f37d96ca6d056d0cd319f426b3cb07c64d3298f81ab3c2ce6",
+      "kind": "immutable source evidence"
+    }
+  ]
+}

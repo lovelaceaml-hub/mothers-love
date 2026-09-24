@@ -1,3 +1,32 @@
+## Active state: PLAN-01, the 3D world with Peace and Joy (September 24)
+
+The active plan is `/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
+(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
+(Anthony, 2026-09-24):** "I want everything to be 3D" and "I like how it shows currently".
+No painted sky panoramas, painted island layers or painted colour filter go into the world.
+The paintings made on 2026-09-23 are set aside on Drive `3D World/art/painted-v2/` and are
+not used. The rules in the sections below still bind unless PLAN-01 changes them.
+
+## Active state: Plan 26, the 3D Studio kit inside the world (September 23)
+
+Anthony granted the 3D Studio coordinator full creative design and admin authority for
+the 3D world. [Plan 26](docs/PLAN-26-world-kit.md) is active: lanes K0 to K6 in their own
+worktrees, merged here by the coordinator. The design is
+`/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
+section below still binds. One writer per worktree; do not write in this checkout while
+a K lane is merging.
+
+## Active state: pass D2 landed, promotion plan awaiting approval
+
+Anthony reviewed the D1 prototype against the approved direction board on 2026-09-21, asked Fable to bring it closer to his vision, ruled "Mostly Opus but Fable can be used" and "keep going, show me after each section", then raised the bar to "spectacular, jaw-dropping, amazing, smooth, finesse, radiant, glory. Do not hold back." Pass D2 landed eight sections on this branch (head `2ad95b0`), all in the sample-only `?source=sample&art=design` path: see [docs/HANDOFF.md](docs/HANDOFF.md), the [D2 record](docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md) and the [Radiance design](docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md). Still binding: the wording layout with "Thank you" at the top, no build-polished-apps or Stitch, no personal pixels outside the depth-tested slot, `art=classic` and `art=cinematic` byte-identical to D1, no production promotion or merge without Anthony. [Plan 25](docs/PLAN-25-world-promotion.md) is the drafted promotion path (gate flip to live data, Anthony's TV check, P0 and the completion review, the merge Anthony clicks, the TV URL); it does not run until he approves it. The previous design-checkpoint text below is history.
+
+
+## September 21: Approved whole-world visual upgrade
+
+[Plan 24](docs/PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
+
+Work in `/Users/anthony/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md), [task ledger](docs/runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
+
 ## September 21: Recognition bubbles inside the world
 
 [Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.

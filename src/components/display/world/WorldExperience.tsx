@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   RECOGNITION_ZONES,
   ZONES,
@@ -7,12 +7,22 @@ import {
   type Quality,
   type ZoneId,
 } from "./world-data";
-import { neighborDialogue } from "./neighbor-dialogue";
+import { legacyNeighborDialogue, neighborDialogue } from "./neighbor-dialogue";
 import { useWorldFeed } from "./use-world-feed";
 import { readingSeconds, type WorldSource } from "./world-feed";
 import { RecognitionText, WorldContent, WorldDialog } from "./WorldContent";
 import type { WorldEngine, WorldStatus } from "./world-engine";
 import styles from "./WorldExperience.module.css";
+import { WorldTvOverlay } from "./WorldTvOverlay";
+import tvStyles from "./WorldTv.module.css";
+import { TV_TOUR_SPEED } from "./prototype/tv-page";
+import { useDisplayChimes } from "../use-display-chimes";
+import {
+  isWorldDesignStudy,
+  studyArrival,
+  studyKit,
+  type StudyArrival,
+} from "./prototype/design-mode";
 
 const INITIAL: WorldStatus = {
   zone: "garden",
@@ -22,6 +32,8 @@ const INITIAL: WorldStatus = {
   fps: 0,
   calls: 0,
   triangles: 0,
+  textures: 0,
+  geometries: 0,
   quality: "High",
   frames: 0,
   arrival: {
@@ -37,9 +49,18 @@ const INITIAL: WorldStatus = {
 };
 export function WorldExperience({
   initialSource = "live",
+  designReview = false,
+  initialStudyArrival,
+  tvPage = false,
 }: {
   initialSource?: WorldSource;
+  designReview?: boolean;
+  initialStudyArrival?: string;
+  /** The TV page (`?view=tv`, design study only): screen text, ticker, speed 2, no settings. */
+  tvPage?: boolean;
 }) {
+  const [arrivalStudy, setArrivalStudy] = useState<StudyArrival>(studyArrival(initialStudyArrival));
+  const launchedStudy = useRef(false);
   const neighborDescriptionId = useId();
   const recognitionDescriptionId = useId();
   const canvas = useRef<HTMLCanvasElement>(null),
@@ -52,8 +73,9 @@ export function WorldExperience({
   const [paused, setPaused] = useState(false),
     [reduced, setReduced] = useState(false),
     [still, setStill] = useState(false),
-    [speed, setSpeed] = useState(1),
-    [quality, setQuality] = useState<Quality>("auto");
+    [speed, setSpeed] = useState(tvPage ? TV_TOUR_SPEED : 1),
+    // The TV page starts on Automatic, so a TV browser that cannot keep up steps down (K5).
+    [quality, setQuality] = useState<Quality>(designReview && !tvPage ? "high" : "auto");
   const [source, setSource] = useState<WorldSource>(initialSource),
     [panel, setPanel] = useState<"settings" | "map" | "recognitions" | null>(
       null,
@@ -64,8 +86,17 @@ export function WorldExperience({
     [held, setHeld] = useState(false),
     [filter, setFilter] = useState(0),
     [selectedFallback, setSelectedFallback] = useState<string | null>(null);
-  const feed = useWorldFeed(source),
-    feedRef = useRef(feed);
+  const rawFeed = useWorldFeed(source);
+  const feed = useMemo(() => designReview && rawFeed.phase === "sample"
+    ? { ...rawFeed, records: rawFeed.records.map((record, index) => index === 0 ? { ...record, expressionIds: [2, 7, 8] } : record) }
+    : rawFeed, [designReview, rawFeed]);
+  const feedRef = useRef(feed);
+  useEffect(() => {
+    if (designReview && initialStudyArrival && ready && feed.phase === "sample" && !launchedStudy.current) {
+      launchedStudy.current = true;
+      engine.current?.previewStudyArrival(studyArrival(initialStudyArrival));
+    }
+  }, [designReview, initialStudyArrival, ready, feed.phase]);
   const settings = useRef({
     paused,
     reduced: reduced || still,
@@ -89,9 +120,20 @@ export function WorldExperience({
     media.addEventListener("change", motion);
     async function start() {
       try {
-        const { WorldEngine } = await import("./world-engine");
-        if (cancelled || !canvas.current) return;
+        // The design study loads the 3D Studio kit alongside the engine, so its first frame
+        // is already dressed. Every other page skips the loader chunk and every kit request.
+        const [{ WorldEngine }, kit] = await Promise.all([
+          import("./world-engine"),
+          isWorldDesignStudy() && studyKit()
+            ? import("./kit/kit-loader").then((module) => module.loadStudyKit())
+            : Promise.resolve(undefined),
+        ]);
+        if (cancelled || !canvas.current) {
+          kit?.dispose();
+          return;
+        }
         const instance = new WorldEngine(canvas.current, {
+          kit,
           reducedMotion: media.matches || settings.current.reduced,
           onSelection: () => setHeld(true),
           onStatus: (next) => {
@@ -250,11 +292,44 @@ export function WorldExperience({
           : feed.phase === "connecting"
             ? "Connecting"
             : "Quiet world";
+  // One cue text, shown floating for classic and cinematic and inside the study
+  // panel for the design review, where a floating line would cover the pearl.
+  const arrivalCue = `${source === "sample" ? "SAMPLE ENTRANCE" : "A NEW LIGHT IN OUR WORLD"}${
+    arrival.waveSize > 1 ? ` · ${arrival.waveIndex} of ${arrival.waveSize}` : ""
+  }`;
+  // TV page (step 7): the TV View's chimes, import only. Browsers need one gesture first.
+  // One hook per kind, since each remembers only its own last key: the weekly goal chimes once,
+  // however many arrivals chime around it.
+  const goal = feed.snapshot?.insights.goal;
+  const sound = tvPage && safe ? feed.snapshot?.settings.sound : undefined;
+  const arrivalChime = useDisplayChimes(
+    sound,
+    arrival.phase === "approach" && arrival.id ? { key: `arrival:${arrival.id}`, kind: "arrival" } : null,
+  );
+  const goalChime = useDisplayChimes(
+    sound,
+    goal?.achieved ? { key: `goal:${goal.weekStart}`, kind: "milestone" } : null,
+  );
+  const enableArrival = arrivalChime.enable, enableGoal = goalChime.enable;
+  const freshKey = (status.tvArrivals ?? []).join(",");
+  const fresh = useMemo(() => (freshKey ? freshKey.split(",") : []), [freshKey]);
+  useEffect(() => {
+    if (!tvPage) return;
+    const once = () => { enableArrival(); enableGoal(); };
+    window.addEventListener("pointerdown", once, { once: true });
+    window.addEventListener("keydown", once, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", once);
+      window.removeEventListener("keydown", once);
+    };
+  }, [tvPage, enableArrival, enableGoal]);
   return (
     <main
       ref={root}
       className={`${styles.world} ${arriving ? styles.arriving : ""}`}
       data-testid="world-preview"
+      data-design-review={designReview || undefined}
+      data-prototype-heart-ready={status.prototypeHeartReady}
       data-zone={status.zone}
       data-traveling={status.traveling}
       data-ready={ready}
@@ -277,17 +352,29 @@ export function WorldExperience({
       data-source={source}
       data-feed-phase={feed.phase}
       data-arrival={arrival.phase}
+      data-kit={status.kit}
+      data-kit-missing={status.kit ? status.kitMissing : undefined}
+      data-tv-page={tvPage || undefined}
     >
       <p id={neighborDescriptionId} className={styles.screenReaderOnly}>
         Fictional neighbors illustrate words of kindness.{" "}
-        {neighborDialogue(status.elapsed, status.zone, arriving) ??
-          "They greet and walk together."}
+        {/* The design study's rigged neighbors read the same schedule as their speech cards;
+            without them the study keeps its miniature figures. In the Grove they speak the
+            expression the panel shows, as their card does. Classic and cinematic keep the
+            rule their own procedural cards follow. */}
+        {designReview
+          ? status.kitNeighbors
+            ? (neighborDialogue(status.elapsed, status.zone, arriving, expressionId) ??
+              "They greet, walk together and share a heart.")
+            : "Miniature figures provide scale in this visual study."
+          : (legacyNeighborDialogue(status.elapsed, status.zone, arriving) ??
+            "They greet and walk together.")}
       </p>
       <canvas
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label="A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"
+        aria-label={designReview && !status.kitNeighbors ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
         role="img"
         aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
@@ -308,7 +395,20 @@ export function WorldExperience({
         </div>
       )}
       <div className={styles.shade} aria-hidden="true" />
-      <header className={styles.header}>
+      {tvPage && (
+        <WorldTvOverlay
+          // Once the arriving bubble has gone, the title names where the camera is heading back to.
+          zone={arrival.phase === "return" && status.traveling ? ZONES[zoneIndex(status.destination)] : zone}
+          traveling={(status.traveling && !arriving) || arrival.phase === "return"}
+          arriving={arriving && arrival.phase !== "return"}
+          safe={safe}
+          sample={source === "sample"}
+          records={feed.records}
+          fresh={fresh}
+          reduced={reduced || still || ownerStill}
+        />
+      )}
+      {!tvPage && <header className={styles.header}>
         <a
           className={styles.brand}
           href="https://mothers-love.vercel.app/display"
@@ -323,9 +423,30 @@ export function WorldExperience({
         <div className={styles.preview}>
           <span className={styles.statusDot} />
           {sourceLabel}
-          <span>A heavenly journey · Preview</span>
+          <span>{designReview ? "Visual study 02 · For your review" : "A heavenly journey · Preview"}</span>
         </div>
-      </header>
+      </header>}
+      {designReview && !tvPage && !immersive && (
+        <aside className={styles.studyControls} aria-label="Arrival design studies">
+          <span>ARRIVAL STUDIES</span>
+          <div>
+            {([
+              ["constellation", "Pearl formation"],
+              ["ribbon", "Silk unveiling"],
+              ["bloom", "Petal bloom"],
+            ] as const).map(([value, label]) => (
+              <button key={value} aria-pressed={arrivalStudy === value} disabled={!ready || arriving}
+                onClick={() => {
+                  setArrivalStudy(value); setHeld(false); setPaused(false);
+                  engine.current?.setPaused(false); engine.current?.holdReading(false);
+                  engine.current?.previewStudyArrival(value);
+                }}>{label}</button>
+            ))}
+            {arriving && <button onClick={() => engine.current?.finishStudyArrival()}>Back to world</button>}
+          </div>
+          {arriving && <span className={styles.studyCue}>{arrivalCue}</span>}
+        </aside>
+      )}
       {!ready && !fallback && (
         <p className={styles.notice} role="status">
           Opening your world...
@@ -375,7 +496,7 @@ export function WorldExperience({
         <div
           className={`${styles.presentation} ${immersive ? styles.hidden : ""}`}
         >
-          <section className={styles.story} aria-label="Current world location">
+          {!tvPage && <section className={styles.story} aria-label="Current world location">
             <div className={styles.eyebrow}>
               {status.traveling
                 ? "JOURNEYING TO"
@@ -383,13 +504,14 @@ export function WorldExperience({
             </div>
             <h1>{zone.name}</h1>
             <p className={styles.caption}>{zone.caption}</p>
-          </section>
+          </section>}
           {(fallback || !RECOGNITION_ZONES.includes(status.zone)) && (
             <aside
-              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}`}
+              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}${tvPage ? ` ${tvStyles.panel}` : ""}`}
               aria-label="World content"
             >
               <WorldContent
+                tv={tvPage}
                 elapsed={
                   record
                     ? Math.max(
@@ -410,7 +532,7 @@ export function WorldExperience({
                   engine.current?.setExpression(id);
                 }}
               />
-              {record &&
+              {record && !tvPage &&
                 [
                   "garden",
                   "heart",
@@ -447,6 +569,7 @@ export function WorldExperience({
             </aside>
           )}
           {!fallback &&
+            !tvPage &&
             !immersive &&
             !status.traveling &&
             RECOGNITION_ZONES.includes(status.zone) && (
@@ -481,15 +604,10 @@ export function WorldExperience({
           {arrivalRecord && <RecognitionText record={arrivalRecord} />}
         </section>
       )}
-      {safe && arriving && !immersive && (
-        <p className={styles.worldArrivalCue}>
-          {source === "sample" ? "SAMPLE ENTRANCE" : "A NEW LIGHT IN OUR WORLD"}
-          {arrival.waveSize > 1
-            ? ` · ${arrival.waveIndex} of ${arrival.waveSize}`
-            : ""}
-        </p>
+      {safe && arriving && !immersive && !designReview && (
+        <p className={styles.worldArrivalCue}>{arrivalCue}</p>
       )}
-      <footer className={styles.footer}>
+      {!tvPage && <footer className={styles.footer}>
         {!immersive && (
           <nav className={styles.tour} aria-label="World locations">
             {ZONES.slice(0, 3).map((item, i) => (
@@ -542,7 +660,7 @@ export function WorldExperience({
             {immersive ? "Show details" : "Hide details"}
           </button>
         </div>
-      </footer>
+      </footer>}
       {panel === "settings" && (
         <WorldDialog title="World controls" onClose={closePanel}>
           <div className={styles.settingsBody}>
@@ -550,6 +668,7 @@ export function WorldExperience({
               Content
               <select
                 value={source}
+                disabled={designReview}
                 onChange={(event) => {
                   setSource(event.target.value as WorldSource);
                   setHeld(false);
@@ -586,7 +705,7 @@ export function WorldExperience({
                 }}
               >
                 <option value="auto">Automatic</option>
-                <option value="high">High</option>
+                <option value="high">{designReview ? "High definition (up to 4K)" : "High"}</option>
                 <option value="low">Low</option>
               </select>
             </label>
@@ -652,6 +771,27 @@ export function WorldExperience({
                   <dt>Triangles</dt>
                   <dd>{status.triangles.toLocaleString()}</dd>
                 </div>
+                {designReview && (
+                  <>
+                    <div>
+                      <dt>Textures</dt>
+                      <dd>{status.textures}</dd>
+                    </div>
+                    <div>
+                      <dt>Geometries</dt>
+                      <dd>{status.geometries}</dd>
+                    </div>
+                    <div>
+                      <dt>Kit</dt>
+                      <dd>
+                        {status.kit ?? "off"}
+                        {status.kitCounts
+                          ? ` ${status.kitCounts.loaded} of ${status.kitCounts.total}`
+                          : ""}
+                      </dd>
+                    </div>
+                  </>
+                )}
               </dl>
             </details>
             <p>

@@ -7,6 +7,52 @@
   background: #e6edf1;
   font-family: Arial, Helvetica, sans-serif;
 }
+.studyControls {
+  position: absolute;
+  z-index: 2;
+  top: 31px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.studyControls > span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 8px;
+  letter-spacing: .22em;
+  color: #806651;
+}
+.studyControls > div { display: flex; gap: 5px; }
+.studyControls button {
+  border: 1px solid #cfb79a88;
+  border-radius: 25px;
+  background: #fffbf0d9;
+  color: #705267;
+  padding: 9px 13px;
+  font: 11px Arial, sans-serif;
+  cursor: pointer;
+}
+.studyControls button[aria-pressed="true"] { background: #f5e0df; border-color: #c796a5; }
+.studyControls button:disabled { cursor: default; opacity: .58; }
+.studyControls button:focus-visible { outline: 2px solid #956c51; outline-offset: 3px; }
+.studyCue { display: block; margin-top: 8px; font-size: 10px; letter-spacing: .2em; color: #754466; }
+.world[data-design-review] .shade {
+  background: linear-gradient(180deg, #fff9f076, transparent 21%, transparent 62%, #fff6e970 82%, #fff8eef2);
+}
+/*
+ * The TV page's clear air (Anthony, 2026-09-24: "Can you remove the haze foggy look"): the
+ * cream wash over the top and the bottom of the picture was part of the milky look, and the TV
+ * page's header, share card and ticker each carry their own glass, so it has nothing to hold up.
+ */
+.world[data-tv-page] .shade { display: none; }
+.world[data-design-review] .story h1 { font-size: clamp(32px, 3.55vw, 66px); }
+@media (max-width: 850px) {
+  .studyControls { top: 108px; left: 50%; width: max-content; max-width: calc(100% - 24px); }
+  .studyControls > span { display: none; }
+  .studyControls > div { justify-content: center; flex-wrap: wrap; }
+  .studyControls button { min-height: 38px; padding: 9px 10px; font-size: 10px; }
+  .world[data-design-review][data-arrival="reading"] .studyCue { display: none; }
+}
 .canvas {
   position: absolute;
   width: 100%;

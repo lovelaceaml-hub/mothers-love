@@ -1,0 +1,2636 @@
+{
+  "version": "v1",
+  "generatedAt": "2026-09-23T01:15:19-07:00",
+  "source": {
+    "repo": "3d-studio",
+    "commit": "546ff10362c6d1011bec1900ef46be4d38fe8e0b",
+    "plan": "docs/PLAN-03-world-kit.md"
+  },
+  "decoder": {
+    "path": "../draco/",
+    "files": [
+      "draco_decoder.js",
+      "draco_decoder.wasm",
+      "draco_wasm_wrapper.js"
+    ],
+    "three": "0.180.0",
+    "sha256": {
+      "draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+      "draco_decoder.wasm": "a680d927bed9cb864ddbd63521868891af2bfbe755092761b4837487618df8ac",
+      "draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+    }
+  },
+  "assets": [
+    {
+      "id": "recognition.constellation-sparkle",
+      "file": "recognition/constellation-sparkle.glb",
+      "sha256": "547e236f21e066d7a08828870008b97c111577ed83a24d529ad2a09dc31d2b76",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "welcome",
+        "live-feed",
+        "orbit"
+      ],
+      "size": 0.4,
+      "pivot": "center",
+      "verts": 1531,
+      "tris": 2936,
+      "bytes": 11516,
+      "materials": [
+        "SparkleGlow",
+        "SparkleHalo"
+      ],
+      "clips": [
+        {
+          "name": "twinkle",
+          "seconds": 2,
+          "loop": true
+        }
+      ],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-01",
+      "file": "recognition/medallion-01.glb",
+      "sha256": "3996d951c6147d20cda01e2797e59e6158eaafec919e52bedc1398d1115cef45",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 4415,
+      "tris": 7781,
+      "bytes": 41780,
+      "materials": [
+        "Orb01Glass",
+        "BubbleCoral",
+        "EyeGloss",
+        "EyeShine",
+        "BubbleBlush",
+        "Orb01Back",
+        "Bezel01Gold",
+        "Stud01Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-02",
+      "file": "recognition/medallion-02.glb",
+      "sha256": "99c656038ee8bd5f0b70e560a02b8758b2d22ee0b3101696fff092703b3bb0c2",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 4157,
+      "tris": 7793,
+      "bytes": 37360,
+      "materials": [
+        "Orb02Glass",
+        "GiftGold",
+        "GiftRibbon",
+        "Orb02Back",
+        "Bezel02Gold",
+        "Stud02Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-03",
+      "file": "recognition/medallion-03.glb",
+      "sha256": "6b8b0f4a78b9b908fc09401f0f5f032d17d386a4daba36e50dbac42d19004c9a",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 4224,
+      "tris": 8212,
+      "bytes": 35232,
+      "materials": [
+        "Orb03Glass",
+        "HeartPeach",
+        "BandageStrip",
+        "BandagePad",
+        "Orb03Back",
+        "Bezel03Gold",
+        "Stud03Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-04",
+      "file": "recognition/medallion-04.glb",
+      "sha256": "1c12639b530ddf94d13e4dcb9b790523874e4a76aaaf779f9260a457b06c1e0a",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 4496,
+      "tris": 8504,
+      "bytes": 37444,
+      "materials": [
+        "Orb04Glass",
+        "CloudPink",
+        "CloudPiping",
+        "Orb04Back",
+        "Bezel04Gold",
+        "Stud04Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-05",
+      "file": "recognition/medallion-05.glb",
+      "sha256": "76ed4b4955b8eb5b769621ac20b5981894ad813005e24f5483036b6f7b35c528",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 3528,
+      "tris": 6616,
+      "bytes": 33916,
+      "materials": [
+        "Orb05Glass",
+        "DoorFrameBlue",
+        "DoorLightBlue",
+        "DoorKnobGold",
+        "Orb05Back",
+        "Bezel05Gold",
+        "Stud05Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-06",
+      "file": "recognition/medallion-06.glb",
+      "sha256": "a39df8ec40815aac0bee58434ebf45efab80d0adad5ee99b8b82d743ae3f061a",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 4622,
+      "tris": 8868,
+      "bytes": 39936,
+      "materials": [
+        "Orb06Glass",
+        "TeacupTan",
+        "Tea",
+        "Steam",
+        "TeacupHeart",
+        "Orb06Back",
+        "Bezel06Gold",
+        "Stud06Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-07",
+      "file": "recognition/medallion-07.glb",
+      "sha256": "ab2d3a1518355ef5f05f170b691ddd98ff26c34da4fb255d92fe915a7e72d818",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 5088,
+      "tris": 8966,
+      "bytes": 47328,
+      "materials": [
+        "Orb07Glass",
+        "CandleLavender",
+        "CandleDish",
+        "Wick",
+        "Flame",
+        "FlameCore",
+        "Orb07Back",
+        "Bezel07Gold",
+        "Stud07Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-08",
+      "file": "recognition/medallion-08.glb",
+      "sha256": "5ff8ab8b522b65f091f96426382795d78d2033258ba0bed7c688198e1e628b15",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 5049,
+      "tris": 9862,
+      "bytes": 41708,
+      "materials": [
+        "Orb08Glass",
+        "HandRose",
+        "HandCuff",
+        "HandHeart",
+        "Orb08Back",
+        "Bezel08Gold",
+        "Stud08Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.medallion-09",
+      "file": "recognition/medallion-09.glb",
+      "sha256": "c361ab2a10e6c3bf54e650f4bc44e1371b82556cd6c93ddcdec1fa635be47bc9",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "expressions"
+      ],
+      "size": 0.5,
+      "pivot": "center",
+      "verts": 3249,
+      "tris": 6266,
+      "bytes": 28968,
+      "materials": [
+        "Orb09Glass",
+        "StarPurple",
+        "Sparkle",
+        "Orb09Back",
+        "Bezel09Gold",
+        "Stud09Gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.orbit-ring",
+      "file": "recognition/orbit-ring.glb",
+      "sha256": "e2ff4e92a715cb683dbed291f138dc96d71baad7d4a6e7ea0ba87041d53206da",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "welcome"
+      ],
+      "size": 5,
+      "pivot": "center",
+      "verts": 3433,
+      "tris": 6336,
+      "bytes": 21044,
+      "materials": [
+        "OrbitGold",
+        "OrbitPearl",
+        "OrbitBeadGold",
+        "OrbitDotGold"
+      ],
+      "clips": [
+        {
+          "name": "spin",
+          "seconds": 3,
+          "loop": true
+        }
+      ],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "recognition.recognition-pearl",
+      "file": "recognition/recognition-pearl.glb",
+      "sha256": "5c16d72afa690dd179570c04b9fc468f5564987131563a0c792a3e4cba1c2d96",
+      "group": "recognition",
+      "feature": "recognition",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "peacemakers",
+        "orbit",
+        "live-feed",
+        "welcome"
+      ],
+      "size": 3,
+      "pivot": "center",
+      "verts": 9072,
+      "tris": 17200,
+      "bytes": 53960,
+      "materials": [
+        "PearlGlass",
+        "PearlHalo",
+        "PearlRimGold",
+        "PearlBeadGold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "arrival.butterfly",
+      "file": "arrival/butterfly.glb",
+      "sha256": "e27339ba33280505d351b6f78b35cef6bf82ef82c9b591a0680c332e43b3d195",
+      "group": "arrival",
+      "feature": "arrival",
+      "zones": [
+        "welcome",
+        "garden",
+        "heart",
+        "live-feed"
+      ],
+      "size": 0.356,
+      "pivot": "center",
+      "verts": 794,
+      "tris": 1232,
+      "bytes": 11632,
+      "materials": [
+        "Wing",
+        "Gold",
+        "ButterflyBody"
+      ],
+      "clips": [
+        {
+          "name": "flap",
+          "seconds": 0.5,
+          "loop": true
+        }
+      ],
+      "lod": null,
+      "budget": "ordinary",
+      "skinned": true,
+      "bones": 3
+    },
+    {
+      "id": "arrival.butterfly-gate",
+      "file": "arrival/butterfly-gate.glb",
+      "sha256": "b390b588ccbbdaf83062382e3abe780a7653e0f76675e1dcaa21509adb4eda42",
+      "group": "arrival",
+      "feature": "arrival",
+      "zones": [
+        "welcome"
+      ],
+      "size": 6.14,
+      "pivot": "base",
+      "verts": 17326,
+      "tris": 30216,
+      "bytes": 84776,
+      "materials": [
+        "Pearl",
+        "Gold",
+        "Wing",
+        "ButterflyBody"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark",
+      "layout": {
+        "clear_opening": [
+          2.1,
+          5
+        ]
+      }
+    },
+    {
+      "id": "arrival.lotus-bloom",
+      "file": "arrival/lotus-bloom.glb",
+      "sha256": "ccf577cb89096e4a40984229c0c35179470ed75cf160d447ac1904912cc83946",
+      "group": "arrival",
+      "feature": "arrival",
+      "zones": [
+        "live-feed"
+      ],
+      "size": 2.975,
+      "pivot": "base",
+      "verts": 7004,
+      "tris": 12400,
+      "bytes": 132080,
+      "materials": [
+        "Petal",
+        "PetalPearl",
+        "PetalInnerGlow",
+        "Gold",
+        "GoldGlow"
+      ],
+      "clips": [
+        {
+          "name": "bloom",
+          "seconds": 2.5,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "ordinary",
+      "skinned": true,
+      "bones": 32
+    },
+    {
+      "id": "arrival.petal-drift",
+      "file": "arrival/petal-drift.glb",
+      "sha256": "355a51811a4c3eaf774eb108be20197ddd91ba38b310e0847bb977ba30ebc076",
+      "group": "arrival",
+      "feature": "arrival",
+      "zones": [
+        "live-feed",
+        "welcome",
+        "garden"
+      ],
+      "size": 0.782,
+      "pivot": "center",
+      "verts": 567,
+      "tris": 864,
+      "bytes": 37712,
+      "materials": [
+        "Petal"
+      ],
+      "clips": [
+        {
+          "name": "drift",
+          "seconds": 4,
+          "loop": true
+        }
+      ],
+      "lod": null,
+      "budget": "ordinary",
+      "skinned": true,
+      "bones": 9
+    },
+    {
+      "id": "arrival.ribbon-portal",
+      "file": "arrival/ribbon-portal.glb",
+      "sha256": "3908cd5fbfb57339be88224ab0923311cc6750252a1a877392e679c46f67faa2",
+      "group": "arrival",
+      "feature": "arrival",
+      "zones": [
+        "live-feed",
+        "welcome"
+      ],
+      "size": 7.582,
+      "pivot": "base",
+      "verts": 9604,
+      "tris": 14052,
+      "bytes": 50152,
+      "materials": [
+        "Gold",
+        "Silk",
+        "GoldGlow",
+        "Pearl"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary",
+      "layout": {
+        "clear_opening": [
+          3.21,
+          4.47
+        ]
+      }
+    },
+    {
+      "id": "landmark.curved-ramp",
+      "file": "landmarks/curved-ramp.glb",
+      "sha256": "cd42515d13e94d7616ec9b9810c2b3a4a694e7f4f2b144cc6bc594f33b5cb95f",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "practice",
+        "peacemakers",
+        "featured"
+      ],
+      "size": 5.209,
+      "pivot": "base",
+      "verts": 5434,
+      "tris": 9632,
+      "bytes": 28280,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.filigree-railing",
+      "file": "landmarks/filigree-railing.glb",
+      "sha256": "b6663a735ffcb195fa99f3d2ec4417751eaed01e8675bc1d10d4b3e167a0caea",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "peacemakers",
+        "practice",
+        "featured",
+        "promise",
+        "welcome"
+      ],
+      "size": 2.15,
+      "pivot": "base",
+      "verts": 2717,
+      "tris": 5314,
+      "bytes": 16728,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary",
+      "layout": {
+        "tiling": {
+          "pitch": 2,
+          "axis": "X (glTF X)",
+          "note": "End posts are centred on x = -1 and x = +1; place segments 2.0 apart so neighbours share one post."
+        }
+      }
+    },
+    {
+      "id": "landmark.fountain-of-kindness",
+      "file": "landmarks/fountain-of-kindness.glb",
+      "sha256": "982ba46d3cb3983bfe4c2f6c24ba59659ed052abfb67512067719237d3cf02ab",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "milestone"
+      ],
+      "size": 4.6,
+      "pivot": "base",
+      "verts": 20556,
+      "tris": 40720,
+      "bytes": 94712,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_water",
+        "landmark_rose"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark"
+    },
+    {
+      "id": "landmark.garden-bench",
+      "file": "landmarks/garden-bench.glb",
+      "sha256": "3b6ed1c4e65c45db9ab7c649e9eabb39540ee16c585e61cbab14586896f8db15",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "garden",
+        "calendar",
+        "live-feed",
+        "practice"
+      ],
+      "size": 1.5,
+      "pivot": "base",
+      "verts": 3642,
+      "tris": 6980,
+      "bytes": 23900,
+      "materials": [
+        "landmark_pearl",
+        "landmark_rose",
+        "landmark_gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.gazebo-glass",
+      "file": "landmarks/gazebo-glass.glb",
+      "sha256": "0ce675c9a22af0abe1bad158401b63622e2c450ee7b5b155740be0aaf9578ae1",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 5.17,
+      "pivot": "base",
+      "verts": 9844,
+      "tris": 19184,
+      "bytes": 54224,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_blush",
+        "landmark_pearl_glass"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.lantern-post",
+      "file": "landmarks/lantern-post.glb",
+      "sha256": "6e96b00aea412f06c447c8e97368f325b0d141265a76df618fd0bb51cd80d72c",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "welcome",
+        "garden",
+        "calendar",
+        "live-feed",
+        "promise"
+      ],
+      "size": 2.79,
+      "pivot": "base",
+      "verts": 4832,
+      "tris": 9616,
+      "bytes": 25928,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_glow"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.love-observatory",
+      "file": "landmarks/love-observatory.glb",
+      "sha256": "c28d43fb70c4916c2efa3919e1ccd0765fac5a3e8b8f91e3dd925bfcb1d28c5f",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "status"
+      ],
+      "size": 6.808,
+      "pivot": "base",
+      "verts": 14855,
+      "tris": 29420,
+      "bytes": 74340,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_blush",
+        "landmark_rose",
+        "landmark_window",
+        "landmark_lavender",
+        "landmark_lens"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark"
+    },
+    {
+      "id": "landmark.peace-globe",
+      "file": "landmarks/peace-globe.glb",
+      "sha256": "3c7ee84951c026ea92eba9909e5b810a87436ecd3007035df525a764edc9efc9",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "peacemakers"
+      ],
+      "size": 2.953,
+      "pivot": "base",
+      "verts": 8784,
+      "tris": 17156,
+      "bytes": 55024,
+      "materials": [
+        "landmark_gold",
+        "landmark_pearl",
+        "landmark_globe_sea",
+        "landmark_globe_land",
+        "landmark_rose",
+        "landmark_halo"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.pearl-arch",
+      "file": "landmarks/pearl-arch.glb",
+      "sha256": "7937d3e326486e06b58f54a09bf6ae7462227ef553a879cf9f5f2b7c96bef567",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "welcome",
+        "garden",
+        "heart",
+        "live-feed",
+        "promise"
+      ],
+      "size": 5.19,
+      "pivot": "base",
+      "verts": 9004,
+      "tris": 17528,
+      "bytes": 45616,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_rose"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.pearl-column",
+      "file": "landmarks/pearl-column.glb",
+      "sha256": "a4a93e12ea82887eb37af53daf7ff9822c69b7cca557a8b8242d4c9ba0ff8ae2",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "heart",
+        "featured",
+        "status",
+        "practice",
+        "promise"
+      ],
+      "size": 4,
+      "pivot": "base",
+      "verts": 4944,
+      "tris": 9560,
+      "bytes": 23156,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.pearl-pavilion",
+      "file": "landmarks/pearl-pavilion.glb",
+      "sha256": "3e4faf39c3ef711a18560f67527f03f5461d89104a3eb10d430765e94913b2f1",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "featured"
+      ],
+      "size": 7.58,
+      "pivot": "base",
+      "verts": 23301,
+      "tris": 45288,
+      "bytes": 97324,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_blush",
+        "landmark_lavender"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark"
+    },
+    {
+      "id": "landmark.pearl-pavilion-horseshoe",
+      "file": "landmarks/pearl-pavilion-horseshoe.glb",
+      "sha256": "7337eee557757cf3fba2eb6a98e3b569348dcd608762e7419d27b7b828a6c59e",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "featured"
+      ],
+      "size": 7.663,
+      "pivot": "base",
+      "verts": 23913,
+      "tris": 46402,
+      "bytes": 114896,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_blush",
+        "landmark_pearl_glass"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark",
+      "layout": {
+        "hero_slot": {
+          "note": "Where the hero recognition pearl floats, glTF coordinates (Y up, piece base on y = 0). A pearl of up to free_radius fits between the floor, the columns and the ring beam.",
+          "centre": [
+            0,
+            2.526,
+            0
+          ],
+          "free_radius": 2.086,
+          "floor_height": 0.44,
+          "beam_underside": 4.613
+        },
+        "column_angles_from_open_centre_deg": [
+          85,
+          123,
+          161,
+          199,
+          237,
+          275
+        ],
+        "open_side": "-Y in Blender, +Z in glTF (faces the camera)"
+      }
+    },
+    {
+      "id": "landmark.pearl-stairs",
+      "file": "landmarks/pearl-stairs.glb",
+      "sha256": "1905cebf93f0bee08363ad7b0c39f5e348e2bafec8500f2efdc5e55ea77373d0",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "practice",
+        "heart",
+        "orbit",
+        "featured"
+      ],
+      "size": 3.528,
+      "pivot": "base",
+      "verts": 4272,
+      "tris": 7760,
+      "bytes": 23812,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.pool-fountain",
+      "file": "landmarks/pool-fountain.glb",
+      "sha256": "b545aff0ac0eb57543ab6bd0d6a0e191df6080acd0082e7e32d902061e81a7d0",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "practice",
+        "live-feed",
+        "garden",
+        "milestone"
+      ],
+      "size": 2.155,
+      "pivot": "base",
+      "verts": 9232,
+      "tris": 18024,
+      "bytes": 52212,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_water",
+        "landmark_rose"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "landmark.stone-tablet",
+      "file": "landmarks/stone-tablet.glb",
+      "sha256": "9e861b4ef5968e4cacd022ffef38b00f8e34a7c93195bd82a9dea41efaf9a979",
+      "group": "landmarks",
+      "feature": "landmark",
+      "zones": [
+        "garden",
+        "expressions",
+        "practice",
+        "promise",
+        "welcome"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 1395,
+      "tris": 2576,
+      "bytes": 11596,
+      "materials": [
+        "landmark_pearl",
+        "landmark_gold",
+        "landmark_rose"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary",
+      "textFace": {
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centre": [
+          0,
+          0.82,
+          0.125
+        ],
+        "width": 0.96,
+        "height": 1.04
+      }
+    },
+    {
+      "id": "nature.blossom-tree-a",
+      "file": "nature/blossom-tree-a.glb",
+      "sha256": "bc35addf005edfe7b98bac3b30a410becfe8b8854254e5ac48c0afb8db571c54",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "live-feed",
+        "practice",
+        "promise",
+        "orbit",
+        "milestone"
+      ],
+      "size": 5,
+      "pivot": "base",
+      "verts": 7770,
+      "tris": 15516,
+      "bytes": 72212,
+      "materials": [
+        "blossom-tree-a-bark",
+        "blossom-tree-a-blossom"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.blossom-tree-b",
+      "file": "nature/blossom-tree-b.glb",
+      "sha256": "0d2b18b1d358f822ff183256c85cbae67e36d683cf83a28877efded5fefa88ef",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "live-feed",
+        "practice",
+        "promise",
+        "orbit",
+        "milestone"
+      ],
+      "size": 6,
+      "pivot": "base",
+      "verts": 7026,
+      "tris": 14028,
+      "bytes": 64604,
+      "materials": [
+        "blossom-tree-b-bark",
+        "blossom-tree-b-blossom"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.blossom-tree-c",
+      "file": "nature/blossom-tree-c.glb",
+      "sha256": "d8a24772a777581620072ede578f63e4ad0fb470d14257b33931c4ad3ffb1793",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "live-feed",
+        "practice",
+        "promise",
+        "orbit",
+        "milestone"
+      ],
+      "size": 4.671,
+      "pivot": "base",
+      "verts": 5876,
+      "tris": 11728,
+      "bytes": 55360,
+      "materials": [
+        "blossom-tree-c-bark",
+        "blossom-tree-c-blossom"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.cloud-a",
+      "file": "nature/cloud-a.glb",
+      "sha256": "66fe409f92899ee7b5ebec3f9f6ec4e3780beeab192a3f0315f4e97f1fe8b612",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 8,
+      "pivot": "center",
+      "verts": 6934,
+      "tris": 13864,
+      "bytes": 47112,
+      "materials": [
+        "cloud-a-cotton"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.cloud-b",
+      "file": "nature/cloud-b.glb",
+      "sha256": "a913e35ce4c4ecc6d897b51508327d0a7e436d4bd737c4434d8b70f306eab97e",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 10,
+      "pivot": "center",
+      "verts": 6088,
+      "tris": 12172,
+      "bytes": 41584,
+      "materials": [
+        "cloud-b-cotton"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.cloud-c",
+      "file": "nature/cloud-c.glb",
+      "sha256": "ec255a4269ebb269a8268ac1ccee6de0d50f3083ec60950a053066c1f256a41a",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 6,
+      "pivot": "center",
+      "verts": 6892,
+      "tris": 13780,
+      "bytes": 47388,
+      "materials": [
+        "cloud-c-cotton"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.crystal-blue",
+      "file": "nature/crystal-blue.glb",
+      "sha256": "e11f12a03e7473c6a7687dd05f50fbe74455fb84e7e747930b088f4b51c9bc8d",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "welcome",
+        "live-feed",
+        "peacemakers",
+        "status",
+        "milestone"
+      ],
+      "size": 1.3,
+      "pivot": "base",
+      "verts": 1360,
+      "tris": 2700,
+      "bytes": 12044,
+      "materials": [
+        "crystal-blue-crystal"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.crystal-lavender",
+      "file": "nature/crystal-lavender.glb",
+      "sha256": "1c8729b74844710b99327c42cb908056b81373eb4763350f4b769e59062f3f0f",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "welcome",
+        "orbit",
+        "status",
+        "expressions",
+        "milestone"
+      ],
+      "size": 1.699,
+      "pivot": "base",
+      "verts": 2448,
+      "tris": 4860,
+      "bytes": 19772,
+      "materials": [
+        "crystal-lavender-crystal"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.crystal-pink",
+      "file": "nature/crystal-pink.glb",
+      "sha256": "b3e5deca3c19ccaa83347e46648fed1d06732442789fad2b55b23cc6fa4774eb",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "welcome",
+        "heart",
+        "featured",
+        "promise",
+        "orbit"
+      ],
+      "size": 1.9,
+      "pivot": "base",
+      "verts": 1904,
+      "tris": 3780,
+      "bytes": 15908,
+      "materials": [
+        "crystal-pink-crystal"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.hydrangea-bush",
+      "file": "nature/hydrangea-bush.glb",
+      "sha256": "9604b4d036d4cc4c486d29b7849fa114c0259210931d3a7ccb6689ee88e16f45",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "calendar",
+        "expressions",
+        "practice",
+        "peacemakers",
+        "status"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 9040,
+      "tris": 17436,
+      "bytes": 75300,
+      "materials": [
+        "hydrangea-bush-leaves",
+        "hydrangea-bush-florets"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.island-large",
+      "file": "nature/island-large.glb",
+      "sha256": "474db8cc441082815a29eb922e6a8c5800558c2481720d2a8fa85db22021117f",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "orbit",
+        "milestone",
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 20,
+      "pivot": "center",
+      "verts": 21704,
+      "tris": 42160,
+      "bytes": 159404,
+      "materials": [
+        "island-large-grass",
+        "island-large-rock",
+        "island-large-water",
+        "island-large-waterfall-mist",
+        "island-large-bark",
+        "island-large-blossom",
+        "island-large-petal",
+        "island-large-gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "landmark"
+    },
+    {
+      "id": "nature.island-medium",
+      "file": "nature/island-medium.glb",
+      "sha256": "df9637cc688533f76b9c0ed785b2d5a768847e40767642d64effe29a497fd90d",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 14,
+      "pivot": "center",
+      "verts": 9636,
+      "tris": 18740,
+      "bytes": 79972,
+      "materials": [
+        "island-medium-grass",
+        "island-medium-rock",
+        "island-medium-bark",
+        "island-medium-blossom",
+        "island-medium-petal",
+        "island-medium-gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.island-small",
+      "file": "nature/island-small.glb",
+      "sha256": "a9fbd7b19962bbc917be4be696ff02db2f2dae089dc5ffed15885579bc3605e7",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 8,
+      "pivot": "center",
+      "verts": 6928,
+      "tris": 13384,
+      "bytes": 56652,
+      "materials": [
+        "island-small-grass",
+        "island-small-rock",
+        "island-small-petal",
+        "island-small-gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.lily-pads",
+      "file": "nature/lily-pads.glb",
+      "sha256": "1fb4b73a6b4ddb7ba7ced891dd2e9a6781f93e6336a40d91138aeaac60a44ec7",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "live-feed",
+        "milestone"
+      ],
+      "size": 2.5,
+      "pivot": "base",
+      "verts": 3026,
+      "tris": 5996,
+      "bytes": 23568,
+      "materials": [
+        "lily-pads-pad",
+        "lily-pads-stem",
+        "lily-pads-petal"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.rose-bush",
+      "file": "nature/rose-bush.glb",
+      "sha256": "f48ac3aec844b15863c443bd6d16e9172ea356894fa78899c782ee422e8e459a",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "garden",
+        "heart",
+        "featured",
+        "calendar",
+        "promise",
+        "welcome"
+      ],
+      "size": 1.45,
+      "pivot": "base",
+      "verts": 8634,
+      "tris": 16112,
+      "bytes": 83696,
+      "materials": [
+        "rose-bush-leaves",
+        "rose-bush-rose0",
+        "rose-bush-rose1",
+        "rose-bush-rose2",
+        "rose-bush-rose3"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "nature.stepping-stones",
+      "file": "nature/stepping-stones.glb",
+      "sha256": "e30cf112164245cd70a0503a8978340a9b2c83023a082604afe39182b3b3e30b",
+      "group": "nature",
+      "feature": "nature",
+      "zones": [
+        "live-feed",
+        "garden",
+        "practice",
+        "promise",
+        "heart"
+      ],
+      "size": 4.8,
+      "pivot": "base",
+      "verts": 3708,
+      "tris": 6336,
+      "bytes": 20340,
+      "materials": [
+        "stepping-stones-pearl",
+        "stepping-stones-gold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "neighbor.child",
+      "file": "neighbors/child.glb",
+      "sha256": "2e6d98613f247e8aaf023290e5cafa8257aabc07fdd965b3b4f164389b6be7b4",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1,
+      "pivot": "base",
+      "verts": 10712,
+      "tris": 21168,
+      "bytes": 227884,
+      "materials": [
+        "child_Top",
+        "child_Bottom",
+        "child_Skin",
+        "child_Shoes",
+        "child_Stripe",
+        "child_Hair",
+        "child_EyeWhite",
+        "child_Pupil",
+        "child_Glint",
+        "child_Blush",
+        "child_Mouth",
+        "child_Tongue",
+        "child_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.father",
+      "file": "neighbors/father.glb",
+      "sha256": "537d96128ef0c132c6b580a38a61019c4350f96bbb793a8f3f363e58b83d4210",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 9256,
+      "tris": 18292,
+      "bytes": 216192,
+      "materials": [
+        "father_Top",
+        "father_Bottom",
+        "father_Shoes",
+        "father_Skin",
+        "father_Hair",
+        "father_EyeWhite",
+        "father_Pupil",
+        "father_Glint",
+        "father_Blush",
+        "father_Mouth",
+        "father_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.grandfather",
+      "file": "neighbors/grandfather.glb",
+      "sha256": "6ee984224a79f366b8fe18f114e197ec45158b03c1b306aba3caf772b1b84758",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.5,
+      "pivot": "base",
+      "verts": 10942,
+      "tris": 21536,
+      "bytes": 225924,
+      "materials": [
+        "grandfather_Top",
+        "grandfather_Bottom",
+        "grandfather_Shoes",
+        "grandfather_Skin",
+        "grandfather_Button",
+        "grandfather_Hair",
+        "grandfather_EyeWhite",
+        "grandfather_Pupil",
+        "grandfather_Glint",
+        "grandfather_Blush",
+        "grandfather_Mouth",
+        "grandfather_Glasses",
+        "grandfather_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.grandmother",
+      "file": "neighbors/grandmother.glb",
+      "sha256": "4bac05417e62d486001b23a46676382d77eebcd0fd088ee8c237f6466803d09d",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.5,
+      "pivot": "base",
+      "verts": 9952,
+      "tris": 19596,
+      "bytes": 221308,
+      "materials": [
+        "grandmother_Top",
+        "grandmother_Skin",
+        "grandmother_Shoes",
+        "grandmother_Bottom",
+        "grandmother_Button",
+        "grandmother_Hair",
+        "grandmother_EyeWhite",
+        "grandmother_Pupil",
+        "grandmother_Glint",
+        "grandmother_Blush",
+        "grandmother_Mouth",
+        "grandmother_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.mother",
+      "file": "neighbors/mother.glb",
+      "sha256": "814246be4df49da02eaa35dcc81d4b4517a5c89be267d2a9572537b0c3f7b70d",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.6,
+      "pivot": "base",
+      "verts": 9914,
+      "tris": 19560,
+      "bytes": 223880,
+      "materials": [
+        "mother_Top",
+        "mother_Skin",
+        "mother_Shoes",
+        "mother_Bottom",
+        "mother_Belt",
+        "mother_Hair",
+        "mother_EyeWhite",
+        "mother_Pupil",
+        "mother_Glint",
+        "mother_Blush",
+        "mother_Mouth",
+        "mother_Tongue",
+        "mother_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "neighbor.teenager",
+      "file": "neighbors/teenager.glb",
+      "sha256": "044ddc4ef5d1e2d02ef3c2a465862f1444770e5dba9cbb03aacfaba434f23ff3",
+      "group": "neighbors",
+      "feature": "neighbor",
+      "zones": [
+        "garden",
+        "heart",
+        "expressions",
+        "welcome",
+        "featured",
+        "calendar",
+        "peacemakers",
+        "status",
+        "orbit",
+        "milestone",
+        "live-feed",
+        "practice",
+        "promise"
+      ],
+      "size": 1.4,
+      "pivot": "base",
+      "verts": 10364,
+      "tris": 20304,
+      "bytes": 225000,
+      "materials": [
+        "teenager_Top",
+        "teenager_Bottom",
+        "teenager_Shoes",
+        "teenager_Skin",
+        "teenager_Pocket",
+        "teenager_String",
+        "teenager_Hair",
+        "teenager_EyeWhite",
+        "teenager_Pupil",
+        "teenager_Glint",
+        "teenager_Blush",
+        "teenager_Mouth",
+        "teenager_Tie",
+        "teenager_Heart"
+      ],
+      "clips": [
+        {
+          "name": "after_you",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "bow",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "cheer",
+          "seconds": 2.4,
+          "loop": false
+        },
+        {
+          "name": "comfort",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "encourage",
+          "seconds": 3,
+          "loop": false
+        },
+        {
+          "name": "give_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true
+        },
+        {
+          "name": "listen",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "offer_hand",
+          "seconds": 2.8,
+          "loop": false
+        },
+        {
+          "name": "receive_heart",
+          "seconds": 3.2,
+          "loop": false
+        },
+        {
+          "name": "talk",
+          "seconds": 3,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "seconds": 1,
+          "loop": true
+        },
+        {
+          "name": "wave",
+          "seconds": 2.4,
+          "loop": false
+        }
+      ],
+      "lod": null,
+      "budget": "character",
+      "skinned": true,
+      "bones": 19
+    },
+    {
+      "id": "expression.01-hello-bubble",
+      "file": "expressions/01-hello-bubble.glb",
+      "sha256": "70fbb00a41b92229f9510be70cd9bf478022a121d9cb65502dd8eb49c07283f5",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 4887,
+      "tris": 8956,
+      "bytes": 26636,
+      "materials": [
+        "BubbleCoral",
+        "EyeGloss",
+        "EyeShine",
+        "BubbleBlush"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.02-gift-box",
+      "file": "expressions/02-gift-box.glb",
+      "sha256": "ee59078eea4c8a4ea7e2e8da70b3d3e2a52cccea2a4c9f4b9e5188ecd32edcd7",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 4661,
+      "tris": 8984,
+      "bytes": 25332,
+      "materials": [
+        "GiftGold",
+        "GiftRibbon"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.03-mended-heart",
+      "file": "expressions/03-mended-heart.glb",
+      "sha256": "e00ea6f5495dd0782c149a924fd84e54366f9017a4782f72316177c6d36778bb",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 4962,
+      "tris": 9912,
+      "bytes": 23964,
+      "materials": [
+        "HeartPeach",
+        "BandageStrip",
+        "BandagePad"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.04-comfort-cloud",
+      "file": "expressions/04-comfort-cloud.glb",
+      "sha256": "fc030bbca5cab9142e34a6a59237156162a0b94363ba162672b8a6e1fdc43093",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 5451,
+      "tris": 10560,
+      "bytes": 24308,
+      "materials": [
+        "CloudPink",
+        "CloudPiping"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.05-open-door",
+      "file": "expressions/05-open-door.glb",
+      "sha256": "0d87c6b7a898d392038b35b27337224cb989fefb65927d9a3dce72d9f3206caf",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 3291,
+      "tris": 6366,
+      "bytes": 19336,
+      "materials": [
+        "DoorFrameBlue",
+        "DoorLightBlue",
+        "DoorKnobGold"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.06-teacup",
+      "file": "expressions/06-teacup.glb",
+      "sha256": "b37df01a4f38118792130444d0ed01582d23a36800196993cce6fb8fd48c562f",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 5744,
+      "tris": 11372,
+      "bytes": 31600,
+      "materials": [
+        "TeacupTan",
+        "Tea",
+        "Steam",
+        "TeacupHeart"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.07-candle",
+      "file": "expressions/07-candle.glb",
+      "sha256": "757e8fbbd7331293fa0770051501eb376440853eda9cc5d3fe7e79986f41c087",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 6272,
+      "tris": 11588,
+      "bytes": 37700,
+      "materials": [
+        "CandleLavender",
+        "CandleDish",
+        "Wick",
+        "Flame",
+        "FlameCore"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.08-helping-hand",
+      "file": "expressions/08-helping-hand.glb",
+      "sha256": "cc1ab5ef672983c04f8e7166a768e158d5fee57936d9f1e39b4e3e0d74e1fc7d",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 6797,
+      "tris": 13582,
+      "bytes": 40184,
+      "materials": [
+        "HandRose",
+        "HandCuff",
+        "HandHeart"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "expression.09-star",
+      "file": "expressions/09-star.glb",
+      "sha256": "bdef233bfd6aa553440a4eac343fe9acfcf49d61f84afdd70a7b4f728d38a297",
+      "group": "expressions",
+      "feature": "expression",
+      "zones": [],
+      "size": 1.2,
+      "pivot": "center",
+      "verts": 2798,
+      "tris": 5588,
+      "bytes": 13964,
+      "materials": [
+        "StarPurple",
+        "Sparkle"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "core.flower",
+      "file": "core/flower.glb",
+      "sha256": "7083bd0e07c76e7facc5ea69d1fd7ba3e132e5b5e74475a8f424df67ffb37004",
+      "group": "core",
+      "feature": "core",
+      "zones": [],
+      "size": 1.15,
+      "pivot": "center",
+      "verts": 3913,
+      "tris": 6720,
+      "bytes": 25052,
+      "materials": [
+        "Gold",
+        "Petal"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "core.heart",
+      "file": "core/heart.glb",
+      "sha256": "845350523ad4619409b22aa4d6cee78ad27b955e494523c48bc8e2f150811e04",
+      "group": "core",
+      "feature": "core",
+      "zones": [],
+      "size": 1.5,
+      "pivot": "center",
+      "verts": 4370,
+      "tris": 8736,
+      "bytes": 18536,
+      "materials": [
+        "Rose"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "core.pearl",
+      "file": "core/pearl.glb",
+      "sha256": "f5af3fe0c187d7121f63d9ce2dcd05f302b1edc61a8c46e860ef7a18e6e0277e",
+      "group": "core",
+      "feature": "core",
+      "zones": [],
+      "size": 0.85,
+      "pivot": "center",
+      "verts": 2143,
+      "tris": 3968,
+      "bytes": 11004,
+      "materials": [
+        "PearlSkin"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "core.ribbon",
+      "file": "core/ribbon.glb",
+      "sha256": "63a46e4ff2ee4fc79e349b6a64cda88bd54e8e6a8a706edefd238e136f6c7d3d",
+      "group": "core",
+      "feature": "core",
+      "zones": [],
+      "size": 1.4,
+      "pivot": "center",
+      "verts": 1265,
+      "tris": 2376,
+      "bytes": 7444,
+      "materials": [
+        "Silk"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "ordinary"
+    },
+    {
+      "id": "people.child",
+      "file": "people/child.glb",
+      "sha256": "15ff1036ad7c5a5aef347f6d66ea74c701bfd3ef987ceb158cd7b753748317c4",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1,
+      "pivot": "center",
+      "verts": 10402,
+      "tris": 20552,
+      "bytes": 66624,
+      "materials": [
+        "child_Top",
+        "child_Bottom",
+        "child_Skin",
+        "child_Shoes",
+        "child_Stripe",
+        "child_Hair",
+        "child_EyeWhite",
+        "child_Pupil",
+        "child_Glint",
+        "child_Blush",
+        "child_Mouth",
+        "child_Tongue"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    },
+    {
+      "id": "people.father",
+      "file": "people/father.glb",
+      "sha256": "906b38ff0388cfa54f4339254a8329f82a9c3777f641a6f4e4a777292fe58781",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1.6,
+      "pivot": "center",
+      "verts": 8946,
+      "tris": 17676,
+      "bytes": 56880,
+      "materials": [
+        "father_Top",
+        "father_Bottom",
+        "father_Shoes",
+        "father_Skin",
+        "father_Hair",
+        "father_EyeWhite",
+        "father_Pupil",
+        "father_Glint",
+        "father_Blush",
+        "father_Mouth"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    },
+    {
+      "id": "people.grandfather",
+      "file": "people/grandfather.glb",
+      "sha256": "dcc06ef45474134c6f236e8e6c4b0ae0b65616f1be0db2c87ae87a0b0a646387",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1.5,
+      "pivot": "center",
+      "verts": 10850,
+      "tris": 21316,
+      "bytes": 69800,
+      "materials": [
+        "grandfather_Top",
+        "grandfather_Bottom",
+        "grandfather_Shoes",
+        "grandfather_Skin",
+        "grandfather_Button",
+        "grandfather_Cane",
+        "grandfather_Hair",
+        "grandfather_EyeWhite",
+        "grandfather_Pupil",
+        "grandfather_Glint",
+        "grandfather_Blush",
+        "grandfather_Mouth",
+        "grandfather_Glasses"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    },
+    {
+      "id": "people.grandmother",
+      "file": "people/grandmother.glb",
+      "sha256": "9c7402e6ca742f592856a40cdc152c2f0837bf06b2a525994f0737c66cd44b4d",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1.5,
+      "pivot": "center",
+      "verts": 9642,
+      "tris": 18980,
+      "bytes": 61368,
+      "materials": [
+        "grandmother_Top",
+        "grandmother_Skin",
+        "grandmother_Shoes",
+        "grandmother_Bottom",
+        "grandmother_Button",
+        "grandmother_Hair",
+        "grandmother_EyeWhite",
+        "grandmother_Pupil",
+        "grandmother_Glint",
+        "grandmother_Blush",
+        "grandmother_Mouth"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    },
+    {
+      "id": "people.mother",
+      "file": "people/mother.glb",
+      "sha256": "b020263d621c4764ccc074d879eed648e91ecebb3b6fda1ef8428749337231e3",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1.6,
+      "pivot": "center",
+      "verts": 9604,
+      "tris": 18944,
+      "bytes": 62548,
+      "materials": [
+        "mother_Top",
+        "mother_Skin",
+        "mother_Shoes",
+        "mother_Bottom",
+        "mother_Belt",
+        "mother_Hair",
+        "mother_EyeWhite",
+        "mother_Pupil",
+        "mother_Glint",
+        "mother_Blush",
+        "mother_Mouth",
+        "mother_Tongue"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    },
+    {
+      "id": "people.teenager",
+      "file": "people/teenager.glb",
+      "sha256": "d1d88e433283137128cc08d8ed76d0516287a98197f5f1ebc8765d367d3e116f",
+      "group": "people",
+      "feature": "people",
+      "zones": [],
+      "size": 1.4,
+      "pivot": "center",
+      "verts": 10054,
+      "tris": 19688,
+      "bytes": 66252,
+      "materials": [
+        "teenager_Top",
+        "teenager_Bottom",
+        "teenager_Shoes",
+        "teenager_Skin",
+        "teenager_Pocket",
+        "teenager_String",
+        "teenager_Hair",
+        "teenager_EyeWhite",
+        "teenager_Pupil",
+        "teenager_Glint",
+        "teenager_Blush",
+        "teenager_Mouth",
+        "teenager_Tie"
+      ],
+      "clips": [],
+      "lod": null,
+      "budget": "character"
+    }
+  ]
+}
