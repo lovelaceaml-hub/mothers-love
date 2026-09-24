@@ -21,7 +21,23 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
         ],
       },
+      {
+        // The 3D Studio kit. Every kit version is its own folder (`/world-kit/v1`, then `v2`),
+        // so a TV never refetches a file between visits. The Draco decoder in
+        // `/world-kit/draco/` has no version folder, so it keeps the default revalidating cache
+        // and a later three.js upgrade reaches every TV (Plan 28 Section 8).
+        source: "/world-kit/:version(v\\d+)/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
     ];
+  },
+  async redirects() {
+    // The 3D world moved to its own address, `/world` (Plan 28 Section 5). Old preview links
+    // keep working: the query string passes through unchanged. Temporary, so a browser never
+    // pins it.
+    return [{ source: "/display/world-preview", destination: "/world", permanent: false }];
   },
   async rewrites() {
     // Preview uses the public TV read endpoints without database credentials.

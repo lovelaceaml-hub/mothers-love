@@ -1,0 +1,10 @@
+{
+  "source": "Mothers_Love_Heavenly_Ribbons_3D.html from the conversation",
+  "vertices": 18828,
+  "triangles": 37652,
+  "packed_mesh_sha256": "b067c22ae44ce69e731f29132ef53574a6a5611a5d27975c38cc01829e14c8d1",
+  "position_float32_sha256": "b5d23f4ced5661eb4f6de98512d3b255055da79c831ac40c1da3878dd33f138e",
+  "normals_float32_sha256": "689076eef6cdedfc813aff80ba872222550fdec5adbe775acf011f56b5a547de",
+  "indices_uint16_sha256": "1149313ab05ee2aaae7c3d86902ecb4d9c1c0bf9dc1eba91ba2a5fef2dc781c6",
+  "note": "Geometry is original. The .glb simple PBR material is only a placeholder for importing; custom shading, lighting and ribbons must be ported separately."
+}

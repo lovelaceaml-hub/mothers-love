@@ -52,3 +52,20 @@ Open [Display Studio](https://mothers-love.vercel.app/admin/display). Choose any
 On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this screen once if the browser requires a sound gesture. Studio volume and event toggles still control sound. Pause also stops decorative motion. Long circle messages move to reveal their complete text, with dedicated reading pages as well. All nine Spotlight and Daily Practice expressions and all three One Kind Word lines rotate fairly. Home, school and work appear in sequence.
 
 The latest owner choice keeps all selected effects active. The app does not automatically reduce effects. Actual TV speed, room audio and a real phone scan remain hardware checks, outside the selected software-only proof.
+
+## The 3D world
+
+The [3D world](https://mothers-love.vercel.app/world) is its own page beside the TV View. It never replaces the [TV View](https://mothers-love.vercel.app/display) and is never part of the TV program: each screen shows one or the other, chosen by its address. To find it without typing, open [Display controls](https://mothers-love.vercel.app/admin/display) and choose **open the 3D world** at the bottom of the page.
+
+The page opens the way a TV should show it: the camera tours thirteen places of kindness, recognitions float in the world as pearls, a ticker along the bottom lists the latest recognitions, and the QR code invites people to share one. It shows the same published recognitions and follows the same owner settings as the TV View: Quiet, Neutral, Pause arrivals, Pause rotation and Still all apply, and Quiet or Neutral clears every recognition from the world at once. With Still, or on a screen set to reduce motion, the ticker is hidden, because a ticker that cannot move would cut messages off at the edge of the screen; the pearls still show every word. Submitted names never appear.
+
+Useful addresses:
+
+| Address | What it shows |
+| --- | --- |
+| [/world](https://mothers-love.vercel.app/world) | The TV tour with live recognitions |
+| [/world?source=sample](https://mothers-love.vercel.app/world?source=sample) | The same tour with fictional sample recognitions, labelled Sample recognitions and Fictional sample |
+| [/world?view=explore](https://mothers-love.vercel.app/world?view=explore) | The explorer: the world map, Read recognitions, Hold this recognition, Fullscreen and **Settings** |
+| [/world?art=cinematic](https://mothers-love.vercel.app/world?art=cinematic) or [/world?art=classic](https://mothers-love.vercel.app/world?art=classic) | The two earlier looks, kept as fallbacks |
+
+**Picture quality** starts on Automatic, which steps the picture down if the screen cannot keep up. In the explorer, Settings also offers High and Low. The old preview address, `/display/world-preview`, still works and moves to `/world`.

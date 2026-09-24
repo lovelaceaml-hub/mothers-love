@@ -2,11 +2,12 @@
 
 Every release note and handoff entry this project has written, newest first. The current state lives on one page in [HANDOFF.md](HANDOFF.md); this file is the record behind it.
 
-Plan 28 Section 3 made this file on 2026-09-23. It has three parts:
+Plan 28 Section 3 made this file on 2026-09-23, and Section 5 added part 4 on 2026-09-24. It has four parts:
 
 1. **Entries added on 2026-09-23.** Release notes that existed only on branches Plan 28 Section 4 will delete (`change/heart-ribbons-3d` and `tv17/pick`), or only in merged pull requests and Vercel, so they are not lost. Each names its source.
 2. **Entries moved from the handoff.** The whole of `docs/HANDOFF.md` as it stood on `main` at `1b4c31a`, copied unchanged apart from two things: one stray `# Handoff` heading line that sat in the middle of it is dropped, and every heading moves one level down to sit under this part. Each entry describes the state on the day it was written. Where an entry says "on a branch, not released" or names the branch `codex/mothers-love`, later entries supersede it: `codex/mothers-love` was renamed `main` on 2026-09-23.
 3. **Documents and files kept outside `main`.** What stayed on branches or tags when every document came to `main`, and where each one is.
+4. **The world branch's handoff and agent notes.** The 3D world's own release notes and agent notes, kept when the world came to `main`.
 
 Links below are relative to this folder. A few old entries name files by absolute path under `/Users/anthony/Projects/mothers-love-worktrees/`; many of those working copies no longer exist, and the tag in part 3 or the branch named in the entry holds the file.
 
@@ -262,9 +263,9 @@ Two plans had been numbered 25 and three numbered 26 on different branches. Anth
 | 26 | [Expression Cosmos prototype](PLAN-26-pearl-sequence.md) | unchanged | 2026-09-22T07:32Z, `feat/tv-pearl-sequence` |
 | 27 | [Promote the heavenly world](PLAN-27-world-promotion.md) | `PLAN-25-world-promotion.md` | 2026-09-22T11:18Z, `feat/world-cinematic` |
 | 28 | [Clean up and refactor the repository](PLAN-28-repository-refactor.md) | `PLAN-26-repository-refactor.md` | 2026-09-23T01:50Z, `codex/color-polish-v6` |
-| 29 | The 3D Studio kit inside the heavenly world | `PLAN-26-world-kit.md` | 2026-09-23T07:24Z, local `feat/world-cinematic` and `world-kit/k0` |
+| 29 | [The 3D Studio kit inside the heavenly world](PLAN-29-world-kit.md) | `PLAN-26-world-kit.md` | 2026-09-23T07:24Z, local `feat/world-cinematic` and `world-kit/k0` |
 
-Plan 29's file still carries its old name on the world branch; its own coordinator renames it, and it reaches `main` when the world branch merges. The run trees and the `record/*` tags carry no plan number, so no link to them changed. Text written before the ruling keeps the number it was written under.
+Plan 29 reached `main` with the world, renamed `PLAN-29-world-kit.md` by Plan 28 Section 5 on 2026-09-24, which also deleted the world branch's copy of `PLAN-25-world-promotion.md` (`main` carries it as Plan 27). The run trees and the `record/*` tags carry no plan number, so no link to them changed. Text written before the ruling keeps the number it was written under.
 
 Five plans also existed in two different copies under one name. Section 3 kept the newer copy of each, and in every case the older copy is contained in the newer one's history except Plan 17:
 
@@ -295,6 +296,8 @@ All of them also stay in the tag `archive/codex/color-polish-v6` (commit `e5ffa3
 
 These belong to work still in progress. Each arrives on `main` when its branch merges, and nothing here is lost if it waits.
 
+Update, 2026-09-24 (Plan 28 Section 5): the world's documents in the first two rows arrive on `main` with `feat/world-surface`, which merges `feat/world-cinematic` and `feat/world-base`; the world's own handoff and agent notes are in part 4. The last two branches were archived by Plan 28 Section 4, so their documents live in the tags `archive/feat/tv-pearl-sequence` and `archive/feat/tv-pearl-design`.
+
 | Branch | Documents |
 | --- | --- |
 | `feat/world-cinematic` (draft pull request #10) and the kit's `world-kit/*` lanes | `RETRO-20-heavenly-world.md`, `WORLD-CINEMATIC-ART-PASS.md`, `design/heavenly-world/`, `design/world-quality/` (including a copied design handoff whose internal links point into its original bundle), run records `2026-09-20-world-prototype-01`, `2026-09-21-living-heaven`, `2026-09-21-tv-bubbles`, `2026-09-21-world-recognitions`, the Plan 29 file and its record tree, and the world's additions to `AGENTS.md`, `README.md`, `HANDOFF.md`, `CONTRACT.md`, `USER-MANUAL.md` and Plan 18 |
@@ -322,3 +325,123 @@ git -C /Users/anthony/Projects/mothers-love checkout archive/codex/color-polish-
 ```
 
 The commercial's words are on `main` in [video/SCRIPT.md](video/SCRIPT.md) and [video/narration.json](video/narration.json), and its finished files are in Drive under `Project Outputs/The Words of Mother's Love/Commercial`.
+
+## Part 4: the world branch's handoff and agent notes
+
+Added by Plan 28 Section 5 on 2026-09-24, when `feat/world-surface` brought the 3D world to `main`. Before then the world branch (`feat/world-cinematic`, earlier `feature/world-cinematic-art-pass` and `feature/tv-3d-world-prototype-01`) kept its own `docs/HANDOFF.md` and `AGENTS.md`, with world entries stacked above an older copy of the TV notes. The TV notes were already in part 2 and in `AGENTS.md` on `main`, so only the world entries are kept here, copied unchanged from `feat/world-cinematic` at `07261d0` apart from two things: every heading moves two levels down, and links are repointed so they open from this folder (Plan 25 and Plan 26 links go to the same plans under their new numbers, 27 and 29). Each entry describes the state on the day it was written: the preview links are old Vercel previews, `/display/world-preview` is now a redirect to `/world`, and the Plans 25 and 26 named inside them are Plans 27 and 29 since the 2026-09-23 renumbering.
+
+### From the world branch's handoff
+
+#### September 23: this checkout moved to the one home
+
+This checkout now lives at `/Users/anthony/Projects/mothers-love-world/web` (it was
+`/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`). The project
+home is `/Users/anthony/Projects/mothers-love-world/START-HERE.md`; the active plan is
+`/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`.
+3D Studio moved to `/Users/anthony/Projects/mothers-love-world/studio`, and
+`scripts/world-kit-sync.mjs --studio` now defaults there.
+
+#### September 22: Pass D2, the world made radiant
+
+[Latest preview](https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `2ad95b07f1338c387fccc075fc30b38152bdcb9e` (the [branch alias](https://mothers-love-git-feature-world-cinematic-art-pass-lvzion.vercel.app/display/world-preview?source=sample&art=design) always shows the newest push). Eight sections landed on `feature/world-cinematic-art-pass` since D1: golden-hour light and air, a glass pearl with halo and sparkles, pink clouds and cotton-candy canopies, the three rebuilt arrivals (lit lotus with a beam, one silk ribbon with butterflies, a descending light string), sculpted rose-ivory islands with glittering water and hazy landmark domes, a real glow pass with light shafts and living air, water and pearl and heart finesse with gold and lanterns at dusk, and camera finesse with an arrival flourish, travel haze, tiers and a shadow cadence.
+
+Unchanged and proven on every section: the frozen wording layout on the pearl (0 differing pixels with the glow on and off), no personal pixels outside the depth-tested slot, and `art=classic` and `art=cinematic` byte-identical to Codex's D1 captures. Production, API and database untouched; PR #8 stays draft.
+
+Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-27-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
+
+#### September 21: Show designs before Claude implementation
+
+Current D1: [refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `80586a20b2aaee166bbd48d26ac8bd3f0c5daa29` is ready for [visual review](runs/2026-09-21-world-quality/D1-VISUAL-REVIEW.md). Preserve the wording layout and Thank you at the top. Anthony rejected build-polished-apps and Stitch; do not use them. Build/TypeScript, 52 unit tests and 32 browser checks pass. Fable/Opus remain held until visual approval; P0 and physical-device acceptance remain open.
+
+Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
+
+Previous D0 checkpoint, superseded for current visual review: [Astra sample prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) was delivered with [references and a real tour](runs/2026-09-21-world-quality/VISUAL-REVIEW.md). Source: `9dc7e455047f7eebb8ebfcc1affd125f3b591d3c`. The final build, TypeScript, 47 world unit tests and 23 local still/browser checks pass. It includes Garden, Sanctuary, Expressions, the supplied original heart, pearl typography and canonical exterior symbols, and three arrival studies. All 13 locations remain accessible; the other ten are early visual sketches.
+
+[Plan 24](PLAN-24-world-visual-quality.md), [execution record](runs/2026-09-21-world-quality/RECORD.md), and [ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json) record this design gate. Claude implementation is held for Anthony's visual approval. Do not resume the stopped Claude session because authentication changes. Draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8) remains draft. The historical CI readiness failure is still unresolved, and P0 is incomplete. Production, API and database behavior remain outside this task.
+
+#### September 21: Recognition bubbles inside the world
+
+[Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
+
+[Plan 23](PLAN-23-recognitions-in-the-world.md) supersedes the screen-fixed presentation in Plan 22. Deployment `dpl_4fxa6cxBK7giTmqZsAg8aEQRrRUJ` is a preview only. Production, API and database are unchanged. One native Sol high review ran; both findings were corrected directly, with no further review round. The [run record](runs/2026-09-21-world-recognitions/RECORD.md) contains verification and release evidence. Physical TV performance and room-distance readability remain separate from browser verification.
+
+#### September 21: Circular recognitions and hands-free TV touring
+
+[Corrected heavenly world](https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview) now presents recognition and arrival messages inside circular pearl bubbles. The camera glides during reading and automatically travels between locations without clicks. Reduced motion and Still view automatically change viewpoints; explicit reading holds and owner pauses remain available. The world uses a 20-second minimum stop extended for full message reading, replacing the inherited three-minute Garden wait.
+
+[Plan 22](PLAN-22-tv-bubbles-and-autoplay.md) is current authority for this correction. Deployment `dpl_2d4mnuhiNsSw8GuBngUjEEXXypo7` is a preview only. The original production display, API and database are unchanged. The [run record](runs/2026-09-21-tv-bubbles/RECORD.md) records the focused checks, one review round and source checkpoint process.
+
+#### September 21: Live heavenly journey continuation
+
+[Plan 21](PLAN-21-living-heaven.md) is current authority: Anthony requested live data by default, fully animated scenery, interacting people and autonomous completion with minimal tests and at most one review round. The world now opens with live approved recognitions; explicit `?source=sample` selects fictional demonstrations. New fictional neighbors illustrate canonical expressions with gestures, smiles and heart exchanges. Animated sky veils complement the existing water, silk, flowers, clouds and grand entrances.
+
+Delivery: [live heavenly world](https://mothers-love-60sz9lgsq-lvzion.vercel.app/display/world-preview), deployment `dpl_2i8BhTKT2mosL4ryhFYK8Cd7idrc`. Existing production and database resources are unchanged. The new instruction supersedes the previous additional Claude review gate; one native read-only completion review covers this continuation. The [run record](runs/2026-09-21-living-heaven/RECORD.md) records verification and the source checkpoint. One native review round is complete; its three findings were corrected without another review.
+
+#### September 21: Heavenly World preview
+
+The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.
+
+[Full plan](PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](runs/2026-09-20-world-prototype-01/RECORD.md).
+
+Source checkpoint: [private feature branch](https://github.com/lovelaceaml-hub/mothers-love/tree/feature/tv-3d-world-prototype-01). Native controller review passed; the additional Claude privacy audit remains pending sign-in or explicit deferral.
+
+Continue branch `feature/tv-3d-world-prototype-01` in its isolated worktree. The initial three-zone hosting receipt is historical; Plan 20's final receipt governs the expanded world. Rollback means stop using this preview, with no production or database rollback. Physical-TV performance and viewing distance remain separate commissioning checks.
+
+
+### From the world branch's AGENTS.md
+
+#### Active state: PLAN-01, the 3D world with Peace and Joy (September 24)
+
+The active plan is `/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
+(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
+(Anthony, 2026-09-24):** "I want everything to be 3D" and "I like how it shows currently".
+No painted sky panoramas, painted island layers or painted colour filter go into the world.
+The paintings made on 2026-09-23 are set aside on Drive `3D World/art/painted-v2/` and are
+not used. The rules in the sections below still bind unless PLAN-01 changes them.
+
+#### Active state: Plan 26, the 3D Studio kit inside the world (September 23)
+
+Anthony granted the 3D Studio coordinator full creative design and admin authority for
+the 3D world. [Plan 26](PLAN-29-world-kit.md) is active: lanes K0 to K6 in their own
+worktrees, merged here by the coordinator. The design is
+`/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
+section below still binds. One writer per worktree; do not write in this checkout while
+a K lane is merging.
+
+#### Active state: pass D2 landed, promotion plan awaiting approval
+
+Anthony reviewed the D1 prototype against the approved direction board on 2026-09-21, asked Fable to bring it closer to his vision, ruled "Mostly Opus but Fable can be used" and "keep going, show me after each section", then raised the bar to "spectacular, jaw-dropping, amazing, smooth, finesse, radiant, glory. Do not hold back." Pass D2 landed eight sections on this branch (head `2ad95b0`), all in the sample-only `?source=sample&art=design` path: see [docs/HANDOFF.md](HANDOFF.md), the [D2 record](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) and the [Radiance design](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md). Still binding: the wording layout with "Thank you" at the top, no build-polished-apps or Stitch, no personal pixels outside the depth-tested slot, `art=classic` and `art=cinematic` byte-identical to D1, no production promotion or merge without Anthony. [Plan 25](PLAN-27-world-promotion.md) is the drafted promotion path (gate flip to live data, Anthony's TV check, P0 and the completion review, the merge Anthony clicks, the TV URL); it does not run until he approves it. The previous design-checkpoint text below is history.
+
+
+#### September 21: Approved whole-world visual upgrade
+
+[Plan 24](PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
+
+Work in `/Users/anthony/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](runs/2026-09-21-world-quality/RECORD.md), [task ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
+
+#### September 21: Recognition bubbles inside the world
+
+[Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
+
+[Plan 23](PLAN-23-recognitions-in-the-world.md) supersedes the screen-fixed presentation in Plan 22. Deployment `dpl_4fxa6cxBK7giTmqZsAg8aEQRrRUJ` is a preview only. Production, API and database are unchanged. One native Sol high review ran; both findings were corrected directly, with no further review round. The [run record](runs/2026-09-21-world-recognitions/RECORD.md) contains verification and release evidence. Physical TV performance and room-distance readability remain separate from browser verification.
+
+#### September 21: Circular recognitions and hands-free TV touring
+
+[Corrected heavenly world](https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview) now presents recognition and arrival messages inside circular pearl bubbles. The camera glides during reading and automatically travels between locations without clicks. Reduced motion and Still view automatically change viewpoints; explicit reading holds and owner pauses remain available. The world uses a 20-second minimum stop extended for full message reading, replacing the inherited three-minute Garden wait.
+
+[Plan 22](PLAN-22-tv-bubbles-and-autoplay.md) is current authority for this correction. Deployment `dpl_2d4mnuhiNsSw8GuBngUjEEXXypo7` is a preview only. The original production display, API and database are unchanged. The [run record](runs/2026-09-21-tv-bubbles/RECORD.md) records the focused checks, one review round and source checkpoint process.
+
+#### September 21: Live heavenly journey continuation
+
+[Plan 21](PLAN-21-living-heaven.md) is current authority: Anthony requested live data by default, fully animated scenery, interacting people and autonomous completion with minimal tests and at most one review round. The world now opens with live approved recognitions; explicit `?source=sample` selects fictional demonstrations. New fictional neighbors illustrate canonical expressions with gestures, smiles and heart exchanges. Animated sky veils complement the existing water, silk, flowers, clouds and grand entrances.
+
+Delivery: [live heavenly world](https://mothers-love-60sz9lgsq-lvzion.vercel.app/display/world-preview), deployment `dpl_2i8BhTKT2mosL4ryhFYK8Cd7idrc`. Existing production and database resources are unchanged. The new instruction supersedes the previous additional Claude review gate; one native read-only completion review covers this continuation. The [run record](runs/2026-09-21-living-heaven/RECORD.md) records verification and the source checkpoint. One native review round is complete; its three findings were corrected without another review.
+
+#### September 21: Heavenly World preview
+
+The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.
+
+[Full plan](PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](runs/2026-09-20-world-prototype-01/RECORD.md).
+
+Current authority is Plan 20, including the user's full-world expansion and radiant pearl choice. Live mode is authorized only as a read of the existing explicitly public projection. No production promotion, database modification, real-data fixture/screenshot, or change to the current TV renderer belongs in this preview. This branch starts from `tv17/pick` at `8a10f8c`; newer independent production heart work must be preserved.
+

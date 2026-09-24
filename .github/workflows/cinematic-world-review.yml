@@ -1,0 +1,42 @@
+name: Cinematic world preview review
+on:
+  pull_request:
+    paths:
+      - 'src/components/display/world/world-cinematic-art.ts'
+      - 'src/components/display/world/world-scene.ts'
+      - 'src/components/display/world/art/design-mode.ts'
+      - 'scripts/review-cinematic-world.mjs'
+      - '.github/workflows/cinematic-world-review.yml'
+permissions:
+  contents: read
+concurrency:
+  group: cinematic-world-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      npm_config_cache: /tmp/npm-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated sample server
+        run: |
+          npm run dev > /tmp/world-dev.log 2>&1 &
+          for i in $(seq 1 80); do curl -fsS "http://localhost:3000/world?source=sample&art=cinematic" >/dev/null && exit 0; sleep 3; done
+          cat /tmp/world-dev.log
+          exit 1
+      - run: xvfb-run -a node scripts/review-cinematic-world.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cinematic-world-review
+          path: world-art-evidence/
+          if-no-files-found: warn

@@ -1,0 +1,128 @@
+[
+  {
+    "original_name": "CAF1D483-06D7-47BF-8CF8-25A9E3E1B11D.jpeg",
+    "package_path": "references/approved/01_Recognition_Pearl_Target.jpeg",
+    "sha256": "bab28bd5685c75107139cdff8550f3beaa3656c32ad8e079ce3038d7b9832187",
+    "dimensions": [
+      864,
+      1536
+    ],
+    "role": "Latest user-supplied detailed pearl and whole-world visual target"
+  },
+  {
+    "original_name": "2E27109E-D927-4B89-9102-F6DA27184D89.jpeg",
+    "package_path": "references/approved/02_Arrival_Bloom_Target.jpeg",
+    "sha256": "b9b192afa95de8058e423491b72ad8ce34199d0002782164e89c1214e551f0ed",
+    "dimensions": [
+      864,
+      1536
+    ],
+    "role": "Latest user-supplied bloom entrance and world material target"
+  },
+  {
+    "original_name": "8147A452-5515-47D5-88F2-FD6DAAC2EF47.jpeg",
+    "package_path": "references/approved/03_Ribbon_Portal_Target.jpeg",
+    "sha256": "6850ff8fef1d26be2f9acf77268972c7207009c0b83b6cbf80e91aced79023db",
+    "dimensions": [
+      864,
+      1536
+    ],
+    "role": "Latest user-supplied silk portal and architecture target"
+  },
+  {
+    "original_name": "754AC039-748B-4A7A-9C34-75A4F73F7AE4.jpeg",
+    "package_path": "references/approved/04_Constellation_Gather_Target.jpeg",
+    "sha256": "fa7ac1554bd6b498a3296cc430b19f68f0cdd9c682bc79bb06620f1a636aa8f6",
+    "dimensions": [
+      864,
+      1536
+    ],
+    "role": "Latest user-supplied constellation and layered world target"
+  },
+  {
+    "original_name": "mother_s_love_expression_cosmos.png",
+    "package_path": "references/original_concept_renders/mother_s_love_expression_cosmos.png",
+    "sha256": "884779de224490722463f532768e577c93fed8cc198e8cf3b1c2989346e79459",
+    "role": "Earlier generated concept artwork, not a runtime screenshot or canonical data source"
+  },
+  {
+    "original_name": "arrival_bloom_mother_s_love.png",
+    "package_path": "references/original_concept_renders/arrival_bloom_mother_s_love.png",
+    "sha256": "ad95626e867f04ab26eeb184c3719b3f811c774ba7673bde64aaddddc76a723d",
+    "role": "Earlier generated concept artwork, not a runtime screenshot or canonical data source"
+  },
+  {
+    "original_name": "mother_s_love_sanctuary_arrival.png",
+    "package_path": "references/original_concept_renders/mother_s_love_sanctuary_arrival.png",
+    "sha256": "1f71f4b32c16b160218a36784186225e3a915fc13258d8b7d4ed3afbee70a278",
+    "role": "Earlier generated concept artwork, not a runtime screenshot or canonical data source"
+  },
+  {
+    "original_name": "pastel_constellation_of_mother_s_love.png",
+    "package_path": "references/original_concept_renders/pastel_constellation_of_mother_s_love.png",
+    "sha256": "60c6c83b6dfdca215153ab2ac30379f0dd02f5c9caea8da7ca02e2ee9aa2824e",
+    "role": "Earlier generated concept artwork, not a runtime screenshot or canonical data source"
+  },
+  {
+    "original_name": "imagegen.png",
+    "duplicate_of": "references/original_concept_renders/mother_s_love_expression_cosmos.png",
+    "sha256": "884779de224490722463f532768e577c93fed8cc198e8cf3b1c2989346e79459"
+  },
+  {
+    "original_name": "IMG_4627.jpeg",
+    "package_path": "references/baseline_redacted/redacted_IMG_4627.jpeg",
+    "role": "Earlier app composition screenshot; readable live recognition content or aggregate values redacted locally",
+    "redacted_regions": [
+      [
+        0,
+        440,
+        125,
+        644
+      ],
+      [
+        222,
+        570,
+        565,
+        812
+      ],
+      [
+        531,
+        443,
+        688,
+        573
+      ]
+    ]
+  },
+  {
+    "original_name": "IMG_4628.jpeg",
+    "package_path": "references/baseline_redacted/redacted_IMG_4628.jpeg",
+    "role": "Earlier app composition screenshot; readable live recognition content or aggregate values redacted locally",
+    "redacted_regions": [
+      [
+        221,
+        582,
+        508,
+        764
+      ]
+    ]
+  },
+  {
+    "original_name": "IMG_4629.jpeg",
+    "package_path": "references/baseline_redacted/redacted_IMG_4629.jpeg",
+    "role": "Earlier app composition screenshot; readable live recognition content or aggregate values redacted locally",
+    "redacted_regions": []
+  },
+  {
+    "original_name": "IMG_4630.jpeg",
+    "package_path": "references/baseline_redacted/redacted_IMG_4630.jpeg",
+    "role": "Earlier app composition screenshot; readable live recognition content or aggregate values redacted locally",
+    "redacted_regions": [
+      [
+        62,
+        670,
+        665,
+        1104
+      ]
+    ]
+  }
+]
