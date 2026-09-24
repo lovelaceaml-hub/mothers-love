@@ -1,0 +1,4 @@
+# 2026-09-18T19:18Z L0 gemini gate unmet, spill to sonnet
+
+What happened: L0 on Gemini 3.8 Flash (High) via agy ended at 19:15:57Z after about 50 seconds with no output: "a tool required the "command" permission that headless mode cannot prompt for, so it was auto-denied." Raw output kept at /Users/anthony/.claude/worktrees/mothers-love-tv17-critic/.tv17/agy.out. Same gate failure recorded in 2026-09-10-color-polish (LF, LC, LH).
+Ruling: gate unmet for L0. Spill chain (Gemini, then Sonnet 5, never Opus or Fable): Gemini 3.8 Flash (Medium) runs through the same gate, so it is skipped for the same reason, not tried. L0 runs as a Claude Sonnet 5 read-only helper with the same mandate; output to research/L0-critique.md. Not taken: --dangerously-skip-permissions (would broaden a permission without Anthony's say).

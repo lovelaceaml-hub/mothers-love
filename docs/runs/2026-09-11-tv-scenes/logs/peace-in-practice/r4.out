@@ -1,0 +1,36 @@
+The rotating 3D heart for Scene 9 Peace in Practice is built and verified.
+
+The flat image and card-spin CSS transform are replaced with a real three dimensional sculpted heart mesh rendered on a 780 by 726 backing store canvas. The heart geometry derives from the parametric heart curve, puffed into over 1000 quads with Lambert diffuse, Blinn specular highlight, Fresnel rim lighting, a contact shadow beneath, and 12 orbiting 3D glints.
+
+### What now works
+1. [peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js) builds the 3D heart mesh, projects it with perspective camera ($F = 3.2$), sorts visible quads by depth, and shades each quad across the shipped heart palette with no per-frame array allocations.
+2. [peace-in-practice.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css) sizes `#tv .scene[data-scene="9"] #heart-host canvas` and stops animations under `#tv.still`.
+3. [peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts) verifies the canvas exists with `role="img"`, confirms canvas frame changes between 2000 ms and 4000 ms, verifies three distinct luminance bands (shadow, base, highlight), and checks canvas presence in still mode.
+4. [peace-in-practice.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md) records the Round r4 result.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step
+Have the coordinator run the Playwright test suite and verification probe for the lane.
+
+## COMPLETION
+
+### Files changed
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md)
+
+### Top-level identifiers added
+- `PIP_HEART_N`
+- `PIP_HEART_M`
+- `PIP_HEART_TOTAL_VERTS`
+- `PIP_HEART_TOTAL_QUADS`
+- `PIP_HEART_MESH_DATA`
+- `PIP_HEART_SPARKS_DATA`
+- `PIP_HEART_ROT_BUFFERS`
+- `pipInitHeartMesh`
+- `pipInitHeartSparks`
+- `pipInitHeartBuffers`
+- `pipRenderHeartFrame`

@@ -1,0 +1,71 @@
+[chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different w
+[chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-desktop 
+[chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: home-phone 
+[chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-desktop 
+[chromium] › tests/color-polish/color-polish.spec.ts:15:6 › color-only geometry and contrast: submission-phone 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: daily-practice 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: everyday-peace 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: expressions 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: featured 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: garden 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: impact 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: one-kind-word 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: peace-promise 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: shared-expression 
+[chromium] › tests/color-polish/color-polish.spec.ts:28:41 › actual app TV color scene: spotlight 
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 1 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 10 ────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 11 ────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 2 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 3 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 4 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 5 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 6 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 7 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 8 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 9 ─────
+[chromium] › tests/color-polish/color-polish.spec.ts:44:5 › V6 celebration styles and motion are preserved 
+[chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 0 fix
+[chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 1 fix
+[chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 2 fix
+[chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the 20 fi
+[chromium] › tests/display/display.e2e.spec.ts:168:9 › Bubble Board display synthetic fixtures › renders the long 
+[chromium] › tests/display/display.e2e.spec.ts:178:7 › Bubble Board display synthetic fixtures › opens directly wi
+[chromium] › tests/display/display.e2e.spec.ts:193:7 › Bubble Board display synthetic fixtures › retries a tempora
+[chromium] › tests/display/display.e2e.spec.ts:213:7 › Bubble Board display synthetic fixtures › aborts a hung ini
+[chromium] › tests/display/display.e2e.spec.ts:252:7 › Bubble Board display synthetic fixtures › shows a concise s
+[chromium] › tests/display/display.e2e.spec.ts:278:7 › Bubble Board display synthetic fixtures › honors trail and 
+[chromium] › tests/display/display.e2e.spec.ts:288:7 › Bubble Board display synthetic fixtures › keeps garden bubb
+[chromium] › tests/display/display.e2e.spec.ts:343:7 › Bubble Board display synthetic fixtures › adds a newly poll
+[chromium] › tests/display/display.e2e.spec.ts:381:7 › Bubble Board display synthetic fixtures › keeps live rail e
+[chromium] › tests/display/display.e2e.spec.ts:397:7 › Bubble Board display synthetic fixtures › reads hearts for 
+[chromium] › tests/display/display.e2e.spec.ts:440:7 › Bubble Board display synthetic fixtures › keeps cluster con
+[chromium] › tests/display/display.e2e.spec.ts:487:7 › Bubble Board display synthetic fixtures › keeps all-nine ex
+[chromium] › tests/display/display.e2e.spec.ts:528:7 › Bubble Board display synthetic fixtures › removes the live 
+[chromium] › tests/display/display.e2e.spec.ts:537:7 › Bubble Board display synthetic fixtures › renders the quiet
+[chromium] › tests/display/display.e2e.spec.ts:543:7 › Bubble Board display synthetic fixtures › gives each rotati
+[chromium] › tests/display/display.e2e.spec.ts:568:7 › Bubble Board display synthetic fixtures › keeps the monthly
+[chromium] › tests/display/display.e2e.spec.ts:634:7 › Bubble Board display synthetic fixtures › uses a distinct c
+[chromium] › tests/display/display.e2e.spec.ts:649:7 › Bubble Board display synthetic fixtures › uses a distinct c
+[chromium] › tests/display/display.e2e.spec.ts:664:7 › Bubble Board display synthetic fixtures › keeps garden bubb
+[chromium] › tests/display/display.e2e.spec.ts:689:7 › Bubble Board display synthetic fixtures › paginates the ful
+[chromium] › tests/display/display.e2e.spec.ts:729:7 › Bubble Board display synthetic fixtures › paginates the ful
+[chromium] › tests/display/display.e2e.spec.ts:779:7 › Bubble Board display synthetic fixtures › bounds a legal de
+[chromium] › tests/interview/integration-browser.spec.ts:23:5 › rich Garden motion remains bounded at both TV sizes 
+[chromium] › tests/interview/integration-browser.spec.ts:49:5 › the actual Nine Expressions screen unfolds from a ra
+[chromium] › tests/interview/integration-browser.spec.ts:5:5 › full circle messages pan automatically and the owner 
+[chromium] › tests/interview/integration-browser.spec.ts:73:7 › impact plays its approved reveal sequence 
+[chromium] › tests/interview/integration-browser.spec.ts:73:7 › shared-expression plays its approved reveal sequence
+[chromium] › tests/interview/integration-browser.spec.ts:97:7 › daily-practice shows the timed teaching journey 
+[chromium] › tests/interview/integration-browser.spec.ts:97:7 › everyday-peace shows the timed teaching journey 
+[chromium] › tests/interview/integration-browser.spec.ts:97:7 › one-kind-word shows the timed teaching journey 
+[chromium] › tests/interview/integration-browser.spec.ts:97:7 › peace-promise shows the timed teaching journey 
+[chromium] › tests/interview/integration-browser.spec.ts:97:7 › spotlight shows the timed teaching journey 
+[chromium] › tests/interview/studio-browser.spec.ts:105:5 › studio renders real sample and approved previews and sav
+[chromium] › tests/interview/submission-experience.spec.ts:87:7 › interview completion submission experience › mak
+[chromium] › tests/mobile-recognition/mobile-recognition.spec.ts:110:5 › motion walkthrough and published receipt wi
+[chromium] › tests/plan08/tv-garden-verification.spec.ts:283:7 › Plan 08 central screen composition › maps a saved
+[chromium] › tests/plan08/tv-garden-verification.spec.ts:289:7 › Plan 08 central screen composition › labels the o
+[chromium] › tests/plan08/tv-garden-verification.spec.ts:70:7 › Plan 08 TV Garden synthetic browser coverage › kee
+[chromium] › tests/submission/plan08/submission-form-refresh.spec.ts:13:7 › Plan 08 submission garden › keeps nine
+[chromium] › tests/submission/submission.spec.ts:293:5 › has no automated accessibility violations on the expression

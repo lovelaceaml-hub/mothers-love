@@ -1,0 +1,31 @@
+Deleted branch tv/pick (was 22133ff).
+tv/pick recreated at 8fcb59f from tv/base
+merged tv/scene-welcome
+merged tv/scene-garden
+merged tv/scene-arrival
+merged tv/scene-featured
+merged tv/scene-calendar
+merged tv/scene-peacemakers
+merged tv/scene-status
+merged tv/scene-expressions
+merged tv/scene-peace-in-practice
+merged tv/scene-orbit
+merged tv/scene-milestone
+tv/pick head 463ce8d
+top-level declarations 248, duplicates 0
+typecheck exit 0
+lint exit 1
+   820:10  warning  Unused eslint-disable directive (no problems were reported from '@next/next/no-img-element')
+  1:1  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+✖ 18 problems (14 errors, 4 warnings)
+test exit 0
+build exit 0
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0
+probe PASS
+probe scenes [1, 2, 4, 5, 8, 6, 7, 9, 10, 11] issues []
+scenes+usable e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/featured.spec.ts:56:5 › bubbles stay circular during an exit 
+  2) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  2 failed
+  80 passed (3.1m)
+DONE

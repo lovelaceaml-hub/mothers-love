@@ -1,0 +1,34 @@
+Milestone correction r5 is ready for coordinator verification.
+
+The left-side copy block has been removed, the sculpture now begins at the left edge of the stage, the campaign and weekly goal rail is widened to 560 px with scaled typography, the tribute stream canvas is set to 1162 px width, and node orbit radii now span 170 to 380 px.
+
+### Changes completed
+
+1. In [`/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js), removed the `.progress-intro` column, updated the stream canvas to `width="1162" height="622"`, and widened the node radius formula to `170 + rng() * 210`.
+2. In [`/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css), scoped all rules to `#tv .scene[data-scene="11"]` to place `.progress-sculpture` at `left: 0`, `.progress-rail` at `left: 46px; width: 560px;`, `.stream-world` at `left: 650px;`, and scaled eyebrows, threshold, titles, progress tracks, medallion, and values to fill the rail without vertical or horizontal overflow.
+3. In [`/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts), added the 2000 ms acceptance test verifying `.progress-intro` does not exist, `.progress-rail` has no overflow (`scrollHeight <= clientHeight + 1` and `scrollWidth <= clientWidth + 1`), rail left edge within scene is under 60 px, and rail width is at least 540 px.
+4. In [`/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md), recorded the Round r5 summary in the Result section and updated the file manifests.
+
+### What works now
+- Milestone scene displays the sculpture spanning from the left edge across the full stage.
+- Rail typography is enlarged and legible on television screens while keeping the milestone and weekly goal metrics completely within the 553 px rail height.
+- Helix tribute stream scales crisply across the wider 1162 px stream world.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step
+1. Run coordinator verification (typecheck, lint, build, scene spec, probe) across worktree `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone`.
+
+### Questions
+1. Proceed with the coordinator verification run? (1 for Yes, 2 to inspect diffs first)
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`
+
+Top-level identifiers added:
+- none

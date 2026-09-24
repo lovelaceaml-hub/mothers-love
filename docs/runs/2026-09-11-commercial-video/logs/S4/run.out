@@ -1,0 +1,75 @@
+Running video assembly and self-checks in the foreground (rendering cards, encoding segments, mixing audio, and assembling commercial files).
+Running video assembly and self-checks in the foreground (rendering cards, encoding segments, mixing audio, and assembling commercial files).
+Running final verification of assemble.mjs (rendering cards, encoding segments, mixing audio, and assembling commercial files).
+Both campaign commercial video files (16:9 and 9:16) are rendered, encoded, and verified.
+
+### Verification outputs
+
+1. `npm_config_cache=/tmp/npm-cache node scripts/video/assemble.mjs`
+```text
+music: none
+1 title: start=0.000 speechStart=0.400 length=11.924
+2 why: start=11.424 speechStart=11.824 length=12.380
+3 nine-words: start=23.304 speechStart=23.704 length=11.924
+4 feed: start=34.728 speechStart=35.128 length=9.764
+5 share: start=43.992 speechStart=44.392 length=12.980
+6 tv: start=56.472 speechStart=56.872 length=11.012
+7 invite: start=66.984 speechStart=67.384 length=11.156
+QR OK
+ASSEMBLE OK
+```
+
+2. `/opt/homebrew/bin/ffprobe` stream and duration checks:
+```text
+=== docs/private/video/out/mothers-love-commercial-16x9.mp4 ===
+codec_name=h264
+width=1920
+height=1080
+r_frame_rate=30/1
+codec_name=aac
+r_frame_rate=0/0
+duration=78.080000
+
+=== docs/private/video/out/mothers-love-commercial-9x16.mp4 ===
+codec_name=h264
+width=1080
+height=1920
+r_frame_rate=30/1
+codec_name=aac
+r_frame_rate=0/0
+duration=78.080000
+```
+
+3. `grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/assemble.mjs scripts/video/cards.html`
+```text
+scripts/video/assemble.mjs:0
+scripts/video/cards.html:0
+```
+
+4. `git status --short`
+```text
+ M next-env.d.ts
+ M scripts/video/capture.mjs
+?? scripts/video/assemble.mjs
+?? scripts/video/cards.html
+```
+
+Limitations:
+No audio track was present at `/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/music/track.mp3`, so the script ran with narration only (`music: none`) per the work order instructions.
+
+## COMPLETION
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+
+Generated deliverables:
+- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json)
+
+What Anthony must do:
+Nothing, you are clear.
+
+Next step:
+Inspect the contact sheet preview at [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png) (takes 30 seconds).

@@ -1,0 +1,1 @@
+tests/color-polish-scenes/garden.spec.ts(58,78): error TS2339: Property 'id' does not exist on type 'never'.

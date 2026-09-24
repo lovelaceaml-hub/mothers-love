@@ -1,0 +1,21 @@
+{
+  "id": "dpl_28gaTx5ztnqhzxmuSnZfiiTHgQKv",
+  "name": "mothers-love",
+  "url": "mothers-love-o6rtntg3y-lvzion.vercel.app",
+  "created": 1790049008927,
+  "state": "READY",
+  "target": null,
+  "creator": {
+    "uid": "ELDrH1pTcyqZwrLCamtKfoLv",
+    "username": "lovelaceaml-hub"
+  },
+  "meta": {
+    "githubCommitRef": "feature/world-cinematic-art-pass",
+    "githubCommitSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+    "githubCommitMessage": "Refine sample world materials and pearl detail while preserving the wording layout",
+    "githubRepo": "mothers-love",
+    "githubOrg": "lovelaceaml-hub"
+  },
+  "inspectorUrl": "https://vercel.com/lvzion/mothers-love/28gaTx5ztnqhzxmuSnZfiiTHgQKv",
+  "isRollbackCandidate": false
+}

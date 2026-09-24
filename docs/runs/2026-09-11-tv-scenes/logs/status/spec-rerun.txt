@@ -1,0 +1,8 @@
+spec rerun exit 1
+  4 failed
+  1 passed (51.3s)
+  1) [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/status.spec.ts:98:5 › the nine medallions carry at least three motion vocabularies 
+  3) [chromium] › tests/color-polish-scenes/status.spec.ts:113:5 › icon transforms differ pairwise and follow different waveforms 
+  4) [chromium] › tests/color-polish-scenes/status.spec.ts:210:5 › the ambient sweep runs only when motion is allowed 
+DONE

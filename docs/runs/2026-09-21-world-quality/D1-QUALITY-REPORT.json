@@ -1,0 +1,373 @@
+{
+  "sourceSha": "80586a20b2aaee166bbd48d26ac8bd3f0c5daa29",
+  "origin": "http://127.0.0.1:32743",
+  "mode": "quality",
+  "sourceFiles": [
+    {
+      "file": "public/world-prototype/README.md",
+      "sha256": "1938cd7d9b250afc7c0b3626b24194285b350c16fb127a9a472ee406a62ecd50"
+    },
+    {
+      "file": "public/world-prototype/original-heart.glb",
+      "sha256": "6e8a43b05db30e56fe40ad78e7f83a5bdfc9012be9eaa27346e96f87ac4862c0"
+    },
+    {
+      "file": "src/app/display/world-preview/page.tsx",
+      "sha256": "d0a243efa2185d35f9db04195393f089fca0ac5162b1cc1257dd9d99afcdc963"
+    },
+    {
+      "file": "src/components/display/world/WorldContent.tsx",
+      "sha256": "e6fd4a4749ba61aaca5b83ddfaddcd8e6b7053af2f410d9f0883303cd1c767e2"
+    },
+    {
+      "file": "src/components/display/world/WorldExperience.module.css",
+      "sha256": "bc75916cb3d9d1602d4676f0b63539fe1543a2437bfc822d46cfd85806811512"
+    },
+    {
+      "file": "src/components/display/world/WorldExperience.tsx",
+      "sha256": "ff5b5293b2edb2fb767e4a9aad1822b8a7147fbb5f4b4cccc015b9b7cc246a0a"
+    },
+    {
+      "file": "src/components/display/world/arrival-director.ts",
+      "sha256": "3f2468aa7c3a21b0cd1c5a4245989b20c6b4fa52edf9e0c972748ec67daeb9f2"
+    },
+    {
+      "file": "src/components/display/world/camera-director.ts",
+      "sha256": "2fa30007d1f97b1069edb865f1c89306b4b39f344873ef5d8b5300c17402f546"
+    },
+    {
+      "file": "src/components/display/world/neighbor-dialogue.ts",
+      "sha256": "67528283ffdcaf7eb4ed1786c3f5457d744b680e8e36e4d1a2d44ef8e65aa423"
+    },
+    {
+      "file": "src/components/display/world/prototype/design-mode.ts",
+      "sha256": "c4472734e1d8652507d9efc68676bebf89339486ca847f1c28c6240bf60c31e3"
+    },
+    {
+      "file": "src/components/display/world/prototype/design-world.ts",
+      "sha256": "6cac8b2e54609bfc02f1327794b0e05218c5a214fe876d797ecc81e3a49fdc4f"
+    },
+    {
+      "file": "src/components/display/world/prototype/pearl-skin.ts",
+      "sha256": "9b8acabef8102c24ffc57f6be71d075d9111a76e231cf94c936d03ee752e3c5e"
+    },
+    {
+      "file": "src/components/display/world/prototype/study-geometry.ts",
+      "sha256": "6cd1533bb50ee3f5cd215a83dfdd346b60a6d529914aad06ec4edd202bf16d88"
+    },
+    {
+      "file": "src/components/display/world/prototype/study-lighting.ts",
+      "sha256": "fc22d4b594fb1bde0661b4594aa0395ee14b4f70b842d291ac2b27839cfba90a"
+    },
+    {
+      "file": "src/components/display/world/reading.ts",
+      "sha256": "88444767607bce007d0a5b1ef4e1edfedbf5a75e66e0282096aa42e194c17084"
+    },
+    {
+      "file": "src/components/display/world/recognition-director.ts",
+      "sha256": "488b2af9069a46d631ed42298085f0a5eb6e15459a67f30b1424ac161d54c169"
+    },
+    {
+      "file": "src/components/display/world/static-batch.ts",
+      "sha256": "768196ef421b46c6bd6b2e2cffbbf603255f44369fdbbec09ad5933d7f754ce5"
+    },
+    {
+      "file": "src/components/display/world/use-world-feed.ts",
+      "sha256": "e2ad82230533d36a6d51491baa9e230a6a4a6e59ba0a7d5782b3c9f0f1a12807"
+    },
+    {
+      "file": "src/components/display/world/world-cinematic-art.ts",
+      "sha256": "dbf048e392a906335b0125f6a7703635dc76a2cf9e454cdffa1d187dd6e502df"
+    },
+    {
+      "file": "src/components/display/world/world-data.ts",
+      "sha256": "c325964d70c9e34263c66621be690f75647c3d05f3df5070b3f709c92262f120"
+    },
+    {
+      "file": "src/components/display/world/world-districts.ts",
+      "sha256": "4082dd300fefb7df9e00ced9645f544f9f99c9feb37f18f6cb627fe988653c76"
+    },
+    {
+      "file": "src/components/display/world/world-engine.ts",
+      "sha256": "5338b5c88e27502206b53acaa2024b0df5d1b6e0df266266c405bcb0fee7616b"
+    },
+    {
+      "file": "src/components/display/world/world-feed.ts",
+      "sha256": "a98233e5fd45d660b80dd443185b72d4406aea6619cb4f229ab71dad32f67b6a"
+    },
+    {
+      "file": "src/components/display/world/world-neighbors.ts",
+      "sha256": "f8320dd7c36e5f9bca7ec6376fd2ebdf765d2255fa7f611bc6c9f53676f3487e"
+    },
+    {
+      "file": "src/components/display/world/world-recognitions.ts",
+      "sha256": "1fb35706b57ee75ab1d3de4849bab2cdf885701c7af0e8623e4459a809ccce27"
+    },
+    {
+      "file": "src/components/display/world/world-scene-legacy.ts",
+      "sha256": "4fa286c32d3c133112f90240ca5b6ef53eab74753129764ee0d2bb0407c192f9"
+    },
+    {
+      "file": "src/components/display/world/world-scene.ts",
+      "sha256": "a964c96a41b9d28bcd3805bf9c9507ed59c2e386235a959aedf9106c30349ce7"
+    }
+  ],
+  "browser": "145.0.7632.6",
+  "platform": "darwin",
+  "args": [
+    "--use-gl=angle",
+    "--use-angle=metal"
+  ],
+  "checks": [
+    {
+      "test": "design rendered with explicit sample content",
+      "passed": true,
+      "readyElapsedMs": 1564,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-design-review": "true",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "4",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "18.99",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-prototype-heart-ready": "true",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,7.324,18.650",
+        "data-world-bubble-screen": "0.183,0.304,0.992"
+      }
+    },
+    {
+      "test": "High tier actual 1920 by 1080 drawing buffer",
+      "passed": true,
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "cssWidth": 1920,
+        "cssHeight": 1080,
+        "dpr": 1
+      }
+    },
+    {
+      "test": "High tier actual 3840 by 2160 drawing buffer",
+      "passed": true,
+      "resolution": {
+        "width": 3840,
+        "height": 2160,
+        "cssWidth": 3840,
+        "cssHeight": 2160,
+        "dpr": 1
+      }
+    },
+    {
+      "test": "Low tier retains bounded drawing buffer at a 4K viewport",
+      "passed": true
+    },
+    {
+      "test": "Real animation timing with advancing app frames and clock",
+      "passed": true
+    },
+    {
+      "test": "No page errors, error console messages or API requests",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "consoleMessages": [],
+  "failedRequests": [],
+  "apiRequests": [],
+  "cameraSamples": [],
+  "limitations": [
+    "Design review only. P0 and physical device acceptance remain open.",
+    "All records are fictional. This is not a real-data test."
+  ],
+  "resolutions": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "cssWidth": 1920,
+      "cssHeight": 1080,
+      "dpr": 1
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "cssWidth": 3840,
+      "cssHeight": 2160,
+      "dpr": 1
+    }
+  ],
+  "motionBefore": {
+    "data-testid": "world-preview",
+    "data-design-review": "true",
+    "data-zone": "garden",
+    "data-traveling": "false",
+    "data-ready": "true",
+    "data-frames": "10",
+    "data-elapsed": "0.00",
+    "data-reading-remaining": "18.95",
+    "data-world-bubbles": "14",
+    "data-arrival-in-world": "false",
+    "data-world-textures": "14",
+    "data-motion": "tour",
+    "data-source": "sample",
+    "data-feed-phase": "sample",
+    "data-arrival": "idle",
+    "data-prototype-heart-ready": "true",
+    "data-camera-position": "41.000,11.000,40.000",
+    "data-world-bubble-position": "31.194,7.324,18.650",
+    "data-world-bubble-screen": "0.183,0.304,0.992"
+  },
+  "animationFrameTimes": [
+    8.099999999999909,
+    8.5,
+    8.299999999999727,
+    8.100000000000364,
+    8.399999999999636,
+    8.600000000000364,
+    8.299999999999727,
+    8.200000000000273,
+    8.299999999999727,
+    7.700000000000273,
+    9.199999999999818,
+    8.199999999999818,
+    8.400000000000091,
+    8.300000000000182,
+    8.299999999999727,
+    8.400000000000091,
+    8.300000000000182,
+    8.400000000000091,
+    8.299999999999727,
+    7.700000000000273,
+    9,
+    8.299999999999727,
+    8.300000000000182,
+    7.5,
+    8.400000000000091,
+    8.699999999999818,
+    8.800000000000182,
+    8.299999999999727,
+    8.300000000000182,
+    8.299999999999727,
+    8.400000000000091,
+    7.5,
+    9.300000000000182,
+    7.799999999999727,
+    8.300000000000182,
+    8.699999999999818,
+    8.400000000000091,
+    7.900000000000091,
+    7.800000000000182,
+    9.299999999999727,
+    8.200000000000273,
+    8.5,
+    8.199999999999818,
+    8.400000000000091,
+    8.099999999999909,
+    8.599999999999909,
+    7.800000000000182,
+    8,
+    8.400000000000091,
+    8.299999999999727,
+    9.099999999999909,
+    8.400000000000091,
+    8.300000000000182,
+    8.400000000000091,
+    8.299999999999727,
+    8.099999999999909,
+    8.5,
+    8.200000000000273,
+    8.5,
+    8,
+    8.699999999999818,
+    7.400000000000091,
+    9.199999999999818,
+    7.5,
+    8.400000000000091,
+    8.800000000000182,
+    7.900000000000091,
+    9.199999999999818,
+    8.199999999999818,
+    7.5,
+    8.300000000000182,
+    9.300000000000182,
+    7.699999999999818,
+    8.599999999999909,
+    8.599999999999909,
+    7.600000000000364,
+    9.199999999999818,
+    7.399999999999636,
+    9.200000000000728,
+    8.299999999999272,
+    8.300000000000182,
+    8.400000000000546,
+    7.5,
+    9.099999999999454,
+    8.400000000000546,
+    8.299999999999272,
+    7.900000000000546,
+    8.800000000000182,
+    8.099999999999454,
+    7.900000000000546,
+    9.099999999999454,
+    7.300000000000182,
+    8.899999999999636,
+    7.900000000000546,
+    8.899999999999636,
+    8.199999999999818,
+    8.200000000000728,
+    8.799999999999272,
+    8.400000000000546,
+    7.5,
+    9.199999999999818,
+    8.199999999999818,
+    8.400000000000546,
+    8.299999999999272,
+    8,
+    8.800000000000182,
+    8.300000000000182,
+    8.199999999999818,
+    7.699999999999818,
+    8.200000000000728,
+    9.199999999999818,
+    8.300000000000182,
+    8.299999999999272,
+    7.900000000000546,
+    8,
+    9.199999999999818,
+    7.300000000000182,
+    9.300000000000182,
+    7.5,
+    9.099999999999454
+  ],
+  "motionAfter": {
+    "data-testid": "world-preview",
+    "data-design-review": "true",
+    "data-zone": "garden",
+    "data-traveling": "false",
+    "data-ready": "true",
+    "data-frames": "26",
+    "data-elapsed": "0.13",
+    "data-reading-remaining": "18.83",
+    "data-world-bubbles": "14",
+    "data-arrival-in-world": "false",
+    "data-world-textures": "14",
+    "data-motion": "tour",
+    "data-source": "sample",
+    "data-feed-phase": "sample",
+    "data-arrival": "idle",
+    "data-prototype-heart-ready": "true",
+    "data-camera-position": "40.473,11.085,40.206",
+    "data-world-bubble-position": "31.200,7.324,18.646",
+    "data-world-bubble-screen": "0.189,0.303,0.992"
+  },
+  "renderingDetails": "Renderer\nWebGL 2\nFrame rate\n20 fps\nQuality\nHigh\nDraw calls\n434\nTriangles\n3,410,844"
+}

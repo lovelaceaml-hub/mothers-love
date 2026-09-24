@@ -1,0 +1,22 @@
+Recognition Calendar animations and fx canvas are implemented and verified for round r2.
+
+The scene now features a continuous ripple wave across past and today cells with scaled counts, a breathing ring and rotating conic halo on today, a staggered glow walking down expression rows, and a dedicated canvas generating ascending sparkles from active days and diagonal light sweeps across the month panel. All animations respect still mode and reduced motion, and day selection remains idempotent.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step
+Review the living calendar in the Studio preview at [/admin/display](https://mothers-love.vercel.app/admin/display).
+
+## COMPLETION
+
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)
+
+Top-level identifiers added:
+- `CALENDAR_SPARKLE_COLORS`
+- `calendarCacheCells`
+- `calendarTick`

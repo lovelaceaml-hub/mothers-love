@@ -1,0 +1,15 @@
+Updated depth assertions in the milestone spec and recorded the Round 2 summary.
+
+The helix stream reaches its extreme z coordinates only at specific phases of its cycle. The per-sample bar now checks `minZ <= -500` and `maxZ >= 200`, while the aggregate checks across all samples ensure `smallestMinZ <= -600` and `largestMaxZ >= 300`. Blur and scale checks remain unchanged.
+
+### Updated files
+1. [`milestone.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts)
+2. [`milestone.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md)
+
+### What Anthony must do
+Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`

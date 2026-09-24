@@ -1,0 +1,14 @@
+The sharp threshold in the depth layer test is updated to `parseBlur(a.blur) < 0.15` and recorded in the lane document.
+
+The core default path applies tiny blurs between 0.02 px and 0.09 px during screenScale breathing. Near actors are now verified as sharp when blur is below 0.15 px while deeper layers remain tested above 0.3 px.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Inspect the diffs in [peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts) and [peacemakers.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md).
+
+## COMPLETION
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)

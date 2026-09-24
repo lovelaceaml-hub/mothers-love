@@ -1,0 +1,23 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+scene syntax ok
+scoped rules: 1
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  10 failed
+  4 passed (1.7m)
+  1) [chromium] › tests/color-polish-scenes/garden.spec.ts:10:5 › garden renders circular bubbles and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/garden.spec.ts:25:5 › the garden fills over a minute with one replacement at a time 
+  3) [chromium] › tests/color-polish-scenes/garden.spec.ts:71:5 › petals are carried, not dropped ──
+  4) [chromium] › tests/color-polish-scenes/garden.spec.ts:109:5 › bubbles span two depth layers ───
+  5) [chromium] › tests/color-polish-scenes/garden.spec.ts:133:5 › bubbles stay circular through sprout, swell and burst 
+  6) [chromium] › tests/color-polish-scenes/garden.spec.ts:142:5 › reduced motion renders the garden still 
+  7) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  8) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+DONE

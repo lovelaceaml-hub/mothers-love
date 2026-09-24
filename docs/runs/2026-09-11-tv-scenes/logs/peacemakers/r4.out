@@ -1,0 +1,28 @@
+We Are Peacemakers now presents six recognitions with staggered retirement, globe floating motion with light sweep, kindness threads and traveling light beads, departure petals, and thread-hit ring glow.
+
+The scene layout selects up to six non-overlapping bubbles right of the globe while preserving the single large reader fallback when any message exceeds standard size. A new canvas draw hook renders breathing halos around the globe, curved kindness threads to active bubbles, and traveling light sparks that illuminate bubble rim rings on arrival.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Open [/admin/display](https://mothers-love.vercel.app/admin/display) in your browser, switch the preview selector to We Are Peacemakers, and inspect the six bubbles, threads, and globe float.
+
+1. Would you like to review the next scene in Plan 13, or run the full test suite?
+
+## COMPLETION
+
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)
+
+Top-level identifiers added:
+- `PEACEMAKERS_POSITIONS`
+- `PEACEMAKERS_PETAL_COLORS`
+- `PEACEMAKERS_BEADS`
+- `peacemakersBubbles`
+- `peacemakersEmitPetals`
+- `peacemakersBezier`
+- `peacemakersDraw`

@@ -1,0 +1,22 @@
+All five corrections for Round r5 are implemented across the allowlisted files.
+
+The heart luminance test now evaluates the full canvas rather than a fixed central crop, eliminating phase sensitivity at arbitrary checkpoints. Quad fill strings are precomputed into a 2,048-entry cached color table so runtime frames execute only bitwise integer indexing and direct array lookups, unused vertex rotation arrays were removed, spark sizes span 1.5 to 3 px, and the burst test advances in 2 s increments.
+
+### What now works
+1. Full-canvas luminance shading test in [tests/color-polish-scenes/peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts) checks that shadow, base, and highlight each exceed 200 px, and verifies at least 40% non-highlight pixels.
+2. Cached color table with 32 intensity buckets, 8 rim levels, and 8 specular levels avoids runtime string allocations in [public/color-polish/scenes/peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js).
+3. Vertex loop in [public/color-polish/scenes/peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js) computes projected coordinates without storing unused rotated vertices.
+4. Spark sizes vary from 1.5 to 3 px (`1.5 + (i % 4) * 0.5`).
+5. Bubble burst Playwright test samples every 2,000 ms over the 60 s window and verifies particle expiration three samples (6 s) after initial burst.
+6. Lane record updated with the Round r5 entry in [docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md).
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next step (2-minute action)
+Review the diff in your git client or trigger the coordinator test suite to verify the landing review closure.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js
+- /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts
+- /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md

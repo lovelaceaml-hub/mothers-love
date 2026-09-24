@@ -1,0 +1,11 @@
+
+Running 6 tests using 5 workers
+
+  ✓  2 [chromium] › tests/color-polish-scenes/garden.spec.ts:164:5 › petals are carried, not dropped (1.8s)
+  ✓  6 [chromium] › tests/color-polish-scenes/garden.spec.ts:233:5 › reduced motion renders the garden still (7.5s)
+  ✓  5 [chromium] › tests/color-polish-scenes/garden.spec.ts:196:5 › bubbles span two depth layers (9.4s)
+  ✓  1 [chromium] › tests/color-polish-scenes/garden.spec.ts:31:5 › the garden fills over a minute with one replacement at a time (10.9s)
+  ✓  4 [chromium] › tests/color-polish-scenes/garden.spec.ts:15:5 › garden renders circular bubbles and no overflow at 14 s (11.6s)
+  ✓  3 [chromium] › tests/color-polish-scenes/garden.spec.ts:224:5 › bubbles stay circular through sprout, swell and burst (14.8s)
+
+  6 passed (16.9s)

@@ -19,15 +19,15 @@ Environment: local Next.js dev server at `127.0.0.1:3102`, Chromium headless, sy
 
 | Screen | Size | Evidence |
 |---|---:|---|
-| Open form | 390 x 844 | [submission-open-phone-390x844.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/submission-open-phone-390x844.png) |
-| Open form | 1440 x 1000 | [submission-open-desktop-1440x1000.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/submission-open-desktop-1440x1000.png) |
-| Public preview | 390 x 844 | [submission-preview-phone-390x844.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/submission-preview-phone-390x844.png) |
-| Published receipt | 390 x 844 | [submission-receipt-phone-390x844.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/submission-receipt-phone-390x844.png) |
+| Open form | 390 x 844 | [submission-open-phone-390x844.png](submission-open-phone-390x844.png) |
+| Open form | 1440 x 1000 | [submission-open-desktop-1440x1000.png](submission-open-desktop-1440x1000.png) |
+| Public preview | 390 x 844 | [submission-preview-phone-390x844.png](submission-preview-phone-390x844.png) |
+| Published receipt | 390 x 844 | [submission-receipt-phone-390x844.png](submission-receipt-phone-390x844.png) |
 
 The immutable prototype was also captured at both reference sizes for direct comparison:
 
-- [prototype-reference-phone-390x844.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/prototype-reference-phone-390x844.png)
-- [prototype-reference-desktop-1440x1000.png](/Users/anthony/Projects/mothers-love-worktrees/submission/docs/runs/2026-09-08-full-app/research/submission-evidence/prototype-reference-desktop-1440x1000.png)
+- [prototype-reference-phone-390x844.png](prototype-reference-phone-390x844.png)
+- [prototype-reference-desktop-1440x1000.png](prototype-reference-desktop-1440x1000.png)
 
 ## Visual comparison
 
@@ -41,7 +41,7 @@ The following visible differences are intentional contract corrections or access
 
 ## Privacy copy verification
 
-[privacy/page.tsx](/Users/anthony/Projects/mothers-love-worktrees/submission/src/app/privacy/page.tsx) now states:
+[privacy/page.tsx](../../../../../src/app/privacy/page.tsx) now states:
 
 - Active recognition content, including submitted names and messages, expires after seven days, or 168 hours from submission.
 - The original lifetime does not extend through edit, feature, restore, or hide actions.

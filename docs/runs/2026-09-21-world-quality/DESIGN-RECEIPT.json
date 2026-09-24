@@ -1,0 +1,53 @@
+{
+  "sourceSha": "9dc7e455047f7eebb8ebfcc1affd125f3b591d3c",
+  "deploymentId": "dpl_DiFAMWTTBngRib5RXTSxVG6fbCg9",
+  "hostname": "mothers-love-4dyumji0r-lvzion.vercel.app",
+  "state": "READY",
+  "target": null,
+  "branch": "feature/world-cinematic-art-pass",
+  "previewUrl": "https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design",
+  "classicUrl": "https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=classic",
+  "cinematicUrl": "https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=cinematic",
+  "video": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/connected-tour.mp4",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "width": 1440,
+        "height": 900,
+        "r_frame_rate": "25/1"
+      }
+    ],
+    "format": {
+      "duration": "69.200000",
+      "size": "26906865"
+    }
+  },
+  "checks": {
+    "stills": 23,
+    "tour": 3,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "failedRequests": 0,
+    "apiRequests": 0
+  },
+  "ci": {
+    "observedFailedRun": "https://github.com/lovelaceaml-hub/mothers-love/actions/runs/35666544249",
+    "status": "P0 remains open; no CI fix claimed."
+  },
+  "review": "Author visual inspection only; no independent model review ran.",
+  "unitTests": {
+    "passed": 47,
+    "failed": 0,
+    "includes": "7 URL-boundary cases and 40 existing world tests"
+  },
+  "optimizedBuild": "passed, including TypeScript",
+  "hostedInspection": {
+    "method": "CUA accessibility state, screenshot and console logs",
+    "url": "https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design",
+    "observed": "Rendered sample world, enabled arrival controls, canonical expressions and automatic camera tour.",
+    "consoleErrors": [],
+    "controlNote": "Two earlier Playwright DOM reads timed out before inspection; the documented accessibility/screenshot path succeeded."
+  }
+}

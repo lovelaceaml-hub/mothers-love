@@ -1,0 +1,16 @@
+w1920 ms0 exit 0
+w1920 ms6000 exit 0
+w1920 ms14000 exit 0
+w3840 ms0 exit 0
+w3840 ms6000 exit 0
+w3840 ms14000 exit 0
+arrivals exit 0
+DONE
+w1920 ms0 exit 0
+w1920 ms6000 exit 0
+w1920 ms14000 exit 0
+w3840 ms0 exit 0
+w3840 ms6000 exit 0
+w3840 ms14000 exit 0
+arrivals exit 0
+DONE
