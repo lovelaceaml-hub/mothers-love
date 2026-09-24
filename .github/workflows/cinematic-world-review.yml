@@ -4,6 +4,7 @@ on:
     paths:
       - 'src/components/display/world/world-cinematic-art.ts'
       - 'src/components/display/world/world-scene.ts'
+      - 'src/components/display/world/prototype/design-mode.ts'
       - 'scripts/review-cinematic-world.mjs'
       - '.github/workflows/cinematic-world-review.yml'
 permissions:
@@ -29,7 +30,7 @@ jobs:
       - name: Start isolated sample server
         run: |
           npm run dev > /tmp/world-dev.log 2>&1 &
-          for i in $(seq 1 80); do curl -fsS http://localhost:3000/display/world-preview?source=sample >/dev/null && exit 0; sleep 3; done
+          for i in $(seq 1 80); do curl -fsS "http://localhost:3000/world?source=sample&art=cinematic" >/dev/null && exit 0; sleep 3; done
           cat /tmp/world-dev.log
           exit 1
       - run: xvfb-run -a node scripts/review-cinematic-world.mjs

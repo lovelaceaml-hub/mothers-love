@@ -153,3 +153,71 @@ describe("recognition objects in the environment", () => {
     expect(bubbles.hitTargets).toHaveLength(0);
   });
 });
+
+/**
+ * Plan 28 Section 5: the design look is now the default for live recognitions, so its pearl
+ * skins and the TV page's main and flowing bubbles must clear as immediately as the classic
+ * faces do. Every privacy state (quiet, neutral, disabled, expired, stale, a source switch)
+ * reaches the bubbles as an empty record list (`world-engine.ts` `setFeed`).
+ */
+describe("design look clears every pearl and skin on the privacy path", () => {
+  function designSetup(search: string) {
+    // A canvas that accepts every drawing call, since the study skin paints far more than the classic face.
+    const gradient = { addColorStop() {} };
+    const context: Record<string | symbol, unknown> = new Proxy({}, {
+      get(target: Record<string | symbol, unknown>, key) {
+        if (key in target) return target[key];
+        if (key === "measureText") return (text: string) => ({ width: [...text].length * 25, actualBoundingBoxAscent: 20, actualBoundingBoxDescent: 6 });
+        if (key === "getImageData") return (_x: number, _y: number, w: number, h: number) => ({ data: new Uint8ClampedArray(Math.max(1, w * h * 4)), width: w, height: h });
+        if (typeof key === "string" && key.startsWith("create")) return () => gradient;
+        return () => undefined;
+      },
+      set(target: Record<string | symbol, unknown>, key, value) { target[key] = value; return true; },
+    });
+    vi.stubGlobal("document", {
+      createElement: () => ({ width: 0, height: 0, style: {}, getContext: () => context }),
+      // The skin's medallion icons load as images; in Node they simply never arrive.
+      createElementNS: () => ({ style: {}, addEventListener() {}, removeEventListener() {} }),
+    });
+    vi.stubGlobal("window", { location: { search } });
+    const scene = new Scene();
+    const bubbles = new WorldRecognitionBubbles(scene);
+    const camera = new PerspectiveCamera(43, 16 / 9, 0.1, 450);
+    camera.position.fromArray(ZONES[0].eye);
+    camera.lookAt(new Vector3(...ZONES[0].target));
+    camera.updateMatrixWorld();
+    const records = sampleWorldFeed().records;
+    const arrival: ArrivalState = { phase: "idle", id: null, age: 0, progress: 0, waveIndex: 0, waveSize: 0 };
+    const input = {
+      time: 0, camera, zone: "garden" as const, selectedId: records[0].id, readingAge: 0, arrival,
+      minimum: 20, expressionId: 1, still: true, sparkles: true, trails: true,
+      tvLoop: () => 0, tvArrivals: () => 0, destination: "garden" as const, paused: false,
+      hold: () => 12,
+    };
+    return { scene, bubbles, records, input };
+  }
+  it.each([
+    ["the TV page, the /world default", ""],
+    ["the explorer", "?view=explore"],
+  ])("%s shows live-shaped records, then clears them", (_label, search) => {
+    const { scene, bubbles, records, input } = designSetup(search);
+    bubbles.setRecords(records, false);
+    for (let step = 0; step < 4; step++) bubbles.update({ ...input, time: step * 0.5 });
+    expect(bubbles.inspect().count).toBeGreaterThan(0);
+    const targets = [...bubbles.hitTargets];
+    bubbles.setRecords([], false);
+    bubbles.update({ ...input, time: 3 });
+    const after = bubbles.inspect();
+    expect(after.count).toBe(0);
+    expect(after.textures).toBe(0);
+    expect(after.focused).toBeUndefined();
+    expect(targets.every((face) => !face.visible && !face.userData.recognitionId)).toBe(true);
+    // No object anywhere in the scene still names a recognition once the list is empty.
+    const named: string[] = [];
+    scene.traverse((object) => {
+      if (object.visible && object.userData.recognitionId) named.push(object.name || object.type);
+    });
+    expect(named).toEqual([]);
+    bubbles.dispose();
+  });
+});

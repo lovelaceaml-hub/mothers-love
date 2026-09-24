@@ -21,6 +21,7 @@ import {
   isWorldDesignStudy,
   studyArrival,
   studyKit,
+  studyReviewFeed,
   type StudyArrival,
 } from "./prototype/design-mode";
 
@@ -49,14 +50,18 @@ const INITIAL: WorldStatus = {
 };
 export function WorldExperience({
   initialSource = "live",
+  design = false,
   designReview = false,
   initialStudyArrival,
   tvPage = false,
 }: {
   initialSource?: WorldSource;
+  /** The design look, the default at `/world` for live and sample (Plan 28 Section 5). */
+  design?: boolean;
+  /** The design review: the design look's explorer on fictional sample content only. */
   designReview?: boolean;
   initialStudyArrival?: string;
-  /** The TV page (`?view=tv`, design study only): screen text, ticker, speed 2, no settings. */
+  /** The TV page, the design look's default view: screen text, ticker, speed 2, no settings. */
   tvPage?: boolean;
 }) {
   const [arrivalStudy, setArrivalStudy] = useState<StudyArrival>(studyArrival(initialStudyArrival));
@@ -74,8 +79,9 @@ export function WorldExperience({
     [reduced, setReduced] = useState(false),
     [still, setStill] = useState(false),
     [speed, setSpeed] = useState(tvPage ? TV_TOUR_SPEED : 1),
-    // The TV page starts on Automatic, so a TV browser that cannot keep up steps down (K5).
-    [quality, setQuality] = useState<Quality>(designReview && !tvPage ? "high" : "auto");
+    // Every view starts on Automatic, so a TV browser that cannot keep up steps down (K5);
+    // High and Low stay in Settings (Plan 28 Section 5).
+    [quality, setQuality] = useState<Quality>("auto");
   const [source, setSource] = useState<WorldSource>(initialSource),
     [panel, setPanel] = useState<"settings" | "map" | "recognitions" | null>(
       null,
@@ -87,9 +93,8 @@ export function WorldExperience({
     [filter, setFilter] = useState(0),
     [selectedFallback, setSelectedFallback] = useState<string | null>(null);
   const rawFeed = useWorldFeed(source);
-  const feed = useMemo(() => designReview && rawFeed.phase === "sample"
-    ? { ...rawFeed, records: rawFeed.records.map((record, index) => index === 0 ? { ...record, expressionIds: [2, 7, 8] } : record) }
-    : rawFeed, [designReview, rawFeed]);
+  // Sample content on the design review only; a live feed is never rewritten.
+  const feed = useMemo(() => studyReviewFeed(rawFeed, designReview), [designReview, rawFeed]);
   const feedRef = useRef(feed);
   useEffect(() => {
     if (designReview && initialStudyArrival && ready && feed.phase === "sample" && !launchedStudy.current) {
@@ -328,7 +333,9 @@ export function WorldExperience({
       ref={root}
       className={`${styles.world} ${arriving ? styles.arriving : ""}`}
       data-testid="world-preview"
+      data-design={design || undefined}
       data-design-review={designReview || undefined}
+      data-quality={quality}
       data-prototype-heart-ready={status.prototypeHeartReady}
       data-zone={status.zone}
       data-traveling={status.traveling}
@@ -346,6 +353,7 @@ export function WorldExperience({
       data-world-bubble-screen={status.worldBubbles?.focused?.screen
         .map((value) => value.toFixed(3))
         .join(",")}
+      data-world-bubble-radius={status.worldBubbles?.focused?.radius.toFixed(3)}
       data-arrival-in-world={status.worldBubbles?.arrivalInWorld ?? false}
       data-world-textures={status.worldBubbles?.textures ?? 0}
       data-motion={paused || reduced || still || ownerStill ? "still" : "tour"}
@@ -362,7 +370,7 @@ export function WorldExperience({
             without them the study keeps its miniature figures. In the Grove they speak the
             expression the panel shows, as their card does. Classic and cinematic keep the
             rule their own procedural cards follow. */}
-        {designReview
+        {design
           ? status.kitNeighbors
             ? (neighborDialogue(status.elapsed, status.zone, arriving, expressionId) ??
               "They greet, walk together and share a heart.")
@@ -374,7 +382,7 @@ export function WorldExperience({
         key={retry}
         ref={canvas}
         className={styles.canvas}
-        aria-label={designReview && !status.kitNeighbors ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
+        aria-label={design && !status.kitNeighbors ? "A continuous three-dimensional heavenly world celebrating Mother's Love, with miniature fictional figures" : "A continuous three-dimensional heavenly world celebrating Mother's Love, with animated fictional neighbors exchanging words of kindness"}
         role="img"
         aria-describedby={`${neighborDescriptionId} ${recognitionDescriptionId}`}
         hidden={fallback}
@@ -423,7 +431,7 @@ export function WorldExperience({
         <div className={styles.preview}>
           <span className={styles.statusDot} />
           {sourceLabel}
-          <span>{designReview ? "Visual study 02 · For your review" : "A heavenly journey · Preview"}</span>
+          <span>{designReview ? "Visual study 02 · For your review" : design ? "A heavenly journey" : "A heavenly journey · Preview"}</span>
         </div>
       </header>}
       {designReview && !tvPage && !immersive && (
@@ -604,7 +612,7 @@ export function WorldExperience({
           {arrivalRecord && <RecognitionText record={arrivalRecord} />}
         </section>
       )}
-      {safe && arriving && !immersive && !designReview && (
+      {safe && arriving && !immersive && !design && (
         <p className={styles.worldArrivalCue}>{arrivalCue}</p>
       )}
       {!tvPage && <footer className={styles.footer}>
@@ -705,7 +713,7 @@ export function WorldExperience({
                 }}
               >
                 <option value="auto">Automatic</option>
-                <option value="high">{designReview ? "High definition (up to 4K)" : "High"}</option>
+                <option value="high">{design ? "High definition (up to 4K)" : "High"}</option>
                 <option value="low">Low</option>
               </select>
             </label>
@@ -771,7 +779,7 @@ export function WorldExperience({
                   <dt>Triangles</dt>
                   <dd>{status.triangles.toLocaleString()}</dd>
                 </div>
-                {designReview && (
+                {design && (
                   <>
                     <div>
                       <dt>Textures</dt>

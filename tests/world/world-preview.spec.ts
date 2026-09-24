@@ -8,13 +8,16 @@ test.use({
     args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
   },
 });
-const path = "/display/world-preview";
+// These journeys were written for the cinematic world, which was the preview's default. Since
+// Plan 28 Section 5 the world lives at `/world` with the design look as its default, so they
+// ask for the cinematic look explicitly and keep testing what they always tested.
+const path = "/world";
 const canvas = (page: Page) =>
   page.locator('canvas[aria-label^="A continuous"]');
 async function open(page: Page, live = false) {
   if (process.env.WORLD_PREVIEW_ACCESS)
     await page.goto(`${process.env.WORLD_PREVIEW_ACCESS}&source=sample`);
-  await page.goto(path + (live ? "?source=live" : "?source=sample"));
+  await page.goto(path + (live ? "?source=live&art=cinematic" : "?source=sample&art=cinematic"));
   await expect(page.getByTestId("world-preview")).toHaveAttribute(
     "data-ready",
     "true",

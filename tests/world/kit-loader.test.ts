@@ -303,10 +303,10 @@ describe("kit gate", () => {
     expect(studyKit(search)).toBe(expected);
   });
 
-  it("never loads outside the fictional study or under kit=off", async () => {
+  it("never loads for the classic and cinematic fallbacks or under kit=off", async () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
-    for (const search of ["?art=design&source=sample&kit=off", "?art=classic&source=sample", "?art=design&source=live", "?source=sample"]) {
+    for (const search of ["?art=design&source=sample&kit=off", "?kit=off", "?art=classic&source=sample", "?art=cinematic", "?art=classic&source=live"]) {
       vi.stubGlobal("window", { location: { search } });
       expect(await loadStudyKit(), search).toBeUndefined();
     }
@@ -320,6 +320,17 @@ describe("kit gate", () => {
     vi.spyOn(console, "warn").mockImplementation(() => undefined);
     expect(await loadStudyKit({ timeoutMs: 2000 })).toBeUndefined();
     expect(fetch.mock.calls.map(call => String(call[0]))).toContain("/world-kit/v1/manifest.json");
+  });
+
+  it("dresses the design look with live recognitions too, the default at /world (Plan 28 Section 5)", async () => {
+    for (const search of ["", "?source=live", "?art=design&source=live&view=explore"]) {
+      const fetch = vi.fn(async (input: RequestInfo | URL) => { void input; return new Response("missing", { status: 404 }); });
+      vi.stubGlobal("fetch", fetch);
+      vi.stubGlobal("window", { location: { search } });
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
+      expect(await loadStudyKit({ timeoutMs: 2000 }), search).toBeUndefined();
+      expect(fetch.mock.calls.map(call => String(call[0])), search).toContain("/world-kit/v1/manifest.json");
+    }
   });
 
   it("corridor islets exist only when the kit can place them, so a kit without the island leaves the procedural world unchanged", () => {

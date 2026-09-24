@@ -1,24 +1,21 @@
 import type { Recognition } from "@/lib/contracts";
 import { TOUR_ORDER, type ZoneId } from "../world-data";
-import { isWorldDesignStudy } from "./design-mode";
+import { worldView } from "./design-mode";
 
 /*
  * The world page for the church TV (PLAN-01 Section 5), built on the design study.
  *
- * Opt in with `?view=tv` next to `art=design&source=sample`. Without it the design study is
- * exactly what it was, so its review harness, its captures and `?art=classic` / cinematic
- * never see any of this. Everything here is pure, so the rules are provable in plain Node.
+ * Since Plan 28 Section 5 it is the default at `/world` for live and sample content alike
+ * (it was opt in with `?view=tv` on the fictional sample only). `?view=explore` opens the
+ * design study's explorer exactly as it was, so its review harness and captures, and
+ * `?art=classic` / cinematic, never see any of this. Everything here is pure, so the rules
+ * are provable in plain Node.
  */
 
-/** Pure when a search string is supplied. True only inside the design study gate. */
+/** Pure when a search string is supplied. The design look, unless `?view=explore`. Never on a server. */
 export function studyTvPage(search?: string) {
-  const source = search ?? (typeof window === "undefined" ? "" : window.location.search);
-  if (search === undefined && !isWorldDesignStudy()) return false;
-  const query = new URLSearchParams(source);
-  if (search !== undefined && !(query.getAll("art").length === 1 && query.get("art") === "design"
-    && query.getAll("source").length === 1 && query.get("source") === "sample")) return false;
-  // Exactly one `view`, as the server side gate in the page reads it.
-  return query.getAll("view").length === 1 && query.get("view") === "tv";
+  if (search === undefined && typeof window === "undefined") return false;
+  return worldView(search) === "tv";
 }
 
 /**

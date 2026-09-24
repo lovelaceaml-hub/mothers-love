@@ -40,13 +40,19 @@ const everyShown = (plan: ReturnType<typeof planWorldBubbles>) =>
   [...plan.places.values()].flatMap((place) => [...place.big, ...place.small]);
 
 describe("TV page gate", () => {
-  it("is on only with view=tv inside the design study", () => {
+  it("is the design look's default view at /world, live and sample, unless view=explore (Plan 28 Section 5)", () => {
+    expect(studyTvPage("")).toBe(true);
+    expect(studyTvPage("?source=sample")).toBe(true);
     expect(studyTvPage("?art=design&source=sample&view=tv")).toBe(true);
-    expect(studyTvPage("?art=design&source=sample")).toBe(false);
+    expect(studyTvPage("?art=design&source=live&view=tv")).toBe(true);
+    expect(studyTvPage("?art=design&art=design&source=sample&view=tv")).toBe(true);
+    expect(studyTvPage("?view=explore")).toBe(false);
+    expect(studyTvPage("?art=design&source=sample&view=explore")).toBe(false);
     expect(studyTvPage("?art=classic&source=sample&view=tv")).toBe(false);
-    expect(studyTvPage("?source=sample&view=tv")).toBe(false);
-    expect(studyTvPage("?art=design&source=live&view=tv")).toBe(false);
-    expect(studyTvPage("?art=design&art=design&source=sample&view=tv")).toBe(false);
+    expect(studyTvPage("?art=cinematic")).toBe(false);
+  });
+  it("is never on without a browser", () => {
+    expect(studyTvPage()).toBe(false);
   });
 });
 

@@ -31,6 +31,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    // The 3D world moved to its own address, `/world` (Plan 28 Section 5). Old preview links
+    // keep working: the query string passes through unchanged. Temporary, so a browser never
+    // pins it.
+    return [{ source: "/display/world-preview", destination: "/world", permanent: false }];
+  },
   async rewrites() {
     // Preview uses the public TV read endpoints without database credentials.
     if (process.env.VERCEL_ENV !== "preview") return [];

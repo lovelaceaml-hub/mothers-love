@@ -19,7 +19,7 @@ const args = process.env.DESIGN_REVIEW_SOFTWARE === '1'
   : ['--use-gl=angle', '--use-angle=metal'];
 await mkdir(output, { recursive: true });
 const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-const applicationPaths = execFileSync('git', ['ls-files', 'src/components/display/world', 'src/app/display/world-preview', 'public/world-prototype', 'public/world-kit'], { encoding: 'utf8' }).trim().split('\n');
+const applicationPaths = execFileSync('git', ['ls-files', 'src/components/display/world', 'src/app/world', 'public/world-prototype', 'public/world-kit'], { encoding: 'utf8' }).trim().split('\n');
 const sourceFiles = [];
 for (const file of applicationPaths) sourceFiles.push({ file, sha256: createHash('sha256').update(await readFile(file)).digest('hex') });
 const browser = await chromium.launch({ headless: true, args, ...(channel ? { channel } : {}) });
@@ -53,14 +53,20 @@ page.setDefaultTimeout(10000);
 const world = page.getByTestId('world-preview');
 const attrs = () => world.evaluate(el => Object.fromEntries([...el.attributes].filter(a => a.name.startsWith('data-')).map(a => [a.name, a.value])));
 /**
+ * The world's address since Plan 28 Section 5. The design look opens the TV page by default,
+ * so the design study (its explorer, map and Settings) is `&view=explore`; classic and
+ * cinematic keep exactly the query they always had.
+ */
+const study = (query = '') => `${origin}/world?source=sample&art=design&view=explore${query}`;
+/**
  * Opens one art mode on sample data. The design study waits for its kit state as well: `ready`
  * by default, `off` under DESIGN_REVIEW_KIT=off, or whatever a fault run expects; classic and
  * cinematic never load the kit and must say `off`.
  */
-async function open(art, { kit = art === 'design' && !kitOff ? 'ready' : 'off', label = art } = {}) {
+async function open(art, { kit = art === 'design' && !kitOff ? 'ready' : 'off', label = art, query: extra = '' } = {}) {
   const start = performance.now();
-  const query = art === 'design' && kitOff ? '&kit=off' : '';
-  await page.goto(`${origin}/display/world-preview?source=sample&art=${art}${query}`, { waitUntil: 'domcontentloaded' });
+  const query = (art === 'design' && kitOff ? '&kit=off' : '') + extra;
+  await page.goto(art === 'design' ? study(query) : `${origin}/world?source=sample&art=${art}${query}`, { waitUntil: 'domcontentloaded' });
   await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
   const readyElapsedMs = Math.round(performance.now() - start);
   // The kit loads before the engine, so its state is published with the first report; allow
@@ -69,9 +75,20 @@ async function open(art, { kit = art === 'design' && !kitOff ? 'ready' : 'off', 
   const kitElapsedMs = Math.round(performance.now() - start);
   await expect.poll(async () => Number(await world.getAttribute('data-frames'))).toBeGreaterThan(0);
   await expect(world).toHaveAttribute('data-source', 'sample');
+  // Every view starts on Automatic (Plan 28 Section 5).
+  await expect(world).toHaveAttribute('data-quality', 'auto');
   if (art === 'design') await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
-  report.checks.push({ test: `${label} rendered with explicit sample content, kit ${kit}`, passed: true, readyElapsedMs, kitElapsedMs,
+  report.checks.push({ test: `${label} rendered with explicit sample content, kit ${kit}, quality auto`, passed: true, readyElapsedMs, kitElapsedMs,
     kitAfterReadyMs: kitElapsedMs - readyElapsedMs, attributes: await attrs() });
+}
+/**
+ * The design study's stills and parity captures stay at High, the tier they were always taken
+ * at, so they compare byte for byte with the captures from before Auto became the default.
+ */
+async function openStudyAtHigh(query = '') {
+  await open('design', { query });
+  await setQuality('high');
+  await expect(world).toHaveAttribute('data-quality', 'high');
 }
 async function shot(name) {
   await expect(world).toHaveAttribute('data-source', 'sample');
@@ -168,8 +185,52 @@ async function measure(label,width,height,quality) {
   report.checks.push({test:`Real animation timing with advancing app frames and clock at ${label}`,passed:advanced,...stats,loadAverage1Min:loadAfter[0],loadPolluted:polluted});
 }
 try {
-  if (mode !== 'kit-faults') await open('design');
-  if (mode === 'kit-faults') {
+  if (mode === 'stills') await openStudyAtHigh();
+  else if (mode !== 'kit-faults' && mode !== 'parity') await open('design');
+  if (mode === 'parity') {
+    // The pearl text parity check: the paused Garden at High with the radiance pass on and with
+    // `&radiance=off`. The glow may change everything around the pearl, never its words, so
+    // every pixel inside .8 of the focused pearl's projected radius (the outermost text pixel
+    // sits at .81 of the face) must be identical.
+    const garden = async (query, name) => {
+      await openStudyAtHigh(query);
+      await pause();
+      await expect(world).toHaveAttribute('data-zone', 'garden');
+      await expect(world).toHaveAttribute('data-traveling', 'false');
+      const attributes = await attrs();
+      return { bytes: await shot(name), attributes };
+    };
+    const on = await garden('', 'parity-radiance-on');
+    const off = await garden('&radiance=off', 'parity-radiance-off');
+    const numbers = value => String(value ?? '').split(',').map(Number);
+    const [cameraX, cameraY, cameraZ] = numbers(on.attributes['data-camera-position']);
+    const [pearlX, pearlY, pearlZ] = numbers(on.attributes['data-world-bubble-position']);
+    const [ndcX, ndcY] = numbers(on.attributes['data-world-bubble-screen']);
+    const radius = Number(on.attributes['data-world-bubble-radius']);
+    const distance = Math.hypot(pearlX - cameraX, pearlY - cameraY, pearlZ - cameraZ);
+    const { width, height } = page.viewportSize();
+    // The world camera's vertical field of view is 43 degrees on a landscape screen.
+    const pixels = radius / (distance * Math.tan((43 * Math.PI) / 360)) * (height / 2);
+    const disc = { cx: (ndcX + 1) / 2 * width, cy: (1 - ndcY) / 2 * height, r: 0.8 * pixels };
+    const sameCamera = on.attributes['data-camera-position'] === off.attributes['data-camera-position']
+      && on.attributes['data-world-bubble-screen'] === off.attributes['data-world-bubble-screen'];
+    const inside = await page.evaluate(async ([left, right, disc]) => {
+      const load = src => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; });
+      const [x, y] = await Promise.all([load(left), load(right)]);
+      const read = image => { const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height; const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, image.width, image.height).data; };
+      const p = read(x), q = read(y);
+      let compared = 0, differing = 0, outside = 0;
+      for (let i = 0; i < p.length; i += 4) {
+        const px = (i / 4) % x.width, py = Math.floor(i / 4 / x.width);
+        const same = p[i] === q[i] && p[i + 1] === q[i + 1] && p[i + 2] === q[i + 2];
+        if ((px - disc.cx) ** 2 + (py - disc.cy) ** 2 <= disc.r ** 2) { compared++; if (!same) differing++; } else if (!same) outside++;
+      }
+      return { compared, differing, differingOutside: outside };
+    }, [`data:image/png;base64,${on.bytes.toString('base64')}`, `data:image/png;base64,${off.bytes.toString('base64')}`, disc]);
+    report.checks.push({ test: 'Pearl text parity: radiance on and off identical inside the focused pearl', passed: sameCamera && inside.compared > 10000 && inside.differing === 0,
+      sameCamera, disc: { cx: Math.round(disc.cx), cy: Math.round(disc.cy), r: Math.round(disc.r) }, ...inside,
+      note: 'differingOutside counts the glow, rays and protect pass around the pearl, which the radiance switch is meant to change' });
+  } else if (mode === 'kit-faults') {
     // Plan 26 K0: the kit fails soft. Three paused Garden captures on the same run: the
     // procedural study (`kit=off`), the study with the Draco decoder refused (every asset
     // fails, so `data-kit="failed"`), and the study with one asset refused (`partial`, one
@@ -180,7 +241,7 @@ try {
     // The study opens parked at the Garden, which is where every capture here is taken.
     const garden = async name => { await pause(); await expect(world).toHaveAttribute('data-zone', 'garden'); return shot(name); };
     // The procedural reference is always `&kit=off`, whatever DESIGN_REVIEW_KIT says.
-    await page.goto(`${origin}/display/world-preview?source=sample&art=design&kit=off`, { waitUntil: 'domcontentloaded' });
+    await page.goto(study('&kit=off'), { waitUntil: 'domcontentloaded' });
     await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
     await expect(world).toHaveAttribute('data-kit', 'off', { timeout: 10000 });
     await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
@@ -191,7 +252,7 @@ try {
       const handler = route => route.abort('failed');
       await page.route(`**/${pattern}`, handler);
       const start = performance.now();
-      await page.goto(`${origin}/display/world-preview?source=sample&art=design`, { waitUntil: 'domcontentloaded' });
+      await page.goto(study(), { waitUntil: 'domcontentloaded' });
       await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
       await expect(world).toHaveAttribute('data-kit', expected, { timeout: 10000 });
       const readyElapsedMs = Math.round(performance.now() - start);
@@ -292,6 +353,22 @@ try {
       await visit('heart','Heart Sanctuary');await shot(`${art}-heart`);
       report.checks.push({test:`${art} comparison excludes design controls`,passed:true});
     }
+    // Plan 28 Section 5: `/world` with only `?source=sample` is the design look's TV page on
+    // Automatic, the kit dressed, no settings panel; and the old preview address redirects here
+    // with its query intact.
+    await page.goto(`${origin}/world?source=sample`, { waitUntil: 'domcontentloaded' });
+    await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+    await expect(world).toHaveAttribute('data-kit', kitOff ? 'off' : 'ready', { timeout: 10000 });
+    await expect(world).toHaveAttribute('data-tv-page', 'true');
+    await expect(world).toHaveAttribute('data-design', 'true');
+    await expect(world).toHaveAttribute('data-quality', 'auto');
+    await expect(page.getByRole('button', { name: 'Settings', exact: true })).toHaveCount(0);
+    await shot('tv-default-garden');
+    report.checks.push({ test: '/world defaults to the design TV page on Automatic', passed: true, attributes: await attrs() });
+    await page.goto(`${origin}/display/world-preview?source=sample&art=classic`, { waitUntil: 'domcontentloaded' });
+    const moved = new URL(page.url());
+    await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
+    report.checks.push({ test: '/display/world-preview redirects to /world with its query', passed: moved.pathname === '/world' && moved.search === '?source=sample&art=classic', url: moved.pathname + moved.search });
   }
 } catch(error) {
   report.checks.push({test:'Design verification completed',passed:false,detail:String(error)});
