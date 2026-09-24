@@ -89,6 +89,25 @@ export function studyHaze(
   return out;
 }
 
+/** A colour's three channels as three's `Color` holds them, in the linear working space; a `Color` is one. */
+export type StudyRgb = { r: number; g: number; b: number };
+
+/**
+ * TV page: the haze colour at a given mood exposure. The sky dome multiplies its linear colour
+ * by `studyExposure` (`studySkyFragment`), and the tone mapped scenery takes the same factor
+ * from the renderer, but three mixes the fog in after tone mapping, so in flight the fully
+ * fogged sea at the horizon would stay bright while the sky's horizon dims: a line. So the
+ * engine writes `base` (the fog colour, linear, as `T.Fog` holds it) times `exposure` into the
+ * fog and the background every frame. Written into `out`, so it allocates nothing; parked the
+ * exposure is exactly 1 and the colour is exactly `base`.
+ */
+export function studyHazeColor<C extends StudyRgb>(base: StudyRgb, exposure: number, out: C): C {
+  out.r = base.r * exposure;
+  out.g = base.g * exposure;
+  out.b = base.b * exposure;
+  return out;
+}
+
 export type MoodInput = {
   dt: number;
   moving: boolean;

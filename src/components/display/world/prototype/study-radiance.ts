@@ -224,6 +224,13 @@ export class StudyRadiance {
   private readonly whiteBasic = new T.MeshBasicMaterial({ color: 0xffffff, fog: false, toneMapped: false });
   private readonly blackBasic = new T.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false });
   private readonly clearColor = new T.Color();
+  /**
+   * The fog colour the glow pass blacks out and puts back, kept as a colour rather than a hex
+   * so it comes back exactly: the TV page's fog dips with the mood exposure (`studyHazeColor`)
+   * to a colour no eight bit hex holds. The study's own fog is a hex, which came back exactly
+   * either way.
+   */
+  private readonly fogColor = new T.Color();
   private readonly sunWorld = new T.Vector3(...STUDY_SUN.direction).multiplyScalar(330);
   private readonly sunNdc = new T.Vector3();
   private readonly toSun = new T.Vector3();
@@ -366,7 +373,7 @@ export class StudyRadiance {
 
     const background = scene.background;
     const fog = scene.fog instanceof T.Fog ? scene.fog : null;
-    const fogColor = fog ? fog.color.getHex() : 0;
+    if (fog) this.fogColor.copy(fog.color);
     renderer.getClearColor(this.clearColor);
     const clearAlpha = renderer.getClearAlpha();
     const autoClear = renderer.autoClear;
@@ -402,7 +409,7 @@ export class StudyRadiance {
     scene.overrideMaterial = null;
     camera.layers.set(0);
     scene.background = background;
-    if (fog) fog.color.setHex(fogColor);
+    if (fog) fog.color.copy(this.fogColor);
     STUDY_GLOW_PASS.value = 0;
 
     this.bloom.render(renderer, this.glowRT, this.glowRT, 0, false);

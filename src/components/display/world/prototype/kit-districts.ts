@@ -59,6 +59,16 @@ export const KIT_LOD_DISTANCE = { far: 42, near: 38 } as const;
 export const KIT_FAR_CELL_FACTOR = 3;
 
 /**
+ * How far the people stay in view. The TV page raises them to `STUDY_TV_VIEW_DISTANCE` on the
+ * High tier only: they are small at that range, and the TV page runs Auto, where every extra
+ * figure costs frames the auto lower to Low (which is sticky) would take back from everything.
+ * Auto and Low, and every page without `?view=tv`, keep `KIT_NEAR_DISTANCE`.
+ */
+export function kitPeopleDistance(tv: boolean, tier: "high" | "auto" | "low") {
+  return tier === "high" ? tvViewDistance(KIT_NEAR_DISTANCE, tv) : KIT_NEAR_DISTANCE;
+}
+
+/**
  * Vertex clustering cell, kit units, per piece. From the tour eye a kit unit spans about 30
  * px at 1080p, so a cell of .05 is under two pixels; the clustered piece reads as the
  * authored one at a fraction of its triangles (measured: a rose bush 16k to 3k at .1, an
@@ -389,9 +399,10 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
   console.debug("kit districts", JSON.stringify(stats));
 
   const cameraAt = new T.Vector3();
-  // The TV page's clear air shows what the study's haze hid, so there the detail groups and
-  // the people stay in view out to `STUDY_TV_VIEW_DISTANCE` (Low keeps its own distances).
-  // Resolved once, like every other page gate. The near and far merge swap is left as it is.
+  // The TV page's clear air shows what the study's haze hid, so there the detail groups stay in
+  // view out to `STUDY_TV_VIEW_DISTANCE` (Low keeps its own distances), and on High the people
+  // too (`kitPeopleDistance`). Resolved once, like every other page gate. The near and far
+  // merge swap is left as it is.
   const tv = studyTvPage();
   return {
     update(time, zone, arrival) {
@@ -401,8 +412,9 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
       materials.selected.value = selected();
       if (camera) {
         cameraAt.copy(camera.position);
-        const limit = tvViewDistance(lowTier ? KIT_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? KIT_DETAIL_DISTANCE.high : KIT_DETAIL_DISTANCE.auto, tv, lowTier);
-        const nearLimit = tvViewDistance(KIT_NEAR_DISTANCE, tv, lowTier);
+        const tier = lowTier ? "low" : scene.userData.studyTier === "high" ? "high" : "auto";
+        const limit = tvViewDistance(KIT_DETAIL_DISTANCE[tier], tv, lowTier);
+        const nearLimit = kitPeopleDistance(tv, tier);
         for (const state of states) {
           const distance = cameraAt.distanceTo(state.center);
           if (distance > KIT_LOD_DISTANCE.far) state.far = true;

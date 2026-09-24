@@ -340,8 +340,9 @@ export class WorldRecognitionBubbles {
     root.add(face, ring, lights);
     // The slot ordinal seeds this pearl, so its sparkle scatter is stable and unlike its neighbours.
     // The skin reads the 3D Studio kit off the scene lazily, on its first update (Plan 26 K1).
+    // On the TV page its halo fades out before the plane's edge (`PEARL_HALO_TV_FADE`).
     const study = this.studyAssets && skin
-      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length, () => this.hostScene.userData.studyKit)
+      ? new StudyPearlSkin(root, this.studyAssets, this.slots.length, () => this.hostScene.userData.studyKit, { tv: this.tvPage })
       : undefined;
     root.visible = face.visible = false;
     this.root.add(root);

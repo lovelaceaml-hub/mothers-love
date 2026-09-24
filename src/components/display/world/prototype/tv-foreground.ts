@@ -149,6 +149,31 @@ export function applyTvForeground(context: DesignKitContext): KitBuilderHandle |
 }
 
 /**
+ * The TV page's sea (clear air). In the thinner fog the study's deep turquoise read as a grey
+ * beige band 150 to 350 units out and a slate teal close by, worst at the Pearl Pavilion, so
+ * on the TV it is a lighter pastel. `palette.water` is also the TV lotus basins' and the kit
+ * ponds' water, which take the same lighter colour. The sea also gets its own environment
+ * (`applyTvWaterEnvironment`) at `envMapIntensity`, since three 0.180 lights a material without
+ * an `envMap` of its own by the scene's `environmentIntensity`, which the TV page lowers.
+ */
+export const TV_WATER = { color: "#86cedc", envMapIntensity: 1.2 } as const;
+
+/**
+ * TV page: hands the sea's water material (`scene.userData.studyTvWater`, which the design
+ * world publishes on the TV page only) the scene's own PMREM environment, once the engine has
+ * built it, at `TV_WATER.envMapIntensity`. Returns whether it did, so without the TV page, or
+ * before there is an environment, it is a no-op. The same texture, so the program is the same.
+ */
+export function applyTvWaterEnvironment(scene: T.Scene) {
+  const water = scene.userData.studyTvWater as T.Material | undefined;
+  if (!(water instanceof T.MeshStandardMaterial) || !scene.environment) return false;
+  water.envMap = scene.environment;
+  water.envMapIntensity = TV_WATER.envMapIntensity;
+  water.needsUpdate = true;
+  return true;
+}
+
+/**
  * Pearl white stone, gold filigree and pastel blossom: the TV page's palette on the study's
  * own shared materials, so every district and every kit piece mapped onto them follows.
  */
@@ -161,6 +186,7 @@ export function applyTvPalette(palette: DesignKitContext["palette"]) {
   set(palette.lawn, "#cfe4bd");
   set(palette.leaf, "#a8cfa3");
   set(palette.cotton, "#ffd9e6");
+  set(palette.water, TV_WATER.color);
   const gold = palette.gold as T.MeshStandardMaterial;
   if (gold.isMeshStandardMaterial) {
     gold.color.set("#f0cd86");

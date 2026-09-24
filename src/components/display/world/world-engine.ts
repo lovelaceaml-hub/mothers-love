@@ -14,6 +14,7 @@ import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./protot
 import {
   StudyMood,
   studyHaze,
+  studyHazeColor,
   type MoodInput,
   type StudyHaze,
 } from "./prototype/study-mood";
@@ -36,6 +37,7 @@ import {
 } from "./prototype/tv-page";
 import { TV_ARC, TV_FOCUS_DELAY, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
 import { TvHosts } from "./prototype/tv-hosts";
+import { applyTvWaterEnvironment } from "./prototype/tv-foreground";
 import type { HoldSeconds } from "./recognition-director";
 
 /** The TV page's hold rule (step 4). It sets its own floor, so the owner minimum is not read. */
@@ -215,6 +217,11 @@ export class WorldEngine {
   private readonly haze: StudyHaze = this.tv
     ? { near: STUDY_TV_FOG.near, far: STUDY_TV_FOG.far }
     : { near: STUDY_FOG.near, far: STUDY_FOG.far };
+  /**
+   * TV page: the fog colour at a mood exposure of 1, in the linear working space `T.Fog` holds
+   * it in (`new T.Fog(STUDY_TV_FOG.color, ...)` in the design world), for `studyHazeColor`.
+   */
+  private readonly tvHazeBase = new THREE.Color(STUDY_TV_FOG.color);
   private readonly bufferSize = new THREE.Vector2();
   private elapsed = 0;
   private last = 0;
@@ -254,8 +261,9 @@ export class WorldEngine {
       if (start) this.director.visit(start, true);
       this.hosts = new TvHosts(this.world.scene);
       // The clear air's seam rule (`STUDY_TV_CAMERA_FAR`): the fog is complete before the far
-      // plane, and the far plane stops short of the TV page's larger sea disc, so the sea
-      // meets the sky in the horizon colour and its rim is never drawn. resize() keeps it.
+      // plane, and wherever the TV page's larger sea disc ends in view it is deeper than the
+      // fog's far end, so the sea is fully fogged before it ends and meets the sky in the
+      // horizon colour. resize() keeps it.
       this.camera.far = STUDY_TV_CAMERA_FAR;
       this.camera.updateProjectionMatrix();
     }
@@ -310,6 +318,9 @@ export class WorldEngine {
       this.world.scene.environmentIntensity = 0.55;
       // The TV page's clearer day takes a little less environment fill (`STUDY_TV_TONE`).
       if (isWorldDesignStudy()) this.world.scene.environmentIntensity = this.tv ? STUDY_TV_TONE.environmentIntensity : STUDY_TONE.environmentIntensity;
+      // TV page: the sea takes that environment as its own (`TV_WATER`), so its reflection keeps
+      // the pastel light instead of following the lower fill.
+      if (this.tv) applyTvWaterEnvironment(this.world.scene);
     } catch (error) {
       this.radiance?.dispose();
       this.bubbles.dispose();
@@ -703,6 +714,13 @@ export class WorldEngine {
       else studyHaze(mood.travel, this.haze);
       scene.fog.near = this.haze.near;
       scene.fog.far = this.haze.far;
+      // TV page: the fog and the background dip with the sky (`studyHazeColor`), so the fully
+      // fogged sea meets the sky's horizon in one colour through a flight too. The radiance
+      // pass blacks the fog out for its glow layer and puts this exact colour back after.
+      if (this.tv) {
+        studyHazeColor(this.tvHazeBase, mood.exposure, scene.fog.color);
+        if (scene.background instanceof THREE.Color) scene.background.copy(scene.fog.color);
+      }
     }
   }
   private report() {

@@ -443,6 +443,18 @@ export const ISLET_COLOURS = { cap: "#c9dfb5", bush: "#e7a3c0", rock: "#ecc4bf",
 
 const dummy = new T.Object3D();
 
+/**
+ * The sky lane clouds' material (`SOFT_CLOUD`). The TV page's clear air: a flight through a sky
+ * lane passes a lighter veil, `TV_SOFT_CLOUD_OPACITY`. Set on the material, so the table, the
+ * constant and every other page keep `SOFT_CLOUD.opacity`; the rim and the program are the same.
+ */
+export function corridorSoftCloud(tv = false) {
+  const softCloud = studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34);
+  softCloud.name = "corridor soft cloud";
+  if (tv) softCloud.opacity = TV_SOFT_CLOUD_OPACITY;
+  return softCloud;
+}
+
 export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle | void {
   const { kit, scene } = context;
   const meshes: T.InstancedMesh[] = [];
@@ -453,13 +465,9 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   };
   palette.blossom.name = "corridor blossom"; palette.cloud.name = "corridor cloud";
   // Sky lane clouds are soft (SOFT_CLOUD): the camera may brush them, so they draw at half
-  // opacity without writing depth; the rim is kept, the sheen softened.
-  const softCloud = context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34));
-  softCloud.name = "corridor soft cloud";
-  // The TV page's clear air: a flight through a sky lane passes a lighter veil. Set on the
-  // material, so the table, the constant and every other page keep `SOFT_CLOUD.opacity`.
+  // opacity without writing depth; the rim is kept, the sheen softened. Lighter on the TV page.
   const tv = studyTvPage();
-  if (tv) softCloud.opacity = TV_SOFT_CLOUD_OPACITY;
+  const softCloud = context.material(corridorSoftCloud(tv));
   const islet: Partial<Record<string, T.Material>> = {
     grass: context.material(new T.MeshStandardMaterial({ color: ISLET_COLOURS.cap, roughness: .92, metalness: 0, dithering: true })),
     petal: context.material(new T.MeshPhysicalMaterial({ color: ISLET_COLOURS.bush, roughness: .7, sheen: .5, sheenColor: new T.Color("#ffe0ea"), sheenRoughness: .6, dithering: true })),
@@ -568,9 +576,6 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     projected.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projected);
     const eye = camera.position;
-    // The TV page keeps the finer islet and tree levels out to `STUDY_TV_VIEW_DISTANCE`, where
-    // its thinner fog would otherwise show the swap to the tenth of a surface at 80 units.
-    const lodNear = tvViewDistance(LOD_NEAR, tv, low);
     for (const piece of culled) {
       const range = piece.range(low);
       let near = 0, far = 0;
@@ -580,7 +585,7 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
         sphere.center.set(place.position[0], place.position[1] + piece.centerY * place.scale, place.position[2]);
         sphere.radius = piece.radius * place.scale + FRUSTUM_MARGIN;
         if (!frustum.intersectsSphere(sphere)) continue;
-        if (piece.far && distance > lodNear) placeAt(piece.far, far++, place.position, place.rotationY, place.scale);
+        if (piece.far && distance > LOD_NEAR) placeAt(piece.far, far++, place.position, place.rotationY, place.scale);
         else placeAt(piece.near, near++, place.position, place.rotationY, place.scale);
       }
       piece.near.count = near; piece.near.instanceMatrix.needsUpdate = true;

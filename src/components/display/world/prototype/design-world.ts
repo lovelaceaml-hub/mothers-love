@@ -14,7 +14,7 @@ import { createStudyClouds, studyCloudAtlas, studyCloudLayout } from "./study-cl
 import { arrivalPose } from "./arrival-choreography";
 import { bloomStage, constellationStage, ribbonStage, type StageContext } from "./arrival-stages";
 import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
-import { studySunHalo } from "./study-lighting";
+import { studySkyFragment, studySunHalo } from "./study-lighting";
 import {
   STUDY_EXPOSURE, STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW, STUDY_TV_RIM_SCALE,
   scaleStudyRim, softDot, sparklePoints, studyGlow, studyRim, studySilk, studyStone, studyStoneCaustic,
@@ -292,23 +292,12 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   // through a travel and lifts again on arrival, together with the tone mapping exposure the
   // engine sets from the same value. Parked, the uniform is exactly 1 and this is unchanged.
   //
-  // The TV page's clear air softens two terms: the wide warm glow round the sun (.20 to .08)
-  // and the painted cloud band (.55 to .30), which together laid a pale veil over the lower
-  // sky. The sky colours stay, and the horizon is still the fog colour. Written into the source
-  // rather than read from a uniform, so without the TV page the source is character for
-  // character the study's (the same program), and the TV page's differs and compiles its own.
-  const skySun = tv ? ".08" : ".20", skyCloud = tv ? ".30" : ".55";
+  // The TV page's clear air softens three terms of the sky (`STUDY_TV_SKY`): the wide warm glow
+  // round the sun, the painted cloud band and the tight sun core. `studySkyFragment` writes them
+  // into the source, so without the TV page the program is character for character the study's.
   const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, studyExposure: STUDY_EXPOSURE, top: { value: new T.Color(STUDY_SKY.zenith) }, mid: { value: new T.Color(STUDY_SKY.mid) }, horizon: { value: new T.Color(STUDY_SKY.horizon) }, sun: { value: new T.Vector3(...STUDY_SUN.direction) } },
     vertexShader: `varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader: `varying vec3 p;uniform float time,studyExposure;uniform vec3 top,mid,horizon,sun;
-      float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
-      float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+1.71;a*=.5;}return v;}
-      void main(){vec3 d=normalize(p);vec3 c=mix(horizon,mid,smoothstep(0.,.18,d.y));c=mix(c,top,smoothstep(.18,.75,d.y));
-      float lift=smoothstep(0.,.16,d.y);
-      vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.965,.831,.871),cloud*${skyCloud}*lift);
-      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*${skySun}+pow(key,60.)*.5)*lift;c=min(c,vec3(1.))*studyExposure;gl_FragColor=vec4(c,1.);
-      #include <colorspace_fragment>
-      }` }));
+    fragmentShader: studySkyFragment(tv) }));
   mesh(scene, geometry(new T.SphereGeometry(STUDY_SKY_RADIUS, 32, 16)), sky).renderOrder = -100;
   // The TV page's sun is a smaller, fainter pair of sprites (`STUDY_TV_SUN_HALO`).
   const halo = studySunHalo(tv);
@@ -382,10 +371,13 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   leaf.name = "leaf"; rose.name = "rose"; roseGold.name = "rose gold"; bloom.name = "bloom"; water.name = "water";
   const sea = mesh(scene, geometry(new T.CircleGeometry(STUDY_SEA.radius, 96)), water, STUDY_SEA.center); sea.rotation.x = -Math.PI / 2;
   sea.name = "Study sea"; sea.layers.enable(1);
-  // The TV page's thinner fog would show the disc's rim, so there it reaches 800, past the
-  // camera's far plane (`STUDY_TV_CAMERA_FAR`): the sea fades into the horizon colour and is
-  // clipped before it ends. The ripples read world space, so they keep their size.
+  // The TV page's thinner fog would show the disc's rim, so there it reaches 800: wherever the
+  // rim is in view it is deeper than the fog's far end, so the sea is fully fogged before it
+  // ends (the rule on `STUDY_TV_CAMERA_FAR`). The ripples read world space, so they keep their size.
   if (tv) sea.scale.setScalar(STUDY_TV_SEA_SCALE);
+  // TV page: the engine gives the sea its own environment once it has built one
+  // (`applyTvWaterEnvironment`), so its reflection no longer follows the scene's lower fill.
+  if (tv) scene.userData.studyTvWater = water;
 
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.

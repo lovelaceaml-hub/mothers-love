@@ -61,10 +61,12 @@ export const STUDY_SEA = { radius: 320, center: [0, -5, -30] as [number, number,
 /**
  * TV page: in the thinner fog the sea disc's rim would show against the sky, so the disc grows
  * to 800 (2.5 times) and the camera's far plane moves out from 450 to 600. The rule the tests
- * hold: the fog is complete (480) before the far plane (600), and the far plane falls short of
- * the nearest sea rim from any camera the tour uses, so the sea fades fully into the horizon
- * colour and is clipped there, never ending in view; and the whole sky dome (400 round the
- * origin, the camera never more than about 125 from it) stays inside the far plane.
+ * hold: from every pose the tour uses, on a landscape and a portrait screen, every point of the
+ * sea's rim inside the view is at least the fog's far end (480) deep, so the sea is fully
+ * fogged before it ends: where it is drawn at all it is already the horizon colour, the same
+ * colour as the sky dome behind it. The fog is also complete before the far plane (600), so
+ * the sea is never clipped half fogged; and the whole sky dome (400 round the origin, the
+ * camera never more than about 125 from it) stays inside the far plane.
  */
 export const STUDY_TV_CAMERA_FAR = 600;
 export const STUDY_TV_SEA_SCALE = 2.5;
