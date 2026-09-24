@@ -22,7 +22,7 @@ This approved plan retains P0 through P7 from the supplied `02_EXECUTION_PLAN.md
 - Existing draft PR: `https://github.com/lovelaceaml-hub/mothers-love/pull/8`.
 - Art branch: `feature/world-cinematic-art-pass`, baseline `b324b81cabe947592f6723425c58f14307b58083`.
 - PR base: `feature/tv-3d-world-prototype-01`, `07cb3f63301150e2849a30531b4a441e4c0a3f39`.
-- Integration worktree: `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`.
+- Integration worktree: `/Users/anthony/Projects/mothers-love-world/web`.
 - Cinematic sample: `https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample`.
 - Same-build classic: `https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample&art=classic`.
 - The planning browser spot-check reached readiness and rendered both paths. Paused Sanctuary views shared camera coordinates `[-13,12,19]`. This is not a formal deterministic regression or a CI pass.

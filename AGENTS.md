@@ -3,7 +3,7 @@
 Anthony granted the 3D Studio coordinator full creative design and admin authority for
 the 3D world. [Plan 26](docs/PLAN-26-world-kit.md) is active: lanes K0 to K6 in their own
 worktrees, merged here by the coordinator. The design is
-`/Users/anthony/Projects/3d-studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
+`/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
 section below still binds. One writer per worktree; do not write in this checkout while
 a K lane is merging.
 
@@ -16,7 +16,7 @@ Anthony reviewed the D1 prototype against the approved direction board on 2026-0
 
 [Plan 24](docs/PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
 
-Work in `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md), [task ledger](docs/runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
+Work in `/Users/anthony/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md), [task ledger](docs/runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
 
 ## September 21: Recognition bubbles inside the world
 

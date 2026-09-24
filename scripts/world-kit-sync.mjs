@@ -46,7 +46,7 @@ const option = (name, fallback) => {
   return at >= 0 && args[at + 1] ? args[at + 1] : fallback;
 };
 const checkOnly = args.includes("--check");
-const studio = path.resolve(option("--studio", process.env.WORLD_KIT_STUDIO || "/Users/anthony/Projects/3d-studio"));
+const studio = path.resolve(option("--studio", process.env.WORLD_KIT_STUDIO || "/Users/anthony/Projects/mothers-love-world/studio"));
 const out = path.resolve(option("--out", path.join(repo, "public", "world-kit")));
 const threeDir = path.resolve(option("--three", path.join(repo, "node_modules", "three")));
 const versionDir = path.join(out, KIT_VERSION);

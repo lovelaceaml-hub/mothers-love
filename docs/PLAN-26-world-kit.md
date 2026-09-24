@@ -31,12 +31,12 @@ agents, Opus 5.5 and Fable, Sol and Astra when available, Gemini Flash as review
 ## Design and rulings
 
 - Design (authoritative for this plan):
-  `/Users/anthony/Projects/3d-studio/docs/design/WORLD-INTEGRATION.md` (lane D1, Fable).
+  `/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md` (lane D1, Fable).
 - Coordinator rulings on its open questions:
-  `/Users/anthony/Projects/3d-studio/docs/runs/2026-09-23-world-kit-v2/decisions/2026-09-23-D1-rulings.md`.
+  `/Users/anthony/Projects/mothers-love-world/studio/docs/runs/2026-09-23-world-kit-v2/decisions/2026-09-23-D1-rulings.md`.
   Kit on by default under `art=design` with `kit=off`; neighbors return with
   "FICTIONAL NEIGHBORS" cards, active pair only; 18 s legs kept.
-- Kit source: `/Users/anthony/Projects/3d-studio/kit/` on its `main` branch.
+- Kit source: `/Users/anthony/Projects/mothers-love-world/studio/kit/` on its `main` branch.
 - Unchanged: the frozen wording layout with "Thank you," at the top; personal pixels only
   on the depth tested face; sample only previews, captures and tests; classic and
   cinematic byte identical; no build-polished-apps or Stitch; no real recognition data

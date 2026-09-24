@@ -1,3 +1,12 @@
+## September 23: this checkout moved to the one home
+
+This checkout now lives at `/Users/anthony/Projects/mothers-love-world/web` (it was
+`/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`). The project
+home is `/Users/anthony/Projects/mothers-love-world/START-HERE.md`; the active plan is
+`/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`.
+3D Studio moved to `/Users/anthony/Projects/mothers-love-world/studio`, and
+`scripts/world-kit-sync.mjs --studio` now defaults there.
+
 ## September 22: Pass D2, the world made radiant
 
 [Latest preview](https://mothers-love-h9bu8wwu1-lvzion.vercel.app/display/world-preview?source=sample&art=design) at `2ad95b07f1338c387fccc075fc30b38152bdcb9e` (the [branch alias](https://mothers-love-git-feature-world-cinematic-art-pass-lvzion.vercel.app/display/world-preview?source=sample&art=design) always shows the newest push). Eight sections landed on `feature/world-cinematic-art-pass` since D1: golden-hour light and air, a glass pearl with halo and sparkles, pink clouds and cotton-candy canopies, the three rebuilt arrivals (lit lotus with a beam, one silk ribbon with butterflies, a descending light string), sculpted rose-ivory islands with glittering water and hazy landmark domes, a real glow pass with light shafts and living air, water and pearl and heart finesse with gold and lanterns at dusk, and camera finesse with an arrival flourish, travel haze, tiers and a shadow cadence.
