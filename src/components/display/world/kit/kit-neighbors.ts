@@ -20,6 +20,7 @@ import {
 import { WORLD_EXPRESSIONS, ZONES, type ZoneId } from "../world-data";
 import type { DesignKitContext, KitBuilderHandle } from "../prototype/design-world";
 import { sparklePoints, studyRim } from "../prototype/study-materials";
+import { studyTvPage } from "../prototype/tv-page";
 import type { WorldKit } from "./kit-loader";
 import type { KitAssetId } from "./kit-manifest";
 
@@ -627,6 +628,13 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
   if ([...casting.values()].some(cast => !cast.toy)) return undefined;
 
   const material = context.material(neighborMaterial());
+  // PLAN-01 Section 5 step 9, TV page only: a soft pastel lift over the garments, and the
+  // family pausing to look up at the bubbles while they stand together.
+  const tvPage = studyTvPage();
+  if (tvPage) {
+    (material as T.MeshStandardMaterial).emissive.set("#ffe6ef");
+    (material as T.MeshStandardMaterial).emissiveIntensity = 0.1;
+  }
   const templates = new Map<KitAssetId, { root: T.Object3D; clips: ReadonlyMap<string, T.AnimationClip> }>();
   const template = (id: KitAssetId) => {
     const cached = templates.get(id);
@@ -902,6 +910,11 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
           const walkTime = (fraction: number) => ((fraction * walked / actor.stride) % 1) * walkLength;
           const idleTime = time + actor.slot * 1.7 + pair.index * 0.9;
           pose(actor, rig, neighborWeights(beat, actor.slot, actor.lengths, idleTime, walkTime, { now: place.walked, before: before.walked, pace: place.pace }));
+          // Bones rest unrotated (glTF Y up, facing +Z), so a turn about x lifts the face.
+          if (tvPage && beat.staging === "stance") {
+            const look = smooth(beat.beatAge / 1.2) * smooth((beat.beatLength - beat.beatAge) / 1.2);
+            rig.skeleton.getBoneByName("head")?.rotateX(-0.42 * look);
+          }
         }
         if (contactCount < maxActors) {
           _vector.copy(actor.holder.position);

@@ -181,15 +181,18 @@ export function paintTvMessage(canvas: HTMLCanvasElement, message: string, windo
   const c = canvas.getContext("2d")!;
   c.font = serif(TV_BIG.body * scale);
   const lines = wrap((t) => c.measureText(t).width, message, TV_BIG.windowWidth * scale);
-  const line = TV_BIG.line * scale, pad = 10 * scale, window = windowHeight * scale;
+  const line = TV_BIG.line * scale, window = windowHeight * scale;
   const text = lines.length * line;
+  // A message that scrolls is padded by the fade, so its first and last lines are read clear.
+  const fits = text + 20 * scale <= window;
+  const pad = fits ? 10 * scale : window * TV_FADE;
   const height = Math.ceil(Math.max(window, text + pad * 2));
   canvas.width = Math.ceil(TV_BIG.windowWidth * scale);
   canvas.height = height;
   c.clearRect(0, 0, canvas.width, canvas.height);
   c.font = serif(TV_BIG.body * scale);
   c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = TV_TEXT.body;
-  let y = text + pad * 2 <= window ? (window - text) / 2 : pad;
+  let y = fits ? (window - text) / 2 : pad;
   for (const item of lines) { c.fillText(item, canvas.width / 2, y + (line - TV_BIG.body * scale) / 2); y += line; }
   return { lines: lines.length, height, overflow: Math.max(0, height - window) };
 }
@@ -236,6 +239,9 @@ export function paintTvSmallFace(canvas: HTMLCanvasElement, record: Recognition,
   c.restore();
 }
 
+/** The fade at a scrolling window's edges, as a fraction of the window's height. */
+export const TV_FADE = 0.12;
+
 /** How far a held message has scrolled: still for 2 s, then evenly to the end 2 s before the hold ends. */
 export function tvScrollFraction(age: number, hold: number) {
   return Math.min(1, Math.max(0, (age - 2) / Math.max(1, hold - 4)));
@@ -277,7 +283,7 @@ export class TvBubbleDecor {
     this.orbit.name = "tv gold orbit"; this.orbit.rotation.set(0.35, 0.2, 0.3);
     this.fade = shared.fade;
     this.window = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({
-      transparent: true, depthWrite: false, toneMapped: false, alphaMap: this.fade,
+      transparent: true, depthWrite: false, toneMapped: false,
     }));
     this.window.name = "tv message window"; this.window.position.z = 0.006; this.window.renderOrder = 2;
     this.window.visible = false;
@@ -299,7 +305,10 @@ export class TvBubbleDecor {
     texture.repeat.set(1, (windowHeight * scale) / painted.height);
     this.message = { canvas, texture, key, overflow: painted.overflow, height: painted.height };
     const material = this.window.material;
-    material.map = texture; material.needsUpdate = true;
+    material.map = texture;
+    // Only a scrolling message fades at its edges; one that fits is shown whole and crisp.
+    material.alphaMap = painted.overflow > 0 ? this.fade : null;
+    material.needsUpdate = true;
     // Slot space: the face disc has radius 1 over 512 canvas pixels of a 1024 face.
     this.window.scale.set(TV_BIG.windowWidth / 512, windowHeight / 512, 1);
     this.window.position.y = (512 - (windowTop + windowHeight / 2)) / 512;
@@ -372,13 +381,13 @@ export class TvDecorShared {
       }`,
   });
   readonly orbitMaterial = new T.MeshStandardMaterial({ color: "#e2bd72", metalness: 0.85, roughness: 0.25 });
-  /** Top and bottom edges of the message window fade over 5 percent; alpha maps read green. */
+  /** A scrolling window's top and bottom edges fade over this much of it (about one line); alpha maps read green. */
   readonly fade: T.DataTexture;
   constructor() {
     const rows = 64, data = new Uint8Array(rows * 4);
     for (let i = 0; i < rows; i++) {
       const v = i / (rows - 1), edge = Math.min(v, 1 - v);
-      const alpha = Math.round(255 * Math.min(1, edge / 0.05));
+      const alpha = Math.round(255 * Math.min(1, edge / TV_FADE));
       data.set([alpha, alpha, alpha, 255], i * 4);
     }
     this.fade = new T.DataTexture(data, 1, rows);
