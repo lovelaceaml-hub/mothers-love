@@ -747,7 +747,7 @@ describe("corridors: sky lanes", () => {
     // The relaxation is real and stated: some pair flight passes inside a soft cloud's sphere.
     const pairGaps = clouds.map(cloud => FLIGHTS.clearance(cloud.position, 0, ["pairs"]).clearance);
     expect(Math.min(...pairGaps)).toBeLessThan(SOFT_CLOUD.centreClearance);
-    const source = readFileSync(path.resolve(repo, "src/components/display/world/art/kit-corridors.ts"), "utf8");
+    const source = readFileSync(path.resolve(repo, "src/components/display/world/art/kit-corridor-routes.ts"), "utf8");
     expect(source).toContain("exempt from the zone button pair flights");
   });
 
