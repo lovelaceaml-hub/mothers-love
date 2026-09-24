@@ -27,6 +27,8 @@ The provided references have approved mood, material, composition and arrival di
 | Prototype QA lists 42/55/62/90 checks or a 64/68-check claim elsewhere | They concern different local packages. The recovered latest four-study archive contains its own 90-check QA result and a separate four-check graphics result. Retain reports with their artifacts; do not combine totals or claim they verified the app PR. |
 | Different files share `Mothers_Love_Bubble_Atelier/` paths | They are deliberately separated under `prototypes/01_bubbles_latest/` and `02_bubbles_alternative/`. Never extract them over one another or assume the last chat filename is correct. |
 | Cinematic screenshot used as a flat scene backdrop | Use it for reference only. The user wants a traversable world with live objects and real camera space. Baked textures/reflections are fine when honestly described; a full reference screenshot on a plane is not the requested world. |
+| Painted backdrops versus the flat-backdrop rule (PLAN-01, 2026-09-23) | Anthony chose a hybrid look: painted sky panoramas on a dome and painted distant-island layers are allowed behind the real, traversable 3D platforms and bubbles, with a painted colour grade. The row above still holds: never put a full screenshot or a target painting on a plane as the scene. Target frames are look references for side-by-side checks only. Spec: 3D Studio `docs/design/concept/v2/ASSET-SPEC.md`. |
+| "No angels" in the stable decisions below versus Peace and Joy (PLAN-01, 2026-09-23) | Anthony asked for the two lamb angel hosts, Peace and Joy, by name. They are authorized. The rule still bars any other added religious iconography. |
 
 ## Stable design decisions
 
