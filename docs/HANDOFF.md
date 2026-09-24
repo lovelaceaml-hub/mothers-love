@@ -48,7 +48,7 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 - **Documents:** this folder, and only this folder on `main`. Plans are numbered by the date of their first commit (Anthony, 2026-09-23); the next new plan takes 30, because 29 is the 3D Studio kit. Each plan has a Build log, and each run keeps its record in `docs/runs/<plan-id>/`. What still lives on other branches is listed in [HISTORY.md](HISTORY.md), part 3.
 - **Rules of the product:** [CONTRACT.md](CONTRACT.md). **How people use it:** [USER-MANUAL.md](USER-MANUAL.md).
 - **Evidence and finished media:** Drive, `Anthony Mac Storage/Project Outputs/The Words of Mother's Love`, https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw. Captures and probe output go there, not into Git.
-- **Working copies:** the main checkout `/Users/anthony/Projects/mothers-love` stays on `main`. Other working copies sit under `/Users/anthony/Projects/mothers-love-worktrees/`, one per live branch; since Plan 28 Section 4 the only one left there is `never-expire`, which goes once the Plan 18 Section B chat is archived. The world's copies live under `/Users/anthony/Projects/mothers-love-world/` and belong to the world plans.
+- **Working copies:** the main checkout `/Users/anthony/Projects/mothers-love` stays on `main`. Other working copies go under `/Users/anthony/Projects/mothers-love-worktrees/`, one per live branch; since Plan 28 Section 4 that folder is empty. The world's copies live under `/Users/anthony/Projects/mothers-love-world/` and belong to the world plans.
 
 ## Rules that matter on the next change
 
