@@ -1,0 +1,108 @@
+
+Running 16 tests using 5 workers
+
+  ✓   4 [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms (7.2s)
+  ✓   1 [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms (7.3s)
+  ✓   3 [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s (8.6s)
+  ✓   6 [chromium] › tests/color-polish-scenes/calendar.spec.ts:226:5 › reduced motion renders the calendar still with no pulse (5.1s)
+  ✓   7 [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance (5.6s)
+  ✘   8 [chromium] › tests/color-polish-scenes/calendar.spec.ts:241:5 › the same holds at 3840 (4.4s)
+  ✘   2 [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count (8.7s)
+  ✘   5 [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle (13.0s)
+  ✓  10 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (889ms)
+  ✓   9 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (1.6s)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (455ms)
+  ✓  16 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (530ms)
+  ✓  15 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (1.9s)
+  ✓  14 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.2s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.2s)
+  ✘  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m164[39m
+    Received:    [31m165[39m
+
+      47 |     expect(cell.bCenterXDiff).toBeLessThanOrEqual(2);
+      48 |     expect(cell.bCenterYDiff).toBeLessThanOrEqual(2);
+    > 49 |     expect(cell.scrollWidth).toBeLessThanOrEqual(cell.clientWidth);
+         |                              ^
+      50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
+      51 |   }
+      52 | }
+        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:73:3
+
+    Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m8[39m
+    Received: [31m9[39m
+
+      119 |     });
+      120 |
+    > 121 |     expect(timings.length).toBe(pastDayCount);
+          |                            ^
+      122 |     expect(timings.length).toBeGreaterThan(0);
+      123 |     for (const timing of timings) {
+      124 |       expect(timing.endTime).toBeLessThanOrEqual(timing.currentTime);
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:121:28
+
+    Error Context: test-results/color-polish-scenes-calend-ea969-se-once-on-entry-and-settle-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/calendar.spec.ts:241:5 › the same holds at 3840 ────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m164[39m
+    Received:    [31m165[39m
+
+      47 |     expect(cell.bCenterXDiff).toBeLessThanOrEqual(2);
+      48 |     expect(cell.bCenterYDiff).toBeLessThanOrEqual(2);
+    > 49 |     expect(cell.scrollWidth).toBeLessThanOrEqual(cell.clientWidth);
+         |                              ^
+      50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
+      51 |   }
+      52 | }
+        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:244:3
+
+    Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  4 failed
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle 
+    [chromium] › tests/color-polish-scenes/calendar.spec.ts:241:5 › the same holds at 3840 ─────────
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  12 passed (1.5m)

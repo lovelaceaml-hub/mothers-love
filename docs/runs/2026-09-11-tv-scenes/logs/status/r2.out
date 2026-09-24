@@ -1,0 +1,19 @@
+Deterministic waveform sampling across a single page is now configured in [status.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts).
+
+The test now loads the scene once at 6000 ms, records the initial transforms, and performs four sequential 1000 ms runtime steps paired with animation pauses. This guarantees exact one-second virtual intervals between all five samples and eliminates live playback timing jitter across separate page navigations.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Run the coordinator suite or review the updated files:
+1. View the revised spec in [status.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts).
+2. Inspect the lane record in [status.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md).
+
+### Questions
+1. Would you like to proceed with the coordinator integration run now?
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md)

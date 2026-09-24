@@ -135,9 +135,13 @@ export function validateReportQuery(period: string | null, from: string | null, 
   return { period, from, to };
 }
 
-export function validateAdminListQuery(status: string | null, expression: string | null, from: string | null, to: string | null): { status: string | null; expression: number | null; from: string | null; to: string | null } | null {
+export type AdminListSort = "oldest" | "newest";
+
+export function validateAdminListQuery(status: string | null, expression: string | null, from: string | null, to: string | null, sort: string | null = null): { status: string | null; expression: number | null; from: string | null; to: string | null; sort: AdminListSort } | null {
   const normalizedStatus = status?.trim() || null;
   if (normalizedStatus && !["held", "published", "hidden", "invalid"].includes(normalizedStatus)) return null;
+  const normalizedSort = sort?.trim() || "newest";
+  if (normalizedSort !== "oldest" && normalizedSort !== "newest") return null;
   const normalizedExpression = expression?.trim() || null;
   const expressionNumber = normalizedExpression === null ? null : Number(normalizedExpression);
   if (expressionNumber !== null && (!Number.isInteger(expressionNumber) || expressionNumber < 1 || expressionNumber > 9)) return null;
@@ -145,7 +149,7 @@ export function validateAdminListQuery(status: string | null, expression: string
   const normalizedTo = to?.trim() || null;
   if ((normalizedFrom && !isIsoDate(normalizedFrom)) || (normalizedTo && !isIsoDate(normalizedTo))) return null;
   if (normalizedFrom && normalizedTo && normalizedFrom > normalizedTo) return null;
-  return { status: normalizedStatus, expression: expressionNumber, from: normalizedFrom, to: normalizedTo };
+  return { status: normalizedStatus, expression: expressionNumber, from: normalizedFrom, to: normalizedTo, sort: normalizedSort };
 }
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {

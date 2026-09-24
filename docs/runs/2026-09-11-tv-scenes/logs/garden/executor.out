@@ -1,0 +1,26 @@
+Recognition Garden petals on a breeze, passing light band, depth layers, and test specifications are complete and ready for coordinator verification.
+
+The scene now intercepts petal particles from the retirement burst and draws them with horizontal breeze drift, upward lift, flutter, and expiration fade on the garden canvas, preventing any double draw from core. A soft golden linear light band moves across y 470 to 636 behind the swaying plants over a 26-second repeating period. Bubbles feature distinct far, mid, and near depth layers with blur, scaling, and z-index ordering while preserving all five bubbles, the 7-second cadence, and circularity invariants.
+
+### What now works
+1. Petals on a breeze: Splices retired petals out of `V.fx` in `onRetire` into `V.garden.petals`, rendering them on [`living-garden`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js#L220-L245) with horizontal drift and lift instead of gravity.
+2. Passing light: Renders a soft 420px wide light band across y 470 to 636 moving from -420 to 2232 over 26 seconds on [`public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js#L162-L173).
+3. Depth layers: Implements the depth recipe via `mountGarden`, `placeGarden`, and `integrateGarden` on [`public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js#L4-L98) with far (0.86 scale, 0.7px blur), mid (0.94 scale, 0.25px blur), and near (1.0 scale, sharp) layers.
+4. Behavior spec: Six automated Playwright tests in [`tests/color-polish-scenes/garden.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) covering circularity, absence of overflow, click-advance prevention, garden growth over 60s, petal lifecycles, and still mode.
+5. Lane record: Documented in [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next 2-minute action
+Trigger the coordinator to run verification (typecheck, lint, test, build, your spec, and probe).
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`
+
+Anything not done and why:
+Nothing; all items from the work order and gap report decision are implemented and tested.

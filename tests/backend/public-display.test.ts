@@ -24,7 +24,7 @@ const recognition = {
   expressionIds: [2, 6],
   createdAt: "2026-09-08T10:00:00.000Z",
   firstPublishedAt: "2026-09-08T10:00:00.000Z",
-  expiresAt: "2026-09-15T10:00:00.000Z",
+  expiresAt: "2026-09-15T07:00:00.000Z",
   version: 1,
   status: "published",
   featured: true,

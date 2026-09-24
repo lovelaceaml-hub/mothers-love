@@ -1,5 +1,6 @@
 import type { PublicFeedItem, PublicFeedSnapshot } from "@/lib/feed-contract";
 import { hasVisibleNameContent } from "@/lib/name-validation";
+import { clampPublicExpiry } from "./expiry-clamp";
 import { graphemeLength } from "./time";
 import { databaseClient } from "./supabase";
 
@@ -61,7 +62,7 @@ export function projectPublicFeed(value: unknown): PublicFeedSnapshot | null {
       message: item.message as string,
       expressionIds: [...(item.expressionIds as number[])],
       firstPublishedAt: item.firstPublishedAt as string,
-      expiresAt: item.expiresAt as string,
+      expiresAt: clampPublicExpiry(item.expiresAt as string, serverTime),
     };
     if (items.length > 0 && !isOrdered(items[items.length - 1], projected)) return null;
     items.push(projected);

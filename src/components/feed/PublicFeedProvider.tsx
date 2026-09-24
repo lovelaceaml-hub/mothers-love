@@ -11,6 +11,7 @@ import {
 } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
 
 import {
   activeFeedItems,
@@ -222,7 +223,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const requestSerialRef = useRef(0);
   const feedControllerRef = useRef<AbortController | null>(null);
   const feedDeadlineRef = useRef<number | null>(null);
-  const expiryTimerRef = useRef<number | null>(null);
+  const expiryTimerRef = useRef<SafeTimerHandle | null>(null);
   const reactionControllerRef = useRef<AbortController | null>(null);
   const reactionSerialRef = useRef(0);
   const reactionEntriesRef = useRef<Record<string, ReactionEntry>>({});
@@ -240,7 +241,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
 
   const clearExpiryTimer = useCallback(() => {
     if (expiryTimerRef.current !== null) {
-      window.clearTimeout(expiryTimerRef.current);
+      clearSafeTimeout(expiryTimerRef.current);
       expiryTimerRef.current = null;
     }
   }, []);
@@ -456,7 +457,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         const remainingMs = Math.min(...freshItems.map((item) => (
           Date.parse(item.expiresAt) - (current.verifiedServerTimeMs + elapsedMs)
         )));
-        expiryTimerRef.current = window.setTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
+        expiryTimerRef.current = setSafeTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
       } else {
         expiryTimerRef.current = null;
       }
@@ -466,7 +467,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const remainingMs = Math.min(...visibleItems.map((item) => (
         Date.parse(item.expiresAt) - (nextSnapshot.verifiedServerTimeMs + elapsedMs)
       )));
-      expiryTimerRef.current = window.setTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
+      expiryTimerRef.current = setSafeTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
     }
 
     void loadReactions(visibleItems, generation);

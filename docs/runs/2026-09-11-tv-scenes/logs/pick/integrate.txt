@@ -1,0 +1,27 @@
+Preparing worktree (new branch 'tv/pick')
+HEAD is now at 8fcb59f Merge branch 'codex/color-polish-v6' into tv/base
+merged tv/scene-welcome
+merged tv/scene-garden
+merged tv/scene-arrival
+merged tv/scene-featured
+merged tv/scene-calendar
+merged tv/scene-peacemakers
+merged tv/scene-status
+merged tv/scene-expressions
+merged tv/scene-peace-in-practice
+merged tv/scene-orbit
+merged tv/scene-milestone
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+arrival sequence [('single', 1), ('single', 5), ('single', 2), ('single', 3), ('single', 4), ('single', 0), ('group', 2), ('group', 4), ('group', 3), ('group', 1), ('group', 0)]
+probe PASS
+full e2e exit 1
+  71 failed
+  4 skipped
+  9 did not run
+  145 passed (4.8m)
+DONE

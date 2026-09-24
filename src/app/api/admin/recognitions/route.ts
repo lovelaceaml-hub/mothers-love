@@ -11,9 +11,11 @@ export async function GET(request: NextRequest) {
   const verified = await verifyAdmin(request, true);
   if (!verified.actor) return errorResult(verified.result?.status || 401, verified.result?.code || "UNAUTHENTICATED");
   const params = request.nextUrl.searchParams;
-  const filters = validateAdminListQuery(params.get("status"), params.get("expression"), params.get("from"), params.get("to"));
+  const filters = validateAdminListQuery(params.get("status"), params.get("expression"), params.get("from"), params.get("to"), params.get("sort"));
   if (!filters) return errorResult(400, "INVALID_REQUEST");
-  const page = Math.max(0, Math.min(100000, Number(params.get("page") || 0) || 0));
+  // The screen counts pages from 1; the database counts from 0.
+  const requestedPage = Math.floor(Number(params.get("page") || 1) || 1);
+  const page = Math.max(0, Math.min(100000, requestedPage - 1));
   const result = await databaseAction("admin_list", {
     actor: actorPayload(verified.actor),
     page,
@@ -23,6 +25,7 @@ export async function GET(request: NextRequest) {
     expression: filters.expression,
     from: filters.from,
     to: filters.to,
+    sort: filters.sort,
   });
   return databaseResult(result.data, result.error);
 }

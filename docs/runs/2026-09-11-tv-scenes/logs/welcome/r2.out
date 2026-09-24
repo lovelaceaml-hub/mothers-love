@@ -1,0 +1,12 @@
+Updated the reduced motion scale assertion tolerance in [welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts#L162-L170).
+
+The mount-time transform scale includes the base layer scale multiplied by the actor depth breathing factor, which varies from 0.90 to 1.00. The test now checks that measured scale is between `layerScale * 0.88` and `layerScale * 1.02` inclusive, keeping the stability check across 1000 ms intact.
+
+1. Updated [tests/color-polish-scenes/welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts#L162-L170) to assert scale is between `layerScale * 0.88` and `layerScale * 1.02`.
+2. Appended the Round 2 record sentence to [docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md#L28).
+
+What Anthony must do: Nothing, you're clear.
+
+## COMPLETION
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)

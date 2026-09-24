@@ -1,0 +1,42 @@
+Starting dev server on port 3101...
+
+> mothers-love@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3101
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://127.0.0.1:3101
+- Network:       http://127.0.0.1:3101
+✓ Ready in 341ms
+✓ Running next.config.ts took 90ms
+
+ GET / 200 in 292ms (next.js: 175ms, application-code: 117ms)
+Dev server is up.
+Recording beat 2 (why) [16x9]...
+ GET /expressions 200 in 54ms (next.js: 9ms, application-code: 46ms)
+Recording beat 2 (why) [9x16]...
+ GET /expressions 200 in 33ms (next.js: 3ms, application-code: 30ms)
+Recording beat 3 (nine-words) [16x9]...
+ GET /expressions 200 in 827ms (next.js: 54ms, application-code: 773ms)
+Recording beat 3 (nine-words) [9x16]...
+ GET /expressions 200 in 34ms (next.js: 4ms, application-code: 31ms)
+Recording beat 4 (feed) [16x9]...
+ GET / 200 in 27ms (next.js: 6ms, application-code: 22ms)
+Recording beat 4 (feed) [9x16]...
+ GET / 200 in 24ms (next.js: 4ms, application-code: 20ms)
+Recording beat 5 (share) [16x9]...
+ GET /recognize 200 in 349ms (next.js: 326ms, application-code: 23ms)
+Recording beat 5 (share) [9x16]...
+ GET /recognize 200 in 32ms (next.js: 7ms, application-code: 25ms)
+Recording beat 6 (tv) [16x9]...
+ GET /display 200 in 227ms (next.js: 196ms, application-code: 31ms)
+2 why 16x9 1920x1080 14.4s (in: 1.8s, target: 10s)
+2 why 9x16 1080x1920 14.2s (in: 1.7s, target: 10s)
+3 nine-words 16x9 1920x1080 17.5s (in: 2.8s, target: 12s)
+3 nine-words 9x16 1080x1920 15.8s (in: 1.2s, target: 12s)
+4 feed 16x9 1920x1080 17.8s (in: 2.3s, target: 12s)
+4 feed 9x16 1080x1920 17.8s (in: 2.3s, target: 12s)
+5 share 16x9 1920x1080 19.0s (in: 1.5s, target: 14s)
+5 share 9x16 1080x1920 18.7s (in: 1.2s, target: 14s)
+6 tv 16x9 1920x1080 17.4s (in: 3.9s, target: 10s)
+CAPTURE OK
+[?25h

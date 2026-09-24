@@ -1,115 +1,75 @@
-## Active state: PLAN-01, the 3D world with Peace and Joy (September 24)
-
-The active plan is `/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
-(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
-(Anthony, 2026-09-24):** "I want everything to be 3D" and "I like how it shows currently".
-No painted sky panoramas, painted island layers or painted colour filter go into the world.
-The paintings made on 2026-09-23 are set aside on Drive `3D World/art/painted-v2/` and are
-not used. The rules in the sections below still bind unless PLAN-01 changes them.
-
-## Active state: Plan 26, the 3D Studio kit inside the world (September 23)
-
-Anthony granted the 3D Studio coordinator full creative design and admin authority for
-the 3D world. [Plan 26](docs/PLAN-26-world-kit.md) is active: lanes K0 to K6 in their own
-worktrees, merged here by the coordinator. The design is
-`/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
-section below still binds. One writer per worktree; do not write in this checkout while
-a K lane is merging.
-
-## Active state: pass D2 landed, promotion plan awaiting approval
-
-Anthony reviewed the D1 prototype against the approved direction board on 2026-09-21, asked Fable to bring it closer to his vision, ruled "Mostly Opus but Fable can be used" and "keep going, show me after each section", then raised the bar to "spectacular, jaw-dropping, amazing, smooth, finesse, radiant, glory. Do not hold back." Pass D2 landed eight sections on this branch (head `2ad95b0`), all in the sample-only `?source=sample&art=design` path: see [docs/HANDOFF.md](docs/HANDOFF.md), the [D2 record](docs/runs/2026-09-21-world-quality/D2-FABLE-PASS.md) and the [Radiance design](docs/runs/2026-09-21-world-quality/RADIANCE-DESIGN.md). Still binding: the wording layout with "Thank you" at the top, no build-polished-apps or Stitch, no personal pixels outside the depth-tested slot, `art=classic` and `art=cinematic` byte-identical to D1, no production promotion or merge without Anthony. [Plan 25](docs/PLAN-25-world-promotion.md) is the drafted promotion path (gate flip to live data, Anthony's TV check, P0 and the completion review, the merge Anthony clicks, the TV URL); it does not run until he approves it. The previous design-checkpoint text below is history.
-
-
-## September 21: Approved whole-world visual upgrade
-
-[Plan 24](docs/PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
-
-Work in `/Users/anthony/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](docs/runs/2026-09-21-world-quality/RECORD.md), [task ledger](docs/runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
-
-## September 21: Recognition bubbles inside the world
-
-[Fly through the heavenly world](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview). Recognition names, complete messages, rims and sparkles now travel together as actual 3D objects among the scenery. The automatic camera flies around them while reading, then travels between locations. New recognitions emerge at the portal, receive full reading time and join the resident world. No fixed recognition card covers the healthy 3D view. Phone controls sit below the location caption.
-
-[Plan 23](docs/PLAN-23-recognitions-in-the-world.md) supersedes the screen-fixed presentation in Plan 22. Deployment `dpl_4fxa6cxBK7giTmqZsAg8aEQRrRUJ` is a preview only. Production, API and database are unchanged. One native Sol high review ran; both findings were corrected directly, with no further review round. The [run record](docs/runs/2026-09-21-world-recognitions/RECORD.md) contains verification and release evidence. Physical TV performance and room-distance readability remain separate from browser verification.
-
-## September 21: Circular recognitions and hands-free TV touring
-
-[Corrected heavenly world](https://mothers-love-fzpf184o3-lvzion.vercel.app/display/world-preview) now presents recognition and arrival messages inside circular pearl bubbles. The camera glides during reading and automatically travels between locations without clicks. Reduced motion and Still view automatically change viewpoints; explicit reading holds and owner pauses remain available. The world uses a 20-second minimum stop extended for full message reading, replacing the inherited three-minute Garden wait.
-
-[Plan 22](docs/PLAN-22-tv-bubbles-and-autoplay.md) is current authority for this correction. Deployment `dpl_2d4mnuhiNsSw8GuBngUjEEXXypo7` is a preview only. The original production display, API and database are unchanged. The [run record](docs/runs/2026-09-21-tv-bubbles/RECORD.md) records the focused checks, one review round and source checkpoint process.
-
-## September 21: Live heavenly journey continuation
-
-[Plan 21](docs/PLAN-21-living-heaven.md) is current authority: Anthony requested live data by default, fully animated scenery, interacting people and autonomous completion with minimal tests and at most one review round. The world now opens with live approved recognitions; explicit `?source=sample` selects fictional demonstrations. New fictional neighbors illustrate canonical expressions with gestures, smiles and heart exchanges. Animated sky veils complement the existing water, silk, flowers, clouds and grand entrances.
-
-Delivery: [live heavenly world](https://mothers-love-60sz9lgsq-lvzion.vercel.app/display/world-preview), deployment `dpl_2i8BhTKT2mosL4ryhFYK8Cd7idrc`. Existing production and database resources are unchanged. The new instruction supersedes the previous additional Claude review gate; one native read-only completion review covers this continuation. The [run record](docs/runs/2026-09-21-living-heaven/RECORD.md) records verification and the source checkpoint. One native review round is complete; its three findings were corrected without another review.
-
-## September 21: Heavenly World preview
-
-The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.vercel.app/display/world-preview) now contains thirteen connected 3D locations, a cinematic camera, full recognition reading, single and five-person grand entrances, and optional read-only live data from the existing public TV endpoint. Anthony selected radiant pearl heaven. Default content is fictional and clearly labeled. The production TV and all database/admin behavior remain unchanged.
-
-[Full plan](docs/PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](docs/PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](docs/runs/2026-09-20-world-prototype-01/RECORD.md).
-
-Current authority is Plan 20, including the user's full-world expansion and radiant pearl choice. Live mode is authorized only as a read of the existing explicitly public projection. No production promotion, database modification, real-data fixture/screenshot, or change to the current TV renderer belongs in this preview. This branch starts from `tv17/pick` at `8a10f8c`; newer independent production heart work must be preserved.
-
-## Bubble entrance on scene change (September 19)
-Anthony approved: after every scene change on the live TV, the incoming scene's message bubbles come in one at a time (fade and grow, shuffled order, uneven intervals), the first about half way through the 1.15 second fade and all settled within about 3.5 seconds. Still mode and reduced motion keep bubbles instant. It lives in core/transitions.js and transitions.css and only drives each bubble's inner circle and rings, never the bubble's position or drift; tests/color-polish-scenes/bubble-entrance.spec.ts covers it. Live as deployment dpl_6TxaUYW8F7fMGJfqBRJnYMtf51K2 from tv17/pick; see docs/HANDOFF.md.
-
-## Color Polish live (September 10)
-The Color Polish release is complete and live at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, database settings version 6, revision 2, presentation enabled true. Activation and rollback are SQL-only today, through the two research files docs/runs/2026-09-10-color-polish/research/activation.sql and docs/runs/2026-09-10-color-polish/research/rollback.sql; no admin route exists yet for either. Read /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md and its Build log, and the run record at /Users/anthony/Projects/mothers-love/docs/runs/2026-09-10-color-polish/INDEX.md, for the full history and the remaining follow-ups.
-
-A click, tap, ArrowRight or Space on the live TV display now advances to the next scene, never in the Studio sample preview. Read /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md for that change and the two home page follow-ups alongside it.
-
-Every scene on the live TV display now shows a small, subtle countdown ring in the bottom right corner, hidden when the mode is not normal, when rotation is paused by the owner, in still mode, when a scene is forced away from the playlist, and during arrivals and transitions. Transient poll failures never change the display while the last good snapshot is under 60 seconds old, and the renderer iframe must never be remounted on a status change.
-
-# The Words of Mother's Love
-
-## Current authority
-Anthony explicitly requested: "I want you to plan out this entire app and deploy it." This supersedes the historical planning-only handoff. Local implementation, dependencies, isolated new app hosting and deployment are authorized. Purchases need explicit budget authority. Existing apps/databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
+# The Words of Mother's Love: agent notes
 
 ## Read first
-- /Users/anthony/Projects/mothers-love/docs/PLAN-12-tv-stability-countdown-and-home-action.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/PLAN-09-interview-completion.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-09-interview-completion/INDEX.md.
-- /Users/anthony/Projects/mothers-love/docs/PLAN-07-flexible-names.md including Build log.
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-flexible-names/INDEX.md.
-- /Users/anthony/Projects/mothers-love/docs/CONTRACT.md.
-- /Users/anthony/Projects/mothers-love/docs/source-handoff/03_CONTENT_AND_DESIGN.md and relevant phases/tests.
+- /Users/anthony/Projects/mothers-love/docs/HANDOFF.md, the current state on one page.
+- The active plan and its Build log: /Users/anthony/Projects/mothers-love/docs/PLAN-28-repository-refactor.md, run record /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/INDEX.md.
+- /Users/anthony/Projects/mothers-love/docs/CONTRACT.md, the product contract.
+- /Users/anthony/Projects/mothers-love/docs/HISTORY.md when you need an older release note or a file that stayed outside `main`.
+
+## Current state (2026-09-24)
+Production is the branch `main` (renamed from `codex/mothers-love` on 2026-09-23). Plan 18 Section B went live with merge 43d801f, Vercel deployment dpl_BrhaanCyzqbm3zUZDYdKkVDFfgf9, and migration 016 was applied at 11:27 UTC on 2026-09-24, so every recognition now expires in 2126 and browsers see at most 7 days. Never roll the code back alone past 43d801f: roll the database back first (docs/runs/2026-09-23-keep-forever/lanes/SB.md), or roll forward. Live: home feed of the latest 100, the form at /recognize, the expression guide, admin, the TV at /display with eleven screens drawing from the latest 100 and the sculpted 3D heart, the app icon, and Android install with kiosk mode at /display?kiosk=1. The 3D world is not live. On 2026-09-24, at Anthony's request, pull request #12 (PLAN-01 Section 5, the world TV page) merged into feat/world-cinematic and pull request #10 merged feat/world-cinematic into feat/world-base, before PLAN-01 Section 5 steps 0 and 11 (Mac baselines and safety checks), which still come before the world reaches `main`. The world gets its own address /world beside the TV view (Plan 28 Section 5), never replacing /display. The 3D Studio kit (Plan 29) has its own coordinator writing on feat/world-cinematic and world-kit/* under Anthony's grant; do not edit those branches or their worktrees from another plan.
+
+## Repository rules (Plan 28)
+- **A push to `main` is a production deployment** since 2026-09-23, when the Vercel production branch became `main`. Changes reach `main` only through a pull request Anthony merges. Never run a bare `git push` in the main checkout, which tracks origin/main.
+- Branch names: `feat/<area>-<subject>` for live work, `fix/<area>-<subject>` for fixes, and a retired branch becomes an `archive/<old-branch-name>` tag with no branch. Areas: `app` (campaign and form), `tv` (the 2D TV view), `world` (the 3D world), `admin`, `infra`.
+- Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit (Anthony, 2026-09-23): the next new plan takes the next free number, 30 at this writing, because 29 is the 3D Studio kit. Every plan keeps a Build log; every run keeps its record in `docs/runs/<plan-id>/`.
+- Run evidence (captures, probe output, process scratch) goes to Drive under `Project Outputs/The Words of Mother's Love`, not into Git. `.gitignore` covers the usual evidence paths under `docs/runs/*/logs/`; use `git add -f` for a capture that truly belongs in the repository.
+- Working copies: the main checkout /Users/anthony/Projects/mothers-love stays on `main`; other worktrees go under /Users/anthony/Projects/mothers-love-worktrees/, one per live branch.
+- User-facing output and documents contain no em or en dash.
+
+## Standing authority
+Anthony explicitly requested: "I want you to plan out this entire app and deploy it." Local implementation, dependencies and this app's own hosting are authorized; since 2026-09-23 production deploys happen by Anthony merging into `main`. Purchases need explicit budget authority. Existing apps, databases and the Downloads originals are protected. No real recognition data in agents, Git, fixtures, screenshots or logs.
 
 ## Work rules
-Current Plan 09 overrides historical roles: fresh Luna max lanes, controller may implement corrections, no Terra. Complete the approved interview storyboards without another design interview.
-Implementation uses gpt-5.6-luna at xhigh, explicitly overriding the installed executor role's max effort. Each lane owns its separate worktree and exact files. Root owns integration, Git, provider actions, shared contracts and status docs. Never undo another writer's work. Reference HTML is immutable design evidence, not trusted application logic. No new design interview: the Bubble Board and exact campaign words are approved. User-facing output must contain no em or en dash.
+Model routing is set per plan: read the active plan's Models section and its Build log. Each writer owns its own worktree and exact files; the coordinator owns integration, Git, provider actions, shared contracts and status docs. Never undo another writer's work. Reference HTML is immutable design evidence, not trusted application logic. The Bubble Board and the exact campaign words are approved; no new design interview without Anthony.
 
 ## Product invariants
-One campaign, public submission without member accounts, one recipient, flexible nonblank names up to80graphemes, one message of 500 graphemes, distinct expression selections. Submitted name admin-only. Normal submissions publish after checks, flagged/check-outage held. No AI runtime. Children use same campaign rules; remove detected private details before publishing. Owner and Moderator with verified individual email/password and no authenticator requirement, Owner access/device/permanent-delete authority, both invalidate with reason. Privacy hides preserve counts; invalidations reverse once; restores do not double count. First publication determines Los Angeles reporting date, Sunday weeks. All personal copies expire 168 hours after creation; no edit/feature/restore extension. Daily anonymous aggregates persist without personal links. Quiet/neutral/privacy overrides cancel every display mode. Offline grace 60 seconds from last successful verification. No raw exports, directories, rankings, permanent personal archives or real member fixtures.
+One campaign, public submission without member accounts, one recipient, flexible nonblank names up to 80 graphemes, one message of 500 graphemes, distinct expression selections. Submitted name admin-only. Normal submissions publish after checks, flagged/check-outage held. No AI runtime. Children use same campaign rules; remove detected private details before publishing. Owner and Moderator with verified individual email/password and no authenticator requirement, Owner access/device/permanent-delete authority, both invalidate with reason. Privacy hides preserve counts; invalidations reverse once; restores do not double count. First publication determines Los Angeles reporting date, Sunday weeks. Recognitions are kept forever and stay on the home page (Anthony, 2026-09-23, PLAN-18); the TV draws from the latest 100; browsers never see an expiry more than 7 days ahead. Other personal copies keep their short lifetimes. Daily anonymous aggregates persist without personal links. Quiet/neutral/privacy overrides cancel every display mode. Offline grace 60 seconds from last successful verification. No raw exports, directories, rankings or real member fixtures.
 
 ## Verification and deployment
-Commands become authoritative as foundation lands: npm run typecheck, npm test, npm run build, npm run test:e2e. Use npm_config_cache=/tmp/npm-cache for npm/npx. Isolated synthetic local and deployed smoke tests; never seed production with example people. Missing backend configuration must disable collection truthfully. Production changes only to this new app's confirmed resources. Every route must enforce server authorization; no private display fields or elevated browser key. Physical-TV/phone commissioning is a distinct unexecuted check until Anthony supplies actual evidence.
+Commands: npm run typecheck, npm test, npm run build, npm run test:e2e. Use npm_config_cache=/tmp/npm-cache for npm/npx. Isolated synthetic local and deployed smoke tests; never seed production with example people. Missing backend configuration must disable collection truthfully. Production changes only to this app's confirmed resources. Every route must enforce server authorization; no private display fields or elevated browser key. Physical-TV/phone commissioning is a distinct unexecuted check until Anthony supplies actual evidence.
 
-## Status
-Completed application follow-up: docs/PLAN-04-polish-and-hearts.md; previous follow-up: docs/PLAN-03-live-feed.md; previous copy follow-up: docs/PLAN-02-copy-cleanup.md; previous full plan: docs/PLAN-01-full-app.md. Full app is live with collection open after the latest ready-to-use request and verified activation at settings version2. Strict TLS, dedicated password setup, email/password access without an authenticator, and expanded educational examples are deployed. Final integration review passed. Release source and non-sensitive evidence backups are recorded in docs/HANDOFF.md. After the free-project quota refusal, Anthony explicitly instructed use of the existing database. Confirmed target cvuwdlmlukepwfffpgdu with new dedicated mothers_love schema and restricted-runtime public.ml_* bridge functions. Never change existing app objects, global default privileges or exposed schemas. One exact additive auth redirect for the new deployment is permitted if needed, preserving every existing entry. Shared backup excludes new campaign personal rows before collection. No reset/db push/migration repair/schema-wide diff against shared production.
+## Database boundary
+After the free-project quota refusal, Anthony explicitly instructed use of the existing database. Confirmed target cvuwdlmlukepwfffpgdu with the dedicated mothers_love schema and restricted-runtime public.ml_* bridge functions. Never change existing app objects, global default privileges or exposed schemas. One exact additive auth redirect for the deployment is permitted if needed, preserving every existing entry. Shared backup excludes campaign personal rows. No reset/db push/migration repair/schema-wide diff against shared production. Strict TLS is mandatory.
+
+## Sculpted 3D heart on Peace in Practice (live since September 20)
+Live as commit 4c4b340, deployment dpl_6wmAeMRmLigLcAYuFJkq1S1qQhGD. Scene 9 shows the approved WebGL 2 heart with sheer ribbons (public/color-polish/scenes/peace-in-practice-heart3d.js, mesh in peace-in-practice-heart-mesh.js) at the study's full sweep; Anthony asked never to hold the ribbons under the subheading again, so the heading's words are drawn on top of the ribbon tips. The Canvas 2D heart in peace-in-practice.js is the fallback only; never delete it and never edit only the fallback by mistake. The heart owns no loop (the core calls draw), gives its graphics context back on leaving the scene, and the renderer page's content policy must stay as it is. The default test browser has no WebGL 2, so the 3D journeys live in tests/color-polish-scenes/peace-in-practice-heart3d.spec.ts, which asks for software WebGL.
+
+## Plan 17 TV (live since September 19)
+Plan 17 (TV text fit, restored Peacemakers and Peace in Practice, today's fade for every scene change, the Live Recognitions screen, entrance and arrival work, Goal vortex, Welcome bubbles) is live on the split renderer under public/color-polish/core/ and public/color-polish/scenes/. No message is ever truncated, clipped or ellipsized. A heart count change must never cancel an arrival (core/host.js). The flower arrival replaced the line rosette on September 19; the two empty .arrival-rosette layers stay as anchors for the stage tick and its tests.
+
+## Bubble entrance on scene change (September 19)
+Anthony approved: after every scene change on the live TV, the incoming scene's message bubbles come in one at a time (fade and grow, shuffled order, uneven intervals), the first about half way through the 1.15 second fade and all settled within about 3.5 seconds. Still mode and reduced motion keep bubbles instant. It lives in core/transitions.js and transitions.css and only drives each bubble's inner circle and rings, never the bubble's position or drift; tests/color-polish-scenes/bubble-entrance.spec.ts covers it.
+
+## Color Polish (live since September 10)
+The Color Polish TV and sample preview run at https://mothers-love.vercel.app/display and https://mothers-love.vercel.app/admin/display, database settings version 6, revision 2, presentation enabled true. Activation and rollback are SQL-only, through /Users/anthony/Projects/mothers-love/docs/runs/2026-09-10-color-polish/research/activation.sql and rollback.sql; no admin route exists for either. Full history: /Users/anthony/Projects/mothers-love/docs/PLAN-10-color-polish.md.
+
+A click, tap, ArrowRight or Space on the live TV display advances to the next scene, never in the Studio sample preview (Plan 11).
+
+Every scene on the live TV display shows a small, subtle countdown ring in the bottom right corner, hidden when the mode is not normal, when rotation is paused by the owner, in still mode, when a scene is forced away from the playlist, and during arrivals and transitions. Transient poll failures never change the display while the last good snapshot is under 60 seconds old, and the renderer iframe must never be remounted on a status change (Plan 12).
+
+## Admin list (September 20)
+The Recognitions screen and the review inbox send a 1-based page that the API converts to the database's 0-based page; never pass it straight through again, or the newest 50 disappear. The list defaults to oldest first and numbers rows by arrival order. Migration 015 lets the database honor the order; whether it is applied live is not recorded, and the screen says so when it is not.
 
 ## Copy style
 Use simple task-oriented instructions. No age-specific explanations or personal-data duration explanations in app screens. Keep exact campaign catalog wording, useful errors, and concise action consequences. Expression submission cards show the number, quoted expression and check indicator, with full explanations always visible beneath in quieter text. Selected cards turn gold and shimmer. Technical data rules remain unchanged.
 
-## Live feed request
-Anthony requested a public list-first home with a prominent form action and discreet visible Admin link. Published, unexpired recognition messages may appear in this new public feed; submitted names and moderation details remain private. The form moves to /recognize. Read PLAN-03-live-feed.md for the explicit feed allowlist, stale-state removal and campaign-only function boundary. No roster or new participant account requirement is approved.
+## Live feed
+Anthony requested a public list-first home with a prominent form action and discreet visible Admin link. Published, unexpired recognition messages may appear in this public feed; submitted names and moderation details remain private. The form lives at /recognize. Read PLAN-03-live-feed.md for the explicit feed allowlist, stale-state removal and campaign-only function boundary. No roster or new participant account requirement is approved. The home page shows the latest 100 (Plan 16).
 
-Home motion is approved and deployed: coral/gold primary action, gentle decorative animation with pause and reduced-motion support. Admin and TV View are grouped at the bottom, linking to existing login and direct public TV View. Preserve feed data timing and server access rules. See docs/runs/2026-09-08-live-feed/research/motion-publication.md.
+Home motion is approved and deployed: coral/gold primary action, gentle decorative animation with pause and reduced-motion support. Admin and TV View are grouped at the bottom, linking to existing login and direct public TV View. Preserve feed data timing and server access rules.
 
-## Presentation and hearts follow-up
-Anthony approved warmer, lighter typography, distinct TV screen animations, fitting rounded content panels, heart counts with one toggleable like per browser without sign-in, and a scrollable latest-30 feed. Hearts must never flash: a 10 second feed refresh keeps every confirmed heart on screen unchanged while new counts load, and a tap fills the heart at once, then the server count replaces it, rolling back on failure (September 18). Shared feed appears only on public pages and every eligible TV screen; admin/sign-in remain focused. TV personal content derives only from the verified public display snapshot. Neutral, Quiet, expired and stale states clear personal content. Likes never affect campaign totals, ordering, feature priority or lifetime. See PLAN-04 and its reaction contract for the additive runtime-only database and anonymous-cookie boundaries.
+## Presentation and hearts
+Anthony approved warmer, lighter typography, distinct TV screen animations, fitting rounded content panels, heart counts with one toggleable like per browser without sign-in, and a scrollable feed. Hearts must never flash: a 10 second feed refresh keeps every confirmed heart on screen unchanged while new counts load, and a tap fills the heart at once, then the server count replaces it, rolling back on failure (September 18). Shared feed appears only on public pages and every eligible TV screen; admin/sign-in remain focused. TV personal content derives only from the verified public display snapshot. Neutral, Quiet, expired and stale states clear personal content. Likes never affect campaign totals, ordering, feature priority or lifetime. See PLAN-04 and its reaction contract for the additive runtime-only database and anonymous-cookie boundaries.
 
 ## Confirmed presentation correction
 Preserve the approved circular Bubble Board and expressive drift, sparkle, bounce, trails and constellation movement. Readable long-message panels do not replace the signature circular compositions. TV screen titles occupy the main header top-right. Recognition Garden uses bubbles as its live feed and has no duplicate recent-recognition rail; other eligible TV screens retain the rail. On /recognize, expressions stack one per row at every width, selected expression cards turn gold with shimmer and a check indicator. As of September 10, at Anthony's request, /recognize shows only the form, with no live feed. As of September 18, at Anthony's request, the receipt screen that follows a sent recognition (the one offering Recognize Someone Else) shows the same live Recent recognitions list as the home page beneath the receipt, while the form itself still shows no feed (tests/receipt-feed); the home page keeps the feed, with the single shimmering Share a recognition action above Recent recognitions on phones. Gold shimmer applies to selected expressions, not the submit button. Respect reduced motion and existing privacy states. On phones, the Share a recognition action is the dominant element above the medallions and the feed, with shimmer and a 6 second pulse, and recent recognition cards are compact but never truncate messages, keeping message text at least .875rem.
 
-## Direct TV access correction
-Anthony removes TV pairing: /display opens directly for anyone with the link. Public TV snapshot is read-only and explicitly projected, with no code, login, device registration, session token or acknowledgement. Admin access remains secured. Global settings, neutral/quiet, expiry, cleanup gating and offline safety remain. Historical paired-only wording below older plans is superseded. Read PLAN-05.
+## Direct TV access
+/display opens directly for anyone with the link. Public TV snapshot is read-only and explicitly projected, with no code, login, device registration, session token or acknowledgement. Admin access remains secured. Global settings, neutral/quiet, expiry, cleanup gating and offline safety remain. The kiosk mode (/display?kiosk=1) only adds a fullscreen button and a screen wake lock; the service worker has no fetch handler, so the live display is never cached. Read PLAN-05.
 
-## Garden refresh correction
-New eligible records must enter Garden on the next successful snapshot even while full or rotation is paused. Keep unchanged polls stable and refill hidden/expired slots. TV reads use their own bounded client lifecycle; never retire the mutation pool to recover a public read. PLAN-06tracks the correction.
+## Garden refresh
+New eligible records must enter Garden on the next successful snapshot even while full or rotation is paused. Keep unchanged polls stable and refill hidden/expired slots. TV reads use their own bounded client lifecycle; never retire the mutation pool to recover a public read. Read PLAN-06.
 
 ## Flexible names
-Anthony explicitly removed required first-name/last-initial formatting. Accept single names, full names and nicknames consistently in browser/API/admin/feed/TV. Keep required nonblank and80grapheme bounds, moderation, safe rendering and submitted-name privacy. Never reintroduce a shape rejection or truncate names to initials. Read PLAN-07.
+Anthony explicitly removed required first-name/last-initial formatting. Accept single names, full names and nicknames consistently in browser/API/admin/feed/TV. Keep required nonblank and 80 grapheme bounds, moderation, safe rendering and submitted-name privacy. Never reintroduce a shape rejection or truncate names to initials. Read PLAN-07.

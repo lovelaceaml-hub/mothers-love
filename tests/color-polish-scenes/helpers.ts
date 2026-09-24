@@ -495,6 +495,21 @@ export async function cardShape(
 }
 
 /**
+ * Makes WebGL 2 unavailable in every frame of the page, the way an old TV
+ * browser or a display without graphics acceleration reports it, so a scene
+ * shows what it falls back to. Call before loadRenderer.
+ * Called by the Peace in Practice specs.
+ */
+export async function withoutWebGL2(page: Page) {
+  await page.addInitScript(() => {
+    const real = HTMLCanvasElement.prototype.getContext;
+    (HTMLCanvasElement.prototype as any).getContext = function (kind: string, ...rest: unknown[]) {
+      return kind === 'webgl2' ? null : (real as any).call(this, kind, ...rest);
+    };
+  });
+}
+
+/**
  * Direct-renderer harness for color-polish tests.
  * Called by scene specs to test the renderer directly through /probe.
  */

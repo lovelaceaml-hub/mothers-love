@@ -1,0 +1,17 @@
+build (env) exit 0
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count 
+  3) [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle 
+  4) [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms 
+  5) [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms 
+  6) [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance 
+  7) [chromium] › tests/color-polish-scenes/calendar.spec.ts:226:5 › reduced motion renders the calendar still with no pulse 
+  8) [chromium] › tests/color-polish-scenes/calendar.spec.ts:241:5 › the same holds at 3840 ────────
+  9) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  11) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+  12) [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance 
+  12 failed
+  4 passed (6.5m)
+DONE

@@ -1,0 +1,363 @@
+
+Running 15 tests using 5 workers
+
+  ✘   1 [chromium] › tests/color-polish-scenes/orbit.spec.ts:10:5 › orbit renders circular planets and no overflow at 14 s (10.6s)
+  ✘   2 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (11.8s)
+  ✘   5 [chromium] › tests/color-polish-scenes/orbit.spec.ts:119:5 › the far planet is blurred and dim, the near planet sharp with a shadow (11.2s)
+  ✘   3 [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate (11.1s)
+  ✘   4 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (11.4s)
+  ✘   6 [chromium] › tests/color-polish-scenes/orbit.spec.ts:182:5 › planets stay circular through the orbit (5.5s)
+  ✘   7 [chromium] › tests/color-polish-scenes/orbit.spec.ts:204:5 › reduced motion renders the orbit still (6.7s)
+  ✘   8 [chromium] › tests/color-polish-scenes/orbit.spec.ts:213:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names (6.2s)
+  ✘   9 [chromium] › tests/color-polish-scenes/orbit.spec.ts:226:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot (6.4s)
+  ✘  11 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (6.8s)
+  ✘  10 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (12.3s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (1.9s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (6.0s)
+  ✓  14 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.9s)
+  ✘  15 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/orbit.spec.ts:10:5 › orbit renders circular planets and no overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    8 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-orbit--90fb7-ets-and-no-overflow-at-14-s-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:26:21
+
+    Error Context: test-results/color-polish-scenes-orbit--de2d9-it-in-3D-at-the-slower-rate-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish-scenes/orbit.spec.ts:119:5 › the far planet is blurred and dim, the near planet sharp with a shadow 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:120:21
+
+    Error Context: test-results/color-polish-scenes-orbit--10719--planet-sharp-with-a-shadow-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish-scenes/orbit.spec.ts:182:5 › planets stay circular through the orbit 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:183:21
+
+    Error Context: test-results/color-polish-scenes-orbit--97d53--circular-through-the-orbit-chromium/error-context.md
+
+  7) [chromium] › tests/color-polish-scenes/orbit.spec.ts:204:5 › reduced motion renders the orbit still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:205:28
+
+    Error Context: test-results/color-polish-scenes-orbit--9c3be-ion-renders-the-orbit-still-chromium/error-context.md
+
+  8) [chromium] › tests/color-polish-scenes/orbit.spec.ts:213:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:218:23
+
+    Error Context: test-results/color-polish-scenes-orbit--c9586--two-distinct-catalog-names-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish-scenes/orbit.spec.ts:226:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:227:21
+
+    Error Context: test-results/color-polish-scenes-orbit--67dd2-ystem-contains-one-orb-slot-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+      100 |   await page.getByLabel('Password').fill('synthetic-password');
+      101 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 102 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      103 | }
+      104 |
+      105 |
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:102:22)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:224:3
+
+    Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
+
+  11) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3113/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3113/admin/login"[22m
+
+
+      100 |   await page.getByLabel('Password').fill('synthetic-password');
+      101 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 102 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      103 | }
+      104 |
+      105 |
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:102:22)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:261:3
+
+    Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
+
+  12) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  12 failed
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:10:5 › orbit renders circular planets and no overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:119:5 › the far planet is blurred and dim, the near planet sharp with a shadow 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:182:5 › planets stay circular through the orbit 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:204:5 › reduced motion renders the orbit still 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:213:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names 
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:226:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  3 passed (2.2m)

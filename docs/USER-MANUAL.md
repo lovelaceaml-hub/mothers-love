@@ -18,6 +18,8 @@ Use your email and password at [admin sign-in](https://mothers-love.vercel.app/a
 ## Review and manage recognitions
 Open the [review inbox](https://mothers-love.vercel.app/admin/review) to check messages awaiting approval. Use [recognitions](https://mothers-love.vercel.app/admin/recognitions) to search, edit or manage a message. Choose a reason when prompted.
 
+The recognitions list shows every submission, oldest first, numbered in the order it came in, with the submitted name and the full message. Use Order to show the newest first; each submission keeps its number either way.
+
 | Action | What it does |
 |---|---|
 | Publish | Makes an approved message available on the home page and TV |
@@ -30,7 +32,9 @@ Open the [review inbox](https://mothers-love.vercel.app/admin/review) to check m
 If another admin changes a message while you are editing, review their changes before saving again. [Insights](https://mothers-love.vercel.app/admin/insights) shows campaign totals and lets you download a summary.
 
 ## Open TV View
-Open [TV View](https://mothers-love.vercel.app/display) on the TV browser. No account or code is needed. Check the text from the viewing distance and scan the QR code with your phone.
+Open [TV View](https://mothers-love.vercel.app/display) on the TV browser. No account or code is needed. Check the text from the viewing distance and scan the QR code with your phone. The TV shows eleven screens in turn, including Live Recognitions. To move to the next screen, click or tap the TV, or press the right arrow or the space bar.
+
+For a screen that only shows the TV, open [TV View in kiosk mode](https://mothers-love.vercel.app/display?kiosk=1) and press Enter full screen; the screen stays awake where the browser allows it. On an Android device, open TV View and use the browser's install option to add it as an app; the installed TV View opens full screen in landscape.
 
 Use [Display controls](https://mothers-love.vercel.app/admin/display) to change motion, pause the display or stop showing messages. These settings apply to all open TV screens when they refresh. If an offline TV must stop showing a message immediately, turn off or blank that screen.
 
@@ -43,7 +47,7 @@ Heart controls appear at the top right of recognition cards. Tap the heart to li
 
 ## Preview and arrange the TV program
 
-Open [Display Studio](https://mothers-love.vercel.app/admin/display). Choose any of the ten screen tabs and press Play or Replay. Safe sample is the default; Current approved explicitly loads public display content and clears it if verification fails or the content expires. Tempo, effects and timing preview your unsaved choices. Save display settings applies them to the TV on refresh.
+Open [Display Studio](https://mothers-love.vercel.app/admin/display). Choose any of the eleven screen tabs and press Play or Replay. Safe sample is the default; Current approved explicitly loads public display content and clears it if verification fails or the content expires. Tempo, effects and timing preview your unsaved choices. Save display settings applies them to the TV on refresh.
 
 On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this screen once if the browser requires a sound gesture. Studio volume and event toggles still control sound. Pause also stops decorative motion. Long circle messages move to reveal their complete text, with dedicated reading pages as well. All nine Spotlight and Daily Practice expressions and all three One Kind Word lines rotate fairly. Home, school and work appear in sequence.
 

@@ -1,0 +1,29 @@
+Section 8 Nine Expressions fit and focused card rebalance is complete and ready for coordinator verification.
+
+The focused detail card is rebalanced into an airy flex column with larger typography, 4 px of slack is restored to the grid state, and the comprehensive Playwright scene spec is in place. The catalog text and animated card geometry remain completely intact.
+
+1. Scoped layout and typography rules added to [expressions.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.css).
+2. Playwright behavioral tests written in [expressions.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts).
+3. Lane execution record and mathematical measurements documented in [expressions.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md).
+
+Now works:
+- Grid front layer has 4 px of vertical slack (scrollHeight 159 px in a 163 px client box), leaving at least 28 px clearance beneath the phrase.
+- Focused card detail distributes content evenly across the card height; explanation ends at 86.69% of card height with 19.8 px clearance above the attribution note.
+- Seven Playwright tests verify circularity, overflow, grid slack, compact cards, focused balance, replay through all nine expressions, reduced motion, and 3840 viewport parity.
+
+Inspect the lane record file at [expressions.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md) (1 minute).
+
+### What Anthony must do
+Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md)
+
+Files inspected without changes:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.js) (existing JS geometry 590x167 grid and 950x530 focused fits the rebalance without edits)
+
+Anything not done and why:
+None; all tasks in the work order are completed.

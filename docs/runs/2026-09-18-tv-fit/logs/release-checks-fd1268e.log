@@ -1,0 +1,508 @@
+
+> mothers-love@0.1.0 typecheck
+> tsc --noEmit
+
+
+> mothers-love@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m/Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed[39m
+
+ [32m✓[39m tests/foundation/client-api.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 603[2mms[22m[39m
+     [33m[2m✓[22m[39m adds credentials and an explicit bearer token without logging payloads [33m 600[2mms[22m[39m
+ [32m✓[39m tests/backend/tls-config.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 2631[2mms[22m[39m
+     [33m[2m✓[22m[39m fails closed when a configured database has no CA certificate [33m 657[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps strict SSL when DATABASE_URL requests sslmode=disable [33m 1850[2mms[22m[39m
+ [32m✓[39m tests/backend/members-route.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 364[2mms[22m[39m
+     [33m[2m✓[22m[39m retries delivery for an existing pending invitation without renewing or inventing its expiry [33m 349[2mms[22m[39m
+ [32m✓[39m tests/foundation/display-settings.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+ [32m✓[39m tests/color-polish-data/color-polish.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 425[2mms[22m[39m
+ [32m✓[39m tests/backend/public-display.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 407[2mms[22m[39m
+ [32m✓[39m tests/display/coordinator.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m tests/color-polish-data/query.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 118[2mms[22m[39m
+ [32m✓[39m tests/backend/route-contract.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+ [32m✓[39m tests/interview/insights-storyboard.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 212[2mms[22m[39m
+ [32m✓[39m tests/backend/public-display-recovery.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 845[2mms[22m[39m
+     [33m[2m✓[22m[39m caches one strict TLS max-one TV generation and reuses the server config accessor [33m 365[2mms[22m[39m
+ [32m✓[39m tests/interview/integration-coordinator.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 548[2mms[22m[39m
+     [33m[2m✓[22m[39m gives different recognitions their dedicated readable turn [33m 360[2mms[22m[39m
+ [32m✓[39m tests/display/teaching/TeachingScreens.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 155[2mms[22m[39m
+ [32m✓[39m tests/admin/admin-utils.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m tests/display/insights/insights-data.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 224[2mms[22m[39m
+ [32m✓[39m tests/submission/submission-validation.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 236[2mms[22m[39m
+ [32m✓[39m tests/display/garden/model.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 274[2mms[22m[39m
+ [32m✓[39m tests/backend/auth.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 192[2mms[22m[39m
+ [32m✓[39m tests/backend/public-feed.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 316[2mms[22m[39m
+ [32m✓[39m tests/interview/studio-preview.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m tests/display/scene-link.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 143[2mms[22m[39m
+ [32m✓[39m tests/backend/validation.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 293[2mms[22m[39m
+ [32m✓[39m tests/interview/teaching-screens.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 434[2mms[22m[39m
+ [32m✓[39m tests/color-polish-data/sql-contract.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m tests/backend/public-display-admission.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 515[2mms[22m[39m
+ [32m✓[39m tests/foundation/contracts.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+ [32m✓[39m tests/color-polish-data/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m tests/backend/reactions.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m tests/foundation/catalog.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/display/performance/fair-selection.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/display/performance/reconnect-cache.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/display/layering.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/backend/sql-contract.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/display/performance/request-guard.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/backend/tv-garden-settings-sql-contract.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/display/performance/refresh-plan.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/display/performance/render-budget.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/admin/display-controls/display-controls.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/display/performance/smooth-mode-indicator.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/display/performance/adaptive-quality.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m40 passed[39m[22m[90m (40)[39m
+[2m      Tests [22m [1m[32m255 passed[39m[22m[90m (255)[39m
+[2m   Start at [22m 08:06:16
+[2m   Duration [22m 13.56s[2m (transform 41.33s, setup 0ms, import 67.38s, tests 9.52s, environment 71ms)[22m
+
+
+> mothers-love@0.1.0 build
+> next build
+
+▲ Next.js 16.3.4 (Turbopack)
+✓ Running next.config.ts took 75ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.8s
+  Running TypeScript ...
+  Finished TypeScript in 1802ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/36) ...
+  Generating static pages using 9 workers (9/36) 
+  Generating static pages using 9 workers (18/36) 
+  Generating static pages using 9 workers (27/36) 
+✓ Generating static pages using 9 workers (36/36) in 255ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/display
+├ ○ /admin/insights
+├ ○ /admin/login
+├ ○ /admin/mfa
+├ ○ /admin/recognitions
+├ ƒ /admin/recognitions/[id]
+├ ○ /admin/review
+├ ○ /admin/set-password
+├ ○ /admin/settings
+├ ƒ /api/admin/devices
+├ ƒ /api/admin/devices/[id]
+├ ƒ /api/admin/members
+├ ƒ /api/admin/members/[id]
+├ ƒ /api/admin/overview
+├ ƒ /api/admin/recognitions
+├ ƒ /api/admin/recognitions/[id]
+├ ƒ /api/admin/reports
+├ ƒ /api/admin/reports/export
+├ ƒ /api/admin/session
+├ ƒ /api/admin/settings
+├ ƒ /api/config
+├ ƒ /api/display/ack
+├ ƒ /api/display/color-polish
+├ ƒ /api/display/daily
+├ ƒ /api/display/pair
+├ ƒ /api/display/snapshot
+├ ƒ /api/feed
+├ ƒ /api/reactions
+├ ƒ /api/reactions/[id]
+├ ƒ /api/recognitions
+├ ○ /api/tv-v6
+├ ○ /display
+├ ○ /display-legacy
+├ ○ /display-v6
+├ ○ /expressions
+├ ○ /privacy
+└ ○ /recognize
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+Running 276 tests using 2 workers
+
+[1A[2K[1/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:152:5 › the four reworked entrances start deep and resolve flat
+[1A[2K[2/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:95:5 › single and group entrance styles cycle in the recorded order, and four frame styles are declared
+[1A[2K[3/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:251:5 › circularity holds on .event-orb at entrance midpoint, hold midpoint, and exit midpoint
+[1A[2K[4/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:286:5 › arrival ring carries 3D rotation while orb and ancestors carry none
+[1A[2K[5/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:345:5 › reduced motion displays bubble within one frame without assembly or burst
+[1A[2K[6/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:407:5 › G3 computed-style stage dim holds, and the backdrop is a bright full screen layer above header and rail
+[1A[2K[7/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:504:5 › four frame styles are logged with no immediate repeat and vary independently from path styles
+[1A[2K[8/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:548:5 › feed rail and returnScene behavior are unchanged after arrival chain
+[1A[2K[9/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:589:5 › screenshots for frame styles at assembly midpoint and path styles at entrance midpoint
+[1A[2K[10/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:667:5 › arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave
+[1A[2K[11/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:958:5 › the single arrival backdrop is bright at 1920 and at 3840, and orb text keeps AA contrast on it
+[1A[2K[12/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1052:5 › the header and the live recognition rail are covered during the single arrival and readable again after
+[1A[2K[13/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:958:5 › the group arrival backdrop is bright at 1920 and at 3840, and orb text keeps AA contrast on it
+[1A[2K[14/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1052:5 › the header and the live recognition rail are covered during the group arrival and readable again after
+[1A[2K[15/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1136:5 › every entrance style, single and group, runs under the bright backdrop
+[1A[2K[16/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1176:5 › arrival timing is unchanged: single entrance, hold and exit keep their recorded lengths
+[1A[2K[17/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1232:5 › captures the bright single and group arrival at start, mid flight and after clearing, at 1920
+[1A[2K[18/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1232:5 › captures the bright single and group arrival at start, mid flight and after clearing, at 3840
+[1A[2K[19/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1317:5 › a quiet update during the single arrival clears every personal word and the backdrop cannot outlive it
+[1A[2K[20/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1317:5 › a quiet update during the group arrival clears every personal word and the backdrop cannot outlive it
+[1A[2K[21/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1317:5 › a unavailable update during the single arrival clears every personal word and the backdrop cannot outlive it
+[1A[2K[22/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1317:5 › a unavailable update during the group arrival clears every personal word and the backdrop cannot outlive it
+[1A[2K[23/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1367:5 › captures every frame style, single and group, under the bright backdrop at 1920, and each stays bright
+[1A[2K[24/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1367:5 › captures every frame style, single and group, under the bright backdrop at 3840, and each stays bright
+[1A[2K[25/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1591:5 › the entrance composition fills the whole screen for every wave and every frame style at 1920
+[1A[2K[26/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1627:5 › a 500 grapheme message fits whole on the full screen single orb and the group pairs at 1920
+[1A[2K[27/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1591:5 › the entrance composition fills the whole screen for every wave and every frame style at 3840
+[1A[2K[28/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1627:5 › a 500 grapheme message fits whole on the full screen single orb and the group pairs at 3840
+[1A[2K[29/276] [chromium] › tests/color-polish-scenes/arrival.spec.ts:1681:5 › the exit flight still lands on the feed rail from the full screen frame
+[1A[2K[30/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:54:5 › calendar renders circular orbs and no overflow at 14 s
+[1A[2K[31/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:71:5 › day cells keep the corner date and centered count
+[1A[2K[32/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:76:5 › past days pulse once on entry and settle
+[1A[2K[33/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:131:5 › calendar wave, today halo or ring, and fx canvas render at 6000 ms
+[1A[2K[34/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:166:5 › fx canvas is not blank over the month panel at 6000 ms
+[1A[2K[35/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:200:5 › Studio day click selects a day and the scene still does not advance
+[1A[2K[36/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:225:5 › reduced motion renders the calendar still with no pulse
+[1A[2K[37/276] [chromium] › tests/color-polish-scenes/calendar.spec.ts:240:5 › the same holds at 3840
+[1A[2K[38/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:146:5 › expressions renders with circular medallions and no overflow at 14 s
+[1A[2K[39/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:177:5 › grid cards fit with slack
+[1A[2K[40/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:189:5 › compact cards fit
+[1A[2K[41/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:199:5 › the focused card is balanced
+[1A[2K[42/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › every expression can be the focused one
+[1A[2K[43/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:255:5 › reduced motion renders the scene still and matches G6
+[1A[2K[44/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:287:5 › the same holds at 3840
+[1A[2K[45/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:308:5 › focused card has positive translateZ and phrase rendered at least 1.6x grid phrase size
+[1A[2K[46/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:364:5 › visible layer scrollWidth and scrollHeight never exceed client size in grid and bloomed states at both widths
+[1A[2K[47/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:423:5 › eight unfocused cards computed opacity is about 0.7 while focused is 1
+[1A[2K[48/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:448:5 › across three separate visits to scene 7 through loadRenderer, three different cards take focus matching S.bloomIndex
+[1A[2K[49/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:476:5 › three columns carry distinct rotateY values and rows carry distinct translateZ values in grid state
+[1A[2K[50/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:535:5 › no .orb exists in expressions scene
+[1A[2K[51/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:676:7 › every card, border and glow stays 16px inside the scene box and the 1920x1080 screen for nine full visits
+[1A[2K[52/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:676:7 › every card, border and glow stays 32px inside the scene box and the 3840x2160 screen for nine full visits
+[1A[2K[53/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:714:7 › at 1920x1080 every card's words fit, the title and footnote sit clear, and nothing is shrunk
+[1A[2K[54/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:714:7 › at 3840x2160 every card's words fit, the title and footnote sit clear, and nothing is shrunk
+[1A[2K[55/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:823:9 › at 1920x1080 with 0.03em wider letters every focused panel still fits above its source note
+[1A[2K[56/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:823:9 › at 3840x2160 with 0.03em wider letters every focused panel still fits above its source note
+[1A[2K[57/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:823:9 › at 1920x1080 with 0.05em wider letters every focused panel still fits above its source note
+[1A[2K[58/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:823:9 › at 3840x2160 with 0.05em wider letters every focused panel still fits above its source note
+[1A[2K[59/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:911:7 › at 1920x1080 a card leaving focus keeps its glow 16px inside the scene box
+[1A[2K[60/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:911:7 › at 3840x2160 a card leaving focus keeps its glow 32px inside the scene box
+[1A[2K[61/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1016:5 › tilt, drift, timing and keyframes are exactly the Plan 15 values
+[1A[2K[62/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1163:7 › at 1920x1080 no card ever jumps: every view change is a continuous, eased glide of about one second
+[1A[2K[63/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1163:7 › at 3840x2160 no card ever jumps: every view change is a continuous, eased glide of about one second
+[1A[2K[64/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1210:5 › the chosen card grows from its grid place into focus while the others glide to their places, by transform and opacity only
+[1A[2K[65/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1294:5 › when focus moves on, the two cards switch places in view and the one gaining focus stays on top
+[1A[2K[66/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1352:7 › a 30 s dwell shows 2 whole focuses and glides back to the grid at 26 s
+[1A[2K[67/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1352:7 › a 40 s dwell shows 3 whole focuses and glides back to the grid at 36 s
+[1A[2K[68/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1352:7 › a 60 s dwell shows 5 whole focuses and glides back to the grid at 56 s
+[1A[2K[69/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1405:5 › a scene held past its dwell repeats the plan and carries on to the following expressions
+[1A[2K[70/276] [chromium] › tests/color-polish-scenes/expressions.spec.ts:1417:5 › with reduced motion and a running scene the view change is a plain crossfade: nothing travels
+[1A[2K[71/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:12:5 › featured renders circular bubbles and no overflow at 14 s
+[1A[2K[72/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:38:5 › bubbles span two depth layers
+[1A[2K[73/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:26:5 › the scene stays populated and replaces one bubble at a time
+[1A[2K[74/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:58:5 › bubbles stay circular during an exit
+[1A[2K[75/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:69:5 › reduced motion renders the featured scene still
+[1A[2K[76/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:78:5 › expression panel displays catalog content and eight orbit icons at 2 s and 17 s
+[1A[2K[77/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:120:5 › expression panel rotates across fresh opens
+[1A[2K[78/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:134:5 › in-pass advance flips cleanly with no error at 16 s
+[1A[2K[79/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:153:5 › keepAge remount preserves current expression and does not re-flip when sceneAge >= 15
+[1A[2K[80/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:202:5 › sweep clip wrapper exists and feature panel preserves 3d without overflow hidden
+[1A[2K[81/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:224:5 › at 14 s eyebrow and bubbles match first expression, at 21 s match second, with burst between
+[1A[2K[82/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:312:5 › panel transform-style is preserve-3d, bounding box >= 1.5x bubble diameter, and orbs have no 3D rotation
+[1A[2K[83/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:371:5 › bubbles stay circular at flip midpoint and steady state under perspective
+[1A[2K[84/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:385:5 › forced scene change at 15.2 s leaves next scene eyebrow untouched and logs no error
+[1A[2K[85/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:417:5 › with fixture where only one record carries incoming expression, three bubbles appear and featured_sparse_expression is logged
+[1A[2K[86/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:494:5 › phrase is the panel largest text and is rendered above the expression name
+[1A[2K[87/276] [chromium] › tests/color-polish-scenes/featured.spec.ts:518:5 › panel has soft glow and particle layer inside bounds
+[1A[2K[88/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:13:5 › garden renders circular bubbles and no overflow at 14 s
+[1A[2K[89/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:29:5 › the garden fills over a minute with one replacement at a time
+[1A[2K[90/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:72:5 › petals are carried after a replacement, then decay to nothing
+[1A[2K[91/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:130:5 › bubbles span two depth layers
+[1A[2K[92/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:158:5 › bubbles stay circular through sprout, swell and burst
+[1A[2K[93/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:167:5 › reduced motion renders the garden still
+[1A[2K[94/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:176:5 › with the mostly-long fixture, no page indicator is visible up to 320 chars and grown slots stay circular, inside root, and disjoint
+[1A[2K[95/276] [chromium] › tests/color-polish-scenes/garden.spec.ts:304:5 › a long message paginates at most twice, or not at all, and logs verbatim true when it does
+[1A[2K[96/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:14:5 › helpers open the welcome scene in the Studio and it is circular
+[1A[2K[97/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:28:5 › reduced motion renders the welcome scene still
+[1A[2K[98/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:36:5 › loadRenderer loads the renderer and getState().mode is normal
+[1A[2K[99/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:42:5 › cardShape passes on valid card shapes and fails on invalid ones
+[1A[2K[100/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:107:5 › the bubble overlap rule catches touching circles and ignores rectangle corners
+[1A[2K[101/276] [chromium] › tests/color-polish-scenes/helpers.spec.ts:120:5 › with the mostly-long fixture, no two bubbles in scene 1 or scene 9 cover each other across a 60 second showing
+[1A[2K[102/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:276:7 › the cards are the rail's own cards, same text sizes as another screen's rail, at 1920
+[1A[2K[103/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:296:7 › fills the screen from the header rule to the bottom, two readable columns, at 1920
+[1A[2K[104/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:276:7 › the cards are the rail's own cards, same text sizes as another screen's rail, at 3840
+[1A[2K[105/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:296:7 › fills the screen from the header rule to the bottom, two readable columns, at 3840
+[1A[2K[106/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:348:5 › the rail underneath fades away on this screen and comes back on the next one
+[1A[2K[107/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:373:5 › enters with the same fade as every other screen
+[1A[2K[108/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:396:5 › same records and order as the rail, newest first, and every one of 100 gets its turn
+[1A[2K[109/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:418:5 › scrolls continuously at the rail's own pace and never while an arrival or a pause holds the screen
+[1A[2K[110/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:437:5 › 500 grapheme messages are shown whole at the rail's 18 px, never shortened
+[1A[2K[111/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:465:5 › three records sit still in two columns with nothing repeated
+[1A[2K[112/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:479:5 › an empty feed shows a calm message and keeps the QR, not a blank panel
+[1A[2K[113/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:490:5 › Neutral, Quiet and an unverified connection clear every name and message
+[1A[2K[114/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:518:5 › expired records leave the screen, and when all have expired the calm empty state takes over
+[1A[2K[115/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:538:5 › a new recognition joins without reshuffling the columns
+[1A[2K[116/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:562:5 › dwell comes from the saved playlist: last in the rotation, then back to Welcome
+[1A[2K[117/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:580:5 › a disabled live-feed entry keeps the screen out of the rotation
+[1A[2K[118/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:592:5 › reduced motion: no scroll, whole cards only, pages change with a fade
+[1A[2K[119/276] [chromium] › tests/color-polish-scenes/live-feed.spec.ts:643:5 › Studio lists Live Recognitions and previews it with fictional sample content
+[1A[2K[120/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:13:5 › milestone renders circular bubbles, studio preview, and does not overflow at 14 s
+[1A[2K[121/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:54:5 › the goal expression heading or phrase is the largest computed font size, strictly larger than threshold
+[1A[2K[122/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:145:5 › every pearl shows catalog phrase and name without THANK YOU, using goal expression or first expression
+[1A[2K[123/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:215:5 › with 48-record sample at least 12 distinct record ids pass through in 30 s including outside current week
+[1A[2K[124/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:251:5 › milestone contributors are present in the stream at 0 s and markShown is called for all pearls
+[1A[2K[125/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:288:5 › records including goal expression carry data-weekly="true" and gold rim
+[1A[2K[126/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:346:5 › the stream is dense, continuous and individual
+[1A[2K[127/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:423:5 › extreme depth
+[1A[2K[128/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:492:5 › reduced motion renders the milestone still
+[1A[2K[129/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:502:5 › left copy is removed and rail is widened without overflow at 2000 ms
+[1A[2K[130/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:564:5 › noOverflow holds and no phrase is truncated at any pearl size
+[1A[2K[131/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:608:5 › mostly-long fixture: the goal card, milestone card and tribute pearl text all fit their panels and rims at 0, 6, 14 and 21 s at 1920 and 3840 wide
+[1A[2K[132/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:642:5 › the goal card and milestone card sit clear of the panel top and bottom edges, balanced, with no empty middle gap, at 1920 and 3840 wide
+[1A[2K[133/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:670:5 › tribute pearls are fully opaque inside the panel and fade out only at its edges, never crossing it while visible
+[1A[2K[134/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:875:5 › the swirl is full: at least 16 pearls drawn inside the panel, none cut at its edges, for a whole 60 second showing
+[1A[2K[135/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:965:5 › at 3840 the swirl carries the same pearls, drawn inside the panel with their words fitting, at 0, 6, 14 and 21 s
+[1A[2K[136/276] [chromium] › tests/color-polish-scenes/milestone.spec.ts:995:5 › a pool smaller than the swirl still fills the panel, and a record never takes more pearls than the pool needs
+[1A[2K[137/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:109:5 › orbit renders circular planets and no overflow at 14 s
+[1A[2K[138/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:157:5 › planets orbit in 3D at the slower rate
+[1A[2K[139/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:269:5 › the far planet is blurred and dim, the near planet sharp with a shadow
+[1A[2K[140/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:338:5 › planets stay circular through the orbit
+[1A[2K[141/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:360:5 › reduced motion renders the orbit still
+[1A[2K[142/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:369:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names
+[1A[2K[143/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:382:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot
+[1A[2K[144/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:398:5 › centre element bounding box is at least 1.5 times the largest orbiting bubble diameter
+[1A[2K[145/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:445:5 › a 210 character planet grows past the old 263 px tier to show its message whole and stays smaller than the centre
+[1A[2K[146/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:494:5 › planet diameters grow with message length from the Plan 15 tiers, every message shows whole, and planets stay circular
+[1A[2K[147/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:616:5 › phrase computed font size in the centre is larger than the expression name font size
+[1A[2K[148/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:635:5 › two probe runs with the same seed produce the same focused expression
+[1A[2K[149/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:649:5 › centre circle fits the name, full quote and description with a rim margin for all nine catalog expressions at 1920 and 3840 wide
+[1A[2K[150/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:721:5 › mostly-long fixture: every planet shows its message whole with a rim margin, drawn at the floor or larger, at 0, 6, 14 and 21 s at 1920 and 3840 wide
+[1A[2K[151/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:744:5 › over a full orbit every planet keeps its words at the drawn floor, never rises over the title, and never exceeds the room under it
+[1A[2K[152/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:768:5 › long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 500 grapheme planet is drawn at the smallest circle its words fit
+[1A[2K[153/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:803:5 › medium messages (120 to 220 characters) show whole in Orbit, drawn at the floor or larger, at 1920 and 3840 wide
+[1A[2K[chromium] › tests/color-polish-scenes/orbit.spec.ts:768:5 › long-only fixture: 250, 400 and 500 grapheme planets show whole, and the 500 grapheme planet is drawn at the smallest circle its words fit
+orbit 1920 wide: [{"id":"mostly-emoji","diameter":294,"pages":1,"font":19.5},{"id":"mostly-400","diameter":474,"pages":1,"font":19.5},{"id":"mostly-250","diameter":390,"pages":1,"font":19.5},{"id":"mostly-500","diameter":542,"pages":1,"font":19.5}]
+
+[1A[2Korbit 3840 wide: [{"id":"mostly-emoji","diameter":294,"pages":1,"font":19.5},{"id":"mostly-400","diameter":474,"pages":1,"font":19.5},{"id":"mostly-250","diameter":390,"pages":1,"font":19.5},{"id":"mostly-500","diameter":542,"pages":1,"font":19.5}]
+
+[1A[2K[154/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:824:5 › a planet replaced on the far side is sized for its new message and still fits its rim
+[1A[2K[155/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:852:5 › orbit bubble sizing re-measures once a still-loading document.fonts.ready resolves
+[1A[2K[156/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1014:5 › the orbiting bubbles are smaller than the build Anthony watched and the gold centre stays the dominant circle
+[1A[2K[157/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1049:5 › a planet is drawn wider than the soft cap only when its own message cannot show whole any smaller
+[1A[2K[158/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1074:5 › orbit.js states the soft cap and the hard cap it measures against
+[1A[2K[159/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1089:5 › the expression medallions revolve around their recognition: in front on the near half, behind on the far half, never over the name or the message
+[1A[2K[160/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1151:5 › orbit holds through a full showing at both the 30 and the 60 second dwell
+[1A[2K[161/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1210:5 › with enough fitting messages in the pool, no planet ever holds one too long for the soft cap, through a 60 second showing with far-side replacements
+[1A[2K[162/276] [chromium] › tests/color-polish-scenes/orbit.spec.ts:1255:5 › with too few fitting messages, exactly one planet holds a longer one, never magnified, and the fitting planets keep fitting records
+[1A[2K[163/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:293:5 › with an all short pool the reserved bubble plus two regular bubbles are filled, and none is empty
+[1A[2K[164/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:313:5 › a 250, a 400 and a 500 grapheme message only ever appear in the reserved bubble
+[1A[2K[165/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:336:5 › a 500 grapheme message fits the reserved bubble whole, above the 18 px floor
+[1A[2K[166/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:356:5 › several very long recognitions take turns in the reserved bubble and leave the other bubbles alone
+[1A[2K[167/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:375:5 › with no very long recognition waiting, the reserved bubble still refreshes, in place and never empty
+[1A[2K[168/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:411:5 › on the live playlist, the reserved bubble only takes a message there is still time to read
+[1A[2K[169/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:436:5 › the scene reads its dwell from the saved playlist, not from a constant
+[1A[2K[170/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:442:5 › the reserved bubble eases to the size the next message needs, and its words are whole at every size
+[1A[2K[171/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:478:5 › across a 60 second showing no bubble covers the heading, the artwork or the reserved bubble
+[1A[2K[172/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:509:5 › the reserved bubble clears the heading, the heart artwork and the other bubbles
+[1A[2K[173/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:546:5 › the hardest record the product allows is never truncated, and any paging finishes inside the scene dwell
+[1A[2K[174/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:568:5 › no message text drops below the 18 px floor, and the TV is drawn at double size on a 3840 screen
+[1A[2K[175/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:583:5 › the turning heart is a solid a little under half as thick as it is wide, at 1920 and at 3840
+[1A[2K[176/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:624:5 › the heart surface is smooth: no bands, streaks or seam, at 1920 and at 3840
+[1A[2K[177/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:686:5 › the heart is shaded, not a flat silhouette
+[1A[2K[178/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:716:5 › reduced motion renders the scene still, with the heart held at a three quarter angle
+[1A[2K[179/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:739:5 › bubbles stay circular and inside the scene at 0.3 s, 6 s, 14 s and 21 s
+[1A[2K[180/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:777:5 › the regular bubbles keep the live drift and stay clear of the artwork
+[1A[2K[181/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:815:5 › shows the production title copy, the hands banner artwork and fourteen ambient hearts
+[1A[2K[182/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:843:5 › a studio click does not advance away from the scene
+[1A[2K[183/276] [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:852:5 › no recognition data is fetched from a live network endpoint
+[1A[2K[184/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:139:5 › with an all-short pool, one reserved bubble and two regular bubbles appear at the scene’s positions
+[1A[2K[185/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:169:5 › a very long recognition appears only in the reserved bubble, and the others fit whole
+[1A[2K[186/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:192:5 › the reserved bubble steps its font down toward the floor as the grapheme count rises
+[1A[2K[187/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:213:5 › a 500 grapheme message fits the reserved bubble whole, within the scene’s own dwell
+[1A[2K[188/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:233:5 › the reserved bubble reads its dwell from the snapshot, not from a constant
+[1A[2K[189/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:240:5 › with three very long recognitions at once, they take turns in the reserved bubble
+[1A[2K[190/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:264:5 › with no very long recognition waiting, the reserved bubble still refreshes, in place and never empty
+[1A[2K[191/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:304:5 › on the live playlist, the reserved bubble only takes a message there is still time to read
+[1A[2K[192/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:330:5 › across a 60 second showing the drifting bubbles stay off the globe and the reserved bubble
+[1A[2K[193/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:359:5 › the reserved bubble holds still while the other bubbles drift
+[1A[2K[194/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:380:5 › at 3840 the message still draws at or above the 36 px floor on the screen
+[1A[2K[195/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:408:5 › peacemakers renders circular bubbles and no scene overflow at 14 s
+[1A[2K[196/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:420:5 › bubbles stay circular at 0.3 s, 6 s, 14 s and 20 s
+[1A[2K[197/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:432:5 › reduced motion renders peacemakers still, with circular bubbles
+[1A[2K[198/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:455:5 › shows the production title copy and the globe artwork
+[1A[2K[199/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:476:5 › the reserved bubble clears the heading, the globe artwork and the other bubbles
+[1A[2K[200/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:511:5 › a steady bubble retires by drifting out, then a new bubble arrives
+[1A[2K[201/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:534:5 › the scene 8 keep-out boxes are production’s title box and the globe’s focal area
+[1A[2K[202/276] [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:542:5 › no recognition data is fetched from a live network endpoint
+[1A[2K[203/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:398:9 › stage edges at 1920 › the stage clip reaches both screen edges and stops at the header rule and the feed rail at 1920
+[1A[2K[204/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:474:9 › stage edges at 1920 › scene element boxes are identical with and without the edge to edge clip at 1920
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:474:9 › stage edges at 1920 › scene element boxes are identical with and without the edge to edge clip at 1920
+stage-edges 1920 element counts {"welcome":86,"garden":26,"featured":100,"calendar":156,"status":173,"expressions":332,"peacemakers":30,"peace-in-practice":159,"orbit":54,"milestone":73}
+
+[1A[2K[205/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:518:9 › stage edges at 1920 › the stage never paints a pixel of the header band or the feed rail band, at every checkpoint, at 1920
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:398:9 › stage edges at 1920 › the stage clip reaches both screen edges and stops at the header rule and the feed rail at 1920
+stage-edges 1920 crossers {"welcome":{"crossers":1,"total":85},"garden":{"crossers":0,"total":25},"featured":{"crossers":7,"total":99},"calendar":{"crossers":0,"total":155},"status":{"crossers":0,"total":172},"expressions":{"crossers":0,"total":331},"peacemakers":{"crossers":0,"total":29},"peace-in-practice":{"crossers":0,"total":158},"orbit":{"crossers":0,"total":53},"milestone":{"crossers":0,"total":72}}
+
+[1A[2K[206/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:554:9 › stage edges at 1920 › a full screen sheet of scene paint is cut exactly at the header rule and the feed rail, and nowhere else, at 1920
+[1A[2K[207/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:616:9 › stage edges at 1920 › Live Recognitions full screen is not cut by the stage clip and still stays under the header at 1920
+[1A[2K[208/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:398:9 › stage edges at 3840 › the stage clip reaches both screen edges and stops at the header rule and the feed rail at 3840
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:518:9 › stage edges at 1920 › the stage never paints a pixel of the header band or the feed rail band, at every checkpoint, at 1920
+stage-edges 1920 stage paint per band {"welcome@6000":{"header":0,"rail":0,"stage":540937},"garden@6000":{"header":0,"rail":0,"stage":176843},"featured@6000":{"header":0,"rail":0,"stage":570440},"calendar@6000":{"header":0,"rail":0,"stage":948266},"status@6000":{"header":0,"rail":0,"stage":911430},"expressions@6000":{"header":0,"rail":0,"stage":759170},"peacemakers@6000":{"header":0,"rail":0,"stage":434874},"peace-in-practice@6000":{"header":0,"rail":0,"stage":317672},"orbit@6000":{"header":0,"rail":0,"stage":324053},"milestone@6000":{"header":0,"rail":0,"stage":726304},"expressions@0":{"header":0,"rail":0,"stage":804013},"expressions@6300":{"header":0,"rail":0,"stage":803061},"expressions@6600":{"header":0,"rail":0,"stage":804212},"expressions@7000":{"header":0,"rail":0,"stage":804324},"expressions@12000":{"header":0,"rail":0,"stage":804445},"expressions@16500":{"header":0,"rail":0,"stage":804857},"welcome@0":{"header":0,"rail":0,"stage":549154},"orbit@14000":{"header":0,"rail":0,"stage":270613},"milestone@14000":{"header":0,"rail":0,"stage":692631}}
+
+[1A[2K[209/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:474:9 › stage edges at 3840 › scene element boxes are identical with and without the edge to edge clip at 3840
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:474:9 › stage edges at 3840 › scene element boxes are identical with and without the edge to edge clip at 3840
+stage-edges 3840 element counts {"welcome":86,"garden":26,"featured":100,"calendar":156,"status":173,"expressions":332,"peacemakers":30,"peace-in-practice":159,"orbit":54,"milestone":73}
+
+[1A[2K[210/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:518:9 › stage edges at 3840 › the stage never paints a pixel of the header band or the feed rail band, at every checkpoint, at 3840
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:398:9 › stage edges at 3840 › the stage clip reaches both screen edges and stops at the header rule and the feed rail at 3840
+stage-edges 3840 crossers {"welcome":{"crossers":1,"total":85},"garden":{"crossers":0,"total":25},"featured":{"crossers":7,"total":99},"calendar":{"crossers":0,"total":155},"status":{"crossers":0,"total":172},"expressions":{"crossers":0,"total":331},"peacemakers":{"crossers":0,"total":29},"peace-in-practice":{"crossers":0,"total":158},"orbit":{"crossers":0,"total":53},"milestone":{"crossers":0,"total":72}}
+
+[1A[2K[211/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:554:9 › stage edges at 3840 › a full screen sheet of scene paint is cut exactly at the header rule and the feed rail, and nowhere else, at 3840
+[1A[2K[212/276] [chromium] › tests/color-polish-scenes/stage-edges.spec.ts:616:9 › stage edges at 3840 › Live Recognitions full screen is not cut by the stage clip and still stays under the header at 3840
+[1A[2K[213/276] [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s
+[1A[2K  1) [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('color-polish-studio')
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('color-polish-studio')[22m
+
+
+       at color-polish-scenes/helpers.ts:292
+
+      290 |   await signInAs(page);
+      291 |   await page.goto('/admin/display');
+    > 292 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
+          |                                                         ^
+      293 |
+      294 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
+      295 |   const selector = page.getByLabel('Color Polish preview scene');
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/helpers.ts:292:57)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/status.spec.ts:128:31
+
+    Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
+
+
+[1A[2K[214/276] [chromium] › tests/color-polish-scenes/status.spec.ts:137:5 › the nine medallions carry at least three motion vocabularies
+[1A[2K[215/276] [chromium] › tests/color-polish-scenes/status.spec.ts:152:5 › icon transforms differ pairwise and follow different waveforms
+[1A[2K[216/276] [chromium] › tests/color-polish-scenes/status.spec.ts:243:5 › the ambient sweep runs only when motion is allowed
+[1A[2K[217/276] [chromium] › tests/color-polish-scenes/status.spec.ts:281:5 › no icon exceeds the motion envelope over 30 seconds
+[1A[2K[218/276] [chromium] › tests/color-polish-scenes/status.spec.ts:310:5 › all nine catalog phrases are present in the DOM verbatim at 0 s
+[1A[2K[219/276] [chromium] › tests/color-polish-scenes/status.spec.ts:323:5 › at 6 s and at 14 s, at least three coins differ in flip state and reverse face shows two-digit number
+[1A[2K[220/276] [chromium] › tests/color-polish-scenes/status.spec.ts:393:5 › both today and overall counts equal fixture totals after 2 s and hold
+[1A[2K[221/276] [chromium] › tests/color-polish-scenes/status.spec.ts:417:5 › phrase computed font size is larger than expression name on every card and no phrase in coin face
+[1A[2K[222/276] [chromium] › tests/color-polish-scenes/status.spec.ts:458:5 › sweep element rect spans full width of grid and cards do not clip it
+[1A[2K[chromium] › tests/color-polish-scenes/stage-edges.spec.ts:518:9 › stage edges at 3840 › the stage never paints a pixel of the header band or the feed rail band, at every checkpoint, at 3840
+stage-edges 3840 stage paint per band {"welcome@6000":{"header":0,"rail":0,"stage":2147191},"garden@6000":{"header":0,"rail":0,"stage":704491},"featured@6000":{"header":0,"rail":0,"stage":2328391},"calendar@6000":{"header":0,"rail":0,"stage":3790799},"status@6000":{"header":0,"rail":0,"stage":3648262},"expressions@6000":{"header":0,"rail":0,"stage":3009604},"peacemakers@6000":{"header":0,"rail":0,"stage":1726437},"peace-in-practice@6000":{"header":0,"rail":0,"stage":1253356},"orbit@6000":{"header":0,"rail":0,"stage":1264933},"milestone@6000":{"header":0,"rail":0,"stage":2938550},"expressions@0":{"header":0,"rail":0,"stage":3215072},"expressions@6300":{"header":0,"rail":0,"stage":3215024},"expressions@6600":{"header":0,"rail":0,"stage":3215675},"expressions@7000":{"header":0,"rail":0,"stage":3215468},"expressions@12000":{"header":0,"rail":0,"stage":3217019},"expressions@16500":{"header":0,"rail":0,"stage":3218062},"welcome@0":{"header":0,"rail":0,"stage":2213977},"orbit@14000":{"header":0,"rail":0,"stage":1062040},"milestone@14000":{"header":0,"rail":0,"stage":2804084}}
+
+[1A[2K[223/276] [chromium] › tests/color-polish-scenes/status.spec.ts:481:5 › no card overflows, no orb exists in scene, and no circular bubble has 3D rotation
+[1A[2K[224/276] [chromium] › tests/color-polish-scenes/status.spec.ts:519:5 › reduced motion matches G5 exactly
+[1A[2K[225/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:45:7 › Section B: scene transitions › all ten playlist scene changes complete with one scene, the live fade, and no flood, tide, vortex or storm artifact
+[1A[2K[226/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:93:7 › Section B: scene transitions › uses the live gentle crossfade with slight translation and uniform scale, matching the formula at several points
+[1A[2K[227/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:160:7 › Section B: scene transitions › a click during a transition does not double-advance, and a requested scene queues instead
+[1A[2K[228/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:256:7 › Section B: scene transitions › holds queued arrivals until the scene transition has cleaned up
+[1A[2K[229/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:319:7 › Section B: scene transitions › calls the departing scene onLeave once and records a thrown hook
+[1A[2K[230/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:350:7 › Section B: scene transitions › switches scenes immediately and leaves no transition layer in still mode
+[1A[2K[231/276] [chromium] › tests/color-polish-scenes/transitions.spec.ts:367:7 › Section B: scene transitions › hides the countdown during transition and shows it after completion
+[1A[2K[232/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:15:5 › welcome renders circular bubbles and no overflow at 14 s
+[1A[2K[233/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:29:5 › bubbles differ in speed and span two depth layers
+[1A[2K[234/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:68:5 › at least one bubble changes heading between 6 and 14 s
+[1A[2K[235/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:100:5 › bubbles stay circular through motion
+[1A[2K[236/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:136:5 › reduced motion renders the welcome scene still
+[1A[2K[237/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:188:5 › at 2000 ms actors count is exactly 4 (the reserved bubble and three regular ones)
+[1A[2K[238/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:195:5 › scene replaces at least one bubble within 30 s
+[1A[2K[239/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:224:5 › entering bubble has non-zero rotate angle on its words
+[1A[2K[240/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:355:5 › four whole bubbles at 0 s, 6 s and 14 s with mostly-long fixture, none paging, and no readerSlot collapse
+[1A[2K[241/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:382:5 › speech bubbles visible count reaches at least 2 by 6 s and 3 by 9 s with border-radius 16px
+[1A[2K[242/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:489:5 › circularity and noOverflow pass with speech bubbles present
+[1A[2K[243/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:514:5 › no speech bubble rect intersects another, the serif couplet, the h1 title, or any orb slot, and bubbles satisfy bounds
+[1A[2K[244/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:625:5 › every message renders at or above 18 px floor, fitting messages on one page, overflowing messages verbatim paginated without truncation
+[1A[2K[245/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:704:5 › reduced motion displays static speech bubbles without rotation or fading
+[1A[2K[246/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[247/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool eight short at 60 s: bubbles 4 to 4, paging {}, reserved held len-100-4, len-70-2, len-45-6
+
+[1A[2K[248/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 40 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool eight short at 30 s: bubbles 4 to 4, paging {}, reserved held len-100-4, len-45-6
+
+[1A[2K[249/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 60 s, 3840 wide: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 40 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool eight short at 40 s: bubbles 4 to 4, paging {}, reserved held len-100-4, len-45-6
+
+[1A[2K[250/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, eight short at 60 s, 3840 wide: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool eight short at 60 s, 3840 wide: bubbles 4 to 4, paging {}, reserved held len-100-4, len-70-2, len-45-6
+
+[1A[2K[251/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 40 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool one 250, one 400, one 500 with five short at 60 s: bubbles 4 to 4, paging {}, reserved held len-250-0, len-500-2
+
+[1A[2K[252/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 40 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool one 250, one 400, one 500 with five short at 40 s: bubbles 4 to 4, paging {}, reserved held len-250-0, len-500-2
+
+[1A[2K[253/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 60 s, 3840 wide: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool one 250, one 400, one 500 with five short at 30 s: bubbles 4 to 4, paging {}, reserved held len-250-0, len-500-2
+
+[1A[2K[254/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, three long only at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, three long only at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool three long only at 60 s: bubbles 1 to 1, paging {}, reserved held len-400-1, len-500-2
+
+[1A[2K[255/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, mostly long at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, one 250, one 400, one 500 with five short at 60 s, 3840 wide: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool one 250, one 400, one 500 with five short at 60 s, 3840 wide: bubbles 4 to 4, paging {}, reserved held len-250-0, len-500-2
+
+[1A[2K[256/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, every message 180 to 420 at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, mostly long at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool mostly long at 60 s: bubbles 4 to 4, paging {}, reserved held len-400-4, len-250-3, len-500-5
+
+[1A[2K[257/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, five short and one that cannot fit 480 px at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, every message 180 to 420 at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool every message 180 to 420 at 60 s: bubbles 3 to 3, paging {}, reserved held len-420-5, len-360-4
+
+[1A[2K[258/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, five short and one that cannot fit 480 px at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, five short and one that cannot fit 480 px at 60 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool five short and one that cannot fit 480 px at 60 s: bubbles 4 to 4, paging {"hard-500":3}, reserved held hard-500, len-60-0
+
+[1A[2K[259/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1033:5 › three long messages take turns in the reserved bubble and never touch the other bubbles
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1014:7 › round 5 pool, five short and one that cannot fit 480 px at 30 s: long messages only in the reserved bubble, nothing else pages, floor kept
+welcome round 5 pool five short and one that cannot fit 480 px at 30 s: bubbles 4 to 4, paging {}, reserved held len-60-0, len-90-3
+
+[1A[2K[260/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1076:5 › with no long message in the pool the reserved bubble still shows a message, at its larger size
+[1A[2K[261/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1098:5 › mostly-long fixture: every word fits its bubble, drawn at the floor or larger, at 0, 6, 14 and 21 s at 1920 and 3840 wide
+[1A[2K[262/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1134:5 › a paging bubble is the reserved bubble, holds a message that cannot show whole even there, and its pages fit the dwell
+[1A[2K[chromium] › tests/color-polish-scenes/welcome.spec.ts:1134:5 › a paging bubble is the reserved bubble, holds a message that cannot show whole even there, and its pages fit the dwell
+welcome 1920 wide: [{"id":"mostly-short-1","diameter":318,"drawn":267,"pages":1,"drawnFont":19.83},{"id":"hard-500","diameter":480,"drawn":480,"pages":3,"drawnFont":18},{"id":"mostly-emoji","diameter":376,"drawn":316,"pages":1,"drawnFont":20.16},{"id":"mostly-short-2","diameter":296,"drawn":295,"pages":1,"drawnFont":21.91}]
+
+[1A[2Kwelcome 3840 wide: [{"id":"mostly-short-1","diameter":318,"drawn":267,"pages":1,"drawnFont":39.65},{"id":"hard-500","diameter":480,"drawn":480,"pages":3,"drawnFont":36},{"id":"mostly-emoji","diameter":376,"drawn":316,"pages":1,"drawnFont":40.32},{"id":"mostly-short-2","diameter":296,"drawn":295,"pages":1,"drawnFont":43.82}]
+
+[1A[2K[263/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1174:7 › at a 30 s dwell the record that cannot fit 480 px waits instead of being paged or cut
+[1A[2K[264/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1174:7 › at a 40 s dwell the record that cannot fit 480 px pages only if its pages finish in time
+[1A[2K[265/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1174:7 › at a 60 s dwell the record that cannot fit 480 px pages in the reserved bubble inside the time left
+[1A[2K[266/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1214:5 › medium messages (120 to 220 characters) either show whole in the reserved bubble or wait, and never page a regular bubble
+[1A[2K[267/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1249:5 › a bubble replaced while drifting shows its new message whole, and a long one only in the reserved bubble
+[1A[2K[268/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1288:5 › welcome bubble sizing re-measures once a still-loading document.fonts.ready resolves
+[1A[2K[269/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1352:7 › round 5, mostly-long fixture: no steady drifting bubble covers the words of a large still bubble
+[1A[2K[270/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1352:7 › round 5, medium fixture: no steady drifting bubble covers the words of a large still bubble
+[1A[2K[271/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1352:7 › round 5, six short plus 400: no steady drifting bubble covers the words of a large still bubble
+[1A[2K[272/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1352:7 › round 5, twelve of 40 to 130: no steady drifting bubble covers the words of a large still bubble
+[1A[2K[273/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1402:7 › round 5, twelve short records: drift replacement brings a different record back when one fits
+[1A[2K[274/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1402:7 › round 5, twelve of 40 to 130: drift replacement brings a different record back when one fits
+[1A[2K[275/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1425:5 › the fit checks can fail: a message forced past its rim is reported
+[1A[2K[276/276] [chromium] › tests/color-polish-scenes/welcome.spec.ts:1461:5 › the long message probe agrees with the grapheme counts it is given
+[1A[2K  1 failed
+    [chromium] › tests/color-polish-scenes/status.spec.ts:110:5 › status renders circular medallions and no overflow at 14 s 
+  275 passed (32.2m)
+exit 1

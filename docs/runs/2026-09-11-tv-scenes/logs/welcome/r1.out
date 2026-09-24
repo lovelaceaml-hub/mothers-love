@@ -1,0 +1,15 @@
+Removed the still-mode early return in [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) so depth styling applies on initial mount under reduced motion, and updated [welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) to verify matrix scale and stillness.
+
+### Why
+- The `if (S.still) return true;` check at the start of `placeWelcome` was skipping initial layer transform, opacity, blur, and z-index assignment when `postRender` called `renderFloaters` at mount.
+- Removing that early return lets the one-time mount call apply layer depth styling while keeping bubbles still because `tickSlots` never runs under reduced motion.
+- The updated test asserts that every orb slot has a `data-depth` attribute, matches its expected layer scale (`far` 0.84, `mid` 0.93, `near` 1) within 0.02, and remains identical across two readings 1000 ms apart.
+
+### What Anthony must do
+Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)

@@ -15,3 +15,21 @@ docs/private/
 /public/icons/butterfly-heart-v1-*.png
 /public/apple-touch-icon.png
 /public/favicon.ico
+
+# Plan 26 decision 3: run evidence lives in Drive, not in Git. The captures,
+# probe re runs and process scratch matched below were archived on 2026-09-22
+# to "Project Outputs/The Words of Mother's Love" in the Anthony Mac Storage
+# Drive folder, with SHA-256 receipts. Use "git add -f" to keep a capture that
+# belongs in the repository. Record: Plan 26 Section 2, at
+# docs/runs/2026-09-22-repo-refactor/lanes/S2.md, which Section 3 brings here.
+docs/runs/*/logs/**/*.png
+docs/runs/*/logs/**/*.cjs
+docs/runs/*/logs/**/*.pid
+docs/runs/*/logs/**/*.done
+docs/runs/*/logs/**/*.progress
+docs/runs/*/logs/**/probe-r*/
+
+# Loose review evidence folders that collected at the repository root.
+/home-review-evidence/
+/mobile-recognition-evidence/
+/color-review-evidence/

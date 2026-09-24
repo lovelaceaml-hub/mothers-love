@@ -1,0 +1,6 @@
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate 
+  2) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  2 failed
+  13 passed (1.5m)
+DONE

@@ -1,0 +1,15 @@
+build (env) exit 0
+e2e exit 1
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  3) [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s 
+  4) [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers 
+  5) [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+  6) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  7) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable 
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance 
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  10 failed
+  6 passed (5.2m)
+DONE

@@ -1,0 +1,7 @@
+garden typecheck exit 0
+garden spec isolated: spec rerun exit 0   6 passed (16.9s) DONE 
+garden committed d73020d and pushed
+merged into pick 912987a
+pick garden spec exit 0   6 passed (9.1s) 
+pick pushed 912987a
+FINISHED

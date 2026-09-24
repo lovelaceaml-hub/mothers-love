@@ -20,7 +20,7 @@ const item = {
   message: "A synthetic public message.",
   expressionIds: [2, 6],
   firstPublishedAt: "2026-09-08T10:00:00.000Z",
-  expiresAt: "2026-09-15T10:00:00.000Z",
+  expiresAt: "2026-09-15T07:00:00.000Z",
 };
 
 const snapshot = {

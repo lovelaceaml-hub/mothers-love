@@ -1,0 +1,25 @@
+Section 4 depth layers and test specifications for Featured Recognition landed.
+
+The featured scene now implements the three-tier floater depth model (far, mid, near) with scale, blur, and speed scaling, along with the two-second forward drift for steady bubbles, predecessor layer inheritance on new arrivals, and data-depth element attributes. The accompanying Playwright spec verifies circularity, continuous staggered replacement, layer distribution, and reduced-motion handling.
+
+### Changes implemented
+
+1. [`featured.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js): Added depth configuration (`far`, `mid`, `near`), `mount` layer seeding, `integrate` forward drift trigger after 12 seconds, `place` smoothed interpolation and slot synchronization, and dataset depth updates.
+2. [`featured.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css): Preserved the scoped header comment with no additional CSS required.
+3. [`featured.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts): Implemented five behavioral Playwright tests covering circularity, absence of overflow, click advance prevention, single-bubble replacement cadence, depth layers, exit circularity, and still mode.
+4. [`featured.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md): Recorded lane execution, closed gap report items, and logged the deferred reader orb reset.
+
+### What Anthony must do
+
+Nothing, you're clear.
+
+## COMPLETION
+
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`
+
+Anything not done:
+- Long-message reader orb whole-scene reset deferred to a future shared `tv/base` lane as specified in the work order and gap report.

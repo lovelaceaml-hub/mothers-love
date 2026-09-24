@@ -10,6 +10,7 @@ import {
   type Recognition,
 } from "@/lib/contracts";
 import { hasVisibleNameContent } from "@/lib/name-validation";
+import { clampPublicExpiry } from "./expiry-clamp";
 import { isIsoDate, graphemeLength } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 
@@ -22,6 +23,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_CURSOR_LENGTH = 64;
 const MAX_RECOGNITIONS = 1000;
+export const MAX_DISPLAY_POOL = 100;
 const MAX_BIGINT = BigInt("9223372036854775807");
 const PUBLIC_DISPLAY_OPERATION_DEADLINE_MS = 8_000;
 const DISPLAY_SCREEN_ID_SET = new Set<string>(DISPLAY_SCREEN_IDS);
@@ -257,7 +259,7 @@ function projectRecognition(value: unknown, serverTime: number): Recognition | n
     expressionIds: [...recognition.expressionIds],
     createdAt: recognition.createdAt as string,
     firstPublishedAt: recognition.firstPublishedAt as string,
-    expiresAt: recognition.expiresAt as string,
+    expiresAt: clampPublicExpiry(recognition.expiresAt as string, serverTime),
     version: recognition.version,
     status: "published",
     featured: recognition.featured,
@@ -326,6 +328,16 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
     if (recognitions.length > 0 && !isOrdered(recognitions[recognitions.length - 1], recognition)) return null;
     recognitions.push(recognition);
   }
+  const newestIds = new Set(
+    [...recognitions]
+      .sort((left, right) => {
+        const timeDifference = Date.parse(right.firstPublishedAt as string) - Date.parse(left.firstPublishedAt as string);
+        return timeDifference || right.id.toLowerCase().localeCompare(left.id.toLowerCase());
+      })
+      .slice(0, MAX_DISPLAY_POOL)
+      .map((recognition) => recognition.id.toLowerCase()),
+  );
+  const displayRecognitions = recognitions.filter((recognition) => newestIds.has(recognition.id.toLowerCase()));
   if (settings.mode !== "normal" && recognitions.length > 0) return null;
   const arrivalsValue = record.arrivals;
   if (!Array.isArray(arrivalsValue) || arrivalsValue.length > MAX_RECOGNITIONS) return null;
@@ -336,7 +348,7 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
     if (!arrival) return null;
     if (arrivalIds.has(arrival.eventId)) return null;
     arrivalIds.add(arrival.eventId);
-    arrivals.push(arrival);
+    if (newestIds.has(arrival.recognitionId.toLowerCase())) arrivals.push(arrival);
   }
   if (settings.mode !== "normal" && arrivals.length > 0) return null;
   if (record.revision !== undefined && !isSafeInteger(record.revision, 1)) return null;
@@ -344,7 +356,7 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
   return {
     serverTime: record.serverTime as string,
     revision: record.revision,
-    recognitions,
+    recognitions: displayRecognitions,
     aggregate,
     settings,
     submissionUrl: record.submissionUrl,

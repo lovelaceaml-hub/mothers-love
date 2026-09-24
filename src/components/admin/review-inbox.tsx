@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
+import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
 import { ActionDialog } from './action-dialog';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
 import { formatDateTime, isExpired, statusLabel, type ActionKind } from './admin-utils';
@@ -41,7 +42,7 @@ export function ReviewInbox() {
   }, [load]);
 
   useEffect(() => {
-    const timers = items.map((item) => window.setTimeout(() => {
+    const timers = items.map((item) => setSafeTimeout(() => {
       if (isExpired(item.expiresAt)) {
         setItems((current) => current.filter((candidate) => candidate.id !== item.id));
         setSelected((current) => current?.id === item.id ? null : current);
@@ -49,7 +50,7 @@ export function ReviewInbox() {
         setNotice((current) => selected?.id === item.id ? 'This held recognition expired before you could decide. It was removed from this list.' : current);
       }
     }, Math.max(0, new Date(item.expiresAt).getTime() - Date.now())));
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
+    return () => timers.forEach((timer: SafeTimerHandle) => clearSafeTimeout(timer));
   }, [items, selected]);
 
   const commit = async () => {

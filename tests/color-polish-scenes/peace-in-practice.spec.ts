@@ -1,5 +1,5 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
-import { buildActiveDisplayFixture, circularity, loadRenderer } from './helpers';
+import { buildActiveDisplayFixture, circularity, loadRenderer, withoutWebGL2 } from './helpers';
 
 // Scene 9, Peace in Practice.
 //
@@ -580,7 +580,12 @@ test('no message text drops below the 18 px floor, and the TV is drawn at double
   expect(scale).toBeCloseTo(2, 1);
 });
 
-test('the turning heart is a solid a little under half as thick as it is wide, at 1920 and at 3840', async ({ page }) => {
+// Since 2026-09-20 the scene's heart is the WebGL 2 sculpture with its sheer
+// ribbons (peace-in-practice-heart3d.spec.ts). The Canvas 2D solid is what the
+// scene shows where WebGL 2 cannot be had, so the tests of that solid below
+// take WebGL 2 away first and measure the fallback, exactly as before.
+test('without WebGL 2, the turning heart is a solid a little under half as thick as it is wide, at 1920 and at 3840', async ({ page }) => {
+  await withoutWebGL2(page);
   test.setTimeout(240000);
   for (const width of [1920, 3840]) {
     const frame = await loadAt(page, width, { fixture: allShortFixture, scene: 9 });
@@ -621,7 +626,8 @@ test('the turning heart is a solid a little under half as thick as it is wide, a
   }
 });
 
-test('the heart surface is smooth: no bands, streaks or seam, at 1920 and at 3840', async ({ page }) => {
+test('without WebGL 2, the heart surface is smooth: no bands, streaks or seam, at 1920 and at 3840', async ({ page }) => {
+  await withoutWebGL2(page);
   test.setTimeout(240000);
   for (const width of [1920, 3840]) {
     const frame = await loadAt(page, width, { fixture: allShortFixture, scene: 9 });
@@ -683,7 +689,8 @@ test('the heart surface is smooth: no bands, streaks or seam, at 1920 and at 384
   }
 });
 
-test('the heart is shaded, not a flat silhouette', async ({ page }) => {
+test('without WebGL 2, the heart is shaded, not a flat silhouette', async ({ page }) => {
+  await withoutWebGL2(page);
   const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9, ms: 2000 });
   const tones = await frame.evaluate(() => {
     const canvas = document.querySelector<HTMLCanvasElement>('#heart-host canvas.pip-heart');
@@ -740,7 +747,8 @@ async function ribbonReading(frame: Frame) {
   });
 }
 
-test('ribbons of gold flow around the heart, behind it and in front of it, and the heart beats', async ({ page }) => {
+test('without WebGL 2, ribbons of gold flow around the heart, behind it and in front of it, and the heart beats', async ({ page }) => {
+  await withoutWebGL2(page);
   const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9, ms: 2000 });
   const first = await ribbonReading(frame);
   // Gold is really drawn on both sides of the solid.
@@ -764,7 +772,8 @@ test('ribbons of gold flow around the heart, behind it and in front of it, and t
   expect(Math.max(...swells)).toBeLessThanOrEqual(1.0301);
 });
 
-test('reduced motion renders the scene still, with the heart held at a three quarter angle', async ({ page }) => {
+test('without WebGL 2, reduced motion renders the scene still, with the heart held at a three quarter angle', async ({ page }) => {
+  await withoutWebGL2(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const frame = await loadRenderer(page, { fixture: allShortFixture, scene: 9 });
   const still = await frame.evaluate(() => (window as any).colorPolishRuntime.getState().still === true);

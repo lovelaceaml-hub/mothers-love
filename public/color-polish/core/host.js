@@ -43,6 +43,8 @@ function validBootstrap(value){return !!value&&typeof value==='object'&&!Array.i
 
 function clearPresentation(){
  active=null;transition=null;slots=[];sceneRoot=null;eduCards=[];numberNodes=[];numCache.clear();feedLanes=[];particles=[];heartRenderer=null;hearts=[];tributes=[];frozen=false;
+ // Scene 9's WebGL 2 heart holds a graphics context; a cleared display gives it back.
+ if(typeof pipReleaseHeart3D==='function')pipReleaseHeart3D();
  if(typeof V!=='undefined')V={root:null,clock:0,actors:[],fx:[],garden:null,planets:[],stream:null,status:[],next:14,serial:0};
  const stage=$('stage');if(stage)stage.replaceChildren();
  const event=$('event');if(event){event.className='event-stage';event.replaceChildren();}

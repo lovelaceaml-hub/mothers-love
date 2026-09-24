@@ -1,0 +1,24 @@
+Peace in Practice top-level identifiers have been renamed with file-unique prefixes and the blur cap has been applied.
+
+Shared global scope collisions are eliminated for cross-scene execution, and the blur calculation in the `place` override is capped at 0.9 px.
+
+### Summary of changes
+1. Renamed top-level `LAYERS` to `PIP_LAYERS` in [`peace-in-practice.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js) and updated references in `mount` and `place`.
+2. Renamed generic helper `hexToRgba` to `hexToRgbaPIP` (with `peace_in_practice_hexToRgba` alias) and updated call sites in `draw`.
+3. Applied the readability blur ceiling cap `const blur=Math.min(.9, Math.max(baseBlur, L.blur))` in `place`.
+4. Appended the r1 verification line to the Result section of [`peace-in-practice.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md).
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Review the diff in [`peace-in-practice.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js) and [`peace-in-practice.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md).
+
+## COMPLETION
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md)
+
+Identifiers renamed:
+- `LAYERS`: renamed to `PIP_LAYERS` (references updated in `mount` and `place`)
+- `hexToRgba`: renamed to `hexToRgbaPIP` with alias `peace_in_practice_hexToRgba` (references updated in `draw`)

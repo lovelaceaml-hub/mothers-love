@@ -1,0 +1,17 @@
+The calendar pulse settle assertion has been updated and the lane record has been appended.
+
+The shared checkpoint helper pauses animations, which keeps fully elapsed pulses in a paused state rather than finished. The test now compares `getComputedTiming().endTime` against `anim.currentTime` and verifies the pulse count matches past day elements.
+
+### What works now
+- [`tests/color-polish-scenes/calendar.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts#L99-L129) evaluates `getComputedTiming().endTime <= anim.currentTime` for all `calendar-entry-pulse` animations and verifies the count equals `.day.past` elements.
+- [`docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md#L26-L32) records the Round 1 fix under Result.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Run the coordinator suite against [`tests/color-polish-scenes/calendar.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts) to verify the 13th test passes.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
+- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
