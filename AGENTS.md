@@ -1,14 +1,11 @@
-## Active state: the painted world, PLAN-01 (September 23)
+## Active state: PLAN-01, the 3D world with Peace and Joy (September 24)
 
 The active plan is `/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
-(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Painted backdrop
-ruling (Section 0, Anthony's hybrid look):** a painted sky panorama on a dome and a
-painted layer of distant islands are allowed behind the real 3D world, with a painted
-colour grade over everything. A flat full screenshot or a target painting on a plane is
-still not allowed; target frames are look references only. The masters, their spec and
-provenance are in 3D Studio `docs/design/concept/v2/ASSET-SPEC.md` and Drive
-`3D World/art/painted-v2/`. The rules in the sections below still bind unless PLAN-01
-changes them.
+(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
+(Anthony, 2026-09-24):** "I want everything to be 3D" and "I like how it shows currently".
+No painted sky panoramas, painted island layers or painted colour filter go into the world.
+The paintings made on 2026-09-23 are set aside on Drive `3D World/art/painted-v2/` and are
+not used. The rules in the sections below still bind unless PLAN-01 changes them.
 
 ## Active state: Plan 26, the 3D Studio kit inside the world (September 23)
 
