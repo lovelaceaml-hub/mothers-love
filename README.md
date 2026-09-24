@@ -2,12 +2,13 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-**Now (2026-09-23):** production is `main` at `1b4c31a`, with eleven TV screens, the sculpted 3D heart, an admin list of every submission in arrival order, and Android install with a fullscreen TV kiosk mode. The 3D world is being built on its own branch and is not live. The current state and open items are on one page: [docs/HANDOFF.md](docs/HANDOFF.md).
+**Now (2026-09-24):** production is `main`, with eleven TV screens, the sculpted 3D heart, an admin list of every submission in arrival order, and Android install with a fullscreen TV kiosk mode. The 3D world has its own address, `/world`, beside the TV display; it goes live when pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) merges (Plan 28 Section 5, 2026-09-24). The current state and open items are on one page: [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), [Share a recognition](https://mothers-love.vercel.app/recognize), [Expression guide](https://mothers-love.vercel.app/expressions).
 - **TV:** [TV display](https://mothers-love.vercel.app/display), opens directly without a code; [kiosk mode](https://mothers-love.vercel.app/display?kiosk=1) for a dedicated screen; the [Live Recognitions screen](https://mothers-love.vercel.app/display?scene=live-feed).
+- **3D world:** [/world](https://mothers-love.vercel.app/world), its own page beside the TV display, never in the TV program; [sample](https://mothers-love.vercel.app/world?source=sample) and [explorer with Settings](https://mothers-love.vercel.app/world?view=explore). Live once pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) merges; until then its [preview](https://mothers-love-git-feat-world-surface-lvzion.vercel.app/world) needs a Vercel sign in.
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
@@ -47,12 +48,12 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [21](docs/PLAN-21-living-heaven.md) | A living heaven of kindness | Part of the 3D world branch, not live |
 | [22](docs/PLAN-22-tv-bubbles-and-autoplay.md) | Recognition bubbles and hands free touring | Part of the 3D world branch, not live |
 | [23](docs/PLAN-23-recognitions-in-the-world.md) | Fly among recognitions | Part of the 3D world branch, not live |
-| [24](docs/PLAN-24-world-visual-quality.md) | Whole world visual upgrade | In progress on `feat/world-cinematic`; pass D2 done |
+| [24](docs/PLAN-24-world-visual-quality.md) | Whole world visual upgrade | Pass D2 done; P0 closed by pull request #16; reaches `main` with the world in pull request #19 |
 | [25](docs/PLAN-25-live-tv-pearl-study.md) | Live TV pearl design study | Archived 2026-09-24 as tag `archive/feat/tv-pearl-design`, not live |
 | [26](docs/PLAN-26-pearl-sequence.md) | Expression Cosmos prototype | Archived 2026-09-24 as tag `archive/feat/tv-pearl-sequence`, not live |
-| [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | Draft; gate G5 superseded, the rest folded into Plan 28 Section 5 |
+| [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | G5 superseded; G1 done by Plan 28 Section 5 (pull request #19); the TV check, completion review and merge follow in Plan 28 |
 | [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | In progress, one section per chat |
-| 29 | The 3D Studio kit inside the heavenly world (was 26) | In progress on `world-kit/*` under its own coordinator; its file reaches `main` with the world branch |
+| [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; its file reaches `main` with pull request #19 |
 
 ## Other documents
 

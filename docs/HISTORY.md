@@ -263,9 +263,9 @@ Two plans had been numbered 25 and three numbered 26 on different branches. Anth
 | 26 | [Expression Cosmos prototype](PLAN-26-pearl-sequence.md) | unchanged | 2026-09-22T07:32Z, `feat/tv-pearl-sequence` |
 | 27 | [Promote the heavenly world](PLAN-27-world-promotion.md) | `PLAN-25-world-promotion.md` | 2026-09-22T11:18Z, `feat/world-cinematic` |
 | 28 | [Clean up and refactor the repository](PLAN-28-repository-refactor.md) | `PLAN-26-repository-refactor.md` | 2026-09-23T01:50Z, `codex/color-polish-v6` |
-| 29 | The 3D Studio kit inside the heavenly world | `PLAN-26-world-kit.md` | 2026-09-23T07:24Z, local `feat/world-cinematic` and `world-kit/k0` |
+| 29 | [The 3D Studio kit inside the heavenly world](PLAN-29-world-kit.md) | `PLAN-26-world-kit.md` | 2026-09-23T07:24Z, local `feat/world-cinematic` and `world-kit/k0` |
 
-Plan 29's file still carries its old name on the world branch; its own coordinator renames it, and it reaches `main` when the world branch merges. The run trees and the `record/*` tags carry no plan number, so no link to them changed. Text written before the ruling keeps the number it was written under.
+Plan 29 reached `main` with the world, renamed `PLAN-29-world-kit.md` by Plan 28 Section 5 on 2026-09-24, which also deleted the world branch's copy of `PLAN-25-world-promotion.md` (`main` carries it as Plan 27). The run trees and the `record/*` tags carry no plan number, so no link to them changed. Text written before the ruling keeps the number it was written under.
 
 Five plans also existed in two different copies under one name. Section 3 kept the newer copy of each, and in every case the older copy is contained in the newer one's history except Plan 17:
 
@@ -295,6 +295,8 @@ All of them also stay in the tag `archive/codex/color-polish-v6` (commit `e5ffa3
 ### Documents that still live only on active branches
 
 These belong to work still in progress. Each arrives on `main` when its branch merges, and nothing here is lost if it waits.
+
+Update, 2026-09-24 (Plan 28 Section 5): the world's documents in the first two rows arrive on `main` with `feat/world-surface`, which merges `feat/world-cinematic` and `feat/world-base`; the world's own handoff and agent notes are in part 4. The last two branches were archived by Plan 28 Section 4, so their documents live in the tags `archive/feat/tv-pearl-sequence` and `archive/feat/tv-pearl-design`.
 
 | Branch | Documents |
 | --- | --- |

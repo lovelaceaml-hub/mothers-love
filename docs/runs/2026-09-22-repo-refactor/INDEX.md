@@ -31,9 +31,9 @@ After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment 
 | S1 | Rename and reduce the branches (Opus 5 xhigh, 45 minutes) | complete | claude-opus-5 xhigh | /Users/anthony/Projects/mothers-love (main checkout) | Haiku 4.5 sweep, Sonnet 5 high read only | S0 |
 | S2 | Fix the main working copy (Opus 5 xhigh, 30 minutes) | complete | claude-opus-5 xhigh | /Users/anthony/Projects/mothers-love (main checkout) | Haiku 4.5 sweep, Sonnet 5 high read only | S1 |
 | S3 | One documentation set (Opus 5 xhigh, 40 minutes) | complete, merged 2026-09-24 as pull request #11 | claude-opus-5-5 xhigh | temporary worktree of fix/infra-one-doc-set, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S2 |
-| S4 | Worktrees (Opus 5 xhigh, 20 minutes) | complete, waiting for Anthony's merge | claude-opus-5-5 xhigh | temporary worktree of fix/infra-s4-worktrees, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S3 |
-| S5 | The 3D world as its own surface (Opus 5 xhigh, about 2 hours) | planned | pending | pending | pending | pending |
-| S6 | Retire the dead code (Opus 5 xhigh, 45 minutes) | planned | pending | pending | pending | pending |
+| S4 | Worktrees (Opus 5 xhigh, 20 minutes) | complete, merged 2026-09-24 as pull request #18 | claude-opus-5-5 xhigh | temporary worktree of fix/infra-s4-worktrees, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S3 |
+| S5 | The 3D world as its own surface (Opus 5 xhigh, about 2 hours) | review; draft pull request #19 staged | claude-opus-5-5 xhigh | /Users/anthony/Projects/mothers-love-worktrees/world-surface (feat/world-surface) | Haiku 4.5 sweep, Sonnet 5 high read only | S4 |
+| S6 | Retire the dead code (Opus 5 xhigh, 45 minutes) | built; routes removed on `main` (#17), P0 fix #16 merged with its CI check green 2026-09-24; review not yet recorded | claude-opus-5-5 (cloud) | cloud clone | pending | S3 |
 | S7 | Split the oversized files (Opus 5 xhigh, about 2 hours) | planned | pending | pending | pending | pending |
 | S8 | Verify, review, back up, report (Opus 5 xhigh, 1 hour) | planned | pending | pending | pending | pending |
 
@@ -55,8 +55,8 @@ After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment 
 <!-- lane: S1 state: complete model: claude-opus-5-xhigh worktree: /Users/anthony/Projects/mothers-love review: sonnet-5-high updated: 2026-09-23T05:11Z -->
 <!-- lane: S2 state: complete model: claude-opus-5-xhigh then claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love review: sonnet-5-high updated: 2026-09-23T08:01Z -->
 <!-- lane: S3 state: complete model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-one-doc-set review: sonnet-5-high updated: 2026-09-24T14:16Z -->
-<!-- lane: S4 state: complete-awaiting-merge model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-s4-worktrees review: sonnet-5-high updated: 2026-09-24T14:45Z -->
-<!-- lane: S5 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
-<!-- lane: S6 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
+<!-- lane: S4 state: complete model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-s4-worktrees review: sonnet-5-high updated: 2026-09-24T17:34Z -->
+<!-- lane: S5 state: review model: claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love-worktrees/world-surface review: sonnet-5-high updated: 2026-09-24T17:34Z -->
+<!-- lane: S6 state: review model: claude-opus-5-5 worktree: cloud clone review: pending updated: 2026-09-24T17:34Z -->
 <!-- lane: S7 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
 <!-- lane: S8 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->

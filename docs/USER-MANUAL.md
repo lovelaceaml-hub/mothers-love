@@ -53,19 +53,19 @@ On [TV View](https://mothers-love.vercel.app/display), use Enable chimes on this
 
 The latest owner choice keeps all selected effects active. The app does not automatically reduce effects. Actual TV speed, room audio and a real phone scan remain hardware checks, outside the selected software-only proof.
 
+## The 3D world
 
-## Heavenly World preview
+The [3D world](https://mothers-love.vercel.app/world) is its own page beside the TV View. It never replaces the [TV View](https://mothers-love.vercel.app/display) and is never part of the TV program: each screen shows one or the other, chosen by its address. To find it without typing, open [Display controls](https://mothers-love.vercel.app/admin/display) and choose **open the 3D world** at the bottom of the page.
 
-The separate [world preview](https://mothers-love-ipk16tg3a-lvzion.vercel.app/display/world-preview) opens with **Live recognitions** from the campaign. For fictional demonstrations, choose Sample world in Settings or add `?source=sample` to the preview address. **World map** opens all thirteen locations. Garden, Sanctuary, and Expressions also have quick buttons. The tour starts automatically without a click. The camera flies in a slow arc among readable pearl bubbles above the gardens and along the river, then travels to the next location. These bubbles live inside the world: their position, size and depth change naturally as the camera passes them. They remain part of the scenery during travel.
+The page opens the way a TV should show it: the camera tours thirteen places of kindness, recognitions float in the world as pearls, a ticker along the bottom lists the latest recognitions, and the QR code invites people to share one. It shows the same published recognitions and follows the same owner settings as the TV View: Quiet, Neutral, Pause arrivals, Pause rotation and Still all apply, and Quiet or Neutral clears every recognition from the world at once. Submitted names never appear.
 
-**Read recognitions** opens complete messages and an expression filter. **Linger with this recognition** returns to its reading view and holds it. **Continue reading tour** resumes. Names and messages are drawn directly on the world bubbles. Long messages turn through numbered pages automatically; the full unbroken message is always available in Read recognitions. Previous and next arrows select another story. Clicking a bubble in the scenery selects and holds it. Use Continue reading tour to release it. In Garden of Days, choose a date to see its counts and currently available stories.
+Useful addresses:
 
-Animated fictional neighbors greet, gesture, smile and exchange hearts throughout the world. Their speech illustrates the campaign's words of kindness; the recognition bubbles show actual approved campaign messages in Live recognitions and fictional examples in Sample world. Soft sky ribbons, water, silk and light animate around the reading stops.
+| Address | What it shows |
+| --- | --- |
+| [/world](https://mothers-love.vercel.app/world) | The TV tour with live recognitions |
+| [/world?source=sample](https://mothers-love.vercel.app/world?source=sample) | The same tour with fictional sample recognitions, marked Fictional sample |
+| [/world?view=explore](https://mothers-love.vercel.app/world?view=explore) | The explorer: the world map, Read recognitions, Hold this recognition, Fullscreen and **Settings** |
+| [/world?art=cinematic](https://mothers-love.vercel.app/world?art=cinematic) or [/world?art=classic](https://mothers-love.vercel.app/world?art=classic) | The two earlier looks, kept as fallbacks |
 
-**Settings** controls speed, picture quality, and still view. In Sample world, **Preview grand entrance** demonstrates one fictional arrival rising inside the luminous world portal; **Preview five arrivals** demonstrates a wave with separate reading time for every person. Resume the tour and release a held recognition before starting a demonstration. Reduced motion gives a stable reading celebration and automatically changes locations with immediate cuts. Still view also continues the automatic tour; Pause tour or Hold this recognition intentionally stops it. The owner's arrival-pause setting suppresses live entrances.
-
-Live recognitions is the default and uses the existing public TV feed and the owner's mode, motion, reading time, arrival pause, rotation pause, and scene selections. World stops have a 20-second minimum, extended until the complete message has received its reading time. They do not inherit the original TV playlist's three-minute Garden wait. A new verified publication enters after the current reading interval. Existing records are not replayed as new arrivals when opening or reconnecting. Quiet and unavailable states clear messages. The world does not submit recognitions or change settings.
-
-**Hide details** clears location labels and controls while the bubbles remain in the environment; Show details or Escape brings the controls back. **Fullscreen** uses the browser's fullscreen support. If 3D cannot run, a still view retains the reading browser and all locations; Try 3D again recreates the renderer. The original [TV display](https://mothers-love.vercel.app/display) continues separately.
-
-Vercel protects preview deployments. Use the final handoff's temporary share link or a signed-in owning Vercel session. Share links expire, without changing the original TV address. Sound is not part of this preview; celebrations are visual.
+**Picture quality** starts on Automatic, which steps the picture down if the screen cannot keep up. In the explorer, Settings also offers High and Low. The old preview address, `/display/world-preview`, still works and moves to `/world`.
