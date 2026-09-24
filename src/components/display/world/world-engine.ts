@@ -6,21 +6,21 @@ import { createWorldScene } from "./world-scene";
 import { WorldRecognitionBubbles } from "./world-recognitions";
 import { ArrivalDirector, type ArrivalState } from "./arrival-director";
 import { RecognitionDirector } from "./recognition-director";
-import { isWorldDesignStudy, studyKit, studyRadiance, type StudyArrival } from "./prototype/design-mode";
-import { arrivalAdmitted, arrivalStyleAt, arrivalStyleCycles } from "./prototype/arrival-choreography";
-import { resolveStudyTier, StudyRadiance } from "./prototype/study-radiance";
-import { applyStudyDetail, type StudyDetailEntry } from "./prototype/study-budget";
-import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./prototype/camera-finesse";
+import { isWorldDesignStudy, studyKit, studyRadiance, type StudyArrival } from "./art/design-mode";
+import { arrivalAdmitted, arrivalStyleAt, arrivalStyleCycles } from "./art/arrival-choreography";
+import { resolveStudyTier, StudyRadiance } from "./art/study-radiance";
+import { applyStudyDetail, type StudyDetailEntry } from "./art/study-budget";
+import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./art/camera-finesse";
 import {
   StudyMood,
   studyHaze,
   studyHazeColor,
   type MoodInput,
   type StudyHaze,
-} from "./prototype/study-mood";
-import { STUDY_CALM, STUDY_EXPOSURE } from "./prototype/study-materials";
-import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
-import { STUDY_FOG, STUDY_TONE, STUDY_TV_CAMERA_FAR, STUDY_TV_FOG, STUDY_TV_TONE } from "./prototype/study-palette";
+} from "./art/study-mood";
+import { STUDY_CALM, STUDY_EXPOSURE } from "./art/study-materials";
+import { studyEnvironment, studyPixelRatio } from "./art/study-lighting";
+import { STUDY_FOG, STUDY_TONE, STUDY_TV_CAMERA_FAR, STUDY_TV_FOG, STUDY_TV_TONE } from "./art/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import type { WorldKit } from "./kit/kit-loader";
 import { kitState, type KitState } from "./kit/kit-manifest";
@@ -34,10 +34,10 @@ import {
   tvStartPlace,
   worldHoldSeconds,
   type WorldBubblePlan,
-} from "./prototype/tv-page";
-import { TV_ARC, TV_FOCUS_DELAY, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
-import { TvHosts } from "./prototype/tv-hosts";
-import { applyTvWaterEnvironment } from "./prototype/tv-foreground";
+} from "./art/tv-page";
+import { TV_ARC, TV_FOCUS_DELAY, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./art/tv-places";
+import { TvHosts } from "./art/tv-hosts";
+import { applyTvWaterEnvironment } from "./art/tv-foreground";
 import type { HoldSeconds } from "./recognition-director";
 
 /** The TV page's hold rule (step 4). It sets its own floor, so the owner minimum is not read. */

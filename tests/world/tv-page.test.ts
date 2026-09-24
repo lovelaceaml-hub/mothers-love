@@ -14,9 +14,9 @@ import {
   tourLoopSeconds,
   tvRecords,
   worldHoldSeconds,
-} from "@/components/display/world/prototype/tv-page";
+} from "@/components/display/world/art/tv-page";
 import { snapshot } from "./fixtures";
-import { tvPlaceHold } from "@/components/display/world/prototype/tv-places";
+import { tvPlaceHold } from "@/components/display/world/art/tv-places";
 
 /** Fictional records only: numbered names and plain sample words. */
 function records(count: number): Recognition[] {

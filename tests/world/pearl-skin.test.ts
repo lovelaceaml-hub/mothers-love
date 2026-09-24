@@ -26,7 +26,7 @@ import {
   paintStudyPearl,
   type StudyPearlFrame,
   type StudyPearlKit,
-} from "../../src/components/display/world/prototype/pearl-skin";
+} from "../../src/components/display/world/art/pearl-skin";
 import { SAMPLE_RECOGNITIONS, WORLD_EXPRESSIONS } from "../../src/components/display/world/world-data";
 import { wrapBubbleText } from "../../src/components/display/world/world-recognitions";
 import type { Recognition } from "@/lib/contracts";

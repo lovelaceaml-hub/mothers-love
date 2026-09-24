@@ -39,7 +39,7 @@ import {
   type NeighborClip,
 } from "@/components/display/world/neighbor-dialogue";
 import { WORLD_EXPRESSIONS, ZONES, RECOGNITION_ZONES, type ZoneId } from "@/components/display/world/world-data";
-import type { DesignKitContext } from "@/components/display/world/prototype/design-world";
+import type { DesignKitContext } from "@/components/display/world/art/design-world";
 
 afterEach(() => vi.unstubAllGlobals());
 

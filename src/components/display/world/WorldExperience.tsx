@@ -15,7 +15,7 @@ import type { WorldEngine, WorldStatus } from "./world-engine";
 import styles from "./WorldExperience.module.css";
 import { WorldTvOverlay } from "./WorldTvOverlay";
 import tvStyles from "./WorldTv.module.css";
-import { TV_TOUR_SPEED } from "./prototype/tv-page";
+import { TV_TOUR_SPEED } from "./art/tv-page";
 import { useDisplayChimes } from "../use-display-chimes";
 import {
   isWorldDesignStudy,
@@ -23,7 +23,7 @@ import {
   studyKit,
   studyReviewFeed,
   type StudyArrival,
-} from "./prototype/design-mode";
+} from "./art/design-mode";
 
 const INITIAL: WorldStatus = {
   zone: "garden",

@@ -2,8 +2,8 @@ import * as T from "three";
 import { describe, expect, it } from "vitest";
 import type { Recognition } from "@/lib/contracts";
 import { TOUR_ORDER } from "@/components/display/world/world-data";
-import { heldBig, planWorldBubbles } from "@/components/display/world/prototype/tv-page";
-import { TV_MAIN_RADIUS, TV_MEDALLION_SCALE, TV_PLACES, TV_READ, tvFlowRadius, tvPlaceWorld } from "@/components/display/world/prototype/tv-places";
+import { heldBig, planWorldBubbles } from "@/components/display/world/art/tv-page";
+import { TV_MAIN_RADIUS, TV_MEDALLION_SCALE, TV_PLACES, TV_READ, tvFlowRadius, tvPlaceWorld } from "@/components/display/world/art/tv-places";
 import {
   TV_BUD_SCALE,
   TV_FLOW,
@@ -18,7 +18,7 @@ import {
   tvFlowRecord,
   tvLeaving,
   tvStreamStep,
-} from "@/components/display/world/prototype/tv-flow";
+} from "@/components/display/world/art/tv-flow";
 
 /** Fictional records only: numbered names and plain sample words. */
 function records(count: number): Recognition[] {

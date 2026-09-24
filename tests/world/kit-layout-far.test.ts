@@ -29,7 +29,7 @@ import {
   readingKeepOut,
   type KitPlacement,
   type ZoneLayout,
-} from "@/components/display/world/prototype/kit-layout-far";
+} from "@/components/display/world/art/kit-layout-far";
 import {
   CLOUD_VIEW_DISTANCE,
   CORRIDOR_KEEP,
@@ -59,10 +59,10 @@ import {
   readingArcEye,
   skyLaneStation,
   tourLegs,
-} from "@/components/display/world/prototype/kit-corridors";
-import { FAR_BUILDER_ZONES, FAR_DETAIL_DISTANCE, FAR_KEEP, farZonesEnabled } from "@/components/display/world/prototype/kit-far-zones";
-import { SMALL_SITE_RADIUS, STUDY_CLOUD_TINTS, STUDY_COLLAR_TINTS, studyCloudLayout } from "@/components/display/world/prototype/study-clouds";
-import { studyLandmarkCloudSites, studyLandmarkLayout } from "@/components/display/world/prototype/study-landmarks";
+} from "@/components/display/world/art/kit-corridors";
+import { FAR_BUILDER_ZONES, FAR_DETAIL_DISTANCE, FAR_KEEP, farZonesEnabled } from "@/components/display/world/art/kit-far-zones";
+import { SMALL_SITE_RADIUS, STUDY_CLOUD_TINTS, STUDY_COLLAR_TINTS, studyCloudLayout } from "@/components/display/world/art/study-clouds";
+import { studyLandmarkCloudSites, studyLandmarkLayout } from "@/components/display/world/art/study-landmarks";
 
 /* ------------------------------------------------------------------------------------------ */
 /* The kit's own facts: ids, authored zones and exact bounds from the glTF accessors.           */
@@ -747,7 +747,7 @@ describe("corridors: sky lanes", () => {
     // The relaxation is real and stated: some pair flight passes inside a soft cloud's sphere.
     const pairGaps = clouds.map(cloud => FLIGHTS.clearance(cloud.position, 0, ["pairs"]).clearance);
     expect(Math.min(...pairGaps)).toBeLessThan(SOFT_CLOUD.centreClearance);
-    const source = readFileSync(path.resolve(repo, "src/components/display/world/prototype/kit-corridors.ts"), "utf8");
+    const source = readFileSync(path.resolve(repo, "src/components/display/world/art/kit-corridors.ts"), "utf8");
     expect(source).toContain("exempt from the zone button pair flights");
   });
 
@@ -862,7 +862,7 @@ describe("the islet look, the collar tints and the far zone builder (round four 
     expect(ISLET_COLOURS.cap).toBe("#c9dfb5");
     expect(ISLET_COLOURS.bush).toBe("#e7a3c0");
     expect(ISLET_COLOURS.rim).toBe("gold");
-    const source = readFileSync(path.resolve(repo, "src/components/display/world/prototype/kit-corridors.ts"), "utf8");
+    const source = readFileSync(path.resolve(repo, "src/components/display/world/art/kit-corridors.ts"), "utf8");
     expect(source).toContain("Kit corridor islet rims");
   });
 

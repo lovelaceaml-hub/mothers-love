@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { KIT_BUDGETS, budgetProblem } from "@/components/display/world/kit/kit-manifest";
-import { HOSTS_READY, hostClipFor } from "@/components/display/world/prototype/tv-hosts";
+import { HOSTS_READY, hostClipFor } from "@/components/display/world/art/tv-hosts";
 
 describe("Peace and Joy on the TV page", () => {
   it("builds against the placeholder until the lamb files are in 3D Studio main", () => {

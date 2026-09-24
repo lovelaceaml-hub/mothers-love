@@ -3,7 +3,7 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { clone as cloneSkinned } from "three/addons/utils/SkeletonUtils.js";
-import { isWorldDesignStudy, studyKit } from "../prototype/design-mode";
+import { isWorldDesignStudy, studyKit } from "../art/design-mode";
 import {
   KIT_BASE,
   isSameOriginKitBase,

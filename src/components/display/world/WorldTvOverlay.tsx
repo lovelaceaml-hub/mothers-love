@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { Recognition } from "@/lib/contracts";
-import { tickerItems } from "./prototype/tv-page";
+import { tickerItems } from "./art/tv-page";
 import type { WorldZone } from "./world-data";
 import { TrustedQR } from "./WorldContent";
 import styles from "./WorldTv.module.css";

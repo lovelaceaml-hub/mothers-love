@@ -5,7 +5,7 @@ import {
   worldDesignReview,
   worldSampleSource,
   worldView,
-} from "@/components/display/world/prototype/design-mode";
+} from "@/components/display/world/art/design-mode";
 
 export const metadata: Metadata = {
   title: "A Heavenly World | Mother's Love",

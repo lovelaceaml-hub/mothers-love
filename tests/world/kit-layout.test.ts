@@ -35,9 +35,9 @@ import {
   type KitPlacement,
   type MedallionLayout,
   type ZoneLayout,
-} from "../../src/components/display/world/prototype/kit-layout-core";
-import { KIT_CLUSTER_CELL, KIT_ZONE_LAYOUTS, staticRole } from "../../src/components/display/world/prototype/kit-districts";
-import { petalField, risingCenters } from "../../src/components/display/world/prototype/study-air";
+} from "../../src/components/display/world/art/kit-layout-core";
+import { KIT_CLUSTER_CELL, KIT_ZONE_LAYOUTS, staticRole } from "../../src/components/display/world/art/kit-districts";
+import { petalField, risingCenters } from "../../src/components/display/world/art/study-air";
 import { parseKitManifest } from "../../src/components/display/world/kit/kit-manifest";
 import { RECOGNITION_ZONES, TOUR_ORDER, ZONES } from "../../src/components/display/world/world-data";
 
@@ -286,7 +286,7 @@ describe("near zone tables", () => {
 
   it("copies the medallion ring and the hero pearl's placement from the pearl's own files", () => {
     // pearl-skin.ts moves the medallions; world-recognitions.ts places and sizes the pearl.
-    const skin = source("prototype/pearl-skin.ts"), pearls = source("world-recognitions.ts");
+    const skin = source("art/pearl-skin.ts"), pearls = source("world-recognitions.ts");
     expect(skin).toContain(`const radiusX = (frame.portrait ? ${MEDALLION.portrait.radiusX} : ${MEDALLION.landscape.radiusX}) * frame.orbitScale;`);
     expect(skin).toContain(`const radiusY = (frame.portrait ? ${MEDALLION.portrait.radiusY} : ${MEDALLION.landscape.radiusY}) * frame.orbitScale;`);
     expect(skin).toContain(`const size = frame.portrait ? ${String(MEDALLION.portrait.size).replace(/^0/, "")} : frame.orbitScale;`);
@@ -342,7 +342,7 @@ describe("near zone tables", () => {
     // The grove as design-world.ts builds it: columns at (cos a * 10.5, sin a * 9.3) for
     // a = -.9 pi + i / 8 * 1.6 pi, each icon disc of radius .96 at y 5.15 in a group turned
     // .48, .37 in front of the column axis; the piece bobs .15 and the selected one rises .6.
-    const world = source("prototype/design-world.ts"), builder = source("prototype/kit-districts.ts");
+    const world = source("art/design-world.ts"), builder = source("art/kit-districts.ts");
     expect(world).toContain("const a=-Math.PI*.9+i/8*Math.PI*1.6, x=Math.cos(a)*10.5,z=Math.sin(a)*9.3;");
     expect(world).toContain("const groveIcon = geometry(new T.CircleGeometry(.96, 48));");
     expect(world).toContain("group.position.set(x,5.15,z);group.rotation.y=.48;");

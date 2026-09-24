@@ -5,7 +5,7 @@ import {
   bloomTexture,
   glowTargetSize,
   sunScreenWeight,
-} from "../../src/components/display/world/prototype/study-radiance";
+} from "../../src/components/display/world/art/study-radiance";
 
 /**
  * The radiance pass needs a WebGL context, so only its pure parts are proved here, plus the

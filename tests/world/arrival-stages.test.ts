@@ -2,7 +2,7 @@ import * as T from "three";
 import { describe, expect, it } from "vitest";
 import { WorldKit, type KitAsset, type KitModel } from "../../src/components/display/world/kit/kit-loader";
 import type { KitAssetId, KitManifest, KitManifestEntry } from "../../src/components/display/world/kit/kit-manifest";
-import { arrivalPose, type ArrivalPose } from "../../src/components/display/world/prototype/arrival-choreography";
+import { arrivalPose, type ArrivalPose } from "../../src/components/display/world/art/arrival-choreography";
 import {
   ARRIVAL_EYE_LOCAL,
   ARRIVAL_PEARL,
@@ -22,7 +22,7 @@ import {
   ribbonSilkCentre,
   ribbonStage,
   type StageContext,
-} from "../../src/components/display/world/prototype/arrival-stages";
+} from "../../src/components/display/world/art/arrival-stages";
 import { ARRIVAL_VIEW } from "../../src/components/display/world/world-data";
 
 /**

@@ -2,15 +2,15 @@ import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
 import type { ArrivalState } from "./arrival-director";
 import { messagePages, readingSeconds } from "./reading";
-import { isWorldDesignStudy } from "./prototype/design-mode";
+import { isWorldDesignStudy } from "./art/design-mode";
 import {
   StudyPearlAssets,
   StudyPearlSkin,
   paintStudyPearl,
   type StudyPearlFrame,
-} from "./prototype/pearl-skin";
-import { STUDY_TV_SPECKS, StudyWaterHalo } from "./prototype/study-glory";
-import { studyCanvasSize, type StudyTier } from "./prototype/study-budget";
+} from "./art/pearl-skin";
+import { STUDY_TV_SPECKS, StudyWaterHalo } from "./art/study-glory";
+import { studyCanvasSize, type StudyTier } from "./art/study-budget";
 import {
   RECOGNITION_ZONES,
   TOUR_ORDER,
@@ -26,7 +26,7 @@ import {
   studyTvPage,
   worldHoldSeconds,
   type WorldBubblePlan,
-} from "./prototype/tv-page";
+} from "./art/tv-page";
 import {
   TV_BIG,
   TvBubbleDecor,
@@ -38,7 +38,7 @@ import {
   tvScrollFraction,
   type TvBubbleRole,
   type TvFaceStyle,
-} from "./prototype/tv-bubbles";
+} from "./art/tv-bubbles";
 import {
   TV_FOCUS_DELAY,
   TV_FOCUS_IN,
@@ -51,7 +51,7 @@ import {
   tvFlowRadius,
   tvPlaceWorld,
   type TvPlaceWorld,
-} from "./prototype/tv-places";
+} from "./art/tv-places";
 import {
   TV_FLOW_SETTLED,
   TvLeavePath,
@@ -63,8 +63,8 @@ import {
   tvRestBob,
   TvFlowTurn,
   type TvFlowPose,
-} from "./prototype/tv-flow";
-import { TV_ARRIVAL_RADIUS, tvArrivalExit } from "./prototype/tv-arrival";
+} from "./art/tv-flow";
+import { TV_ARRIVAL_RADIUS, tvArrivalExit } from "./art/tv-arrival";
 
 export function wrapBubbleText(
   measure: (text: string) => number,

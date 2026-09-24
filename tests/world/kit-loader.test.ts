@@ -1,6 +1,6 @@
 import * as T from "three";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { studyKit } from "@/components/display/world/prototype/design-mode";
+import { studyKit } from "@/components/display/world/art/design-mode";
 import {
   KIT_TIMEOUT_MS,
   WorldKit,
@@ -12,7 +12,7 @@ import {
 import { KIT_DECODER_FILES, kitState, type KitAssetId } from "@/components/display/world/kit/kit-manifest";
 import { applyKitRemap, createKitRemap, kitMaterialRole } from "@/components/display/world/kit/kit-materials";
 import { looping, scrubbed } from "@/components/display/world/kit/kit-clips";
-import { kitCorridorSites } from "@/components/display/world/prototype/kit-corridors";
+import { kitCorridorSites } from "@/components/display/world/art/kit-corridors";
 
 afterEach(() => vi.unstubAllGlobals());
 

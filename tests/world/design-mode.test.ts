@@ -7,7 +7,7 @@ import {
   worldDesignReview,
   worldSampleSource,
   worldView,
-} from "../../src/components/display/world/prototype/design-mode";
+} from "../../src/components/display/world/art/design-mode";
 import { emptyFeed, sampleWorldFeed } from "../../src/components/display/world/world-feed";
 
 afterEach(() => vi.unstubAllGlobals());

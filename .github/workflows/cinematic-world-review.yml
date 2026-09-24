@@ -4,7 +4,7 @@ on:
     paths:
       - 'src/components/display/world/world-cinematic-art.ts'
       - 'src/components/display/world/world-scene.ts'
-      - 'src/components/display/world/prototype/design-mode.ts'
+      - 'src/components/display/world/art/design-mode.ts'
       - 'scripts/review-cinematic-world.mjs'
       - '.github/workflows/cinematic-world-review.yml'
 permissions:

@@ -6,14 +6,14 @@ import {
   StudyCameraFinesse,
   studyTravelEase,
   type FinesseInput,
-} from "../../src/components/display/world/prototype/camera-finesse";
+} from "../../src/components/display/world/art/camera-finesse";
 import {
   STUDY_MOOD,
   StudyMood,
   studyFlourish,
   studyHaze,
-} from "../../src/components/display/world/prototype/study-mood";
-import { resolveStudyTier } from "../../src/components/display/world/prototype/study-radiance";
+} from "../../src/components/display/world/art/study-mood";
+import { resolveStudyTier } from "../../src/components/display/world/art/study-radiance";
 import { smoothstep } from "../../src/components/display/world/world-data";
 
 /**

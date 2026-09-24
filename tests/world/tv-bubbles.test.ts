@@ -12,9 +12,9 @@ import {
   tvMessageFits,
   paintTvMessage,
   tvScrollFraction,
-} from "@/components/display/world/prototype/tv-bubbles";
+} from "@/components/display/world/art/tv-bubbles";
 import { wrapBubbleText } from "@/components/display/world/world-recognitions";
-import { TV_FLOW_MIN_DIAMETER, TV_READ } from "@/components/display/world/prototype/tv-places";
+import { TV_FLOW_MIN_DIAMETER, TV_READ } from "@/components/display/world/art/tv-places";
 
 describe("TV bubble faces", () => {
   it("fits 9 lines at the body size in the main bubble's message window, below a one line name", () => {

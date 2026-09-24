@@ -1,9 +1,9 @@
 import * as T from "three";
 import { describe, expect, it } from "vitest";
 import { ARRIVAL_VIEW } from "@/components/display/world/world-data";
-import { TV_BIG, TV_FOV } from "@/components/display/world/prototype/tv-bubbles";
-import { TV_MEDALLION_SCALE, TV_READ } from "@/components/display/world/prototype/tv-places";
-import { TV_ARRIVAL_AT, TV_ARRIVAL_RADIUS, tvArrivalExit } from "@/components/display/world/prototype/tv-arrival";
+import { TV_BIG, TV_FOV } from "@/components/display/world/art/tv-bubbles";
+import { TV_MEDALLION_SCALE, TV_READ } from "@/components/display/world/art/tv-places";
+import { TV_ARRIVAL_AT, TV_ARRIVAL_RADIUS, tvArrivalExit } from "@/components/display/world/art/tv-arrival";
 
 /** The fixed arrival camera on a 1920 by 1080 screen. */
 const camera = new T.PerspectiveCamera(TV_FOV, 16 / 9, 0.1, 450);

@@ -7,7 +7,7 @@ import {
   moteCloud,
   petalField,
   skyStars,
-} from "../../src/components/display/world/prototype/study-air";
+} from "../../src/components/display/world/art/study-air";
 import { ZONES } from "../../src/components/display/world/world-data";
 
 const centers = ZONES.map((zone) => zone.center);

@@ -18,10 +18,10 @@ import {
   type NeighborStaging,
 } from "../neighbor-dialogue";
 import { WORLD_EXPRESSIONS, ZONES, type ZoneId } from "../world-data";
-import type { DesignKitContext, KitBuilderHandle } from "../prototype/design-world";
-import { tvViewDistance } from "../prototype/study-budget";
-import { sparklePoints, studyRim } from "../prototype/study-materials";
-import { studyTvPage } from "../prototype/tv-page";
+import type { DesignKitContext, KitBuilderHandle } from "../art/design-world";
+import { tvViewDistance } from "../art/study-budget";
+import { sparklePoints, studyRim } from "../art/study-materials";
+import { studyTvPage } from "../art/tv-page";
 import type { WorldKit } from "./kit-loader";
 import type { KitAssetId } from "./kit-manifest";
 

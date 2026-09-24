@@ -5,29 +5,29 @@ import { ARRIVAL_VIEW, TOUR_ORDER, ZONES, type ZoneId } from "@/components/displ
 import { CameraDirector } from "@/components/display/world/camera-director";
 import {
   FINESSE_OFFSET_LIMIT, StudyCameraFinesse, studyTravelEase, type FinesseInput,
-} from "@/components/display/world/prototype/camera-finesse";
-import { STUDY_MOOD, studyHaze, studyHazeColor } from "@/components/display/world/prototype/study-mood";
+} from "@/components/display/world/art/camera-finesse";
+import { STUDY_MOOD, studyHaze, studyHazeColor } from "@/components/display/world/art/study-mood";
 import {
   STUDY_FOG, STUDY_SEA, STUDY_SKY, STUDY_SKY_RADIUS, STUDY_TONE, STUDY_TV_CAMERA_FAR, STUDY_TV_FOG, STUDY_TV_SEA_SCALE, STUDY_TV_TONE,
-} from "@/components/display/world/prototype/study-palette";
-import { studyLandmarkLayout } from "@/components/display/world/prototype/study-landmarks";
-import { TV_ARC, TV_READ, tvFlowRadius, tvPlaceWorld, tvReadingFrame } from "@/components/display/world/prototype/tv-places";
-import { TV_FOV } from "@/components/display/world/prototype/tv-bubbles";
+} from "@/components/display/world/art/study-palette";
+import { studyLandmarkLayout } from "@/components/display/world/art/study-landmarks";
+import { TV_ARC, TV_READ, tvFlowRadius, tvPlaceWorld, tvReadingFrame } from "@/components/display/world/art/tv-places";
+import { TV_FOV } from "@/components/display/world/art/tv-bubbles";
 import {
   STUDY_DETAIL_DISTANCE, STUDY_TV_VIEW_DISTANCE, applyStudyDetail, studyDetailDistance, tvViewDistance,
-} from "@/components/display/world/prototype/study-budget";
-import { StudyRadiance, studyCompositeFragment } from "@/components/display/world/prototype/study-radiance";
-import { STUDY_TV_CLOUDS, createStudyClouds, studyCloudLayout } from "@/components/display/world/prototype/study-clouds";
-import { STUDY_TV_SUN_HALO, studySkyFragment, studySunHalo } from "@/components/display/world/prototype/study-lighting";
-import { STUDY_TV_SPECKS, StudyWaterHalo, WATER_HALO_OPACITY } from "@/components/display/world/prototype/study-glory";
-import { STUDY_TV_RIM_SCALE, scaleStudyRim, softDot, studyRim } from "@/components/display/world/prototype/study-materials";
-import { createStudyAir } from "@/components/display/world/prototype/study-air";
-import { LOD_NEAR, SOFT_CLOUD, corridorSoftCloud } from "@/components/display/world/prototype/kit-corridors";
-import { KIT_NEAR_DISTANCE, kitPeopleDistance } from "@/components/display/world/prototype/kit-districts";
+} from "@/components/display/world/art/study-budget";
+import { StudyRadiance, studyCompositeFragment } from "@/components/display/world/art/study-radiance";
+import { STUDY_TV_CLOUDS, createStudyClouds, studyCloudLayout } from "@/components/display/world/art/study-clouds";
+import { STUDY_TV_SUN_HALO, studySkyFragment, studySunHalo } from "@/components/display/world/art/study-lighting";
+import { STUDY_TV_SPECKS, StudyWaterHalo, WATER_HALO_OPACITY } from "@/components/display/world/art/study-glory";
+import { STUDY_TV_RIM_SCALE, scaleStudyRim, softDot, studyRim } from "@/components/display/world/art/study-materials";
+import { createStudyAir } from "@/components/display/world/art/study-air";
+import { LOD_NEAR, SOFT_CLOUD, corridorSoftCloud } from "@/components/display/world/art/kit-corridors";
+import { KIT_NEAR_DISTANCE, kitPeopleDistance } from "@/components/display/world/art/kit-districts";
 import { NEIGHBOR_VIEW_DISTANCE, neighborViewDistance } from "@/components/display/world/kit/kit-neighbors";
-import { PEARL_HALO_TV_FADE, StudyPearlAssets, StudyPearlSkin, pearlHaloFragment } from "@/components/display/world/prototype/pearl-skin";
-import { TV_WATER, applyTvPalette, applyTvWaterEnvironment } from "@/components/display/world/prototype/tv-foreground";
-import type { DesignKitContext } from "@/components/display/world/prototype/design-world";
+import { PEARL_HALO_TV_FADE, StudyPearlAssets, StudyPearlSkin, pearlHaloFragment } from "@/components/display/world/art/pearl-skin";
+import { TV_WATER, applyTvPalette, applyTvWaterEnvironment } from "@/components/display/world/art/tv-foreground";
+import type { DesignKitContext } from "@/components/display/world/art/design-world";
 
 /*
  * The TV page's clear air (Anthony, 2026-09-24: "Can you remove the haze foggy look"; his

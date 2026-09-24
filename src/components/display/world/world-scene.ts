@@ -1,7 +1,7 @@
 import { createWorldScene as createLegacyWorldScene } from "./world-scene-legacy";
 import { attachCinematicArt } from "./world-cinematic-art";
-import { isWorldDesignStudy, worldArt } from "./prototype/design-mode";
-import { createDesignWorld } from "./prototype/design-world";
+import { isWorldDesignStudy, worldArt } from "./art/design-mode";
+import { createDesignWorld } from "./art/design-world";
 import type { WorldKit } from "./kit/kit-loader";
 export type { WorldScene } from "./world-scene-legacy";
 

@@ -1,9 +1,9 @@
 import * as T from "three";
 import { describe, expect, it } from "vitest";
 import { TOUR_ORDER, ZONES, type ZoneId } from "@/components/display/world/world-data";
-import { TV_BIG, TV_FLOW_MIN_PX, TV_FLOW_PX, TV_FOV, tvTourCamera } from "@/components/display/world/prototype/tv-bubbles";
-import { tvRestBob } from "@/components/display/world/prototype/tv-flow";
-import { studyRibbonPoint } from "@/components/display/world/prototype/study-geometry";
+import { TV_BIG, TV_FLOW_MIN_PX, TV_FLOW_PX, TV_FOV, tvTourCamera } from "@/components/display/world/art/tv-bubbles";
+import { tvRestBob } from "@/components/display/world/art/tv-flow";
+import { studyRibbonPoint } from "@/components/display/world/art/study-geometry";
 import {
   TV_BASIN,
   TV_FOCUS_DELAY,
@@ -28,7 +28,7 @@ import {
   zoneOf,
   TV_BREATH,
   type TvPose,
-} from "@/components/display/world/prototype/tv-places";
+} from "@/components/display/world/art/tv-places";
 
 /** A billboard disc (it faces the camera) on a `width` by `height` screen: centre and radius in pixels. */
 function onScreen(camera: T.PerspectiveCamera, position: T.Vector3, radius: number, width = 1920, height = 1080) {

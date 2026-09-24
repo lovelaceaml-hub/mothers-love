@@ -1,15 +1,15 @@
 import * as T from "three";
 import { describe, expect, it } from "vitest";
-import { studyPixelRatio } from "../../src/components/display/world/prototype/study-lighting";
-import { STUDY_RIBBON_PHASE, studyPetal, studyRibbonPoint, studyTerrace } from "../../src/components/display/world/prototype/study-geometry";
-import { softDot, studySilk, studyStone } from "../../src/components/display/world/prototype/study-materials";
-import { studyLandmarkCloudSites, studyLandmarkLayout } from "../../src/components/display/world/prototype/study-landmarks";
-import { studyCanopyPuffs } from "../../src/components/display/world/prototype/study-canopy";
-import { studyCloudLayout } from "../../src/components/display/world/prototype/study-clouds";
+import { studyPixelRatio } from "../../src/components/display/world/art/study-lighting";
+import { STUDY_RIBBON_PHASE, studyPetal, studyRibbonPoint, studyTerrace } from "../../src/components/display/world/art/study-geometry";
+import { softDot, studySilk, studyStone } from "../../src/components/display/world/art/study-materials";
+import { studyLandmarkCloudSites, studyLandmarkLayout } from "../../src/components/display/world/art/study-landmarks";
+import { studyCanopyPuffs } from "../../src/components/display/world/art/study-canopy";
+import { studyCloudLayout } from "../../src/components/display/world/art/study-clouds";
 import { ZONES } from "../../src/components/display/world/world-data";
-import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "../../src/components/display/world/prototype/study-palette";
-import { applyStudyDetail, STUDY_DETAIL_DISTANCE, studyCanvasSize, studyDetailDistance } from "../../src/components/display/world/prototype/study-budget";
-import { resolveStudyTier, type StudyTier } from "../../src/components/display/world/prototype/study-radiance";
+import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "../../src/components/display/world/art/study-palette";
+import { applyStudyDetail, STUDY_DETAIL_DISTANCE, studyCanvasSize, studyDetailDistance } from "../../src/components/display/world/art/study-budget";
+import { resolveStudyTier, type StudyTier } from "../../src/components/display/world/art/study-radiance";
 
 describe("sample study quality", () => {
   it.each([

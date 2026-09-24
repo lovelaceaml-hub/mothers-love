@@ -7,7 +7,7 @@ import {
   arrivalStyleAt,
   arrivalStyleCycles,
   bloomFraction,
-} from "../../src/components/display/world/prototype/arrival-choreography";
+} from "../../src/components/display/world/art/arrival-choreography";
 import { sampleWorldFeed } from "../../src/components/display/world/world-feed";
 
 function state(phase: ArrivalPhase, progress: number) {

@@ -9,7 +9,7 @@ import {
   WATER_HALO_Y,
   lanternLayout,
   type LanternPoint,
-} from "../../src/components/display/world/prototype/study-glory";
+} from "../../src/components/display/world/art/study-glory";
 
 /** One bridge rail as the world builds it: 49 samples along the curve. */
 function rail(offset: number): LanternPoint[] {
