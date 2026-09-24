@@ -1,0 +1,292 @@
+/** The six far zone placement tables and their motion helpers (overview in kit-layout-far-shapes.ts); kit-layout-far.ts assembles them. */
+import { seededRandom } from "../world-data";
+import type { KitAssetId } from "../kit/kit-manifest";
+import {
+  type KitPlacement,
+  type ZoneLayout,
+  TERRACE_Y,
+  readingKeepOut,
+  localSunAzimuth,
+  onTiltedRing,
+  round,
+  at,
+} from "./kit-layout-far-shapes";
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.11 Garden of Days                                                                          */
+/* ------------------------------------------------------------------------------------------ */
+
+/** Seven columns, one per weekday, at this pitch; the rows are the weeks. */
+export const CALENDAR_GRID = { columns: 7, rows: 5, pitchX: 2.3, pitchZ: 2.5, offsetZ: 1.4, days: 31 } as const;
+
+/** The centre of day `index` (0 based) on the terrace. The last, partial row stays left aligned. */
+export function calendarDayCell(index: number): [number, number, number] {
+  const column = index % CALENDAR_GRID.columns, row = Math.floor(index / CALENDAR_GRID.columns);
+  return at((column - 3) * CALENDAR_GRID.pitchX, TERRACE_Y, (row - 2) * CALENDAR_GRID.pitchZ + CALENDAR_GRID.offsetZ);
+}
+
+/**
+ * Data driven dressing for the Garden of Days (design 6.11), from the public insights only:
+ * one floating `core.pearl` over every day that had recognitions, sized by the count, and one
+ * `core.flower` on that day's stone. Aggregate counts only, no personal content; the builder
+ * clears them with the feed. The pearls bob on the world clock (role animated).
+ */
+export function calendarDayPlacements(calendar: ReadonlyArray<{ periodStart: string; recognitions: number }>): KitPlacement[] {
+  const placements: KitPlacement[] = [];
+  for (const day of calendar) {
+    const index = Number(day.periodStart.slice(-2)) - 1;
+    if (!Number.isInteger(index) || index < 0 || index >= CALENDAR_GRID.days || day.recognitions <= 0) continue;
+    const [x, , z] = calendarDayCell(index);
+    placements.push({ id: "core.pearl", position: at(x, 2.5, z), scale: round(.55 + .07 * Math.min(5, day.recognitions)), role: "animated", note: `day ${index + 1}: ${day.recognitions} recognitions, bobs on the clock` });
+    placements.push({ id: "core.flower", position: at(x, TERRACE_Y + .5, z), rotationY: round((index % 5) * 1.256), scale: .5, role: "instanced", note: `day ${index + 1} bloomed` });
+  }
+  return placements;
+}
+
+export function calendarLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [];
+  for (let index = 0; index < CALENDAR_GRID.days; index++) {
+    const row = Math.floor(index / CALENDAR_GRID.columns);
+    placements.push({
+      id: "nature.stepping-stones", position: calendarDayCell(index),
+      // Across the rows the sets stand on end, so the seven columns read as seven stone paths.
+      rotationY: round(row % 2 ? -Math.PI / 2 : Math.PI / 2), scale: .48, role: "instanced",
+      note: `day ${index + 1}${index === 0 ? "; the current day's set glows warm (studyGlow .12) at run time" : ""}`,
+    });
+  }
+  // The border: four hydrangeas at the head of the grid, four on the lawns beside it.
+  for (const x of [-6.9, -2.3, 2.3, 6.9]) placements.push({ id: "nature.hydrangea-bush", position: at(x, TERRACE_Y, -5.9), rotationY: round(x * .7), scale: 1.1, role: "instanced", note: "border, head of the calendar" });
+  for (const side of [-1, 1]) for (const z of [2.6, -3.4]) placements.push({ id: "nature.hydrangea-bush", position: at(side * 9.8, TERRACE_Y, z), rotationY: round(side * z * .3), scale: 1, role: "instanced", note: "border, lawn side" });
+  // A second bench mirrors the builder's common bench at (-9.3, .7, -1), so the pair flanks the grid.
+  placements.push({ id: "landmark.garden-bench", position: at(9.3, TERRACE_Y, -1), rotationY: round(-Math.PI / 2), scale: 1.2, role: "static", note: "faces the calendar across from the common bench" });
+  return { zone: "calendar", placements, keepOut: readingKeepOut("calendar") };
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.12 Love Observatory                                                                        */
+/* ------------------------------------------------------------------------------------------ */
+
+/** Nine columns on a ring of this radius, the front left open toward the camera. */
+export const OBSERVATORY_RING = { radius: 9, firstDegrees: 150, stepDegrees: 30 } as const;
+export const OBSERVATORY_COLUMN_HEIGHT = { least: 1.6, most: 4 } as const;
+/** The kit column is 4 units tall; this is its uniform scale for a count against the largest. */
+export function observatoryColumnScale(count: number, max: number) {
+  const share = max > 0 ? Math.max(0, Math.min(1, count / max)) : 0;
+  return round((OBSERVATORY_COLUMN_HEIGHT.least + (OBSERVATORY_COLUMN_HEIGHT.most - OBSERVATORY_COLUMN_HEIGHT.least) * share) / 4);
+}
+export function observatoryColumnCell(expression: number): [number, number, number] {
+  const angle = (OBSERVATORY_RING.firstDegrees + (expression - 1) * OBSERVATORY_RING.stepDegrees) * Math.PI / 180;
+  return at(Math.cos(angle) * OBSERVATORY_RING.radius, TERRACE_Y, Math.sin(angle) * OBSERVATORY_RING.radius);
+}
+/** The observatory turns its lens (authored at azimuth .518 to the right of its front) toward the sun. */
+export function observatoryYaw() {
+  return round(localSunAzimuth("status") - .518);
+}
+
+/** The nine expression pieces in canonical order (expression 1 first). */
+export const EXPRESSION_PIECES: readonly KitAssetId[] = [
+  "expression.01-hello-bubble", "expression.02-gift-box", "expression.03-mended-heart", "expression.04-comfort-cloud",
+  "expression.05-open-door", "expression.06-teacup", "expression.07-candle", "expression.08-helping-hand", "expression.09-star",
+];
+
+export function statusLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [
+    { id: "landmark.love-observatory", position: at(0, .6, -4.5), rotationY: observatoryYaw(), scale: 1.32, role: "static", note: "9 tall; replaces the procedural glass globe and its ten rings; the lens faces the sun" },
+  ];
+  for (let expression = 1; expression <= 9; expression++) {
+    const [x, , z] = observatoryColumnCell(expression);
+    placements.push({ id: "landmark.pearl-column", position: at(x, TERRACE_Y, z), scale: 1, role: "static", note: `expression ${expression} column; height scales with insights.month.expressionCounts (observatoryColumnScale), eased at tau 1.2 s` });
+    placements.push({ id: EXPRESSION_PIECES[expression - 1], position: at(x, TERRACE_Y + 4 + .75, z), rotationY: round(Math.atan2(-x, -z)), scale: .55, role: "animated", note: `caps expression ${expression} column, .75 above its top, turned to the centre` });
+  }
+  placements.push({ id: "nature.crystal-lavender", position: at(-3.4, TERRACE_Y, -.2), rotationY: .4, scale: 1.1, role: "instanced", note: "sparkle class" });
+  placements.push({ id: "nature.crystal-blue", position: at(4.2, TERRACE_Y, -1.6), rotationY: -1.1, scale: .9, role: "instanced", note: "sparkle class" });
+  placements.push({ id: "nature.crystal-blue", position: at(2.6, TERRACE_Y, .9), rotationY: 2.2, scale: .7, role: "instanced", note: "sparkle class" });
+  for (const side of [-1, 1]) {
+    placements.push({ id: "nature.blossom-tree-a", position: at(side * 12.6, TERRACE_Y, .2), rotationY: round(side * 1.3), scale: 1, role: "static" });
+    placements.push({ id: "nature.hydrangea-bush", position: at(side * 8.8, TERRACE_Y, 6.4), rotationY: round(side * .5), scale: 1, role: "instanced" });
+    placements.push({ id: "nature.hydrangea-bush", position: at(side * 11.6, TERRACE_Y, -2.4), rotationY: round(side * 1.9), scale: .9, role: "instanced" });
+  }
+  return { zone: "status", placements, keepOut: readingKeepOut("status") };
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.13 Expression Cosmos                                                                       */
+/* ------------------------------------------------------------------------------------------ */
+
+/**
+ * The ring system stands behind the hero pearl, not around it: the procedural orbits at
+ * (0, 7, 0) scribbled across the pearl's words from the tour camera (director's note 7 on the
+ * round three captures). From here every ring point stays outside the hero reading sphere at
+ * (3, 9, 5) radius 7, at least 7 units behind the disc plane (z at most -2 against the disc's
+ * z 5, so the rings frame the pearl and never cross its text), above the terrace (lowest point
+ * 2.9) and clear of the arch row at z -9.3 (gap 1.1), which `tests/world/kit-layout-far.test.ts`
+ * proves from the ring maths below.
+ */
+export const COSMOS_CENTER: [number, number, number] = [0, 10, -7];
+/** Where the selected expression rides as the sun of the cosmos: the apex of the ring system, in view above the pearl. */
+export const COSMOS_SUN: [number, number, number] = [0, 17.6, -7];
+/** The four rings, radii 5 to 7.1 like the procedural ones (the kit ring is radius 2.5). */
+export const COSMOS_RINGS = [0, 1, 2, 3].map(k => ({ k, radius: round(5 + k * .7), scale: round((5 + k * .7) / 2.5), tilt: [round(k * .55), 0] as [number, number], rotationY: round(.4 + k * .37) }));
+/** A point of ring `k` at parameter `angle`, local, for the builder's beads and the layout test. */
+export function cosmosRingPoint(k: number, angle: number): [number, number, number] {
+  const spec = COSMOS_RINGS[k];
+  return onTiltedRing(spec.radius, angle, spec.tilt, spec.rotationY, COSMOS_CENTER);
+}
+/**
+ * The arc of ring `k` that lies behind the ring centre's plane, seen from the tour camera at
+ * +z: with the yaw `b` and the x tilt `a`, a ring point at parameter `f` has local
+ * z = radius * cos(a) * sin(f - b), so the deep back arc is where sin(f - b) is at most -.4.
+ * The fourth ring stands nearly upright facing the camera (tilt 1.65) and has no back arc
+ * worth the name, so the planets ride the first three.
+ */
+export function cosmosBackArc(k: number): { start: number; span: number } {
+  const ring = COSMOS_RINGS[k];
+  const inset = Math.asin(.4);
+  return { start: ring.rotationY + Math.PI + inset, span: Math.PI - 2 * inset };
+}
+/**
+ * Where planet `i` (0 to 8) rides at clock `t`: three per ring on the first three rings, on
+ * the back arc only, swinging gently there. The pearl is read from the front, so no planet
+ * ever crosses its words (`tests/world/kit-layout-far.test.ts` proves the cone).
+ */
+export function cosmosPlanetPose(i: number, t: number): { position: [number, number, number]; ring: number; angle: number } {
+  const slot = i % 3, ring = Math.floor(i / 3);
+  const arc = cosmosBackArc(ring), rate = .09 + ring * .015;
+  const angle = arc.start + arc.span * (.15 + .35 * slot) + .22 * Math.sin(t * rate + slot * 2.1);
+  const spec = COSMOS_RINGS[ring];
+  return { position: onTiltedRing(spec.radius, angle, spec.tilt, spec.rotationY, COSMOS_CENTER), ring, angle };
+}
+/** The small pearls between the planets, on the same back arcs. */
+export function cosmosPearlPose(i: number, t: number): [number, number, number] {
+  const slot = i % 3, ring = Math.floor(i / 3);
+  const arc = cosmosBackArc(ring);
+  const angle = arc.start + arc.span * (.02 + .35 * slot) + .16 * Math.sin(t * (.11 + ring * .01) + slot);
+  const spec = COSMOS_RINGS[ring];
+  return onTiltedRing(spec.radius, angle, spec.tilt, spec.rotationY, COSMOS_CENTER);
+}
+
+export function orbitLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [];
+  for (const ring of COSMOS_RINGS) placements.push({
+    id: "recognition.orbit-ring", position: [...COSMOS_CENTER], rotationY: ring.rotationY, tilt: ring.tilt, scale: ring.scale, role: "animated",
+    note: `cosmos ring ${ring.k}, radius ${ring.radius}; frames the hero pearl from behind (every ring point outside the reading sphere and behind the disc plane); spins on the clock`,
+  });
+  for (let i = 0; i < 9; i++) {
+    const pose = cosmosPlanetPose(i, 0);
+    placements.push({ id: EXPRESSION_PIECES[i], position: pose.position.map(round) as [number, number, number], scale: .7, role: "animated", note: `planet on ring ${pose.ring}, back arc (cosmosPlanetPose); the selected expression moves to COSMOS_SUN at 1.1 as the sun` });
+  }
+  for (let i = 0; i < 9; i++) placements.push({ id: "core.pearl", position: cosmosPearlPose(i, 0).map(round) as [number, number, number], scale: .35, role: "animated", note: "between the planets (cosmosPearlPose)" });
+  // Sculpted puffs 6 to 12 units under the island rim, among the study cloud collar.
+  const rand = seededRandom(6130);
+  const puffs: KitAssetId[] = ["nature.cloud-a", "nature.cloud-b", "nature.cloud-c"];
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2 + (rand() - .5) * .5, radius = 13 + rand() * 4;
+    placements.push({ id: puffs[i % 3], position: at(Math.cos(angle) * radius, -6 - rand() * 6, Math.sin(angle) * radius), rotationY: round(rand() * Math.PI * 2), scale: round(1.2 + rand() * .6), role: "instanced", note: "under the rim" });
+  }
+  placements.push({ id: "nature.crystal-pink", position: at(8.5, TERRACE_Y, 7.5), rotationY: .3, scale: 1.3, role: "instanced", note: "sparkle class" });
+  placements.push({ id: "nature.crystal-lavender", position: at(-8.5, TERRACE_Y, 7.5), rotationY: -.8, scale: 1.3, role: "instanced", note: "sparkle class" });
+  placements.push({ id: "nature.crystal-pink", position: at(-7.2, TERRACE_Y, 9.6), rotationY: 1.9, scale: 1, role: "instanced", note: "sparkle class" });
+  return { zone: "orbit", placements, keepOut: readingKeepOut("orbit") };
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.14 Fountain of Kindness                                                                    */
+/* ------------------------------------------------------------------------------------------ */
+
+export const FOUNTAIN_PEARLS = 65;
+/**
+ * Pearl `i` on the helix at clock `t`, rising only as far as the week's progress (0 to 1 from
+ * `insights.goal.value / target`): the fountain's height is the progress.
+ */
+export function fountainPearlPose(i: number, t: number, progress: number): [number, number, number] {
+  const cap = .2 + .8 * Math.max(0, Math.min(1, progress));
+  const u = (((i / FOUNTAIN_PEARLS + t * .013) % 1) + 1) % 1 * cap;
+  const angle = i * 2.4 + t * .22, radius = 2 + u * 7;
+  return at(Math.cos(angle) * radius, 1 + u * 18, Math.sin(angle) * radius);
+}
+
+export function milestoneLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [
+    { id: "landmark.fountain-of-kindness", position: at(0, .6, 0), scale: 3, role: "static", note: "12 tall; replaces the five procedural tiers and their five falls (the two back edge falls stay)" },
+  ];
+  for (let i = 0; i < FOUNTAIN_PEARLS; i++) placements.push({ id: "core.pearl", position: fountainPearlPose(i, 0, 1), scale: .45, role: "animated", note: i === 0 ? "helix pearl; rises with insights.goal progress (fountainPearlPose); 160 kit petals burst from the top once per visit when goal.achieved" : "helix pearl" });
+  placements.push({ id: "landmark.pool-fountain", position: at(0, TERRACE_Y, 9.6), scale: 1.3, role: "static", note: "catches the overflow at the forecourt" });
+  for (const side of [-1, 1]) placements.push({ id: "nature.crystal-blue", position: at(side * 8.2, TERRACE_Y, 6.6), rotationY: round(side * .9), scale: 1.2, role: "instanced", note: "sparkle class" });
+  placements.push({ id: "nature.crystal-lavender", position: at(-9.4, TERRACE_Y, -4.2), rotationY: 2.4, scale: 1, role: "instanced", note: "sparkle class" });
+  const rand = seededRandom(6140);
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2 + .4 + (rand() - .5) * .5, radius = 14 + rand() * 3;
+    placements.push({ id: "nature.cloud-b", position: at(Math.cos(angle) * radius, -5 - rand() * 6, Math.sin(angle) * radius), rotationY: round(rand() * Math.PI * 2), scale: round(1.1 + rand() * .6), role: "instanced", note: "under the rim" });
+  }
+  return { zone: "milestone", placements, keepOut: readingKeepOut("milestone") };
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.15 River of Recognitions                                                                   */
+/* ------------------------------------------------------------------------------------------ */
+
+/** The canal across the island's front third: an ellipse of the study water at y .735, local. */
+export const RIVER_CANAL = { center: [0, .735, 7.4] as [number, number, number], radiusX: 9.6, radiusZ: 3.2 };
+
+export function liveFeedLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [
+    { id: "nature.stepping-stones", position: at(-8.4, .78, 7.2), rotationY: round(Math.PI / 2), scale: .75, role: "instanced", note: "crosses the canal on the left; the six procedural piers stay as stepping piers" },
+    { id: "nature.lily-pads", position: at(-5.8, .75, 4.4), rotationY: .6, scale: .9, role: "instanced", note: "six pads with a bud" },
+    { id: "nature.lily-pads", position: at(1.2, .75, 11.4), rotationY: -1.4, scale: .8, role: "instanced", note: "six pads with a bud" },
+    { id: "arrival.lotus-bloom", position: at(-3, .76, 10), rotationY: .2, scale: 1.2, role: "animated", note: "scrubbed to 1 (open) while a recognition is read here, a bud otherwise; the newest recognition is the open flower" },
+    { id: "nature.blossom-tree-b", position: at(-10.2, TERRACE_Y, -8.2), rotationY: .9, scale: 1, role: "static" },
+    { id: "nature.blossom-tree-c", position: at(11.6, TERRACE_Y, .4), rotationY: -2.1, scale: .9, role: "static", note: "the smaller tree: the hero pearl's reading sphere reaches this side" },
+  ];
+  return { zone: "live-feed", placements, keepOut: readingKeepOut("live-feed") };
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* 6.16 Peace Promise                                                                           */
+/* ------------------------------------------------------------------------------------------ */
+
+export const PROMISE_PORTAL = { position: [0, .6, -5] as [number, number, number], scale: 1.7, openingCenterKit: [0, 2.95, 0] as [number, number, number], clearOpeningKit: [3.21, 4.47] as [number, number] };
+/** The two ribbon pieces inside the loop: their places, and the slow turn each makes on the clock. */
+export const PROMISE_RIBBONS = [
+  { position: [-1, 4.3, -4.6] as [number, number, number], yaw: .6, rate: .025 },
+  { position: [1, 7.4, -5.4] as [number, number, number], yaw: -.5, rate: -.025 },
+] as const;
+export function promiseRibbonYaw(index: 0 | 1, t: number) {
+  return PROMISE_RIBBONS[index].yaw + t * PROMISE_RIBBONS[index].rate;
+}
+
+/** Ten rose bushes on the two lawn arcs, clear of everything else on the island. Seeded, so stable. */
+export function promiseRoses(): KitPlacement[] {
+  const rand = seededRandom(6160);
+  const taken: Array<[number, number, number]> = [
+    [-10, 5, 2.4], [10.5, 5, 2.4], [-8, 4, 1.6], [8, 2, 1.3], [-9.3, -1, 1.6], [-11.3, 6, .9], [11.3, 6, .9],
+    [-12.4, -2.8, 1.6], [12.3, -6.9, 1.6], [-8.6, 8.6, 1.4], [11.4, -1.5, 1.4], [-5.4, -1.2, 1.2], [5.4, -1.2, 1.2],
+  ];
+  const roses: KitPlacement[] = [];
+  let guard = 0;
+  while (roses.length < 10 && guard++ < 400) {
+    const side = roses.length % 2 ? 1 : -1;
+    const angle = (rand() - .5) * 1.1, radius = 8.3 + rand() * 2.6;
+    const x = side * Math.cos(angle) * radius, z = Math.sin(angle) * radius;
+    if (x * x + z * z > 12.2 * 12.2) continue;
+    if (taken.some(([tx, tz, clearance]) => Math.hypot(tx - x, tz - z) < clearance + .75)) continue;
+    taken.push([x, z, .8]);
+    roses.push({ id: "nature.rose-bush", position: at(x, TERRACE_Y, z), rotationY: round(rand() * Math.PI * 2), scale: round(.9 + rand() * .3), role: "instanced" });
+  }
+  return roses;
+}
+
+export function promiseLayout(): ZoneLayout {
+  const placements: KitPlacement[] = [
+    { id: "arrival.ribbon-portal", position: PROMISE_PORTAL.position, scale: PROMISE_PORTAL.scale, role: "static", note: "the sculpture, about 10 tall; replaces the two procedural box slabs" },
+    { id: "core.ribbon", position: PROMISE_RIBBONS[0].position, rotationY: PROMISE_RIBBONS[0].yaw, scale: 1.7, role: "animated", note: "inside the loop, low left; turns .025 rad a second (promiseRibbonYaw)" },
+    { id: "core.ribbon", position: PROMISE_RIBBONS[1].position, rotationY: PROMISE_RIBBONS[1].yaw, scale: 1.7, role: "animated", note: "inside the loop, high right; turns the other way (promiseRibbonYaw)" },
+    { id: "landmark.stone-tablet", position: at(8, TERRACE_Y, 2), scale: 1.3, role: "static", note: "blank, face toward the camera" },
+    { id: "landmark.garden-bench", position: at(-8, TERRACE_Y, 4), rotationY: .6, scale: 1.3, role: "static", note: "faces the sculpture" },
+    { id: "nature.blossom-tree-c", position: at(-8.6, TERRACE_Y, 8.6), rotationY: 2.3, scale: 1, role: "static" },
+    { id: "nature.blossom-tree-a", position: at(11.4, TERRACE_Y, -1.5), rotationY: -.4, scale: 1.05, role: "static" },
+    { id: "nature.crystal-pink", position: at(-5.4, TERRACE_Y, -1.2), rotationY: .7, scale: 1.2, role: "instanced", note: "at the sculpture's foot, sparkle class" },
+    { id: "nature.crystal-pink", position: at(5.4, TERRACE_Y, -1.2), rotationY: -2.2, scale: 1.1, role: "instanced", note: "at the sculpture's foot, sparkle class" },
+    ...promiseRoses(),
+  ];
+  return { zone: "promise", placements, keepOut: readingKeepOut("promise") };
+}
