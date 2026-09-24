@@ -25,6 +25,8 @@ After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment 
 
 After Section 5: the 3D world lives at `/world` on `feat/world-surface`, which merges production, `feat/world-cinematic` and `feat/world-base`, with the design look, live recognitions, the TV page and Automatic quality as defaults, and `/display/world-preview` redirecting there. PLAN-01 Section 5 steps 0 and 11 passed on this Mac, with baselines and evidence in Drive under `3D World/previews/`. Every TV, API and library file is byte identical to production. Draft pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) waits for Sections 7 and 8, Anthony's TV check and his merge. Section 6's P0 fix, #16, passed its CI check.
 
+After Section 7: at Anthony's answer, all sixteen world and coordinator files over roughly 400 lines are split, and the world's `prototype/` folder is `art/`, in eighteen commits on `feat/world-surface` (`b04e4be` to `5ab3e8a`, 75 new modules). Every split is a move: 13,623 of 13,677 code lines reappear verbatim, the rest are reshaped signatures and braces, and every new line is listed per file. The captures of the split world are byte identical to Section 5's in every still and both parity captures; `/display`'s source is unchanged apart from the coordinator's move into five modules re-exported by the same file. The largest source file in the world or the coordinator is 444 lines. #19 waits for Section 8, Anthony's TV check and his merge.
+
 ## Lanes
 
 | Lane | Title | State | Model | Worktree | Review | Depends on |
@@ -36,7 +38,7 @@ After Section 5: the 3D world lives at `/world` on `feat/world-surface`, which m
 | S4 | Worktrees (Opus 5 xhigh, 20 minutes) | complete, merged 2026-09-24 as pull request #18 | claude-opus-5-5 xhigh | temporary worktree of fix/infra-s4-worktrees, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S3 |
 | S5 | The 3D world as its own surface (Opus 5 xhigh, about 2 hours) | complete; draft pull request #19 waits for Sections 7 and 8, the TV check and Anthony's merge | claude-opus-5-5 xhigh | /Users/anthony/Projects/mothers-love-worktrees/world-surface (feat/world-surface) | Haiku 4.5 sweep, Sonnet 5 high read only | S4 |
 | S6 | Retire the dead code (Opus 5 xhigh, 45 minutes) | built; routes removed on `main` (#17), P0 fix #16 merged with its CI check green 2026-09-24; review not yet recorded | claude-opus-5-5 (cloud) | cloud clone | pending | S3 |
-| S7 | Split the oversized files (Opus 5 xhigh, about 2 hours) | planned | pending | pending | pending | pending |
+| S7 | Split the oversized files (Opus 5 xhigh, about 2 hours) | built on feat/world-surface (draft pull request #19); review pending | claude-opus-5-5 xhigh | /Users/anthony/Projects/mothers-love-worktrees/world-surface (feat/world-surface) | Haiku 4.5 sweep, Sonnet 5 high read only | S5 |
 | S8 | Verify, review, back up, report (Opus 5 xhigh, 1 hour) | planned | pending | pending | pending | pending |
 
 ## Folders
@@ -60,5 +62,5 @@ After Section 5: the 3D world lives at `/world` on `feat/world-surface`, which m
 <!-- lane: S4 state: complete model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-s4-worktrees review: sonnet-5-high updated: 2026-09-24T17:34Z -->
 <!-- lane: S5 state: complete-awaiting-merge model: claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love-worktrees/world-surface review: sonnet-5-high updated: 2026-09-24T17:45Z -->
 <!-- lane: S6 state: review model: claude-opus-5-5 worktree: cloud clone review: pending updated: 2026-09-24T17:34Z -->
-<!-- lane: S7 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
+<!-- lane: S7 state: built model: claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love-worktrees/world-surface review: pending updated: 2026-09-24T19:01Z -->
 <!-- lane: S8 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
