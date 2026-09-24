@@ -612,6 +612,42 @@ const PEARL_BEAD_RADIUS = .024;
 
 type PearlMedallion = { id: number; root: T.Group; glint: T.Sprite; tint: T.Color; procedural: T.Object3D[] };
 
+/**
+ * TV page only: where the pearl halo fades to nothing, in the shader's `d` (the halo plane's
+ * centre to its edge is 1.8, its corners 2.55). The study's outer ring is still about .025 at
+ * the plane's edge, which the TV page's clearer air showed as a faint straight line beside the
+ * main bubble; on the TV the whole halo is multiplied down to zero between these two, so it
+ * is exactly zero before the plane ends.
+ */
+export const PEARL_HALO_TV_FADE = [1.5, 1.78] as const;
+
+/**
+ * The pearl halo's fragment. Without the TV page it is the study's, character for character
+ * (the same program); on the TV page it gains the edge fade (`PEARL_HALO_TV_FADE`), which
+ * changes the source, so it compiles its own program and the study's is untouched.
+ */
+export function pearlHaloFragment(tv = false) {
+  const fade = tv ? `
+          rgb*=1.-smoothstep(${PEARL_HALO_TV_FADE[0]},${PEARL_HALO_TV_FADE[1]},d);` : "";
+  return `varying vec2 haloUv;uniform float time;
+        void main(){float d=length(haloUv-.5)*3.6;
+          // Section 7: a six second breath, so the pearl feels alive while it is being read.
+          // It reads the same frozen clock as everything else, so a still frame is complete.
+          float breath=.85+.15*(.5+.5*sin(time*1.0472));
+          float core=pow(max(0.,1.-d/1.75),2.4);
+          float outer=exp(-pow((d-1.18)*2.2,2.));
+          vec3 rgb=(mix(vec3(1.,.90,.80),vec3(1.,.78,.86),smoothstep(.6,1.6,d))*core*.55+vec3(.80,.86,1.)*outer*.16)*breath;${fade}
+          gl_FragColor=vec4(rgb,clamp(dot(rgb,vec3(.2126,.7152,.0722)),0.,1.));
+          #include <colorspace_fragment>
+        }`;
+}
+
+/** What a skin's host may ask of it beyond the kit. */
+export type StudyPearlSkinOptions = {
+  /** The TV page (`?view=tv`): its halo fades out before the plane's edge (`PEARL_HALO_TV_FADE`). */
+  tv?: boolean;
+};
+
 type PearlKitDressing = {
   rim?: T.Mesh;
   rimPearls?: T.Mesh;
@@ -671,14 +707,18 @@ export class StudyPearlSkin {
   private readonly noTurn = new T.Quaternion();
   /** Instance scale of the pearl beads and of the gold beads on the unit bead sphere (.024). */
   private beadScales: [number, number] = [.9, 1.22];
+  /** The TV page, from the host (`StudyPearlSkinOptions`); false keeps every piece the study's. */
+  private readonly tv: boolean;
 
   /**
    * `kitSource` is read once, on the first update, and only by the design study host. Without
-   * it, or when it yields no kit, the skin is exactly the procedural one.
+   * it, or when it yields no kit, the skin is exactly the procedural one. `options.tv` is the
+   * TV page, which the recognition host resolves once; without it the skin is the study's.
    */
-  constructor(parent: T.Group, assets: StudyPearlAssets, seed: number, kitSource?: StudyPearlKitSource) {
+  constructor(parent: T.Group, assets: StudyPearlAssets, seed: number, kitSource?: StudyPearlKitSource, options: StudyPearlSkinOptions = {}) {
     this.assets = assets;
     this.kitSource = kitSource;
+    this.tv = options.tv === true;
     this.root.name = "Design study pearl glass, halo and exterior canonical symbols";
     parent.add(this.root);
     this.root.add(this.orbits);
@@ -688,17 +728,7 @@ export class StudyPearlSkin {
       transparent: true, depthTest: true, depthWrite: false, toneMapped: false, blending: T.AdditiveBlending,
       uniforms: { time: this.clock },
       vertexShader: "varying vec2 haloUv;void main(){haloUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
-      fragmentShader: `varying vec2 haloUv;uniform float time;
-        void main(){float d=length(haloUv-.5)*3.6;
-          // Section 7: a six second breath, so the pearl feels alive while it is being read.
-          // It reads the same frozen clock as everything else, so a still frame is complete.
-          float breath=.85+.15*(.5+.5*sin(time*1.0472));
-          float core=pow(max(0.,1.-d/1.75),2.4);
-          float outer=exp(-pow((d-1.18)*2.2,2.));
-          vec3 rgb=(mix(vec3(1.,.90,.80),vec3(1.,.78,.86),smoothstep(.6,1.6,d))*core*.55+vec3(.80,.86,1.)*outer*.16)*breath;
-          gl_FragColor=vec4(rgb,clamp(dot(rgb,vec3(.2126,.7152,.0722)),0.,1.));
-          #include <colorspace_fragment>
-        }`,
+      fragmentShader: pearlHaloFragment(this.tv),
     })));
     this.halo.name = "pearl halo"; this.halo.position.z = -.4; this.halo.renderOrder = 2;
     this.halo.layers.enable(1); this.root.add(this.halo);
@@ -983,6 +1013,10 @@ export class StudyPearlSkin {
   }
   private geometry<G extends T.BufferGeometry>(g: G) { this.geometries.add(g); return g; }
   private material<M extends T.Material>(m: M) { this.materials.add(m); return m; }
+  /** Shows or hides the whole skin (the TV page hides it while its bubble rises, fades or floats away). */
+  set visible(value: boolean) {
+    this.root.visible = value;
+  }
   update(time: number, ids: readonly number[], detailed: boolean, frame: StudyPearlFrame) {
     if (!this.kitResolved) this.dress();
     this.clock.value = time;

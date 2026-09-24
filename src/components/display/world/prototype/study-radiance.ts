@@ -128,13 +128,56 @@ void main(){
   #include <colorspace_fragment>
 }`;
 
+/** The composite's last line, which the TV page's knee replaces. */
+const COMPOSITE_OUT = "gl_FragColor = vec4(clamp((glow + rays) * (1. - protect), 0., 1.), 1.);";
+
+/**
+ * The TV page's radiance (clear air). The study's bloom is wide and soft on purpose, and on the
+ * TV page's clearer picture that same spread read as a milky veil over everything: every lantern,
+ * rail and crest smeared into the air round it. So on the TV the bloom is tighter (radius .55 to
+ * .2), a little weaker (.8 to .6) and ignores the faintest glow (threshold 0 to .05); the glow
+ * reaches the screen at .10 on every tier (the study's .22 High and .16 Auto); the god rays at
+ * .05 (from .12); and the composite adds a soft knee, `knee`, below which the faint tail of the
+ * bloom fades out instead of tinting the whole frame. The glow layer is also drawn with the
+ * study's old fog distances (`STUDY_FOG`, 22 to 250), handed in by the design world, so the far
+ * glow does not bloom more now that the main fog is thinner.
+ */
+export const STUDY_TV_RADIANCE = {
+  bloomStrength: .6,
+  bloomRadius: .2,
+  bloomThreshold: .05,
+  glowStrength: .10,
+  rayStrength: .05,
+  knee: [.006, .03] as const,
+};
+
+/**
+ * The composite fragment. Without the TV page it is `COMPOSITE_FRAGMENT` itself, character for
+ * character, so the study's program is untouched. On the TV page its last line gains the knee:
+ * a pixel whose brightest channel is under .006 gets nothing, and the glow fades in up to .03.
+ */
+export function studyCompositeFragment(tv = false) {
+  if (!tv) return COMPOSITE_FRAGMENT;
+  const [low, high] = STUDY_TV_RADIANCE.knee;
+  return COMPOSITE_FRAGMENT.replace(COMPOSITE_OUT, `vec3 lit = glow + rays;
+  float peak = max(lit.r, max(lit.g, lit.b));
+  lit *= smoothstep(${low}, ${high}, peak);
+  gl_FragColor = vec4(clamp(lit * (1. - protect), 0., 1.), 1.);`);
+}
+
+/** How the TV page's glow pass fogs the glow layer: the design world publishes this on the scene. */
+export type StudyGlowFog = { near: number; far: number };
+
 export class StudyRadiance {
-  /** Undefined when the context cannot render to a half float target. The study then keeps its single pass. */
-  static create(renderer: T.WebGLRenderer) {
+  /**
+   * Undefined when the context cannot render to a half float target. The study then keeps its single pass.
+   * `tv` is the TV page (`?view=tv`), which takes `STUDY_TV_RADIANCE`; without it nothing changes.
+   */
+  static create(renderer: T.WebGLRenderer, options: { tv?: boolean } = {}) {
     const float = renderer.extensions.has("EXT_color_buffer_float");
     const half = renderer.extensions.has("EXT_color_buffer_half_float");
     if (!float && !half) return undefined;
-    return new StudyRadiance(renderer);
+    return new StudyRadiance(renderer, options.tv === true);
   }
 
   /** Tuned down from the design's .62 and .5 after the checkpoint captures. See the uniforms below. */
@@ -181,6 +224,13 @@ export class StudyRadiance {
   private readonly whiteBasic = new T.MeshBasicMaterial({ color: 0xffffff, fog: false, toneMapped: false });
   private readonly blackBasic = new T.MeshBasicMaterial({ color: 0x000000, fog: false, toneMapped: false });
   private readonly clearColor = new T.Color();
+  /**
+   * The fog colour the glow pass blacks out and puts back, kept as a colour rather than a hex
+   * so it comes back exactly: the TV page's fog dips with the mood exposure (`studyHazeColor`)
+   * to a colour no eight bit hex holds. The study's own fog is a hex, which came back exactly
+   * either way.
+   */
+  private readonly fogColor = new T.Color();
   private readonly sunWorld = new T.Vector3(...STUDY_SUN.direction).multiplyScalar(330);
   private readonly sunNdc = new T.Vector3();
   private readonly toSun = new T.Vector3();
@@ -189,7 +239,11 @@ export class StudyRadiance {
   private readonly scratch = new T.Vector3();
   private disposed = false;
 
-  private constructor(private readonly renderer: T.WebGLRenderer) {
+  private constructor(private readonly renderer: T.WebGLRenderer, private readonly tv = false) {
+    if (tv) {
+      this.glowStrength = this.baseGlowStrength = STUDY_TV_RADIANCE.glowStrength;
+      this.rayStrength = STUDY_TV_RADIANCE.rayStrength;
+    }
     const buffer = renderer.getDrawingBufferSize(new T.Vector2());
     const glow = glowTargetSize(buffer.x, buffer.y);
     const aux = { width: Math.max(1, Math.round(glow.width / 2)), height: Math.max(1, Math.round(glow.height / 2)) };
@@ -207,14 +261,17 @@ export class StudyRadiance {
     this.maskRT = new T.WebGLRenderTarget(aux.width, aux.height, { depthBuffer: true });
     this.maskRT.texture.generateMipmaps = false;
     // Threshold 0: the glow layer already contains only what is meant to glow, so a
-    // luminance cut would only throw away the soft tails this pass exists for.
-    this.bloom = new UnrealBloomPass(new T.Vector2(glow.width, glow.height), .8, .55, 0);
+    // luminance cut would only throw away the soft tails this pass exists for. The TV page
+    // wants exactly those tails gone (`STUDY_TV_RADIANCE`), so it takes a small cut.
+    this.bloom = tv
+      ? new UnrealBloomPass(new T.Vector2(glow.width, glow.height), STUDY_TV_RADIANCE.bloomStrength, STUDY_TV_RADIANCE.bloomRadius, STUDY_TV_RADIANCE.bloomThreshold)
+      : new UnrealBloomPass(new T.Vector2(glow.width, glow.height), .8, .55, 0);
     this.bloom.renderToScreen = false;
     this.bloom.setSize(glow.width, glow.height);
     this.compositeMaterial = new T.ShaderMaterial({
       uniforms: this.compositeUniforms,
       vertexShader: RAY_VERTEX,
-      fragmentShader: COMPOSITE_FRAGMENT,
+      fragmentShader: studyCompositeFragment(tv),
       // Screen blending, not additive: out = dst + src * (1 - dst), so however bright the
       // glow is it can never push a pixel past white. On a palette that already sits near
       // .9 this is the difference between radiance and a flat wash.
@@ -231,7 +288,8 @@ export class StudyRadiance {
       toneMapped: false,
       fog: false,
     });
-    this.compositeMaterial.customProgramCacheKey = () => "study-radiance-composite-v2";
+    // The TV page's knee is its own program, under its own key; the study's key is unchanged.
+    this.compositeMaterial.customProgramCacheKey = tv ? () => "study-radiance-composite-v2-tv" : () => "study-radiance-composite-v2";
     this.compositeUniforms.bloomTexture.value = bloomTexture(this.bloom);
     this.compositeUniforms.raysTexture.value = this.raysRT.texture;
     this.compositeUniforms.protectTexture.value = this.protectRT.texture;
@@ -262,8 +320,9 @@ export class StudyRadiance {
     this.tier = tier;
     if (tier === "low") return;
     this.rayQuad.material = this.rayMaterial(tier === "high" ? 48 : 32);
-    // Corrected from the design's .62 High and .45 Auto after the checkpoint captures.
-    this.baseGlowStrength = tier === "high" ? .22 : .16;
+    // Corrected from the design's .62 High and .45 Auto after the checkpoint captures. The TV
+    // page takes its own strength on every tier, here because the engine re-runs this on resize.
+    this.baseGlowStrength = this.tv ? STUDY_TV_RADIANCE.glowStrength : tier === "high" ? .22 : .16;
     this.glowStrength = this.baseGlowStrength * this.moodScale;
   }
 
@@ -314,7 +373,7 @@ export class StudyRadiance {
 
     const background = scene.background;
     const fog = scene.fog instanceof T.Fog ? scene.fog : null;
-    const fogColor = fog ? fog.color.getHex() : 0;
+    if (fog) this.fogColor.copy(fog.color);
     renderer.getClearColor(this.clearColor);
     const clearAlpha = renderer.getClearAlpha();
     const autoClear = renderer.autoClear;
@@ -324,9 +383,16 @@ export class StudyRadiance {
     STUDY_GLOW_PASS.value = 1;
     renderer.setClearColor(0x000000, 0);
 
+    // The TV page draws the glow layer through the study's own fog distances, which the design
+    // world publishes on the scene, and puts the thinner main fog back straight after, so the
+    // protect and ray masks and the next main pass all see the scene's own fog.
+    const glowFog = this.tv && fog ? (scene.userData.studyGlowFog as StudyGlowFog | undefined) : undefined;
+    const fogNear = fog ? fog.near : 0, fogFar = fog ? fog.far : 0;
+    if (fog && glowFog) { fog.near = glowFog.near; fog.far = glowFog.far; }
     camera.layers.set(1);
     renderer.setRenderTarget(this.glowRT);
     renderer.render(scene, camera);
+    if (fog && glowFog) { fog.near = fogNear; fog.far = fogFar; }
 
     camera.layers.set(3);
     scene.overrideMaterial = this.whiteBasic;
@@ -343,7 +409,7 @@ export class StudyRadiance {
     scene.overrideMaterial = null;
     camera.layers.set(0);
     scene.background = background;
-    if (fog) fog.color.setHex(fogColor);
+    if (fog) fog.color.copy(this.fogColor);
     STUDY_GLOW_PASS.value = 0;
 
     this.bloom.render(renderer, this.glowRT, this.glowRT, 0, false);

@@ -23,6 +23,16 @@ export const WATER_HALO_SPAN = { across: 9, along: 14 };
 export const WATER_HALO_OPACITY = .18;
 const WATER_HALO_TAU = .6;
 
+/**
+ * The TV page's clear air (Anthony, 2026-09-24: "Can you remove the haze foggy look"). Every
+ * additive speck adds light on top of the picture, and hundreds of them together (lanterns on
+ * every rail and keystone, the sparkle field, the motes round the camera) lift the whole frame
+ * toward white, which reads as haze. On the TV they are fewer in strength, not in number: the
+ * lanterns from .58, the sparkle field from .9, the motes from .28, and the water halo under
+ * the bubble being read from `WATER_HALO_OPACITY`. The stars also leave the glow layer there.
+ */
+export const STUDY_TV_SPECKS = { lanterns: .4, sparkles: .55, motes: .12, waterHalo: .08 } as const;
+
 const HALO_VERTEX = `varying vec2 haloUv;
 void main(){ haloUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
 
@@ -48,7 +58,8 @@ export class StudyWaterHalo {
   private readonly mesh: T.Mesh;
   private lastTime = 0;
 
-  constructor(scene: T.Scene) {
+  /** `peak` is the opacity the halo fades up to: the study's own unless the TV page hands in its lighter one. */
+  constructor(scene: T.Scene, private readonly peak = WATER_HALO_OPACITY) {
     this.material = new T.ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader: HALO_VERTEX,
@@ -78,7 +89,7 @@ export class StudyWaterHalo {
   update(focus: T.Vector3 | undefined, camera: T.Camera, time: number) {
     const dt = time - this.lastTime;
     this.lastTime = time;
-    const target = focus ? WATER_HALO_OPACITY : 0;
+    const target = focus ? this.peak : 0;
     const blend = dt > 0 ? 1 - Math.exp(-dt / WATER_HALO_TAU) : 1;
     this.uniforms.haloOpacity.value += (target - this.uniforms.haloOpacity.value) * blend;
     this.uniforms.haloTime.value = time;

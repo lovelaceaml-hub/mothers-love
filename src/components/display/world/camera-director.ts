@@ -18,6 +18,12 @@ export class CameraDirector {
    * travel and nothing whatever besides.
    */
   ease: (t: number) => number = smoothstep;
+  /**
+   * The reading arc: how far the camera swings round a place (radians) and how much it
+   * breathes in and out (a fraction of the eye distance). The TV page narrows both so a big
+   * bubble keeps its reading size; every other page keeps these defaults.
+   */
+  arc = { swing: 0.48, approach: 0.1 };
   readonly position = new Vector3(...ZONES[0].eye);
   readonly target = new Vector3(...ZONES[0].target);
   zone: ZoneId = "garden";
@@ -208,8 +214,8 @@ export class CameraDirector {
     // Fly a broad, slow arc among the world-space bubbles throughout reading.
     if (!instant && !this.special && !this.traveling) {
       const zone = ZONES[zoneIndex(this.zone)];
-      const angle = Math.sin(this.age * 0.035) * 0.48;
-      const approach = 1 - Math.sin(this.age * 0.03) * 0.1;
+      const angle = Math.sin(this.age * 0.035) * this.arc.swing;
+      const approach = 1 - Math.sin(this.age * 0.03) * this.arc.approach;
       const dx = zone.eye[0] - zone.target[0],
         dz = zone.eye[2] - zone.target[2];
       this.position.set(

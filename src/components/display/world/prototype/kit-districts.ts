@@ -7,8 +7,10 @@ import type { KitAsset } from "../kit/kit-loader";
 import { createKitRemap, kitMaterialWords, type MaterialRemap } from "../kit/kit-materials";
 import type { DesignKitContext, DesignKitDistrict, KitBuilderHandle } from "./design-world";
 import { CORE_ZONE_LAYOUTS, KIT_BOUNDS, type KitPlacement, type LayoutSwarm, type ZoneLayout } from "./kit-layout-core";
+import { tvViewDistance } from "./study-budget";
 import { studyTerrace } from "./study-geometry";
 import { studyGlass, studyGlow, studyRim } from "./study-materials";
+import { studyTvPage } from "./tv-page";
 
 /**
  * The thirteen districts dressed with the 3D Studio kit (WORLD-INTEGRATION section 6).
@@ -55,6 +57,16 @@ export const KIT_NEAR_DISTANCE = 72;
 export const KIT_LOD_DISTANCE = { far: 42, near: 38 } as const;
 /** Far merges are clustered this many times coarser than the near ones. */
 export const KIT_FAR_CELL_FACTOR = 3;
+
+/**
+ * How far the people stay in view. The TV page raises them to `STUDY_TV_VIEW_DISTANCE` on the
+ * High tier only: they are small at that range, and the TV page runs Auto, where every extra
+ * figure costs frames the auto lower to Low (which is sticky) would take back from everything.
+ * Auto and Low, and every page without `?view=tv`, keep `KIT_NEAR_DISTANCE`.
+ */
+export function kitPeopleDistance(tv: boolean, tier: "high" | "auto" | "low") {
+  return tier === "high" ? tvViewDistance(KIT_NEAR_DISTANCE, tv) : KIT_NEAR_DISTANCE;
+}
 
 /**
  * Vertex clustering cell, kit units, per piece. From the tour eye a kit unit spans about 30
@@ -387,6 +399,11 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
   console.debug("kit districts", JSON.stringify(stats));
 
   const cameraAt = new T.Vector3();
+  // The TV page's clear air shows what the study's haze hid, so there the detail groups stay in
+  // view out to `STUDY_TV_VIEW_DISTANCE` (Low keeps its own distances), and on High the people
+  // too (`kitPeopleDistance`). Resolved once, like every other page gate. The near and far
+  // merge swap is left as it is.
+  const tv = studyTvPage();
   return {
     update(time, zone, arrival) {
       const camera = scene.userData.studyCamera as T.Camera | undefined;
@@ -395,12 +412,14 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
       materials.selected.value = selected();
       if (camera) {
         cameraAt.copy(camera.position);
-        const limit = lowTier ? KIT_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? KIT_DETAIL_DISTANCE.high : KIT_DETAIL_DISTANCE.auto;
+        const tier = lowTier ? "low" : scene.userData.studyTier === "high" ? "high" : "auto";
+        const limit = tvViewDistance(KIT_DETAIL_DISTANCE[tier], tv, lowTier);
+        const nearLimit = kitPeopleDistance(tv, tier);
         for (const state of states) {
           const distance = cameraAt.distanceTo(state.center);
           if (distance > KIT_LOD_DISTANCE.far) state.far = true;
           else if (distance < KIT_LOD_DISTANCE.near) state.far = false;
-          const detail = distance < limit, near = distance < KIT_NEAR_DISTANCE;
+          const detail = distance < limit, near = distance < nearLimit;
           for (const item of state.items) {
             let visible = !item.lod || (item.lod === "far") === state.far;
             if (item.detail === "near") visible &&= near; else if (item.detail) visible &&= detail;

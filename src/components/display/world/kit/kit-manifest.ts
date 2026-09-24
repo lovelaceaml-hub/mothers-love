@@ -35,13 +35,15 @@ export const KIT_FEATURE_PRIORITY: readonly KitFeature[] = [
   "recognition", "arrival", "landmark", "nature", "neighbor", "expression", "core", "people",
 ];
 
-export type KitBudgetName = "ordinary" | "landmark" | "character";
+export type KitBudgetName = "ordinary" | "landmark" | "character" | "host";
 export type KitBudget = { verts: number; bytes: number };
 /** Plan 03, for a TV browser. A kilobyte is 1,000 bytes, as the W1 manifest spells out (150,000). */
 export const KIT_BUDGETS: Readonly<Record<KitBudgetName, KitBudget>> = {
   ordinary: { verts: 10_000, bytes: 150_000 },
   landmark: { verts: 25_000, bytes: 300_000 },
   character: { verts: 12_000, bytes: 250_000 },
+  /** PLAN-01 Section 5: the two lamb hosts, Peace and Joy (3D Studio kit/world/hosts/manifest.json). */
+  host: { verts: 20_000, bytes: 400_000 },
 };
 
 /** The thirteen `ZoneId`s, spelled out so this file stays free of runtime imports. A test pins it to `ZONES`. */

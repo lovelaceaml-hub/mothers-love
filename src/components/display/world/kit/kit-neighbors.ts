@@ -19,7 +19,9 @@ import {
 } from "../neighbor-dialogue";
 import { WORLD_EXPRESSIONS, ZONES, type ZoneId } from "../world-data";
 import type { DesignKitContext, KitBuilderHandle } from "../prototype/design-world";
+import { tvViewDistance } from "../prototype/study-budget";
 import { sparklePoints, studyRim } from "../prototype/study-materials";
+import { studyTvPage } from "../prototype/tv-page";
 import type { WorldKit } from "./kit-loader";
 import type { KitAssetId } from "./kit-manifest";
 
@@ -111,6 +113,15 @@ export const NEIGHBOR_BLEND = 0.35;
 export const NEIGHBOR_VISIBLE_PAIRS = { high: 4, auto: 4, low: 1 } as const;
 /** Pairs farther than this from the camera are hidden (the Auto detail distance, design 7.2). */
 export const NEIGHBOR_VIEW_DISTANCE = 115;
+/**
+ * How far a pair may be from the camera and still be shown. The TV page's clear air no longer
+ * hides a family appearing at 115 units, so there High and Auto keep them in view out to
+ * `STUDY_TV_VIEW_DISTANCE` (`NEIGHBOR_VISIBLE_PAIRS` still caps how many); Low, and every page
+ * without `?view=tv`, keep `NEIGHBOR_VIEW_DISTANCE`.
+ */
+export function neighborViewDistance(tvPage: boolean, tier: "high" | "auto" | "low") {
+  return tvViewDistance(NEIGHBOR_VIEW_DISTANCE, tvPage, tier === "low");
+}
 /** The hero rig plays when its pair is the active one and the camera is closer than this. */
 export const NEIGHBOR_HERO_DISTANCE = 42;
 /**
@@ -627,6 +638,13 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
   if ([...casting.values()].some(cast => !cast.toy)) return undefined;
 
   const material = context.material(neighborMaterial());
+  // PLAN-01 Section 5 step 9, TV page only: a soft pastel lift over the garments, and the
+  // family pausing to look up at the bubbles while they stand together.
+  const tvPage = studyTvPage();
+  if (tvPage) {
+    (material as T.MeshStandardMaterial).emissive.set("#ffe6ef");
+    (material as T.MeshStandardMaterial).emissiveIntensity = 0.1;
+  }
   const templates = new Map<KitAssetId, { root: T.Object3D; clips: ReadonlyMap<string, T.AnimationClip> }>();
   const template = (id: KitAssetId) => {
     const cached = templates.get(id);
@@ -859,9 +877,10 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       _frustum.setFromProjectionMatrix(_matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
       camera.getWorldPosition(cameraAt);
     }
+    const viewDistance = neighborViewDistance(tvPage, tier);
     const inView = (pair: Pair) => {
       if (!camera) return pair === active;
-      if (pair.centre.distanceTo(cameraAt) > NEIGHBOR_VIEW_DISTANCE) return false;
+      if (pair.centre.distanceTo(cameraAt) > viewDistance) return false;
       _sphere.center.copy(pair.centre).setY(pair.centre.y + 1.4);
       _sphere.radius = pair.stage.walk + 3;
       return _frustum.intersectsSphere(_sphere);
@@ -902,6 +921,11 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
           const walkTime = (fraction: number) => ((fraction * walked / actor.stride) % 1) * walkLength;
           const idleTime = time + actor.slot * 1.7 + pair.index * 0.9;
           pose(actor, rig, neighborWeights(beat, actor.slot, actor.lengths, idleTime, walkTime, { now: place.walked, before: before.walked, pace: place.pace }));
+          // Bones rest unrotated (glTF Y up, facing +Z), so a turn about x lifts the face.
+          if (tvPage && beat.staging === "stance") {
+            const look = smooth(beat.beatAge / 1.2) * smooth((beat.beatLength - beat.beatAge) / 1.2);
+            rig.skeleton.getBoneByName("head")?.rotateX(-0.42 * look);
+          }
         }
         if (contactCount < maxActors) {
           _vector.copy(actor.holder.position);
@@ -963,6 +987,13 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       card.mesh.updateMatrixWorld();
       // Nothing may cover the words: a card that would overlap the pearl being read steps aside.
       card.mesh.visible = !coversFocus(card.mesh, camera, scene.userData.studyFocus as FocusLike);
+      // TV page: nor any recognition bubble on show, and the cards rest while the camera is in
+      // close to read, where one would stand huge over the QR card and the ticker.
+      if (tvPage && card.mesh.visible) {
+        const discs = scene.userData.tvDiscs as FocusLike[] | undefined;
+        card.mesh.visible = !((scene.userData.tvReading as number | undefined ?? 0) > 0.02
+          || discs?.some((disc) => coversFocus(card.mesh, camera, disc)));
+      }
     }
   }
 

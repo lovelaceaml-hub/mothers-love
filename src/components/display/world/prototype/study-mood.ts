@@ -65,15 +65,46 @@ export function studyFlourish(age: number) {
 
 export type StudyHaze = { near: number; far: number };
 
+/** Where the study's haze closes to in flight, as a haze pair. Module level, so a default allocates nothing. */
+const TRAVEL_HAZE: StudyHaze = { near: STUDY_MOOD.travelFogNear, far: STUDY_MOOD.travelFogFar };
+
 /**
  * The haze distances for a given amount of travel, 0 parked to 1 in flight.
  * The caller may hand in the object to write into, so the engine's per frame use allocates
  * nothing; omitting it returns a fresh one, which is what the tests read.
+ *
+ * `parked` and `flight` default to the study's own `STUDY_FOG` and travel haze, so every caller
+ * that names neither gets exactly today's values. The TV page hands `STUDY_TV_FOG` in as both,
+ * which keeps its clear air the same parked and in flight.
  */
-export function studyHaze(travel: number, out: StudyHaze = { near: 0, far: 0 }) {
+export function studyHaze(
+  travel: number,
+  out: StudyHaze = { near: 0, far: 0 },
+  parked: StudyHaze = STUDY_FOG,
+  flight: StudyHaze = TRAVEL_HAZE,
+) {
   const t = Math.max(0, Math.min(1, travel));
-  out.near = STUDY_FOG.near + (STUDY_MOOD.travelFogNear - STUDY_FOG.near) * t;
-  out.far = STUDY_FOG.far + (STUDY_MOOD.travelFogFar - STUDY_FOG.far) * t;
+  out.near = parked.near + (flight.near - parked.near) * t;
+  out.far = parked.far + (flight.far - parked.far) * t;
+  return out;
+}
+
+/** A colour's three channels as three's `Color` holds them, in the linear working space; a `Color` is one. */
+export type StudyRgb = { r: number; g: number; b: number };
+
+/**
+ * TV page: the haze colour at a given mood exposure. The sky dome multiplies its linear colour
+ * by `studyExposure` (`studySkyFragment`), and the tone mapped scenery takes the same factor
+ * from the renderer, but three mixes the fog in after tone mapping, so in flight the fully
+ * fogged sea at the horizon would stay bright while the sky's horizon dims: a line. So the
+ * engine writes `base` (the fog colour, linear, as `T.Fog` holds it) times `exposure` into the
+ * fog and the background every frame. Written into `out`, so it allocates nothing; parked the
+ * exposure is exactly 1 and the colour is exactly `base`.
+ */
+export function studyHazeColor<C extends StudyRgb>(base: StudyRgb, exposure: number, out: C): C {
+  out.r = base.r * exposure;
+  out.g = base.g * exposure;
+  out.b = base.b * exposure;
   return out;
 }
 

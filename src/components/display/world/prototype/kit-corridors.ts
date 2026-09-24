@@ -7,6 +7,8 @@ import type { KitAssetId } from "../kit/kit-manifest";
 import { studyRim } from "./study-materials";
 import type { DesignKitContext, KitBuilderHandle } from "./design-world";
 import { applyKitFarZones, farZonesEnabled } from "./kit-far-zones";
+import { tvViewDistance } from "./study-budget";
+import { studyTvPage } from "./tv-page";
 
 /**
  * The corridors between the thirteen districts (WORLD-INTEGRATION 6.17): lantern posts at the
@@ -203,6 +205,8 @@ export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
  * puffs, on the fountain leg eight along the long descent.
  */
 export const SOFT_CLOUD = { opacity: .5, centreClearance: 6, solidGap: 1, spacing: 9 } as const;
+/** TV page only: the sky lane clouds' opacity in the clear air (the material, never the table). */
+export const TV_SOFT_CLOUD_OPACITY = .25;
 export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "practice", to: "calendar",
@@ -439,6 +443,18 @@ export const ISLET_COLOURS = { cap: "#c9dfb5", bush: "#e7a3c0", rock: "#ecc4bf",
 
 const dummy = new T.Object3D();
 
+/**
+ * The sky lane clouds' material (`SOFT_CLOUD`). The TV page's clear air: a flight through a sky
+ * lane passes a lighter veil, `TV_SOFT_CLOUD_OPACITY`. Set on the material, so the table, the
+ * constant and every other page keep `SOFT_CLOUD.opacity`; the rim and the program are the same.
+ */
+export function corridorSoftCloud(tv = false) {
+  const softCloud = studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34);
+  softCloud.name = "corridor soft cloud";
+  if (tv) softCloud.opacity = TV_SOFT_CLOUD_OPACITY;
+  return softCloud;
+}
+
 export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle | void {
   const { kit, scene } = context;
   const meshes: T.InstancedMesh[] = [];
@@ -449,9 +465,9 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   };
   palette.blossom.name = "corridor blossom"; palette.cloud.name = "corridor cloud";
   // Sky lane clouds are soft (SOFT_CLOUD): the camera may brush them, so they draw at half
-  // opacity without writing depth; the rim is kept, the sheen softened.
-  const softCloud = context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34));
-  softCloud.name = "corridor soft cloud";
+  // opacity without writing depth; the rim is kept, the sheen softened. Lighter on the TV page.
+  const tv = studyTvPage();
+  const softCloud = context.material(corridorSoftCloud(tv));
   const islet: Partial<Record<string, T.Material>> = {
     grass: context.material(new T.MeshStandardMaterial({ color: ISLET_COLOURS.cap, roughness: .92, metalness: 0, dithering: true })),
     petal: context.material(new T.MeshPhysicalMaterial({ color: ISLET_COLOURS.bush, roughness: .7, sheen: .5, sheenColor: new T.Color("#ffe0ea"), sheenRoughness: .6, dithering: true })),
@@ -505,11 +521,12 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     culled.push({ near, far, places, radius: sphere.radius, centerY: sphere.center.y, range });
   }
 
-  // Lantern posts: four per bridge.
+  // Lantern posts: four per bridge. On the TV page the clear air would show a post appearing at
+  // 96 units, so there they reach `STUDY_TV_VIEW_DISTANCE` (Low keeps its 70).
   const postTable = corridorPosts();
   if (kit.has("landmark.lantern-post") && postTable.length) {
     cullable(instanced("landmark.lantern-post", CORRIDOR_KEEP.post, "Kit corridor lantern posts", postTable.length, false), undefined,
-      low => (low ? LOW_TIER_VIEW.post : POST_VIEW_DISTANCE),
+      low => (low ? LOW_TIER_VIEW.post : tvViewDistance(POST_VIEW_DISTANCE, tv)),
       postTable.map(post => ({ position: post.position, rotationY: post.rotationY, scale: 1.1 })));
   }
 

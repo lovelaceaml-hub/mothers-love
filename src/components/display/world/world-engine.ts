@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Recognition } from "@/lib/contracts";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { CameraDirector } from "./camera-director";
 import { createWorldScene } from "./world-scene";
@@ -13,15 +14,49 @@ import { StudyCameraFinesse, studyTravelEase, type FinesseInput } from "./protot
 import {
   StudyMood,
   studyHaze,
+  studyHazeColor,
   type MoodInput,
   type StudyHaze,
 } from "./prototype/study-mood";
 import { STUDY_CALM, STUDY_EXPOSURE } from "./prototype/study-materials";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
-import { STUDY_FOG, STUDY_TONE } from "./prototype/study-palette";
+import { STUDY_FOG, STUDY_TONE, STUDY_TV_CAMERA_FAR, STUDY_TV_FOG, STUDY_TV_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import type { WorldKit } from "./kit/kit-loader";
 import { kitState, type KitState } from "./kit/kit-manifest";
+import {
+  ArrivalPacer,
+  TV_BUBBLE_PLACES,
+  heldBig,
+  planWorldBubbles,
+  studyTvPage,
+  tvRecords,
+  tvStartPlace,
+  worldHoldSeconds,
+  type WorldBubblePlan,
+} from "./prototype/tv-page";
+import { TV_ARC, TV_FOCUS_DELAY, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
+import { TvHosts } from "./prototype/tv-hosts";
+import { applyTvWaterEnvironment } from "./prototype/tv-foreground";
+import type { HoldSeconds } from "./recognition-director";
+
+/** The TV page's hold rule (step 4). It sets its own floor, so the owner minimum is not read. */
+const tvHold: HoldSeconds = (message) => worldHoldSeconds(message);
+/**
+ * The TV page reads a place with the new rule only where its bubbles scroll the whole message
+ * (`TV_BUBBLE_PLACES`, every place); any other keeps paging by `readingSeconds`, so no page is
+ * ever skipped. The hold also covers the camera's glide in to the main bubble and its pull back
+ * out, so the message itself is held the full rule.
+ */
+const placeHold = (director: CameraDirector): HoldSeconds => (message, minimum) =>
+  TV_BUBBLE_PLACES.includes(director.zone)
+    ? tvPlaceHold(message, director.zone)
+    : readingSeconds(message, minimum);
+/** TV page, sample mode: a fictional arrival every 90 s after the first 45, to show the pacing. */
+const SAMPLE_ARRIVAL_FIRST = 45;
+const SAMPLE_ARRIVAL_EVERY = 90;
+/** How long an arrival stays marked new in the ticker. */
+const FRESH_SECONDS = 90;
 import {
   RECOGNITION_ZONES,
   TOUR_ORDER,
@@ -58,6 +93,8 @@ export type WorldStatus = {
   kitCounts?: { loaded: number; total: number };
   /** True once kit neighbors stand in the design world in place of the miniature figures. */
   kitNeighbors?: boolean;
+  /** TV page: records that arrived in the last 90 s, newest last, for the ticker. */
+  tvArrivals?: string[];
 };
 export type EngineOptions = {
   onStatus: (status: WorldStatus) => void;
@@ -73,8 +110,8 @@ export type EngineOptions = {
 export class WorldEngine {
   readonly renderer: THREE.WebGLRenderer;
   readonly director = new CameraDirector();
-  readonly arrivals = new ArrivalDirector();
-  readonly recognitions = new RecognitionDirector();
+  readonly arrivals = new ArrivalDirector(studyTvPage() ? tvHold : undefined);
+  readonly recognitions = new RecognitionDirector(studyTvPage() ? placeHold(this.director) : undefined);
   private feed: WorldFeed = emptyFeed();
   private readingHeld = false;
   private lastReadingZone: ZoneId = "garden";
@@ -96,6 +133,47 @@ export class WorldEngine {
   private readonly environment: THREE.WebGLRenderTarget;
   /** Resolved once: the tick runs sixty times a second and must not reparse the URL. */
   private readonly study = isWorldDesignStudy();
+  /** Resolved once: the TV page (`?view=tv`) inside the study. */
+  private readonly tv = studyTvPage();
+  /** Where the tour stops to read: every place on the TV page (step 5), the six recognition places elsewhere. */
+  private readonly readingZones: readonly ZoneId[] = this.tv
+    ? [...new Set([...RECOGNITION_ZONES, ...TV_BUBBLE_PLACES])]
+    : RECOGNITION_ZONES;
+  private readonly holdFor: HoldSeconds = this.tv ? placeHold(this.director) : readingSeconds;
+  private readonly pacer = new ArrivalPacer();
+  private tvPlan?: WorldBubblePlan;
+  /** How many times the tour has left each place: picks the place's main bubble. */
+  private readonly tvVisits = new Map<ZoneId, number>();
+  /** How many times the tour has arrived at each place: picks its flowing bubble, so it changes as the camera arrives. */
+  private readonly tvArrivalCounts = new Map<ZoneId, number>();
+  private tvFresh: Array<{ id: string; at: number }> = [];
+  private tvClock = 0;
+  private tvStart = -1;
+  private tvWasTraveling = false;
+  /** The place the tour last settled at; leaving it for the next one counts a visit. */
+  private tvSettledZone: ZoneId | null = null;
+  /** TV page: how far the camera has glided in to read the main bubble, eased (0 to 1). */
+  private focusWeight = 0;
+  private readonly focusPose = { eye: new THREE.Vector3(), target: new THREE.Vector3() };
+  private readonly focusMatrix = new THREE.Matrix4();
+  private readonly focusQuaternion = new THREE.Quaternion();
+  /** TV page: the one record a visit holds on, reused so the per frame pool allocates nothing. */
+  private readonly tvPool: Recognition[] = [];
+  /**
+   * TV page: the place and visit the pool's record was picked for, and its id. Later frames of
+   * the same visit keep it while it stays in the snapshot, so a new snapshot (a new plan) never
+   * swaps the bubble being read and the camera never glides out and back in mid read.
+   */
+  private tvPickedZone: ZoneId | null = null;
+  private tvPickedVisit = -1;
+  private tvPickedId?: string;
+  private sampleArrivalAt = SAMPLE_ARRIVAL_FIRST;
+  private sampleArrivalIndex = 0;
+  /** Bound once, so the per frame bubble update allocates no closure. */
+  private readonly tvLoop = (place: ZoneId) => this.tvVisits.get(place) ?? 0;
+  private readonly tvArrivals = (place: ZoneId) => this.tvArrivalCounts.get(place) ?? 0;
+  /** TV page: Peace and Joy (the placeholder until the lamb files land, `HOSTS_READY`). */
+  private hosts?: TvHosts;
   /** Resolved once with the study gate: whether this page asked for the kit at all. */
   private readonly kitRequested = this.study && studyKit();
   private readonly kit?: WorldKit;
@@ -135,7 +213,15 @@ export class WorldEngine {
     traveling: false,
     arrivalPhase: "idle",
   };
-  private readonly haze: StudyHaze = { near: STUDY_FOG.near, far: STUDY_FOG.far };
+  /** The TV page starts, and stays, in its clear air (`STUDY_TV_FOG`). */
+  private readonly haze: StudyHaze = this.tv
+    ? { near: STUDY_TV_FOG.near, far: STUDY_TV_FOG.far }
+    : { near: STUDY_FOG.near, far: STUDY_FOG.far };
+  /**
+   * TV page: the fog colour at a mood exposure of 1, in the linear working space `T.Fog` holds
+   * it in (`new T.Fog(STUDY_TV_FOG.color, ...)` in the design world), for `studyHazeColor`.
+   */
+  private readonly tvHazeBase = new THREE.Color(STUDY_TV_FOG.color);
   private readonly bufferSize = new THREE.Vector2();
   private elapsed = 0;
   private last = 0;
@@ -168,6 +254,19 @@ export class WorldEngine {
     }
     // Study only: the expression the DOM picker shows, for the grove and the terrace steles.
     if (this.study) this.world.scene.userData.studyExpression = this.expressionId;
+    if (this.tv) {
+      // A narrow swing, so both bubbles keep their reading size wherever the camera is on it.
+      this.director.arc = { ...TV_ARC };
+      const start = tvStartPlace();
+      if (start) this.director.visit(start, true);
+      this.hosts = new TvHosts(this.world.scene);
+      // The clear air's seam rule (`STUDY_TV_CAMERA_FAR`): the fog is complete before the far
+      // plane, and wherever the TV page's larger sea disc ends in view it is deeper than the
+      // fog's far end, so the sea is fully fogged before it ends and meets the sky in the
+      // horizon colour. resize() keeps it.
+      this.camera.far = STUDY_TV_CAMERA_FAR;
+      this.camera.updateProjectionMatrix();
+    }
     this.reduced = options.reducedMotion;
     try {
       this.renderer = new THREE.WebGLRenderer({
@@ -205,7 +304,7 @@ export class WorldEngine {
         room.dispose(); pmrem.dispose();
       }
       if (isWorldDesignStudy() && studyRadiance()) {
-        this.radiance = StudyRadiance.create(this.renderer);
+        this.radiance = StudyRadiance.create(this.renderer, { tv: this.tv });
         if (this.radiance) {
           // Every pass of one presented frame is counted together, so the reset moves into
           // StudyRadiance.render and happens exactly once per frame it presents.
@@ -217,7 +316,11 @@ export class WorldEngine {
       if (isWorldDesignStudy()) this.world.scene.userData.studyCamera = this.camera;
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
-      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = STUDY_TONE.environmentIntensity;
+      // The TV page's clearer day takes a little less environment fill (`STUDY_TV_TONE`).
+      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = this.tv ? STUDY_TV_TONE.environmentIntensity : STUDY_TONE.environmentIntensity;
+      // TV page: the sea takes that environment as its own (`TV_WATER`), so its reflection keeps
+      // the pastel light instead of following the lower fill.
+      if (this.tv) applyTvWaterEnvironment(this.world.scene);
     } catch (error) {
       this.radiance?.dispose();
       this.bubbles.dispose();
@@ -235,6 +338,9 @@ export class WorldEngine {
   }
 
   private selectPearl = (event: MouseEvent) => {
+    // The TV page has no controls to let go of a held bubble, so a tap (the one that turns the
+    // chimes on) never holds one: the tour keeps playing.
+    if (this.tv) return;
     if (this.arrivalState.phase !== "idle" || this.director.traveling) return;
     const rect = this.canvas.getBoundingClientRect(),
       ray = new THREE.Raycaster();
@@ -353,6 +459,7 @@ export class WorldEngine {
       this.feed.phase === "live" ||
       this.feed.phase === "reconnecting";
     const minimum = this.feed.snapshot?.settings.readingSeconds ?? 24;
+    if (this.tv) this.tvPacing(now, safe);
     const previousArrival = this.arrivalState;
     const before = previousArrival.phase;
     const canStart =
@@ -361,6 +468,11 @@ export class WorldEngine {
       (this.rotationPaused ||
         this.demoRequested ||
         this.isReadingComplete(delta, minimum));
+    // TV page: at most one arrival interrupts the tour per minute (step 5).
+    if (this.tv && canStart && previousArrival.phase === "idle" && safe && !this.feed.snapshot?.settings.pauseArrivals) {
+      const id = this.pacer.next(this.tvClock, this.rotationPaused);
+      if (id) this.arrivals.enqueue([id]);
+    }
     this.arrivalState = this.arrivals.update(
       this.paused ? 0 : delta,
       this.feed.records,
@@ -389,7 +501,7 @@ export class WorldEngine {
       this.finishArrival(true);
     const arriving = this.arrivalState.phase !== "idle";
     const readingBeforeCamera =
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
       !this.director.traveling;
     if (readingBeforeCamera && !arriving)
       this.recognitions.update(
@@ -414,6 +526,17 @@ export class WorldEngine {
       );
       if (previousZone !== this.director.zone) this.dirty = true;
     }
+    // TV page: a departure after a full hold completes the place. The visit is counted once the
+    // tour settles at the next place, so a place keeps its bubbles while the camera flies away.
+    if (this.tv) {
+      if (!this.tvWasTraveling && this.director.traveling && !arriving) this.pacer.placeCompleted();
+      this.tvWasTraveling = this.director.traveling;
+      if (!this.director.traveling && !arriving && this.director.zone !== this.tvSettledZone) {
+        if (this.tvSettledZone) this.tvVisits.set(this.tvSettledZone, (this.tvVisits.get(this.tvSettledZone) ?? 0) + 1);
+        this.tvSettledZone = this.director.zone;
+        this.tvArrivalCounts.set(this.director.zone, (this.tvArrivalCounts.get(this.director.zone) ?? 0) + 1);
+      }
+    }
     if (this.mood) this.applyStudyMood(this.paused ? 0 : delta, moving);
     if (moving || arriving || before !== "idle") {
       this.world.update(this.elapsed, this.director.zone, this.arrivalState);
@@ -427,7 +550,7 @@ export class WorldEngine {
     )
       this.recognitions.finishReading();
     const readingVisible =
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
       !this.director.traveling &&
       !arriving;
     const changedZone = this.director.zone !== this.lastReadingZone;
@@ -460,6 +583,13 @@ export class WorldEngine {
       input.elapsed = this.elapsed;
       this.finesse.apply(this.camera, input);
     }
+    // TV page: the camera glides in to read the place's bubbles, then back out. The glide blends
+    // the finished tour pose (the finesse's breath included) toward the reading framing, so the
+    // finesse's aim never trails it.
+    if (this.tv) {
+      this.tvFocus(delta, moving, readingVisible, minimum);
+      this.world.scene.userData.tvReading = this.focusWeight;
+    }
     // Everything downstream, the world bubbles included, reads the finished pose.
     this.camera.updateMatrixWorld();
     this.dirty =
@@ -478,7 +608,23 @@ export class WorldEngine {
           this.feed.snapshot?.settings.effects?.trails ??
           this.feed.snapshot?.settings.showTrails ??
           true,
+        tvLoop: this.tv ? this.tvLoop : undefined,
+        tvArrivals: this.tv ? this.tvArrivals : undefined,
+        paused: this.paused,
+        destination: this.director.destination,
+        hold: this.holdFor,
       }) || this.dirty;
+    if (this.hosts) {
+      this.hosts.update({
+        time: this.elapsed,
+        dt: this.paused ? 0 : delta,
+        camera: this.camera,
+        phase: this.arrivalState.phase,
+        traveling: this.director.traveling,
+        bubble: this.bubbles.arrivalBubble(),
+        still: !moving,
+      });
+    }
     // Study only: the focal pearl's place in the world, so the drifting petals can keep clear
     // of the words. Read on the next frame, which at these speeds is well inside the guard's margin.
     if (this.study)
@@ -506,6 +652,7 @@ export class WorldEngine {
             entries as StudyDetailEntry[],
             this.camera.position,
             resolveStudyTier(this.quality, this.lowered),
+            this.tv,
           );
       }
       if (this.radiance) this.radiance.render(this.world.scene, this.camera);
@@ -562,9 +709,18 @@ export class WorldEngine {
     scene.userData.studyHush = mood.hush;
     scene.userData.studyTravel = mood.travel;
     if (scene.fog instanceof THREE.Fog) {
-      studyHaze(mood.travel, this.haze);
+      // The TV page's clear air never closes in: its flight haze is its parked haze.
+      if (this.tv) studyHaze(mood.travel, this.haze, STUDY_TV_FOG, STUDY_TV_FOG);
+      else studyHaze(mood.travel, this.haze);
       scene.fog.near = this.haze.near;
       scene.fog.far = this.haze.far;
+      // TV page: the fog and the background dip with the sky (`studyHazeColor`), so the fully
+      // fogged sea meets the sky's horizon in one colour through a flight too. The radiance
+      // pass blacks the fog out for its glow layer and puts this exact colour back after.
+      if (this.tv) {
+        studyHazeColor(this.tvHazeBase, mood.exposure, scene.fog.color);
+        if (scene.background instanceof THREE.Color) scene.background.copy(scene.fog.color);
+      }
     }
   }
   private report() {
@@ -599,7 +755,59 @@ export class WorldEngine {
         ? { loaded: this.kit.loaded, total: this.kit.loaded + this.kit.missing.length }
         : undefined,
       kitNeighbors: this.world.scene.userData.studyNeighbors === true,
+      tvArrivals: this.tv ? this.tvFresh.map((item) => item.id) : undefined,
     });
+  }
+  /**
+   * TV page: the camera's reading move (Anthony, 2026-09-24: "the camera flies close"). The
+   * weight follows `tvFocusWeight` over the hold, but never faster than a full glide in about
+   * 1.4 s (`TV_FOCUS_IN` / 1.6), so an arrival, a changed record or an owner's hold turns into a
+   * glide rather than a jump; a pause holds it where it is, and a still view (reduced motion,
+   * Still) cuts instead. While the owner has paused rotation the reading age stands still, so
+   * once the place has had its first look the camera reads in the full framing, never frozen
+   * half way through a glide in or out.
+   */
+  private tvFocus(delta: number, moving: boolean, readingVisible: boolean, minimum: number) {
+    const zone = this.director.zone, age = this.recognitions.age;
+    const current = this.readingPool().find((record) => record.id === this.recognitions.id);
+    const wanted = TV_BUBBLE_PLACES.includes(zone) && current && readingVisible && this.arrivalState.phase === "idle"
+      ? (this.rotationPaused && age > TV_FOCUS_DELAY ? 1 : tvFocusWeight(age, this.holdFor(current.message, minimum), !moving))
+      : 0;
+    if (!moving && !this.paused) this.focusWeight = wanted;
+    else if (!this.paused) {
+      const step = (Math.max(0, delta) * 1.6) / TV_FOCUS_IN;
+      this.focusWeight += Math.max(-step, Math.min(step, wanted - this.focusWeight));
+    }
+    if (this.focusWeight < 1e-4) return;
+    tvReadingFrame(zone, this.elapsed, this.camera.aspect, this.camera.fov, this.focusPose);
+    this.focusMatrix.lookAt(this.focusPose.eye, this.focusPose.target, this.camera.up);
+    this.focusQuaternion.setFromRotationMatrix(this.focusMatrix);
+    this.camera.position.lerp(this.focusPose.eye, this.focusWeight);
+    this.camera.quaternion.slerp(this.focusQuaternion, this.focusWeight);
+  }
+  /**
+   * TV page: the pacing clock, the fresh marks for the ticker and, in sample mode, a
+   * fictional arrival now and then so the lotus, the hosts and the pacing can be seen.
+   */
+  private tvPacing(now: number, safe: boolean) {
+    if (this.tvStart < 0) this.tvStart = now;
+    this.tvClock = (now - this.tvStart) / 1000;
+    if (this.tvFresh.length && this.tvClock - this.tvFresh[0].at >= FRESH_SECONDS)
+      this.tvFresh = this.tvFresh.filter((item) => this.tvClock - item.at < FRESH_SECONDS);
+    if (!safe || this.feed.phase !== "sample" || this.tvClock < this.sampleArrivalAt) return;
+    this.sampleArrivalAt += SAMPLE_ARRIVAL_EVERY;
+    const pool = tvRecords(this.feed.records);
+    if (!pool.length) return;
+    const id = pool[this.sampleArrivalIndex++ % pool.length].id;
+    this.pacer.forget(id);
+    this.pacer.offer([id]);
+    this.noteFresh([id]);
+  }
+  private noteFresh(ids: readonly string[]) {
+    for (const id of ids) {
+      this.tvFresh = this.tvFresh.filter((item) => item.id !== id);
+      this.tvFresh.push({ id, at: this.tvClock });
+    }
   }
   setFeed(feed: WorldFeed) {
     if ((feed.phase === "sample") !== (this.feed.phase === "sample")) {
@@ -630,7 +838,8 @@ export class WorldEngine {
       this.world.scene.userData.studyInsights = safe
         ? (feed.snapshot?.insights ?? null)
         : null;
-    this.bubbles.setRecords(safe ? feed.records : []);
+    this.bubbles.setRecords(safe ? feed.records : [], feed.phase === "sample");
+    if (this.tv) this.tvPlan = planWorldBubbles(safe ? feed.records : []);
     this.world.setEffects(
       settings?.effects?.sparkles !== false,
       settings?.effects?.trails ?? settings?.showTrails ?? true,
@@ -657,13 +866,22 @@ export class WorldEngine {
       this.arrivals.cancel();
       this.finishArrival(true);
       this.arrivalState = this.arrivals.state();
+      this.pacer.clear();
+      if (!safe) this.tvFresh = [];
+    } else if (this.tv) {
+      // New arrivals join the ticker at once; their lotus waits for the pacer.
+      this.pacer.prune(new Set(feed.records.map((record) => record.id)));
+      this.pacer.offer(feed.arrivals);
+      this.noteFresh(feed.arrivals);
+      const ids = new Set(feed.records.map((record) => record.id));
+      this.tvFresh = this.tvFresh.filter((item) => ids.has(item.id));
     } else this.arrivals.enqueue(feed.arrivals);
     this.recognitions.update(
       0,
       this.readingPool(),
       settings?.readingSeconds ?? 24,
       true,
-      RECOGNITION_ZONES.includes(this.director.zone) &&
+      this.readingZones.includes(this.director.zone) &&
         !this.director.traveling &&
         this.arrivalState.phase === "idle",
       feed.records,
@@ -673,7 +891,7 @@ export class WorldEngine {
   }
   private isReadingComplete(delta: number, minimum: number) {
     if (
-      !RECOGNITION_ZONES.includes(this.director.zone) ||
+      !this.readingZones.includes(this.director.zone) ||
       this.director.traveling
     )
       return true;
@@ -682,7 +900,7 @@ export class WorldEngine {
     );
     return (
       !current ||
-      this.recognitions.age + delta >= readingSeconds(current.message, minimum)
+      this.recognitions.age + delta >= this.holdFor(current.message, minimum)
     );
   }
   private readingPool(includeHeld = true) {
@@ -691,6 +909,20 @@ export class WorldEngine {
     );
     if (includeHeld && this.readingHeld && held) return [held];
     const zone = this.director.zone;
+    // TV page: each visit holds on the place's main bubble for this loop (step 5). It is picked
+    // once, as the visit begins, and kept to the visit's end while it stays in the snapshot; it
+    // is picked again only at a new place or visit, or once it has left the snapshot.
+    if (this.tv && this.tvPlan && TV_BUBBLE_PLACES.includes(zone)) {
+      const visit = this.tvVisits.get(zone) ?? 0;
+      const kept = zone === this.tvPickedZone && visit === this.tvPickedVisit ? this.feedRecord(this.tvPickedId) : undefined;
+      const record = kept ?? heldBig(this.tvPlan, zone, visit);
+      this.tvPickedZone = zone;
+      this.tvPickedVisit = visit;
+      this.tvPickedId = record?.id;
+      this.tvPool.length = 0;
+      if (record) this.tvPool.push(record);
+      return this.tvPool;
+    }
     if (zone === "featured") {
       const featured = this.feed.records.filter((record) => record.featured);
       return featured.length ? featured : this.feed.records;
@@ -700,6 +932,16 @@ export class WorldEngine {
         record.expressionIds.includes(this.expressionId),
       );
     return this.feed.records;
+  }
+  /**
+   * TV page: the snapshot's own copy of the record with this id (a new snapshot brings new
+   * objects), or undefined once it has left. A plain loop, so the per frame pool allocates nothing.
+   */
+  private feedRecord(id: string | undefined) {
+    if (id === undefined) return undefined;
+    const records = this.feed.records;
+    for (let i = 0; i < records.length; i++) if (records[i].id === id) return records[i];
+    return undefined;
   }
   setExpression(id: number) {
     this.expressionId = id;
@@ -713,7 +955,7 @@ export class WorldEngine {
       this.readingPool(),
       24,
       true,
-      RECOGNITION_ZONES.includes(this.director.zone),
+      this.readingZones.includes(this.director.zone),
       this.feed.records,
     );
     this.report();
@@ -754,7 +996,7 @@ export class WorldEngine {
     );
     const destination = ZONES.find(
       (zone) =>
-        RECOGNITION_ZONES.includes(zone.id) &&
+        this.readingZones.includes(zone.id) &&
         (!this.feed.snapshot || enabled.has(zone.scene)),
     );
     if (
@@ -832,6 +1074,7 @@ export class WorldEngine {
     this.canvas.removeEventListener("webglcontextlost", this.contextLost);
     this.canvas.removeEventListener("click", this.selectPearl);
     this.radiance?.dispose();
+    this.hosts?.dispose();
     this.world.dispose();
     this.bubbles.dispose();
     // After the world: its placements share the kit's geometry, and the kit ends the decoder.

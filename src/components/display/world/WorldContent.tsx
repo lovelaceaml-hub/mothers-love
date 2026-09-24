@@ -7,6 +7,7 @@ import { readingSeconds, type WorldFeed } from "./world-feed";
 import { messagePages } from "./reading";
 import type { ZoneId } from "./world-data";
 import styles from "./WorldExperience.module.css";
+import tvStyles from "./WorldTv.module.css";
 
 export function WorldDialog({
   title,
@@ -263,6 +264,7 @@ export function WorldContent({
   expressionId,
   onExpression,
   elapsed = 0,
+  tv = false,
 }: {
   zone: ZoneId;
   feed: WorldFeed;
@@ -270,6 +272,8 @@ export function WorldContent({
   expressionId: number;
   onExpression: (id: number) => void;
   elapsed?: number;
+  /** The TV page, whose own card already carries the "Share a recognition" code. */
+  tv?: boolean;
 }) {
   const expression = EXPRESSIONS[expressionId - 1],
     insights = feed.snapshot?.insights;
@@ -319,7 +323,7 @@ export function WorldContent({
       <>
         <div className={styles.cardLabel}>OUR SHARED IMPACT</div>
         <h2>Love keeps growing.</h2>
-        <div className={styles.metrics}>
+        <div className={`${styles.metrics}${tv ? ` ${tvStyles.metrics}` : ""}`}>
           <div>
             <strong>
               {insights?.currentWeek.recognitions.toLocaleString() ?? "0"}
@@ -402,10 +406,12 @@ export function WorldContent({
           {insights?.campaign.recognitions.toLocaleString() ?? 0} recognitions
           of kindness
         </p>
-        <TrustedQR
-          url="https://mothers-love.vercel.app/recognize"
-          label="Share a recognition"
-        />
+        {!tv && (
+          <TrustedQR
+            url="https://mothers-love.vercel.app/recognize"
+            label="Share a recognition"
+          />
+        )}
       </>
     );
   return (

@@ -159,11 +159,23 @@ void main() {
 }`;
 
 /**
+ * The TV page's clear air (Anthony, 2026-09-24: "Can you remove the haze foggy look"). The sky
+ * ring's puffs are fainter and keep more of their own colour through the thinner fog (a pale
+ * wall of pink round the horizon was half of the milky look), and the island collars are a
+ * little lighter but still there, so every island still reads as floating. Applied to the
+ * per puff alpha attribute and the relief uniform only: the layout and the shader are the same.
+ */
+export const STUDY_TV_CLOUDS = { skyAlpha: .6, islandAlpha: .8, skyRelief: .9 } as const;
+
+/**
  * Two instanced billboards, one per tier. The quad is expanded in view space so a
  * puff always faces the camera without a per frame CPU pass, and the shared study
  * clock drives the drift, so a frozen clock still renders every cloud in place.
+ *
+ * `tv` is the TV page (`?view=tv`), which scales the alphas by `STUDY_TV_CLOUDS`; without it
+ * every value is exactly the study's.
  */
-export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, time: { value: number }) {
+export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, time: { value: number }, tv = false) {
   const palettes = { sky: STUDY_CLOUD_TINTS.map(hex => new T.Color(hex)), island: STUDY_COLLAR_TINTS.map(hex => new T.Color(hex)) };
   const meshes: T.InstancedMesh[] = [];
   const materials: T.ShaderMaterial[] = [];
@@ -184,7 +196,8 @@ export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, ti
     const uniforms = T.UniformsUtils.merge([T.UniformsLib.fog]);
     uniforms.atlas = { value: atlas };
     uniforms.tier = { value: tier };
-    uniforms.fogRelief = { value: tier < .5 ? .6 : 0 };
+    uniforms.fogRelief = { value: tier < .5 ? (tv ? STUDY_TV_CLOUDS.skyRelief : .6) : 0 };
+    const alphaScale = tv ? (tier < .5 ? STUDY_TV_CLOUDS.skyAlpha : STUDY_TV_CLOUDS.islandAlpha) : 1;
     // The study clock is shared by reference, so nothing here needs its own frame hook.
     uniforms.time = time;
     // Shared by reference too, so the engine's one write reaches both cloud tiers.
@@ -210,7 +223,7 @@ export function createStudyClouds(layout: StudyCloudLayout, atlas: T.Texture, ti
     puffs.forEach((puff, i) => {
       mesh.setMatrixAt(i, matrix.makeTranslation(puff.x, puff.y, puff.z));
       palette[puff.tint].toArray(tints, i * 3);
-      alphas[i] = puff.alpha;
+      alphas[i] = tv ? puff.alpha * alphaScale : puff.alpha;
       variants[i] = puff.variant;
       phases[i] = puff.phase;
       sizes[i * 2] = puff.width;
