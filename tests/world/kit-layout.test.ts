@@ -285,8 +285,9 @@ describe("near zone tables", () => {
   });
 
   it("copies the medallion ring and the hero pearl's placement from the pearl's own files", () => {
-    // pearl-skin.ts moves the medallions; world-recognitions.ts places and sizes the pearl.
-    const skin = source("art/pearl-skin.ts"), pearls = source("world-recognitions.ts");
+    // pearl-skin.ts builds the medallion rim and pearl-skin-frame.ts moves the medallions;
+    // world-recognitions.ts places and sizes the pearl.
+    const skin = source("art/pearl-skin.ts") + source("art/pearl-skin-frame.ts"), pearls = source("world-recognitions.ts");
     expect(skin).toContain(`const radiusX = (frame.portrait ? ${MEDALLION.portrait.radiusX} : ${MEDALLION.landscape.radiusX}) * frame.orbitScale;`);
     expect(skin).toContain(`const radiusY = (frame.portrait ? ${MEDALLION.portrait.radiusY} : ${MEDALLION.landscape.radiusY}) * frame.orbitScale;`);
     expect(skin).toContain(`const size = frame.portrait ? ${String(MEDALLION.portrait.size).replace(/^0/, "")} : frame.orbitScale;`);
