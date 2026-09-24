@@ -1,15 +1,18 @@
 import * as T from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { seededRandom, type ZoneId } from "../world-data";
-import type { DesignKitContext, KitBuilderHandle } from "./design-world";
+import type { DesignKitContext, DesignKitDistrict, KitBuilderHandle } from "./design-world";
 import { applyKitLayouts } from "./kit-districts";
 import type { KitPlacement, ZoneLayout } from "./kit-layout-core";
 import { TV_BUBBLE_PLACES } from "./tv-page";
+import { TV_BASIN, TV_MAIN_RADIUS, TV_PLACES, TV_TERRACE_TOP, TV_WATER_TOP, tvPlaceWorld, worldToLayout, zoneOf } from "./tv-places";
 
 /*
  * The TV page's foreground restyle (PLAN-01 Section 5, step 3), everything still 3D and in
  * the world's current look: denser blossom through the kit layouts, ringed pearls floating
- * round the island, pastel petals drifting through the air and more waterfalls off the edge.
- * The Garden first; the other places follow after Anthony's yes (step 10).
+ * round the island, pastel petals drifting through the air, more waterfalls off the edge, and
+ * the lotuses the bubbles come from: at every place a lotus in an ivory basin whose gold stem
+ * holds the main bubble, and a second lotus the flowing bubbles bud from.
  *
  * Built only on the TV page and only with a kit, like every other kit builder.
  */
@@ -64,6 +67,7 @@ export function applyTvForeground(context: DesignKitContext): KitBuilderHandle |
   for (const place of TV_BUBBLE_PLACES) {
     const district = context.districts.get(place);
     if (!district) continue;
+    buildTvLotuses(context, district, place);
     const random = seededRandom(5101 + district.index);
     const group = new T.Group();
     group.name = `TV foreground ${place}`;
@@ -162,4 +166,122 @@ export function applyTvPalette(palette: DesignKitContext["palette"]) {
     gold.color.set("#f0cd86");
     gold.roughness = 0.2;
   }
+}
+
+/*
+ * The lotuses. Built once per place, in its layout frame, as one mesh per shared study material
+ * (ivory basin, gold rim and stem, water, leaf pads, blossom petals), so the static batch
+ * folds them into the district's own draws.
+ */
+const UP = new T.Vector3(0, 1, 0);
+/** One petal: an almond, its base at the origin, pointing along +z; blush at the base, white at the tip. */
+function petal(length: number, width: number, lean: number, turn: number, lift: number, base: T.Color, tip: T.Color) {
+  const g = new T.SphereGeometry(1, 14, 8);
+  g.scale(width, 0.07, length);
+  g.translate(0, 0, length);
+  const position = g.getAttribute("position");
+  const colors = new Float32Array(position.count * 3), color = new T.Color();
+  for (let i = 0; i < position.count; i++) {
+    color.copy(base).lerp(tip, Math.min(1, position.getZ(i) / (2 * length)));
+    colors.set([color.r, color.g, color.b], i * 3);
+  }
+  g.setAttribute("color", new T.BufferAttribute(colors, 3));
+  g.rotateX(-lean);
+  g.rotateY(turn);
+  g.translate(0, lift, 0);
+  return g;
+}
+/** A lotus in bloom, about 1.2 across at scale 1: two rings of petals round a gold seed pod. */
+function lotus(at: T.Vector3, scale: number, turn: number, petals: T.BufferGeometry[], gold: T.BufferGeometry[]) {
+  const blush = new T.Color("#f3a9c4"), white = new T.Color("#fff6f8"), inner = new T.Color("#f7c3d4");
+  const parts: T.BufferGeometry[] = [];
+  for (let i = 0; i < 8; i++) parts.push(petal(0.3, 0.2, 0.42, turn + (i / 8) * Math.PI * 2, 0, blush, white));
+  for (let i = 0; i < 6; i++) parts.push(petal(0.23, 0.16, 0.95, turn + ((i + 0.5) / 6) * Math.PI * 2, 0.04, inner, white));
+  for (const part of parts) { part.scale(scale, scale, scale); part.translate(at.x, at.y, at.z); petals.push(part); }
+  const pod = new T.CylinderGeometry(0.13, 0.1, 0.12, 18);
+  pod.scale(scale, scale, scale); pod.translate(at.x, at.y + 0.1 * scale, at.z);
+  gold.push(pod);
+}
+/** An ivory basin with a gold rim, its water and three lily pads; returns where its water is. */
+function basin(at: T.Vector3, radius: number, height: number, ivory: T.BufferGeometry[], gold: T.BufferGeometry[], water: T.BufferGeometry[], leaves: T.BufferGeometry[], seed: number) {
+  const profile = [[0.84, 0], [1, 0.16], [1, 0.84], [0.97, 1], [0.9, 1], [0.88, 0.8]].map(([r, y]) => new T.Vector2(r * radius, y * height));
+  const wall = new T.LatheGeometry(profile, 56);
+  wall.translate(at.x, at.y, at.z);
+  ivory.push(wall);
+  const rim = new T.TorusGeometry(radius * 0.935, 0.045, 8, 72);
+  rim.rotateX(Math.PI / 2); rim.translate(at.x, at.y + height, at.z);
+  gold.push(rim);
+  const surface = new T.CircleGeometry(radius * 0.885, 48);
+  surface.rotateX(-Math.PI / 2); surface.translate(at.x, at.y + height * 0.8, at.z);
+  water.push(surface);
+  padsOn(new T.Vector3(at.x, at.y + height * 0.8 + 0.01, at.z), radius * 0.6, radius * 0.2, leaves, seed);
+  return at.y + height * 0.8;
+}
+/** Three lily pads round a point on the water. */
+function padsOn(at: T.Vector3, reach: number, size: number, leaves: T.BufferGeometry[], seed: number) {
+  const random = seededRandom(seed);
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2 + random() * 0.8;
+    const pad = new T.CylinderGeometry(size, size, 0.02, 22, 1, false, 0.3, Math.PI * 2 - 0.6);
+    pad.rotateY(random() * Math.PI * 2);
+    pad.translate(at.x + Math.cos(a) * reach, at.y, at.z + Math.sin(a) * reach);
+    leaves.push(pad);
+  }
+}
+/**
+ * A place's two lotuses and the main bubble's stem: from the main lotus's seed pod a gold stem
+ * rises, then curves in under the bubble, where a gold calyx of six sepals cradles it.
+ */
+export function buildTvLotuses(context: DesignKitContext, district: DesignKitDistrict, place: ZoneId) {
+  const spots = TV_PLACES[place], zone = zoneOf(place), world = tvPlaceWorld(place);
+  const ivory: T.BufferGeometry[] = [], gold: T.BufferGeometry[] = [], water: T.BufferGeometry[] = [], leaves: T.BufferGeometry[] = [], petals: T.BufferGeometry[] = [];
+  const stand = (x: number, z: number, onWater: boolean | undefined, size: { radius: number; height: number }, scale: number, seed: number) => {
+    const at = new T.Vector3(x, TV_TERRACE_TOP, z);
+    let top = TV_WATER_TOP;
+    if (onWater) padsOn(new T.Vector3(x, TV_WATER_TOP + 0.01, z), size.radius * 0.7, size.radius * 0.22, leaves, seed);
+    else top = basin(at, size.radius, size.height, ivory, gold, water, leaves, seed);
+    const flower = new T.Vector3(x, top + 0.02, z);
+    lotus(flower, scale, seed * 0.37, petals, gold);
+    return flower;
+  };
+  const main = stand(spots.lotus[0], spots.lotus[1], spots.onWater?.main, TV_BASIN.main, 1.55, district.index * 7 + 1);
+  if (!spots.flowBud) {
+    const flowAt = worldToLayout(zone, world.flow.lotus);
+    stand(flowAt.x, flowAt.z, spots.onWater?.flow, TV_BASIN.flow, 1.1, district.index * 7 + 4);
+  }
+  // The stem: up from the seed pod, then over to the calyx under the bubble.
+  const [cx, cy, cz] = spots.main;
+  const calyx = new T.Vector3(cx, cy - TV_MAIN_RADIUS * 0.96, cz);
+  const from = main.clone().add(new T.Vector3(0, 0.16, 0));
+  const climb = calyx.y - from.y;
+  const stem = new T.CubicBezierCurve3(from, from.clone().addScaledVector(UP, climb * 0.55), calyx.clone().addScaledVector(UP, -climb * 0.3), calyx);
+  gold.push(new T.TubeGeometry(stem, 48, 0.085, 10, false));
+  const cup = new T.TorusGeometry(TV_MAIN_RADIUS * 0.28, 0.07, 8, 56);
+  cup.rotateX(Math.PI / 2); cup.translate(calyx.x, calyx.y + 0.06, calyx.z);
+  gold.push(cup);
+  for (let k = 0; k < 6; k++) {
+    const a = (k / 6) * Math.PI * 2;
+    const sepal = new T.SphereGeometry(1, 10, 8);
+    sepal.scale(0.13, 0.5, 0.05);
+    sepal.translate(0, 0.42, 0);
+    sepal.rotateX(0.62);
+    sepal.rotateY(a);
+    sepal.translate(calyx.x + Math.sin(a) * TV_MAIN_RADIUS * 0.27, calyx.y, calyx.z + Math.cos(a) * TV_MAIN_RADIUS * 0.27);
+    gold.push(sepal);
+  }
+  const add = (parts: T.BufferGeometry[], material: T.Material, name: string) => {
+    if (!parts.length) return;
+    // One attribute set for the merge: the lathe, circle and tube carry uvs like the rest.
+    const merged = mergeGeometries(parts.map((part) => (part.index ? part.toNonIndexed() : part)), false);
+    parts.forEach((part) => part.dispose());
+    if (!merged) return;
+    const mesh = context.mesh(district.layout, context.geometry(merged), material);
+    mesh.name = `TV lotus ${name} ${place}`;
+    mesh.castShadow = name !== "water";
+  };
+  add(ivory, context.palette.ivory, "basin");
+  add(gold, context.palette.gold, "gold");
+  add(water, context.palette.water, "water");
+  add(leaves, context.palette.leaf, "pads");
+  add(petals, context.palette.bloom, "petals");
 }

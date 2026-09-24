@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Recognition } from "@/lib/contracts";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { CameraDirector } from "./camera-director";
 import { createWorldScene } from "./world-scene";
@@ -33,7 +34,7 @@ import {
   worldHoldSeconds,
   type WorldBubblePlan,
 } from "./prototype/tv-page";
-import { TV_FOCUS_DELAY, TV_FOCUS_IN, TV_FOCUS_OUT, tvFocusWeight, tvReadingPose } from "./prototype/tv-anchors";
+import { TV_ARC, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
 import { TvHosts } from "./prototype/tv-hosts";
 import type { HoldSeconds } from "./recognition-director";
 
@@ -41,13 +42,13 @@ import type { HoldSeconds } from "./recognition-director";
 const tvHold: HoldSeconds = (message) => worldHoldSeconds(message);
 /**
  * The TV page reads a place with the new rule only where its bubbles scroll the whole message
- * (`TV_BUBBLE_PLACES`); every other place keeps paging by `readingSeconds` until it is converted,
- * so no page is ever skipped. At an anchored place the hold also covers the camera's glide in
- * to the main bubble and its pull back out, so the message itself is held the full rule.
+ * (`TV_BUBBLE_PLACES`, every place); any other keeps paging by `readingSeconds`, so no page is
+ * ever skipped. The hold also covers the camera's glide in to the main bubble and its pull back
+ * out, so the message itself is held the full rule.
  */
 const placeHold = (director: CameraDirector): HoldSeconds => (message, minimum) =>
   TV_BUBBLE_PLACES.includes(director.zone)
-    ? worldHoldSeconds(message) + TV_FOCUS_DELAY + TV_FOCUS_IN + TV_FOCUS_OUT
+    ? tvPlaceHold(message, director.zone)
     : readingSeconds(message, minimum);
 /** TV page, sample mode: a fictional arrival every 90 s after the first 45, to show the pacing. */
 const SAMPLE_ARRIVAL_FIRST = 45;
@@ -139,8 +140,10 @@ export class WorldEngine {
   private readonly holdFor: HoldSeconds = this.tv ? placeHold(this.director) : readingSeconds;
   private readonly pacer = new ArrivalPacer();
   private tvPlan?: WorldBubblePlan;
-  /** How many times the tour has left each place: picks the place's held big bubble. */
+  /** How many times the tour has left each place: picks the place's main bubble. */
   private readonly tvVisits = new Map<ZoneId, number>();
+  /** How many times the tour has arrived at each place: picks its flowing bubble, so it changes as the camera arrives. */
+  private readonly tvArrivalCounts = new Map<ZoneId, number>();
   private tvFresh: Array<{ id: string; at: number }> = [];
   private tvClock = 0;
   private tvStart = -1;
@@ -150,12 +153,15 @@ export class WorldEngine {
   /** TV page: how far the camera has glided in to read the main bubble, eased (0 to 1). */
   private focusWeight = 0;
   private readonly focusPose = { eye: new THREE.Vector3(), target: new THREE.Vector3() };
-  private readonly focusEye = new THREE.Vector3();
-  private readonly focusLook = new THREE.Vector3();
+  private readonly focusMatrix = new THREE.Matrix4();
+  private readonly focusQuaternion = new THREE.Quaternion();
+  /** TV page: the one record a visit holds on, reused so the per frame pool allocates nothing. */
+  private readonly tvPool: Recognition[] = [];
   private sampleArrivalAt = SAMPLE_ARRIVAL_FIRST;
   private sampleArrivalIndex = 0;
   /** Bound once, so the per frame bubble update allocates no closure. */
   private readonly tvLoop = (place: ZoneId) => this.tvVisits.get(place) ?? 0;
+  private readonly tvArrivals = (place: ZoneId) => this.tvArrivalCounts.get(place) ?? 0;
   /** TV page: Peace and Joy (the placeholder until the lamb files land, `HOSTS_READY`). */
   private hosts?: TvHosts;
   /** Resolved once with the study gate: whether this page asked for the kit at all. */
@@ -231,6 +237,8 @@ export class WorldEngine {
     // Study only: the expression the DOM picker shows, for the grove and the terrace steles.
     if (this.study) this.world.scene.userData.studyExpression = this.expressionId;
     if (this.tv) {
+      // A narrow swing, so both bubbles keep their reading size wherever the camera is on it.
+      this.director.arc = { ...TV_ARC };
       const start = tvStartPlace();
       if (start) this.director.visit(start, true);
       this.hosts = new TvHosts(this.world.scene);
@@ -498,6 +506,7 @@ export class WorldEngine {
       if (!this.director.traveling && !arriving && this.director.zone !== this.tvSettledZone) {
         if (this.tvSettledZone) this.tvVisits.set(this.tvSettledZone, (this.tvVisits.get(this.tvSettledZone) ?? 0) + 1);
         this.tvSettledZone = this.director.zone;
+        this.tvArrivalCounts.set(this.director.zone, (this.tvArrivalCounts.get(this.director.zone) ?? 0) + 1);
       }
     }
     if (this.mood) this.applyStudyMood(this.paused ? 0 : delta, moving);
@@ -532,11 +541,8 @@ export class WorldEngine {
       readingVisible,
       this.feed.records,
     );
-    // TV page: at an anchored place the camera glides in to read the main bubble, then back out.
-    const focus = this.tv ? this.tvFocus(delta, moving, readingVisible, minimum) : undefined;
-    const eye = focus?.eye ?? this.director.position, look = focus?.target ?? this.director.target;
-    this.camera.position.copy(eye);
-    this.camera.lookAt(look);
+    this.camera.position.copy(this.director.position);
+    this.camera.lookAt(this.director.target);
     if (this.finesse) {
       const input = this.finesseInput;
       input.dt = this.paused ? 0 : delta;
@@ -544,10 +550,17 @@ export class WorldEngine {
       input.traveling = this.director.traveling;
       input.arrivalPhase = this.arrivalState.phase;
       input.reading = readingVisible && this.recognitions.id !== null;
-      input.position = eye;
-      input.target = look;
+      input.position = this.director.position;
+      input.target = this.director.target;
       input.elapsed = this.elapsed;
       this.finesse.apply(this.camera, input);
+    }
+    // TV page: the camera glides in to read the place's bubbles, then back out. The glide blends
+    // the finished tour pose (the finesse's breath included) toward the reading framing, so the
+    // finesse's aim never trails it.
+    if (this.tv) {
+      this.tvFocus(delta, moving, readingVisible, minimum);
+      this.world.scene.userData.tvReading = this.focusWeight;
     }
     // Everything downstream, the world bubbles included, reads the finished pose.
     this.camera.updateMatrixWorld();
@@ -568,6 +581,7 @@ export class WorldEngine {
           this.feed.snapshot?.settings.showTrails ??
           true,
         tvLoop: this.tv ? this.tvLoop : undefined,
+        tvArrivals: this.tv ? this.tvArrivals : undefined,
         destination: this.director.destination,
         hold: this.holdFor,
       }) || this.dirty;
@@ -706,23 +720,28 @@ export class WorldEngine {
     });
   }
   /**
-   * TV page: the camera's reading move at an anchored place (Anthony, 2026-09-24: "the camera
-   * flies close"). The weight rises over the first seconds of the hold and falls over the last,
-   * eased again so an arrival or a pause never jumps the view; a still view cuts instead.
+   * TV page: the camera's reading move (Anthony, 2026-09-24: "the camera flies close"). The
+   * weight follows `tvFocusWeight` over the hold, but never faster than a full glide in 1.6 s,
+   * so an arrival, a changed record or an owner's hold turns into a glide rather than a jump; a
+   * pause holds it where it is, and a still view (reduced motion, Still) cuts instead.
    */
   private tvFocus(delta: number, moving: boolean, readingVisible: boolean, minimum: number) {
     const zone = this.director.zone;
-    const main = TV_BUBBLE_PLACES.includes(zone) ? this.bubbles.mainAnchor(zone) : undefined;
     const current = this.readingPool().find((record) => record.id === this.recognitions.id);
-    const wanted = main && current && readingVisible && this.arrivalState.phase === "idle"
+    const wanted = TV_BUBBLE_PLACES.includes(zone) && current && readingVisible && this.arrivalState.phase === "idle"
       ? tvFocusWeight(this.recognitions.age, this.holdFor(current.message, minimum), !moving)
       : 0;
-    this.focusWeight = !moving ? wanted : this.focusWeight + (wanted - this.focusWeight) * (1 - Math.exp(-Math.max(0, delta) / 0.35));
-    if (!main || this.focusWeight < 1e-4) return undefined;
-    tvReadingPose(main.position, main.radius, this.director.position, this.camera.aspect, this.focusPose);
-    this.focusEye.copy(this.director.position).lerp(this.focusPose.eye, this.focusWeight);
-    this.focusLook.copy(this.director.target).lerp(this.focusPose.target, this.focusWeight);
-    return { eye: this.focusEye, target: this.focusLook };
+    if (!moving && !this.paused) this.focusWeight = wanted;
+    else if (!this.paused) {
+      const step = (Math.max(0, delta) * 1.6) / TV_FOCUS_IN;
+      this.focusWeight += Math.max(-step, Math.min(step, wanted - this.focusWeight));
+    }
+    if (this.focusWeight < 1e-4) return;
+    tvReadingFrame(zone, this.elapsed, this.camera.aspect, this.camera.fov, this.focusPose);
+    this.focusMatrix.lookAt(this.focusPose.eye, this.focusPose.target, this.camera.up);
+    this.focusQuaternion.setFromRotationMatrix(this.focusMatrix);
+    this.camera.position.lerp(this.focusPose.eye, this.focusWeight);
+    this.camera.quaternion.slerp(this.focusQuaternion, this.focusWeight);
   }
   /**
    * TV page: the pacing clock, the fresh marks for the ticker and, in sample mode, a
@@ -848,10 +867,12 @@ export class WorldEngine {
     );
     if (includeHeld && this.readingHeld && held) return [held];
     const zone = this.director.zone;
-    // TV page: each visit holds on the place's big bubble for this loop (step 5).
+    // TV page: each visit holds on the place's main bubble for this loop (step 5).
     if (this.tv && this.tvPlan && TV_BUBBLE_PLACES.includes(zone)) {
       const record = heldBig(this.tvPlan, zone, this.tvVisits.get(zone) ?? 0);
-      return record ? [record] : [];
+      this.tvPool.length = 0;
+      if (record) this.tvPool.push(record);
+      return this.tvPool;
     }
     if (zone === "featured") {
       const featured = this.feed.records.filter((record) => record.featured);

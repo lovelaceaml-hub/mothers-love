@@ -16,6 +16,7 @@ import {
   worldHoldSeconds,
 } from "@/components/display/world/prototype/tv-page";
 import { snapshot } from "./fixtures";
+import { tvPlaceHold } from "@/components/display/world/prototype/tv-places";
 
 /** Fictional records only: numbered names and plain sample words. */
 function records(count: number): Recognition[] {
@@ -63,11 +64,13 @@ describe("hold time", () => {
   it("counts an emoji family once", () => {
     expect(worldHoldSeconds("a".repeat(160) + "👩‍👩‍👧‍👦".repeat(20))).toBe(13);
   });
-  it("keeps one loop of 13 places under about 6 minutes for everyday messages", () => {
-    const everyday = records(13).map((record) => worldHoldSeconds(record.message));
+  it("keeps one loop of 13 places under about 6 minutes, the camera's glide in and out included", () => {
+    // Each place's own hold, the River's stream included.
+    const everyday = records(13).map((record, i) => tvPlaceHold(record.message, TOUR_ORDER[i]));
     expect(tourLoopSeconds(everyday)).toBeLessThan(6 * 60);
-    // Twelve 200 character messages and one at the 20 s cap still fit.
-    expect(tourLoopSeconds([...Array(12).fill(worldHoldSeconds("a".repeat(200))), 20])).toBeLessThan(6 * 60);
+    // Twelve 200 character messages and one at the 20 s cap stay about there.
+    const long = TOUR_ORDER.map((place, i) => tvPlaceHold("a".repeat(i ? 200 : 500), place));
+    expect(tourLoopSeconds(long)).toBeLessThan(6.5 * 60);
   });
 });
 

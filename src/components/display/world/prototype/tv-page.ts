@@ -34,10 +34,11 @@ export function tvStartPlace(search?: string): ZoneId | undefined {
 /** Step 8: the TV tour runs at the settings panel's fastest speed, and the panel is hidden. */
 export const TV_TOUR_SPEED = 2;
 /**
- * Step 5: the places that show the new, anchored bubbles (`tv-anchors.ts`): the Garden first
- * (step 10, redone after Anthony's review of 2026-09-24); the others follow after his yes.
+ * Step 5: the places that show the TV page's bubbles, every one of the thirteen (Anthony,
+ * 2026-09-24: "All 13 places now"): a main bubble on its lotus and a flowing one beside it
+ * (`tv-places.ts`, `tv-flow.ts`).
  */
-export const TV_BUBBLE_PLACES: readonly ZoneId[] = ["garden"];
+export const TV_BUBBLE_PLACES: readonly ZoneId[] = TOUR_ORDER;
 /** The TV draws from the latest 100 (AGENTS.md product invariants). */
 export const TV_RECORD_LIMIT = 100;
 

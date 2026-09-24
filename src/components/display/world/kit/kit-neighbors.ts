@@ -976,6 +976,13 @@ export function createKitNeighbors(context: DesignKitContext): KitNeighbors | un
       card.mesh.updateMatrixWorld();
       // Nothing may cover the words: a card that would overlap the pearl being read steps aside.
       card.mesh.visible = !coversFocus(card.mesh, camera, scene.userData.studyFocus as FocusLike);
+      // TV page: nor any recognition bubble on show, and the cards rest while the camera is in
+      // close to read, where one would stand huge over the QR card and the ticker.
+      if (tvPage && card.mesh.visible) {
+        const discs = scene.userData.tvDiscs as FocusLike[] | undefined;
+        card.mesh.visible = !((scene.userData.tvReading as number | undefined ?? 0) > 0.02
+          || discs?.some((disc) => coversFocus(card.mesh, camera, disc)));
+      }
     }
   }
 

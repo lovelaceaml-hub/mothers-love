@@ -28,23 +28,42 @@ import {
   type WorldBubblePlan,
 } from "./prototype/tv-page";
 import {
+  TV_BIG,
   TvBubbleDecor,
   TvDecorShared,
+  canvasMeasure,
   paintTvBigFace,
-  paintTvSmallFace,
+  tvFitFlowDiameter,
+  tvFlowStyle,
   tvScrollFraction,
   type TvBubbleRole,
+  type TvFaceStyle,
 } from "./prototype/tv-bubbles";
 import {
-  TV_ANCHORS,
   TV_FOCUS_DELAY,
   TV_FOCUS_IN,
   TV_FOCUS_OUT,
-  buildTvTether,
-  tvAnchorWorld,
-  tvBridgeAnchors,
-  type TvAnchorKind,
-} from "./prototype/tv-anchors";
+  TV_FLOW_MIN_DIAMETER,
+  TV_MAIN_RADIUS,
+  TV_MEDALLION_SCALE,
+  TV_READ,
+  TV_PLACES,
+  tvFlowRadius,
+  tvPlaceWorld,
+  type TvPlaceWorld,
+} from "./prototype/tv-places";
+import {
+  TV_FLOW_SETTLED,
+  TvLeavePath,
+  TvRisePath,
+  TvSwap,
+  tvArriving,
+  tvFlowRecord,
+  tvLeaving,
+  tvRestBob,
+  tvStreamStep,
+  type TvFlowPose,
+} from "./prototype/tv-flow";
 
 export function wrapBubbleText(
   measure: (text: string) => number,
@@ -152,27 +171,30 @@ type Input = {
   still: boolean;
   sparkles: boolean;
   trails: boolean;
-  /** TV page only: how many times the tour has left a place, which picks its held big bubble. */
+  /** TV page only: how many times the tour has left a place, which picks its main bubble. */
   tvLoop?: (place: ZoneId) => number;
+  /** TV page only: how many times the tour has arrived at a place, which picks its flowing bubble. */
+  tvArrivals?: (place: ZoneId) => number;
   /** TV page only: where the camera is flying to, so that place's bubbles are ready on arrival. */
   destination?: ZoneId;
   /** TV page only: the hold rule, for the held bubble's scroll. */
   hold?: (message: string, minimum: number) => number;
 };
-/** TV page only: a bubble's fixed role, world place and size, and its decoration. */
+/** TV page only: a bubble's role and place, its decoration and how its face was painted. */
 type TvSlot = {
-  role: TvBubbleRole | "corridor";
-  place: ZoneId | "corridor";
-  /** What it rests on, and the gold stem, chain or calyx that ties it there (world space). */
-  kind?: TvAnchorKind;
-  tether?: { group: T.Group; geometries: T.BufferGeometry[] };
+  role: TvBubbleRole;
+  place: ZoneId | "arrival";
   decor: TvBubbleDecor;
-  position: T.Vector3;
-  radius: number;
   windowTop: number;
+  style: TvFaceStyle;
+  /** A flowing bubble's diameter on screen at rest, px, which its face was painted for. */
+  diameter: number;
 };
+/** TV page only: one bubble spot of a place, its two slots (one arriving, one leaving) and its ways in and out. */
+type TvSpot = { swap: TvSwap; slots: [Slot, Slot]; rise: TvRisePath; leave: TvLeavePath };
+type TvPlace = { world: TvPlaceWorld; main: TvSpot; flow: TvSpot; seed: number; presence: number };
 type Slot = {
-  zone: ZoneId | "arrival" | "corridor";
+  zone: ZoneId | "arrival";
   index: number;
   root: T.Group;
   face: T.Mesh<T.CircleGeometry, T.MeshBasicMaterial>;
@@ -244,9 +266,10 @@ export class WorldRecognitionBubbles {
    * scene by the engine each frame. It is read once per update rather than per slot.
    */
   private hush = 0;
-  /** TV page only (`?view=tv`): the Garden's big and small bubbles, corridors, hearts. */
+  /** TV page only (`?view=tv`): every place's main and flowing bubbles (`tv-places.ts`, `tv-flow.ts`). */
   private readonly tvPage = studyTvPage();
   private readonly tvShared?: TvDecorShared;
+  private readonly tvPlaces = new Map<ZoneId, TvPlace>();
   private tvPlan?: WorldBubblePlan;
   private tvSample = false;
 
@@ -256,53 +279,43 @@ export class WorldRecognitionBubbles {
     if (this.designStudy) this.waterHalo = new StudyWaterHalo(scene);
     this.root.name = "Recognition bubbles in the world";
     scene.add(this.root);
-    if (this.tvPage) this.tvShared = new TvDecorShared();
-    // The TV page's anchored places (the Garden first) rest their bubbles on real things in the
-    // scene (`tv-anchors.ts`); every other recognition place keeps its three study pearls.
-    const zones = this.tvPage ? [...new Set([...RECOGNITION_ZONES, ...TV_BUBBLE_PLACES])] : RECOGNITION_ZONES;
-    for (const zone of zones) {
-      const anchors = this.tvPage && TV_BUBBLE_PLACES.includes(zone) ? TV_ANCHORS[zone] : undefined;
-      if (!anchors) {
-        for (let index = 0; index < 3; index++) this.create(zone, index);
-        continue;
-      }
-      const definition = ZONES.find((item) => item.id === zone)!;
-      anchors.forEach((anchor, index) => {
-        const role: TvBubbleRole = anchor.role === "main" ? "held" : anchor.role;
-        // Only the main bubble is read up close, so only it wears the study's glass skin.
-        const slot = this.create(zone, index, role === "held");
-        const placed = tvAnchorWorld(definition, anchor);
-        this.makeTv(slot, role, { position: placed.centre, radius: placed.radius }, zone, anchor.kind, placed.from);
+    if (this.tvPage) {
+      this.tvShared = new TvDecorShared();
+      const lift = new T.Vector3(0, 0.55, 0);
+      TV_BUBBLE_PLACES.forEach((place, seed) => {
+        const world = tvPlaceWorld(place);
+        // Only the main bubble wears the study's glass skin and its expression medallions.
+        const make = (role: TvBubbleRole, index: number) => {
+          const slot = this.create(place, index, role === "main");
+          this.makeTv(slot, role, place);
+          return slot;
+        };
+        this.tvPlaces.set(place, {
+          world,
+          seed,
+          presence: 0,
+          main: {
+            swap: new TvSwap(), slots: [make("main", 0), make("main", 1)],
+            rise: new TvRisePath(world.main.lotus.clone().add(lift), world.main.centre),
+            leave: new TvLeavePath(world.main.centre, world.main.away),
+          },
+          flow: {
+            swap: new TvSwap(), slots: [make("flow", 2), make("flow", 3)],
+            rise: new TvRisePath(world.flow.lotus.clone().add(lift), world.flow.rest),
+            leave: new TvLeavePath(world.flow.rest, world.flow.away),
+          },
+        });
       });
     }
-    if (this.tvPage)
-      tvBridgeAnchors(TV_BUBBLE_PLACES).forEach((anchor, k) =>
-        this.makeTv(this.create("corridor", k, false), "corridor", { position: anchor.centre, radius: anchor.radius }, "corridor", "rail", anchor.from));
+    // Every other recognition place keeps its three study pearls.
+    for (const zone of RECOGNITION_ZONES.filter((item) => !this.tvPlaces.has(item)))
+      for (let index = 0; index < 3; index++) this.create(zone, index);
     const arrival = this.create("arrival", 0);
-    // The arriving bubble reads like a held one: the same face, window and body size.
-    if (this.tvPage) this.makeTv(arrival, "held", { position: new T.Vector3(), radius: 0 });
+    // The arriving bubble reads like a main one: the same face, window and body size.
+    if (this.tvPage) this.makeTv(arrival, "main", "arrival");
   }
-  private makeTv(
-    slot: Slot, role: TvSlot["role"], placement: { position: T.Vector3; radius: number },
-    place: TvSlot["place"] = "corridor", kind?: TvAnchorKind, from?: T.Vector3,
-  ) {
-    const tether = kind && from
-      ? buildTvTether(kind, from, placement.position, placement.radius, this.tvShared!.orbitMaterial)
-      : undefined;
-    if (tether) {
-      tether.group.visible = false;
-      this.root.add(tether.group);
-    }
-    slot.tv = {
-      role,
-      place,
-      kind,
-      tether,
-      decor: new TvBubbleDecor(slot.root, this.tvShared!),
-      position: placement.position,
-      radius: placement.radius,
-      windowTop: 0,
-    };
+  private makeTv(slot: Slot, role: TvBubbleRole, place: TvSlot["place"]) {
+    slot.tv = { role, place, decor: new TvBubbleDecor(slot.root, this.tvShared!), windowTop: 0, style: TV_BIG, diameter: 0 };
   }
   private create(zone: Slot["zone"], index: number, skin = true): Slot {
     const root = new T.Group();
@@ -393,10 +406,14 @@ export class WorldRecognitionBubbles {
     const tier: StudyTier = publishedTier === "auto" || publishedTier === "low"
       ? publishedTier
       : "high";
-    // On the TV page only the held bubble (and the arriving one) is read up close.
-    const canvasSize = this.designStudy
-      ? studyCanvasSize(slot.tv ? slot.tv.role === "held" : slot.index === 0, tier)
-      : (slot.index === 0 ? 1024 : 512);
+    // On the TV page a main bubble is 650 px across and a flowing one at most 400 (`TV_READ`),
+    // so 1024 and 512 faces are drawn a little over one texel to the pixel; the arriving one
+    // keeps the study's hero size.
+    const canvasSize = slot.tv
+      ? slot.tv.place === "arrival" ? studyCanvasSize(true, tier) : slot.tv.role === "main" ? 1024 : 512
+      : this.designStudy
+        ? studyCanvasSize(slot.index === 0, tier)
+        : (slot.index === 0 ? 1024 : 512);
     if (
       this.designStudy &&
       slot.record?.id === record?.id &&
@@ -524,112 +541,193 @@ export class WorldRecognitionBubbles {
     slot.texture.needsUpdate = true;
     return true;
   }
-  /** TV page: the face once per record and canvas; big bubbles also paint their message window. */
+  /**
+   * TV page: the face once per record and canvas, and the whole message in its window. A main
+   * bubble reads at the main size; a flowing one is as large as its message needs (up to the
+   * layout's largest) and its words are sized to it, 23.5 px at rest whatever its diameter.
+   */
   private paintTv(slot: Slot, record: Recognition) {
     const tv = slot.tv!, canvas = slot.canvas!, texture = slot.texture!;
-    // Only the held bubble (and the arriving one) is read up close with the whole message. The
-    // second big bubble stands back, so it wears the small face, which reads at its size; its
-    // whole message shows when it takes the held place on the next loop.
-    const big = tv.role === "held";
     const heart = sampleHeartCount(record, this.tvSample);
     const key = `tv:${canvas.width}:${heart}`;
     if (slot.pageKey === key) return false;
     slot.pageKey = key;
-    if (big) {
-      tv.windowTop = paintTvBigFace(canvas, record, heart, wrapBubbleText).windowTop;
-      tv.decor.setMessage(record.message, tv.windowTop, canvas.width / 1024, wrapBubbleText);
-    } else {
-      paintTvSmallFace(canvas, record, heart, wrapBubbleText);
-      tv.decor.setMessage(undefined, 0, 1, wrapBubbleText);
-    }
+    tv.diameter = tv.role === "flow"
+      ? tvFitFlowDiameter(canvasMeasure(canvas.getContext("2d")!), record, wrapBubbleText, TV_FLOW_MIN_DIAMETER, TV_READ.flow.max, canvas.width / 1024)
+      : 0;
+    tv.style = tv.role === "flow" ? tvFlowStyle(tv.diameter) : TV_BIG;
+    tv.windowTop = paintTvBigFace(canvas, record, heart, wrapBubbleText, tv.style).windowTop;
+    tv.decor.setMessage(record.message, tv.windowTop, canvas.width / 1024, wrapBubbleText, tv.style);
     texture.needsUpdate = true;
     return true;
   }
   /**
-   * TV page: one place's bubbles. The held big bubble shows the record being read (or the
-   * plan's held record for this loop), the second big bubble the place's other big record,
-   * then the small ones in plan order. Each stands at its own fixed world place.
+   * TV page: one place's two bubbles. The main bubble shows the record being read (or the
+   * plan's main record for this loop); the flowing one, the place's next small record at every
+   * arrival. When either is to show another recognition, the old bubble floats away and a new
+   * one rises from its lotus (`tv-flow.ts`).
    */
-  private updateTvPlace(place: ZoneId, input: Input, entranceActive: boolean, arrivalId: string | null) {
-    if (!this.tvPlaceActive(place, input)) {
-      for (const slot of this.slots) if (slot.tv?.place === place) this.hideTv(slot);
-      return false;
-    }
+  private updateTvPlace(place: ZoneId, state: TvPlace, input: Input, entranceActive: boolean, arrivalId: string | null) {
+    const active = this.tvPlaceShown(place, state, input);
     const plan = this.tvPlan;
-    const loop = input.tvLoop?.(place) ?? 0;
-    const bubbles = plan?.places.get(place);
-    const drop = (record?: Recognition) => (record && entranceActive && record.id === arrivalId ? undefined : record);
     const selected = place === input.zone && input.selectedId ? this.records.get(input.selectedId) : undefined;
-    const held = selected ?? (plan ? heldBig(plan, place, loop) : undefined);
-    const second = bubbles?.big.find((record) => record.id !== held?.id);
-    const small = bubbles?.small ?? [];
-    let changed = false;
-    let smallIndex = 0;
-    for (const slot of this.slots) {
-      if (slot.zone !== place || !slot.tv) continue;
-      const record = drop(slot.tv.role === "held" ? held : slot.tv.role === "second" ? second : small[smallIndex++]);
-      changed = this.showTv(slot, record, input, place === input.zone && slot.tv.role === "held" && !entranceActive) || changed;
-      if (place === input.zone && slot.tv.role === "held" && slot.root.visible) this.focused = slot;
+    const main = selected ?? (plan ? heldBig(plan, place, input.tvLoop?.(place) ?? 0) : undefined);
+    const stream = TV_PLACES[place].stream;
+    const step = place === input.zone ? tvStreamStep(stream?.every, input.readingAge) : 0;
+    const flow = tvFlowRecord(plan, place, input.tvArrivals?.(place) ?? 0, main?.id, step);
+    // The recognition presented at the arrival stage is not shown twice while it is there.
+    const shown = (record?: Recognition) => (record && entranceActive && record.id === arrivalId ? undefined : record);
+    let changed = this.tvSpot(place, state, state.main, shown(main), input, active);
+    changed = this.tvSpot(place, state, state.flow, shown(flow), input, active) || changed;
+    if (place === input.zone) {
+      const reading = state.main.slots.find((slot) => slot.root.visible && slot.record?.id === state.main.swap.current);
+      if (reading) this.focused = reading;
     }
     return changed;
   }
   /**
-   * TV page: a place's bubbles are built (textures and all) only while the camera is at the
-   * place, flying to it, or within sight of it; farther away they are released. The gap
-   * between 75 and 95 units keeps a place from flickering in and out at the edge.
+   * TV page: a place shows its bubbles only while the camera is there or flying between it and
+   * the next place, so every view reads one place's recognitions and no far bubble clutters it
+   * (textures and all are released elsewhere). A place fades in and out over about a second.
    */
-  private readonly tvActive = new Set<ZoneId | "corridor">();
-  private readonly tvNearBridges = new Set<Slot>();
-  private readonly tvCentres = new Map(ZONES.map((zone) => [zone.id, new T.Vector3(...zone.center)]));
-  private tvPlaceActive(place: ZoneId, input: Input) {
-    const distance = input.camera.position.distanceTo(this.tvCentres.get(place)!);
-    const active = place === input.zone || place === input.destination || distance < (this.tvActive.has(place) ? 95 : 75);
-    if (active) this.tvActive.add(place); else this.tvActive.delete(place);
-    return active;
+  private tvLastTime = 0;
+  private tvStarted = false;
+  private tvPlaceShown(place: ZoneId, state: TvPlace, input: Input) {
+    const shown = place === input.zone || place === input.destination;
+    const dt = Math.max(0, Math.min(0.25, input.time - this.tvLastTime));
+    // The first frame opens on the place as it is; after that a place fades in and out.
+    state.presence = input.still || !this.tvStarted ? (shown ? 1 : 0)
+      : state.presence + ((shown ? 1 : 0) - state.presence) * (1 - Math.exp(-dt / 0.35));
+    return shown || state.presence > 0.01;
   }
   private hideTv(slot: Slot) {
     if (slot.record) this.clear(slot);
     slot.root.visible = slot.face.visible = false;
-    if (slot.tv) {
-      slot.tv.decor.visible = false;
-      if (slot.tv.tether) slot.tv.tether.group.visible = false;
-    }
+    slot.tv?.decor && (slot.tv.decor.visible = false);
   }
-  /** TV page: assign, paint, place and decorate one bubble at its fixed world place. */
-  private showTv(slot: Slot, record: Recognition | undefined, input: Input, detailed: boolean) {
-    const tv = slot.tv!;
-    this.assign(slot, record, input.time);
-    if (!slot.record) {
-      slot.root.visible = slot.face.visible = false;
-      tv.decor.visible = false;
-      if (tv.tether) tv.tether.group.visible = false;
+  private readonly tvPose: TvFlowPose = { u: 0, scale: 1, opacity: 1 };
+  private readonly tvPlainFrame: StudyPearlFrame = { sparkles: false, portrait: false, orbitScale: TV_MEDALLION_SCALE, lanes: false, shield: false };
+  private readonly tvLeavePose: TvFlowPose = { u: 0, scale: 1, opacity: 1 };
+  /**
+   * TV page: one spot. The slot already showing the wanted recognition keeps it; the other
+   * takes the one leaving. A far place, or a still view, swaps with no journey.
+   */
+  private tvSpot(place: ZoneId, state: TvPlace, spot: TvSpot, record: Recognition | undefined, input: Input, active: boolean) {
+    const { time } = input;
+    const swap = spot.swap;
+    // A recognition that left the snapshot goes at once; it never floats away with its words.
+    if (swap.previous !== undefined && !this.records.has(swap.previous)) swap.drop(swap.previous);
+    swap.want(record?.id, time, input.still || !active, spot === state.flow);
+    swap.settle(time);
+    const [a, b] = spot.slots;
+    const holds = (slot: Slot, id?: string) => id !== undefined && slot.record?.id === id;
+    const current = holds(a, swap.current) ? a : holds(b, swap.current) ? b : holds(a, swap.previous) ? b : a;
+    const leaving = current === a ? b : a;
+    if (!active) {
+      this.hideTv(current);
+      this.hideTv(leaving);
       return false;
     }
+    const role = current.tv!.role;
+    const bob = role === "flow" ? tvRestBob(time, state.seed) : 0;
+    let changed = false;
+    // The arriving (or resting) bubble.
+    const arriving = swap.current === undefined ? null
+      : swap.at === -Infinity ? this.restPose()
+      : tvArriving(time - swap.at, this.tvPose);
+    const next = swap.current === undefined ? undefined : this.records.get(swap.current);
+    if (!next || !arriving) {
+      // Nothing to show yet, or not yet budded: its face is painted ahead, out of sight.
+      this.assign(current, next, time);
+      if (current.record) changed = this.paint(current, 0, input.minimum) || changed;
+      current.root.visible = current.face.visible = false;
+      if (current.tv) current.tv.decor.visible = false;
+    } else {
+      spot.rise.at(arriving.u, current.root.position);
+      changed = this.showTvSlot(current, next, input, arriving, arriving.u >= 1 ? bob : 0, place, state.presence, swap.at) || changed;
+    }
+    // The leaving one.
+    const gone = swap.previous === undefined ? null : tvLeaving(time - swap.at, this.tvLeavePose);
+    const old = swap.previous === undefined ? undefined : this.records.get(swap.previous);
+    if (!old || !gone) this.hideTv(leaving);
+    else {
+      spot.leave.at(gone.u, leaving.root.position);
+      changed = this.showTvSlot(leaving, old, input, gone, bob * (1 - gone.u), place, state.presence, swap.at) || changed;
+    }
+    return changed;
+  }
+  private restPose() {
+    const pose = this.tvPose;
+    pose.u = 1; pose.scale = 1; pose.opacity = 1;
+    return pose;
+  }
+  /** TV page: assign, paint, size, fade and decorate one bubble at the place its flow puts it (already set). */
+  private showTvSlot(slot: Slot, record: Recognition, input: Input, pose: TvFlowPose, bob: number, place: ZoneId, presence: number, swapAt: number) {
+    const tv = slot.tv!;
+    this.assign(slot, record, input.time);
+    if (!slot.record) { this.hideTv(slot); return false; }
     const changed = this.paint(slot, 0, input.minimum);
-    // It rests where it is anchored; the stem, chain or calyx holds it there, so it never drifts.
-    slot.root.position.copy(tv.position);
-    slot.radius = tv.radius;
-    if (tv.tether) tv.tether.group.visible = true;
-    const grow = input.still || tv.role === "held" ? 1 : T.MathUtils.smoothstep(input.time - slot.born - slot.index * 0.2, 0, 1.8);
-    slot.root.scale.setScalar(slot.radius * Math.max(0.01, grow));
+    slot.root.position.y += bob;
+    const full = tv.role === "main" ? TV_MAIN_RADIUS : tvFlowRadius(place, tv.diameter, input.camera.fov);
+    slot.radius = full * pose.scale;
+    slot.root.scale.setScalar(Math.max(0.01, slot.radius));
     slot.root.quaternion.copy(input.camera.quaternion);
     slot.root.visible = slot.face.visible = true;
-    slot.face.material.opacity = 1;
+    const opacity = pose.opacity * presence;
+    slot.face.material.opacity = opacity;
     slot.face.material.color.set("#ffffff");
     this.effects(slot, input.time, input.sparkles, input.trails);
     tv.decor.visible = true;
-    tv.decor.update(input.time, tv.role === "held");
-    const reading = detailed && slot.record.id === input.selectedId && tv.decor.scrollable;
-    // The message scrolls only while the camera is in close: after the glide in, before the pull back.
-    const hold = input.hold?.(slot.record.message, input.minimum) ?? 20;
-    const lead = TV_FOCUS_DELAY + TV_FOCUS_IN;
-    tv.decor.scroll(reading ? tvScrollFraction(input.readingAge - lead, hold - lead - TV_FOCUS_OUT) : 0);
-    // The study's orbit lanes scale with the bubble; at the TV size they would cross the whole
-    // view, so the TV bubbles wear the decor's own gold ring instead.
-    const frame = detailed ? this.frameFor(slot, input.camera, input.sparkles) : this.plainFrame;
-    if (detailed) frame.lanes = false;
-    slot.study?.update(input.time, slot.record.expressionIds, detailed, frame);
+    tv.decor.update(input.time, opacity);
+    this.tvDiscList.push(slot);
+    // Words scroll only while the camera reads this place: the main one from the glide in to the
+    // pull back, the flowing one once it has come to rest, each ending 2 s before the pull back.
+    const here = place === input.zone && pose.u >= 1 && tv.decor.scrollable;
+    const held = here ? this.tvHoldRecord(place, input) : undefined;
+    const hold = held && input.hold ? input.hold(held.message, input.minimum) : 20;
+    if (tv.role === "main") {
+      const lead = TV_FOCUS_DELAY + TV_FOCUS_IN;
+      tv.decor.scroll(here && slot.record.id === input.selectedId ? tvScrollFraction(input.readingAge - lead, hold - lead - TV_FOCUS_OUT) : 0);
+    } else {
+      // From the moment it came to rest (or the visit's start, when it was already resting) to
+      // the next turn of the River's stream or the camera's pull back, whichever comes first.
+      const rested = swapAt === -Infinity ? Math.max(TV_FLOW_SETTLED, TV_FOCUS_DELAY + TV_FOCUS_IN) : input.readingAge - (input.time - swapAt) + TV_FLOW_SETTLED;
+      const every = TV_PLACES[place].stream?.every;
+      const until = Math.min(hold - TV_FOCUS_OUT, every ? (Math.floor(Math.max(0, rested - TV_FLOW_SETTLED) / every) + 1) * every : Infinity);
+      tv.decor.scroll(here ? tvScrollFraction(input.readingAge - rested, until - rested) : 0);
+    }
+    // The main bubble being read wears its expression medallions, set close round its rim so
+    // they never reach the flowing bubble beside it (`TV_MEDALLION_SCALE`).
+    const detailed = tv.role === "main" && place === input.zone && slot.record.id === input.selectedId && opacity >= 0.99;
+    if (slot.study) {
+      const frame = detailed ? this.frameFor(slot, input.camera, input.sparkles) : this.tvPlainFrame;
+      // The study's orbit lanes would cross the whole view at this size; the decor's gold ring stands in.
+      frame.lanes = false;
+      frame.orbitScale = TV_MEDALLION_SCALE;
+      slot.study.update(input.time, slot.record.expressionIds, detailed, frame);
+    }
     return changed;
+  }
+  /**
+   * TV page: every TV bubble on show this frame, published on the scene for the neighbors'
+   * speech cards, which step aside rather than cover one (`kit-neighbors.ts`).
+   */
+  private readonly tvDiscList: Slot[] = [];
+  private readonly tvDiscs: Array<{ position: number[]; radius: number }> = [];
+  private publishTvDiscs() {
+    if (!this.tvPage) return;
+    while (this.tvDiscs.length < this.tvDiscList.length) this.tvDiscs.push({ position: [0, 0, 0], radius: 0 });
+    this.tvDiscs.length = this.tvDiscList.length;
+    this.tvDiscList.forEach((slot, i) => {
+      slot.root.position.toArray(this.tvDiscs[i].position);
+      this.tvDiscs[i].radius = slot.radius * 1.17;
+    });
+    this.hostScene.userData.tvDiscs = this.tvDiscs;
+  }
+  /** The record the camera holds on at a place: its main bubble's. */
+  private tvHoldRecord(place: ZoneId, input: Input) {
+    const id = this.tvPlaces.get(place)?.main.swap.current ?? input.selectedId;
+    return id ? this.records.get(id) : undefined;
   }
   update(input: Input) {
     const {
@@ -656,22 +754,12 @@ export class WorldRecognitionBubbles {
       (record) => !entranceActive || record.id !== arrival.id,
     );
     this.tvShared?.tick(time);
-    const tvPlaces = this.tvPage ? TV_BUBBLE_PLACES : [];
-    for (const place of tvPlaces) changed = this.updateTvPlace(place, input, entranceActive, arrival.id) || changed;
-    if (this.tvPage) {
-      let corridor = 0;
-      for (const slot of this.slots) {
-        if (slot.zone !== "corridor") continue;
-        const record = this.tvPlan?.corridors[corridor++];
-        // Bridge bubbles are built only while the camera is near them (70 in, 85 out).
-        const distance = input.camera.position.distanceTo(slot.tv!.position);
-        const near = distance < (this.tvNearBridges.has(slot) ? 85 : 70);
-        if (near) this.tvNearBridges.add(slot); else this.tvNearBridges.delete(slot);
-        if (!near) this.hideTv(slot);
-        else changed = this.showTv(slot, record, input, false) || changed;
-      }
-    }
-    const plans = RECOGNITION_ZONES.filter((place) => !tvPlaces.includes(place)).map((place) => {
+    this.tvDiscList.length = 0;
+    for (const [place, state] of this.tvPlaces) changed = this.updateTvPlace(place, state, input, entranceActive, arrival.id) || changed;
+    this.tvLastTime = time;
+    this.tvStarted = this.tvPlaces.size > 0;
+    this.publishTvDiscs();
+    const plans = RECOGNITION_ZONES.filter((place) => !this.tvPlaces.has(place)).map((place) => {
       let pool = records;
       if (place === "featured") {
         const featured = records.filter((r) => r.featured);
@@ -834,7 +922,7 @@ export class WorldRecognitionBubbles {
       changed = this.paint(arrivalSlot, age, minimum) || changed;
       if (arrivalSlot.tv) {
         arrivalSlot.tv.decor.visible = true;
-        arrivalSlot.tv.decor.update(time, true);
+        arrivalSlot.tv.decor.update(time);
         // The arriving bubble always reads by the TV rule, wherever the tour happens to be.
         arrivalSlot.tv.decor.scroll(arrival.phase === "reading" && arrivalSlot.tv.decor.scrollable
           ? tvScrollFraction(arrival.age, worldHoldSeconds(arrivalSlot.record.message))
@@ -938,11 +1026,6 @@ export class WorldRecognitionBubbles {
     }
     slot.lights.instanceMatrix.needsUpdate = true;
   }
-  /** TV page: where a place's main bubble rests (its anchor), for the camera's reading move. */
-  mainAnchor(place: ZoneId): { position: T.Vector3; radius: number } | undefined {
-    const slot = this.slots.find((item) => item.tv?.place === place && item.tv.role === "held");
-    return slot?.tv ? { position: slot.tv.position, radius: slot.tv.radius } : undefined;
-  }
   /** TV page: the arriving bubble's world place and size while it shows, for the hosts. */
   arrivalBubble(): { position: T.Vector3; radius: number } | undefined {
     const slot = this.slots[this.slots.length - 1];
@@ -975,10 +1058,8 @@ export class WorldRecognitionBubbles {
     });
     this.records.clear();
     this.waterHalo?.dispose();
-    this.slots.forEach((slot) => {
-      slot.tv?.decor.dispose();
-      slot.tv?.tether?.geometries.forEach((geometry) => geometry.dispose());
-    });
+    this.slots.forEach((slot) => slot.tv?.decor.dispose());
+    this.tvPlaces.clear();
     this.tvShared?.dispose();
     this.studyAssets?.dispose();
     this.focused = undefined;

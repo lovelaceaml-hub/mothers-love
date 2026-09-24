@@ -509,6 +509,7 @@ export function WorldExperience({
               aria-label="World content"
             >
               <WorldContent
+                tv={tvPage}
                 elapsed={
                   record
                     ? Math.max(
