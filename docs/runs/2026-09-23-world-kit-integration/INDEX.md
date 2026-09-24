@@ -1,7 +1,7 @@
 # Run: 2026-09-23-world-kit-integration
 
 Plan ID: 2026-09-23-world-kit-integration
-Plan file: /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/docs/PLAN-26-world-kit.md
+Plan file: /Users/anthony/Projects/mothers-love/docs/PLAN-29-world-kit.md (written as `docs/PLAN-26-world-kit.md` in the old worktree `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`; renamed Plan 29 by date on 2026-09-23 and brought to `main` by Plan 28 Section 5)
 Runner: pending
 Started: 2026-09-23T07:24Z
 Coordinator: pending

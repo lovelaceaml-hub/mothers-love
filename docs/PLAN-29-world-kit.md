@@ -1,5 +1,7 @@
 # Plan 26: the 3D Studio kit inside the heavenly world
 
+Numbering and standing, added 2026-09-24 by Plan 28 Section 5: this plan was Plan 26 until Anthony ruled on 2026-09-23 that plans renumber by date, which made it Plan 29. It reached `main` with the world branch as `docs/PLAN-29-world-kit.md` (it was `docs/PLAN-26-world-kit.md` on `feat/world-cinematic`). The text below keeps the number it was written under, and its plan id `2026-09-23-world-kit-integration` and run tree did not change. On 2026-09-24 Anthony ruled that [Plan 28](PLAN-28-repository-refactor.md) leads the world; Plan 28 Section 5 moved the world to its own address, `/world`, with the design look as the default.
+
 **Goal:** the design world (`art=design`) is dressed with the 3D Studio kit: recognition
 pearls ringed by expression medallions, lotus, ribbon portal and Butterfly Gate
 arrivals, rigged neighbors who speak the nine expressions and hand over hearts, and all
