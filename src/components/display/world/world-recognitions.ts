@@ -410,7 +410,7 @@ export class WorldRecognitionBubbles {
     const tier: StudyTier = publishedTier === "auto" || publishedTier === "low"
       ? publishedTier
       : "high";
-    // On the TV page a main bubble is 650 px across and a flowing one at most 400 (`TV_READ`),
+    // On the TV page a main bubble is 650 px across and a flowing one at most 380 (`TV_READ`),
     // so 1024 and 512 faces are drawn a little over one texel to the pixel; the arriving one
     // keeps the study's hero size.
     const canvasSize = slot.tv
