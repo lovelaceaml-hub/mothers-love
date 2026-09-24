@@ -306,8 +306,9 @@ function browserKitIO(decoderPath: string): KitIO {
 
 /**
  * The kit for the design world, or `undefined` whenever it should not or could not load:
- * outside the fictional study, under `?kit=off`, after the timeout, or on any manifest or
- * decoder failure. Never throws.
+ * outside the design look (the `?art=classic` and `?art=cinematic` fallbacks), under
+ * `?kit=off`, after the timeout, or on any manifest or decoder failure. Since Plan 28
+ * Section 5 the design look, and so the kit, is the default for live content too. Never throws.
  */
 export async function loadStudyKit(options?: KitLoadOptions): Promise<WorldKit | undefined> {
   if (!isWorldDesignStudy() || !studyKit()) return undefined;

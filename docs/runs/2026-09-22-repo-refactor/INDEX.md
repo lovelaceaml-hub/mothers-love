@@ -23,6 +23,8 @@ After Section 3: every plan, 01 to 28, is in `docs/` on the branch `fix/infra-on
 
 After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment READY, so Section 3's acceptance is recorded. Four retired Mother's Love worktrees and a stray `church-data-backup` worktree are removed, and six retired local branches are deleted, each first confirmed preserved by an `archive/*` or `record/*` tag on GitHub or by `main`. 177 files that lived only in those folders, 195.6 MB, are in Drive under `2026-09-24-plan28-section-4-worktrees/` with SHA-256 receipts, verified before anything was removed. After Anthony's answers, the Plan 18 Section B chat was archived and `never-expire` removed too, and the loose files under `/Users/anthony/Documents/Codex/2026-09-20/` went to the Trash, so the worktrees folder went from 4.8 GB to empty and no working copy remains outside `~/Projects`. Nothing the world owns was touched.
 
+After Section 5: the 3D world lives at `/world` on `feat/world-surface`, which merges production, `feat/world-cinematic` and `feat/world-base`, with the design look, live recognitions, the TV page and Automatic quality as defaults, and `/display/world-preview` redirecting there. PLAN-01 Section 5 steps 0 and 11 passed on this Mac, with baselines and evidence in Drive under `3D World/previews/`. Every TV, API and library file is byte identical to production. Draft pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) waits for Sections 7 and 8, Anthony's TV check and his merge. Section 6's P0 fix, #16, passed its CI check.
+
 ## Lanes
 
 | Lane | Title | State | Model | Worktree | Review | Depends on |
@@ -32,7 +34,7 @@ After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment 
 | S2 | Fix the main working copy (Opus 5 xhigh, 30 minutes) | complete | claude-opus-5 xhigh | /Users/anthony/Projects/mothers-love (main checkout) | Haiku 4.5 sweep, Sonnet 5 high read only | S1 |
 | S3 | One documentation set (Opus 5 xhigh, 40 minutes) | complete, merged 2026-09-24 as pull request #11 | claude-opus-5-5 xhigh | temporary worktree of fix/infra-one-doc-set, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S2 |
 | S4 | Worktrees (Opus 5 xhigh, 20 minutes) | complete, merged 2026-09-24 as pull request #18 | claude-opus-5-5 xhigh | temporary worktree of fix/infra-s4-worktrees, removed at close out | Haiku 4.5 sweep, Sonnet 5 high read only | S3 |
-| S5 | The 3D world as its own surface (Opus 5 xhigh, about 2 hours) | review; draft pull request #19 staged | claude-opus-5-5 xhigh | /Users/anthony/Projects/mothers-love-worktrees/world-surface (feat/world-surface) | Haiku 4.5 sweep, Sonnet 5 high read only | S4 |
+| S5 | The 3D world as its own surface (Opus 5 xhigh, about 2 hours) | complete; draft pull request #19 waits for Sections 7 and 8, the TV check and Anthony's merge | claude-opus-5-5 xhigh | /Users/anthony/Projects/mothers-love-worktrees/world-surface (feat/world-surface) | Haiku 4.5 sweep, Sonnet 5 high read only | S4 |
 | S6 | Retire the dead code (Opus 5 xhigh, 45 minutes) | built; routes removed on `main` (#17), P0 fix #16 merged with its CI check green 2026-09-24; review not yet recorded | claude-opus-5-5 (cloud) | cloud clone | pending | S3 |
 | S7 | Split the oversized files (Opus 5 xhigh, about 2 hours) | planned | pending | pending | pending | pending |
 | S8 | Verify, review, back up, report (Opus 5 xhigh, 1 hour) | planned | pending | pending | pending | pending |
@@ -56,7 +58,7 @@ After Section 4: pull request #11 merged on 2026-09-24 as `896dd06`, deployment 
 <!-- lane: S2 state: complete model: claude-opus-5-xhigh then claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love review: sonnet-5-high updated: 2026-09-23T08:01Z -->
 <!-- lane: S3 state: complete model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-one-doc-set review: sonnet-5-high updated: 2026-09-24T14:16Z -->
 <!-- lane: S4 state: complete model: claude-opus-5-5-xhigh worktree: scratchpad temporary worktree of fix/infra-s4-worktrees review: sonnet-5-high updated: 2026-09-24T17:34Z -->
-<!-- lane: S5 state: review model: claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love-worktrees/world-surface review: sonnet-5-high updated: 2026-09-24T17:34Z -->
+<!-- lane: S5 state: complete-awaiting-merge model: claude-opus-5-5-xhigh worktree: /Users/anthony/Projects/mothers-love-worktrees/world-surface review: sonnet-5-high updated: 2026-09-24T17:45Z -->
 <!-- lane: S6 state: review model: claude-opus-5-5 worktree: cloud clone review: pending updated: 2026-09-24T17:34Z -->
 <!-- lane: S7 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
 <!-- lane: S8 state: planned model: pending worktree: pending review: pending updated: 2026-09-23T01:22Z -->
