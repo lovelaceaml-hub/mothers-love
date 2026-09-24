@@ -47,6 +47,23 @@ describe("TV bubble faces", () => {
   });
 });
 
+describe("right to left text on a TV bubble face (Plan 24 P7)", () => {
+  // Fictional words only: "a good neighbour" and "thank you for your kindness".
+  const measure = (text: string, px: number) => [...text].length * px * 0.5;
+  it("keeps every character of a right to left or mixed direction name and message", () => {
+    for (const [name, message] of [
+      ["שכנה טובה", "תודה רבה על החסד שלך. ".repeat(12)],
+      ["جار طيب", "شكرا لك على لطفك. ".repeat(12)],
+      ["Neighbor שכנה", "Thank you, جار طيب, for 3 warm meals and שכנה טובה too. ".repeat(6)],
+    ]) {
+      expect(tvFaceLayout(measure, name, TV_BIG, wrapBubbleText).names.join("")).toBe(name);
+      const lines = wrapBubbleText((text) => measure(text, TV_BIG.body), message, TV_BIG.windowWidth);
+      expect(lines.length).toBeGreaterThan(1);
+      expect(lines.join("")).toBe(message);
+    }
+  });
+});
+
 describe("a flowing bubble's size", () => {
   // A serif's average glyph is about half its size; close enough to prove the rule.
   const measure = (text: string, px: number) => [...text].length * px * 0.5;

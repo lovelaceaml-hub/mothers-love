@@ -60,9 +60,13 @@ try {
   if (phase === 'live') {
     await check('Live pearls appear in the world and the ticker runs', async () => {
       await expect.poll(async () => Number(await world.getAttribute('data-world-bubbles')), { timeout: 30000 }).toBeGreaterThan(0);
-      await expect(page.locator('section[aria-label="Live recognitions"]')).toHaveCount(1);
+      // Plan 28 Section 8: the ticker is left out in still motion (the owner's Still setting),
+      // because a row that cannot move would cut messages at the screen's edge.
+      const motion = await world.getAttribute('data-motion');
+      await expect(page.locator('section[aria-label="Live recognitions"]')).toHaveCount(motion === 'still' ? 0 : 1);
       await expect(page.getByText('Fictional sample')).toHaveCount(0);
-      return { bubbles: Number(await world.getAttribute('data-world-bubbles')) };
+      await expect(page.getByText('Sample recognitions')).toHaveCount(0);
+      return { bubbles: Number(await world.getAttribute('data-world-bubbles')), motion };
     });
     await check('A quiet state from the endpoint clears every pearl and the ticker at the next poll', async () => {
       await page.route('**/api/display/color-polish*', async route => {

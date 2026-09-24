@@ -133,6 +133,12 @@ function graphemes(text: string) {
   lengths.set(text, count);
   return count;
 }
+/** The cache holds message text, so an unsafe feed, a source switch and disposal empty it. */
+export function forgetFlowLengths() {
+  lengths.clear();
+}
+/** Whether the length cache still holds a message, for the privacy tests. */
+export const flowLengthKept = (message: string) => lengths.has(message);
 /**
  * The longest message a flowing bubble takes, graphemes: about what its largest size holds whole
  * at 23.5 px. A longer one would have to scroll faster than it can be read in a flowing turn, so

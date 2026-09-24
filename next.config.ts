@@ -22,9 +22,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // The 3D Studio kit and its Draco decoder. Every kit version is its own folder
-        // (`/world-kit/v1`, then `v2`), so a TV never refetches a file between visits.
-        source: "/world-kit/:path*",
+        // The 3D Studio kit. Every kit version is its own folder (`/world-kit/v1`, then `v2`),
+        // so a TV never refetches a file between visits. The Draco decoder in
+        // `/world-kit/draco/` has no version folder, so it keeps the default revalidating cache
+        // and a later three.js upgrade reaches every TV (Plan 28 Section 8).
+        source: "/world-kit/:version(v\\d+)/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],

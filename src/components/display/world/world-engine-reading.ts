@@ -1,8 +1,18 @@
 /** The engine's feed and reading: taking a new feed, the reading pool and hold, and selecting a recognition or an expression. WorldEngine calls these with itself as `this`. */
 import type { WorldFeed } from "./world-feed";
-import { TV_BUBBLE_PLACES, heldBig, planWorldBubbles } from "./art/tv-page";
+import { TV_BUBBLE_PLACES, forgetWorldHolds, heldBig, planWorldBubbles } from "./art/tv-page";
+import { forgetFlowLengths } from "./art/tv-flow";
 import { TOUR_ORDER, ZONES, type ZoneId } from "./world-data";
 import type { WorldEngine } from "./world-engine";
+
+/**
+ * P7: the TV page's measure caches are keyed by message text, so they are emptied with every
+ * unsafe feed, every source switch and disposal, like every other reference (Plan 28 Section 8).
+ */
+export function forgetMessageMeasures() {
+  forgetWorldHolds();
+  forgetFlowLengths();
+}
 
 export function setEngineFeed(this: WorldEngine, feed: WorldFeed) {
   if ((feed.phase === "sample") !== (this.feed.phase === "sample")) {
@@ -10,6 +20,7 @@ export function setEngineFeed(this: WorldEngine, feed: WorldFeed) {
     this.finishArrival(true);
     this.arrivalState = this.arrivals.state();
     this.readingHeld = false;
+    forgetMessageMeasures();
   }
   this.feed = feed;
   const safe =
@@ -62,7 +73,10 @@ export function setEngineFeed(this: WorldEngine, feed: WorldFeed) {
     this.finishArrival(true);
     this.arrivalState = this.arrivals.state();
     this.pacer.clear();
-    if (!safe) this.tvFresh = [];
+    if (!safe) {
+      this.tvFresh = [];
+      forgetMessageMeasures();
+    }
   } else if (this.tv) {
     // New arrivals join the ticker at once; their lotus waits for the pacer.
     this.pacer.prune(new Set(feed.records.map((record) => record.id)));

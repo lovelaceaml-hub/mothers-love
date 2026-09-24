@@ -57,14 +57,14 @@ The latest owner choice keeps all selected effects active. The app does not auto
 
 The [3D world](https://mothers-love.vercel.app/world) is its own page beside the TV View. It never replaces the [TV View](https://mothers-love.vercel.app/display) and is never part of the TV program: each screen shows one or the other, chosen by its address. To find it without typing, open [Display controls](https://mothers-love.vercel.app/admin/display) and choose **open the 3D world** at the bottom of the page.
 
-The page opens the way a TV should show it: the camera tours thirteen places of kindness, recognitions float in the world as pearls, a ticker along the bottom lists the latest recognitions, and the QR code invites people to share one. It shows the same published recognitions and follows the same owner settings as the TV View: Quiet, Neutral, Pause arrivals, Pause rotation and Still all apply, and Quiet or Neutral clears every recognition from the world at once. Submitted names never appear.
+The page opens the way a TV should show it: the camera tours thirteen places of kindness, recognitions float in the world as pearls, a ticker along the bottom lists the latest recognitions, and the QR code invites people to share one. It shows the same published recognitions and follows the same owner settings as the TV View: Quiet, Neutral, Pause arrivals, Pause rotation and Still all apply, and Quiet or Neutral clears every recognition from the world at once. With Still, the ticker is hidden, because a ticker that cannot move would cut messages off at the edge of the screen; the pearls still show every word. Submitted names never appear.
 
 Useful addresses:
 
 | Address | What it shows |
 | --- | --- |
 | [/world](https://mothers-love.vercel.app/world) | The TV tour with live recognitions |
-| [/world?source=sample](https://mothers-love.vercel.app/world?source=sample) | The same tour with fictional sample recognitions, marked Fictional sample |
+| [/world?source=sample](https://mothers-love.vercel.app/world?source=sample) | The same tour with fictional sample recognitions, labelled Sample recognitions and Fictional sample |
 | [/world?view=explore](https://mothers-love.vercel.app/world?view=explore) | The explorer: the world map, Read recognitions, Hold this recognition, Fullscreen and **Settings** |
 | [/world?art=cinematic](https://mothers-love.vercel.app/world?art=cinematic) or [/world?art=classic](https://mothers-love.vercel.app/world?art=classic) | The two earlier looks, kept as fallbacks |
 

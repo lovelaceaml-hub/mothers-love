@@ -15,7 +15,11 @@ const TICKER_SPEED = 70;
  * recognition, and the glass ticker along the whole bottom of the screen.
  *
  * Every personal word here comes from the same records the TV View shows; nothing renders
- * unless the feed is safe, and the ticker empties with it.
+ * unless the feed is safe, and the ticker empties with it. Fictional sample content is never
+ * labelled live: it reads "Sample recognitions" with no live dot (Plan 28 Section 8).
+ *
+ * In still or reduced motion the ticker is left out: a row that cannot move would cut every
+ * message past the screen's edge, and no message is ever clipped. The bubbles keep every word.
  */
 export function WorldTvOverlay({
   zone,
@@ -49,20 +53,20 @@ export function WorldTvOverlay({
           </div>
         </div>
         <div className={styles.live}>
-          <span className={styles.liveDot} aria-hidden="true" />
-          Live recognitions
+          {!sample && <span className={styles.liveDot} aria-hidden="true" />}
+          {sample ? "Sample recognitions" : "Live recognitions"}
           {sample && <small>Fictional sample</small>}
         </div>
       </header>
       <div className={styles.share}>
         <TrustedQR url="https://mothers-love.vercel.app/recognize" label="Share a recognition" />
       </div>
-      {safe && <Ticker records={records} fresh={fresh} reduced={reduced} />}
+      {safe && !reduced && <Ticker records={records} fresh={fresh} sample={sample} />}
     </>
   );
 }
 
-function Ticker({ records, fresh, reduced }: { records: readonly Recognition[]; fresh: readonly string[]; reduced: boolean }) {
+function Ticker({ records, fresh, sample }: { records: readonly Recognition[]; fresh: readonly string[]; sample: boolean }) {
   // Newest first; the latest arrivals lead, newest of them first, and carry a "New" mark.
   const items = useMemo(() => {
     const all = tickerItems(records);
@@ -95,15 +99,15 @@ function Ticker({ records, fresh, reduced }: { records: readonly Recognition[]; 
       </span>
     ));
   return (
-    <section className={styles.ticker} aria-label="Live recognitions">
+    <section className={styles.ticker} aria-label={sample ? "Sample recognitions" : "Live recognitions"}>
       <div
         key={leadKey}
         ref={track}
-        className={`${styles.track} ${reduced ? styles.still : ""}`}
+        className={styles.track}
         style={{ animationDuration: `${duration}s` }}
       >
         {row(0)}
-        {!reduced && row(1)}
+        {row(1)}
       </div>
     </section>
   );

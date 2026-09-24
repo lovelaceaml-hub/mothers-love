@@ -166,10 +166,6 @@
   animation: ticker linear infinite;
   will-change: transform;
 }
-.track.still {
-  animation: none;
-  padding-left: 3vw;
-}
 @keyframes ticker {
   to {
     transform: translateX(-50%);

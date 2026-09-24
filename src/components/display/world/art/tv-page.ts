@@ -62,6 +62,13 @@ export function worldHoldSeconds(message: string) {
   return hold;
 }
 
+/** The cache holds message text, so an unsafe feed, a source switch and disposal empty it. */
+export function forgetWorldHolds() {
+  holdCache.clear();
+}
+/** Whether the hold cache still holds a message, for the privacy tests. */
+export const worldHoldKept = (message: string) => holdCache.has(message);
+
 /**
  * One tour loop, in seconds, for the hold at each place: the camera director's 18 s travel
  * and 20 s dwell both run at the tour speed, and a place is left only once its hold is done.

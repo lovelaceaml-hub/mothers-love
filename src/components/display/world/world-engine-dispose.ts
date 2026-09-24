@@ -1,5 +1,6 @@
 /** The engine's lifecycle edges: a lost context, a hidden page, and disposal. WorldEngine calls these with itself as `this`. */
 import type { WorldEngine } from "./world-engine";
+import { forgetMessageMeasures } from "./world-engine-reading";
 
 export function engineContextLost(this: WorldEngine, event: Event) {
   event.preventDefault();
@@ -27,6 +28,7 @@ export function disposeEngine(this: WorldEngine) {
   this.hosts?.dispose();
   this.world.dispose();
   this.bubbles.dispose();
+  forgetMessageMeasures();
   // After the world: its placements share the kit's geometry, and the kit ends the decoder.
   this.kit?.dispose();
   this.environment.dispose();

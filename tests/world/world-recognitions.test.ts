@@ -77,6 +77,21 @@ describe("recognition objects in the environment", () => {
     expect(lines.join("")).toBe(text);
     expect(lines.some((line) => line.includes("👨‍👩‍👧‍👦"))).toBe(true);
   });
+  it("retains right to left and mixed direction text when wrapping (Plan 24 P7)", () => {
+    // Fictional words only: "a good neighbour" and "thank you for your kindness" in Hebrew
+    // and Arabic, and an English line that carries both.
+    const count = (value: string) =>
+      [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(value)].length;
+    for (const text of [
+      "שכנה טובה, תודה רבה על החסד שלך",
+      "جار طيب، شكرا لك على لطفك",
+      "Thank you, שכנה טובה, for 3 warm meals and جار طيب too",
+    ]) {
+      const lines = wrapBubbleText(count, text, 12);
+      expect(lines.length).toBeGreaterThan(1);
+      expect(lines.join("")).toBe(text);
+    }
+  });
   it("keeps world anchors while camera perspective moves, with depth-tested geometry", () => {
     const { bubbles, camera, input } = setup();
     bubbles.update(input);

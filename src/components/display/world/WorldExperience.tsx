@@ -201,9 +201,13 @@ export function WorldExperience({
               ? "The live view will return after the connection is verified."
               : "The world is resting. Thank you for sharing kindness."}
           </p>
-          <button onClick={() => setSource("sample")}>
-            Explore the sample world
-          </button>
+          {/* Never on the TV page: it has no Settings, so a tap would leave a live TV on
+              fictional content until someone reloads it (Plan 28 Section 8). */}
+          {!tvPage && (
+            <button onClick={() => setSource("sample")}>
+              Explore the sample world
+            </button>
+          )}
         </section>
       )}
       {renderReadingOverlay(world)}
