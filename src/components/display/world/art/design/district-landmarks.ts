@@ -6,7 +6,11 @@ import type { DesignKitDistrict } from "../design-world-types";
 import type { DesignBuilders } from "./builders";
 
 /** Each smaller district's own procedural landmark. */
-export function designDistrictLandmarks({ material, mesh, geometry, gold, ring, ivory, petal, rose, cylinder }: DesignWorldBase, { districtRoots, districts, waterfall, arch, archRecord }: Pick<DesignBuilders, "waterfall" | "arch" | "archRecord"> & { districtRoots: Map<ZoneId, T.Group>; districts: Map<ZoneId, DesignKitDistrict> }) {
+export function designDistrictLandmarks({
+  material, mesh, geometry, gold, ring, ivory, petal, rose, cylinder,
+}: DesignWorldBase, {
+  districtRoots, districts, waterfall, arch, archRecord,
+}: Pick<DesignBuilders, "waterfall" | "arch" | "archRecord"> & { districtRoots: Map<ZoneId, T.Group>; districts: Map<ZoneId, DesignKitDistrict> }) {
   // Distinct distant landmarks keep every destination legible throughout a continuous tour.
   // Every piece is also recorded on its district, so a kit builder can replace it in place.
   for (const zone of ZONES.slice(3)) {

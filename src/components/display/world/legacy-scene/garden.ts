@@ -3,7 +3,9 @@ import { ZONES } from "../world-data";
 import type { LegacySceneKit } from "./scene-kit";
 
 /** The island platforms, and the Garden: its flowers, recognition pearls and arches. */
-export function legacyGarden({ scene, mesh, pearl, gold, mint, mat, geometries, random, materials, orb }: LegacySceneKit) {
+export function legacyGarden({
+  scene, mesh, pearl, gold, mint, mat, geometries, random, materials, orb,
+}: LegacySceneKit) {
   function platform(index: number, radius: number) {
     const group = new THREE.Group();
     group.position.fromArray(ZONES[index].center);

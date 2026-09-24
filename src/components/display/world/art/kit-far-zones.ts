@@ -68,7 +68,10 @@ export function applyKitFarZones(context: DesignKitContext): KitBuilderHandle | 
   const stats: Record<string, { placed: number; skipped: string[]; instanced: number; animated: number; statics: number }> = {};
   const dummy = new T.Object3D(), at = new T.Vector3(), spin = new T.Euler();
 
-  const { instancedMesh, stamp, scaleOf, placeStatic, placeAnimated, placePiece, removeLandmark, replaceArchRow } = farZonePieces(context, at);
+  const {
+    instancedMesh, stamp, scaleOf, placeStatic, placeAnimated, placePiece, removeLandmark,
+    replaceArchRow,
+  } = farZonePieces(context, at);
 
   const selected = () => (typeof scene.userData.studyExpression === "number" ? (scene.userData.studyExpression as number) : -1);
   const insights = (): Insights => (scene.userData.studyInsights && typeof scene.userData.studyInsights === "object" ? (scene.userData.studyInsights as Insights) : {});

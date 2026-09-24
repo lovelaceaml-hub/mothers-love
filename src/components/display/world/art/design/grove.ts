@@ -4,7 +4,12 @@ import type { DesignWorldBase } from "./base";
 import type { ZoneId } from "../../world-data";
 
 /** The Grove of expressions: nine columns carrying the canonical icons. */
-export function designGrove({ geometry, bead, material, instance, gold, mesh, cylinder, ivory, ring, texture, tint, motions, stamp }: DesignWorldBase, { districtRoots, invalidate }: { districtRoots: Map<ZoneId, T.Group>; invalidate: () => void }) {
+export function designGrove({
+  geometry, bead, material, instance, gold, mesh, cylinder, ivory, ring, texture, tint, motions,
+  stamp,
+}: DesignWorldBase, {
+  districtRoots, invalidate,
+}: { districtRoots: Map<ZoneId, T.Group>; invalidate: () => void }) {
   // Canonical expression artwork remains recognizable and retains its original meaning.
   //
   // Section 8: the nine surrounds become one instanced draw and the nine gold rims another,

@@ -3,7 +3,11 @@ import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import type { LegacySceneKit } from "./scene-kit";
 
 /** The Sanctuary: its terraces, the heart and its light, the silk ribbons and the columns. */
-export function legacySanctuary({ mesh, pearl, pink, materials, orb, gold }: LegacySceneKit, { platform }: { platform: (index: number, radius: number) => THREE.Group }) {
+export function legacySanctuary({
+  mesh, pearl, pink, materials, orb, gold,
+}: LegacySceneKit, {
+  platform,
+}: { platform: (index: number, radius: number) => THREE.Group }) {
   const sanctuary = platform(1, 17);
   for (let i = 0; i < 3; i++)
     mesh(

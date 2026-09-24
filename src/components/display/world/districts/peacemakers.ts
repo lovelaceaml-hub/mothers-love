@@ -1,7 +1,9 @@
 import * as T from "three";
 import type { HeavenlyDistrictKit } from "./district-kit";
 
-export function peacemakersDistrict({ island, orb, glass, mesh, gold, ring, random, leaf, tube, glow, animated }: HeavenlyDistrictKit) {
+export function peacemakersDistrict({
+  island, orb, glass, mesh, gold, ring, random, leaf, tube, glow, animated,
+}: HeavenlyDistrictKit) {
   // Globe: luminous meridians and abstract land constellations. Not a geographic map.
   const globe = island("peacemakers", 16),
     earth = new T.Group();

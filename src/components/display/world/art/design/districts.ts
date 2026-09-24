@@ -6,7 +6,12 @@ import type { DesignWorldBase } from "./base";
 import type { DesignBuilders } from "./builders";
 
 /** The thirteen district islands: keel, terraces, arch row, beds, trees, flowers and falls. */
-export function designDistricts({ scene, mesh, stone, geometry, ivory, edge, ring, instance, cottonSphere, cotton, lawn, midPetal, leaf, stamp, finish }: DesignWorldBase, { islandShape, archRecord, arch, tree, flowers, waterfall }: Pick<DesignBuilders, "islandShape" | "archRecord" | "arch" | "tree" | "flowers" | "waterfall">) {
+export function designDistricts({
+  scene, mesh, stone, geometry, ivory, edge, ring, instance, cottonSphere, cotton, lawn, midPetal,
+  leaf, stamp, finish,
+}: DesignWorldBase, {
+  islandShape, archRecord, arch, tree, flowers, waterfall,
+}: Pick<DesignBuilders, "islandShape" | "archRecord" | "arch" | "tree" | "flowers" | "waterfall">) {
   const districtRoots = new Map<ZoneId, T.Group>();
   const districts = new Map<ZoneId, DesignKitDistrict>();
   ZONES.forEach((zone, i) => {

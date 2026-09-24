@@ -5,7 +5,11 @@ import type { DesignKitDistrict } from "../design-world-types";
 import type { DesignBuilders } from "./builders";
 
 /** The miniature figures in the three large districts. */
-export function designFigures({ material, geometry, mesh, bead, cylinder }: DesignWorldBase, { contact, districtRoots, districts }: Pick<DesignBuilders, "contact"> & { districtRoots: Map<ZoneId, T.Group>; districts: Map<ZoneId, DesignKitDistrict> }) {
+export function designFigures({
+  material, geometry, mesh, bead, cylinder,
+}: DesignWorldBase, {
+  contact, districtRoots, districts,
+}: Pick<DesignBuilders, "contact"> & { districtRoots: Map<ZoneId, T.Group>; districts: Map<ZoneId, DesignKitDistrict> }) {
   // A few quiet, miniature figures provide scale without covering the scenery with labels.
   //
   // Section 8: one skin, one hair, one dress per colour and one body lathe, shared by every

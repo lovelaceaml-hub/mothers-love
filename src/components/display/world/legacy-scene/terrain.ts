@@ -3,7 +3,9 @@ import { ZONES } from "../world-data";
 import type { LegacySceneKit } from "./scene-kit";
 
 /** The ground, the soft hills, the pearl waterway and the paths between the three islands. */
-export function legacyTerrain({ mesh, ground, scene, orb, mint, random, materials, pearl, gold }: LegacySceneKit) {
+export function legacyTerrain({
+  mesh, ground, scene, orb, mint, random, materials, pearl, gold,
+}: LegacySceneKit) {
   mesh(new THREE.CircleGeometry(235, 96), ground, scene, 0, -0.7).rotation.x =
     -Math.PI / 2;
   // Shared world terrain: soft hills behind a broad pearl waterway.

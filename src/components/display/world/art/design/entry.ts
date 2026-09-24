@@ -6,7 +6,12 @@ import { studyTerrace } from "../study-geometry";
 import type { DesignWorldBase } from "./base";
 
 /** The arrival stage on the entry platform and its three studies. */
-export function designEntry({ scene, mesh, geometry, ivory, ring, petalGeometry, material, texture, instance, gold, farPetal, pollen, time }: DesignWorldBase, { kit }: { kit: WorldKit | undefined }) {
+export function designEntry({
+  scene, mesh, geometry, ivory, ring, petalGeometry, material, texture, instance, gold, farPetal,
+  pollen, time,
+}: DesignWorldBase, {
+  kit,
+}: { kit: WorldKit | undefined }) {
   // Arrival forms share the existing director phases and complete reading interval.
   const entry = new T.Group(); entry.name="Design study arrival stage";entry.position.set(4.138,.6,19.104);scene.add(entry);
   mesh(entry,geometry(studyTerrace(10.8,11,.65)),ivory);ring(entry,10.2,.35,.03);ring(entry,9.9,.36,.009);

@@ -57,7 +57,10 @@ export function legacySceneKit() {
     parent.add(o);
     return o;
   };
-  return { scene, sun, rim, materials, geometries, textures, random, mat, pearl, gold, mint, pink, ground, mesh, sphere, orb };
+  return {
+    scene, sun, rim, materials, geometries, textures, random, mat, pearl, gold, mint, pink,
+    ground, mesh, sphere, orb,
+  };
 }
 
 /** What every part of the classic scene receives. */

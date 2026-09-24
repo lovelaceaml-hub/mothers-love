@@ -75,7 +75,10 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
   const states: DistrictState[] = [];
   const stats: Record<string, ZoneStats> = {};
   const effects = { sparkles: true, trails: true };
-  const { place, instancedMesh, bakeStatic, bakedInstancedPiece, clusteredCopy, butterflySwarm, clustered, cellOf } = kitLayoutPieces(context, materials, updates);
+  const {
+    place, instancedMesh, bakeStatic, bakedInstancedPiece, clusteredCopy, butterflySwarm,
+    clustered, cellOf,
+  } = kitLayoutPieces(context, materials, updates);
   const triangles = (geometry: T.BufferGeometry, instances = 1) => ((geometry.index ? geometry.index.count : geometry.getAttribute("position").count) / 3) * instances;
   const selected = () => (typeof scene.userData.studyExpression === "number" ? (scene.userData.studyExpression as number) : -1);
   const invalidate = () => scene.userData.invalidate?.();

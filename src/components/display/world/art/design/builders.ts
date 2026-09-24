@@ -6,7 +6,10 @@ import type { DesignKitArch, Crowns } from "../design-world-types";
 import type { DesignWorldBase } from "./base";
 
 /** The shared builders: contact shadows, flower beds, cotton trees, lantern arches, island keels and waterfalls. */
-export function designBuilders({ texture, material, geometry, mesh, instance, midPetal, bloom, pollen, gold, cylinder, leaf, stamp, finish, tube, roseGold, ivory, edge, time }: DesignWorldBase) {
+export function designBuilders({
+  texture, material, geometry, mesh, instance, midPetal, bloom, pollen, gold, cylinder, leaf,
+  stamp, finish, tube, roseGold, ivory, edge, time,
+}: DesignWorldBase) {
   const shadowCanvas = document.createElement("canvas"); shadowCanvas.width = shadowCanvas.height = 128;
   const sc = shadowCanvas.getContext("2d")!, sg = sc.createRadialGradient(64, 64, 0, 64, 64, 64);
   sg.addColorStop(0, "#65566460"); sg.addColorStop(.45, "#75697424"); sg.addColorStop(1, "#75697400"); sc.fillStyle = sg; sc.fillRect(0, 0, 128, 128);
@@ -114,7 +117,10 @@ export function designBuilders({ texture, material, geometry, mesh, instance, mi
   function archRecord(root: T.Group, width: number, height: number): DesignKitArch {
     return { root, parent: root.parent!, width, height, crown: archCrowns.find(crown => crown.root === root) ?? null };
   }
-  return { shadowCanvas, shadow, contact, flowers, tree, archCrowns, arch, islandShape, islandShapeFar, falls, fall, waterfall, archRecord };
+  return {
+    shadowCanvas, shadow, contact, flowers, tree, archCrowns, arch, islandShape, islandShapeFar,
+    falls, fall, waterfall, archRecord,
+  };
 }
 
 /** The shared builders every later part of the design world may use. */

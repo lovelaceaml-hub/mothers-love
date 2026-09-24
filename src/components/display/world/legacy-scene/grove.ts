@@ -3,7 +3,11 @@ import { WORLD_EXPRESSIONS, ZONES } from "../world-data";
 import type { LegacySceneKit } from "./scene-kit";
 
 /** The Grove: the nine expression monuments and their reading anchors. */
-export function legacyGrove({ mesh, gold, pearl, mat, orb, textures, materials, mint }: LegacySceneKit, { platform }: { platform: (index: number, radius: number) => THREE.Group }) {
+export function legacyGrove({
+  mesh, gold, pearl, mat, orb, textures, materials, mint,
+}: LegacySceneKit, {
+  platform,
+}: { platform: (index: number, radius: number) => THREE.Group }) {
   const grove = platform(2, 18),
     anchors: THREE.Vector3[] = [];
   WORLD_EXPRESSIONS.forEach((expression, i) => {

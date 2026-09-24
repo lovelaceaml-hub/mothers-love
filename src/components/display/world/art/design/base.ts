@@ -136,7 +136,12 @@ export function designWorldBase(kit?: WorldKit) {
       out.name = `${group.name} merged ${source.name || source.type}`;
     }
   }
-  return { scene, tv, sceneFog, geometries, materials, textures, instances, motions, time, geometry, material, texture, ivory, edge, gold, roseGold, rose, leaf, lawn, stone, bloom, cylinder, bead, pollen, petalGeometry, petal, midPetal, farPetal, cottonSphere, cotton, dummy, tint, mesh, tube, ring, instance, stamp, finish, batch };
+  return {
+    scene, tv, sceneFog, geometries, materials, textures, instances, motions, time, geometry,
+    material, texture, ivory, edge, gold, roseGold, rose, leaf, lawn, stone, bloom, cylinder,
+    bead, pollen, petalGeometry, petal, midPetal, farPetal, cottonSphere, cotton, dummy, tint,
+    mesh, tube, ring, instance, stamp, finish, batch,
+  };
 }
 
 /** What every part of the design world receives. */

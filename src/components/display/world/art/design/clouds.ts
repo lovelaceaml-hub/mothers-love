@@ -5,7 +5,11 @@ import type { DesignWorldBase } from "./base";
 import type { WorldKit } from "../../kit/kit-loader";
 
 /** The horizon cloud ring and the island collars. */
-export function designClouds({ texture, time, tv, geometry, material, instances, scene }: DesignWorldBase, { kit }: { kit: WorldKit | undefined }) {
+export function designClouds({
+  texture, time, tv, geometry, material, instances, scene,
+}: DesignWorldBase, {
+  kit,
+}: { kit: WorldKit | undefined }) {
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.
   const landmarkLayout = studyLandmarkLayout();

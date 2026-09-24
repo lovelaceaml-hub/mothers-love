@@ -111,7 +111,10 @@ export function heavenlyDistrictKit(scene: T.Scene) {
     ring(group, radius - 0.3, 0.6);
     return group;
   }
-  return { root, random, animated, pearl, gold, leaf, rose, glow, glass, sphere, mesh, orb, ring, tube, island, scene };
+  return {
+    root, random, animated, pearl, gold, leaf, rose, glow, glass, sphere, mesh, orb, ring, tube,
+    island, scene,
+  };
 }
 
 /** The one district type every classic district module receives. */

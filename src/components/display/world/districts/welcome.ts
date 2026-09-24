@@ -1,7 +1,9 @@
 import * as T from "three";
 import type { HeavenlyDistrictKit } from "./district-kit";
 
-export function welcomeDistrict({ island, mesh, gold, pearl, random, orb, rose, animated }: HeavenlyDistrictKit) {
+export function welcomeDistrict({
+  island, mesh, gold, pearl, random, orb, rose, animated,
+}: HeavenlyDistrictKit) {
   // Welcome: layered pearl arch with petal-shaped butterfly forms.
   const welcome = island("welcome", 17);
   for (let n = 0; n < 3; n++) {

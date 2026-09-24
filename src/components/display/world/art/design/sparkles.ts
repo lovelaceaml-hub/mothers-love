@@ -5,7 +5,11 @@ import { STUDY_TV_SPECKS } from "../study-glory";
 import type { DesignWorldBase } from "./base";
 
 /** The sparkle field and the heart's glory: its halo and orbiting sparkles. */
-export function designSparkles({ geometry, texture, material, time, tv, scene, motions, rose, gold }: DesignWorldBase, { heartRoot, sanctuary }: { heartRoot: T.Group; sanctuary: T.Group }) {
+export function designSparkles({
+  geometry, texture, material, time, tv, scene, motions, rose, gold,
+}: DesignWorldBase, {
+  heartRoot, sanctuary,
+}: { heartRoot: T.Group; sanctuary: T.Group }) {
   // Soft glowing dots that breathe, in place of the old solid firefly cubes.
   const sparkleCount=140,sparklePlaces=new Float32Array(sparkleCount*3),sparklePhase=new Float32Array(sparkleCount);
   const rand=seededRandom(455);

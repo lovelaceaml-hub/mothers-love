@@ -24,7 +24,10 @@ export function kitLayoutPieces(context: DesignKitContext, materials: ReturnType
     const cell = KIT_CLUSTER_CELL[id] ?? 0.04;
     return lod === "near" ? cell : cell * KIT_FAR_CELL_FACTOR;
   };
-  return { place, instancedMesh, bakeStatic, bakedInstancedPiece, clusteredCopy, butterflySwarm, clustered, cellOf };
+  return {
+    place, instancedMesh, bakeStatic, bakedInstancedPiece, clusteredCopy, butterflySwarm,
+    clustered, cellOf,
+  };
 
   /** A placed clone: position, yaw and scale from the table. */
   function place(node: T.Object3D, placement: KitPlacement) {

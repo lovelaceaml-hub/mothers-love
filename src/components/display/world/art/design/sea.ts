@@ -4,7 +4,10 @@ import { STUDY_SEA, STUDY_SUN, STUDY_TV_SEA_SCALE } from "../study-palette";
 import type { DesignWorldBase } from "./base";
 
 /** The sea and its water material. */
-export function designSea({ material, time, ivory, edge, gold, stone, lawn, leaf, rose, roseGold, bloom, mesh, scene, geometry, tv }: DesignWorldBase) {
+export function designSea({
+  material, time, ivory, edge, gold, stone, lawn, leaf, rose, roseGold, bloom, mesh, scene,
+  geometry, tv,
+}: DesignWorldBase) {
   // Turquoise, glossier, with a second high frequency ripple and a tight sun glitter path.
   // Verified against three 0.180 meshphysical: at `#include <lights_fragment_end>` the shader
   // carries `reflectedLight`, the perturbed view space `normal` and `vViewPosition`, and the

@@ -34,7 +34,10 @@ export type {
 /** An opt-in visual study on the real world engine, camera, data fixture and clock. */
 export function createDesignWorld(kit?: WorldKit): WorldScene {
   const base = designWorldBase(kit);
-  const { scene, tv, geometries, materials, textures, instances, motions, time, geometry, material, ivory, gold, rose, stone, farPetal, mesh, ring, batch } = base;
+  const {
+    scene, tv, geometries, materials, textures, instances, motions, time, geometry, material,
+    ivory, gold, rose, stone, farPetal, mesh, ring, batch,
+  } = base;
   let disposed = false, sparkles = true, trails = true;
   const invalidate = () => { if (!disposed) scene.userData.invalidate?.(); };
 
@@ -43,9 +46,14 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
 
   const { landmarkLayout, corridorSites, clouds } = designClouds(base, { kit });
 
-  const { shadowCanvas, shadow, contact, flowers, tree, archCrowns, arch, islandShape, islandShapeFar, falls, fall, waterfall, archRecord } = designBuilders(base);
+  const {
+    shadowCanvas, shadow, contact, flowers, tree, archCrowns, arch, islandShape, islandShapeFar,
+    falls, fall, waterfall, archRecord,
+  } = designBuilders(base);
 
-  const { districtRoots, districts } = designDistricts(base, { islandShape, archRecord, arch, tree, flowers, waterfall });
+  const {
+    districtRoots, districts,
+  } = designDistricts(base, { islandShape, archRecord, arch, tree, flowers, waterfall });
 
   const { railSamples, bridges } = designBridges(base);
 
@@ -101,9 +109,13 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
 
   designFigures(base, { contact, districtRoots, districts });
 
-  const { sparkleCount, sparkleGeometry, sparkleDot, sparkleField, heartSparkles } = designSparkles(base, { heartRoot, sanctuary });
+  const {
+    sparkleCount, sparkleGeometry, sparkleDot, sparkleField, heartSparkles,
+  } = designSparkles(base, { heartRoot, sanctuary });
 
-  const { kitHandles } = designKitDressing(base, { kit, arch, contact, waterfall, falls, districts, water, silkMat, shadow, fall, archCrowns, bridges, entry, landmarks, grove, groveSites, sanctuary, arcade, arcadeArches, heartRoot, sparkleDot });
+  const {
+    kitHandles,
+  } = designKitDressing(base, { kit, arch, contact, waterfall, falls, districts, water, silkMat, shadow, fall, archCrowns, bridges, entry, landmarks, grove, groveSites, sanctuary, arcade, arcadeArches, heartRoot, sparkleDot });
 
   // Section 7: the 31 waterfall planes become one mesh. Their world transforms are baked in,
   // and the shader reads only uv, so nothing moves. The material writes no depth, so losing

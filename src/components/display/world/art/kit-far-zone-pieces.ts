@@ -234,5 +234,8 @@ export function farZonePieces(context: DesignKitContext, at: T.Vector3) {
     return k;
   }
 
-  return { instancedMesh, stamp, scaleOf, placeStatic, placeAnimated, placePiece, removeLandmark, replaceArchRow };
+  return {
+    instancedMesh, stamp, scaleOf, placeStatic, placeAnimated, placePiece, removeLandmark,
+    replaceArchRow,
+  };
 }
