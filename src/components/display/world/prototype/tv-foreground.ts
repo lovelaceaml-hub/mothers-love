@@ -88,14 +88,20 @@ export function applyTvForeground(context: DesignKitContext): KitBuilderHandle |
       return {
         x: Math.cos(angle) * (R + 1.5), z: -Math.sin(angle) * (R + 1.5),
         y: 3 + random() * 5, phase: random() * Math.PI * 2, scale: 0.8 + random() * 0.6, tilt: (random() - 0.5) * 1.2,
+        // Built once, so the per frame pose allocates nothing.
+        pearl: [0, 0, 0], ring: [0, 0, 0],
       };
+    });
+    pearlSites.forEach((site) => {
+      site.pearl.fill(site.scale * pearlSize);
+      site.ring.fill(site.scale);
     });
     const place3 = new T.Vector3(), euler = new T.Euler();
     const pose = (time: number) => {
       pearlSites.forEach((site, i) => {
         place3.set(site.x, site.y + Math.sin(time * 0.5 + site.phase) * 0.45, site.z);
-        context.stamp(pearls, i, place3, [site.scale * pearlSize, site.scale * pearlSize, site.scale * pearlSize], euler.set(0, 0, 0));
-        context.stamp(rings, i, place3, [site.scale, site.scale, site.scale], euler.set(1.2 + site.tilt, time * 0.2 + site.phase, site.tilt));
+        context.stamp(pearls, i, place3, site.pearl, euler.set(0, 0, 0));
+        context.stamp(rings, i, place3, site.ring, euler.set(1.2 + site.tilt, time * 0.2 + site.phase, site.tilt));
       });
       pearls.instanceMatrix.needsUpdate = true;
       rings.instanceMatrix.needsUpdate = true;
@@ -110,14 +116,16 @@ export function applyTvForeground(context: DesignKitContext): KitBuilderHandle |
       // ever drifts across the words being read.
       radius: 3 + random() * (R - 1), angle: 0.15 * Math.PI + random() * 0.7 * Math.PI, top: 6 + random() * 10,
       speed: 0.25 + random() * 0.35, spin: random() * 6, size: 0.2 + random() * 0.16, color: PETAL_COLORS[i % PETAL_COLORS.length],
+      scale: [0, 0, 0],
     }));
+    petalSites.forEach((site) => site.scale.fill(site.size));
     petalSites.forEach((site, i) => petals.setColorAt(i, new T.Color(site.color)));
     const drift = (time: number) => {
       petalSites.forEach((site, i) => {
         const fall = (time * site.speed + site.spin) % site.top;
         const a = site.angle + Math.sin(time * 0.05 + site.spin) * 0.25;
         place3.set(Math.cos(a) * site.radius, site.top + 0.8 - fall, -Math.sin(a) * site.radius);
-        context.stamp(petals, i, place3, [site.size, site.size, site.size], euler.set(time * 0.7 + site.spin, time * 0.5 + i, site.spin));
+        context.stamp(petals, i, place3, site.scale, euler.set(time * 0.7 + site.spin, time * 0.5 + i, site.spin));
       });
       petals.instanceMatrix.needsUpdate = true;
     };

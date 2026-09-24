@@ -296,26 +296,31 @@ export function WorldExperience({
     arrival.waveSize > 1 ? ` · ${arrival.waveIndex} of ${arrival.waveSize}` : ""
   }`;
   // TV page (step 7): the TV View's chimes, import only. Browsers need one gesture first.
+  // One hook per kind, since each remembers only its own last key: the weekly goal chimes once,
+  // however many arrivals chime around it.
   const goal = feed.snapshot?.insights.goal;
-  const chimes = useDisplayChimes(
-    tvPage && safe ? feed.snapshot?.settings.sound : undefined,
-    arrival.phase === "approach" && arrival.id
-      ? { key: `arrival:${arrival.id}`, kind: "arrival" }
-      : goal?.achieved
-        ? { key: `goal:${goal.weekStart}`, kind: "milestone" }
-        : null,
+  const sound = tvPage && safe ? feed.snapshot?.settings.sound : undefined;
+  const arrivalChime = useDisplayChimes(
+    sound,
+    arrival.phase === "approach" && arrival.id ? { key: `arrival:${arrival.id}`, kind: "arrival" } : null,
   );
-  const enableChimes = chimes.enable;
+  const goalChime = useDisplayChimes(
+    sound,
+    goal?.achieved ? { key: `goal:${goal.weekStart}`, kind: "milestone" } : null,
+  );
+  const enableArrival = arrivalChime.enable, enableGoal = goalChime.enable;
+  const freshKey = (status.tvArrivals ?? []).join(",");
+  const fresh = useMemo(() => (freshKey ? freshKey.split(",") : []), [freshKey]);
   useEffect(() => {
     if (!tvPage) return;
-    const once = () => enableChimes();
+    const once = () => { enableArrival(); enableGoal(); };
     window.addEventListener("pointerdown", once, { once: true });
     window.addEventListener("keydown", once, { once: true });
     return () => {
       window.removeEventListener("pointerdown", once);
       window.removeEventListener("keydown", once);
     };
-  }, [tvPage, enableChimes]);
+  }, [tvPage, enableArrival, enableGoal]);
   return (
     <main
       ref={root}
@@ -395,7 +400,7 @@ export function WorldExperience({
           safe={safe}
           sample={source === "sample"}
           records={feed.records}
-          fresh={status.tvArrivals ?? []}
+          fresh={fresh}
           reduced={reduced || still || ownerStill}
         />
       )}

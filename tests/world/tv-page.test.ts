@@ -153,6 +153,22 @@ describe("arrival pacing", () => {
     pacer.placeCompleted();
     expect(pacer.next(600)).not.toBeNull();
   });
+  it("keeps the 60 s spacing across a reconnect", () => {
+    const pacer = new ArrivalPacer();
+    pacer.offer(ids(records(3)));
+    expect(pacer.next(0)).not.toBeNull();
+    pacer.clear();
+    pacer.offer(ids(records(3)).slice(1));
+    expect(pacer.next(30)).toBeNull();
+    expect(pacer.next(60)).not.toBeNull();
+  });
+  it("ends the streak after two quiet minutes while rotation is paused", () => {
+    const pacer = new ArrivalPacer();
+    pacer.offer(ids(records(5)));
+    for (const at of [0, 60, 120]) expect(pacer.next(at, true)).not.toBeNull();
+    expect(pacer.next(180, true)).toBeNull();
+    expect(pacer.next(240, true)).not.toBeNull();
+  });
   it("ignores a duplicate arrival event", () => {
     const pacer = new ArrivalPacer();
     const [one] = ids(records(1));

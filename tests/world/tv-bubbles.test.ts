@@ -76,13 +76,26 @@ describe("TV bubble layout in the Garden", () => {
     }
   });
 
-  it("keeps small bubble words at 22 px or more in the tour view", () => {
+  it("keeps every other bubble's words (the second big one wears the small face) at 22 px or more", () => {
     const camera = holdCamera(0);
-    for (const { spec, position, radius } of placements.filter((item) => item.spec.role === "small")) {
+    // Every role but the held one is painted with the small face.
+    expect(placements.filter((item) => item.spec.role !== "held").length).toBe(TV_PLACE_LAYOUT.length - 1);
+    for (const { spec, position, radius } of placements.filter((item) => item.spec.role !== "held")) {
       const { diameter } = onScreen(camera, position, radius);
       const smallest = Math.min(TV_SMALL.body, TV_SMALL.heart, TV_SMALL.nameMin);
       expect((smallest / TV_SMALL.canvas) * diameter, `small at ${spec.ndc}`).toBeGreaterThanOrEqual(22);
     }
+  });
+
+  it("reads the arriving bubble at 34 px or more from the arrival view", () => {
+    // world-recognitions: the arriving bubble reads at (4.138, 12, 19.104), radius 7.3 on the TV page.
+    const camera = new T.PerspectiveCamera(TV_FOV, 16 / 9, 0.1, 450);
+    camera.position.set(...ARRIVAL_VIEW.eye);
+    camera.lookAt(new T.Vector3(...ARRIVAL_VIEW.target));
+    camera.updateMatrixWorld();
+    const seen = onScreen(camera, new T.Vector3(4.138, 12, 19.104), 7.3);
+    expect((TV_BIG.body / TV_BIG.canvas) * seen.diameter).toBeGreaterThanOrEqual(34);
+    expect(Math.abs(seen.ndc.y) + seen.diameter / TV_SCREEN_HEIGHT).toBeLessThan(1.02);
   });
 
   it("keeps every Garden bubble well away from every camera eye", () => {

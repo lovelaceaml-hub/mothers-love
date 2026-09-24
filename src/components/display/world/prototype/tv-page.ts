@@ -17,7 +17,8 @@ export function studyTvPage(search?: string) {
   const query = new URLSearchParams(source);
   if (search !== undefined && !(query.getAll("art").length === 1 && query.get("art") === "design"
     && query.getAll("source").length === 1 && query.get("source") === "sample")) return false;
-  return query.get("view") === "tv";
+  // Exactly one `view`, as the server side gate in the page reads it.
+  return query.getAll("view").length === 1 && query.get("view") === "tv";
 }
 
 /** Step 8: the TV tour runs at the settings panel's fastest speed, and the panel is hidden. */
@@ -27,15 +28,27 @@ export const TV_BUBBLE_PLACES: readonly ZoneId[] = ["garden"];
 /** The TV draws from the latest 100 (AGENTS.md product invariants). */
 export const TV_RECORD_LIMIT = 100;
 
-const graphemes = (text: string) =>
-  [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)].length;
+let segmenter: Intl.Segmenter | undefined;
+const graphemes = (text: string) => {
+  segmenter ??= new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  let count = 0;
+  for (const _ of segmenter.segment(text)) count++;
+  return count;
+};
+/** The engine asks every frame, so each message is measured once (bounded, oldest out first). */
+const holdCache = new Map<string, number>();
 
 /**
  * Step 4 hold time: 12 seconds, plus 1 second for every 20 characters past 160, at most 20.
  * A character is a grapheme, so an emoji family counts once, as the TV View counts it.
  */
 export function worldHoldSeconds(message: string) {
-  return Math.min(20, 12 + Math.max(0, graphemes(message) - 160) / 20);
+  const cached = holdCache.get(message);
+  if (cached !== undefined) return cached;
+  const hold = Math.min(20, 12 + Math.max(0, graphemes(message) - 160) / 20);
+  if (holdCache.size >= 256) holdCache.delete(holdCache.keys().next().value!);
+  holdCache.set(message, hold);
+  return hold;
 }
 
 /**
@@ -144,8 +157,12 @@ export class ArrivalPacer {
   prune(eligible: ReadonlySet<string>) {
     this.queue = this.queue.filter((id) => eligible.has(id));
   }
-  /** The next arrival allowed to interrupt at `now` seconds, or null. */
-  next(now: number): string | null {
+  /**
+   * The next arrival allowed to interrupt at `now` seconds, or null. While the owner has
+   * paused rotation no place can complete, so two quiet minutes end the streak instead.
+   */
+  next(now: number, rotationPaused = false): string | null {
+    if (rotationPaused && now - this.last >= 2 * ARRIVAL_INTERVAL) this.streak = 0;
     if (!this.queue.length || now - this.last < ARRIVAL_INTERVAL || this.streak >= ARRIVAL_STREAK) return null;
     const id = this.queue.shift()!;
     this.last = now;
@@ -162,10 +179,10 @@ export class ArrivalPacer {
   placeCompleted() {
     this.streak = 0;
   }
+  /** Drops what is waiting. The last interruption's time is kept, so a reconnect cannot bring two inside 60 s. */
   clear() {
     this.queue = [];
     this.streak = 0;
-    this.last = -Infinity;
   }
   get pending(): readonly string[] {
     return this.queue;

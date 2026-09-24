@@ -24,6 +24,7 @@ import {
   planWorldBubbles,
   sampleHeartCount,
   studyTvPage,
+  worldHoldSeconds,
   type WorldBubblePlan,
 } from "./prototype/tv-page";
 import {
@@ -495,7 +496,10 @@ export class WorldRecognitionBubbles {
   /** TV page: the face once per record and canvas; big bubbles also paint their message window. */
   private paintTv(slot: Slot, record: Recognition) {
     const tv = slot.tv!, canvas = slot.canvas!, texture = slot.texture!;
-    const big = tv.role === "held" || tv.role === "second";
+    // Only the held bubble (and the arriving one) is read up close with the whole message. The
+    // second big bubble stands back, so it wears the small face, which reads at its size; its
+    // whole message shows when it takes the held place on the next loop.
+    const big = tv.role === "held";
     const heart = sampleHeartCount(record, this.tvSample);
     const key = `tv:${canvas.width}:${heart}`;
     if (slot.pageKey === key) return false;
@@ -559,9 +563,9 @@ export class WorldRecognitionBubbles {
     slot.face.material.color.set("#ffffff");
     this.effects(slot, input.time, input.sparkles, input.trails);
     tv.decor.visible = true;
-    tv.decor.update(input.time, tv.role === "held" || tv.role === "second");
-    const hold = input.hold?.(slot.record.message, input.minimum) ?? 20;
-    tv.decor.scroll(detailed && slot.record.id === input.selectedId ? tvScrollFraction(input.readingAge, hold) : 0);
+    tv.decor.update(input.time, tv.role === "held");
+    const reading = detailed && slot.record.id === input.selectedId && tv.decor.scrollable;
+    tv.decor.scroll(reading ? tvScrollFraction(input.readingAge, input.hold?.(slot.record.message, input.minimum) ?? 20) : 0);
     // The study's orbit lanes scale with the bubble; at the TV size they would cross the whole
     // view, so the TV bubbles wear the decor's own gold ring instead.
     const frame = detailed ? this.frameFor(slot, input.camera, input.sparkles) : this.plainFrame;
@@ -766,8 +770,10 @@ export class WorldRecognitionBubbles {
       if (arrivalSlot.tv) {
         arrivalSlot.tv.decor.visible = true;
         arrivalSlot.tv.decor.update(time, true);
-        const hold = input.hold?.(arrivalSlot.record.message, minimum) ?? 20;
-        arrivalSlot.tv.decor.scroll(arrival.phase === "reading" ? tvScrollFraction(arrival.age, hold) : arrival.phase === "settle" ? 1 : 0);
+        // The arriving bubble always reads by the TV rule, wherever the tour happens to be.
+        arrivalSlot.tv.decor.scroll(arrival.phase === "reading" && arrivalSlot.tv.decor.scrollable
+          ? tvScrollFraction(arrival.age, worldHoldSeconds(arrivalSlot.record.message))
+          : arrival.phase === "settle" ? 1 : 0);
       }
       this.effects(arrivalSlot, time, input.sparkles, input.trails);
       this.recede(arrivalSlot);
@@ -870,8 +876,12 @@ export class WorldRecognitionBubbles {
   /** TV page: the arriving bubble's world place and size while it shows, for the hosts. */
   arrivalBubble(): { position: T.Vector3; radius: number } | undefined {
     const slot = this.slots[this.slots.length - 1];
-    return slot?.root.visible ? { position: slot.root.position, radius: slot.radius } : undefined;
+    if (!slot?.root.visible) return undefined;
+    this.arrivalScratch.position.copy(slot.root.position);
+    this.arrivalScratch.radius = slot.radius;
+    return this.arrivalScratch;
   }
+  private readonly arrivalScratch = { position: new T.Vector3(), radius: 0 };
   inspect() {
     return {
       count: this.slots.filter((slot) => slot.root.visible).length,

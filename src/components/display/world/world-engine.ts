@@ -38,6 +38,13 @@ import type { HoldSeconds } from "./recognition-director";
 
 /** The TV page's hold rule (step 4). It sets its own floor, so the owner minimum is not read. */
 const tvHold: HoldSeconds = (message) => worldHoldSeconds(message);
+/**
+ * The TV page reads a place with the new rule only where its bubbles scroll the whole message
+ * (`TV_BUBBLE_PLACES`); every other place keeps paging by `readingSeconds` until it is converted,
+ * so no page is ever skipped.
+ */
+const placeHold = (director: CameraDirector): HoldSeconds => (message, minimum) =>
+  TV_BUBBLE_PLACES.includes(director.zone) ? worldHoldSeconds(message) : readingSeconds(message, minimum);
 /** TV page, sample mode: a fictional arrival every 90 s after the first 45, to show the pacing. */
 const SAMPLE_ARRIVAL_FIRST = 45;
 const SAMPLE_ARRIVAL_EVERY = 90;
@@ -97,7 +104,7 @@ export class WorldEngine {
   readonly renderer: THREE.WebGLRenderer;
   readonly director = new CameraDirector();
   readonly arrivals = new ArrivalDirector(studyTvPage() ? tvHold : undefined);
-  readonly recognitions = new RecognitionDirector(studyTvPage() ? tvHold : undefined);
+  readonly recognitions = new RecognitionDirector(studyTvPage() ? placeHold(this.director) : undefined);
   private feed: WorldFeed = emptyFeed();
   private readingHeld = false;
   private lastReadingZone: ZoneId = "garden";
@@ -121,7 +128,7 @@ export class WorldEngine {
   private readonly study = isWorldDesignStudy();
   /** Resolved once: the TV page (`?view=tv`) inside the study. */
   private readonly tv = studyTvPage();
-  private readonly holdFor: HoldSeconds = this.tv ? tvHold : readingSeconds;
+  private readonly holdFor: HoldSeconds = this.tv ? placeHold(this.director) : readingSeconds;
   private readonly pacer = new ArrivalPacer();
   private tvPlan?: WorldBubblePlan;
   /** How many times the tour has left each place: picks the place's held big bubble. */
@@ -407,7 +414,7 @@ export class WorldEngine {
         this.isReadingComplete(delta, minimum));
     // TV page: at most one arrival interrupts the tour per minute (step 5).
     if (this.tv && canStart && previousArrival.phase === "idle" && safe && !this.feed.snapshot?.settings.pauseArrivals) {
-      const id = this.pacer.next(this.tvClock);
+      const id = this.pacer.next(this.tvClock, this.rotationPaused);
       if (id) this.arrivals.enqueue([id]);
     }
     this.arrivalState = this.arrivals.update(
@@ -679,7 +686,8 @@ export class WorldEngine {
   private tvPacing(now: number, safe: boolean) {
     if (this.tvStart < 0) this.tvStart = now;
     this.tvClock = (now - this.tvStart) / 1000;
-    this.tvFresh = this.tvFresh.filter((item) => this.tvClock - item.at < FRESH_SECONDS);
+    if (this.tvFresh.length && this.tvClock - this.tvFresh[0].at >= FRESH_SECONDS)
+      this.tvFresh = this.tvFresh.filter((item) => this.tvClock - item.at < FRESH_SECONDS);
     if (!safe || this.feed.phase !== "sample" || this.tvClock < this.sampleArrivalAt) return;
     this.sampleArrivalAt += SAMPLE_ARRIVAL_EVERY;
     const pool = tvRecords(this.feed.records);

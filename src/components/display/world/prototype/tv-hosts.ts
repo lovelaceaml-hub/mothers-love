@@ -37,7 +37,8 @@ export type HostFrame = {
 /** Where the two hosts wait in the tour view: the bottom right corner, which the bubbles keep clear. */
 const AHEAD = { distance: 10, ndc: [[0.84, -0.74], [0.94, -0.63]] as const };
 
-type Host = { root: T.Group; body: T.Mesh; wings: T.Mesh[]; clip: HostClip; target: T.Vector3 };
+/** `base` is the glided place; the bob is added on top each frame, so it never builds up. */
+type Host = { root: T.Group; body: T.Mesh; wings: T.Mesh[]; clip: HostClip; target: T.Vector3; base: T.Vector3 };
 
 export class TvHosts {
   readonly root = new T.Group();
@@ -78,7 +79,7 @@ export class TvHosts {
       });
       root.add(mesh);
       this.root.add(root);
-      this.hosts.push({ root, body: mesh, wings, clip: "fly_idle", target: new T.Vector3() });
+      this.hosts.push({ root, body: mesh, wings, clip: "fly_idle", target: new T.Vector3(), base: new T.Vector3() });
     }
   }
   /** Test and status seam: each host's current clip. */
@@ -109,9 +110,9 @@ export class TvHosts {
       }
       // Glide toward the target; a still frame, or the first frame, lands on it.
       const ease = frame.still || !this.placed ? 1 : 1 - Math.exp(-frame.dt * 2.2);
-      host.root.position.lerp(host.target, ease);
+      host.base.lerp(host.target, ease);
       const bob = frame.still ? 0 : Math.sin(time * 2.9 + i * 1.7) * 0.06;
-      host.root.position.addScaledVector(this.up, bob);
+      host.root.position.copy(host.base).addScaledVector(this.up, bob);
       host.root.quaternion.copy(camera.quaternion);
       // Presenting: a small bow toward the bubble. Flying: wings beat.
       host.root.rotateZ(clip === "present_bubble" ? side * 0.25 : 0);

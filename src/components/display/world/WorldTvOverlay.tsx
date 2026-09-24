@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { Recognition } from "@/lib/contracts";
 import { tickerItems } from "./prototype/tv-page";
 import type { WorldZone } from "./world-data";
@@ -67,21 +67,20 @@ function Ticker({ records, fresh, reduced }: { records: readonly Recognition[]; 
     const lead = [...fresh].reverse().map((id) => all.find((item) => item.id === id)).filter((item) => item !== undefined);
     return [...lead, ...all.filter((item) => !freshSet.has(item.id))].map((item) => ({ ...item, fresh: freshSet.has(item.id) }));
   }, [records, fresh]);
-  const track = useRef<HTMLDivElement>(null);
   const [duration, setDuration] = useState(60);
-  useLayoutEffect(() => {
-    const node = track.current;
+  // A callback ref, so the observer follows the track through every remount below.
+  const observer = useRef<ResizeObserver | null>(null);
+  const track = useCallback((node: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    observer.current = null;
     if (!node) return;
     const measure = () => setDuration(Math.max(20, node.scrollWidth / 2 / TICKER_SPEED));
     measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [items]);
+    observer.current = new ResizeObserver(measure);
+    observer.current.observe(node);
+  }, []);
   // Restart the loop from the front whenever a new arrival leads, so it is seen at once.
   const leadKey = items[0]?.fresh ? items[0].id : "steady";
-  const [cycle, setCycle] = useState(0);
-  useEffect(() => setCycle((n) => n + 1), [leadKey]);
   if (!items.length) return null;
   const row = (copy: number) =>
     items.map((item) => (
@@ -95,7 +94,7 @@ function Ticker({ records, fresh, reduced }: { records: readonly Recognition[]; 
   return (
     <section className={styles.ticker} aria-label="Live recognitions">
       <div
-        key={cycle}
+        key={leadKey}
         ref={track}
         className={`${styles.track} ${reduced ? styles.still : ""}`}
         style={{ animationDuration: `${duration}s` }}

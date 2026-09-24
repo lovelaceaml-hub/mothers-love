@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function WorldPreviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ source?: string; art?: string; entrance?: string; view?: string }>;
+  searchParams: Promise<{ source?: string | string[]; art?: string | string[]; entrance?: string; view?: string | string[] }>;
 }) {
   const query = await searchParams;
   return (

@@ -83,10 +83,10 @@ async function dracoModule(): Promise<Loose> {
   // The decoder is a CommonJS script inside three's ES module package, so evaluate it as one.
   const require = createRequire(import.meta.url);
   const file = require.resolve("three/examples/jsm/libs/draco/gltf/draco_decoder.js");
-  const module = { exports: {} as Loose };
+  const commonjs = { exports: {} as Loose };
   new Function("module", "exports", "require", "__filename", "__dirname", readFileSync(file, "utf8"))(
-    module, module.exports, require, file, path.dirname(file));
-  const factory = module.exports;
+    commonjs, commonjs.exports, require, file, path.dirname(file));
+  const factory = commonjs.exports;
   return new Promise(resolve => { factory({ onModuleLoaded: (module: Loose) => resolve(module) }); });
 }
 

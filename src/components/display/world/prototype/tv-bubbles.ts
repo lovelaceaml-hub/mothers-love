@@ -216,7 +216,14 @@ export function paintTvSmallFace(canvas: HTMLCanvasElement, record: Recognition,
     if (names.length <= 2) break;
     size -= 2;
   } while (size > TV_SMALL.nameMin);
-  names = names.slice(0, 2);
+  // At the 22 px floor a long name may still need more than two lines: keep two, the second
+  // ending in an ellipsis. The whole name shows in the big bubble when the record's turn comes.
+  if (names.length > 2) {
+    c.font = serif(size);
+    let last = `${names[1]}${names.slice(2).join("")}`.trimEnd();
+    while (last && c.measureText(`${last}…`).width > 380) last = [...new Intl.Segmenter().segment(last)].slice(0, -1).map((s) => s.segment).join("").trimEnd();
+    names = [names[0], `${last}…`];
+  }
   const label = heartLabel(heart);
   const body = (() => {
     c.font = serif(TV_SMALL.body);
