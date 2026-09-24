@@ -29,7 +29,7 @@ jobs:
       - name: Start isolated sample server
         run: |
           npm run dev > /tmp/world-dev.log 2>&1 &
-          for i in $(seq 1 80); do curl -fsS http://127.0.0.1:3000/display/world-preview?source=sample >/dev/null && exit 0; sleep 3; done
+          for i in $(seq 1 80); do curl -fsS http://localhost:3000/display/world-preview?source=sample >/dev/null && exit 0; sleep 3; done
           cat /tmp/world-dev.log
           exit 1
       - run: xvfb-run -a node scripts/review-cinematic-world.mjs

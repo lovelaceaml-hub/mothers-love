@@ -19,7 +19,7 @@ page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') co
 await page.route('**/api/**', route => route.abort('blockedbyclient'));
 page.setDefaultTimeout(60000);
 try {
-  await page.goto('http://127.0.0.1:3000/display/world-preview?source=sample', { waitUntil: 'networkidle', timeout: 120000 });
+  await page.goto('http://localhost:3000/display/world-preview?source=sample', { waitUntil: 'networkidle', timeout: 120000 });
   const world = page.getByTestId('world-preview'); await world.waitFor();
   if (await world.getAttribute('data-source') !== 'sample') throw Error('Refusing to record non-sample content');
   await page.screenshot({ path: `${output}/startup.png`, fullPage: true });
@@ -38,7 +38,7 @@ try {
   await page.screenshot({ path: `${output}/phone.png`, fullPage: true });
   checks.push({ test: 'Phone document has no horizontal overflow', passed: await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth) });
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await page.goto('http://127.0.0.1:3000/display/world-preview?source=sample&art=classic', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:3000/display/world-preview?source=sample&art=classic', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.querySelector('[data-testid="world-preview"]')?.getAttribute('data-ready') === 'true');
   await page.screenshot({ path: `${output}/classic-comparison.png`, fullPage: true });
   checks.push({ test: 'Classic comparison remains available', passed: true });
