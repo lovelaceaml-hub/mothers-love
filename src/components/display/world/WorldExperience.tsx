@@ -399,6 +399,7 @@ export function WorldExperience({
         <WorldTvOverlay
           zone={zone}
           traveling={status.traveling && !arriving}
+          arriving={arriving}
           safe={safe}
           sample={source === "sample"}
           records={feed.records}

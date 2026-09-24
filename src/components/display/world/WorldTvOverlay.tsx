@@ -20,6 +20,7 @@ const TICKER_SPEED = 70;
 export function WorldTvOverlay({
   zone,
   traveling,
+  arriving,
   safe,
   sample,
   records,
@@ -28,6 +29,8 @@ export function WorldTvOverlay({
 }: {
   zone: WorldZone;
   traveling: boolean;
+  /** A new recognition is being presented at the arrival stage, away from the tour's place. */
+  arriving: boolean;
   safe: boolean;
   sample: boolean;
   records: readonly Recognition[];
@@ -41,8 +44,8 @@ export function WorldTvOverlay({
         <div className={styles.place}>
           <span className={styles.logo} aria-hidden="true">♡</span>
           <div>
-            <h1>{zone.name}</h1>
-            <p>{traveling ? "On the way" : zone.caption}</p>
+            <h1>{arriving ? "A new recognition" : zone.name}</h1>
+            <p>{arriving ? "A new light in our world" : traveling ? "On the way" : zone.caption}</p>
           </div>
         </div>
         <div className={styles.live}>

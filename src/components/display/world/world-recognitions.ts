@@ -64,6 +64,7 @@ import {
   TvFlowTurn,
   type TvFlowPose,
 } from "./prototype/tv-flow";
+import { TV_ARRIVAL_RADIUS, tvArrivalExit } from "./prototype/tv-arrival";
 
 export function wrapBubbleText(
   measure: (text: string) => number,
@@ -922,14 +923,17 @@ export class WorldRecognitionBubbles {
       // The bubble emerges out of the portal, in front of its arches and light rays.
       // This remains a fixed world path, independent of the camera position.
       const emergence = reveal * (1 - settle);
-      arrivalSlot.root.position.set(
+      // The TV page reads it at the main bubbles' size (step 4); once read, it floats up and
+      // away, dwindling, rather than sliding into the Garden's scenery (`tv-arrival.ts`).
+      let exit = 1;
+      if (this.tvPage && settle > 0) exit = tvArrivalExit(settle, arrivalSlot.root.position);
+      else arrivalSlot.root.position.set(
         4.138 * emergence + 26 * settle,
         7 + reveal * 5 - settle * 7,
         10 + 9.104 * emergence + settle * 6,
       );
-      // The TV page reads the arriving bubble at the main bubble's size (step 4).
       arrivalSlot.radius =
-        (this.tvPage ? 7.3 - settle * 3.6 : 5.4 - settle * 2.7) *
+        (this.tvPage ? TV_ARRIVAL_RADIUS * exit : 5.4 - settle * 2.7) *
         Math.max(0.08, T.MathUtils.smoothstep(reveal, 0, 1));
       arrivalSlot.root.scale.setScalar(arrivalSlot.radius);
       arrivalSlot.root.quaternion.copy(camera.quaternion);
@@ -955,7 +959,9 @@ export class WorldRecognitionBubbles {
       // protect mask, so the bloom and the light column never wash over them.
       const arrivalFrame = this.frameFor(arrivalSlot, camera, input.sparkles,
         arrival.phase === "reading" || arrival.phase === "settle");
-      if (arrivalSlot.tv) arrivalFrame.lanes = false;
+      // On the TV page its medallions ride close round its rim, as the main bubbles' do, so the
+      // lowest never slips under the ticker.
+      if (arrivalSlot.tv) { arrivalFrame.lanes = false; arrivalFrame.orbitScale = TV_MEDALLION_SCALE; }
       arrivalSlot.study?.update(time, arrivalSlot.record.expressionIds, true, arrivalFrame);
       this.focused = arrivalSlot;
       this.arrivalInWorld = true;
