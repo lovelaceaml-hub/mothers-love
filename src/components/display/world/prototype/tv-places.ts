@@ -44,9 +44,9 @@ export const zoneOf = (id: ZoneId) => ZONES.find((zone) => zone.id === id)!;
 /*
  * The reading framing (Anthony: "the camera flies close"). The camera glides from the place's
  * tour view to a framing that holds both of the place's bubbles at reading size on a 1920 by
- * 1080 screen: the main bubble on the right, its words (50 of a 1024 face) at 35.6 px, and the
- * flowing bubble on the left, its words at 22 px or more, each clear of the other, of the title,
- * the live badge, the QR card, the ticker and, at a panel place, the feature panel.
+ * 1080 screen: the main bubble on the right, its words (body 56 of a 1024 face) at 35.5 px, and
+ * the flowing bubble on the left, its words at 22 px or more, each clear of the other, of the
+ * title, the live badge, the QR card, the ticker and, at a panel place, the feature panel.
  */
 export const TV_SCREEN = { width: 1920, height: 1080 } as const;
 export const TV_READ = {
@@ -58,10 +58,17 @@ export const TV_READ = {
    * The flowing bubble's resting centre on screen and its largest diameter, px. The same at
    * every place: its rim clears the feature panel of a panel place and the main bubble's
    * expression medallions, so the two bubbles share the right two thirds of the screen and the
-   * left third keeps the title, the panel and the QR card.
+   * left third keeps the title, the panel and the QR card. At most 380 rather than 400, so
+   * wherever the breath and the bob (`TV_REST_BOB`) take it, its rim stays 14 px or more from
+   * the main bubble's medallions and from a panel place's panel.
    */
-  flow: { x: 800, y: 580, max: 400 },
+  flow: { x: 800, y: 580, max: 380 },
 } as const;
+/**
+ * A narrow screen (a phone, a portrait TV): the main bubble is centred, and smaller where it
+ * must be, so its rainbow rim (1.17 of its diameter) spans at most this share of the width.
+ */
+export const TV_NARROW_SPAN = 0.88;
 /**
  * The main bubble's expression medallions ride close round its rim on the TV page: the study
  * skin's ring (1.36 by 1.28 radii, medallions .205) at .85 of its size, on the gold orbit ring,
@@ -70,6 +77,11 @@ export const TV_READ = {
 export const TV_MEDALLION_SCALE = 0.85;
 /** The smallest diameter a flowing bubble takes on screen, px. */
 export const TV_FLOW_MIN_DIAMETER = 300;
+/**
+ * The most a resting flowing bubble rises or falls as it breathes, world units (`tvRestBob` in
+ * `tv-flow.ts`); the clearance tests hold its resting place at both ends of the bob.
+ */
+export const TV_REST_BOB = 0.13;
 
 /**
  * On arrival the whole place shows for `TV_FOCUS_DELAY` seconds, then the camera glides in over
@@ -92,6 +104,7 @@ const scratch = { back: new T.Vector3(), forward: new T.Vector3(), right: new T.
  * The reading pose for a place's main bubble, seen from the side the camera is on now
  * (`from`): the main bubble's centre at `TV_READ.across` and its diameter `TV_READ.diameter`,
  * with a gentle look down whatever the tour camera's height, so the pose never dives or climbs.
+ * A narrow screen centres the bubble and keeps its rim inside `TV_NARROW_SPAN` of the width.
  * Allocates nothing.
  */
 export function tvReadingPose(
@@ -103,7 +116,11 @@ export function tvReadingPose(
   fov = TV_FOV,
 ) {
   const tan = Math.tan((fov * Math.PI) / 360);
-  const depth = (radius * TV_SCREEN.height) / (TV_READ.diameter * tan);
+  const narrow = aspect < 1.2;
+  // The diameter in px of a 1080 line screen, which is 1080 times the aspect of them wide; a
+  // landscape screen keeps `TV_READ.diameter` exactly.
+  const diameter = narrow ? Math.min(TV_READ.diameter, (TV_NARROW_SPAN * TV_SCREEN.height * aspect) / 1.17) : TV_READ.diameter;
+  const depth = (radius * TV_SCREEN.height) / (diameter * tan);
   const { back, forward, right } = scratch;
   back.copy(from).sub(centre);
   let flat = Math.hypot(back.x, back.z);
@@ -113,7 +130,7 @@ export function tvReadingPose(
   forward.copy(back).normalize().negate();
   right.copy(forward).cross(UP).normalize();
   // A narrow screen (a phone) centres the bubble instead.
-  const lateral = (aspect >= 1.2 ? TV_READ.across : 0) * depth * tan * aspect;
+  const lateral = (narrow ? 0 : TV_READ.across) * depth * tan * aspect;
   out.eye.copy(centre).addScaledVector(forward, -depth).addScaledVector(right, -lateral);
   out.target.copy(out.eye).addScaledVector(forward, depth);
   return out;
@@ -264,9 +281,14 @@ export function tvPlaceWorld(place: ZoneId): TvPlaceWorld {
   worlds.set(place, world);
   return world;
 }
-/** A flowing bubble's radius in the world for its diameter on screen at rest. */
-export function tvFlowRadius(place: ZoneId, diameter: number, fov = TV_FOV) {
-  return (diameter / TV_SCREEN.height) * tvPlaceWorld(place).flow.depth * Math.tan((fov * Math.PI) / 360);
+/**
+ * A flowing bubble's radius in the world for its diameter on screen at rest, in the landscape
+ * reading framing. Its resting depth was set at `TV_FOV`, so the radius is taken at `TV_FOV`
+ * too: a portrait screen's wider camera never swells it into the main bubble. A third argument
+ * (a camera's own field of view) is accepted and ignored.
+ */
+export function tvFlowRadius(place: ZoneId, diameter: number, _fov?: number) {
+  return (diameter / TV_SCREEN.height) * tvPlaceWorld(place).flow.depth * Math.tan((TV_FOV * Math.PI) / 360);
 }
 
 const breathForward = new T.Vector3();

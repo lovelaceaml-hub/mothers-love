@@ -89,20 +89,16 @@ export function tvRecords(records: readonly Recognition[]): Recognition[] {
 export type PlaceBubbles = { big: Recognition[]; small: Recognition[] };
 export type WorldBubblePlan = {
   places: ReadonlyMap<ZoneId, PlaceBubbles>;
-  /** Bubbles along the corridors between places, in tour order. */
-  corridors: Recognition[];
 };
 
 export const SMALL_MIN = 4;
 export const SMALL_MAX = 8;
-export const CORRIDOR_BUBBLES = 3;
 
 /**
- * Step 5 placement. Every place gets 1 or 2 big bubbles and 4 to 8 small ones, and each tour
- * leg gets a few more along its corridor. The newest records fill the big bubbles first, in
- * tour order, so the newest of all is the first place's big bubble; the small bubbles and the
- * corridors take the rest. With few records the list repeats from the newest, but one place
- * never shows the same record twice while it has enough to choose from.
+ * Step 5 placement. Every place gets 1 or 2 big bubbles and 4 to 8 small ones. The newest
+ * records fill the big bubbles first, in tour order, so the newest of all is the first place's
+ * big bubble; the small bubbles take the rest. With few records the list repeats from the
+ * newest, but one place never shows the same record twice while it has enough to choose from.
  */
 export function planWorldBubbles(
   records: readonly Recognition[],
@@ -110,7 +106,7 @@ export function planWorldBubbles(
 ): WorldBubblePlan {
   const pool = tvRecords(records);
   const result = new Map<ZoneId, PlaceBubbles>(places.map((place) => [place, { big: [], small: [] }]));
-  if (!pool.length) return { places: result, corridors: [] };
+  if (!pool.length) return { places: result };
   let cursor = 0;
   const take = (avoid: ReadonlySet<string>) => {
     for (let tries = 0; tries < pool.length; tries++) {
@@ -134,9 +130,7 @@ export function planWorldBubbles(
   const smallCount = Math.max(SMALL_MIN, Math.min(SMALL_MAX, pool.length - bigCount));
   for (const place of places)
     for (let i = 0; i < smallCount; i++) result.get(place)!.small.push(take(shown(place)));
-  const corridors: Recognition[] = [];
-  for (let i = 0; i < places.length * CORRIDOR_BUBBLES; i++) corridors.push(take(new Set()));
-  return { places: result, corridors };
+  return { places: result };
 }
 
 /** Step 5: each visit holds one big bubble; a place's second big bubble is held on the next loop. */

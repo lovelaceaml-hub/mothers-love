@@ -44,7 +44,8 @@ export type TvFaceStyle = {
 };
 /**
  * The main bubble, read up close at 650 px (`TV_READ` in `tv-places.ts`): body 56 of 1024 is
- * 35.5 px on screen, and the window holds nine lines before the message scrolls.
+ * 35.5 px on screen, and below a one line name the window holds nine lines of 64 (with the
+ * message painter's 20 of padding) before the message scrolls.
  */
 export const TV_BIG = {
   canvas: 1024,
@@ -52,7 +53,7 @@ export const TV_BIG = {
   name: 64,
   nameMin: 44,
   body: 56,
-  line: 68,
+  line: 64,
   windowTop: 250,
   windowBottom: 862,
   windowWidth: 660,

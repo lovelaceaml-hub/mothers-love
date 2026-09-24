@@ -75,7 +75,8 @@ export function tvLeaving(t: number, out: TvFlowPose = { u: 0, scale: 1, opacity
 
 /** A gentle rise and fall at rest, so a resting bubble still breathes. */
 export function tvRestBob(time: number, seed: number) {
-  return Math.sin(time * 0.6 + seed * 1.7) * 0.12 + Math.sin(time * 0.23 + seed) * 0.08;
+  // At most .13 either way (`TV_REST_BOB` in `tv-places.ts`), the bob the clearance tests allow for.
+  return Math.sin(time * 0.6 + seed * 1.7) * 0.08 + Math.sin(time * 0.23 + seed) * 0.05;
 }
 
 /**
