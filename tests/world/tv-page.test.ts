@@ -210,14 +210,14 @@ describe("live feed through the store", () => {
     const store = new WorldFeedStore();
     const pacer = new ArrivalPacer();
     store.accept(snapshot({ recognitions: list }), 0);
-    store.consumeArrivals();
+    store.confirmArrivals(store.view(0).arrivals);
     // Two polls, five seconds apart, carry six new arrivals each.
     for (const [poll, at] of [[0, 5000], [1, 10000]] as const) {
       const batch = list.slice(poll * 6, poll * 6 + 6);
       store.accept(snapshot({ recognitions: list, sync: "delta", arrivals: batch.map((r, i) => eventFor(r, poll * 6 + i)) }), at);
       const view = store.view(at);
       pacer.offer(view.arrivals);
-      store.consumeArrivals();
+      store.confirmArrivals(view.arrivals);
       for (const record of batch) expect(ids(tickerItems(view.records))).toContain(record.id);
     }
     expect(pacer.pending).toHaveLength(10);
@@ -238,8 +238,9 @@ describe("live feed through the store", () => {
     const event = eventFor(list[0], 1);
     for (const at of [5000, 10000]) {
       store.accept(snapshot({ recognitions: list, sync: "delta", arrivals: [event] }), at);
-      pacer.offer(store.view(at).arrivals);
-      store.consumeArrivals();
+      const view = store.view(at);
+      pacer.offer(view.arrivals);
+      store.confirmArrivals(view.arrivals);
     }
     expect(pacer.pending).toEqual([list[0].id]);
   });
@@ -280,8 +281,9 @@ describe("live feed through the store", () => {
     const pacer = new ArrivalPacer();
     store.accept(snapshot({ recognitions: list }), 0);
     store.accept(snapshot({ recognitions: list, sync: "delta", arrivals: [eventFor(gone, 1)] }), 5000);
-    pacer.offer(store.view(5000).arrivals);
-    store.consumeArrivals();
+    const arrived = store.view(5000);
+    pacer.offer(arrived.arrivals);
+    store.confirmArrivals(arrived.arrivals);
     expect(ids(everyShown(planWorldBubbles(store.view(5000).records)))).toContain(gone.id);
     store.accept(snapshot({ recognitions: list.slice(1), sync: "delta" }), 10_000);
     const view = store.view(10_000);
