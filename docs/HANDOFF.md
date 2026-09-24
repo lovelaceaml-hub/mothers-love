@@ -27,10 +27,10 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 
 | Work | Where | State |
 | --- | --- | --- |
-| [Plan 28](PLAN-28-repository-refactor.md), repository cleanup | One pull request per section into `main`; record in [runs/2026-09-22-repo-refactor/](runs/2026-09-22-repo-refactor/INDEX.md) | Sections 0 to 3 done (Section 3 merged and live 2026-09-24); Sections 4 to 8 follow, one chat each |
+| [Plan 28](PLAN-28-repository-refactor.md), repository cleanup | One pull request per section into `main`; record in [runs/2026-09-22-repo-refactor/](runs/2026-09-22-repo-refactor/INDEX.md) | Sections 0 to 4 done (Section 3 merged and live 2026-09-24; Section 4's record waits for its pull request); Section 6 closes when #16's CI is green; Sections 5, 7 and 8 follow, one chat each |
 | The 3D world: Plans [24](PLAN-24-world-visual-quality.md), [27](PLAN-27-world-promotion.md) and 29, the 3D Studio kit | `feat/world-cinematic` and `feat/world-base` (pull requests #12 and #10 merged 2026-09-24 at Anthony's request); the kit's lanes on `world-kit/*` | Not live. Pass D2 and PLAN-01 Section 5 are in; PLAN-01 Section 5 steps 0 and 11 (Mac) still come before `main`; the review check `review-cinematic-world.mjs` was failing on #10 when it merged; Plan 28 Section 5 moves the world to `/world` |
-| [Plan 25](PLAN-25-live-tv-pearl-study.md), live TV pearl design study | `feat/tv-pearl-design` | Archived by Anthony's 2026-09-24 tidy decision; the `archive/` tag and branch removal run from the Mac script in projects-index |
-| [Plan 26](PLAN-26-pearl-sequence.md), Expression Cosmos prototype | `feat/tv-pearl-sequence` | Archived by Anthony's 2026-09-24 tidy decision, same script |
+| [Plan 25](PLAN-25-live-tv-pearl-study.md), live TV pearl design study | tag `archive/feat/tv-pearl-design` | Archived by Anthony's 2026-09-24 tidy decision; branch deleted on GitHub and on the Mac, working copy removed (Plan 28 Section 4) |
+| [Plan 26](PLAN-26-pearl-sequence.md), Expression Cosmos prototype | tag `archive/feat/tv-pearl-sequence` | Archived the same way; its prototype art is in Drive under `2026-09-24-plan28-section-4-worktrees` |
 | [Plan 18](PLAN-18-keep-forever-and-admin-details.md), keep every recognition | `main` | Sections A and B done: pull request #13 live 2026-09-24 (merge 43d801f) and migration 016 applied the same day; Sections C and D next |
 
 ## Open items
@@ -48,7 +48,7 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 - **Documents:** this folder, and only this folder on `main`. Plans are numbered by the date of their first commit (Anthony, 2026-09-23); the next new plan takes 30, because 29 is the 3D Studio kit. Each plan has a Build log, and each run keeps its record in `docs/runs/<plan-id>/`. What still lives on other branches is listed in [HISTORY.md](HISTORY.md), part 3.
 - **Rules of the product:** [CONTRACT.md](CONTRACT.md). **How people use it:** [USER-MANUAL.md](USER-MANUAL.md).
 - **Evidence and finished media:** Drive, `Anthony Mac Storage/Project Outputs/The Words of Mother's Love`, https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw. Captures and probe output go there, not into Git.
-- **Working copies:** the main checkout `/Users/anthony/Projects/mothers-love` stays on `main`. Other working copies sit under `/Users/anthony/Projects/mothers-love-worktrees/` and two under `/Users/anthony/Documents/Codex/2026-09-20/`; Plan 28 Section 4 brings them to one per live branch.
+- **Working copies:** the main checkout `/Users/anthony/Projects/mothers-love` stays on `main`. Other working copies go under `/Users/anthony/Projects/mothers-love-worktrees/`, one per live branch; since Plan 28 Section 4 that folder is empty. The world's copies live under `/Users/anthony/Projects/mothers-love-world/` and belong to the world plans.
 
 ## Rules that matter on the next change
 
