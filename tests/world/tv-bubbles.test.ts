@@ -17,8 +17,18 @@ import { wrapBubbleText } from "@/components/display/world/world-recognitions";
 import { TV_FLOW_MIN_DIAMETER, TV_READ } from "@/components/display/world/prototype/tv-places";
 
 describe("TV bubble faces", () => {
-  it("fits 9 lines at the body size in the main bubble's message window", () => {
-    expect(Math.floor((TV_BIG.windowBottom - TV_BIG.windowTop) / TV_BIG.line)).toBeGreaterThanOrEqual(9);
+  it("fits 9 lines at the body size in the main bubble's message window, below a one line name", () => {
+    // Where a one line name leaves the window's top (`tvFaceLayout`), and the rule
+    // `paintTvMessage` paints by: the lines and 20 of padding within the window, or it scrolls.
+    const windowTop = Math.max(TV_BIG.windowTop, Math.max(158, 100 + TV_BIG.thanks * 1.18) + TV_BIG.name * 1.08 + 30);
+    const measure = (text: string, px: number) => [...text].length * px * 0.5;
+    expect(tvFaceLayout(measure, "Neighbor 3", TV_BIG, wrapBubbleText).windowTop).toBeCloseTo(windowTop, 9);
+    expect(9 * TV_BIG.line + 20).toBeLessThanOrEqual(TV_BIG.windowBottom - windowTop);
+    // The painter's own test agrees: nine lines (one 20 character word each) fit whole, ten scroll.
+    const lines = (count: number) => Array.from({ length: count }, (_, i) => `${"kindness".repeat(2)}${String(i).padStart(4, "0")}`).join(" ");
+    expect(wrapBubbleText((text) => measure(text, TV_BIG.body), lines(9), TV_BIG.windowWidth)).toHaveLength(9);
+    expect(tvMessageFits(measure, lines(9), TV_BIG, windowTop, wrapBubbleText)).toBe(true);
+    expect(tvMessageFits(measure, lines(10), TV_BIG, windowTop, wrapBubbleText)).toBe(false);
     // The window's corners stay inside the face, clear of the rainbow rim.
     const corner = Math.hypot(TV_BIG.windowWidth / 2, TV_BIG.windowBottom - 512) / 512;
     expect(corner).toBeLessThan(0.95);

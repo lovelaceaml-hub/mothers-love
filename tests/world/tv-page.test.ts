@@ -36,10 +36,8 @@ function records(count: number): Recognition[] {
   }));
 }
 const ids = (list: readonly { id: string }[]) => list.map((record) => record.id);
-const everyShown = (plan: ReturnType<typeof planWorldBubbles>) => [
-  ...[...plan.places.values()].flatMap((place) => [...place.big, ...place.small]),
-  ...plan.corridors,
-];
+const everyShown = (plan: ReturnType<typeof planWorldBubbles>) =>
+  [...plan.places.values()].flatMap((place) => [...place.big, ...place.small]);
 
 describe("TV page gate", () => {
   it("is on only with view=tv inside the design study", () => {
@@ -117,7 +115,8 @@ describe("bubble placement", () => {
         const shown = ids([...item.big, ...item.small]);
         expect(new Set(shown).size).toBe(shown.length);
       }
-      expect(plan.corridors.length).toBeGreaterThan(0);
+      // Only the places hold bubbles: the corridors between them carry none.
+      expect(Object.keys(plan)).toEqual(["places"]);
     }
   });
   it("holds the first big bubble on one loop and the second on the next", () => {

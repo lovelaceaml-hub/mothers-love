@@ -34,7 +34,7 @@ import {
   worldHoldSeconds,
   type WorldBubblePlan,
 } from "./prototype/tv-page";
-import { TV_ARC, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
+import { TV_ARC, TV_FOCUS_DELAY, TV_FOCUS_IN, tvFocusWeight, tvPlaceHold, tvReadingFrame } from "./prototype/tv-places";
 import { TvHosts } from "./prototype/tv-hosts";
 import type { HoldSeconds } from "./recognition-director";
 
@@ -157,6 +157,14 @@ export class WorldEngine {
   private readonly focusQuaternion = new THREE.Quaternion();
   /** TV page: the one record a visit holds on, reused so the per frame pool allocates nothing. */
   private readonly tvPool: Recognition[] = [];
+  /**
+   * TV page: the place and visit the pool's record was picked for, and its id. Later frames of
+   * the same visit keep it while it stays in the snapshot, so a new snapshot (a new plan) never
+   * swaps the bubble being read and the camera never glides out and back in mid read.
+   */
+  private tvPickedZone: ZoneId | null = null;
+  private tvPickedVisit = -1;
+  private tvPickedId?: string;
   private sampleArrivalAt = SAMPLE_ARRIVAL_FIRST;
   private sampleArrivalIndex = 0;
   /** Bound once, so the per frame bubble update allocates no closure. */
@@ -721,15 +729,18 @@ export class WorldEngine {
   }
   /**
    * TV page: the camera's reading move (Anthony, 2026-09-24: "the camera flies close"). The
-   * weight follows `tvFocusWeight` over the hold, but never faster than a full glide in 1.6 s,
-   * so an arrival, a changed record or an owner's hold turns into a glide rather than a jump; a
-   * pause holds it where it is, and a still view (reduced motion, Still) cuts instead.
+   * weight follows `tvFocusWeight` over the hold, but never faster than a full glide in about
+   * 1.4 s (`TV_FOCUS_IN` / 1.6), so an arrival, a changed record or an owner's hold turns into a
+   * glide rather than a jump; a pause holds it where it is, and a still view (reduced motion,
+   * Still) cuts instead. While the owner has paused rotation the reading age stands still, so
+   * once the place has had its first look the camera reads in the full framing, never frozen
+   * half way through a glide in or out.
    */
   private tvFocus(delta: number, moving: boolean, readingVisible: boolean, minimum: number) {
-    const zone = this.director.zone;
+    const zone = this.director.zone, age = this.recognitions.age;
     const current = this.readingPool().find((record) => record.id === this.recognitions.id);
     const wanted = TV_BUBBLE_PLACES.includes(zone) && current && readingVisible && this.arrivalState.phase === "idle"
-      ? tvFocusWeight(this.recognitions.age, this.holdFor(current.message, minimum), !moving)
+      ? (this.rotationPaused && age > TV_FOCUS_DELAY ? 1 : tvFocusWeight(age, this.holdFor(current.message, minimum), !moving))
       : 0;
     if (!moving && !this.paused) this.focusWeight = wanted;
     else if (!this.paused) {
@@ -867,9 +878,16 @@ export class WorldEngine {
     );
     if (includeHeld && this.readingHeld && held) return [held];
     const zone = this.director.zone;
-    // TV page: each visit holds on the place's main bubble for this loop (step 5).
+    // TV page: each visit holds on the place's main bubble for this loop (step 5). It is picked
+    // once, as the visit begins, and kept to the visit's end while it stays in the snapshot; it
+    // is picked again only at a new place or visit, or once it has left the snapshot.
     if (this.tv && this.tvPlan && TV_BUBBLE_PLACES.includes(zone)) {
-      const record = heldBig(this.tvPlan, zone, this.tvVisits.get(zone) ?? 0);
+      const visit = this.tvVisits.get(zone) ?? 0;
+      const kept = zone === this.tvPickedZone && visit === this.tvPickedVisit ? this.feedRecord(this.tvPickedId) : undefined;
+      const record = kept ?? heldBig(this.tvPlan, zone, visit);
+      this.tvPickedZone = zone;
+      this.tvPickedVisit = visit;
+      this.tvPickedId = record?.id;
       this.tvPool.length = 0;
       if (record) this.tvPool.push(record);
       return this.tvPool;
@@ -883,6 +901,16 @@ export class WorldEngine {
         record.expressionIds.includes(this.expressionId),
       );
     return this.feed.records;
+  }
+  /**
+   * TV page: the snapshot's own copy of the record with this id (a new snapshot brings new
+   * objects), or undefined once it has left. A plain loop, so the per frame pool allocates nothing.
+   */
+  private feedRecord(id: string | undefined) {
+    if (id === undefined) return undefined;
+    const records = this.feed.records;
+    for (let i = 0; i < records.length; i++) if (records[i].id === id) return records[i];
+    return undefined;
   }
   setExpression(id: number) {
     this.expressionId = id;
