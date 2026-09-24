@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
+import { clearSafeTimeout, setSafeTimeout } from '@/lib/safe-timer';
 import { useAdminSession } from './admin-shell';
 import { ActionDialog } from './action-dialog';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
@@ -88,10 +89,10 @@ export function RecognitionDetailPage({ id }: { id: string }) {
   useEffect(() => {
     if (!recognition || expired) return;
     const remaining = Math.max(0, new Date(recognition.expiresAt).getTime() - Date.now());
-    const expiryTimer = window.setTimeout(expireOpenRecognition, remaining);
-    return () => {
-      window.clearTimeout(expiryTimer);
-    };
+    const expiryTimer = setSafeTimeout(() => {
+      if (isExpired(recognition.expiresAt)) expireOpenRecognition();
+    }, remaining);
+    return () => clearSafeTimeout(expiryTimer);
   }, [expired, expireOpenRecognition, recognition]);
 
   const fieldsChanged = useMemo(() => {
