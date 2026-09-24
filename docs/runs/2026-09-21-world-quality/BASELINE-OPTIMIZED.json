@@ -1,0 +1,97 @@
+{
+  "sourceSha": "9a6bbf8bf34f04b5885b6ede39732f026baab488",
+  "applicationSourceSha": "b324b81cabe947592f6723425c58f14307b58083",
+  "runtime": "optimized local Next build",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "reducedMotion": "reduce",
+  "headless": true,
+  "args": [
+    "--use-gl=angle",
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--ignore-gpu-blocklist"
+  ],
+  "browser": "145.0.7632.6",
+  "platform": "darwin",
+  "checks": [
+    {
+      "art": "classic",
+      "url": "http://127.0.0.1:32741/display/world-preview?source=sample&art=classic",
+      "passed": true,
+      "readyElapsedMs": 7072,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "19.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      },
+      "errors": [],
+      "consoleMessages": [
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x104001a5600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x104001a5600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x104001a5600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+        },
+        {
+          "type": "warning",
+          "text": "[.WebGL-0x104001a5600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+        }
+      ],
+      "failedRequests": []
+    },
+    {
+      "art": "cinematic",
+      "url": "http://127.0.0.1:32741/display/world-preview?source=sample",
+      "passed": true,
+      "readyElapsedMs": 6714,
+      "attributes": {
+        "data-testid": "world-preview",
+        "data-zone": "garden",
+        "data-traveling": "false",
+        "data-ready": "true",
+        "data-frames": "2",
+        "data-elapsed": "0.00",
+        "data-reading-remaining": "19.00",
+        "data-world-bubbles": "14",
+        "data-arrival-in-world": "false",
+        "data-world-textures": "14",
+        "data-motion": "still",
+        "data-source": "sample",
+        "data-feed-phase": "sample",
+        "data-arrival": "idle",
+        "data-camera-position": "41.000,11.000,40.000",
+        "data-world-bubble-position": "31.194,6.000,18.650",
+        "data-world-bubble-screen": "0.180,0.163,0.992"
+      },
+      "errors": [],
+      "consoleMessages": [],
+      "failedRequests": []
+    }
+  ],
+  "limitations": [
+    "Preliminary baseline only. Not the complete P0 six-case matrix. Headless macOS differs from historical headed Linux CI. No runtime fix or historical cause established."
+  ]
+}

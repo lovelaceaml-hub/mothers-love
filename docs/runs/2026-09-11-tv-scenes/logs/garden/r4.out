@@ -1,0 +1,16 @@
+Replaced the wall-clock log spacing check with `gardenNext` assertions in the Recognition Garden test suite.
+
+The test now tracks `visualState().gardenNext` across the 60-second sampling window. This verifies that replacements advance by 0 or 7 at each 6-second step without depending on Studio host wall-clock log timestamps.
+
+1. Updated [`garden.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) to assert the initial sample reads 14, consecutive differences are 0 or 7, and the final 62 s sample reaches at least 56.
+2. Updated [`garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) to record Round r4.
+
+### What Anthony must do
+Nothing, you're clear.
+
+Review the diffs in [`garden.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) (takes 1 minute).
+
+## COMPLETION
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

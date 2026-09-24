@@ -1,0 +1,32 @@
+Round r4 landing review corrections for the Welcome scene are complete in [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js).
+
+All seven review items are resolved:
+1. Large reader bubbles are permanently protected from retirement with `retireAt = Infinity` and bypass drift replacement shortening.
+2. The ring animation delay CSS variable is renamed to `--welcome-ring-delay` so it no longer interferes with shared breathing animations.
+3. Spin direction is consolidated into the single `spin-reverse` class toggle, removing `--spin-direction` and `.spin-ccw`.
+4. Transition angles and timestamps seed lazily on first movement from `-1`, and `.orb-slot` has explicit `isolation: isolate`.
+5. The lane record notes the 160-character fixture limit under a new Deferred section.
+6. The retirement interval is set to 4.6 seconds with an exit gate enforcing at most one exiting bubble at a time.
+7. Rendered bubble slot transforms are clamped to stage boundaries (0 to 1812 by 0 to 636) to prevent scroll overflow during off-stage entrance and drift exits.
+
+### What now works
+- Bubble drift entrance and exit transitions no longer expand stage dimensions beyond 1812 by 636 pixels.
+- The shared [tests/color-polish-scenes/helpers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts) and [tests/color-polish-scenes/welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) `noOverflow` assertions pass without overflowing.
+- Large reader bubbles stay visible indefinitely while smaller bubbles cycle with smooth, non-overlapping exits.
+
+### Progress
+- Progress: Welcome scene r4 review corrections applied and ready for coordinator verification.
+
+### What Anthony must do
+- Nothing, you're clear.
+
+### Next action (2 minutes)
+1. Review the git diff for the three updated files in your worktree:
+   - [public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
+   - [public/color-polish/scenes/welcome.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
+   - [docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md

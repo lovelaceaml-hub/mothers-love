@@ -1,0 +1,22 @@
+typecheck exit 2
+lint exit 1
+test exit 0
+build exit 1
+✖ 18 problems (14 errors, 4 warnings)
+public/color-polish/scenes/peacemakers.js syntax ok
+scoped rules: 1
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  9 failed
+  4 passed (5.1m)
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  3) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:10:5 › peacemakers renders circular bubbles and no overflow at 14 s 
+  4) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:25:5 › the scene stays populated with staggered replacement 
+  5) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:38:5 › bubbles span two depth layers with blur only on deeper layers 
+  6) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:77:5 › bubbles stay circular during replacement 
+  7) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance 
+DONE

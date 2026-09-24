@@ -1,0 +1,22 @@
+Section 9 (Peace in Practice richer pop and depth) implementation is complete in [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice).
+
+### What now works
+1. Depth layering is active for all four bubbles in [peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js) across far, mid, and near layers with appropriate scaling, blur filters, pace adjustments, and `data-depth` synchronization.
+2. Bubble retirements trigger `onRetire` to spawn 12 peace sign particles and 8 glowing dots alongside the core hearts burst, capped at 80 particles in `V.peaceFx`.
+3. Scene custom canvas drawing in `draw(dt)` renders rotating peace signs and soft radial gradient glow dots over the `.scene-fx` canvas, maintaining `dataset.peaceFx` count for tests.
+4. Behavior spec in [peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts) covers circularity, overflow, studio advance prevention, burst lifecycle and particle expiration, depth layer spreads, and reduced motion still mode.
+
+### What Anthony must do
+- Nothing, you're clear.
+
+## COMPLETION
+Files changed:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts`
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md`
+
+Unchanged allowlist file:
+- `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css` (retained only its scoped header comment per Hard rule 6)
+
+Anything not done and why:
+- None. All requirements from the work order, depth recipe, and gap decision are implemented.

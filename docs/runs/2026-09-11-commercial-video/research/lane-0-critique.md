@@ -1,0 +1,111 @@
+# Lane 0 critique: Plan 14
+
+Model: Gemini 3.8 Flash (High) through agy, read-only checkout at 3902f93, order orders/L0.md, run 2026-09-11T17:16Z to 17:19Z. Verbatim critique follows, then the coordinator's disposition.
+
+## Critique (verbatim)
+
+Here is the critique of Plan 14 for the Mother's Love commercial video.
+
+Revise Plan 14 to resolve the audio desynchronization defect, timing contradictions, and tooling permission barriers before dispatching Lane 1. The plan specifies an assembly pipeline that will drift audio out of sync by 3.0 seconds, contains impossible timing constraints, and directs an Antigravity worker to run commands and write to paths that the execution environment strictly prohibits.
+
+### Material Objections (Ranked Highest Severity First)
+
+#### 1. Severe Audio-Video Desynchronization Caused by Video Xfades vs. Linear Audio Concatenation
+- **What is wrong:** Section 4 joins seven video clips using 0.5-second crossfades while concatenating audio clips end-to-end with fixed 0.8-second gaps.
+- **Why it matters:** In ffmpeg, an `xfade` transition overlaps adjacent video streams, reducing total video timeline duration by 0.5 seconds per transition. Across six transitions (between seven beats), the total video duration shrinks by 3.0 seconds. Because narration audio is not trimmed or crossfaded by 0.5 seconds at each cut, audio progressively lags behind the video. By Beat 7, the audio will be 3.0 seconds behind, showing the end card while Beat 6 narration is still speaking. This directly violates Section 4's acceptance criterion requiring audio and video to align within 0.3 seconds.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L112-L115) lines 112-115: "clips are joined with 0.5 s xfade... narration is concatenated with the same gaps... audio and captions line up with the matching clip within 0.3 s".
+
+---
+
+#### 2. Mathematical Contradiction Between Word Count, Beat Limits, Card Durations, and Total Runtime
+- **What is wrong:** The plan requires 170 to 200 words of narration (line 70), caps every beat at under 12 seconds (lines 70 and 100), fixes the title card to 3 seconds and end card to 5 seconds (line 112), adds 0.8-second gaps between clips, and sets a hard upper bound of 85 seconds (line 14).
+- **Why it matters:** These constraints are mathematically mutually exclusive:
+  1. At edge-tts rate -5% (roughly 2.25 words per second), 170 words requires at least 75.5 seconds of speech alone. Adding six 0.8-second gaps (4.8 seconds) brings raw audio to 80.3 seconds. At 200 words, speech is 88.9 seconds, which exceeds the 85-second hard limit even before gaps are added.
+  2. If Beat 1 is the 3-second title card, it can hold at most 6 to 7 words. Yet Beat 1 requires introducing the campaign in one sentence and quoting the official site (at least 25 words, requiring 11 to 13 seconds).
+  3. If Beats 1 and 7 are restricted to 3 and 5 seconds, the remaining five beats (Beats 2 through 6) capped at 12 seconds can hold at most 60 seconds of audio. Total spoken audio across all seven beats cannot exceed 68 seconds (3s + 60s + 5s). At 2.25 words per second, 68 seconds can fit at most 153 words, making the mandatory minimum of 170 words impossible to satisfy without failing the 12-second beat cap or the card duration rules.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L14-L112) lines 14, 62, 68, 70, 100, and 112.
+
+---
+
+#### 3. Antigravity Permission Gate Violations and Whitelist Command Rejections
+- **What is wrong:** Sections 1 through 5 hardcode file paths and working directories to `/Users/anthony/Projects/mothers-love/`, and specify direct execution of `ffmpeg` and `ffprobe`.
+- **Why it matters:** Antigravity headless workers operate under strict security constraints: file writes are permitted only under `/Users/anthony/.claude/worktrees/**`, and permitted shell commands are limited to `ls`, `cat`, `pwd`, `find`, `grep`, `node`, `npm`, `git status`, `git diff`, `bash`, `python3`, and `psql`. An Antigravity writer in Lane 1, 2, 3, or 4 will crash with permission denied errors when attempting to write to `/Users/anthony/Projects/mothers-love/` or when invoking `ffmpeg` and `ffprobe` directly.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L40-L118) lines 40, 76, 84, 92, 105, and 118; and dispatch gate facts.
+
+---
+
+#### 4. Incomplete Endpoint Mocking and Local Dev Server Reuse Risk Leaking Live Production Data
+- **What is wrong:** Section 2 instructs `capture.mjs` to start or reuse the local dev server on port 3100 (`reuseExistingServer: !process.env.CI` in playwright.config.ts) and mocks only the static endpoints listed in Inputs without query parameter matching or wildcards.
+- **Why it matters:** The live public pages make parameterized and secondary requests. For example, [ColorPolishHost.tsx](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/src/components/display/color-polish-host/ColorPolishHost.tsx#L89) calls `/api/display/color-polish?after=...` and `/api/reactions?ids=...`. If an endpoint is mocked without wildcard patterns, subsequent polling requests fall through to the reused local dev server. Because Anthony's local server connects to the live database, real member names, private submission details, or live counts will leak into recorded frames. Furthermore, if the mocked `/api/display/color-polish` response does not provide the complete `ColorPolishSnapshot` schema (including `insights`, `presentation.playlist`, and `calendar`), `validateColorPolishSnapshot` fails and sets the display phase to `unavailable`, rendering an error screen instead of the Garden.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L32-L86) lines 32 and 84; [ColorPolishHost.tsx](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/src/components/display/color-polish-host/ColorPolishHost.tsx#L89-L122) lines 89-122; [playwright.config.ts](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/playwright.config.ts#L25) line 25; and [usable.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/tests/color-polish-usable/usable.spec.ts#L106-L216) lines 106-216.
+
+---
+
+#### 5. Obsolete and Missing Reference Paths for Mocking Displays
+- **What is wrong:** Line 32 directs the implementer to copy TV display mocking patterns from `/Users/anthony/Projects/mothers-love/tests/color-polish/color-polish.spec.ts` and `tests/plan08/tv-garden-verification.spec.ts`.
+- **Why it matters:** Neither file exists in the repository baseline. The active display tests and fixtures are located in [usable.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/tests/color-polish-usable/usable.spec.ts). A Flash writer attempting to inspect the non-existent files will halt or guess the schema, resulting in broken display fixtures.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L32) line 32 versus actual repository test layout in `tests/color-polish-usable/usable.spec.ts`.
+
+---
+
+#### 6. Playwright `recordVideo` API Misunderstanding and Undefined 9:16 Cropping
+- **What is wrong:** Section 2 assumes a single continuous Playwright session can record and save isolated webm files per beat, specifies a phone device at 1080x1920, and suggests cropped desktop clips for the phone cut without specifying crop parameters.
+- **Why it matters:** In Playwright, `recordVideo` operates at the `BrowserContext` level and writes video only when the context closes. It has no API to start and stop recordings per beat within an active page. Furthermore, Playwright has no device preset with a 1080x1920 logical viewport (mobile presets use logical CSS pixels such as 390x844 with scale factors). Finally, taking a 1920x1080 desktop recording and center-cropping it to 1080x1920 cuts off over 80% of horizontal content, slicing off form inputs, buttons, and TV elements.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L59-L86) lines 59 and 84.
+
+---
+
+#### 7. Untestable and Physically Impossible Acceptance Criteria
+- **What is wrong:** Several acceptance criteria rely on unexecutable physical actions or lack verification assertions:
+  1. Section 4 instructs the runner to decode the end card QR code with a phone camera (line 114), which an automated CLI agent cannot perform.
+  2. Section 4 requires testing that files play in QuickTime (line 114), which is untestable in a headless environment.
+  3. Section 2 requires contact sheets to show no real data (line 88), but provides no automated image parsing or OCR verification.
+  4. The verify commands in Sections 2, 3, and 4 merely `cat` JSON metadata or print stream info without asserting exit codes, allowing duration mismatches or missing clips to pass silently. Section 5 provides no verification command.
+- **Why it matters:** Automated runners cannot complete these checks honestly, leading to false-positive completions or unhandled failures.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L88-L127) lines 88, 92, 101, 105, 114, 118, and 127.
+
+---
+
+#### 8. External Network Fragility for Speech and Underspecified HTML QR Rendering
+- **What is wrong:** Section 3 relies on `edge-tts` (which calls Microsoft Azure speech web services across the public internet), and Section 4 states that `cards.html` renders the QR code using the `qrcode` Node package.
+- **Why it matters:** An offline or network-restricted execution environment will fail `edge-tts` synthesis immediately. In addition, an HTML file loaded into a browser cannot directly import or execute a Node.js npm package without a bundling step or having `assemble.mjs` generate the QR code as an image/data-URL beforehand.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L34-L112) lines 34, 99, and 112.
+
+---
+
+#### 9. Wording Drift, Invariant Violations, and Conflicting Taglines
+- **What is wrong:** Beat 4 states that narration will explain that "members" can recognize someone who spoke one of these "words" to them (line 65). Beat 3 refers to "The nine words" (line 64). Beat 6 claims recognitions appear on "the TV in the church lobby" (line 67). Furthermore, the official site tagline quoted in line 26 ("Where a mother's love reaches, peace settles") directly conflicts with the app's official catalog tagline in [catalog.ts](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/src/lib/catalog.ts#L4) ("Where a mother's love resides, peace abides").
+- **Why it matters:** The app invariants explicitly state there are no member accounts, rosters, or participant account requirements. Calling the expressions "words" drifts from the approved catalog phrases. The official website text makes no mention of church lobby televisions, and broadcasting conflicting taglines dilutes brand consistency.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L26-L67) lines 26, 64, 65, 67; [catalog.ts](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/src/lib/catalog.ts#L3-L75) lines 3-75; and AGENTS.md rules.
+
+---
+
+#### 10. Unusable QR Call to Action on 9:16 Phone Cuts
+- **What is wrong:** The 9:16 cut is formatted specifically for mobile phones and social stories (lines 9 and 15), but ends with a QR code as the primary call to action.
+- **Why it matters:** A user viewing a 9:16 vertical video on a smartphone cannot scan a QR code displayed on that same smartphone screen. Because burned-in video overlay text cannot provide a clickable hyperlink, mobile viewers are left without a frictionless path to the recognition form.
+- **Evidence:** [PLAN-14-commercial-video.md](file:///Users/anthony/.claude/worktrees/mothers-love-video-critic/docs/PLAN-14-commercial-video.md#L9-L68) lines 9, 15, 68, and 112.
+
+---
+
+### What Anthony Must Do
+1. Decide whether to adjust Plan 14 to resolve these ten objections before Lane 1 execution begins.
+
+---
+
+### Next Steps and Questions
+1. Would you like me to update Plan 14 to fix the timing model, video transition math, and permission paths?
+2. Should we replace the 9:16 phone cut's QR card with a clear, readable text URL call to action?
+
+
+## Disposition (Fable 5.1, coordinator)
+
+1. Xfade audio drift: accepted. Section 4 order places each narration file at the beat's start on the post-crossfade timeline (adelay per beat, offsets computed from the same segment lengths minus 0.5 s per transition) instead of a plain audio concat.
+2. Timing arithmetic: accepted as a clarification. The 12 s cap is per narration line, the 3 s and 5 s card figures are minimum holds, and a card beat holds for its own narration plus the gap. The Section 1 order already bounds narration at 28 words per beat and beat targets at 66 to 78 s; Section 3 measures real durations and a trim round runs if the joined narration exceeds 82 s.
+3. Permission gate and paths: accepted, already handled in the orders. Every writer path is under the worktree, scripts resolve the project root from their own location, and ffmpeg and ffprobe are spawned from node or bash (both allowed commands).
+4. Incomplete mocking and server reuse: accepted. The capture order installs a catch-all **/api/** route that answers 503 for anything not explicitly mocked, uses wildcard patterns for the parameterized endpoints, and copies the full color-polish snapshot shape from tests/color-polish-usable/usable.spec.ts. The worktree dev server has no .env.local, so it is not connected to any database either way.
+5. Missing reference files: rejected as a finding. Both tests/color-polish/color-polish.spec.ts and tests/plan08/tv-garden-verification.spec.ts exist at the baseline (they were outside the critic's read scope). The usable spec is added as the primary display reference anyway.
+6. recordVideo and phone viewport: accepted. One browser context per clip (the webm is written on context close) with an in-point marker in clips.json; phone clips use a 540x960 CSS viewport at device scale factor 2 recorded at 1080x1920 (sharpness proven by the coordinator's experiment before the order was written); the TV beat is fitted, not cropped, on the phone cut.
+7. Untestable acceptance: accepted in part. QuickTime playback becomes an ffmpeg decode check plus ffprobe stream checks; the QR is decoded by opencv-python-headless inside the project venv; every script exits non zero on a failed acceptance; the fixtures plus the catch-all 503 route are the only data source, and the coordinator inspects the contact sheets.
+8. Network and QR rendering: accepted. edge-tts runs with this Mac's normal network (agy has no network restriction); assemble.mjs generates the QR data URL with the qrcode package and injects it into the card HTML with page.setContent, so the browser never imports a Node package.
+9. Wording: accepted for "members" (narration says anyone, since there are no accounts); rejected for "words" (the campaign's own name is The Words of Mother's Love), for the lobby line (it describes where the display is shown, not an official claim), and for the tagline (the app tagline appears on the title card; the site sentence is quoted once with attribution and never presented as the app tagline).
+10. QR on the phone cut: accepted. The 9:16 end card makes the URL text the primary element with the QR secondary.

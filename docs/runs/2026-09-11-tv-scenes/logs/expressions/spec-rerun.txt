@@ -1,0 +1,14 @@
+spec rerun exit 1
+  10 failed
+  5 passed (7.1m)
+  1) [chromium] › tests/color-polish-scenes/expressions.spec.ts:110:5 › expressions renders with circular medallions and no overflow at 14 s 
+  2) [chromium] › tests/color-polish-scenes/expressions.spec.ts:141:5 › grid cards fit with slack ──
+  3) [chromium] › tests/color-polish-scenes/expressions.spec.ts:153:5 › compact cards fit ──────────
+  4) [chromium] › tests/color-polish-scenes/expressions.spec.ts:163:5 › the focused card is balanced 
+  5) [chromium] › tests/color-polish-scenes/expressions.spec.ts:172:5 › every expression can be the focused one 
+  6) [chromium] › tests/color-polish-scenes/expressions.spec.ts:208:5 › reduced motion renders the scene still 
+  7) [chromium] › tests/color-polish-scenes/expressions.spec.ts:219:5 › the same holds at 3840 ─────
+  8) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+  9) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+DONE

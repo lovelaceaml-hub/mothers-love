@@ -1,0 +1,25 @@
+# Work order - welcome correction r4: landing review corrections - Mother's Love TV (Plan 13)
+
+Dispatch ID: agy-welcome-20260911-r4
+Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 1 (data-scene="1"). Round: r4.
+
+The Sonnet 5 landing review of your previous round (r3) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
+
+## Corrections
+1. Blocking: the single large reader bubble (reader mode, `a.large` true) must never be retired by the drift replacement. In mountWelcome move `a.retireAt = 9 + i * 4` after the `if (a.large) { ... return }` branch and give large actors `a.retireAt = Infinity` inside that branch; in integrateWelcome add `&& !a.large` to the shorten-life condition.
+2. Should-fix: the custom property `--delay` is already read by the shared `.orb-breath` breathing animation in renderer.css, so setting it per actor retimes the breath as a side effect. Rename the property to `--welcome-ring-delay` in welcome.js (setProperty) and in welcome.css (`animation-delay: var(--welcome-ring-delay, 0s)` on `.orb-slot::after`).
+3. Cleanup: keep one spin-direction mechanism. Keep the `spin-reverse` class toggle; remove the `--spin-direction` property (its setProperty call and the `animation-direction: var(--spin-direction, normal)` line) and the unused `.spin-ccw` selector.
+4. Cleanup: in mountWelcome drop the mount-time seeding of `a.enterAngle`, `a.exitAngle`, `a.enterLifeAt` and `a.exitLifeAt` (placeWelcome seeds them lazily on the first transition); initialize `a.enterLifeAt` and `a.exitLifeAt` to -1 so the lazy seeding still triggers on the first entering or exiting frame. Add `isolation: isolate;` to the scoped `.orb-slot` rule in welcome.css so the ring's z-index -1 stacking does not depend on will-change alone.
+5. Record: note in the lane record under "## Deferred" that the sample fixture has no message over 160 characters, so reader mode cannot be exercised through the Studio harness; a follow-up could add a direct renderer harness test with a synthetic long record.
+6. Should-fix: mount sets `a.retireAt = 9 + i * 4`; core waits for `max(retireAt, born + minRead)` with a 9 s floor and an exit lasts 3.8 s, so use `a.retireAt = 9 + i * 4.6` and add the gate. Exit gate (scene-level, in the integrate hook, which core calls for every actor before its own physics): core starts an exit for the first steady actor whose clock is at or past max(retireAt, born + minRead) and an exit lasts 3.8 s, so independent retireAt values drift into overlapping exits over a long dwell. Keep a gate on V (for example `V.welcomeLastExit`, set whenever an actor life becomes exiting, detected by comparing a.life against a per-actor `_welcomeSeenLife` field): while any actor is exiting or absent, or while fewer than 4.6 s have passed since the last exit start, push every steady actor whose `retireAt` is at or below `V.clock` forward to `V.clock + 0.5`. This keeps "at most one exiting" durable without touching core. The large reader actor (`a.large`) is exempt from retirement entirely: give it `retireAt = Infinity` at mount and never shorten it.
+7. Blocking (overflow): the protected shared spec tests/color-polish-scenes/helpers.spec.ts opens the welcome scene and asserts the scene root never scrolls wider than 1812 px, and the coordinator measured 1994 and 1833 because core floats a replacement in from off stage and drifts a retired bubble off stage. You cannot edit that spec, so keep the rendered slot inside the stage: in placeWelcome clamp the translate so the slot box including its 6 px ring stays inside 0..1812 by 0..636, that is clamp the centre x to [a.d / 2 * scale + 8, 1812 - a.d / 2 * scale - 8] and the centre y to [a.d / 2 * scale + 8, 636 - a.d / 2 * scale - 8] before writing the transform (only the rendered position; do not change a.x, a.y, a.screenX or a.screenY, and keep writing the unclamped values into the slot record). An entering bubble then fades in at the stage edge and slides to its home, and an exiting bubble drifts to the edge and fades out. Keep the shared `noOverflow(frame)` assertion in welcome.spec.ts as it is (do not replace it with a scene-local measure).
+
+Append one line "Round r4: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/welcome.md. End with `## COMPLETION` listing every file changed.
+
+```allowlist
+/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts
+/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
+```

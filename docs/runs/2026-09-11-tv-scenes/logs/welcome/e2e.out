@@ -1,0 +1,96 @@
+
+Running 13 tests using 5 workers
+
+  ✘   1 [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s (25.3s)
+  ✘   4 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (25.2s)
+  ✓   3 [chromium] › tests/color-polish-scenes/welcome.spec.ts:24:5 › bubbles differ in speed and span two depth layers (26.3s)
+  ✓   2 [chromium] › tests/color-polish-scenes/welcome.spec.ts:10:5 › welcome renders circular bubbles and no overflow at 14 s (26.6s)
+  ✘   5 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (25.5s)
+  ✓   7 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (2.8s)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (843ms)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (996ms)
+  ✓   9 [chromium] › tests/color-polish-scenes/welcome.spec.ts:131:5 › reduced motion renders the welcome scene still (2.7s)
+  ✓   6 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (8.5s)
+  ✓   8 [chromium] › tests/color-polish-scenes/welcome.spec.ts:95:5 › bubbles stay circular through motion (7.3s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.9s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.0m)
+
+
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at color-polish-scenes/helpers.ts:296
+
+      294 |   await selector.selectOption(optionValue);
+      295 |
+    > 296 |   await expect.poll(() => page.frames().some((f) => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+          |   ^
+      297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+      298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
+      299 |
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at color-polish-scenes/helpers.ts:296
+
+      294 |   await selector.selectOption(optionValue);
+      295 |
+    > 296 |   await expect.poll(() => page.frames().some((f) => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+          |   ^
+      297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+      298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
+      299 |
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+    Call Log:
+    - Timeout 5000ms exceeded while waiting on the predicate
+
+       at color-polish-scenes/helpers.ts:296
+
+      294 |   await selector.selectOption(optionValue);
+      295 |
+    > 296 |   await expect.poll(() => page.frames().some((f) => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
+          |   ^
+      297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
+      298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
+      299 |
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
+
+    Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/welcome.spec.ts:63:5 › at least one bubble changes heading between 6 and 14 s 
+  10 passed (1.6m)

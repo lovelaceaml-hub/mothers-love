@@ -1,0 +1,14 @@
+typecheck exit 0
+lint exit 1
+test exit 0
+build exit 0
+✖ 18 problems (14 errors, 4 warnings)
+public/color-polish/scenes/milestone.js syntax ok
+scoped rules: 2
+w1920 ms0 exit 0 w1920 ms6000 exit 0 w1920 ms14000 exit 0 w3840 ms0 exit 0 w3840 ms6000 exit 0 w3840 ms14000 exit 0 arrivals exit 0 
+probe PASS
+e2e exit 1
+  1 failed
+  11 passed (1.4m)
+  1) [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth ────────────────
+DONE

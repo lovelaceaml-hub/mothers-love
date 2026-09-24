@@ -1,0 +1,46 @@
+Card captions on title and end cards are skipped, and the end card heading and URL layout wrapping has been resolved.
+
+### Verification outputs
+
+1. `node --check scripts/video/assemble.mjs`
+```text
+(exit code 0, no output)
+```
+
+2. `grep -n "nowrap\|scrollWidth" scripts/video/cards.html`
+```text
+122:      white-space: nowrap;
+131:      white-space: nowrap;
+169:      white-space: nowrap;
+177:      white-space: nowrap;
+203:      white-space: nowrap;
+213:      white-space: nowrap;
+319:              if (child.scrollWidth > child.clientWidth || child.scrollWidth > 1100) {
+331:          while (urlEl.scrollWidth > urlEl.clientWidth && urlFontSize > 12) {
+363:          while (urlEl.scrollWidth > urlEl.clientWidth && urlFontSize > 12) {
+```
+
+3. `grep -n "clip === 'card'\|clip !== 'card'\|=== \"card\"\|!== \"card\"" scripts/video/assemble.mjs`
+```text
+238:      if (b.clip === 'card') {
+```
+
+4. `grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/assemble.mjs scripts/video/cards.html`
+```text
+scripts/video/assemble.mjs:0
+scripts/video/cards.html:0
+```
+
+## COMPLETION
+
+Modified files:
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Next action (2 minutes)
+Review the completion report and have the coordinator run video assembly.
+
+1. Proceed with coordinator video assembly?

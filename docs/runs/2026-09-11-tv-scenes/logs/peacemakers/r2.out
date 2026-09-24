@@ -1,0 +1,29 @@
+Top-level identifiers in the peacemakers scene are renamed with unique prefixes, and the far-layer blur calculation is capped at 0.9 px.
+
+Every scene script runs in the shared global lexical scope without module isolation. Renaming `LAYERS` and generic hook functions prevents cross-script SyntaxError collisions on merge, while the blur cap preserves text readability during actor entrance scaling.
+
+### Changes made
+1. In [`peacemakers.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js):
+   - Renamed `LAYERS` to `PEACEMAKERS_LAYERS` across definitions and hook references.
+   - Renamed helper functions `place`, `mount`, and `integrate` to `placePEACEMAKERS`, `mountPEACEMAKERS`, and `integratePEACEMAKERS` (with `peacemakersPlace`, `peacemakersMount`, and `peacemakersIntegrate` aliases).
+   - Updated the scene registration descriptor to reference the prefixed hook functions.
+   - Capped the blur calculation in `placePEACEMAKERS` to `Math.min(.9, Math.max(baseBlur, L.blur))`.
+2. In [`peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md):
+   - Appended the round r2 completion record line to `## Result`.
+
+## COMPLETION
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)
+
+Identifiers renamed:
+- `LAYERS` -> `PEACEMAKERS_LAYERS`
+- `place` -> `placePEACEMAKERS` (aliased as `peacemakersPlace`)
+- `mount` -> `mountPEACEMAKERS` (aliased as `peacemakersMount`)
+- `integrate` -> `integratePEACEMAKERS` (aliased as `peacemakersIntegrate`)
+
+What Anthony must do:
+- Nothing, you're clear.
+
+Next step:
+- Run the coordinator verification checks on this lane branch (takes 2 minutes).

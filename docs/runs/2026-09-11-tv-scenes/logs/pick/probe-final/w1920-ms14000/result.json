@@ -1,0 +1,1708 @@
+{
+  "width": 1920,
+  "checkpointMs": 14000,
+  "referenceResets": false,
+  "issues": [],
+  "states": [
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 1,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-20",
+          "key": "slot-1",
+          "x": 1027.2824918087513,
+          "y": 10.204853519903992,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 1,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You gave me your turn without hesitation. I appreciated your consideration."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-41",
+          "key": "slot-2",
+          "x": 1352.7310123407876,
+          "y": 27.672487412419343,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 2,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You greeted me by name and let me join your group first."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-13",
+          "key": "slot-3",
+          "x": 865.3345337747666,
+          "y": 300.83121975215244,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 3,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You greeted me by name and made room for me at the table. It was such a kind welcome."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-34",
+          "key": "slot-4",
+          "x": 1245.9954469183103,
+          "y": 325.94662900159886,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 4,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You patiently let me finish first and offered a helping hand."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 1,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-20",
+            "x": 1183.2824918087513,
+            "y": 166.204853519904,
+            "d": 312,
+            "scale": 0.9958196701825399,
+            "opacity": 1,
+            "vx": 8.760575033825186,
+            "vy": -1.9839234984596483,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -20.80174562521279,
+            "depth": 0.9958196701825399,
+            "screenScale": 0.9958196701825399,
+            "blur": "blur(0.9px)"
+          },
+          {
+            "id": "fixture-41",
+            "x": 1512.7310123407876,
+            "y": 187.67248741241934,
+            "d": 320,
+            "scale": 0.9525707192228764,
+            "opacity": 1,
+            "vx": 9.602167008239249,
+            "vy": 9.993241767875913,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -6.402832167223096,
+            "depth": 0.9525707192228764,
+            "screenScale": 0.9525707192228764,
+            "blur": "blur(0.35px)"
+          },
+          {
+            "id": "fixture-13",
+            "x": 1017.3345337747666,
+            "y": 452.83121975215244,
+            "d": 304,
+            "scale": 0.9958506578182917,
+            "opacity": 1,
+            "vx": -0.7652821335676453,
+            "vy": -2.287950159818244,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -31.404767269268632,
+            "depth": 0.9958506578182917,
+            "screenScale": 0.9958506578182917,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-34",
+            "x": 1393.4954469183103,
+            "y": 473.44662900159886,
+            "d": 295,
+            "scale": 0.9003400499506505,
+            "opacity": 1,
+            "vx": -11.71314533423867,
+            "vy": 8.248676616310576,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -36.43481739796698,
+            "depth": 0.9003400499506505,
+            "screenScale": 0.9003400499506505,
+            "blur": "blur(0.09px)"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": []
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 2,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-6",
+          "key": "slot-5",
+          "x": 144.99764010298173,
+          "y": 227.6160643398846,
+          "d": 304,
+          "born": 0,
+          "phase": "swelling",
+          "since": 0,
+          "serial": 5,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You let me go first even though you were waiting too. Your thoughtfulness stayed with me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-27",
+          "key": "slot-6",
+          "x": 449.31139041541826,
+          "y": 312.0297324006188,
+          "d": 299,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 6,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You welcomed me warmly and made space for me to join you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-47",
+          "key": "slot-7",
+          "x": 986.8028233051059,
+          "y": 92.64996948004924,
+          "d": 303,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 7,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You forgave a small mistake and helped me feel at ease again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-5",
+          "key": "slot-8",
+          "x": 1228.002642731332,
+          "y": 307.64120137202104,
+          "d": 302,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 8,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Thank you for understanding when I made a mistake. Your patience helped me feel at ease."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-26",
+          "key": "slot-9",
+          "x": 1502.824624774406,
+          "y": 160.043191602614,
+          "d": 300,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 9,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You reached out to make peace and encouraged me to start again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 2,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-6",
+            "x": 296.99764010298173,
+            "y": 379.6160643398846,
+            "d": 304,
+            "scale": 0.9735935558578587,
+            "opacity": 1,
+            "vx": 10.855721364397489,
+            "vy": 2.810013576920525,
+            "life": "swelling",
+            "readingPages": 1,
+            "z": -47.67610879149288,
+            "depth": 0.9735935558578587,
+            "screenScale": 0.9735935558578587,
+            "blur": "blur(0.7px)"
+          },
+          {
+            "id": "fixture-27",
+            "x": 598.8113904154183,
+            "y": 461.5297324006188,
+            "d": 299,
+            "scale": 0.919425907970219,
+            "opacity": 1,
+            "vx": -18.347690474994092,
+            "vy": -0.026419017496166878,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 16.93465535994619,
+            "depth": 0.919425907970219,
+            "screenScale": 0.919425907970219,
+            "blur": "blur(0.25px)"
+          },
+          {
+            "id": "fixture-47",
+            "x": 1138.302823305106,
+            "y": 244.14996948004924,
+            "d": 303,
+            "scale": 0.9940045850319399,
+            "opacity": 1,
+            "vx": 4.184213848692877,
+            "vy": 3.8578824584711477,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -55.76674543786794,
+            "depth": 0.9940045850319399,
+            "screenScale": 0.9940045850319399,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-5",
+            "x": 1379.002642731332,
+            "y": 458.64120137202104,
+            "d": 302,
+            "scale": 0.9959777170679773,
+            "opacity": 1,
+            "vx": 5.462360867629774,
+            "vy": 8.16483745052446,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -59.11149942781776,
+            "depth": 0.9959777170679773,
+            "screenScale": 0.9959777170679773,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-26",
+            "x": 1652.824624774406,
+            "y": 310.043191602614,
+            "d": 300,
+            "scale": 0.9601497803155704,
+            "opacity": 1,
+            "vx": -7.507588463318955,
+            "vy": -6.206403797660423,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -14.500199411995709,
+            "depth": 0.9601497803155704,
+            "screenScale": 0.9601497803155704,
+            "blur": "blur(0.25px)"
+          }
+        ],
+        "flowers": 28,
+        "gardenNext": 21,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 4,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-19",
+          "key": "slot-10",
+          "x": 586.7723188457292,
+          "y": 119.0131191494915,
+          "d": 356,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 10,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You understood my mistake and spoke gently. Thank you for helping us move on."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-40",
+          "key": "slot-11",
+          "x": 989.8393066309877,
+          "y": 172.1852562090362,
+          "d": 337,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 11,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your gentle apology and encouragement helped restore peace."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-12",
+          "key": "slot-12",
+          "x": 1458.3152402306955,
+          "y": 287.29512204137046,
+          "d": 342,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 12,
+          "expression": 3,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your sincere apology helped us begin again with a lighter heart. Thank you."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 4,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-19",
+            "x": 764.7723188457292,
+            "y": 297.0131191494915,
+            "d": 356,
+            "scale": 0.9841246438415608,
+            "opacity": 1,
+            "vx": -15.607754063909447,
+            "vy": 3.7470012470539347,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 27.662547640502453,
+            "depth": 0.9841246438415608,
+            "screenScale": 0.9841246438415608,
+            "blur": "blur(0.3px)"
+          },
+          {
+            "id": "fixture-40",
+            "x": 1158.3393066309877,
+            "y": 340.6852562090362,
+            "d": 337,
+            "scale": 0.9007163463534744,
+            "opacity": 1,
+            "vx": 5.105125176558441,
+            "vy": -16.576885974411095,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 8.165579065680504,
+            "depth": 0.9007163463534744,
+            "screenScale": 0.9007163463534744,
+            "blur": "blur(0.09px)"
+          },
+          {
+            "id": "fixture-12",
+            "x": 1629.3152402306955,
+            "y": 458.29512204137046,
+            "d": 342,
+            "scale": 0.9808910725992988,
+            "opacity": 1,
+            "vx": 2.6446418017707507,
+            "vy": 5.3363904472911745,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -9.176895595155656,
+            "depth": 0.9808910725992988,
+            "screenScale": 0.9808910725992988,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 5,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 5,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 8,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-33",
+          "key": "slot-13",
+          "x": 949.6930001993271,
+          "y": 11.867594959718133,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 13,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You met my apology with understanding. Thank you for your patience."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-11",
+          "key": "slot-14",
+          "x": 1273.7718952747357,
+          "y": 5.4763946990375985,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 14,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You patiently heard me out and helped me feel understood. Thank you for your kindness."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-32",
+          "key": "slot-15",
+          "x": 837.6331680715439,
+          "y": 321.07975077273034,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 15,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You praised my effort and encouraged me not to give up."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-46",
+          "key": "slot-16",
+          "x": 1495.8696603152093,
+          "y": 255.44448580491394,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 16,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You reminded me how far I had come and encouraged my next step."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 8,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-33",
+            "x": 1105.6930001993271,
+            "y": 167.86759495971813,
+            "d": 312,
+            "scale": 0.978696296838072,
+            "opacity": 1,
+            "vx": -9.696081634402852,
+            "vy": 4.675467698129783,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -40.671445559710264,
+            "depth": 0.978696296838072,
+            "screenScale": 0.978696296838072,
+            "blur": "blur(0.9px)"
+          },
+          {
+            "id": "fixture-11",
+            "x": 1433.7718952747357,
+            "y": 165.4763946990376,
+            "d": 320,
+            "scale": 0.9449777038520236,
+            "opacity": 1,
+            "vx": -4.253001379329353,
+            "vy": 8.184879977677157,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 7.575684282928705,
+            "depth": 0.9449777038520236,
+            "screenScale": 0.9449777038520236,
+            "blur": "blur(0.35px)"
+          },
+          {
+            "id": "fixture-32",
+            "x": 989.6331680715439,
+            "y": 473.07975077273034,
+            "d": 304,
+            "scale": 0.9860485402977365,
+            "opacity": 1,
+            "vx": -21.155037687111154,
+            "vy": 0.350378171933505,
+            "life": "steady",
+            "readingPages": 1,
+            "z": 13.993895971216261,
+            "depth": 0.9860485402977365,
+            "screenScale": 0.9860485402977365,
+            "blur": "none"
+          },
+          {
+            "id": "fixture-46",
+            "x": 1643.3696603152093,
+            "y": 402.94448580491394,
+            "d": 295,
+            "scale": 0.9959475184634242,
+            "opacity": 1,
+            "vx": -0.9900651516159109,
+            "vy": 5.193566420390925,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -42.14560290798545,
+            "depth": 0.9959475184634242,
+            "screenScale": 0.9959475184634242,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 6,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 6,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 7,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 7,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 9,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-4",
+          "key": "slot-17",
+          "x": 961.1132661052468,
+          "y": 25.605822027690095,
+          "d": 312,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 17,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your encouraging words helped me try again. Thank you for believing in me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-25",
+          "key": "slot-18",
+          "x": 1286.0383949497896,
+          "y": 74.37056759321123,
+          "d": 320,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 18,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You listened to my point of view and made me feel understood."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-18",
+          "key": "slot-19",
+          "x": 554.4543395193311,
+          "y": 284.5783302037314,
+          "d": 304,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 19,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "Your encouragement gave me the courage to finish. You saw the best in me."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-39",
+          "key": "slot-20",
+          "x": 1502.7586222467767,
+          "y": 329.23608183919083,
+          "d": 295,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 20,
+          "expression": null,
+          "large": false,
+          "motion": true,
+          "reading": {
+            "pages": [
+              "You listened without judgment and made room for my feelings."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 9,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [
+          {
+            "id": "fixture-4",
+            "x": 1117.1132661052468,
+            "y": 181.6058220276901,
+            "d": 312,
+            "scale": 0.9847607406544959,
+            "opacity": 1,
+            "vx": -13.505681024492693,
+            "vy": 6.331841339222805,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -21.065489193424582,
+            "depth": 0.9847607406544959,
+            "screenScale": 0.9847607406544959,
+            "blur": "blur(0.8px)"
+          },
+          {
+            "id": "fixture-25",
+            "x": 1446.0383949497896,
+            "y": 234.37056759321123,
+            "d": 320,
+            "scale": 0.9664989375364714,
+            "opacity": 1,
+            "vx": -14.93602875024757,
+            "vy": 3.1775262578872217,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -26.089962958358228,
+            "depth": 0.9664989375364714,
+            "screenScale": 0.9664989375364714,
+            "blur": "blur(0.3px)"
+          },
+          {
+            "id": "fixture-18",
+            "x": 706.4543395193311,
+            "y": 436.5783302037314,
+            "d": 304,
+            "scale": 0.9174675043699008,
+            "opacity": 1,
+            "vx": -11.677183477037802,
+            "vy": -0.0906977629803915,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -5.798260648734868,
+            "depth": 0.9174675043699008,
+            "screenScale": 0.9174675043699008,
+            "blur": "blur(0.04px)"
+          },
+          {
+            "id": "fixture-39",
+            "x": 1650.2586222467767,
+            "y": 476.73608183919083,
+            "d": 295,
+            "scale": 0.9413996062123995,
+            "opacity": 1,
+            "vx": -7.629151677802742,
+            "vy": 0.8593678769113925,
+            "life": "steady",
+            "readingPages": 1,
+            "z": -3.311707000248134,
+            "depth": 0.9413996062123995,
+            "screenScale": 0.9413996062123995,
+            "blur": "none"
+          }
+        ],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 10,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [
+        {
+          "id": "fixture-8",
+          "key": "slot-21",
+          "x": 870.9341745428667,
+          "y": 275.0639669376306,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 21,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You listened kindly and helped us understand each other. Thank you for choosing peace."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-22",
+          "key": "slot-22",
+          "x": 114.63351568844462,
+          "y": 217.83319657242276,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 22,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You heard my concerns and helped us begin again with understanding."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-36",
+          "key": "slot-23",
+          "x": 703.3355228978214,
+          "y": 176.22338700780065,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 23,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You gave me time to explain and helped us understand each other."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        },
+        {
+          "id": "fixture-47",
+          "key": "slot-24",
+          "x": 1370.5736485944199,
+          "y": 206.55120734841415,
+          "d": 284,
+          "born": 0,
+          "phase": "steady",
+          "since": 0,
+          "serial": 24,
+          "expression": 3,
+          "large": false,
+          "motion": false,
+          "reading": {
+            "pages": [
+              "You forgave a small mistake and helped me feel at ease again."
+            ],
+            "index": 0,
+            "at": 0,
+            "duration": 9
+          }
+        }
+      ],
+      "visual": {
+        "clock": 14,
+        "scene": 10,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [
+          {
+            "id": "fixture-8",
+            "z": 392.02565009251055,
+            "scale": 1.38135742407171,
+            "moons": 2
+          },
+          {
+            "id": "fixture-22",
+            "z": 48.38274144304455,
+            "scale": 1.0352742291198251,
+            "moons": 2
+          },
+          {
+            "id": "fixture-36",
+            "z": -392.02565009251055,
+            "scale": 0.783653366014716,
+            "moons": 2
+          },
+          {
+            "id": "fixture-47",
+            "z": -48.3827414430446,
+            "scale": 0.9670503200034232,
+            "moons": 2
+          }
+        ],
+        "stream": [],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    },
+    {
+      "version": "color-polish-v6",
+      "initialized": true,
+      "scene": 11,
+      "sceneAge": 14,
+      "clock": 14,
+      "playing": true,
+      "still": false,
+      "mode": "normal",
+      "queueLength": 0,
+      "active": null,
+      "transition": null,
+      "slots": [],
+      "visual": {
+        "clock": 14,
+        "scene": 11,
+        "dwell": {
+          "1": 30,
+          "2": 180,
+          "3": 30,
+          "4": 30,
+          "5": 30,
+          "6": 30,
+          "7": 30,
+          "8": 60,
+          "9": 60,
+          "10": 30,
+          "11": 30
+        },
+        "actors": [],
+        "flowers": 0,
+        "gardenNext": 12,
+        "fx": 0,
+        "orbit": [],
+        "stream": [
+          {
+            "id": "fixture-5",
+            "x": 466.4829631460707,
+            "y": 546.1738053464031,
+            "z": 351.1533086351913,
+            "scale": 1.5411961150584925,
+            "rise": 22.482001890428364,
+            "radius": 174.16903650388122,
+            "turn": 0.2023212189041078
+          },
+          {
+            "id": "fixture-12",
+            "x": 478.91473512357516,
+            "y": 534.9943272911996,
+            "z": -554.4395378418656,
+            "scale": 0.6433186853882835,
+            "rise": 29.633414624258876,
+            "radius": 239.50059068389237,
+            "turn": 0.23970882907276975
+          },
+          {
+            "id": "fixture-19",
+            "x": 740.6754534151095,
+            "y": 528.3450628893746,
+            "z": -153.0236183722107,
+            "scale": 0.8672849229331114,
+            "rise": 34.245949514210224,
+            "radius": 255.78714112192392,
+            "turn": 0.2098737669480033
+          },
+          {
+            "id": "fixture-26",
+            "x": 330.5763278080097,
+            "y": 600.9854608371738,
+            "z": -351.4116888490197,
+            "scale": 0.7399669606614749,
+            "rise": 33.892080140300095,
+            "radius": 291.8415501900017,
+            "turn": 0.2256168348318897
+          },
+          {
+            "id": "fixture-33",
+            "x": 703.9799665715436,
+            "y": -139.45260391584708,
+            "z": 28.666613722115756,
+            "scale": 1.0295126412075315,
+            "rise": 20.799391206353903,
+            "radius": 205.06738132610917,
+            "turn": 0.16308688781689853
+          },
+          {
+            "id": "fixture-40",
+            "x": 648.9790914781357,
+            "y": -106.08275106957188,
+            "z": -332.2264276728264,
+            "scale": 0.7506231517616944,
+            "rise": 23.5455253245309,
+            "radius": 190.5917784795165,
+            "turn": 0.1468063674471341
+          },
+          {
+            "id": "fixture-47",
+            "x": 643.9699745684525,
+            "y": 41.20734918445491,
+            "z": -526.5163889746368,
+            "scale": 0.6550863175938133,
+            "rise": 17.800890221260488,
+            "radius": 283.82560443133116,
+            "turn": 0.21432218203088269
+          },
+          {
+            "id": "fixture-20",
+            "x": 689.6890067142525,
+            "y": 766.5926847531459,
+            "z": 184.57726547192266,
+            "scale": 1.2263577622455497,
+            "rise": 39.51087628118694,
+            "radius": 236.2353792320937,
+            "turn": 0.14798204507213086
+          },
+          {
+            "id": "fixture-41",
+            "x": 473.00961700305623,
+            "y": -118.29803781211747,
+            "z": -520.544890657198,
+            "scale": 0.657658978793969,
+            "rise": 38.37284405808896,
+            "radius": 303.05827615223825,
+            "turn": 0.1392712881276384
+          },
+          {
+            "id": "fixture-13",
+            "x": 667.0395003719975,
+            "y": 186.25104254787732,
+            "z": -119.08726663546793,
+            "scale": 0.8935853617622659,
+            "rise": 20.756174171343446,
+            "radius": 167.00564990751445,
+            "turn": 0.19145267122192308
+          },
+          {
+            "id": "fixture-34",
+            "x": 692.6843546568543,
+            "y": 196.803818981485,
+            "z": -200.2187166498967,
+            "scale": 0.8331814744492938,
+            "rise": 24.71073437202722,
+            "radius": 208.24932739324868,
+            "turn": 0.18300395293161273
+          },
+          {
+            "id": "fixture-6",
+            "x": 719.7517250964082,
+            "y": 290.39543463793456,
+            "z": -256.2178981320809,
+            "scale": 0.7960402422915156,
+            "rise": 22.689085221849382,
+            "radius": 266.94240216352046,
+            "turn": 0.23408219849923625
+          },
+          {
+            "id": "fixture-27",
+            "x": 513.9117386299098,
+            "y": 126.33357610516782,
+            "z": -630.113168453734,
+            "scale": 0.6134543413010789,
+            "rise": 39.35175608936697,
+            "radius": 223.4458897560835,
+            "turn": 0.2260943043231964
+          },
+          {
+            "id": "fixture-11",
+            "x": 339.30153534284364,
+            "y": 436.5294782562142,
+            "z": -288.8320576186506,
+            "scale": 0.7758962807362816,
+            "rise": 21.473461787216365,
+            "radius": 257.2033491525799,
+            "turn": 0.1390758010861464
+          }
+        ],
+        "singleStyles": [
+          "Through the light",
+          "Comet sweep",
+          "A thousand kind sparks",
+          "Pearl spring",
+          "Spiral bloom",
+          "Petals into pearl"
+        ],
+        "groupStyles": [
+          "Cascading constellation",
+          "Two tides, one wave",
+          "Spiral constellation",
+          "Petal fountains",
+          "Ripple of kindness"
+        ]
+      },
+      "log": [
+        {
+          "at": 14,
+          "type": "bubble_exit_start",
+          "scene": 2,
+          "id": "fixture-6",
+          "kind": "petals",
+          "age": 14
+        },
+        {
+          "at": 14,
+          "type": "garden_replacement",
+          "scene": 2,
+          "index": 1,
+          "active": 5
+        }
+      ]
+    }
+  ],
+  "arrivals": []
+}

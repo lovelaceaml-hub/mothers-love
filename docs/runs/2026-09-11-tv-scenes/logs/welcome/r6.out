@@ -1,0 +1,25 @@
+Welcome ring animation updated to rotate the conic gradient angle directly via `@property`, keeping the pseudo element box stationary and eliminating stage overflow.
+
+The `.orb-slot::after` pseudo element previously rotated its square bounding box by up to 41 percent on diagonal turns, causing transient overflow past stage boundaries. Animating `--welcome-ring-angle` inside the conic gradient spins the visual ring without moving or expanding the box. No shell commands were run, and [`welcome.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) was left untouched.
+
+What now works:
+- [`welcome.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css) registers `@property --welcome-ring-angle`, rotates the angle from 0deg to 360deg in `@keyframes welcomeRingSpin`, and applies it to the conic gradient with all box transforms removed.
+- [`welcome.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md) records Round r6 in the Result section.
+
+What Anthony must do:
+Nothing, you're clear.
+
+Next two-minute action:
+Inspect the diff in [`welcome.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css) before handing control back to the coordinator.
+
+Questions:
+1. Ready for the coordinator to run verification and landing review on Section 1?
+
+## COMPLETION
+
+Files changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
+- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
+
+Anything not done and why:
+Nothing, all requested work in Round r6 is complete. Shell commands were skipped in compliance with the work order.

@@ -1,0 +1,10 @@
+status r2 done
+status verify:  e2e exit 1   1 failed   12 passed (1.5m)   1) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds  DONE 
+status committed 1bde0f8 and pushed
+merged into pick 828729a
+pick build exit 0
+pick scenes+usable e2e exit 1   2 failed   62 passed (2.4m) 
+  1) [chromium] › tests/color-polish-scenes/garden.spec.ts:68:5 › petals are carried, not dropped ──
+  2) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 sec
+pick.diff lines     5818
+DONE

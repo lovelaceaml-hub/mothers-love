@@ -1,0 +1,303 @@
+
+Running 13 tests using 5 workers
+
+  ✘   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (6.0s)
+  ✘   5 [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s (6.1s)
+  ✘   4 [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth (6.1s)
+  ✘   3 [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual (6.2s)
+  ✘   2 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (6.1s)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (433ms)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (548ms)
+  ✘   6 [chromium] › tests/color-polish-scenes/milestone.spec.ts:178:5 › reduced motion renders the milestone still (5.5s)
+  ✘   7 [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms (5.6s)
+  ✘   9 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (5.9s)
+  ✘   8 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (11.0s)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.7s)
+  ✘  13 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:25:28
+
+    Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
+
+  3) [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:11:21
+
+    Error Context: test-results/color-polish-scenes-milest-af9d1-d-does-not-overflow-at-14-s-chromium/error-context.md
+
+  4) [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:51:21
+
+    Error Context: test-results/color-polish-scenes-milest-e5e53-e-continuous-and-individual-chromium/error-context.md
+
+  5) [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth ────────────────
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:116:21
+
+    Error Context: test-results/color-polish-scenes-milestone-extreme-depth-chromium/error-context.md
+
+  6) [chromium] › tests/color-polish-scenes/milestone.spec.ts:178:5 › reduced motion renders the milestone still 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:452:21)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:179:28
+
+    Error Context: test-results/color-polish-scenes-milest-4db81-renders-the-milestone-still-chromium/error-context.md
+
+  7) [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+       at color-polish-scenes/helpers.ts:128
+
+      126 |   await page.getByLabel('Password').fill('synthetic-password');
+      127 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      129 | }
+      130 |
+      131 | /**
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:189:21
+
+    Error Context: test-results/color-polish-scenes-milest-f731a-without-overflow-at-2000-ms-chromium/error-context.md
+
+  8) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+      100 |   await page.getByLabel('Password').fill('synthetic-password');
+      101 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 102 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      103 | }
+      104 |
+      105 |
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:102:22)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:224:3
+
+    Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
+
+  9) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/\/admin(?:\/?$)/[39m
+    Received string:  [31m"http://127.0.0.1:3111/admin/login"[39m
+    Timeout: 5000ms
+
+    Call log:
+    [2m  - Expect "toHaveURL" with timeout 5000ms[22m
+    [2m    9 × unexpected value "http://127.0.0.1:3111/admin/login"[22m
+
+
+      100 |   await page.getByLabel('Password').fill('synthetic-password');
+      101 |   await page.getByRole('button', { name: 'Sign in' }).click();
+    > 102 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
+          |                      ^
+      103 | }
+      104 |
+      105 |
+        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:102:22)
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:261:3
+
+    Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
+
+  10) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  10 failed
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
+    [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:10:5 › milestone renders and does not overflow at 14 s 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:50:5 › the stream is dense, continuous and individual 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:115:5 › extreme depth ─────────────────
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:178:5 › reduced motion renders the milestone still 
+    [chromium] › tests/color-polish-scenes/milestone.spec.ts:188:5 › left copy is removed and rail is widened without overflow at 2000 ms 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  3 passed (1.9m)

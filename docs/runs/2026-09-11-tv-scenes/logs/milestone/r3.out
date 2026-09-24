@@ -1,0 +1,24 @@
+The inert CSS rule has been removed from [milestone.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css), circularity assertions now measure `.stream-pearl` directly in [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts), and the lane record is updated.
+
+The `.stream-node` container has no background or border, whereas `.stream-pearl` already styles the visible circle with `border-radius: 50%`, `overflow: hidden`, and a circular `clip-path`. Removing the extra rule aligns with the gap report decision to keep no CSS beyond the header comment.
+
+### Changes completed
+1. Restored [milestone.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css) to its single header comment line only.
+2. Updated [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts) to query `.stream-pearl` and assert width equals height within 1 px, computed border-radius of 50 percent (or half width within 1 px), measuring at least 14 items.
+3. Updated [milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md) to note that `milestone.css` holds only its header comment with circularity measured on `.stream-pearl`, appending the Round 3 entry to Result.
+
+### Two-minute next action
+Inspect the test assertion update in [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts#L20-L45) to confirm the query targeting.
+
+### What Anthony must do
+- Nothing, you're clear.
+
+### Next step
+1. Proceed with coordinator verification suite run.
+2. Review the diff in git.
+
+## COMPLETION
+Files changed:
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts)
+- [/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md)

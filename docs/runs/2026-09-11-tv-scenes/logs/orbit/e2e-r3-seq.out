@@ -1,0 +1,67 @@
+
+Running 15 tests using 5 workers
+
+  ✓   1 [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still (6.8s)
+  ✓   4 [chromium] › tests/color-polish-scenes/orbit.spec.ts:10:5 › orbit renders circular planets and no overflow at 14 s (7.8s)
+  ✓   5 [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular (7.8s)
+  ✓   3 [chromium] › tests/color-polish-scenes/orbit.spec.ts:120:5 › the far planet is blurred and dim, the near planet sharp with a shadow (7.9s)
+  ✘   2 [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate (7.9s)
+  ✓   7 [chromium] › tests/color-polish-scenes/orbit.spec.ts:205:5 › reduced motion renders the orbit still (2.5s)
+  ✓   9 [chromium] › tests/color-polish-scenes/orbit.spec.ts:227:5 › at 300 ms the sun name matches a catalog entry and every .planet-system contains one .orb-slot (2.6s)
+  ✓   6 [chromium] › tests/color-polish-scenes/orbit.spec.ts:183:5 › planets stay circular through the orbit (3.5s)
+  ✓  11 [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable (374ms)
+  ✓  12 [chromium] › tests/color-polish-usable/usable.spec.ts:298:5 › scene countdown ring counts down and resets on manual advance (705ms)
+  ✓  10 [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene (2.2s)
+  ✓   8 [chromium] › tests/color-polish-scenes/orbit.spec.ts:214:5 › across six fresh opens at 300 ms, the .orbit-sun h2 text shows at least two distinct catalog names (7.7s)
+  ✓  15 [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio (6.5s)
+  ✓  13 [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches (22.6s)
+  ✘  14 [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds (1.3m)
+
+
+  1) [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: <= [32m0.09184000000000002[39m
+    Received:    [31m0.09961359999999848[39m
+
+      115 |   // Measurement is wall-clock sampled.
+      116 |   expect(measuredRate!).toBeGreaterThanOrEqual(0.082 * 0.88);
+    > 117 |   expect(measuredRate!).toBeLessThanOrEqual(0.082 * 1.12);
+          |                         ^
+      118 | });
+      119 |
+      120 | test('the far planet is blurred and dim, the near planet sharp with a shadow', async ({ page }) => {
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:117:25
+
+    Error Context: test-results/color-polish-scenes-orbit--de2d9-it-in-3D-at-the-slower-rate-chromium/error-context.md
+
+  2) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')
+    Expected: visible
+    Timeout: 75000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 75000ms[22m
+    [2m  - waiting for locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')[22m
+
+
+      422 |   // The 60 s stale rule only fires once no poll has verified in that long;
+      423 |   // wait comfortably past it for the existing fallback behavior to run.
+    > 424 |   await expect(page.locator('[data-testid="color-polish-display"][data-display-phase="unavailable"]')).toBeVisible({ timeout: 75_000 });
+          |                                                                                                        ^
+      425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
+      426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
+      427 | });
+        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
+
+    Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
+
+  2 failed
+    [chromium] › tests/color-polish-scenes/orbit.spec.ts:25:5 › planets orbit in 3D at the slower rate 
+    [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
+  13 passed (1.5m)

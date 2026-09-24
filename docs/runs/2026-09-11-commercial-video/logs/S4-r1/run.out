@@ -1,0 +1,26 @@
+Updated [`scripts/video/assemble.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) to extract full double-quoted strings for `CAMPAIGN_TITLE` and `CAMPAIGN_TAGLINE` including apostrophes, with self-check validations.
+
+### Verification outputs
+
+1. `node --check scripts/video/assemble.mjs`
+```text
+Exit code: 0
+Output: (clean, no syntax errors)
+```
+
+2. `node -e "const fs=require('fs');const c=fs.readFileSync('src/lib/catalog.ts','utf8');const t=c.match(/CAMPAIGN_TITLE\s*=\s*\"([^\"]+)\"/)[1];const g=c.match(/CAMPAIGN_TAGLINE\s*=\s*\"([^\"]+)\"/)[1];console.log(JSON.stringify([t,g]))"`
+```text
+["THE WORDS OF MOTHER'S LOVE","Where a mother's love resides, peace abides."]
+```
+
+3. `grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/assemble.mjs`
+```text
+0
+```
+
+## COMPLETION
+File changed:
+- [`/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+
+### What Anthony must do
+Nothing, you're clear.

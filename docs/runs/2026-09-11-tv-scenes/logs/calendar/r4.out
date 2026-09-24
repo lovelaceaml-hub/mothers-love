@@ -1,0 +1,24 @@
+Progress: Calendar round r4 Today halo overflow correction complete.
+
+The Today halo has been rebuilt as an inset ring contained strictly inside the day cell box without rotating the element.
+
+The previous halo pseudo element used `inset: -3px` and an element rotation that expanded the cell `scrollWidth` from 164 to 167. The updated rule sets `inset: 0` with 3px padding and mask compositing to form a 3px border ring directly inside the cell. A repeating linear gradient background-position sweep across 6 seconds now animates the highlight around the ring without element transforms, eliminating scrollable overflow.
+
+### What works now
+- Today day cell scrollable width and height remain completely flush with client dimensions (164px by 78px).
+- The Today ring highlight sweeps along the inset border without any element rotation or layout shift.
+- Still mode and reduced-motion overrides remain fully enforced.
+
+### Changes made
+1. [`calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css): Rebuilt `#tv .scene[data-scene="5"] .day.today::after` with `inset: 0`, `padding: 3px`, masked border box, and animated `background-position` from `200% 0` to `-100% 0` over 6s linear infinite; updated `@keyframes calendarTodayHalo` to animate `background-position`.
+2. [`calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md): Appended the Round r4 summary line to the Result section.
+
+### What Anthony must do
+Nothing, you're clear.
+
+### Two-minute action
+Inspect the uncommitted diff in [`calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css) and [`calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md) before the coordinator runs the test suite.
+
+## COMPLETION
+- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
+- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
