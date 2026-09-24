@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
-      { url: "/icons/butterfly-heart-v1-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/butterfly-heart-v1-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/open-hands-heart-v1-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/open-hands-heart-v1-512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",

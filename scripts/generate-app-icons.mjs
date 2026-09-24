@@ -1,4 +1,4 @@
-/** Generate static icons from Anthony's approved butterfly-and-heart artwork. */
+/** Generate static icons from Anthony's approved open-hands-and-heart artwork. */
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -9,15 +9,17 @@ import path from 'node:path';
 const require = createRequire(import.meta.url);
 const sharp = require('sharp');
 const root = fileURLToPath(new URL('../', import.meta.url));
-const source = await readFile(path.join(root, 'assets/app-icon/butterfly-heart-v1.avif'));
-const expected = 'da7eae2d8b7f13554932b619ea673e16d69c6ea0209fe6332e7b17c3be1b26ef';
-if (createHash('sha256').update(source).digest('hex') !== expected) {
+const artwork = await readFile(path.join(root, 'assets/app-icon/open-hands-heart-v1.svg'));
+const expected = '67cfd35555230c6ffb49b843edb501946a1adec61b2e78b6d199deb2a840c35c';
+if (createHash('sha256').update(artwork).digest('hex') !== expected) {
   throw new Error('Approved app-icon source checksum does not match.');
 }
-const metadata = await sharp(source).metadata();
-if (metadata.width !== 512 || metadata.height !== 512) {
-  throw new Error('The approved app-icon source must be 512 by 512.');
-}
+// The vector artwork is transparent; place it on the app's cream background.
+const source = await sharp(artwork, { density: 384 })
+  .resize(512, 512)
+  .flatten({ background: '#FFF6DC' })
+  .png()
+  .toBuffer();
 const destination = path.join(root, 'public/icons');
 await mkdir(destination, { recursive: true });
 for (const size of [16, 32, 48, 64, 180, 192, 512]) {
@@ -26,7 +28,7 @@ for (const size of [16, 32, 48, 64, 180, 192, 512]) {
     .removeAlpha()
     .png({ compressionLevel: 9 })
     .toBuffer();
-  await writeFile(path.join(destination, `butterfly-heart-v1-${size}.png`), png);
+  await writeFile(path.join(destination, `open-hands-heart-v1-${size}.png`), png);
   if (size === 180) {
     await writeFile(path.join(root, 'public/apple-touch-icon.png'), png);
   }
@@ -51,4 +53,4 @@ for (let i = 0; i < sizes.length; i += 1) {
   offset += images[i].length;
 }
 await writeFile(path.join(root, 'public/favicon.ico'), Buffer.concat([header, ...images]));
-console.log('Generated static butterfly-heart app icons.');
+console.log('Generated static open-hands-heart app icons.');
