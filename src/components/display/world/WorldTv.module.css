@@ -89,6 +89,7 @@
   bottom: auto !important;
   width: 26vw !important;
   max-height: 57vh !important;
+  overflow: hidden !important;
   z-index: 2;
 }
 

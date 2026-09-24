@@ -74,7 +74,8 @@ export function WorldExperience({
     [reduced, setReduced] = useState(false),
     [still, setStill] = useState(false),
     [speed, setSpeed] = useState(tvPage ? TV_TOUR_SPEED : 1),
-    [quality, setQuality] = useState<Quality>(designReview ? "high" : "auto");
+    // The TV page starts on Automatic, so a TV browser that cannot keep up steps down (K5).
+    [quality, setQuality] = useState<Quality>(designReview && !tvPage ? "high" : "auto");
   const [source, setSource] = useState<WorldSource>(initialSource),
     [panel, setPanel] = useState<"settings" | "map" | "recognitions" | null>(
       null,
@@ -504,7 +505,7 @@ export function WorldExperience({
           </section>}
           {(fallback || !RECOGNITION_ZONES.includes(status.zone)) && (
             <aside
-              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""} ${tvPage ? tvStyles.panel : ""}`}
+              className={`${styles.reading} ${RECOGNITION_ZONES.includes(zone.id) ? styles.recognitionBubble : ""} ${status.traveling ? styles.inTransit : ""}${tvPage ? ` ${tvStyles.panel}` : ""}`}
               aria-label="World content"
             >
               <WorldContent

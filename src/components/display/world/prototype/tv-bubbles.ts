@@ -1,15 +1,11 @@
 import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
-import type { WorldZone, ZoneId } from "../world-data";
+import type { WorldZone } from "../world-data";
 
 /*
- * The TV page's recognition bubbles (PLAN-01 Section 5, steps 4 and 5): where each bubble of
- * a place stands, how big, and how its words are painted so they read from across the room.
- *
- * Every bubble is still a depth tested object in the world. Its place is worked out once from
- * the place's tour view (the camera at `zone.eye` looking at `zone.target`), so at the hold
- * the big bubble lands on the right of the frame at a known size, and the text size rules can
- * be proved in plain Node by projecting through the same camera.
+ * The TV page's recognition bubbles (PLAN-01 Section 5, step 4): how their words are painted
+ * so they read from across the room, and the decoration they wear. Where they stand is
+ * `tv-anchors.ts`: every bubble rests on something real in its place.
  */
 
 /** The tour camera's vertical field of view on a landscape screen (world-engine resize). */
@@ -17,141 +13,16 @@ export const TV_FOV = 43;
 export const TV_ASPECT = 16 / 9;
 /** The reference screen for every pixel rule here. */
 export const TV_SCREEN_HEIGHT = 1080;
-/** The narrowed reading arc (CameraDirector.arc) so the held bubble keeps its reading size. */
-export const TV_ARC = { swing: 0.16, approach: 0.03 } as const;
 
 export type TvBubbleRole = "held" | "second" | "small";
-export type TvBubbleSpec = {
-  role: TvBubbleRole;
-  /** Where the bubble's centre lands in the tour view, in normalized device coordinates. */
-  ndc: readonly [number, number];
-  /** How far from the tour eye it stands, world units along its ray. */
-  distance: number;
-  /** Its diameter on a 1080 line screen in the tour view, pixels. */
-  diameter: number;
-};
 
-/**
- * One place's bubbles in its tour view. The held big bubble fills the right of the frame at
- * about 740 px; the second big bubble stands back on the left; three small ones sit in view
- * and five more stand round the island, seen as the camera arrives and leaves. Top left stays
- * clear for the place title, bottom left for the QR code and the bottom for the live ticker.
- */
-export const TV_PLACE_LAYOUT: readonly TvBubbleSpec[] = [
-  { role: "held", ndc: [0.4, -0.02], distance: 15, diameter: 740 },
-  { role: "second", ndc: [-0.42, 0.22], distance: 22, diameter: 420 },
-  { role: "small", ndc: [-0.844, 0.222], distance: 26, diameter: 270 },
-  { role: "small", ndc: [-0.063, 0.444], distance: 34, diameter: 270 },
-  { role: "small", ndc: [-1.25, -0.5], distance: 28, diameter: 270 },
-  { role: "small", ndc: [-0.271, -0.481], distance: 16, diameter: 270 },
-  { role: "small", ndc: [1.55, 0.15], distance: 30, diameter: 280 },
-  { role: "small", ndc: [-1.6, 0.05], distance: 30, diameter: 280 },
-  { role: "small", ndc: [1.3, -0.35], distance: 30, diameter: 280 },
-  { role: "small", ndc: [-1.3, 0.55], distance: 32, diameter: 270 },
-];
-
-/**
- * Places that keep a feature panel (step 7) show it on the left, between the title and the QR
- * code, so their second big bubble and one small one stand in the middle and the other small
- * ones stand round the island.
- */
-export const TV_PANEL_LAYOUT: readonly TvBubbleSpec[] = [
-  { role: "held", ndc: [0.4, -0.02], distance: 15, diameter: 740 },
-  { role: "second", ndc: [-0.1875, 0.444], distance: 26, diameter: 360 },
-  { role: "small", ndc: [-0.1875, -0.296], distance: 18, diameter: 270 },
-  { role: "small", ndc: [1.55, 0.15], distance: 30, diameter: 280 },
-  { role: "small", ndc: [-1.6, 0.05], distance: 30, diameter: 280 },
-  { role: "small", ndc: [1.3, -0.35], distance: 30, diameter: 280 },
-  { role: "small", ndc: [-1.3, 0.55], distance: 32, diameter: 270 },
-  { role: "small", ndc: [-1.25, -0.5], distance: 28, diameter: 270 },
-  { role: "small", ndc: [1.4, 0.6], distance: 32, diameter: 270 },
-  { role: "small", ndc: [-1.5, -0.2], distance: 26, diameter: 270 },
-];
-
-/**
- * The River of Recognitions (step 6): the held big bubble on the right as everywhere, the
- * second big one high in the middle, and eight small bubbles drifting down the river toward the
- * viewer in two columns (the idea of the TV's Live Recognitions screen). Each river bubble
- * runs from `ndc` far up the river to `to` near the viewer over `TV_RIVER_SECONDS`, then
- * starts again at the top; a column's four are a quarter of the run apart.
- */
-export const TV_RIVER_SECONDS = 48;
-export type TvRiverSpec = TvBubbleSpec & { to: readonly [number, number]; toDistance: number; offset: number };
-export const TV_RIVER_LAYOUT: readonly (TvBubbleSpec | TvRiverSpec)[] = [
-  { role: "held", ndc: [0.4, -0.02], distance: 15, diameter: 740 },
-  { role: "second", ndc: [0, 0.62], distance: 32, diameter: 260 },
-  // Each run starts above the top of the frame, so at most three of a column's four are in
-  // view at once, a bubble's height apart (260 px bubbles on a 1080 px screen).
-  ...[-0.78, -0.36].flatMap((x, column) => [0, 0.25, 0.5, 0.75].map((offset): TvRiverSpec => ({
-    role: "small", ndc: [x + 0.06, 1.42], distance: 40, diameter: 260,
-    to: [x - 0.03, -0.6], toDistance: 17, offset: offset + column * 0.125,
-  }))),
-];
-
-export function isRiverSpec(spec: TvBubbleSpec): spec is TvRiverSpec {
-  return "to" in spec;
-}
-
-/** The layout a place's bubbles use on the TV page. */
-export function tvLayoutFor(zone: ZoneId, panelPlaces: readonly ZoneId[]): readonly TvBubbleSpec[] {
-  if (zone === "live-feed") return TV_RIVER_LAYOUT;
-  return panelPlaces.includes(zone) ? TV_PANEL_LAYOUT : TV_PLACE_LAYOUT;
-}
-
-/**
- * A river bubble's run, sampled evenly on screen from its top to its end (a straight lerp in
- * the world would bunch the far part up under perspective), each sample a world place and
- * the radius that keeps the bubble at its diameter there.
- */
-export type TvRiverPath = Array<{ position: T.Vector3; radius: number }>;
-export function tvRiverPath(zone: Pick<WorldZone, "eye" | "target">, spec: TvRiverSpec, samples = 33): TvRiverPath {
-  return Array.from({ length: samples }, (_, i) => {
-    const t = i / (samples - 1);
-    return tvBubblePlacement(zone, {
-      ...spec,
-      ndc: [spec.ndc[0] + (spec.to[0] - spec.ndc[0]) * t, spec.ndc[1] + (spec.to[1] - spec.ndc[1]) * t],
-      distance: spec.distance + (spec.toDistance - spec.distance) * t,
-    });
-  });
-}
-
-/** Where a river bubble is at `time`: its place and radius on the way down, and how present it is (0 to 1). */
-export function tvRiverAt(path: TvRiverPath, offset: number, time: number, out: T.Vector3) {
-  const t = (((time / TV_RIVER_SECONDS + offset) % 1) + 1) % 1;
-  const at = t * (path.length - 1), i = Math.min(path.length - 2, Math.floor(at)), f = at - i;
-  out.copy(path[i].position).lerp(path[i + 1].position, f);
-  // Grow in at the top of the run and fade out at the end, so the wrap is never seen.
-  const presence = Math.min(1, t / 0.06, (1 - t) / 0.06);
-  return { t, radius: path[i].radius + (path[i + 1].radius - path[i].radius) * f, presence };
-}
-
-/** The tour camera for a place, as the director parks it with no reading arc. */
+/** A place's tour camera, parked, as the director leaves it with no reading arc. */
 export function tvTourCamera(zone: Pick<WorldZone, "eye" | "target">, aspect = TV_ASPECT) {
   const camera = new T.PerspectiveCamera(TV_FOV, aspect, 0.1, 450);
   camera.position.fromArray(zone.eye);
   camera.lookAt(new T.Vector3(...zone.target));
   camera.updateMatrixWorld();
   return camera;
-}
-
-/** A bubble's world centre and radius from its spec, in the place's tour view. */
-export function tvBubblePlacement(zone: Pick<WorldZone, "eye" | "target">, spec: TvBubbleSpec) {
-  const camera = tvTourCamera(zone);
-  const eye = camera.position.clone();
-  const ray = new T.Vector3(spec.ndc[0], spec.ndc[1], 0.5).unproject(camera).sub(eye).normalize();
-  const forward = camera.getWorldDirection(new T.Vector3());
-  const position = eye.clone().addScaledVector(ray, spec.distance);
-  const depth = spec.distance * ray.dot(forward);
-  const radius = (spec.diameter / TV_SCREEN_HEIGHT) * depth * Math.tan((TV_FOV * Math.PI) / 360);
-  return { position, radius };
-}
-
-/** Bubbles along the corridor from one place to the next: three, raised over the path. */
-export function tvCorridorPlacements(from: Pick<WorldZone, "center">, to: Pick<WorldZone, "center">) {
-  return [0.35, 0.5, 0.65].map((t, i) => ({
-    position: new T.Vector3(...from.center).lerp(new T.Vector3(...to.center), t).add(new T.Vector3(0, 9 + i * 1.5, 0)),
-    radius: 2.3,
-  }));
 }
 
 /*
@@ -170,15 +41,20 @@ export const TV_BIG = {
   windowWidth: 660,
   heart: 44,
 } as const;
+/**
+ * A small bubble is a glance: "Thank you," the name and the heart count, every word 22 px or
+ * more once the bubble is 150 px across on a 1080 line screen (76 of 512 canvas pixels). Its
+ * whole message is read when the record takes its turn in the main bubble.
+ */
 export const TV_SMALL = {
   canvas: 512,
-  name: 56,
-  nameMin: 44,
-  body: 44,
-  line: 56,
-  lines: 3,
+  thanks: 76,
+  name: 88,
+  nameMin: 76,
+  heart: 76,
   width: 400,
-  heart: 44,
+  /** The smallest diameter, px at 1080p, a small bubble may have in view. */
+  minDiameter: 150,
 } as const;
 /** The fill under the words, lightest to darkest; every text colour is checked against both. */
 export const TV_FILL = ["#fffdf6", "#fbecf1"] as const;
@@ -272,11 +148,7 @@ export function paintTvMessage(canvas: HTMLCanvasElement, message: string, windo
   return { lines: lines.length, height, overflow: Math.max(0, height - window) };
 }
 
-/**
- * A small bubble: the name, the start of the message in up to three lines and the heart
- * count, every word at 22 px or more on a 1080 line screen. The whole message is what the big
- * bubble shows when the record's turn comes, so here a longer message ends in an ellipsis.
- */
+/** A small bubble's face: "Thank you," the name (at most two lines) and the heart count. */
 export function paintTvSmallFace(canvas: HTMLCanvasElement, record: Recognition, heart: number | null, wrap: Wrap) {
   const c = canvas.getContext("2d")!;
   c.clearRect(0, 0, canvas.width, canvas.height);
@@ -287,37 +159,25 @@ export function paintTvSmallFace(canvas: HTMLCanvasElement, record: Recognition,
   let size: number = TV_SMALL.name, names: string[] = [];
   do {
     c.font = serif(size);
-    names = wrap((t) => c.measureText(t).width, record.recipient, 380);
+    names = wrap((t) => c.measureText(t).width, record.recipient, TV_SMALL.width);
     if (names.length <= 2) break;
     size -= 2;
   } while (size > TV_SMALL.nameMin);
-  // At the 22 px floor a long name may still need more than two lines: keep two, the second
-  // ending in an ellipsis. The whole name shows in the big bubble when the record's turn comes.
+  // A long name keeps two lines, the second ending in an ellipsis; the main bubble shows it whole.
   if (names.length > 2) {
     c.font = serif(size);
     let last = `${names[1]}${names.slice(2).join("")}`.trimEnd();
-    while (last && c.measureText(`${last}…`).width > 380) last = [...new Intl.Segmenter().segment(last)].slice(0, -1).map((s) => s.segment).join("").trimEnd();
+    while (last && c.measureText(`${last}…`).width > TV_SMALL.width) last = [...new Intl.Segmenter().segment(last)].slice(0, -1).map((s) => s.segment).join("").trimEnd();
     names = [names[0], `${last}…`];
   }
   const label = heartLabel(heart);
-  const body = (() => {
-    c.font = serif(TV_SMALL.body);
-    const lines = wrap((t) => c.measureText(t).width, record.message, TV_SMALL.width);
-    if (lines.length <= TV_SMALL.lines) return lines;
-    const kept = lines.slice(0, TV_SMALL.lines);
-    let last = kept[TV_SMALL.lines - 1].trimEnd();
-    while (last && c.measureText(`${last}…`).width > TV_SMALL.width) last = [...new Intl.Segmenter().segment(last)].slice(0, -1).map((s) => s.segment).join("").trimEnd();
-    kept[TV_SMALL.lines - 1] = `${last}…`;
-    return kept;
-  })();
-  const total = names.length * size * 1.05 + 14 + body.length * TV_SMALL.line + (label ? 12 + TV_SMALL.heart : 0);
-  let y = Math.max(64, 256 - total / 2);
+  const total = TV_SMALL.thanks * 1.15 + names.length * size * 1.05 + (label ? 14 + TV_SMALL.heart : 0);
+  let y = 256 - total / 2;
+  c.fillStyle = TV_TEXT.thanks; c.font = serif(TV_SMALL.thanks, true); c.fillText("Thank you,", 256, y);
+  y += TV_SMALL.thanks * 1.15;
   c.fillStyle = TV_TEXT.name; c.font = serif(size);
   for (const line of names) { c.fillText(line, 256, y); y += size * 1.05; }
-  y += 14;
-  c.fillStyle = TV_TEXT.body; c.font = serif(TV_SMALL.body);
-  for (const line of body) { c.fillText(line, 256, y + (TV_SMALL.line - TV_SMALL.body) / 2); y += TV_SMALL.line; }
-  if (label) { y += 12; c.fillStyle = TV_TEXT.heart; c.font = serif(TV_SMALL.heart); c.fillText(label, 256, y); }
+  if (label) { y += 14; c.fillStyle = TV_TEXT.heart; c.font = serif(TV_SMALL.heart); c.fillText(label, 256, y); }
   c.restore();
 }
 
@@ -481,14 +341,4 @@ export class TvDecorShared {
   dispose() {
     for (const item of [this.rimGeometry, this.glowGeometry, this.orbitGeometry, this.rimMaterial, this.glowMaterial, this.orbitMaterial, this.fade]) item.dispose();
   }
-}
-
-/** Which places of a tour leg carry corridor bubbles: every leg into or out of a bubble place. */
-export function tvCorridorLegs(order: readonly ZoneId[], places: readonly ZoneId[]) {
-  const legs: Array<[ZoneId, ZoneId]> = [];
-  order.forEach((from, i) => {
-    const to = order[(i + 1) % order.length];
-    if (places.includes(from) || places.includes(to)) legs.push([from, to]);
-  });
-  return legs;
 }

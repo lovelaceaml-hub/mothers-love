@@ -1,5 +1,5 @@
 import type { Recognition } from "@/lib/contracts";
-import { RECOGNITION_ZONES, TOUR_ORDER, type ZoneId } from "../world-data";
+import { TOUR_ORDER, type ZoneId } from "../world-data";
 import { isWorldDesignStudy } from "./design-mode";
 
 /*
@@ -34,15 +34,10 @@ export function tvStartPlace(search?: string): ZoneId | undefined {
 /** Step 8: the TV tour runs at the settings panel's fastest speed, and the panel is hidden. */
 export const TV_TOUR_SPEED = 2;
 /**
- * Step 5: the places that show the new bubbles: the Garden first (step 10), then, after
- * Anthony's yes on 2026-09-24, all thirteen.
+ * Step 5: the places that show the new, anchored bubbles (`tv-anchors.ts`): the Garden first
+ * (step 10, redone after Anthony's review of 2026-09-24); the others follow after his yes.
  */
-export const TV_BUBBLE_PLACES: readonly ZoneId[] = TOUR_ORDER;
-/**
- * The places that also keep a TV feature panel (step 7: welcome and QR, the nine expressions,
- * practice, calendar, impact, weekly goal, promise). Their bubbles leave the panel's side clear.
- */
-export const TV_PANEL_PLACES: readonly ZoneId[] = TOUR_ORDER.filter((place) => !RECOGNITION_ZONES.includes(place));
+export const TV_BUBBLE_PLACES: readonly ZoneId[] = ["garden"];
 /** The TV draws from the latest 100 (AGENTS.md product invariants). */
 export const TV_RECORD_LIMIT = 100;
 
