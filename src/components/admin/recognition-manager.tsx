@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
+import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
 import { adminApi, getAuthErrorMessage } from './admin-api';
 import { ADMIN_LIST_PAGE_SIZE as PAGE_SIZE, formatDateTime, isExpired, numberRecognitions, statusLabel, type ListSort, type NumberedRecognition } from './admin-utils';
 import styles from './admin.module.css';
@@ -59,10 +60,10 @@ export function RecognitionManager() {
   }, [load]);
 
   useEffect(() => {
-    const timers = items.map((item) => window.setTimeout(() => {
+    const timers = items.map((item) => setSafeTimeout(() => {
       if (isExpired(item.expiresAt)) setItems((current) => current.filter((candidate) => candidate.id !== item.id));
     }, Math.max(0, new Date(item.expiresAt).getTime() - Date.now())));
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
+    return () => timers.forEach((timer: SafeTimerHandle) => clearSafeTimeout(timer));
   }, [items]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));

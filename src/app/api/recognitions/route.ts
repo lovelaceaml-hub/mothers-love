@@ -5,6 +5,7 @@ import { databaseAction } from "@/lib/server/operations";
 import { errorResult, databaseResult, requireTrustedOrigin, requestRateKeys } from "@/lib/server/response";
 import { readJson, requireConfigured } from "@/lib/server/http";
 import { sha256 } from "@/lib/server/operations";
+import { clampPublicExpiry } from "@/lib/server/expiry-clamp";
 
 export async function POST(request: NextRequest) {
   const unavailable = requireConfigured();
@@ -27,6 +28,8 @@ export async function POST(request: NextRequest) {
     rateIp: rates.ip,
     rateContext: rates.context,
   });
-  return databaseResult(result.data, result.error, result.data?.ok === true ? 201 : 200);
+  const data = result.data?.ok === true && typeof result.data.expiresAt === "string" && Number.isFinite(Date.parse(result.data.expiresAt))
+    ? { ...result.data, expiresAt: clampPublicExpiry(result.data.expiresAt, Date.now()) }
+    : result.data;
+  return databaseResult(data, result.error, result.data?.ok === true ? 201 : 200);
 }
-
