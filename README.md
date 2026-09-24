@@ -48,8 +48,8 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [22](docs/PLAN-22-tv-bubbles-and-autoplay.md) | Recognition bubbles and hands free touring | Part of the 3D world branch, not live |
 | [23](docs/PLAN-23-recognitions-in-the-world.md) | Fly among recognitions | Part of the 3D world branch, not live |
 | [24](docs/PLAN-24-world-visual-quality.md) | Whole world visual upgrade | In progress on `feat/world-cinematic`; pass D2 done |
-| [25](docs/PLAN-25-live-tv-pearl-study.md) | Live TV pearl design study | Sample preview on `feat/tv-pearl-design`, waiting for Anthony's visual approval |
-| [26](docs/PLAN-26-pearl-sequence.md) | Expression Cosmos prototype | Prototype on `feat/tv-pearl-sequence`, not live |
+| [25](docs/PLAN-25-live-tv-pearl-study.md) | Live TV pearl design study | Archived 2026-09-24 as tag `archive/feat/tv-pearl-design`, not live |
+| [26](docs/PLAN-26-pearl-sequence.md) | Expression Cosmos prototype | Archived 2026-09-24 as tag `archive/feat/tv-pearl-sequence`, not live |
 | [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | Draft; gate G5 superseded, the rest folded into Plan 28 Section 5 |
 | [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | In progress, one section per chat |
 | 29 | The 3D Studio kit inside the heavenly world (was 26) | In progress on `world-kit/*` under its own coordinator; its file reaches `main` with the world branch |
