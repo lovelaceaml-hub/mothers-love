@@ -342,7 +342,7 @@ describe("near zone tables", () => {
     // The grove as design-world.ts builds it: columns at (cos a * 10.5, sin a * 9.3) for
     // a = -.9 pi + i / 8 * 1.6 pi, each icon disc of radius .96 at y 5.15 in a group turned
     // .48, .37 in front of the column axis; the piece bobs .15 and the selected one rises .6.
-    const world = source("art/design-world.ts"), builder = source("art/kit-districts.ts");
+    const world = source("art/design-world.ts"), builder = source("art/kit-district-parts.ts");
     expect(world).toContain("const a=-Math.PI*.9+i/8*Math.PI*1.6, x=Math.cos(a)*10.5,z=Math.sin(a)*9.3;");
     expect(world).toContain("const groveIcon = geometry(new T.CircleGeometry(.96, 48));");
     expect(world).toContain("group.position.set(x,5.15,z);group.rotation.y=.48;");
