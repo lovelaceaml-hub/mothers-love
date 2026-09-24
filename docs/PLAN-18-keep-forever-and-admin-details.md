@@ -1,6 +1,6 @@
 # Plan 18: keep every recognition, and let admins see all details
 
-Status: DRAFT, waiting for Anthony's approval. Nothing in this plan is built yet.
+Status: APPROVED by Anthony on 2026-09-23 (Section A rulings recorded in the Build log). Section B next.
 
 ## Goal line
 
@@ -31,7 +31,7 @@ Every recognition is stored indefinitely, stays on the home page and TV, and an 
 - Approach: rows stop expiring in the database (new rows and existing rows get a far-future `expires_at`), and the server clamps the `expiresAt` it sends to browsers and the TV to "now plus 7 days", refreshed on every 10 second poll. Old tabs and TVs keep working unchanged, no timer ever exceeds the safe window, and every existing "not expired" filter and the cleanup health check keep working untouched.
 - Order matters: ship the server clamp first (it changes nothing while rows still have 7 day dates), verify, then apply the database migration.
 - Restore archived rows into the live table so nothing already archived is missing from the home page and TV.
-- Files: `src/lib/server/public-feed.ts`, `src/lib/server/public-display.ts` and the display routes (coordinate with Plan 17), new `database/015_never_expire.sql`.
+- Files: `src/lib/server/public-feed.ts`, `src/lib/server/public-display.ts` and the display routes (Plan 17 is live and finished), new `database/016_never_expire.sql` (015 is taken by `015_admin_list_order.sql`; Section C then uses 017).
 - Done when: unit tests for the clamp, a fixture test for migration 015, a browser test that a 100 year expiry does not spin the home page, and the live cleanup stays healthy after applying.
 
 ### Section C: admin sees all details
@@ -64,3 +64,5 @@ Spill order per the shared policy. B and C are independent after A, so Parallel 
 
 - 2026-09-19: Plan drafted by Claude (Fable 5.1) at Anthony's request, in the same session that shipped the receipt feed, the heart fix and migration 014. Not yet approved.
 - 2026-09-20: Before Section C, Anthony reported submissions missing from admin. Found and fixed a page offset bug (screen page 1 was database page 2, so the newest 50 never showed) and added arrival-order listing with numbering, submitted name and message in the list (branch `change/admin-all-submissions-in-order`, migration 015). Section C still covers hidden, invalid and archived rows, heart counts and the audit trail. See HANDOFF September 20.
+- 2026-09-23: Anthony ruled "forever": recognitions are never deleted and stay visible indefinitely (confirms the retention reversal; Section A still owns the AGENTS.md and CONTRACT update). To cut Supabase free-plan usage, all three pg_cron jobs in cvuwdlmlukepwfffpgdu were paused (1 lv-zion-worship-notifications, 2 lv-zion-rooms-reminders, 3 ml_purge) and cron.job_run_details was truncated (76 MB). Because ml_purge is paused, an expired row would trip ml_purge_healthy and close collection, so as a bridge every recognition got expires_at = greatest(expires_at, now() + 21 days); earliest expiry is now 2026-10-15 00:39 UTC. New recognitions still get 168 hours from ml_api, so the first new post sent after this expires about 7 days later with no cleanup running. Section B must ship before then, or the bridge must be rerun (UPDATE mothers_love.recognitions SET expires_at = greatest(expires_at, now() + interval '21 days');). Never set a date more than about 24 days ahead until the Section B server clamp is live.
+- 2026-09-23 (Section A, Claude Opus 5.5 with Anthony): Rulings. (1) Retention: forever, never deleted, stays on the home page (Anthony: "forever"). (2) TV draws from the latest 100 recognitions only, while the home page keeps every post (Anthony chose option 1). (3) Home page "load more" past 100: not ruled; the feed stays at the latest 100 for now, open question for Section C or D. Anthony approved the plan and asked to start Section B. AGENTS.md product invariant and docs/CONTRACT.md lifetime line updated to the new rule. Section A complete.
