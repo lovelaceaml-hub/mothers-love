@@ -137,6 +137,10 @@ function graphemes(text: string) {
 export function forgetFlowLengths() {
   lengths.clear();
 }
+/** Keeps only the messages still in the feed, so a withdrawn, expired or edited one goes at once. */
+export function keepFlowLengths(messages: ReadonlySet<string>) {
+  for (const message of lengths.keys()) if (!messages.has(message)) lengths.delete(message);
+}
 /** Whether the length cache still holds a message, for the privacy tests. */
 export const flowLengthKept = (message: string) => lengths.has(message);
 /**

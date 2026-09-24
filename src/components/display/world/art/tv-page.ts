@@ -66,6 +66,10 @@ export function worldHoldSeconds(message: string) {
 export function forgetWorldHolds() {
   holdCache.clear();
 }
+/** Keeps only the messages still in the feed, so a withdrawn, expired or edited one goes at once. */
+export function keepWorldHolds(messages: ReadonlySet<string>) {
+  for (const message of holdCache.keys()) if (!messages.has(message)) holdCache.delete(message);
+}
 /** Whether the hold cache still holds a message, for the privacy tests. */
 export const worldHoldKept = (message: string) => holdCache.has(message);
 

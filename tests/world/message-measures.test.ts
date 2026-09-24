@@ -10,7 +10,8 @@ import type { WorldEngine } from "@/components/display/world/world-engine";
 /**
  * Plan 28 Section 8, from the completion review: the TV page measures each message once and
  * keeps the result keyed by the message's text, so those caches must let go of every message
- * on an unsafe feed, a source switch and disposal (Plan 24 P7), like every other reference.
+ * on an unsafe feed, a source switch and disposal, and of a withdrawn or expired record's
+ * message at the next live feed (Plan 24 P7), like every other reference.
  */
 
 /** Fictional records only: numbered names and plain sample words. */
@@ -69,6 +70,17 @@ describe("the TV page's message measures", () => {
       expect(worldHoldKept(held)).toBe(false);
       expect(flowLengthKept(flowing)).toBe(false);
     });
+
+  it("let go of a withdrawn or expired record's message at the next live feed", () => {
+    const { held, flowing } = measure();
+    const remaining = live.records.filter((record) => record.message !== held && record.message !== flowing);
+    const stays = remaining[0].message;
+    worldHoldSeconds(stays);
+    setEngineFeed.call(stub(), { ...live, records: remaining });
+    expect(worldHoldKept(held)).toBe(false);
+    expect(flowLengthKept(flowing)).toBe(false);
+    expect(worldHoldKept(stays)).toBe(true);
+  });
 
   it("let go of live messages when the source switches to the sample", () => {
     const { held, flowing } = measure();

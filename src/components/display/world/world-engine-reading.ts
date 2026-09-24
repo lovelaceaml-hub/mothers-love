@@ -1,7 +1,7 @@
 /** The engine's feed and reading: taking a new feed, the reading pool and hold, and selecting a recognition or an expression. WorldEngine calls these with itself as `this`. */
 import type { WorldFeed } from "./world-feed";
-import { TV_BUBBLE_PLACES, forgetWorldHolds, heldBig, planWorldBubbles } from "./art/tv-page";
-import { forgetFlowLengths } from "./art/tv-flow";
+import { TV_BUBBLE_PLACES, forgetWorldHolds, heldBig, keepWorldHolds, planWorldBubbles } from "./art/tv-page";
+import { forgetFlowLengths, keepFlowLengths } from "./art/tv-flow";
 import { TOUR_ORDER, ZONES, type ZoneId } from "./world-data";
 import type { WorldEngine } from "./world-engine";
 
@@ -12,6 +12,12 @@ import type { WorldEngine } from "./world-engine";
 export function forgetMessageMeasures() {
   forgetWorldHolds();
   forgetFlowLengths();
+}
+/** On every safe feed they keep only the messages it still carries: withdrawal and expiry too. */
+function keepMessageMeasures(records: WorldFeed["records"]) {
+  const messages = new Set(records.map((record) => record.message));
+  keepWorldHolds(messages);
+  keepFlowLengths(messages);
 }
 
 export function setEngineFeed(this: WorldEngine, feed: WorldFeed) {
@@ -27,6 +33,7 @@ export function setEngineFeed(this: WorldEngine, feed: WorldFeed) {
     feed.phase === "sample" ||
     feed.phase === "live" ||
     feed.phase === "reconnecting";
+  if (safe) keepMessageMeasures(feed.records);
   const settings = feed.snapshot?.settings;
   this.ownerTempo =
     settings?.motion === "calm" ||
