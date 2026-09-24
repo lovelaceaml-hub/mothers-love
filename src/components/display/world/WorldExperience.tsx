@@ -397,9 +397,10 @@ export function WorldExperience({
       <div className={styles.shade} aria-hidden="true" />
       {tvPage && (
         <WorldTvOverlay
-          zone={zone}
-          traveling={status.traveling && !arriving}
-          arriving={arriving}
+          // Once the arriving bubble has gone, the title names where the camera is heading back to.
+          zone={arrival.phase === "return" && status.traveling ? ZONES[zoneIndex(status.destination)] : zone}
+          traveling={(status.traveling && !arriving) || arrival.phase === "return"}
+          arriving={arriving && arrival.phase !== "return"}
           safe={safe}
           sample={source === "sample"}
           records={feed.records}
