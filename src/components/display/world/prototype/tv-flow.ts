@@ -2,6 +2,7 @@ import * as T from "three";
 import type { Recognition } from "@/lib/contracts";
 import type { ZoneId } from "../world-data";
 import type { WorldBubblePlan } from "./tv-page";
+import { TV_FOCUS_OUT } from "./tv-places";
 
 /*
  * How the TV page's bubbles flow (Anthony, 2026-09-24: "Recognition bubbles can also naturally
@@ -118,25 +119,67 @@ export class TvLeavePath {
   }
 }
 
+let segmenter: Intl.Segmenter | undefined;
+const lengths = new Map<string, number>();
+/** A message's length in graphemes, measured once (bounded, oldest out first). */
+function graphemes(text: string) {
+  const known = lengths.get(text);
+  if (known !== undefined) return known;
+  segmenter ??= new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  let count = 0;
+  for (const _ of segmenter.segment(text)) count++;
+  if (lengths.size >= 256) lengths.delete(lengths.keys().next().value!);
+  lengths.set(text, count);
+  return count;
+}
 /**
- * The flowing bubble's recognition at a place: the place's small records in turn, the next one
- * at every arrival (and, along the River's stream, at every `step` of the visit), never the one
- * the main bubble shows. Undefined when there is none other.
+ * The longest message a flowing bubble takes, graphemes: about what its largest size holds whole
+ * at 23.5 px. A longer one would have to scroll faster than it can be read in a flowing turn, so
+ * it waits for its turn in a main bubble (which holds it up to 20 s) and always runs in the ticker.
  */
-export function tvFlowRecord(plan: WorldBubblePlan | undefined, place: ZoneId, arrivals: number, mainId?: string, step = 0): Recognition | undefined {
+export const TV_FLOW_MAX_GRAPHEMES = 130;
+
+/**
+ * The flowing bubble's recognition at a place on its `turn` (`TvFlowTurn`): the place's small
+ * records one after another, each in turn, skipping the one the main bubble shows and any too
+ * long to read in a flowing turn. Undefined when there is none.
+ */
+export function tvFlowRecord(plan: WorldBubblePlan | undefined, place: ZoneId, turn: number, mainId?: string): Recognition | undefined {
   const small = plan?.places.get(place)?.small ?? [];
-  const turn = arrivals * TV_STREAM_STEPS + step;
   for (let k = 0; k < small.length; k++) {
     const record = small[(((turn + k) % small.length) + small.length) % small.length];
-    if (record.id !== mainId) return record;
+    if (record.id !== mainId && graphemes(record.message) <= TV_FLOW_MAX_GRAPHEMES) return record;
   }
   return undefined;
 }
-/** A visit turns the flowing bubble at most this many times (the River's stream), so the next visit starts fresh. */
+/** A visit turns the flowing bubble at most this many times (the River's stream). */
 export const TV_STREAM_STEPS = 4;
 /** Which step of its stream a place's visit is at, `age` seconds in: 0 anywhere without a stream. */
 export function tvStreamStep(every: number | undefined, age: number) {
   return every ? Math.min(TV_STREAM_STEPS - 1, Math.max(0, Math.floor(age / every))) : 0;
+}
+/**
+ * A place's flowing turn: one more at every arrival and, along the River's stream, at every step
+ * of the visit. A step only ever moves forward within a visit (the reading age starts again when
+ * the camera leaves, and the River must not ask for its first record again as it goes), and never
+ * so late that the new bubble could not come to rest before the camera pulls back.
+ */
+export class TvFlowTurn {
+  turn = 0;
+  private seen?: number;
+  private step = 0;
+  update(arrivals: number, here: boolean, age: number, stream?: { every: number; hold: number }) {
+    if (this.seen === undefined) { this.seen = arrivals; this.turn = arrivals; }
+    else if (arrivals !== this.seen) { this.seen = arrivals; this.turn += 1; this.step = 0; }
+    if (stream && here) {
+      const step = tvStreamStep(stream.every, age);
+      if (step > this.step && step * stream.every + TV_FLOW_SETTLED <= stream.hold - TV_FOCUS_OUT) {
+        this.turn += step - this.step;
+        this.step = step;
+      }
+    }
+    return this.turn;
+  }
 }
 
 /**
@@ -163,6 +206,20 @@ export class TvSwap {
   /** The leaving recognition is no longer allowed on screen: it goes at once, never floats away. */
   drop(id: string) {
     if (this.previous === id) this.previous = undefined;
+  }
+  /** The recognition showing (or rising) is no longer allowed on screen: it goes at once. */
+  vanish() {
+    this.current = undefined;
+    this.at = -Infinity;
+  }
+  /** A journey is under way: a new recognition waits for it, so no bubble ever jumps. */
+  busy(time: number) {
+    return this.at !== -Infinity && time - this.at < TV_FLOW_SETTLED;
+  }
+  /** Still or reduced motion: whatever journey was under way ends where it was going. */
+  settleNow() {
+    this.previous = undefined;
+    this.at = -Infinity;
   }
   /** The swap's journey is over: forget the leaving one. */
   settle(time: number) {

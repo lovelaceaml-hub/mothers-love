@@ -582,6 +582,7 @@ export class WorldEngine {
           true,
         tvLoop: this.tv ? this.tvLoop : undefined,
         tvArrivals: this.tv ? this.tvArrivals : undefined,
+        paused: this.paused,
         destination: this.director.destination,
         hold: this.holdFor,
       }) || this.dirty;

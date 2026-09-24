@@ -261,10 +261,10 @@ export class TvBubbleDecor {
     }));
     this.window.name = "tv message window"; this.window.position.z = 0.006; this.window.renderOrder = 2;
     this.window.visible = false;
-    // As the study skin's occluder: black on the glow layer, and on the protect mask.
+    // As the study skin's occluder: black on the glow layer (and on the protect mask, `guard`).
     this.occluder = new T.Mesh(shared.occluderGeometry, shared.occluderMaterial);
     this.occluder.name = "tv bubble occluder"; this.occluder.renderOrder = 1;
-    this.occluder.layers.set(1); this.occluder.layers.enable(3);
+    this.occluder.layers.set(1);
     this.root.add(this.rim, this.glow, this.orbit, this.window, this.occluder);
   }
   /** Paint (once per record and canvas scale) and place the message window under the name. */
@@ -314,6 +314,10 @@ export class TvBubbleDecor {
     // A fading bubble stops guarding the glow behind it, so the glow returns with the scenery.
     this.occluder.visible = opacity > 0.5;
   }
+  /** Whether this bubble also joins the protect mask (layer 3): only one at rest where the camera reads. */
+  guard(protect: boolean) {
+    if (protect) this.occluder.layers.enable(3); else this.occluder.layers.disable(3);
+  }
   set visible(value: boolean) {
     this.root.visible = value;
   }
@@ -334,15 +338,14 @@ export class TvBubbleDecor {
   }
 }
 
-/** The geometry and materials every decor shares, owned by the bubbles host. */
+/** The geometry and materials every decor shares (each decor clones the two shaders), owned by the bubbles host. */
 export class TvDecorShared {
-  readonly time = { value: 0 };
   readonly rimGeometry = new T.RingGeometry(0.975, 1.17, 160, 4);
   readonly glowGeometry = new T.RingGeometry(0.86, 0.99, 160, 2);
   readonly orbitGeometry = new T.TorusGeometry(1.16, 0.006, 6, 128);
   readonly rimMaterial = new T.ShaderMaterial({
     transparent: true, depthTest: true, depthWrite: false, toneMapped: false,
-    uniforms: { time: this.time, alpha: { value: 1 } },
+    uniforms: { time: { value: 0 }, alpha: { value: 1 } },
     vertexShader: "varying vec2 rimP;void main(){rimP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
     fragmentShader: `varying vec2 rimP;uniform float time;uniform float alpha;
       void main(){float r=length(rimP),a=atan(rimP.y,rimP.x);
@@ -379,9 +382,6 @@ export class TvDecorShared {
     }
     this.fade = new T.DataTexture(data, 1, rows);
     this.fade.needsUpdate = true;
-  }
-  tick(time: number) {
-    this.time.value = time;
   }
   dispose() {
     for (const item of [this.rimGeometry, this.glowGeometry, this.orbitGeometry, this.rimMaterial, this.glowMaterial, this.orbitMaterial, this.occluderGeometry, this.occluderMaterial, this.fade]) item.dispose();

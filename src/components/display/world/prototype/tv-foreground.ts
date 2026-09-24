@@ -170,8 +170,10 @@ export function applyTvPalette(palette: DesignKitContext["palette"]) {
 
 /*
  * The lotuses. Built once per place, in its layout frame, as one mesh per shared study material
- * (ivory basin, gold rim and stem, water, leaf pads, blossom petals), so the static batch
- * folds them into the district's own draws.
+ * (ivory basin, gold rim and stem, water, leaf pads, blossom petals). The static batch folds the
+ * ivory and gold into the district's own draws; the water, pads and petals stay a draw each.
+ * Like every kit builder they exist only with the kit (with `?kit=off` the bubbles still rise
+ * and rest at their spots, with no lotus under them).
  */
 const UP = new T.Vector3(0, 1, 0);
 /** One petal: an almond, its base at the origin, pointing along +z; blush at the base, white at the tip. */

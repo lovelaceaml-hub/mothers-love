@@ -2,13 +2,15 @@ import * as T from "three";
 import { describe, expect, it } from "vitest";
 import type { Recognition } from "@/lib/contracts";
 import { TOUR_ORDER } from "@/components/display/world/world-data";
-import { planWorldBubbles } from "@/components/display/world/prototype/tv-page";
-import { TV_MAIN_RADIUS, TV_MEDALLION_SCALE, TV_READ, tvFlowRadius, tvPlaceWorld } from "@/components/display/world/prototype/tv-places";
+import { heldBig, planWorldBubbles } from "@/components/display/world/prototype/tv-page";
+import { TV_MAIN_RADIUS, TV_MEDALLION_SCALE, TV_PLACES, TV_READ, tvFlowRadius, tvPlaceWorld } from "@/components/display/world/prototype/tv-places";
 import {
   TV_BUD_SCALE,
   TV_FLOW,
   TV_FLOW_SETTLED,
+  TV_FLOW_MAX_GRAPHEMES,
   TV_STREAM_STEPS,
+  TvFlowTurn,
   TvLeavePath,
   TvRisePath,
   TvSwap,
@@ -91,6 +93,23 @@ describe("a bubble spot's swaps", () => {
     expect(swap.want("b", 10, true)).toBe(false);
     expect(swap).toMatchObject({ current: "b", previous: undefined, at: -Infinity });
   });
+  it("lets a new recognition wait for the journey under way", () => {
+    const swap = new TvSwap();
+    swap.want("a", 0, false);
+    swap.want("b", 10, false);
+    expect(swap.busy(10 + TV_FLOW_SETTLED - 0.1)).toBe(true);
+    expect(swap.busy(10 + TV_FLOW_SETTLED)).toBe(false);
+  });
+  it("lets the showing recognition go at once, and a still view end a journey where it was going", () => {
+    const swap = new TvSwap();
+    swap.want("a", 0, false);
+    swap.want("b", 10, false);
+    swap.vanish();
+    expect(swap).toMatchObject({ current: undefined, at: -Infinity });
+    swap.want("c", 20, false);
+    swap.settleNow();
+    expect(swap).toMatchObject({ current: "c", previous: undefined, at: -Infinity });
+  });
   it("drops a leaving recognition that left the snapshot at once", () => {
     const swap = new TvSwap();
     swap.want("a", 0, false);
@@ -102,19 +121,28 @@ describe("a bubble spot's swaps", () => {
 
 describe("which recognition flows", () => {
   const plan = planWorldBubbles(records(20));
-  it("takes the place's next small record at every arrival, never the main one", () => {
+  it("takes the place's small records one after another, never the main one", () => {
     const small = plan.places.get("garden")!.small;
     expect(tvFlowRecord(plan, "garden", 0)).toBe(small[0]);
-    expect(tvFlowRecord(plan, "garden", 1)).toBe(small[TV_STREAM_STEPS % small.length]);
+    expect(tvFlowRecord(plan, "garden", 1)).toBe(small[1]);
     expect(tvFlowRecord(plan, "garden", 0, small[0].id)).toBe(small[1]);
   });
-  it("turns along the River's stream within a visit, and at most a few times", () => {
-    expect(tvStreamStep(undefined, 50)).toBe(0);
-    expect(tvStreamStep(13, 0)).toBe(0);
-    expect(tvStreamStep(13, 13)).toBe(1);
-    expect(tvStreamStep(13, 1000)).toBe(TV_STREAM_STEPS - 1);
-    const small = plan.places.get("live-feed")!.small;
-    expect(tvFlowRecord(plan, "live-feed", 0, undefined, 1)).toBe(small[1 % small.length]);
+  for (const count of [3, 6, 8, 10, 100])
+    it(`lets every small record flow within one round of turns (${count} records)`, () => {
+      const counted = planWorldBubbles(records(count));
+      const small = counted.places.get("garden")!.small;
+      const main = heldBig(counted, "garden", 0)!;
+      const shown = new Set(Array.from({ length: small.length }, (_, turn) => tvFlowRecord(counted, "garden", turn, main.id)?.id));
+      const expected = new Set(small.map((record) => record.id).filter((id) => id !== main.id));
+      expect(shown).toEqual(expected);
+    });
+  it("leaves a message too long for a flowing turn to the main bubble and the ticker", () => {
+    const long = records(6).map((record, i) => (i === 3 ? { ...record, message: "kind words ".repeat(20) } : record));
+    const counted = planWorldBubbles(long);
+    // It is among the places' small records, and flows at none of them.
+    expect(TOUR_ORDER.some((place) => counted.places.get(place)!.small.some((record) => record.message.length > TV_FLOW_MAX_GRAPHEMES))).toBe(true);
+    for (const place of TOUR_ORDER)
+      for (let turn = 0; turn < 12; turn++) expect(tvFlowRecord(counted, place, turn)?.message.length ?? 0).toBeLessThanOrEqual(TV_FLOW_MAX_GRAPHEMES);
   });
   it("shows none when the only recognition is the main one", () => {
     const one = planWorldBubbles(records(1));
@@ -123,6 +151,30 @@ describe("which recognition flows", () => {
     expect(tvFlowRecord(undefined, "garden", 0)).toBeUndefined();
   });
 });
+
+describe("a place's flowing turns", () => {
+  it("turns once at every arrival", () => {
+    const turns = new TvFlowTurn();
+    expect(turns.update(1, true, 0)).toBe(1);
+    expect(turns.update(1, true, 30)).toBe(1);
+    expect(turns.update(2, true, 0)).toBe(2);
+    expect(turns.update(2, false, 0)).toBe(2);
+  });
+  it("turns along the River's stream only forward, and only while the new one can still be read", () => {
+    const stream = TV_PLACES["live-feed"].stream!;
+    const turns = new TvFlowTurn();
+    expect(turns.update(1, true, 0, stream)).toBe(1);
+    expect(turns.update(1, true, stream.every, stream)).toBe(2);
+    // The next step would come to rest after the camera pulls back, so it waits for the next visit.
+    expect(turns.update(1, true, stream.every * 2, stream)).toBe(2);
+    // The camera leaves: the reading age starts again, and the stream does not go back.
+    expect(turns.update(1, true, 0, stream)).toBe(2);
+    expect(turns.update(2, true, 0, stream)).toBe(3);
+    expect(tvStreamStep(undefined, 50)).toBe(0);
+    expect(tvStreamStep(13, 1000)).toBe(TV_STREAM_STEPS - 1);
+  });
+});
+
 
 describe("every place's flow keeps clear of its main bubble", () => {
   // The main bubble's farthest reach: its expression medallions, round its rim.

@@ -983,6 +983,10 @@ export class StudyPearlSkin {
   }
   private geometry<G extends T.BufferGeometry>(g: G) { this.geometries.add(g); return g; }
   private material<M extends T.Material>(m: M) { this.materials.add(m); return m; }
+  /** Shows or hides the whole skin (the TV page hides it while its bubble rises, fades or floats away). */
+  set visible(value: boolean) {
+    this.root.visible = value;
+  }
   update(time: number, ids: readonly number[], detailed: boolean, frame: StudyPearlFrame) {
     if (!this.kitResolved) this.dress();
     this.clock.value = time;
