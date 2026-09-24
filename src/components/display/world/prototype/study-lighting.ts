@@ -29,15 +29,25 @@ export function studyEnvironment(renderer: T.WebGLRenderer) {
 }
 
 /**
+ * The TV page's sun (clear air): the wide halo was a 150 unit bloom of warm white across the
+ * top of the frame, which read as haze. On the TV the two sprites shrink and fade to a sun
+ * rather than a veil, in the same colours. Size in world units, then opacity.
+ */
+export const STUDY_TV_SUN_HALO: ReadonlyArray<readonly [number, number]> = [[90, .2], [36, .32]];
+
+/**
  * Two additive sprites standing in for a low sun behind the world.
  * They sit inside the sky sphere and above the sea, and the caller registers
- * the returned materials and texture for disposal.
+ * the returned materials and texture for disposal. `tv` (the TV page) takes the
+ * `STUDY_TV_SUN_HALO` sizes and opacities; without it both are the study's.
  */
-export function studySunHalo() {
+export function studySunHalo(tv = false) {
   const map = softDot(64);
   const at = new T.Vector3(...STUDY_SUN.direction).multiplyScalar(330);
   const sprites: T.Sprite[] = [], materials: T.SpriteMaterial[] = [];
-  for (const [size, color, opacity] of [[150, "#ffe2bd", .5], [60, "#fff3dc", .45]] as Array<[number, string, number]>) {
+  const authored: Array<[number, string, number]> = [[150, "#ffe2bd", .5], [60, "#fff3dc", .45]];
+  const layers = tv ? authored.map(([, color], i) => [STUDY_TV_SUN_HALO[i][0], color, STUDY_TV_SUN_HALO[i][1]] as [number, string, number]) : authored;
+  for (const [size, color, opacity] of layers) {
     const material = new T.SpriteMaterial({
       map, color, transparent: true, opacity,
       blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false,

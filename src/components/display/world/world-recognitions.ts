@@ -9,7 +9,7 @@ import {
   paintStudyPearl,
   type StudyPearlFrame,
 } from "./prototype/pearl-skin";
-import { StudyWaterHalo } from "./prototype/study-glory";
+import { STUDY_TV_SPECKS, StudyWaterHalo } from "./prototype/study-glory";
 import { studyCanvasSize, type StudyTier } from "./prototype/study-budget";
 import {
   RECOGNITION_ZONES,
@@ -279,7 +279,8 @@ export class WorldRecognitionBubbles {
   constructor(private readonly hostScene: T.Scene) {
     const scene = hostScene;
     if (this.designStudy) this.studyAssets = new StudyPearlAssets(() => scene.userData.invalidate?.());
-    if (this.designStudy) this.waterHalo = new StudyWaterHalo(scene);
+    // The TV page's clear air lays a fainter light on the sea under the bubble being read.
+    if (this.designStudy) this.waterHalo = this.tvPage ? new StudyWaterHalo(scene, STUDY_TV_SPECKS.waterHalo) : new StudyWaterHalo(scene);
     this.root.name = "Recognition bubbles in the world";
     scene.add(this.root);
     if (this.tvPage) {

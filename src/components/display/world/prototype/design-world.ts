@@ -16,13 +16,16 @@ import { bloomStage, constellationStage, ribbonStage, type StageContext } from "
 import { studyPetal, studyRibbonPoint, studyTerrace } from "./study-geometry";
 import { studySunHalo } from "./study-lighting";
 import {
-  STUDY_EXPOSURE, STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW,
-  softDot, sparklePoints, studyGlow, studyRim, studySilk, studyStone, studyStoneCaustic,
+  STUDY_EXPOSURE, STUDY_GLOW_PASS, STUDY_HEART_PULSE, STUDY_SUN_VIEW, STUDY_TV_RIM_SCALE,
+  scaleStudyRim, softDot, sparklePoints, studyGlow, studyRim, studySilk, studyStone, studyStoneCaustic,
 } from "./study-materials";
-import { lanternLayout, type LanternPoint } from "./study-glory";
+import { STUDY_TV_SPECKS, lanternLayout, type LanternPoint } from "./study-glory";
 import { createStudyAir, type AirFocus } from "./study-air";
 import { createStudyLandmarks, studyLandmarkCloudSites, studyLandmarkLayout } from "./study-landmarks";
-import { STUDY_FOG, STUDY_SKY, STUDY_SUN, STUDY_TONE } from "./study-palette";
+import {
+  STUDY_FOG, STUDY_SEA, STUDY_SKY, STUDY_SKY_RADIUS, STUDY_SUN, STUDY_TONE, STUDY_TV_FOG, STUDY_TV_SEA_SCALE, STUDY_TV_TONE,
+} from "./study-palette";
+import type { StudyGlowFog } from "./study-radiance";
 import { applyTvForeground, applyTvPalette } from "./tv-foreground";
 import { studyTvPage } from "./tv-page";
 
@@ -138,8 +141,15 @@ export type DesignKitContext = {
 export function createDesignWorld(kit?: WorldKit): WorldScene {
   const scene = new T.Scene();
   scene.name = "Mother's Love, visual study 02";
-  scene.background = new T.Color(STUDY_FOG.color);
-  scene.fog = new T.Fog(STUDY_FOG.color, STUDY_FOG.near, STUDY_FOG.far);
+  // The TV page (`?view=tv`), resolved once. Its clear air (Anthony, 2026-09-24: "Can you
+  // remove the haze foggy look") is every `tv` branch below; without it the study is unchanged.
+  const tv = studyTvPage();
+  const sceneFog = tv ? STUDY_TV_FOG : STUDY_FOG;
+  scene.background = new T.Color(sceneFog.color);
+  scene.fog = new T.Fog(sceneFog.color, sceneFog.near, sceneFog.far);
+  // The glow layer keeps the study's fog distances on the TV page (`StudyRadiance.render`), so
+  // a far lantern or crest does not bloom brighter now that the main fog is thinner.
+  if (tv) scene.userData.studyGlowFog = { near: STUDY_FOG.near, far: STUDY_FOG.far } satisfies StudyGlowFog;
   scene.userData.prototypeHeartReady = false;
   scene.userData.studyArrival = studyArrival(new URLSearchParams(window.location.search).get("entrance"));
   // The kit, for the pieces built outside this file (the pearl skin reads it from here).
@@ -257,14 +267,16 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
     }
   }
 
-  scene.add(new T.HemisphereLight("#f7dbe0", "#cfa79d", .55));
-  const sun = new T.DirectionalLight(STUDY_SUN.color, 2.3);
+  // The TV page's clearer day (`STUDY_TV_TONE`): less soft sky fill, more sun, a firmer shadow
+  // and a touch more warm fill, in the same colours.
+  scene.add(new T.HemisphereLight("#f7dbe0", "#cfa79d", tv ? STUDY_TV_TONE.hemisphere : .55));
+  const sun = new T.DirectionalLight(STUDY_SUN.color, tv ? STUDY_TV_TONE.sun : 2.3);
   // STUDY_SUN fixes the direction; the distance only decides where the orthographic shadow
   // box sits along that ray. At the authored length the two high districts at z -112 (orbit
   // and milestone) sat behind the shadow camera near plane and received no shadow at all, so
   // the light is pushed out along the same direction. Shadow angles are unchanged.
   sun.position.set(...STUDY_SUN.lightPosition).setLength(180);
-  sun.castShadow = true; sun.shadow.intensity = STUDY_TONE.shadowIntensity; sun.shadow.mapSize.set(2048, 2048);
+  sun.castShadow = true; sun.shadow.intensity = tv ? STUDY_TV_TONE.shadowIntensity : STUDY_TONE.shadowIntensity; sun.shadow.mapSize.set(2048, 2048);
   // Bounds measured in light space over all 13 district footprints and the arrival platform, and
   // left asymmetric so the box stays tight: 227 by 125 units is a finer texel on a 2048 map than
   // the old symmetric 240 by 240 box, and the worst remaining district margin is about 10 units.
@@ -273,12 +285,19 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   sun.shadow.camera.near = 20; sun.shadow.camera.far = 290;
   sun.shadow.normalBias = .06; sun.shadow.bias = -.0002; scene.add(sun);
   scene.userData.studySun = sun;
-  const fill = new T.DirectionalLight("#ffd0c8", .75); fill.position.set(70, 38, 95); scene.add(fill);
+  const fill = new T.DirectionalLight("#ffd0c8", tv ? STUDY_TV_TONE.fill : .75); fill.position.set(70, 38, 95); scene.add(fill);
   // A quiet lavender bounce from the cool side of the sky, in place of the old pink rim light.
   const cool = new T.DirectionalLight("#c9c3ff", .35); cool.position.set(80, 30, -40); scene.add(cool);
   // Section 8: the sky carries the study mood envelope, so the whole backdrop dips a little
   // through a travel and lifts again on arrival, together with the tone mapping exposure the
   // engine sets from the same value. Parked, the uniform is exactly 1 and this is unchanged.
+  //
+  // The TV page's clear air softens two terms: the wide warm glow round the sun (.20 to .08)
+  // and the painted cloud band (.55 to .30), which together laid a pale veil over the lower
+  // sky. The sky colours stay, and the horizon is still the fog colour. Written into the source
+  // rather than read from a uniform, so without the TV page the source is character for
+  // character the study's (the same program), and the TV page's differs and compiles its own.
+  const skySun = tv ? ".08" : ".20", skyCloud = tv ? ".30" : ".55";
   const sky = material(new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false, uniforms: { time, studyExposure: STUDY_EXPOSURE, top: { value: new T.Color(STUDY_SKY.zenith) }, mid: { value: new T.Color(STUDY_SKY.mid) }, horizon: { value: new T.Color(STUDY_SKY.horizon) }, sun: { value: new T.Vector3(...STUDY_SUN.direction) } },
     vertexShader: `varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
     fragmentShader: `varying vec3 p;uniform float time,studyExposure;uniform vec3 top,mid,horizon,sun;
@@ -286,12 +305,13 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
       float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+1.71;a*=.5;}return v;}
       void main(){vec3 d=normalize(p);vec3 c=mix(horizon,mid,smoothstep(0.,.18,d.y));c=mix(c,top,smoothstep(.18,.75,d.y));
       float lift=smoothstep(0.,.16,d.y);
-      vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.965,.831,.871),cloud*.55*lift);
-      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*.20+pow(key,60.)*.5)*lift;c=min(c,vec3(1.))*studyExposure;gl_FragColor=vec4(c,1.);
+      vec2 q=vec2(atan(d.z,d.x)*3.8,d.y*8.);float cloud=smoothstep(.38,.70,fbm(q+vec2(time*.001,0.)))*exp(-pow((d.y-.12)*3.,2.));c=mix(c,vec3(.965,.831,.871),cloud*${skyCloud}*lift);
+      float key=max(0.,dot(d,sun));c+=vec3(1.,.914,.824)*(pow(key,5.)*${skySun}+pow(key,60.)*.5)*lift;c=min(c,vec3(1.))*studyExposure;gl_FragColor=vec4(c,1.);
       #include <colorspace_fragment>
       }` }));
-  mesh(scene, geometry(new T.SphereGeometry(400, 32, 16)), sky).renderOrder = -100;
-  const halo = studySunHalo();
+  mesh(scene, geometry(new T.SphereGeometry(STUDY_SKY_RADIUS, 32, 16)), sky).renderOrder = -100;
+  // The TV page's sun is a smaller, fainter pair of sprites (`STUDY_TV_SUN_HALO`).
+  const halo = studySunHalo(tv);
   // Section 6: the two visible sun sprites stay off the glow layer. They are already large and
   // additive, so blooming them doubled the sun and washed out the top of the frame; only the
   // wide band below feeds the bloom. A third sprite lives on the rays layer alone, where it is
@@ -310,7 +330,9 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   })));
   skyBand.name = "Study sky glow band"; skyBand.position.copy(sunAt);
   skyBand.scale.set(420, 140, 1); skyBand.renderOrder = -60;
-  skyBand.layers.set(1); scene.add(skyBand);
+  // Not on the TV page: its 420 unit bloom across the horizon is exactly the veil the clear air
+  // takes away. Its material stays registered, so disposal is the same either way.
+  skyBand.layers.set(1); if (!tv) scene.add(skyBand);
   const raysSun = new T.Sprite(material(new T.SpriteMaterial({
     map: halo.map, color: "#ffe9cc", transparent: true, opacity: 1,
     blending: T.AdditiveBlending, depthWrite: false, depthTest: true, fog: false,
@@ -358,8 +380,12 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   // Named so every merged mesh below carries a readable name a later pass can find.
   ivory.name = "ivory"; edge.name = "edge"; gold.name = "gold"; stone.name = "stone"; lawn.name = "lawn";
   leaf.name = "leaf"; rose.name = "rose"; roseGold.name = "rose gold"; bloom.name = "bloom"; water.name = "water";
-  const sea = mesh(scene, geometry(new T.CircleGeometry(320, 96)), water, [0, -5, -30]); sea.rotation.x = -Math.PI / 2;
+  const sea = mesh(scene, geometry(new T.CircleGeometry(STUDY_SEA.radius, 96)), water, STUDY_SEA.center); sea.rotation.x = -Math.PI / 2;
   sea.name = "Study sea"; sea.layers.enable(1);
+  // The TV page's thinner fog would show the disc's rim, so there it reaches 800, past the
+  // camera's far plane (`STUDY_TV_CAMERA_FAR`): the sea fades into the horizon colour and is
+  // clipped before it ends. The ripples read world space, so they keep their size.
+  if (tv) sea.scale.setScalar(STUDY_TV_SEA_SCALE);
 
   // Soft pink air: a drifting ring of cloud near the horizon, and a collar of puffs
   // under every island rim so the terraces read as floating rather than cut off.
@@ -368,7 +394,8 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   const corridorSites = kit ? kitCorridorSites(kit) : [];
   const cloudSites = studyLandmarkCloudSites(landmarkLayout);
   cloudSites.push(...corridorSites.map(site => ({ center: [...site.center] as [number, number, number], radius: site.radius })));
-  const clouds = createStudyClouds(studyCloudLayout(777, cloudSites), texture(studyCloudAtlas()), time);
+  // The TV page lightens the sky ring and the collars (`STUDY_TV_CLOUDS`); the layout is the same.
+  const clouds = createStudyClouds(studyCloudLayout(777, cloudSites), texture(studyCloudAtlas()), time, tv);
   clouds.geometries.forEach(geometry); clouds.materials.forEach(material);
   clouds.meshes.forEach(o => { instances.add(o); scene.add(o); });
 
@@ -769,7 +796,8 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   sparkleGeometry.setAttribute("position",new T.BufferAttribute(sparklePlaces,3));
   sparkleGeometry.setAttribute("phase",new T.BufferAttribute(sparklePhase,1));
   const sparkleDot=texture(softDot(64));
-  const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",.9,sparkleDot)));
+  // Fainter on the TV page (`STUDY_TV_SPECKS`), so the field stops lifting the air toward white.
+  const sparkleField=new T.Points(sparkleGeometry,material(sparklePoints(time,.55,"#fff0cf",tv?STUDY_TV_SPECKS.sparkles:.9,sparkleDot)));
   sparkleField.name="Study sparkles";sparkleField.frustumCulled=false;scene.add(sparkleField);
 
   // Section 7, heart glory. A wide soft halo that lives on the glow layer alone, so it never
@@ -847,13 +875,13 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
     const corridorHandle = applyKitCorridors(kitContext);
     if (corridorHandle) kitHandles.push(corridorHandle);
     // PLAN-01 Section 5 step 3: the TV page's denser foreground, the Garden first.
-    if (studyTvPage()) {
+    if (tv) {
       const tvHandle = applyTvForeground(kitContext);
       if (tvHandle) kitHandles.push(tvHandle);
     }
   }
   // The TV page's pearl white stone, gold and pastel blossom, on the shared materials.
-  if (studyTvPage()) applyTvPalette({ ivory, edge, gold, rose, roseGold, leaf, lawn, stone, bloom, water, silk: silkMat, cotton, shadow, fall });
+  if (tv) applyTvPalette({ ivory, edge, gold, rose, roseGold, leaf, lawn, stone, bloom, water, silk: silkMat, cotton, shadow, fall });
 
   // Section 7: the 31 waterfall planes become one mesh. Their world transforms are baked in,
   // and the shader reads only uv, so nothing moves. The material writes no depth, so losing
@@ -910,16 +938,24 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
   // Opacity corrected down from the design's .9 after the checkpoint captures: about 285 of
   // them are additive and on the glow layer, so as a set they are a broad lift, not a point.
   // A second round took it to .58: the Sanctuary frame has the arcade keystones and several
-  // converging bridges in it at once, which is the densest lantern view in the world.
+  // converging bridges in it at once, which is the densest lantern view in the world. The TV
+  // page's clear air takes them lower again (`STUDY_TV_SPECKS`).
   const lanterns = new T.Points(lanternGeometry, material(new T.PointsMaterial({
     size: .55, sizeAttenuation: true, map: sparkleDot, color: new T.Color("#ffd9a0"),
-    transparent: true, opacity: .58, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
+    transparent: true, opacity: tv ? STUDY_TV_SPECKS.lanterns : .58, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
   })));
   lanterns.name = "Study lanterns"; lanterns.frustumCulled = false;
   lanterns.layers.enable(1); scene.add(lanterns);
 
-  // Living air. Four objects, one draw call each, all seeded.
-  const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time }, [...ZONES.map(zone => zone.center), ...corridorSites.map(site => site.center)]);
+  // Living air. Four objects, one draw call each, all seeded. The TV page's motes and stars are
+  // quieter (`AirContext.tv`).
+  const air = createStudyAir(scene, { geometry, material, farPetal, dot: sparkleDot, time, tv }, [...ZONES.map(zone => zone.center), ...corridorSites.map(site => site.center)]);
+
+  // TV page: the fresnel rims read as white halos round every silhouette in the clearer light,
+  // so every rim this world's materials carry (the architecture, the stone, the cotton crowns,
+  // the kit pieces, the neighbors, the petals) is softened to `STUDY_TV_RIM_SCALE`, once, now
+  // that every builder has registered its materials. The sculpted heart keeps its rim.
+  if (tv) materials.forEach(m => { if (m !== rose) scaleStudyRim(m, STUDY_TV_RIM_SCALE); });
   return {
     scene, anchors: WORLD_EXPRESSIONS.map((_,i)=>new T.Vector3(14+Math.cos(i)*10,5,-45+Math.sin(i)*10)), recognitionPearls: [],
     setRecognitions() { /* The unchanged world-space recognition manager owns all records. */ },
@@ -934,7 +970,8 @@ export function createDesignWorld(kit?: WorldKit): WorldScene {
       // and the low sun swells a little inside the thicker air. Parked it is 0 and the two
       // sprites are exactly their authored size, so a still capture is unchanged.
       const travel=typeof scene.userData.studyTravel==="number"?scene.userData.studyTravel:0;
-      const swell=1+.12*travel;
+      // The TV page's air does not thicken in flight, so its sun does not swell either.
+      const swell=tv?1:1+.12*travel;
       halo.sprites.forEach((sprite,i)=>sprite.scale.set(haloScale[i]*swell,haloScale[i]*swell,1));
       // The engine publishes its camera on the scene under the study gate, so the motes can
       // wrap around the viewer without changing the shared WorldScene update signature.

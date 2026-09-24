@@ -1,5 +1,6 @@
 import * as T from "three";
 import { ZONES, seededRandom } from "../world-data";
+import { STUDY_TV_SPECKS } from "./study-glory";
 import { STUDY_GLOW_PASS, sparklePoints, studyRim } from "./study-materials";
 
 /**
@@ -145,6 +146,11 @@ export type AirContext = {
   farPetal: T.BufferGeometry;
   dot: T.Texture;
   time: { value: number };
+  /**
+   * The TV page (`?view=tv`): fainter motes and stars off the glow layer, so the specks stop
+   * lifting the frame toward white in its clear air (`STUDY_TV_SPECKS`). Absent elsewhere.
+   */
+  tv?: boolean;
 };
 
 /** Where the focal pearl is right now, so no petal is allowed to drift across its words. */
@@ -210,7 +216,7 @@ export function createStudyAir(scene: T.Scene, ctx: AirContext, centers: readonl
   const moteCenter = { value: new T.Vector3() };
   const moteMaterial = ctx.material(new T.PointsMaterial({
     size: .07, sizeAttenuation: true, map: ctx.dot, color: new T.Color("#fff3dc"),
-    transparent: true, opacity: .28, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
+    transparent: true, opacity: ctx.tv ? STUDY_TV_SPECKS.motes : .28, blending: T.AdditiveBlending, depthWrite: false, toneMapped: false,
   }));
   moteMaterial.onBeforeCompile = shader => {
     shader.uniforms.studyMoteTime = clock;
@@ -243,7 +249,9 @@ transformed = studyMoteCenter + mod(transformed + studyMoteDrift - studyMoteCent
   const starMesh = new T.Points(starGeometry, starMaterial);
   starMesh.name = "Study sky stars";
   starMesh.frustumCulled = false;
-  starMesh.layers.enable(1);
+  // Three hundred stars blooming across the sky were a soft lift of the whole upper frame; on
+  // the TV page they stay sharp points in the main image and never reach the glow.
+  if (!ctx.tv) starMesh.layers.enable(1);
   scene.add(starMesh);
 
   // Butterflies.

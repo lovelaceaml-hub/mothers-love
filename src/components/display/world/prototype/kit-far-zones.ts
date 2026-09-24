@@ -27,7 +27,9 @@ import {
   promiseRibbonYaw,
   type KitPlacement,
 } from "./kit-layout-far";
+import { tvViewDistance } from "./study-budget";
 import { studyGlass, studyRim } from "./study-materials";
+import { studyTvPage } from "./tv-page";
 
 /**
  * The six far districts dressed from K3b's tables (WORLD-INTEGRATION 6.11 to 6.16): the
@@ -538,13 +540,16 @@ export function applyKitFarZones(context: DesignKitContext): KitBuilderHandle | 
   for (const fn of updates) fn(0, FAR_ZONE_IDS[0], undefined);
 
   const cameraAt = new T.Vector3();
+  // The TV page's clear air no longer hides a repeated piece appearing at 110 units, so there
+  // they stay in view out to `STUDY_TV_VIEW_DISTANCE` on High and Auto. Resolved once.
+  const tv = studyTvPage();
   return {
     update(time, zone, arrival) {
       const camera = scene.userData.studyCamera as T.Camera | undefined;
       if (camera) {
         cameraAt.copy(camera.position);
         const lowTier = scene.userData.lowTier === true;
-        const limit = lowTier ? FAR_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? FAR_DETAIL_DISTANCE.high : FAR_DETAIL_DISTANCE.auto;
+        const limit = tvViewDistance(lowTier ? FAR_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? FAR_DETAIL_DISTANCE.high : FAR_DETAIL_DISTANCE.auto, tv, lowTier);
         for (const item of detailGroups) item.group.visible = cameraAt.distanceTo(item.center) < limit;
       }
       for (const fn of updates) fn(time, zone, arrival);

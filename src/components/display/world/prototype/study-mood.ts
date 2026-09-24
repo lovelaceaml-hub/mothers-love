@@ -65,15 +65,27 @@ export function studyFlourish(age: number) {
 
 export type StudyHaze = { near: number; far: number };
 
+/** Where the study's haze closes to in flight, as a haze pair. Module level, so a default allocates nothing. */
+const TRAVEL_HAZE: StudyHaze = { near: STUDY_MOOD.travelFogNear, far: STUDY_MOOD.travelFogFar };
+
 /**
  * The haze distances for a given amount of travel, 0 parked to 1 in flight.
  * The caller may hand in the object to write into, so the engine's per frame use allocates
  * nothing; omitting it returns a fresh one, which is what the tests read.
+ *
+ * `parked` and `flight` default to the study's own `STUDY_FOG` and travel haze, so every caller
+ * that names neither gets exactly today's values. The TV page hands `STUDY_TV_FOG` in as both,
+ * which keeps its clear air the same parked and in flight.
  */
-export function studyHaze(travel: number, out: StudyHaze = { near: 0, far: 0 }) {
+export function studyHaze(
+  travel: number,
+  out: StudyHaze = { near: 0, far: 0 },
+  parked: StudyHaze = STUDY_FOG,
+  flight: StudyHaze = TRAVEL_HAZE,
+) {
   const t = Math.max(0, Math.min(1, travel));
-  out.near = STUDY_FOG.near + (STUDY_MOOD.travelFogNear - STUDY_FOG.near) * t;
-  out.far = STUDY_FOG.far + (STUDY_MOOD.travelFogFar - STUDY_FOG.far) * t;
+  out.near = parked.near + (flight.near - parked.near) * t;
+  out.far = parked.far + (flight.far - parked.far) * t;
   return out;
 }
 

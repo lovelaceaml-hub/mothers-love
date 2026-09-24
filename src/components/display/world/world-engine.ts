@@ -19,7 +19,7 @@ import {
 } from "./prototype/study-mood";
 import { STUDY_CALM, STUDY_EXPOSURE } from "./prototype/study-materials";
 import { studyEnvironment, studyPixelRatio } from "./prototype/study-lighting";
-import { STUDY_FOG, STUDY_TONE } from "./prototype/study-palette";
+import { STUDY_FOG, STUDY_TONE, STUDY_TV_CAMERA_FAR, STUDY_TV_FOG, STUDY_TV_TONE } from "./prototype/study-palette";
 import { emptyFeed, readingSeconds, type WorldFeed } from "./world-feed";
 import type { WorldKit } from "./kit/kit-loader";
 import { kitState, type KitState } from "./kit/kit-manifest";
@@ -211,7 +211,10 @@ export class WorldEngine {
     traveling: false,
     arrivalPhase: "idle",
   };
-  private readonly haze: StudyHaze = { near: STUDY_FOG.near, far: STUDY_FOG.far };
+  /** The TV page starts, and stays, in its clear air (`STUDY_TV_FOG`). */
+  private readonly haze: StudyHaze = this.tv
+    ? { near: STUDY_TV_FOG.near, far: STUDY_TV_FOG.far }
+    : { near: STUDY_FOG.near, far: STUDY_FOG.far };
   private readonly bufferSize = new THREE.Vector2();
   private elapsed = 0;
   private last = 0;
@@ -250,6 +253,11 @@ export class WorldEngine {
       const start = tvStartPlace();
       if (start) this.director.visit(start, true);
       this.hosts = new TvHosts(this.world.scene);
+      // The clear air's seam rule (`STUDY_TV_CAMERA_FAR`): the fog is complete before the far
+      // plane, and the far plane stops short of the TV page's larger sea disc, so the sea
+      // meets the sky in the horizon colour and its rim is never drawn. resize() keeps it.
+      this.camera.far = STUDY_TV_CAMERA_FAR;
+      this.camera.updateProjectionMatrix();
     }
     this.reduced = options.reducedMotion;
     try {
@@ -288,7 +296,7 @@ export class WorldEngine {
         room.dispose(); pmrem.dispose();
       }
       if (isWorldDesignStudy() && studyRadiance()) {
-        this.radiance = StudyRadiance.create(this.renderer);
+        this.radiance = StudyRadiance.create(this.renderer, { tv: this.tv });
         if (this.radiance) {
           // Every pass of one presented frame is counted together, so the reset moves into
           // StudyRadiance.render and happens exactly once per frame it presents.
@@ -300,7 +308,8 @@ export class WorldEngine {
       if (isWorldDesignStudy()) this.world.scene.userData.studyCamera = this.camera;
       this.world.scene.environment = this.environment.texture;
       this.world.scene.environmentIntensity = 0.55;
-      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = STUDY_TONE.environmentIntensity;
+      // The TV page's clearer day takes a little less environment fill (`STUDY_TV_TONE`).
+      if (isWorldDesignStudy()) this.world.scene.environmentIntensity = this.tv ? STUDY_TV_TONE.environmentIntensity : STUDY_TONE.environmentIntensity;
     } catch (error) {
       this.radiance?.dispose();
       this.bubbles.dispose();
@@ -632,6 +641,7 @@ export class WorldEngine {
             entries as StudyDetailEntry[],
             this.camera.position,
             resolveStudyTier(this.quality, this.lowered),
+            this.tv,
           );
       }
       if (this.radiance) this.radiance.render(this.world.scene, this.camera);
@@ -688,7 +698,9 @@ export class WorldEngine {
     scene.userData.studyHush = mood.hush;
     scene.userData.studyTravel = mood.travel;
     if (scene.fog instanceof THREE.Fog) {
-      studyHaze(mood.travel, this.haze);
+      // The TV page's clear air never closes in: its flight haze is its parked haze.
+      if (this.tv) studyHaze(mood.travel, this.haze, STUDY_TV_FOG, STUDY_TV_FOG);
+      else studyHaze(mood.travel, this.haze);
       scene.fog.near = this.haze.near;
       scene.fog.far = this.haze.far;
     }

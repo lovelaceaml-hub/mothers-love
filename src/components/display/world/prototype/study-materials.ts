@@ -6,6 +6,29 @@ import * as T from "three";
  */
 
 /**
+ * Every rim colour `studyRim` gave a material, the very object its shader uniform is bound to.
+ * A WeakMap rather than the material's `userData`, which three copies as JSON on a clone.
+ */
+const rimColors = new WeakMap<T.Material, T.Color[]>();
+
+/**
+ * The TV page's clear air: the fresnel rims read as white halos round every silhouette in the
+ * brighter light, so there each rim colour is scaled by this. The heart keeps its rim.
+ */
+export const STUDY_TV_RIM_SCALE = .6;
+
+/**
+ * Scales every rim `studyRim` put on `target` by `factor`, in place, and returns how many it
+ * scaled. The uniform holds the same colour object, so this reaches the shader whether or not
+ * the program has compiled yet. Call it once per material: the scale is not idempotent.
+ */
+export function scaleStudyRim(target: T.Material, factor: number) {
+  const colors = rimColors.get(target);
+  colors?.forEach(color => color.multiplyScalar(factor));
+  return colors?.length ?? 0;
+}
+
+/**
  * A cheap fresnel rim, the fake glow the study is allowed to use.
  * It chains any hook the material already carries and keeps a distinct program key,
  * so two materials with different rims never share a compiled program.
@@ -15,6 +38,8 @@ export function studyRim<M extends T.Material>(target: M, hex: string, power: nu
   // Snapshot the previous key now: the default key reads onBeforeCompile, which is replaced below.
   const previousKey = target.customProgramCacheKey();
   const color = new T.Color(hex);
+  // Recorded so the TV page can soften the rim (`scaleStudyRim`); nothing else reads it.
+  rimColors.set(target, [...(rimColors.get(target) ?? []), color]);
   const key = `study-rim-${hex}-${power}-${strength}`;
   target.onBeforeCompile = (shader, renderer) => {
     previousCompile(shader, renderer);

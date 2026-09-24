@@ -7,8 +7,10 @@ import type { KitAsset } from "../kit/kit-loader";
 import { createKitRemap, kitMaterialWords, type MaterialRemap } from "../kit/kit-materials";
 import type { DesignKitContext, DesignKitDistrict, KitBuilderHandle } from "./design-world";
 import { CORE_ZONE_LAYOUTS, KIT_BOUNDS, type KitPlacement, type LayoutSwarm, type ZoneLayout } from "./kit-layout-core";
+import { tvViewDistance } from "./study-budget";
 import { studyTerrace } from "./study-geometry";
 import { studyGlass, studyGlow, studyRim } from "./study-materials";
+import { studyTvPage } from "./tv-page";
 
 /**
  * The thirteen districts dressed with the 3D Studio kit (WORLD-INTEGRATION section 6).
@@ -387,6 +389,10 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
   console.debug("kit districts", JSON.stringify(stats));
 
   const cameraAt = new T.Vector3();
+  // The TV page's clear air shows what the study's haze hid, so there the detail groups and
+  // the people stay in view out to `STUDY_TV_VIEW_DISTANCE` (Low keeps its own distances).
+  // Resolved once, like every other page gate. The near and far merge swap is left as it is.
+  const tv = studyTvPage();
   return {
     update(time, zone, arrival) {
       const camera = scene.userData.studyCamera as T.Camera | undefined;
@@ -395,12 +401,13 @@ export function applyKitLayouts(context: DesignKitContext, layouts: readonly Zon
       materials.selected.value = selected();
       if (camera) {
         cameraAt.copy(camera.position);
-        const limit = lowTier ? KIT_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? KIT_DETAIL_DISTANCE.high : KIT_DETAIL_DISTANCE.auto;
+        const limit = tvViewDistance(lowTier ? KIT_DETAIL_DISTANCE.low : scene.userData.studyTier === "high" ? KIT_DETAIL_DISTANCE.high : KIT_DETAIL_DISTANCE.auto, tv, lowTier);
+        const nearLimit = tvViewDistance(KIT_NEAR_DISTANCE, tv, lowTier);
         for (const state of states) {
           const distance = cameraAt.distanceTo(state.center);
           if (distance > KIT_LOD_DISTANCE.far) state.far = true;
           else if (distance < KIT_LOD_DISTANCE.near) state.far = false;
-          const detail = distance < limit, near = distance < KIT_NEAR_DISTANCE;
+          const detail = distance < limit, near = distance < nearLimit;
           for (const item of state.items) {
             let visible = !item.lod || (item.lod === "far") === state.far;
             if (item.detail === "near") visible &&= near; else if (item.detail) visible &&= detail;

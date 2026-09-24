@@ -39,6 +39,12 @@
 .world[data-design-review] .shade {
   background: linear-gradient(180deg, #fff9f076, transparent 21%, transparent 62%, #fff6e970 82%, #fff8eef2);
 }
+/*
+ * The TV page's clear air (Anthony, 2026-09-24: "Can you remove the haze foggy look"): the
+ * cream wash over the top and the bottom of the picture was part of the milky look, and the TV
+ * page's header, share card and ticker each carry their own glass, so it has nothing to hold up.
+ */
+.world[data-tv-page] .shade { display: none; }
 .world[data-design-review] .story h1 { font-size: clamp(32px, 3.55vw, 66px); }
 @media (max-width: 850px) {
   .studyControls { top: 108px; left: 50%; width: max-content; max-width: calc(100% - 24px); }

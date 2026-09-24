@@ -7,6 +7,8 @@ import type { KitAssetId } from "../kit/kit-manifest";
 import { studyRim } from "./study-materials";
 import type { DesignKitContext, KitBuilderHandle } from "./design-world";
 import { applyKitFarZones, farZonesEnabled } from "./kit-far-zones";
+import { tvViewDistance } from "./study-budget";
+import { studyTvPage } from "./tv-page";
 
 /**
  * The corridors between the thirteen districts (WORLD-INTEGRATION 6.17): lantern posts at the
@@ -203,6 +205,8 @@ export function flightCurve(from: ZoneId, to: ZoneId, startAngle = 0) {
  * puffs, on the fountain leg eight along the long descent.
  */
 export const SOFT_CLOUD = { opacity: .5, centreClearance: 6, solidGap: 1, spacing: 9 } as const;
+/** TV page only: the sky lane clouds' opacity in the clear air (the material, never the table). */
+export const TV_SOFT_CLOUD_OPACITY = .25;
 export const SKY_LANES: readonly SkyLane[] = [
   {
     from: "practice", to: "calendar",
@@ -452,6 +456,10 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
   // opacity without writing depth; the rim is kept, the sheen softened.
   const softCloud = context.material(studyRim(new T.MeshPhysicalMaterial({ color: "#f8dde6", roughness: .96, sheen: 1, sheenColor: new T.Color("#fff6f8"), sheenRoughness: .7, dithering: true, transparent: true, opacity: SOFT_CLOUD.opacity, depthWrite: false }), "#fff4ea", 2.2, .34));
   softCloud.name = "corridor soft cloud";
+  // The TV page's clear air: a flight through a sky lane passes a lighter veil. Set on the
+  // material, so the table, the constant and every other page keep `SOFT_CLOUD.opacity`.
+  const tv = studyTvPage();
+  if (tv) softCloud.opacity = TV_SOFT_CLOUD_OPACITY;
   const islet: Partial<Record<string, T.Material>> = {
     grass: context.material(new T.MeshStandardMaterial({ color: ISLET_COLOURS.cap, roughness: .92, metalness: 0, dithering: true })),
     petal: context.material(new T.MeshPhysicalMaterial({ color: ISLET_COLOURS.bush, roughness: .7, sheen: .5, sheenColor: new T.Color("#ffe0ea"), sheenRoughness: .6, dithering: true })),
@@ -505,11 +513,12 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     culled.push({ near, far, places, radius: sphere.radius, centerY: sphere.center.y, range });
   }
 
-  // Lantern posts: four per bridge.
+  // Lantern posts: four per bridge. On the TV page the clear air would show a post appearing at
+  // 96 units, so there they reach `STUDY_TV_VIEW_DISTANCE` (Low keeps its 70).
   const postTable = corridorPosts();
   if (kit.has("landmark.lantern-post") && postTable.length) {
     cullable(instanced("landmark.lantern-post", CORRIDOR_KEEP.post, "Kit corridor lantern posts", postTable.length, false), undefined,
-      low => (low ? LOW_TIER_VIEW.post : POST_VIEW_DISTANCE),
+      low => (low ? LOW_TIER_VIEW.post : tvViewDistance(POST_VIEW_DISTANCE, tv)),
       postTable.map(post => ({ position: post.position, rotationY: post.rotationY, scale: 1.1 })));
   }
 
@@ -559,6 +568,9 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
     projected.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projected);
     const eye = camera.position;
+    // The TV page keeps the finer islet and tree levels out to `STUDY_TV_VIEW_DISTANCE`, where
+    // its thinner fog would otherwise show the swap to the tenth of a surface at 80 units.
+    const lodNear = tvViewDistance(LOD_NEAR, tv, low);
     for (const piece of culled) {
       const range = piece.range(low);
       let near = 0, far = 0;
@@ -568,7 +580,7 @@ export function applyKitCorridors(context: DesignKitContext): KitBuilderHandle |
         sphere.center.set(place.position[0], place.position[1] + piece.centerY * place.scale, place.position[2]);
         sphere.radius = piece.radius * place.scale + FRUSTUM_MARGIN;
         if (!frustum.intersectsSphere(sphere)) continue;
-        if (piece.far && distance > LOD_NEAR) placeAt(piece.far, far++, place.position, place.rotationY, place.scale);
+        if (piece.far && distance > lodNear) placeAt(piece.far, far++, place.position, place.rotationY, place.scale);
         else placeAt(piece.near, near++, place.position, place.rotationY, place.scale);
       }
       piece.near.count = near; piece.near.instanceMatrix.needsUpdate = true;
