@@ -13,6 +13,10 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### September 26: show older recognitions, live
+
+Anthony asked for the older recognitions to show on the home page. The page keeps the latest 100, and a Show older recognitions button beneath them adds the next 100 older ones per tap until "You have reached the first recognition." Migration 017 added the read-only `public.ml_public_feed_older` beside the unchanged home feed function and was applied at about 18:36 UTC (ledger row `017_public_feed_older`); pull request #23 merged at 18:39 UTC as deployment `dpl_7LbPtpZunGfqjMsVPHxcEwxrzF6m`, and Anthony confirmed it on the live page. With 192 eligible recognitions, the button adds the other 92. The TV still draws from the latest 100. Rollback is `dpl_EJ3n1Mau36mrAzQwNXYLG5uDht19`. See [Plan 30](PLAN-30-older-recognitions.md).
+
 ### September 22 to 23: repository cleanup, Plan 28 Sections 0 to 3
 
 Source: [Plan 28](PLAN-28-repository-refactor.md) Build log and [run record](runs/2026-09-22-repo-refactor/INDEX.md). Every branch was first saved as a permanent `archive/<old-branch-name>` tag on GitHub (133 tags), then the branch list went from 128 local and 102 remote branches to 8 local and 5 remote. The production branch `codex/mothers-love` was renamed `main` with production unmoved at `1b4c31a`, and on 2026-09-23 the Vercel production branch setting was changed to `main`, so a push to `main` now deploys production. The main checkout moved to `main`; its 2,242 untracked evidence files went to Drive, SHA-256 verified, and `.gitignore` rules keep new evidence out of Git. Section 3 brought every plan and the earlier run records onto one documentation branch, renumbered the plans by date (part 3), and split the handoff into the current page and this history. No application code, database or deployment setting changed in Sections 0 to 3 apart from the Vercel production branch.
