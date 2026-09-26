@@ -52,5 +52,8 @@ for (let i = 0; i < sizes.length; i += 1) {
   header.writeUInt32LE(offset, entry + 12);
   offset += images[i].length;
 }
-await writeFile(path.join(root, 'public/favicon.ico'), Buffer.concat([header, ...images]));
+const ico = Buffer.concat([header, ...images]);
+await writeFile(path.join(root, 'public/favicon.ico'), ico);
+// The page links the versioned name so a phone or browser cannot keep an older icon.
+await writeFile(path.join(destination, 'open-hands-heart-v1.ico'), ico);
 console.log('Generated static open-hands-heart app icons.');
