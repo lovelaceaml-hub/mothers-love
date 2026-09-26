@@ -49,6 +49,9 @@
 .primaryAction > * { position: relative; z-index: 1; }
 .secondaryAction { color: var(--home-ink); background: #fffdf5; border: 1px solid #9caa9f; margin-top: 1.2rem; }
 .secondaryAction:hover { background: #f1f2e5; }
+.secondaryAction:disabled { cursor: progress; opacity: .7; }
+.olderRow { display: grid; justify-items: center; padding: .4rem 0 1rem; }
+.olderNote { margin: 1rem 0 .2rem; color: var(--home-muted); font: 400 .95rem/1.5 Arial, Helvetica, sans-serif; text-align: center; }
 .welcomeArt { position: relative; min-width: 0; height: 17.4rem; pointer-events: none; }
 .arch { position: absolute; inset: -.3rem 8% .4rem; border-radius: 12rem 12rem 2rem 2rem; border: 1px solid #fffdf8; background: linear-gradient(135deg, #fcf8ee, #f1ede1); box-shadow: inset 9px 12px 16px #fffdfa, inset -8px -7px 14px #b3a48622, 0 12px 30px -22px #927e5440; }
 .arch::before { content: ''; position: absolute; inset: 1rem; border-radius: inherit; background: radial-gradient(ellipse at 45% 0%, #e4e8ed, #faf0d8 94%); box-shadow: inset 3px 6px 12px #9a988721; }

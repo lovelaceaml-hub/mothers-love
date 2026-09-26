@@ -15,6 +15,7 @@ import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/sa
 
 import {
   activeFeedItems,
+  MAX_PUBLIC_FEED_ITEMS,
   type PublicFeedItem,
   type VerifiedFeedSnapshot,
   verifyFeedSnapshot,
@@ -50,9 +51,16 @@ type ReactionRequestError = Error & {
 
 export type PublicFeedStatus = 'loading' | 'ready' | 'empty' | 'error' | 'hidden';
 
+// 'idle' means another older page may exist; 'end' means none is left; 'limit'
+// means the page holds as many older pages as it keeps refreshed.
+export type OlderFeedStatus = 'idle' | 'loading' | 'error' | 'end' | 'limit';
+
 type PublicFeedContextValue = {
   items: PublicFeedItem[];
   status: PublicFeedStatus;
+  olderItems: PublicFeedItem[];
+  olderStatus: OlderFeedStatus;
+  loadOlder: () => void;
   retry: () => void;
   refresh: () => void;
   reactions: Readonly<Record<string, ReactionEntry>>;
@@ -63,6 +71,9 @@ type PublicFeedContextValue = {
 const defaultContext: PublicFeedContextValue = {
   items: [],
   status: 'loading',
+  olderItems: [],
+  olderStatus: 'idle',
+  loadOlder: () => undefined,
   retry: () => undefined,
   refresh: () => undefined,
   reactions: {},
@@ -75,6 +86,38 @@ const PublicFeedContext = createContext<PublicFeedContextValue>(defaultContext);
 const DEFAULT_RETRY_AFTER_MS = 60_000;
 const MAX_RETRY_AFTER_MS = 5 * 60_000;
 const REACTION_BATCH_SIZE = 30;
+// Older pages are re-read on every refresh so a hidden recognition leaves them
+// too; this caps that work at 1,000 older recognitions on one open page.
+export const MAX_OLDER_FEED_PAGES = 10;
+
+async function fetchOlderFeedPage(after: PublicFeedItem, signal: AbortSignal) {
+  const query = new URLSearchParams({ before: after.firstPublishedAt, id: after.id });
+  const requestStartedAt = monotonicNow();
+  const response = await fetch(`/api/feed/older?${query}`, {
+    cache: 'no-store',
+    credentials: 'include',
+    headers: { accept: 'application/json' },
+    signal,
+  });
+  if (!response.ok) throw new Error(`Older feed request failed with status ${response.status}`);
+  const page = verifyFeedSnapshot(await response.json(), requestStartedAt);
+  if (!page) throw new Error('Older feed response was not valid.');
+  return page.items;
+}
+
+// Older items continue the live list: never repeat one of its items and never
+// sort ahead of its last item.
+function olderAfter(items: PublicFeedItem[], older: PublicFeedItem[]) {
+  const last = items[items.length - 1];
+  if (!last) return [];
+  const ids = new Set(items.map((item) => item.id));
+  const lastTime = Date.parse(last.firstPublishedAt);
+  return older.filter((item) => {
+    if (ids.has(item.id)) return false;
+    const time = Date.parse(item.firstPublishedAt);
+    return time < lastTime || (time === lastTime && item.id < last.id);
+  });
+}
 
 function parseRetryAfterMs(value: string | null) {
   if (!value) return undefined;
@@ -220,6 +263,12 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<PublicFeedStatus>('loading');
   const [, setClockVersion] = useState(0);
   const [reactions, setReactions] = useState<Record<string, ReactionEntry>>({});
+  const [olderItems, setOlderItems] = useState<PublicFeedItem[]>([]);
+  const [olderStatus, setOlderStatus] = useState<OlderFeedStatus>('idle');
+  const olderItemsRef = useRef<PublicFeedItem[]>([]);
+  const olderPagesRef = useRef(0);
+  const olderSerialRef = useRef(0);
+  const olderControllerRef = useRef<AbortController | null>(null);
   const requestSerialRef = useRef(0);
   const feedControllerRef = useRef<AbortController | null>(null);
   const feedDeadlineRef = useRef<number | null>(null);
@@ -266,9 +315,26 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     commitReactions({});
   }, [commitReactions]);
 
+  // Every item on screen: the live list, then any older pages beneath it.
   const currentItems = useCallback((candidate: VerifiedFeedSnapshot | null = snapshotRef.current) => {
-    return candidate ? activeFeedItems(candidate, monotonicNow()) : [];
+    if (!candidate) return [];
+    const items = activeFeedItems(candidate, monotonicNow());
+    return [...items, ...olderAfter(items, olderItemsRef.current)];
   }, []);
+
+  const commitOlder = useCallback((items: PublicFeedItem[], pages: number, nextStatus: OlderFeedStatus) => {
+    olderItemsRef.current = items;
+    olderPagesRef.current = pages;
+    setOlderItems(items);
+    setOlderStatus(nextStatus);
+  }, []);
+
+  const clearOlder = useCallback((nextStatus: OlderFeedStatus = 'idle') => {
+    olderSerialRef.current += 1;
+    olderControllerRef.current?.abort();
+    olderControllerRef.current = null;
+    commitOlder([], 0, nextStatus);
+  }, [commitOlder]);
 
   const clearFeed = useCallback((nextStatus: PublicFeedStatus) => {
     requestSerialRef.current += 1;
@@ -283,12 +349,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     reactionRecoveryTimersRef.current.clear();
     reactionRecoveryRef.current.clear();
     feedGenerationRef.current += 1;
+    clearOlder();
     snapshotRef.current = null;
     setSnapshot(null);
     setStatus(nextStatus);
     setClockVersion((version) => version + 1);
     clearReactions();
-  }, [clearExpiryTimer, clearReactions]);
+  }, [clearExpiryTimer, clearOlder, clearReactions]);
 
   const loadReactions = useCallback(async (items: PublicFeedItem[], generation: number, forceRecoveryCheck = false) => {
     reactionControllerRef.current?.abort();
@@ -401,9 +468,93 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     }
   }, [commitReactions]);
 
+  // After each live refresh, read the older pages again from the new end of the
+  // live list, so nothing falls into a gap between them and a recognition hidden
+  // since the last read disappears. A failed read clears them rather than keep
+  // stale records on screen.
+  const refreshOlder = useCallback(async (baseSnapshot: VerifiedFeedSnapshot) => {
+    const pages = olderPagesRef.current;
+    const base = activeFeedItems(baseSnapshot, monotonicNow());
+    if (pages === 0 || base.length === 0) return;
+    const serial = olderSerialRef.current + 1;
+    olderSerialRef.current = serial;
+    olderControllerRef.current?.abort();
+    const controller = new AbortController();
+    olderControllerRef.current = controller;
+    const deadline = window.setTimeout(() => controller.abort(), 8_000);
+    try {
+      const collected: PublicFeedItem[] = [];
+      let lastPageFull = true;
+      for (let page = 0; page < pages && lastPageFull; page += 1) {
+        const after = collected[collected.length - 1] ?? base[base.length - 1];
+        const items = await fetchOlderFeedPage(after, controller.signal);
+        collected.push(...items);
+        lastPageFull = items.length === MAX_PUBLIC_FEED_ITEMS;
+      }
+      if (serial !== olderSerialRef.current) return;
+      const previousIds = olderItemsRef.current.map((item) => item.id).join();
+      const nextStatus: OlderFeedStatus = !lastPageFull ? 'end' : pages >= MAX_OLDER_FEED_PAGES ? 'limit' : 'idle';
+      commitOlder(collected, pages, nextStatus);
+      if (collected.map((item) => item.id).join() !== previousIds) {
+        const shown = currentItems(baseSnapshot);
+        shown.forEach((item) => {
+          if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
+        });
+        void loadReactions(shown, feedGenerationRef.current);
+      }
+    } catch {
+      if (serial !== olderSerialRef.current) return;
+      clearOlder('error');
+    } finally {
+      window.clearTimeout(deadline);
+      if (olderControllerRef.current === controller) olderControllerRef.current = null;
+    }
+  }, [clearOlder, commitOlder, currentItems, loadReactions]);
+
+  const loadOlder = useCallback(async () => {
+    const baseSnapshot = snapshotRef.current;
+    if (!baseSnapshot) return;
+    const base = activeFeedItems(baseSnapshot, monotonicNow());
+    if (base.length < MAX_PUBLIC_FEED_ITEMS || olderPagesRef.current >= MAX_OLDER_FEED_PAGES) return;
+    const shownBefore = currentItems(baseSnapshot);
+    const after = shownBefore[shownBefore.length - 1];
+    const serial = olderSerialRef.current + 1;
+    olderSerialRef.current = serial;
+    olderControllerRef.current?.abort();
+    const controller = new AbortController();
+    olderControllerRef.current = controller;
+    setOlderStatus('loading');
+    const deadline = window.setTimeout(() => controller.abort(), 8_000);
+    try {
+      const items = await fetchOlderFeedPage(after, controller.signal);
+      const latestSnapshot = snapshotRef.current;
+      if (serial !== olderSerialRef.current || !latestSnapshot) return;
+      // A live refresh may have landed meanwhile; place the page after the
+      // current live list. The next refresh re-reads any gap it left.
+      const latestBase = activeFeedItems(latestSnapshot, monotonicNow());
+      const pages = olderPagesRef.current + 1;
+      const known = new Set(shownBefore.map((item) => item.id));
+      const nextOlder = [...olderAfter(latestBase, olderItemsRef.current), ...items.filter((item) => !known.has(item.id))];
+      const nextStatus: OlderFeedStatus = items.length < MAX_PUBLIC_FEED_ITEMS ? 'end' : pages >= MAX_OLDER_FEED_PAGES ? 'limit' : 'idle';
+      commitOlder(nextOlder, pages, nextStatus);
+      const shown = currentItems(latestSnapshot);
+      shown.forEach((item) => {
+        if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
+      });
+      void loadReactions(shown, feedGenerationRef.current);
+    } catch {
+      if (serial !== olderSerialRef.current) return;
+      setOlderStatus('error');
+    } finally {
+      window.clearTimeout(deadline);
+      if (olderControllerRef.current === controller) olderControllerRef.current = null;
+    }
+  }, [commitOlder, currentItems, loadReactions]);
+
   const applySnapshot = useCallback((nextSnapshot: VerifiedFeedSnapshot) => {
     const visibleItems = activeFeedItems(nextSnapshot, monotonicNow());
-    const nextIds = new Set(visibleItems.map((item) => item.id));
+    const shownItems = [...visibleItems, ...olderAfter(visibleItems, olderItemsRef.current)];
+    const nextIds = new Set(shownItems.map((item) => item.id));
     for (const id of reactionTargetTokensRef.current.keys()) {
       if (!nextIds.has(id)) {
         reactionMutationControllersRef.current.get(id)?.abort();
@@ -417,7 +568,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         reactionRecoveryRef.current.delete(id);
       }
     }
-    visibleItems.forEach((item) => {
+    shownItems.forEach((item) => {
       if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
     });
     const generation = feedGenerationRef.current + 1;
@@ -432,7 +583,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const current = snapshotRef.current;
       if (!current) return;
       const freshItems = activeFeedItems(current, monotonicNow());
-      const freshIds = new Set(freshItems.map((item) => item.id));
+      const freshIds = new Set([...freshItems, ...olderAfter(freshItems, olderItemsRef.current)].map((item) => item.id));
       for (const item of current.items) {
         if (!freshIds.has(item.id)) {
           reactionMutationControllersRef.current.get(item.id)?.abort();
@@ -470,8 +621,9 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       expiryTimerRef.current = setSafeTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
     }
 
-    void loadReactions(visibleItems, generation);
-  }, [clearExpiryTimer, commitReactions, loadReactions]);
+    void loadReactions(shownItems, generation);
+    if (olderPagesRef.current > 0) void refreshOlder(nextSnapshot);
+  }, [clearExpiryTimer, commitReactions, loadReactions, refreshOlder]);
 
   const fetchFeed = useCallback(async () => {
     if (!active || document.visibilityState === 'hidden') return;
@@ -683,9 +835,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     })();
   }, [commitReactions, currentItems]);
 
+  const liveItems = snapshot ? activeFeedItems(snapshot, monotonicNow()) : [];
   const context: PublicFeedContextValue = {
-    items: snapshot ? activeFeedItems(snapshot, monotonicNow()) : [],
+    items: liveItems,
     status,
+    olderItems: status === 'ready' ? olderAfter(liveItems, olderItems) : [],
+    olderStatus,
+    loadOlder: () => { void loadOlder(); },
     retry: () => retryRef.current(),
     refresh: () => refreshRef.current(),
     reactions,

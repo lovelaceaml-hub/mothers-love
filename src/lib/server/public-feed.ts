@@ -71,6 +71,37 @@ export function projectPublicFeed(value: unknown): PublicFeedSnapshot | null {
   return { serverTime: record.serverTime as string, items };
 }
 
+export type PublicFeedCursor = { before: string; id: string };
+
+// Reads the ?before=<firstPublishedAt>&id=<uuid> cursor of an older page. The
+// timestamp string is passed to the database unchanged, so its microseconds
+// survive; the browser only echoes back a value this server sent it.
+export function parsePublicFeedCursor(before: string | null, id: string | null): PublicFeedCursor | null {
+  if (parseTimestamp(before) === null || typeof id !== "string" || !UUID_PATTERN.test(id)) return null;
+  return { before: before as string, id: id.toLowerCase() };
+}
+
+// The older page has the same shape and checks as the home feed, and every item
+// must sort strictly after the cursor.
+export function projectOlderPublicFeed(value: unknown, cursor: PublicFeedCursor): PublicFeedSnapshot | null {
+  const snapshot = projectPublicFeed(value);
+  if (!snapshot) return null;
+  const cursorItem = { id: cursor.id, firstPublishedAt: cursor.before } as PublicFeedItem;
+  if (snapshot.items.length > 0 && !isOrdered(cursorItem, snapshot.items[0])) return null;
+  return snapshot;
+}
+
+export async function queryOlderPublicFeed(cursor: PublicFeedCursor): Promise<PublicFeedQuery> {
+  const client = databaseClient();
+  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  try {
+    const rows = await client`select public.ml_public_feed_older(${cursor.before}::timestamptz, ${cursor.id}::uuid) as result`;
+    return { data: rows[0]?.result ?? null, error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+  }
+}
+
 export async function queryPublicFeed(): Promise<PublicFeedQuery> {
   const client = databaseClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
