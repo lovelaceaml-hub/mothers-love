@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Component, createRef, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS, expressionById } from '@/lib/catalog';
-import { ReactionButton, usePublicFeed, type PublicFeedStatus } from './PublicFeedProvider';
-import type { PublicFeedItem } from './feed-types';
+import { ReactionButton, usePublicFeed, type OlderFeedStatus, type PublicFeedStatus } from './PublicFeedProvider';
+import { MAX_PUBLIC_FEED_ITEMS, type PublicFeedItem } from './feed-types';
 import { ExpressionDrift } from '@/components/campaign/ExpressionDrift';
 import styles from './HomeExperience.module.css';
 
@@ -102,6 +102,21 @@ function FeedStateCard({ status, onRetry, showAction = true }: { status: PublicF
   );
 }
 
+// Beneath the newest 100: a button that adds the next 100 older recognitions.
+function OlderRecognitions({ liveCount, status, onLoad }: { liveCount: number; status: OlderFeedStatus; onLoad: () => void }) {
+  if (liveCount < MAX_PUBLIC_FEED_ITEMS) return null;
+  if (status === 'end') return <p className={styles.olderNote} data-testid="older-end">You have reached the first recognition.</p>;
+  if (status === 'limit') return <p className={styles.olderNote} data-testid="older-limit">Showing the most this page can hold.</p>;
+  return (
+    <div className={styles.olderRow} aria-live="polite">
+      {status === 'error' && <p className={styles.olderNote} role="alert">Older recognitions could not load.</p>}
+      <button className={styles.secondaryAction} type="button" onClick={onLoad} disabled={status === 'loading'} aria-busy={status === 'loading'} data-testid="show-older">
+        {status === 'loading' ? 'Loading older recognitions' : status === 'error' ? 'Try again' : 'Show older recognitions'}
+      </button>
+    </div>
+  );
+}
+
 type FeedViewportProps = { status: PublicFeedStatus; children: ReactNode };
 type ReadingSnapshot = { atTop: boolean; anchors: Array<{ id: string; top: number }> };
 
@@ -147,7 +162,7 @@ class ReadingViewport extends Component<FeedViewportProps, Record<string, never>
 // public page (the /recognize receipt), which scrolls normally instead of using
 // the home page's fixed-height phone layout.
 export function RecentRecognitions({ embedded = false }: { embedded?: boolean }) {
-  const { items, status, retry, refresh } = usePublicFeed();
+  const { items, status, retry, refresh, olderItems, olderStatus, loadOlder } = usePublicFeed();
   // On the receipt, fetch once right away so a just-published recognition
   // appears without waiting for the next 10 second refresh.
   const refreshOnMount = useRef(refresh);
@@ -160,7 +175,10 @@ export function RecentRecognitions({ embedded = false }: { embedded?: boolean })
       </div>
       <ReadingViewport status={status}>
         {status === 'ready' && items.length > 0 ? (
-          <div className={styles.feedList}>{items.map((item) => <FeedCard key={item.id} item={item} />)}</div>
+          <>
+            <div className={styles.feedList}>{[...items, ...olderItems].map((item) => <FeedCard key={item.id} item={item} />)}</div>
+            <OlderRecognitions liveCount={items.length} status={olderStatus} onLoad={loadOlder} />
+          </>
         ) : <FeedStateCard status={status} onRetry={retry} showAction={!embedded} />}
       </ReadingViewport>
     </section>
