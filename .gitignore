@@ -13,6 +13,7 @@ docs/private/
 
 # Generated from the approved app-icon source before dev/build.
 /public/icons/open-hands-heart-v1-*.png
+/public/icons/open-hands-heart-v1.ico
 /public/apple-touch-icon.png
 /public/favicon.ico
 
