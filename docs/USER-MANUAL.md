@@ -1,7 +1,7 @@
 # Using The Words of Mother's Love
 
 ## Read recognitions
-Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Scroll the recent recognitions box to read the latest 100. Tap a heart to like a recognition, or tap it again to remove your like. No sign-in is needed. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the public display directly. Use Pause animation to stop decorative movement.
+Open the [home page](https://mothers-love.vercel.app) to see recent recognitions. New messages appear automatically. Scroll the recent recognitions box to read the latest 100, then choose Show older recognitions at the bottom to add 100 older ones at a time, back to the first recognition. Tap a heart to like a recognition, or tap it again to remove your like. No sign-in is needed. Choose Share a recognition to open the form. At the bottom, Admin opens sign-in and TV View opens the public display directly. Use Pause animation to stop decorative movement.
 
 ## Share a recognition
 Open the [recognition form](https://mothers-love.vercel.app/recognize). Enter your name and the recipient's name. Read the explanations beneath each expression, select the ones that fit, and write your message. Each expression has its own row. Selected expressions turn gold and show a checkmark. Preview it, then send it. Your submitted name is visible only to administrators.

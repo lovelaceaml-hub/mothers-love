@@ -54,6 +54,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | G5 superseded; G1 done by Plan 28 Section 5 (pull request #19); the completion review passed in Plan 28 Section 8; the TV check and merge follow |
 | [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | Sections 0 to 7 done; Section 8's completion review passed, pull request #19 waits for the TV check and merge |
 | [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; its file reaches `main` with pull request #19 |
+| [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
 
 ## Other documents
 
