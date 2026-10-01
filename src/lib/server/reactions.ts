@@ -115,3 +115,28 @@ export async function setReaction(
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
   }
 }
+
+export type ReactionTotalResult = {
+  ok: true;
+  total: number;
+};
+
+// The campaign-wide likes total shown in the TV header. Only the one number
+// leaves the server.
+export function projectReactionTotal(value: unknown): ReactionTotalResult | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  if (record.ok !== true || !Number.isSafeInteger(record.total) || (record.total as number) < 0) return null;
+  return { ok: true, total: record.total as number };
+}
+
+export async function queryReactionTotal(): Promise<DatabaseQueryResult> {
+  const client = databaseClient();
+  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  try {
+    const rows = await client`select public.ml_reactions_total() as result`;
+    return { data: rows[0]?.result ?? null, error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+  }
+}

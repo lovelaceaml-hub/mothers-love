@@ -50,6 +50,7 @@ type BridgeControl = {
   playing: boolean;
   elapsedMs?: number;
   reactionCounts: Record<string, number>;
+  reactionTotal: number | null;
   submissionUrl: string;
   qrDataUrl: string | null;
 };
@@ -271,6 +272,7 @@ export function ColorPolishRenderer({
   playing = true,
   elapsedMs,
   reactionCounts = {},
+  reactionTotal = null,
   className,
   onReady,
   holdInput = false,
@@ -333,6 +335,7 @@ export function ColorPolishRenderer({
       playing: playing === true,
       ...(elapsedMs === undefined ? {} : { elapsedMs: boundedNumber(elapsedMs, 0, MAX_CLOCK_MS) }),
       reactionCounts: Object.fromEntries(Object.entries(reactionCounts).slice(0, MAX_RECOGNITIONS).flatMap(([id, count]) => boundedText(id, 128) && isFiniteNumber(count) ? [[id, Math.floor(boundedNumber(count, 0, 100_000_000))]] : [])),
+      reactionTotal: safeMode || !isFiniteNumber(reactionTotal) ? null : Math.floor(boundedNumber(reactionTotal, 0, Number.MAX_SAFE_INTEGER)),
       submissionUrl: snapshot?.submissionUrl ?? '',
       qrDataUrl,
     };
@@ -344,7 +347,7 @@ export function ColorPolishRenderer({
       snapshot: safeMode ? null : bridgedSnapshot,
       control,
     });
-  }, [bridgedSnapshot, elapsedMs, nowMs, playing, qrDataUrl, reactionCounts, replayKey, safeMode, scene, snapshot, source, status]);
+  }, [bridgedSnapshot, elapsedMs, nowMs, playing, qrDataUrl, reactionCounts, reactionTotal, replayKey, safeMode, scene, snapshot, source, status]);
 
   function handleLoad(event: React.SyntheticEvent<HTMLIFrameElement>) {
     const iframe = event.currentTarget;
@@ -388,6 +391,7 @@ export function ColorPolishRenderer({
               playing: playing === true,
               ...(elapsedMs === undefined ? {} : { elapsedMs: boundedNumber(elapsedMs, 0, MAX_CLOCK_MS) }),
               reactionCounts: {},
+              reactionTotal: null,
               submissionUrl: snapshot?.submissionUrl ?? '',
               qrDataUrl,
             } satisfies BridgeControl,

@@ -91,6 +91,7 @@ function setStateFromSnapshot(snapshot,control={}){
  next.featured=clamp(Number(snapshot?.insights?.goal?.expressionId)||2,1,9);
  next.mode=control.status==='ready'&&usableSnapshot(snapshot)&&settings?.mode==='normal'?'normal':control.status==='quiet'?'neutral':'offline';
  next.still=motionStill(next.motion,control.playing===false);
+ next.reactionTotal=finiteNumber(control.reactionTotal)?Math.max(0,Math.floor(control.reactionTotal)):null;
  next.pool=(Array.isArray(snapshot?.recognitions)?snapshot.recognitions:[]).map(value=>normalizedRecord(value,control.reactionCounts)).filter(Boolean).slice(0,1000);
  next.seen=new Set(next.pool.map(r=>r.id));
  next.arrivalIds=new Set((Array.isArray(snapshot?.arrivals)?snapshot.arrivals:[]).map(item=>safeText(item?.eventId,128)).filter(Boolean));
@@ -120,7 +121,7 @@ function lowest(a){let index=0;a.forEach((v,i)=>{if(v<a[index])index=i});return 
 function goal(){const g=S.goal||{};return{id:clamp(Number(g.id)||1,1,9),value:Math.max(0,Number(g.value)||0),target:Math.max(1,Number(g.target)||1),rank:Number.isFinite(g.rank)?Math.max(1,Math.floor(g.rank)):null,ratio:Math.max(0,Number(g.ratio)||0),week:g.week||S.week,referenceFourth:Number(g.referenceFourth)||0,achieved:g.achieved===true}}
 function hasReaction(r){return finiteNumber(r?.likes)}
 function reactionWord(value){return value===1?'like':'likes'}
-function reactionTotal(){const values=S.pool.filter(r=>eligible(r)&&hasReaction(r)).map(r=>r.likes);return values.length?sum(values):null}
+function reactionTotal(){if(finiteNumber(S.reactionTotal)&&S.mode==='normal')return S.reactionTotal;const values=S.pool.filter(r=>eligible(r)&&hasReaction(r)).map(r=>r.likes);return values.length?sum(values):null}
 function reactionMarkup(r,tag='div',className='like-count'){if(!hasReaction(r))return '';return `<${tag} class="${className}">${THUMB}${num('like:'+r.id)}<span>${reactionWord(r.likes)}</span></${tag}>`}
 function numberValue(key){const T=totals(),g=goal();if(key==='likes')return reactionTotal()??0;if(key.startsWith('like:')){const value=S.pool.find(r=>r.id===key.slice(5))?.likes;return finiteNumber(value)?value:0}if(key==='goal:value')return g.value;if(key==='goal:target')return g.target;if(key==='milestone')return S.milestoneValue;const parts=key.split(':');if(parts[0]==='d'){const d=S.days[parts[1]]||{rec:0,expr:Array(9).fill(0)};return parts[2]==='rec'?d.rec:d.expr[Number(parts[2])-1]||0}const x=T[parts[0]];if(!x)return 0;return parts[1]==='rec'?x.rec:parts[1]==='expr'?sum(x.expr):x.expr[+parts[1]-1]||0}
 function num(key,cls='number'){const n=numCache.get(key)?.value??0;return `<span class="${cls}" data-number="${key}">${fmt(n)}</span>`}
