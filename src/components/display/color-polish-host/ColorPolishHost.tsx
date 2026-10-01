@@ -14,6 +14,7 @@ import { validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
 
 const POLL_MS = 5_000;
+const LIKES_TOTAL_POLL_MS = 10_000;
 // Sits above POLL_MS so a healthy but slow read can still finish before it is
 // treated as a failure. A poll that is already in flight is never aborted by
 // the next scheduled tick (see the load function below); this timeout only
@@ -211,6 +212,9 @@ export function ColorPolishHost() {
   const clockRef = useRef<Clock>({ serverMs: Date.now(), performanceMs: performanceNow() });
   const monotonicNowRef = useRef(Date.now());
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
+  // Every like campaign wide, for the header. Summing reactionCounts would only
+  // cover the latest 100 recognitions the snapshot carries.
+  const [reactionTotal, setReactionTotal] = useState<number | null>(null);
 
   const markUnsafe = (nextPhase: HostPhase) => {
     snapshotRef.current = null;
@@ -218,6 +222,7 @@ export function ColorPolishHost() {
     phaseRef.current = nextPhase;
     setPhase(nextPhase);
     setReactionCounts({});
+    setReactionTotal(null);
     setFrameGeneration((value) => value + 1);
   };
 
@@ -261,6 +266,7 @@ export function ColorPolishHost() {
           phaseRef.current = next.settings.mode;
           setPhase(next.settings.mode);
           setReactionCounts({});
+          setReactionTotal(null);
           setFrameGeneration((value) => value + 1);
           return;
         }
@@ -385,6 +391,40 @@ export function ColorPolishHost() {
     return () => controller.abort();
   }, [reactionSignature]);
 
+  const totalActive = phase === 'active';
+  useEffect(() => {
+    if (!totalActive) {
+      setReactionTotal(null);
+      return;
+    }
+    let controller: AbortController | null = null;
+    const load = async () => {
+      if (controller && !controller.signal.aborted) return;
+      const current = new AbortController();
+      controller = current;
+      const timeout = window.setTimeout(() => current.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const response = await fetch('/api/display/likes-total', { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: current.signal });
+        if (!response.ok) return;
+        const body: unknown = await response.json();
+        const total = body && typeof body === 'object' ? (body as Record<string, unknown>).total : undefined;
+        if (current.signal.aborted || typeof total !== 'number' || !Number.isSafeInteger(total) || total < 0) return;
+        setReactionTotal(total);
+      } catch {
+        // A failed read keeps the last good total; unsafe states clear it.
+      } finally {
+        window.clearTimeout(timeout);
+        if (controller === current) controller = null;
+      }
+    };
+    void load();
+    const poll = window.setInterval(() => void load(), LIKES_TOTAL_POLL_MS);
+    return () => {
+      window.clearInterval(poll);
+      controller?.abort();
+    };
+  }, [totalActive]);
+
   if (phase === 'active' && snapshot) {
     return (
       <div
@@ -400,6 +440,7 @@ export function ColorPolishHost() {
           status="ready"
           source="live"
           reactionCounts={reactionCounts}
+          reactionTotal={reactionTotal}
           {...(previewPlan.holdInput ? { holdInput: true } : {})}
           {...(previewPlan.scene === undefined ? {} : { scene: previewPlan.scene })}
           {...(previewPlan.replayKey === undefined ? {} : { replayKey: previewPlan.replayKey })}

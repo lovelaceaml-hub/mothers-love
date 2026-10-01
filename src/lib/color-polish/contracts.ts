@@ -39,6 +39,7 @@ export interface ColorPolishRendererProps {
   playing?: boolean;
   elapsedMs?: number;
   reactionCounts?: Record<string, number>;
+  reactionTotal?: number | null;
   className?: string;
   onReady?: () => void;
 }

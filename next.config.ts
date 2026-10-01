@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
           destination: "https://mothers-love.vercel.app/api/display/color-polish",
         },
         {
+          source: "/api/display/likes-total",
+          destination: "https://mothers-love.vercel.app/api/display/likes-total",
+        },
+        {
           source: "/api/reactions",
           destination: "https://mothers-love.vercel.app/api/reactions",
         },
