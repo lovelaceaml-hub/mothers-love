@@ -48,6 +48,13 @@ const deliberate = [];
 const isDeliberate = url => deliberate.some(pattern => url.includes(pattern));
 report.deliberateFailures = [];
 page.on('requestfailed', r => (isDeliberate(r.url()) ? report.deliberateFailures : report.failedRequests).push({ url: r.url(), failure: r.failure()?.errorText }));
+// The kit builders log what they placed and skipped (`kit districts`, `kit far zones`) once
+// for every world they dress, so the fault mode can tell a dressed world from a bare one.
+const kitBuilds = [];
+page.on('console', m => {
+  const match = /^kit (districts|far zones) (\{.*\})$/s.exec(m.text());
+  if (match) kitBuilds.push({ builder: match[1], zones: JSON.parse(match[2]) });
+});
 await page.route('**/api/**', route => { report.apiRequests.push(route.request().url()); return route.abort('blockedbyclient'); });
 page.setDefaultTimeout(10000);
 const world = page.getByTestId('world-preview');
@@ -96,23 +103,69 @@ async function shot(name) {
   console.log(JSON.stringify({ captured: name, attributes: await attrs() }));
   return bytes;
 }
-/** Byte equality first; when two captures differ, how many pixels and where, decoded in the page. */
+/**
+ * Two loads of the very same world can come back 1 of 255 apart in one channel along the bottom
+ * of the frame (seen on `kit=off` against itself, 2026-10-02), so a pixel only counts as changed
+ * when some channel moved by more than this.
+ */
+const NOISE = 1;
+/**
+ * Byte equality first; when two captures differ, how many pixels and where, how far the largest
+ * channel moved, and how many pixels moved by more than NOISE, decoded in the page.
+ */
 async function compareShots(a, b) {
-  if (Buffer.compare(a, b) === 0) return { identical: true, differingPixels: 0 };
-  const detail = await page.evaluate(async ([left, right]) => {
+  if (Buffer.compare(a, b) === 0) return { identical: true, differingPixels: 0, maxChannelDelta: 0, beyondNoise: 0 };
+  const detail = await page.evaluate(async ([left, right, noise]) => {
     const load = src => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; });
     const [x, y] = await Promise.all([load(left), load(right)]);
     if (x.width !== y.width || x.height !== y.height) return { sizeMismatch: [x.width, x.height, y.width, y.height] };
     const read = image => { const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height; const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, image.width, image.height).data; };
     const p = read(x), q = read(y);
-    let count = 0, box = null;
+    let count = 0, box = null, max = 0, beyond = 0;
     for (let i = 0; i < p.length; i += 4) if (p[i] !== q[i] || p[i + 1] !== q[i + 1] || p[i + 2] !== q[i + 2]) {
       count++; const px = (i / 4) % x.width, py = Math.floor(i / 4 / x.width);
       box = box ? [Math.min(box[0], px), Math.min(box[1], py), Math.max(box[2], px), Math.max(box[3], py)] : [px, py, px, py];
+      const delta = Math.max(Math.abs(p[i] - q[i]), Math.abs(p[i + 1] - q[i + 1]), Math.abs(p[i + 2] - q[i + 2]));
+      if (delta > max) max = delta;
+      if (delta > noise) beyond++;
     }
-    return { differingPixels: count, box };
-  }, [`data:image/png;base64,${a.toString('base64')}`, `data:image/png;base64,${b.toString('base64')}`]);
+    return { differingPixels: count, box, maxChannelDelta: max, beyondNoise: beyond };
+  }, [`data:image/png;base64,${a.toString('base64')}`, `data:image/png;base64,${b.toString('base64')}`, NOISE]);
   return { identical: false, ...detail };
+}
+/**
+ * The focused pearl's face on screen, from the attributes the world publishes. The outermost
+ * text pixel sits at .81 of the face, so a disc of .8 of the projected radius is words and face.
+ */
+function pearlDisc(attributes) {
+  const numbers = value => String(value ?? '').split(',').map(Number);
+  const [cameraX, cameraY, cameraZ] = numbers(attributes['data-camera-position']);
+  const [pearlX, pearlY, pearlZ] = numbers(attributes['data-world-bubble-position']);
+  const [ndcX, ndcY] = numbers(attributes['data-world-bubble-screen']);
+  const radius = Number(attributes['data-world-bubble-radius']);
+  const distance = Math.hypot(pearlX - cameraX, pearlY - cameraY, pearlZ - cameraZ);
+  const { width, height } = page.viewportSize();
+  // The world camera's vertical field of view is 43 degrees on a landscape screen.
+  const pixels = radius / (distance * Math.tan((43 * Math.PI) / 360)) * (height / 2);
+  return { cx: (ndcX + 1) / 2 * width, cy: (1 - ndcY) / 2 * height, r: 0.8 * pixels };
+}
+/** Two captures from the same camera, with the focused pearl at the same place on screen. */
+const sameView = (a, b) => a['data-camera-position'] === b['data-camera-position'] && a['data-world-bubble-screen'] === b['data-world-bubble-screen'];
+/** Pixels compared and differing inside a disc, and differing outside it, decoded in the page. */
+async function compareInDisc(a, b, disc) {
+  return page.evaluate(async ([left, right, disc]) => {
+    const load = src => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; });
+    const [x, y] = await Promise.all([load(left), load(right)]);
+    const read = image => { const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height; const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, image.width, image.height).data; };
+    const p = read(x), q = read(y);
+    let compared = 0, differing = 0, outside = 0;
+    for (let i = 0; i < p.length; i += 4) {
+      const px = (i / 4) % x.width, py = Math.floor(i / 4 / x.width);
+      const same = p[i] === q[i] && p[i + 1] === q[i + 1] && p[i + 2] === q[i + 2];
+      if ((px - disc.cx) ** 2 + (py - disc.cy) ** 2 <= disc.r ** 2) { compared++; if (!same) differing++; } else if (!same) outside++;
+    }
+    return { compared, differing, differingOutside: outside };
+  }, [`data:image/png;base64,${a.toString('base64')}`, `data:image/png;base64,${b.toString('base64')}`, disc]);
 }
 async function pause() { const button=page.getByRole('button',{name:'Pause tour',exact:true}); if (await button.count()) await button.click(); }
 const zones = [
@@ -202,77 +255,101 @@ try {
     };
     const on = await garden('', 'parity-radiance-on');
     const off = await garden('&radiance=off', 'parity-radiance-off');
-    const numbers = value => String(value ?? '').split(',').map(Number);
-    const [cameraX, cameraY, cameraZ] = numbers(on.attributes['data-camera-position']);
-    const [pearlX, pearlY, pearlZ] = numbers(on.attributes['data-world-bubble-position']);
-    const [ndcX, ndcY] = numbers(on.attributes['data-world-bubble-screen']);
-    const radius = Number(on.attributes['data-world-bubble-radius']);
-    const distance = Math.hypot(pearlX - cameraX, pearlY - cameraY, pearlZ - cameraZ);
-    const { width, height } = page.viewportSize();
-    // The world camera's vertical field of view is 43 degrees on a landscape screen.
-    const pixels = radius / (distance * Math.tan((43 * Math.PI) / 360)) * (height / 2);
-    const disc = { cx: (ndcX + 1) / 2 * width, cy: (1 - ndcY) / 2 * height, r: 0.8 * pixels };
-    const sameCamera = on.attributes['data-camera-position'] === off.attributes['data-camera-position']
-      && on.attributes['data-world-bubble-screen'] === off.attributes['data-world-bubble-screen'];
-    const inside = await page.evaluate(async ([left, right, disc]) => {
-      const load = src => new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; });
-      const [x, y] = await Promise.all([load(left), load(right)]);
-      const read = image => { const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height; const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, image.width, image.height).data; };
-      const p = read(x), q = read(y);
-      let compared = 0, differing = 0, outside = 0;
-      for (let i = 0; i < p.length; i += 4) {
-        const px = (i / 4) % x.width, py = Math.floor(i / 4 / x.width);
-        const same = p[i] === q[i] && p[i + 1] === q[i + 1] && p[i + 2] === q[i + 2];
-        if ((px - disc.cx) ** 2 + (py - disc.cy) ** 2 <= disc.r ** 2) { compared++; if (!same) differing++; } else if (!same) outside++;
-      }
-      return { compared, differing, differingOutside: outside };
-    }, [`data:image/png;base64,${on.bytes.toString('base64')}`, `data:image/png;base64,${off.bytes.toString('base64')}`, disc]);
+    const disc = pearlDisc(on.attributes);
+    const sameCamera = sameView(on.attributes, off.attributes);
+    const inside = await compareInDisc(on.bytes, off.bytes, disc);
     report.checks.push({ test: 'Pearl text parity: radiance on and off identical inside the focused pearl', passed: sameCamera && inside.compared > 10000 && inside.differing === 0,
       sameCamera, disc: { cx: Math.round(disc.cx), cy: Math.round(disc.cy), r: Math.round(disc.r) }, ...inside,
       note: 'differingOutside counts the glow, rays and protect pass around the pearl, which the radiance switch is meant to change' });
   } else if (mode === 'kit-faults') {
-    // Plan 26 K0: the kit fails soft. Three paused Garden captures on the same run: the
-    // procedural study (`kit=off`), the study with the Draco decoder refused (every asset
-    // fails, so `data-kit="failed"`), and the study with one asset refused (`partial`, one
-    // missing). While the district, neighbor and corridor builders are K0 stubs, both fault
-    // captures must be byte identical to the procedural one.
+    // Plan 26 K0, kept true to the kit as it now stands. Four paused Garden captures on one run:
+    // the procedural study (`kit=off`); the study with the Draco decoder refused, so every asset
+    // fails (`data-kit="failed"`); the healthy kit; and the study with one asset refused
+    // (`partial`, one missing). K0 asked both faults to match the procedural capture while the
+    // district, neighbor and corridor builders were stubs. Since K1 to K5 (2026-09-23) the
+    // builders dress the world, so only the failed kit must match it (within NOISE). The healthy
+    // kit dresses every place; a partial kit dresses all but the refused asset, whose procedural
+    // pieces stand; and the focused pearl's words never change (K1's text parity with `kit=off`).
     const pixels = process.env.DESIGN_REVIEW_FAULT_PIXELS !== 'off';
     const partialAsset = process.env.DESIGN_REVIEW_PARTIAL_ASSET || 'landmarks/pearl-arch.glb';
+    // The refused file's kit id, which the builders name when they skip its placements.
+    const manifest = await (await fetch(`${origin}/world-kit/v1/manifest.json`)).json();
+    const partialId = manifest.assets.find(entry => entry.file === partialAsset)?.id;
     // The study opens parked at the Garden, which is where every capture here is taken.
     const garden = async name => { await pause(); await expect(world).toHaveAttribute('data-zone', 'garden'); return shot(name); };
+    /** What the kit builders placed and skipped on the page opened since the last call. */
+    const builds = () => {
+      const taken = kitBuilds.splice(0);
+      const zones = Object.assign({}, ...taken.map(build => build.zones));
+      return {
+        builders: taken.map(build => build.builder),
+        placed: Object.values(zones).reduce((sum, zone) => sum + zone.placed, 0),
+        skipped: [...new Set(Object.values(zones).flatMap(zone => zone.skipped))],
+        garden: zones.garden ? { placed: zones.garden.placed, skipped: [...new Set(zones.garden.skipped)] } : null,
+      };
+    };
+    // A dressed world differs from `kit=off` beyond NOISE in at least 1% of the frame.
+    const dressed = comparison => comparison.beyondNoise >= 0.01 * page.viewportSize().width * page.viewportSize().height;
     // The procedural reference is always `&kit=off`, whatever DESIGN_REVIEW_KIT says.
+    kitBuilds.length = 0;
     await page.goto(study('&kit=off'), { waitUntil: 'domcontentloaded' });
     await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
     await expect(world).toHaveAttribute('data-kit', 'off', { timeout: 10000 });
     await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
-    report.checks.push({ test: 'Procedural reference opened with kit=off', passed: true, attributes: await attrs() });
     const reference = await garden('kit-off-garden');
-    const faultRun = async ({ pattern, expected, missing, name }) => {
+    const referenceAttributes = await attrs();
+    const referenceBuild = builds();
+    report.checks.push({ test: 'Procedural reference opened with kit=off: no kit builder ran', passed: !referenceBuild.builders.length, attributes: referenceAttributes, kitBuild: referenceBuild });
+    // The focused pearl's words against the reference: the same view, not one pixel apart on the face.
+    const disc = pearlDisc(referenceAttributes);
+    const words = async (capture, attributes) => ({ sameView: sameView(referenceAttributes, attributes),
+      disc: { cx: Math.round(disc.cx), cy: Math.round(disc.cy), r: Math.round(disc.r) }, ...await compareInDisc(reference, capture, disc) });
+    const wordsHold = result => result.sameView && result.compared > 10000 && result.differing === 0;
+    const faultRun = async ({ pattern, expected, name }) => {
       deliberate.push(pattern);
       const handler = route => route.abort('failed');
       await page.route(`**/${pattern}`, handler);
+      kitBuilds.length = 0;
       const start = performance.now();
       await page.goto(study(), { waitUntil: 'domcontentloaded' });
       await expect(world).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
       await expect(world).toHaveAttribute('data-kit', expected, { timeout: 10000 });
       const readyElapsedMs = Math.round(performance.now() - start);
       await expect(world).toHaveAttribute('data-prototype-heart-ready', 'true');
-      const attributes = await attrs();
       const capture = await garden(name);
+      const attributes = await attrs();
       await page.unroute(`**/${pattern}`, handler);
-      const comparison = await compareShots(reference, capture);
-      const missingOk = missing === undefined || attributes['data-kit-missing'] === String(missing);
-      report.checks.push({ test: `Kit ${expected} when ${pattern} is refused: procedural world stands`, passed: missingOk && (!pixels || comparison.identical),
-        aborted: pattern, readyElapsedMs, attributes, comparedWith: 'kit-off-garden', ...comparison, pixelAssertion: pixels });
+      return { aborted: pattern, readyElapsedMs, attributes, capture, kitBuild: builds(), againstKitOff: await compareShots(reference, capture) };
     };
-    await faultRun({ pattern: 'world-kit/draco/draco_decoder.wasm', expected: 'failed', name: 'kit-failed-garden' });
-    await faultRun({ pattern: `world-kit/v1/${partialAsset}`, expected: 'partial', missing: 1, name: 'kit-partial-garden' });
-    // And the healthy kit, for the record: every asset, within ten seconds of data-ready.
+    const failed = await faultRun({ pattern: 'world-kit/draco/draco_decoder.wasm', expected: 'failed', name: 'kit-failed-garden' });
+    report.checks.push({ test: `Kit failed when ${failed.aborted} is refused: no kit builder ran and the procedural world stands`,
+      passed: !failed.kitBuild.builders.length && (!pixels || failed.againstKitOff.beyondNoise === 0),
+      aborted: failed.aborted, readyElapsedMs: failed.readyElapsedMs, attributes: failed.attributes, kitBuild: failed.kitBuild,
+      comparedWith: 'kit-off-garden', ...failed.againstKitOff, noise: NOISE, pixelAssertion: pixels });
+    // The healthy kit: every asset within ten seconds of data-ready, every placement made.
+    kitBuilds.length = 0;
     await open('design', { kit: 'ready', label: 'design kit on' });
     const healthy = await garden('kit-on-garden');
-    const healthyComparison = await compareShots(reference, healthy);
-    report.checks.push({ test: 'Kit ready: stub builders draw the procedural world', passed: !pixels || healthyComparison.identical,
-      comparedWith: 'kit-off-garden', ...healthyComparison, pixelAssertion: pixels });
+    const healthyAttributes = await attrs();
+    const healthyBuild = builds();
+    const healthyAgainstOff = await compareShots(reference, healthy);
+    const healthyWords = await words(healthy, healthyAttributes);
+    report.checks.push({ test: 'Kit ready: every kit placement made, the Garden dressed, the pearl\'s words identical to kit=off',
+      passed: healthyBuild.placed > 0 && !healthyBuild.skipped.length && (!pixels || (dressed(healthyAgainstOff) && wordsHold(healthyWords))),
+      kitBuild: healthyBuild, comparedWith: 'kit-off-garden', ...healthyAgainstOff, pearlWords: healthyWords, pixelAssertion: pixels });
+    // One asset refused: it is the only one skipped, so its procedural pieces stand and the rest
+    // of the kit dresses the world. Where it has a place in the Garden (the default pearl arch
+    // rises beside the focused pearl) the capture must also differ from the healthy one.
+    const partial = await faultRun({ pattern: `world-kit/v1/${partialAsset}`, expected: 'partial', name: 'kit-partial-garden' });
+    const partialInGarden = partial.kitBuild.garden?.skipped.includes(partialId) ?? false;
+    const partialAgainstReady = await compareShots(healthy, partial.capture);
+    const partialWords = await words(partial.capture, partial.attributes);
+    report.checks.push({ test: `Kit partial when ${partial.aborted} is refused: ${partialId ?? 'its asset'} keeps its procedural pieces and the rest of the kit dresses the world`,
+      passed: partial.attributes['data-kit-missing'] === '1' && partial.kitBuild.placed > 0
+        && partial.kitBuild.skipped.length === 1 && partial.kitBuild.skipped[0] === partialId
+        && (!pixels || (dressed(partial.againstKitOff) && wordsHold(partialWords) && (!partialInGarden || partialAgainstReady.beyondNoise > 0))),
+      aborted: partial.aborted, readyElapsedMs: partial.readyElapsedMs, attributes: partial.attributes, assetId: partialId, inGarden: partialInGarden,
+      kitBuild: partial.kitBuild, againstKitOff: partial.againstKitOff, againstKitReady: partialAgainstReady, pearlWords: partialWords, pixelAssertion: pixels });
   } else if (mode === 'quality') {
     await pause();
     await setQuality('high');
