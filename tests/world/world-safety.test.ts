@@ -26,8 +26,9 @@ describe("verified public world feed", () => {
     expect(store.view(0).arrivals).toEqual([]);
     const next = { ...event, eventId: "2" };
     store.accept(snapshot({ sync: "delta", arrivals: [next] }), 5000);
-    expect(store.view(5000).arrivals).toEqual([records[0].id]);
-    store.consumeArrivals();
+    const view = store.view(5000);
+    expect(view.arrivals).toEqual([records[0].id]);
+    store.confirmArrivals(view.arrivals);
     store.accept(snapshot({ sync: "delta", arrivals: [next] }), 10000);
     expect(store.view(10000).arrivals).toEqual([]);
   });

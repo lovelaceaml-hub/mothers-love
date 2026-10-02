@@ -125,8 +125,16 @@ export class WorldFeedStore {
       now: this.highestTime,
     };
   }
-  consumeArrivals() {
-    this.pending = [];
+  /**
+   * An arrival leaves the queue only once a view carrying it has been committed, so a view
+   * that React batches away never takes an entrance with it (Plan 28 Section 8 follow up).
+   * Every unsafe state still empties the queue at once, through `clear`, and `view` drops a
+   * withdrawn or expired record's arrival before any later view can carry it.
+   */
+  confirmArrivals(delivered: readonly string[]) {
+    if (!delivered.length || !this.pending.length) return;
+    const done = new Set(delivered);
+    this.pending = this.pending.filter((id) => !done.has(id));
   }
 }
 export function sampleWorldFeed(): WorldFeed {
