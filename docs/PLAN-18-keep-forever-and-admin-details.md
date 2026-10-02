@@ -1,6 +1,6 @@
 # Plan 18: keep every recognition, and let admins see all details
 
-Status: APPROVED by Anthony on 2026-09-23 (Section A rulings recorded in the Build log). Section B next.
+Status: APPROVED by Anthony on 2026-09-23 (Section A rulings recorded in the Build log). Sections A and B done: Section B went live on 2026-09-24 (pull request #13, merge 43d801f) with migration 016 applied the same day. Sections C and D next.
 
 ## Goal line
 

@@ -13,6 +13,10 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### October 1: the TV likes count covers every like, live
+
+Source: pull request #25 (`fix/tv-likes-total`, merged 2026-10-01 at 03:34 UTC as `7cf0001`) and Vercel, production deployment `dpl_DvvjsnYgfVud2WTUzFuY4jobMA9o`. The likes count in the TV header used to add up the likes on the latest 100 recognitions the TV holds, so it went down whenever a new recognition pushed an old one out. Migration 018 adds the read-only `public.ml_reactions_total()`, one number for every like on every published, unexpired recognition, and the TV reads it from `/api/display/likes-total` every 10 seconds, keeping the last good value when a read fails and clearing it in every unsafe state. The migration is applied: the address answered 200 with a total on 2026-10-02, and it answers 503 until the function exists. Rollback: `dpl_EYovPyMndoPYiedj3pTUZP4jWKhn` (pull request #24); the function can stay because the old code never calls it.
+
 ### September 26: show older recognitions, live
 
 Anthony asked for the older recognitions to show on the home page. The page keeps the latest 100, and a Show older recognitions button beneath them adds the next 100 older ones per tap until "You have reached the first recognition." Migration 017 added the read-only `public.ml_public_feed_older` beside the unchanged home feed function and was applied at about 18:36 UTC (ledger row `017_public_feed_older`); pull request #23 merged at 18:39 UTC as deployment `dpl_7LbPtpZunGfqjMsVPHxcEwxrzF6m`, and Anthony confirmed it on the live page. With 192 eligible recognitions, the button adds the other 92. The TV still draws from the latest 100. Rollback is `dpl_EJ3n1Mau36mrAzQwNXYLG5uDht19`. See [Plan 30](PLAN-30-older-recognitions.md).

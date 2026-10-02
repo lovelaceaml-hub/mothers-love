@@ -2,26 +2,26 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-**Now (2026-09-24):** production is `main`, with eleven TV screens, the sculpted 3D heart, the open hands app icon, an admin list of every submission in arrival order, and Android install with a fullscreen TV kiosk mode. The 3D world has its own address, `/world`, beside the TV display; it goes live when pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) merges (Plan 28 Section 5, 2026-09-24). The current state and open items are on one page: [docs/HANDOFF.md](docs/HANDOFF.md).
+**Now (2026-10-01):** production is `main`, with eleven TV screens, the sculpted 3D heart, the open hands app icon, an admin list of every submission in arrival order, Android install with a fullscreen TV kiosk mode, and every recognition kept forever. The 3D world is live at its own address, `/world`, beside the TV display (pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19), merged 2026-09-24). The home page shows older recognitions beneath the newest 100 (Plan 30, 2026-09-26), and the TV header's likes count covers every like, not only the latest 100 (pull request [#25](https://github.com/lovelaceaml-hub/mothers-love/pull/25), 2026-10-01). The current state and open items are on one page: [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Quick links
 
 - **Website:** [Live recognitions](https://mothers-love.vercel.app), [Share a recognition](https://mothers-love.vercel.app/recognize), [Expression guide](https://mothers-love.vercel.app/expressions).
 - **TV:** [TV display](https://mothers-love.vercel.app/display), opens directly without a code; [kiosk mode](https://mothers-love.vercel.app/display?kiosk=1) for a dedicated screen; the [Live Recognitions screen](https://mothers-love.vercel.app/display?scene=live-feed).
-- **3D world:** [/world](https://mothers-love.vercel.app/world), its own page beside the TV display, never in the TV program; [sample](https://mothers-love.vercel.app/world?source=sample) and [explorer with Settings](https://mothers-love.vercel.app/world?view=explore). Live once pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19) merges; until then its [preview](https://mothers-love-git-feat-world-surface-lvzion.vercel.app/world) needs a Vercel sign in.
+- **3D world:** [/world](https://mothers-love.vercel.app/world), its own page beside the TV display, never in the TV program; [sample](https://mothers-love.vercel.app/world?source=sample) and [explorer with Settings](https://mothers-love.vercel.app/world?view=explore). Live since 2026-09-24 (pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19)).
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
-- **Current plan:** [Plan 28, clean up and refactor the repository](docs/PLAN-28-repository-refactor.md), with its [run record](docs/runs/2026-09-22-repo-refactor/INDEX.md).
+- **Current plan:** [Plan 18, keep every recognition and admin details](docs/PLAN-18-keep-forever-and-admin-details.md): Sections A and B are live, Sections C (admin sees all details) and D (release and records) are next.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
-- **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love`.
+- **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Projects/Mother's Love/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love), production branch `main`.
 - **Deployments:** [Vercel project](https://vercel.com/lvzion/mothers-love).
 
 ## Plans
 
-Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); the next new plan takes number 30.
+Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); the next new plan takes number 31.
 
 | Plan | Subject | Where it stands |
 | --- | --- | --- |
@@ -42,18 +42,18 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [15](docs/PLAN-15-tv-next-level.md) | TV next level pass | Released through Plan 17 |
 | [16](docs/PLAN-16-feed-100.md) | Latest 100 recognitions | Complete, live |
 | [17](docs/PLAN-17-tv-fit-and-release.md) | TV text fit and Plan 15 release | Live since 2026-09-19 |
-| [18](docs/PLAN-18-keep-forever-and-admin-details.md) | Keep every recognition, admin details | Draft; the admin list fix it led to went live 2026-09-20 |
-| [19](docs/PLAN-19-world-prototype-01.md) | World prototype 01 | Part of the 3D world branch, not live |
-| [20](docs/PLAN-20-heavenly-world.md) | A heavenly world | Part of the 3D world branch, not live |
-| [21](docs/PLAN-21-living-heaven.md) | A living heaven of kindness | Part of the 3D world branch, not live |
-| [22](docs/PLAN-22-tv-bubbles-and-autoplay.md) | Recognition bubbles and hands free touring | Part of the 3D world branch, not live |
-| [23](docs/PLAN-23-recognitions-in-the-world.md) | Fly among recognitions | Part of the 3D world branch, not live |
-| [24](docs/PLAN-24-world-visual-quality.md) | Whole world visual upgrade | Pass D2 done; P0 closed by pull request #16; reaches `main` with the world in pull request #19 |
+| [18](docs/PLAN-18-keep-forever-and-admin-details.md) | Keep every recognition, admin details | Approved 2026-09-23; Sections A and B live 2026-09-24 (every recognition kept forever, migration 016); Sections C and D next. The admin list fix it led to went live 2026-09-20 |
+| [19](docs/PLAN-19-world-prototype-01.md) | World prototype 01 | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
+| [20](docs/PLAN-20-heavenly-world.md) | A heavenly world | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
+| [21](docs/PLAN-21-living-heaven.md) | A living heaven of kindness | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
+| [22](docs/PLAN-22-tv-bubbles-and-autoplay.md) | Recognition bubbles and hands free touring | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
+| [23](docs/PLAN-23-recognitions-in-the-world.md) | Fly among recognitions | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
+| [24](docs/PLAN-24-world-visual-quality.md) | Whole world visual upgrade | Pass D2 done; P0 closed by pull request #16; reached `main` with the world in pull request #19, 2026-09-24 |
 | [25](docs/PLAN-25-live-tv-pearl-study.md) | Live TV pearl design study | Archived 2026-09-24 as tag `archive/feat/tv-pearl-design`, not live |
 | [26](docs/PLAN-26-pearl-sequence.md) | Expression Cosmos prototype | Archived 2026-09-24 as tag `archive/feat/tv-pearl-sequence`, not live |
-| [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | G5 superseded; G1 done by Plan 28 Section 5 (pull request #19); the completion review passed in Plan 28 Section 8; the TV check and merge follow |
-| [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | Sections 0 to 7 done; Section 8's completion review passed, pull request #19 waits for the TV check and merge |
-| [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; its file reaches `main` with pull request #19 |
+| [27](docs/PLAN-27-world-promotion.md) | Promote the heavenly world (was 25) | G5 superseded; G1 done by Plan 28 Section 5 (pull request #19); the completion review passed in Plan 28 Section 8; #19 merged 2026-09-24. Anthony's TV check is not recorded |
+| [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | Sections 0 to 7 done; Section 8's review passed and pull request #19 merged 2026-09-24, so the world is live at `/world`. Closing entry 2026-10-02 in its Build log, with what is left |
+| [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; live at `/world` since 2026-09-24 (pull request #19) |
 | [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
 
 ## Other documents
