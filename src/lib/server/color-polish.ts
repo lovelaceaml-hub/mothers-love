@@ -241,7 +241,7 @@ export function projectColorPolishSnapshot(value: unknown): ColorPolishSnapshot 
   return { ...base, presentation, insights };
 }
 
-export async function queryColorPolishSnapshot(after: string | null, signal?: AbortSignal): Promise<ColorPolishQuery> {
+export async function queryColorPolishSnapshot(after: string | null, signal?: AbortSignal, known?: string[]): Promise<ColorPolishQuery> {
   if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
   const client = getPublicDisplayClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
@@ -252,7 +252,9 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
     await transaction`set local statement_timeout = '5000ms'`;
     await transaction`set transaction isolation level repeatable read`;
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    const rows = await transaction`select public.ml_color_polish_snapshot(${after}) as result`;
+    const rows = known === undefined
+      ? await transaction`select public.ml_color_polish_snapshot(${after}) as result`
+      : await transaction`select public.ml_color_polish_delta(${after}, ${JSON.stringify(known)}::text::jsonb) as result`;
     return rows[0]?.result ?? null;
   }));
   void operation.then(() => undefined, () => undefined);
