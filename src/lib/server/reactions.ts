@@ -1,5 +1,6 @@
 import { randomSessionToken, sha256 } from "./operations";
 import { databaseClient } from "./supabase";
+import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 
 export const REACTION_COOKIE_NAME = "ml_reaction";
 export const REACTION_COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
@@ -130,13 +131,30 @@ export function projectReactionTotal(value: unknown): ReactionTotalResult | null
   return { ok: true, total: record.total as number };
 }
 
-export async function queryReactionTotal(): Promise<DatabaseQueryResult> {
-  const client = databaseClient();
+export async function queryReactionTotal(signal?: AbortSignal): Promise<DatabaseQueryResult> {
+  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
+  const client = getPublicDisplayClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const operation = Promise.resolve().then(() => client.begin("read only", async (transaction) => {
+    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+    await transaction`set local statement_timeout = '5000ms'`;
+    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+    const rows = await transaction`select public.ml_reactions_total() as result`;
+    return rows[0]?.result ?? null;
+  }));
+  void operation.then(() => undefined, () => undefined);
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      retirePublicDisplayClient(client);
+      reject(new Error("DATABASE_TIMEOUT"));
+    }, 8_000);
+  });
   try {
-    const rows = await client`select public.ml_reactions_total() as result`;
-    return { data: rows[0]?.result ?? null, error: null };
+    return { data: await Promise.race([operation, deadline]), error: null };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
   }
 }

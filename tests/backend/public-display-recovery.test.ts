@@ -56,6 +56,7 @@ describe("public display client recovery", () => {
     expect(postgres).toHaveBeenCalledWith(config.databaseUrl, {
       max: 1,
       prepare: false,
+      fetch_types: false,
       idle_timeout: 20,
       connect_timeout: 10,
       ssl: config.databaseSsl,

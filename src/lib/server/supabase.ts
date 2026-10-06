@@ -12,6 +12,9 @@ export function databaseClient(): Sql | null {
     cachedDatabase = postgres(config.databaseUrl, {
       max: 1,
       prepare: false,
+      // Runtime bridges return JSONB and accept scalar/JSONB parameters. Native
+      // array/custom-type discovery adds a catalog read on every connection.
+      fetch_types: false,
       idle_timeout: 20,
       connect_timeout: 10,
       ssl: config.databaseSsl,

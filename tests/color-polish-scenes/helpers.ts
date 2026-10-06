@@ -274,6 +274,29 @@ export const SCENE_IDS = {
 
 export type SceneSlug = keyof typeof SCENE_IDS;
 
+// Selecting a Studio scene replaces its preview iframe. Wait on the current
+// frame, rather than holding the outgoing frame during that replacement.
+export async function readyStudioFrame(page: Page, expectedSceneId: number): Promise<Frame> {
+  let ready: Frame | undefined;
+  await expect.poll(async () => {
+    const frame = page.frames().find((item) => item.url().endsWith('/color-polish/renderer.html'));
+    if (!frame) return false;
+    try {
+      const matches = await frame.evaluate((expected) => {
+        const runtime = (window as any).colorPolishRuntime;
+        const state = runtime?.getState();
+        return state?.mode === 'normal' && state?.scene === expected;
+      }, expectedSceneId);
+      if (matches && !frame.isDetached()) ready = frame;
+      return Boolean(ready);
+    } catch (error) {
+      if (frame.isDetached()) return false;
+      throw error;
+    }
+  }).toBe(true);
+  return ready!;
+}
+
 /**
  * Navigates to Studio, selects scene (or welcome for arrival), advances time, and pauses animations.
  * Called by all color polish scene specs.
@@ -296,19 +319,8 @@ export async function openStudioScene(
   const optionValue = slug === 'arrival' ? 'welcome' : slug;
   await selector.selectOption(optionValue);
 
-  await expect.poll(() => page.frames().some((f) => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
-  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
-  if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
-
   const expectedSceneId = slug === 'arrival' ? SCENE_IDS.welcome : SCENE_IDS[slug];
-  await frame.waitForFunction(
-    ({ expected, directId }) => {
-      const runtime = (window as any).colorPolishRuntime;
-      const state = runtime?.getState();
-      return state?.mode === 'normal' && (state?.scene === expected || state?.scene === directId);
-    },
-    { expected: expectedSceneId, directId: SCENE_IDS[slug] },
-  );
+  const frame = await readyStudioFrame(page, expectedSceneId);
 
   await frame.evaluate((checkpointMs) => {
     (window as any).colorPolishRuntime.step(checkpointMs);

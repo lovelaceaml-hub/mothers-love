@@ -6,13 +6,14 @@ import QRCode from 'qrcode';
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
+import { startVisiblePoll } from '@/lib/visible-poll';
 import { fetchReactionCounts, type ReactionItem } from '@/components/feed/PublicFeedProvider';
 import { useDisplayChimes } from './use-display-chimes';
 import styles from './V6DisplayExperience.module.css';
 
 const TIME_ZONE = 'America/Los_Angeles';
 const SNAPSHOT_TIMEOUT_MS = 10_000;
-const SNAPSHOT_POLL_MS = 4_000;
+const SNAPSHOT_POLL_MS = 5_000;
 const STALE_HIDE_MS = 60_000;
 const INDIVIDUAL_JOURNEY_MS = 3_600;
 const GROUP_JOURNEY_MS = 4_800;
@@ -201,7 +202,7 @@ function useReactionCounts(ids: string[]) {
     let inFlight = false;
     let controller: AbortController | null = null;
     const load = async () => {
-      if (inFlight) return;
+      if (inFlight || document.hidden) return;
       inFlight = true;
       controller = new AbortController();
       const timeout = window.setTimeout(() => controller?.abort(), 8_000);
@@ -219,11 +220,10 @@ function useReactionCounts(ids: string[]) {
         inFlight = false;
       }
     };
-    void load();
-    const interval = window.setInterval(() => void load(), 10_000);
+    const stopPolling = startVisiblePoll(() => void load(), 10_000);
     return () => {
       active = false;
-      window.clearInterval(interval);
+      stopPolling();
       controller?.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -995,9 +995,10 @@ function Shell({ children, snapshot, nowServerMs, nowMs, queueCount, arrival, fe
   );
 }
 
-export function V6DisplayExperience() {
+export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verifiedSnapshot?: DisplaySnapshot; verifiedNowMs?: number } = {}) {
   const reducedMotion = useReducedMotion();
-  const [snapshot, setSnapshot] = useState<DisplaySnapshot | null>(null);
+  const [localSnapshot, setSnapshot] = useState<DisplaySnapshot | null>(null);
+  const snapshot = verifiedSnapshot ?? localSnapshot;
   const [dailyAggregates, setDailyAggregates] = useState<DailyAggregate[]>([]);
   const [stale, setStale] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -1015,9 +1016,39 @@ export function V6DisplayExperience() {
   const cursorRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
   const controllerRef = useRef<AbortController | null>(null);
+  const dailyControllerRef = useRef<AbortController | null>(null);
   const individualStyleRef = useRef(0);
   const groupStyleRef = useRef(0);
   const mountedAtRef = useRef(Date.now());
+
+  const acceptSnapshot = useCallback((next: DisplaySnapshot) => {
+    const receivedAt = Date.now();
+    setSnapshot(next);
+    setServerOffsetMs(Date.parse(next.serverTime) - receivedAt);
+    setLastVerifiedAt(receivedAt);
+    setStale(false);
+    setUnavailable(false);
+    cursorRef.current = next.cursor;
+    const arrivals = next.arrivals ?? [];
+    if (initialSnapshotRef.current) {
+      for (const arrival of arrivals) knownEventsRef.current.add(arrival.eventId);
+      initialSnapshotRef.current = false;
+    } else {
+      const freshIds: string[] = [];
+      for (const arrival of arrivals) {
+        if (knownEventsRef.current.has(arrival.eventId)) continue;
+        knownEventsRef.current.add(arrival.eventId);
+        freshIds.push(arrival.recognitionId);
+      }
+      if (freshIds.length) setQueue((current) => [...current, ...freshIds.filter((id) => !current.includes(id))]);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (verifiedSnapshot) queueMicrotask(() => { if (active) acceptSnapshot(verifiedSnapshot); });
+    return () => { active = false; };
+  }, [acceptSnapshot, verifiedSnapshot]);
 
   const loadSnapshot = useCallback(async () => {
     if (inFlightRef.current || document.visibilityState === 'hidden') return;
@@ -1028,26 +1059,7 @@ export function V6DisplayExperience() {
     try {
       const path = cursorRef.current ? `/api/display/snapshot?after=${encodeURIComponent(cursorRef.current)}` : '/api/display/snapshot';
       const next = await api<DisplaySnapshot>(path, { method: 'GET', auth: false, cache: 'no-store', signal: controller.signal });
-      const receivedAt = Date.now();
-      setSnapshot(next);
-      setServerOffsetMs(Date.parse(next.serverTime) - receivedAt);
-      setLastVerifiedAt(receivedAt);
-      setStale(false);
-      setUnavailable(false);
-      cursorRef.current = next.cursor;
-      const arrivals = next.arrivals ?? [];
-      if (initialSnapshotRef.current) {
-        for (const arrival of arrivals) knownEventsRef.current.add(arrival.eventId);
-        initialSnapshotRef.current = false;
-      } else {
-        const freshIds: string[] = [];
-        for (const arrival of arrivals) {
-          if (knownEventsRef.current.has(arrival.eventId)) continue;
-          knownEventsRef.current.add(arrival.eventId);
-          freshIds.push(arrival.recognitionId);
-        }
-        if (freshIds.length) setQueue((current) => [...current, ...freshIds.filter((id) => !current.includes(id))]);
-      }
+      if (!controller.signal.aborted) acceptSnapshot(next);
     } catch {
       setStale(true);
     } finally {
@@ -1055,32 +1067,36 @@ export function V6DisplayExperience() {
       if (controllerRef.current === controller) controllerRef.current = null;
       inFlightRef.current = false;
     }
-  }, []);
+  }, [acceptSnapshot]);
 
   const loadDailyAggregates = useCallback(async () => {
+    if (document.hidden || dailyControllerRef.current) return;
+    const controller = new AbortController();
+    dailyControllerRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
     try {
-      const response = await api<{ ok?: boolean; items: DailyAggregate[] }>('/api/display/daily', { method: 'GET', auth: false, cache: 'no-store' });
-      if (Array.isArray(response.items)) setDailyAggregates(response.items);
+      const response = await api<{ ok?: boolean; items: DailyAggregate[] }>('/api/display/daily', { method: 'GET', auth: false, cache: 'no-store', signal: controller.signal });
+      if (!controller.signal.aborted && Array.isArray(response.items)) setDailyAggregates(response.items);
     } catch {
       // The V6 UI falls back to the currently retained recognition records until
       // the additive anonymous-aggregate migration is available.
+    } finally {
+      window.clearTimeout(timeout);
+      if (dailyControllerRef.current === controller) dailyControllerRef.current = null;
     }
   }, []);
 
+  const hasVerifiedSnapshot = verifiedSnapshot !== undefined;
   useEffect(() => {
-    void loadSnapshot();
-    void loadDailyAggregates();
-    const poll = window.setInterval(() => void loadSnapshot(), SNAPSHOT_POLL_MS);
-    const dailyPoll = window.setInterval(() => void loadDailyAggregates(), 30_000);
-    const visibility = () => { if (document.visibilityState === 'visible') void loadSnapshot(); };
-    document.addEventListener('visibilitychange', visibility);
+    const stopSnapshots = hasVerifiedSnapshot ? () => {} : startVisiblePoll(() => void loadSnapshot(), SNAPSHOT_POLL_MS);
+    const stopDaily = startVisiblePoll(() => void loadDailyAggregates(), 30_000);
     return () => {
-      window.clearInterval(poll);
-      window.clearInterval(dailyPoll);
-      document.removeEventListener('visibilitychange', visibility);
+      stopSnapshots();
+      stopDaily();
       controllerRef.current?.abort();
+      dailyControllerRef.current?.abort();
     };
-  }, [loadDailyAggregates, loadSnapshot]);
+  }, [hasVerifiedSnapshot, loadDailyAggregates, loadSnapshot]);
 
   useEffect(() => {
     const tick = window.setInterval(() => setNowMs(Date.now()), 250);
@@ -1092,7 +1108,7 @@ export function V6DisplayExperience() {
     if (nowMs - reference >= STALE_HIDE_MS) setUnavailable(true);
   }, [lastVerifiedAt, nowMs]);
 
-  const nowServerMs = nowMs + serverOffsetMs;
+  const nowServerMs = verifiedNowMs ?? nowMs + serverOffsetMs;
   const allRecords = useMemo(() => eligibleRecognitions(snapshot, nowServerMs), [snapshot, nowServerMs]);
   const latest = allRecords.slice(0, 30);
   const reactionIds = latest.map((record) => record.id);
