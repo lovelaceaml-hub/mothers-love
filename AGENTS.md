@@ -112,6 +112,9 @@ TV at /display (renderer in `public/color-polish/core/` and `public/color-polish
   settings, neutral and quiet, expiry, cleanup gating and offline safety still apply. Kiosk mode
   (`?kiosk=1`) only adds fullscreen and a wake lock; the service worker has no fetch handler, so the
   live display is never cached.
+- An open `/display` reloads itself once a new version is live (`DisplayBuildWatch`, `/api/display/build`):
+  checked every 5 minutes, only after two matching reports, at most once per build per tab; a
+  failed check changes nothing. Local builds have no version and never reload.
 - TV personal content comes only from the verified public snapshot; Neutral, Quiet, expired and
   stale states clear it. Admin and sign-in pages show no feed.
 - Color Polish activation and rollback are SQL only, no admin route:
