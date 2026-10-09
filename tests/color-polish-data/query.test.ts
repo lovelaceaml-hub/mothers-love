@@ -47,7 +47,7 @@ describe("Color Polish snapshot query", () => {
       "set transaction isolation level repeatable read",
     ]);
     expect(statements[2]).toContain("public.ml_color_polish_snapshot(?)");
-    expect(statements[2]).toContain("value - 'serverTime'");
+    expect(statements[2]).toContain("value - 'serverTime' - 'cursor'");
     expect(statements[2]).toContain("jsonb_build_object('unchanged', true");
     expect(statements[2]).toContain("then jsonb_build_object");
   });
