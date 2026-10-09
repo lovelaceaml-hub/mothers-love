@@ -78,9 +78,27 @@ describe("GET /api/display/color-polish", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
     expect(await response.json()).toEqual(projected);
-    expect(queryColorPolishSnapshot).toHaveBeenCalledWith("11.1789061600", expect.any(AbortSignal));
+    expect(queryColorPolishSnapshot).toHaveBeenCalledWith("11.1789061600", expect.any(AbortSignal), null);
     expect(projectColorPolishSnapshot).toHaveBeenCalledWith({ ok: true });
     expect(release).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns a compact no-store heartbeat only for a valid conditional request", async () => {
+    const etag = "a".repeat(32);
+    queryColorPolishSnapshot.mockResolvedValue({
+      data: { unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" },
+      etag,
+      error: null,
+    });
+    const response = await GET(new NextRequest("https://mothers-love.vercel.app/api/display/color-polish", {
+      headers: { "If-None-Match": `"${etag}"` },
+    }));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("etag")).toBe(`"${etag}"`);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" });
+    expect(queryColorPolishSnapshot).toHaveBeenCalledWith(null, expect.any(AbortSignal), etag);
+    expect(projectColorPolishSnapshot).not.toHaveBeenCalled();
   });
 
   it("fails closed on unavailable configuration, transport errors, and malformed projections", async () => {
