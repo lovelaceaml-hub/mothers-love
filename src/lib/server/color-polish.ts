@@ -253,15 +253,16 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
     await transaction`set local statement_timeout = '5000ms'`;
     await transaction`set transaction isolation level repeatable read`;
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    // Hash only the stable content: serverTime updates every poll, while edits,
-    // withdrawals, moderation and arrival events must always change the hash.
+    // Hash only stable content: serverTime and the epoch in cursor change each poll.
+    // Keep sync, arrivals, settings and the recognition list in the hash so edits,
+    // withdrawals, moderation and new arrivals invalidate the unchanged response.
     // Project the unchanged response INSIDE Postgres so the shared pooler never
     // transfers the full recognition list to the Vercel server on idle polls.
     const rows = await transaction`
       with payload as (
         select public.ml_color_polish_snapshot(${after}) as value
       ), digest as (
-        select value, md5((value - 'serverTime')::text) as etag from payload
+        select value, md5((value - 'serverTime' - 'cursor')::text) as etag from payload
       )
       select etag, case
         when ${knownEtag}::text = etag and value->>'ok' = 'true'
