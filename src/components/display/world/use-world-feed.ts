@@ -75,7 +75,9 @@ export function useWorldFeed(source: WorldSource): WorldFeed {
       }
     }
     const tick = window.setInterval(publish, 500);
-    const poll = window.setInterval(() => void load(), 5000);
+    // The full recognition snapshot is sizeable; a ten-second refresh preserves live updates
+    // without continuously re-transferring it every five seconds.
+    const poll = window.setInterval(() => void load(), 10_000);
     const visibility = () => {
       // Clear before the browser can display an old personal frame after a hidden gap.
       store.clear("connecting");
