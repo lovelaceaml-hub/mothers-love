@@ -7,7 +7,7 @@ import {
   selectLeastUsedExpression,
 } from "@/lib/server/color-polish";
 import { COLOR_POLISH_DURATIONS, COLOR_POLISH_SCENES, normalizeColorPolishPlaylist } from "@/lib/color-polish/contracts";
-import { validateColorPolishPresentationChanges, validateColorPolishSnapshot } from "@/lib/color-polish/validation";
+import { validateColorPolishHeartbeat, validateColorPolishPresentationChanges, validateColorPolishSnapshot } from "@/lib/color-polish/validation";
 
 const settings = {
   version: 7,
@@ -110,6 +110,17 @@ function snapshot(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+describe("compact unchanged display acknowledgements", () => {
+  it("accepts only a valid small timestamp confirmation", () => {
+    const heartbeat = { unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" };
+    expect(validateColorPolishHeartbeat(heartbeat)).toEqual(heartbeat);
+    expect(validateColorPolishHeartbeat({ ...heartbeat, recognitions: [] })).toBeNull();
+    expect(validateColorPolishHeartbeat({ ...heartbeat, serverTime: "garbled" })).toBeNull();
+    expect(validateColorPolishHeartbeat({ ...heartbeat, unchanged: false })).toBeNull();
+    expect(validateColorPolishSnapshot(heartbeat)).toBeNull();
+  });
+});
 
 describe("Color Polish weekly goal", () => {
   it("chooses the first expression for an official-order tie", () => {
