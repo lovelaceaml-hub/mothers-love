@@ -1,6 +1,6 @@
 import type { Aggregate, Recognition } from "@/lib/contracts";
 import type { ColorPolishSnapshot } from "@/lib/color-polish/contracts";
-import { validateColorPolishSnapshot } from "@/lib/color-polish/validation";
+import { validateColorPolishHeartbeat, validateColorPolishSnapshot } from "@/lib/color-polish/validation";
 import { buildColorPolishSampleSnapshot } from "../color-polish/sample";
 import { SAMPLE_RECOGNITIONS } from "./world-data";
 
@@ -40,6 +40,21 @@ export class WorldFeedStore {
   private seen = new Set<string>();
   private pending: string[] = [];
   cursor: string | null = null;
+  hash: string | null = null;
+  /** Confirm the baseline is still safe without downloading it again. */
+  acceptHeartbeat(payload: unknown, monotonic: number): boolean {
+    const heartbeat = validateColorPolishHeartbeat(payload);
+    if (!heartbeat || !this.snapshot || !this.hash) {
+      this.clear("unavailable");
+      return false;
+    }
+    this.verifiedAt = monotonic;
+    this.serverAt = Date.parse(heartbeat.serverTime);
+    this.highestTime = Math.max(this.highestTime, this.serverAt);
+    this.snapshot = { ...this.snapshot, serverTime: heartbeat.serverTime };
+    this.phase = "live";
+    return true;
+  }
   accept(payload: unknown, monotonic: number): boolean {
     const next = validateColorPolishSnapshot(payload);
     if (!next) {
@@ -93,6 +108,7 @@ export class WorldFeedStore {
     this.snapshot = null;
     this.pending = [];
     this.cursor = null;
+    this.hash = null;
     this.seen.clear();
     this.phase = phase;
     this.verifiedAt = -Infinity;
