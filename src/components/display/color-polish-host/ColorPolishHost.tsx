@@ -10,12 +10,12 @@ import {
   type ColorPolishScene,
   type ColorPolishSnapshot,
 } from '@/lib/color-polish/contracts';
-import { validateColorPolishSnapshot } from '@/lib/color-polish/validation';
+import { validateColorPolishHeartbeat, validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
 
-// Full display snapshots include the latest recognitions; avoid unnecessary database egress.
-// Visibility changes still request an immediate fresh snapshot, and the 60-second stale gate is unchanged.
-const POLL_MS = 10_000;
+// Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
+// rather than the full recognition list. Never slow down delivery to save bandwidth.
+const POLL_MS = 5_000;
 const LIKES_TOTAL_POLL_MS = 10_000;
 // Sits above POLL_MS so a healthy but slow read can still finish before it is
 // treated as a failure. A poll that is already in flight is never aborted by
@@ -207,6 +207,7 @@ export function ColorPolishHost() {
   const snapshotRef = useRef<ColorPolishSnapshot | null>(null);
   const phaseRef = useRef<HostPhase>('checking');
   const cursorRef = useRef<string | null>(null);
+  const snapshotHashRef = useRef<string | null>(null);
   const requestGenerationRef = useRef(0);
   const reactionGenerationRef = useRef(0);
   const controllerRef = useRef<AbortController | null>(null);
@@ -220,6 +221,7 @@ export function ColorPolishHost() {
 
   const markUnsafe = (nextPhase: HostPhase) => {
     snapshotRef.current = null;
+    snapshotHashRef.current = null;
     setSnapshot(null);
     phaseRef.current = nextPhase;
     setPhase(nextPhase);
@@ -249,21 +251,38 @@ export function ColorPolishHost() {
       try {
         const path = after ? `/api/display/color-polish?after=${encodeURIComponent(after)}` : '/api/display/color-polish';
         // Keep the Vercel test-preview access cookie for the public snapshot read.
-        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: controller.signal });
+        const headers: Record<string, string> = { accept: 'application/json' };
+        if (snapshotRef.current && snapshotHashRef.current)
+          headers['If-None-Match'] = `"${snapshotHashRef.current}"`;
+        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers, signal: controller.signal });
         if (!response.ok) throw new Error(`SNAPSHOT_${response.status}`);
-        const next = validateColorPolishSnapshot(await response.json());
-        if (!next) throw new Error('INVALID_SNAPSHOT');
+        const payload: unknown = await response.json();
         if (!mounted || generation !== requestGenerationRef.current) return;
+        const heartbeat = validateColorPolishHeartbeat(payload);
+        if (heartbeat) {
+          if (!snapshotRef.current || !snapshotHashRef.current) throw new Error('MISSING_SNAPSHOT');
+          const serverMs = Date.parse(heartbeat.serverTime);
+          const receivedPerformanceMs = performanceNow();
+          clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
+          monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
+          lastVerifiedRef.current = receivedPerformanceMs;
+          return;
+        }
+        const next = validateColorPolishSnapshot(payload);
+        if (!next) throw new Error('INVALID_SNAPSHOT');
         if (snapshotRef.current && next.revision < snapshotRef.current.revision) return;
         const serverMs = Date.parse(next.serverTime);
         const receivedPerformanceMs = performanceNow();
         clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
         monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
         cursorRef.current = next.cursor;
+        const tag = /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '');
+        snapshotHashRef.current = tag?.[1] ?? null;
         lastVerifiedRef.current = receivedPerformanceMs;
         setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {
           snapshotRef.current = null;
+          snapshotHashRef.current = null;
           setSnapshot(null);
           phaseRef.current = next.settings.mode;
           setPhase(next.settings.mode);
@@ -280,6 +299,7 @@ export function ColorPolishHost() {
       } catch {
         if (!mounted || generation !== requestGenerationRef.current) return;
         if (!snapshotRef.current) {
+          snapshotHashRef.current = null;
           phaseRef.current = 'unavailable';
           setPhase('unavailable');
         }
