@@ -13,7 +13,9 @@ import {
 import { validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
 
-const POLL_MS = 5_000;
+// Full display snapshots include the latest recognitions; avoid unnecessary database egress.
+// Visibility changes still request an immediate fresh snapshot, and the 60-second stale gate is unchanged.
+const POLL_MS = 10_000;
 const LIKES_TOTAL_POLL_MS = 10_000;
 // Sits above POLL_MS so a healthy but slow read can still finish before it is
 // treated as a failure. A poll that is already in flight is never aborted by
