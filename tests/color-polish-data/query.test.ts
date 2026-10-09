@@ -37,14 +37,19 @@ describe("Color Polish snapshot query", () => {
 
     await expect(queryColorPolishSnapshot("11.1789061600")).resolves.toEqual({
       data: { ok: true, source: "color-polish" },
+      etag: null,
       error: null,
     });
     expect(client.begin).toHaveBeenCalledWith("read write", expect.any(Function));
-    expect(client.transaction.mock.calls.map(([strings]) => strings.join("?"))).toEqual([
+    const statements = client.transaction.mock.calls.map(([strings]) => strings.join("?"));
+    expect(statements.slice(0, 2)).toEqual([
       "set local statement_timeout = '5000ms'",
       "set transaction isolation level repeatable read",
-      "select public.ml_color_polish_snapshot(?) as result",
     ]);
+    expect(statements[2]).toContain("public.ml_color_polish_snapshot(?)");
+    expect(statements[2]).toContain("value - 'serverTime'");
+    expect(statements[2]).toContain("jsonb_build_object('unchanged', true");
+    expect(statements[2]).toContain("then jsonb_build_object");
   });
 
   it("fails before opening a client when the request is already aborted", async () => {
