@@ -1,5 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const { parseCertificate } = vi.hoisted(() => ({ parseCertificate: vi.fn() }));
+
+vi.mock("node:crypto", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:crypto")>();
+  return {
+    ...actual,
+    X509Certificate: class extends actual.X509Certificate {
+      constructor(value: string | Buffer) {
+        parseCertificate();
+        super(value);
+      }
+    },
+  };
+});
+
 const TEST_CA = `-----BEGIN CERTIFICATE-----
 MIIDHTCCAgWgAwIBAgIUPT71Xde/02d7VIATeT4/HpE0/x4wDQYJKoZIhvcNAQEL
 BQAwHjEcMBoGA1UEAwwTTW90aGVyIExvdmUgVGVzdCBDQTAeFw0yNjA5MDgwMjQ0
@@ -42,6 +57,7 @@ function configure(overrides: Partial<Record<(typeof CONFIG_KEYS)[number], strin
 
 beforeEach(() => {
   vi.resetModules();
+  parseCertificate.mockClear();
   configure();
 });
 
@@ -66,6 +82,28 @@ describe("server database TLS configuration", () => {
 
     expect(normalizeCaCertificate(TEST_CA.replace(/\n/g, "\\n"))).toBe(TEST_CA);
     expect(getServerConfig()?.databaseSsl).toEqual({ ca: TEST_CA, rejectUnauthorized: true });
+  });
+
+  it("parses a stable CA once per process and revalidates when the raw environment value changes", async () => {
+    configure({ DATABASE_CA_CERT: TEST_CA });
+    const { getServerConfig } = await import("@/lib/server/env");
+
+    for (let request = 0; request < 50; request += 1) {
+      expect(getServerConfig()?.databaseSsl.ca).toBe(TEST_CA);
+      // The display route checks configuration before reading, then its cached
+      // database client checks again. Both checks see the same raw certificate.
+      expect(getServerConfig()?.databaseSsl.ca).toBe(TEST_CA);
+    }
+    expect(parseCertificate).toHaveBeenCalledTimes(1);
+
+    process.env.DATABASE_CA_CERT = "-----BEGIN CERTIFICATE-----\\nAAAA\\n-----END CERTIFICATE-----";
+    expect(getServerConfig()).toBeNull();
+    expect(parseCertificate).toHaveBeenCalledTimes(2);
+
+    process.env.DATABASE_CA_CERT = TEST_CA.replace(/\n/g, "\\n");
+    expect(getServerConfig()?.databaseSsl.ca).toBe(TEST_CA);
+    expect(getServerConfig()?.databaseSsl.ca).toBe(TEST_CA);
+    expect(parseCertificate).toHaveBeenCalledTimes(3);
   });
 
   it.each(["disable", "require"])("keeps strict SSL when DATABASE_URL requests sslmode=%s", async (sslmode) => {

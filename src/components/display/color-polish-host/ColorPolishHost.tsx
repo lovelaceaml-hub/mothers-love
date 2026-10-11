@@ -12,6 +12,7 @@ import {
 } from '@/lib/color-polish/contracts';
 import { validateColorPolishHeartbeat, validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
+import { startVisiblePoll } from '@/lib/visible-poll';
 
 // Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
 // rather than the full recognition list. Never slow down delivery to save bandwidth.
@@ -309,16 +310,15 @@ export function ColorPolishHost() {
       }
     };
 
-    void load();
-    const poll = window.setInterval(() => void load(), POLL_MS);
-    const visibility = () => { if (document.visibilityState === 'visible') void load(); };
-    document.addEventListener('visibilitychange', visibility);
+    const stopPolling = startVisiblePoll(() => void load(), POLL_MS, () => {
+      const verifiedAt = lastVerifiedRef.current;
+      if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) markUnsafe('unavailable');
+    });
     return () => {
       mounted = false;
       ++requestGenerationRef.current;
       controllerRef.current?.abort();
-      window.clearInterval(poll);
-      document.removeEventListener('visibilitychange', visibility);
+      stopPolling();
     };
   }, []);
 
@@ -398,6 +398,7 @@ export function ColorPolishHost() {
       return () => controller.abort();
     }
     const load = async () => {
+      if (document.hidden) return;
       try {
         const chunks = Array.from({ length: Math.ceil(ids.length / 30) }, (_, index) => ids.slice(index * 30, index * 30 + 30));
         const responses = await Promise.all(chunks.map((chunk) => fetchReactionCounts(chunk, controller.signal)));
@@ -410,7 +411,9 @@ export function ColorPolishHost() {
       }
     };
     void load();
-    return () => controller.abort();
+    const visible = () => { if (!document.hidden) void load(); };
+    document.addEventListener('visibilitychange', visible);
+    return () => { controller.abort(); document.removeEventListener('visibilitychange', visible); };
   }, [reactionSignature]);
 
   const totalActive = phase === 'active';
@@ -421,6 +424,7 @@ export function ColorPolishHost() {
     }
     let controller: AbortController | null = null;
     const load = async () => {
+      if (document.hidden) return;
       if (controller && !controller.signal.aborted) return;
       const current = new AbortController();
       controller = current;
@@ -439,10 +443,9 @@ export function ColorPolishHost() {
         if (controller === current) controller = null;
       }
     };
-    void load();
-    const poll = window.setInterval(() => void load(), LIKES_TOTAL_POLL_MS);
+    const stopPolling = startVisiblePoll(() => void load(), LIKES_TOTAL_POLL_MS);
     return () => {
-      window.clearInterval(poll);
+      stopPolling();
       controller?.abort();
     };
   }, [totalActive]);
