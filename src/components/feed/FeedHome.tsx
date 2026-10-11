@@ -166,7 +166,12 @@ export function RecentRecognitions({ embedded = false }: { embedded?: boolean })
   // On the receipt, fetch once right away so a just-published recognition
   // appears without waiting for the next 10 second refresh.
   const refreshOnMount = useRef(refresh);
-  useEffect(() => { if (embedded) refreshOnMount.current(); }, [embedded]);
+  const refreshedOnMount = useRef(false);
+  useEffect(() => {
+    if (!embedded || refreshedOnMount.current) return;
+    refreshedOnMount.current = true;
+    refreshOnMount.current();
+  }, [embedded]);
   return (
     <section className={embedded ? `${styles.feedSection} ${styles.embeddedFeed}` : styles.feedSection} data-testid={embedded ? 'receipt-live-feed' : undefined}>
       <div className={styles.sectionHeader}>

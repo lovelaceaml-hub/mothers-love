@@ -292,23 +292,65 @@ test('display falls back to the legacy renderer when color-polish stays unavaila
 
 test('visible TV polls stop in a hidden tab and refresh immediately when shown again', async ({ page }) => {
   test.setTimeout(45_000);
-  const fixture = buildActiveDisplayFixture();
+  const baseFixture = buildActiveDisplayFixture();
+  const fixture = {
+    ...baseFixture,
+    recognitions: (baseFixture as unknown as { recognitions: Array<Record<string, unknown>> }).recognitions
+      .map(record => ({ ...record, expiresAt: '2030-01-01T12:00:00.000Z' })),
+  };
   let snapshotRequests = 0;
-  let likesTotalRequests = 0;
+  let likesTotalIncludedRequests = 0;
+  let separateLikesRequests = 0;
+  let reactionRequests = 0;
+  let likesTotal = 17;
+  let likesHeaderSent = 0;
+  const likesHeadersReceived: string[] = [];
+  const etag = `"${'a'.repeat(32)}"`;
+  page.on('response', response => {
+    if (new URL(response.url()).pathname === '/api/display/color-polish') {
+      const value = response.headers()['x-likes-total'];
+      if (value) likesHeadersReceived.push(value);
+    }
+  });
   await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  await page.route('**/api/reactions**', async route => {
+    reactionRequests += 1;
+    return fulfillJson(route, { items: [] });
+  });
+  await page.route('**/api/display/likes-total', async route => {
+    separateLikesRequests += 1;
+    return fulfillJson(route, { total: 18 });
+  });
   await page.route('**/api/display/color-polish**', route => {
     snapshotRequests += 1;
-    return fulfillJson(route, fixture);
-  });
-  await page.route('**/api/display/likes-total', route => {
-    likesTotalRequests += 1;
-    return fulfillJson(route, { total: 18 });
+    const url = new URL(route.request().url());
+    const includeTotal = url.searchParams.get('includeLikesTotal') === '1';
+    if (includeTotal) {
+      likesTotalIncludedRequests += 1;
+      likesTotal += 1;
+      likesHeaderSent = likesTotal;
+    }
+    const unchanged = route.request().headers()['if-none-match'] === etag;
+    const body = unchanged ? { unchanged: true, serverTime: '2026-09-10T18:00:05.000Z' } : fixture;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { ETag: etag, ...(includeTotal ? { 'X-Likes-Total': String(likesTotal) } : {}) },
+      body: JSON.stringify(body),
+    });
   });
 
   await page.goto('/display');
   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
-  await expect.poll(() => likesTotalRequests).toBeGreaterThan(0);
-  const beforeHidden = { snapshot: snapshotRequests, likes: likesTotalRequests };
+  const renderer = await findRendererFrame(page);
+  await expect.poll(() => likesTotalIncludedRequests).toBeGreaterThan(0);
+  await expect.poll(() => likesHeadersReceived.length).toBeGreaterThan(0);
+  expect(likesHeadersReceived).toContain(String(likesHeaderSent));
+  const initialTotal = likesHeaderSent;
+  await expect.poll(() => renderer.evaluate(() => (window as any).reactionTotal())).toBe(initialTotal);
+  await expect.poll(() => reactionRequests).toBeGreaterThan(0);
+  expect(likesTotalIncludedRequests).toBeGreaterThanOrEqual(1);
+  const beforeHidden = { snapshot: snapshotRequests, reactions: reactionRequests, included: likesTotalIncludedRequests };
 
   await page.evaluate(() => {
     const visibility = { hidden: true };
@@ -320,18 +362,22 @@ test('visible TV polls stop in a hidden tab and refresh immediately when shown a
     (window as typeof window & { setTestVisibility: (hidden: boolean) => void }).setTestVisibility(true);
   });
 
-  // A visible screen would make two more snapshot reads and one more likes read
-  // over this interval. A hidden screen must issue none.
+  // A visible screen would make two more snapshot reads and one total refresh.
+  // A hidden screen must issue neither those reads nor per-item heart refreshes.
   await page.waitForTimeout(11_000);
   expect(snapshotRequests).toBe(beforeHidden.snapshot);
-  expect(likesTotalRequests).toBe(beforeHidden.likes);
+  expect(reactionRequests).toBe(beforeHidden.reactions);
+  expect(likesTotalIncludedRequests).toBe(beforeHidden.included);
 
   await page.evaluate(() => {
     (window as typeof window & { setTestVisibility: (hidden: boolean) => void }).setTestVisibility(false);
   });
   await expect.poll(() => snapshotRequests, { timeout: 2_000 }).toBe(beforeHidden.snapshot + 1);
-  await expect.poll(() => likesTotalRequests, { timeout: 2_000 }).toBe(beforeHidden.likes + 1);
+  await expect.poll(() => likesTotalIncludedRequests, { timeout: 2_000 }).toBe(beforeHidden.included + 1);
+  await expect.poll(() => reactionRequests, { timeout: 2_000 }).toBe(beforeHidden.reactions + 1);
   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+  await expect.poll(() => renderer.evaluate(() => (window as any).reactionTotal())).toBe(likesHeaderSent);
+  expect(separateLikesRequests).toBe(0);
 });
 
 async function findRendererFrame(page: Page) {

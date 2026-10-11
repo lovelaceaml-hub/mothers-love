@@ -232,8 +232,8 @@ test('shows the latest 100 items, batches heart counts, and keeps the list keybo
   const viewport = page.getByRole('region', { name: 'Recent recognitions' });
   await expect(viewport).toHaveAttribute('tabindex', '0');
   await expect(page.getByRole('article')).toHaveCount(100);
-  await expect.poll(() => reactionRequests.length).toBe(4);
-  expect(reactionRequests.every((ids) => ids.length <= 30)).toBe(true);
+  await expect.poll(() => reactionRequests.length).toBe(1);
+  expect(reactionRequests.every((ids) => ids.length <= 100)).toBe(true);
   expect(reactionRequests.flat()).toHaveLength(100);
 });
 

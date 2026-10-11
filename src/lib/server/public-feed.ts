@@ -71,6 +71,14 @@ export function projectPublicFeed(value: unknown): PublicFeedSnapshot | null {
   return { serverTime: record.serverTime as string, items };
 }
 
+export function projectPublicFeedHeartbeat(value: unknown): { unchanged: true; serverTime: string } | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  if (Object.keys(record).length !== 2 || record.unchanged !== true) return null;
+  const serverTime = parseTimestamp(record.serverTime);
+  return serverTime === null ? null : { unchanged: true, serverTime: record.serverTime as string };
+}
+
 export type PublicFeedCursor = { before: string; id: string };
 
 // Reads the ?before=<firstPublishedAt>&id=<uuid> cursor of an older page. The
@@ -102,13 +110,31 @@ export async function queryOlderPublicFeed(cursor: PublicFeedCursor): Promise<Pu
   }
 }
 
-export async function queryPublicFeed(): Promise<PublicFeedQuery> {
+export async function queryPublicFeed(knownEtag: string | null = null): Promise<PublicFeedQuery & { etag: string | null }> {
   const client = databaseClient();
-  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  if (!client) return { data: null, error: new Error("UNAVAILABLE"), etag: null };
   try {
-    const rows = await client`select public.ml_public_feed() as result`;
-    return { data: rows[0]?.result ?? null, error: null };
+    // Keep unchanged feed reads small across the HTTP boundary. The database
+    // still runs the public feed function, but the server avoids projecting and
+    // validating every item when the content digest matches the caller's tag.
+    const rows = await client`
+      with feed as materialized (
+        select public.ml_public_feed()::jsonb as value
+      ), tagged as (
+        select value, md5((value - 'serverTime')::text) as etag
+        from feed
+      )
+      select etag,
+        case when ${knownEtag}::text = etag
+          then jsonb_build_object('unchanged', true, 'serverTime', value->'serverTime')
+          else value
+        end as result
+      from tagged
+    `;
+    const row = rows[0];
+    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    return { data: row?.result ?? null, error: null, etag };
   } catch (error) {
-    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR"), etag: null };
   }
 }

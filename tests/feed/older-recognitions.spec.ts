@@ -24,6 +24,7 @@ type Options = { total: number; hidden?: Set<number>; failOlder?: () => boolean 
 
 async function serveFeed(page: Page, options: Options) {
   const reactionIds = new Set<string>();
+  const reactionRequests: string[][] = [];
   const olderCursors: string[] = [];
   await page.route('**/api/feed', async (route) => {
     const hidden = options.hidden ?? new Set<number>();
@@ -43,10 +44,11 @@ async function serveFeed(page: Page, options: Options) {
   });
   await page.route('**/api/reactions**', async (route) => {
     const ids = new URL(route.request().url()).searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
+    reactionRequests.push(ids);
     ids.forEach((id) => reactionIds.add(id));
     await route.fulfill({ json: { items: ids.map((id) => ({ id, count: 0, liked: false })) } });
   });
-  return { reactionIds, olderCursors };
+  return { reactionIds, reactionRequests, olderCursors };
 }
 
 const cards = (page: Page) => page.locator('#recent-recognitions [data-recognition-id]');
@@ -55,16 +57,22 @@ test('shows the newest 100, then adds older recognitions a page at a time', asyn
   const served = await serveFeed(page, { total: 230 });
   await page.goto('/');
   await expect(cards(page)).toHaveCount(100);
+  await expect.poll(() => served.reactionRequests.length).toBe(1);
 
   const showOlder = page.getByRole('button', { name: 'Show older recognitions' });
   await showOlder.click();
   await expect(cards(page)).toHaveCount(200);
+  await expect.poll(() => served.reactionRequests.length).toBe(2);
   await expect(page.getByText('Test Recipient 101', { exact: true })).toBeAttached();
   expect(served.olderCursors[0]).toBe(`${record(100).firstPublishedAt}|${record(100).id}`);
   await expect.poll(() => served.reactionIds.has(record(200).id)).toBe(true);
+  expect(served.reactionRequests[1]).toHaveLength(100);
+  expect(served.reactionRequests[1]).toContain(record(200).id);
 
   await showOlder.click();
   await expect(cards(page)).toHaveCount(230);
+  await expect.poll(() => served.reactionRequests.length).toBe(3);
+  expect(served.reactionRequests[2]).toHaveLength(30);
   await expect(page.getByTestId('older-end')).toHaveText('You have reached the first recognition.');
   await expect(showOlder).toHaveCount(0);
   const ids = await cards(page).evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.recognitionId));
@@ -92,11 +100,16 @@ test('a failed older page says so and can be retried', async ({ page }) => {
 
 test('a recognition hidden after loading leaves the older pages on the next refresh', async ({ page }) => {
   const hidden = new Set<number>();
-  await serveFeed(page, { total: 150, hidden });
+  const served = await serveFeed(page, { total: 150, hidden });
   await page.goto('/');
   await page.getByRole('button', { name: 'Show older recognitions' }).click();
   await expect(page.getByText('Test Recipient 120', { exact: true })).toBeAttached();
+  await expect.poll(() => served.reactionRequests.length).toBe(2);
+  const beforePeriodicRefresh = served.reactionRequests.length;
   hidden.add(120);
   await expect(page.getByText('Test Recipient 120', { exact: true })).toHaveCount(0, { timeout: 15_000 });
   await expect(cards(page)).toHaveCount(149);
+  // The periodic snapshot still refreshes every shown heart in two batches.
+  // Re-reading history must fetch no duplicate batches when it only removes a hidden item.
+  await expect.poll(() => served.reactionRequests.length).toBe(beforePeriodicRefresh + 2);
 });

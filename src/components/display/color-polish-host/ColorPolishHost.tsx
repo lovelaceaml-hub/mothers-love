@@ -17,7 +17,7 @@ import { startVisiblePoll } from '@/lib/visible-poll';
 // Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
 // rather than the full recognition list. Never slow down delivery to save bandwidth.
 const POLL_MS = 5_000;
-const LIKES_TOTAL_POLL_MS = 10_000;
+const LIKES_TOTAL_REFRESH_MS = 10_000;
 // Sits above POLL_MS so a healthy but slow read can still finish before it is
 // treated as a failure. A poll that is already in flight is never aborted by
 // the next scheduled tick (see the load function below); this timeout only
@@ -181,6 +181,13 @@ function performanceNow(): number {
   return typeof performance === 'undefined' ? 0 : performance.now();
 }
 
+function readLikesTotal(response: Response): number | null {
+  const raw = response.headers.get('x-likes-total');
+  if (!raw || !/^(0|[1-9][0-9]*)$/.test(raw)) return null;
+  const total = Number(raw);
+  return Number.isSafeInteger(total) ? total : null;
+}
+
 function SafeDisplay({ phase }: { phase: HostPhase }) {
   const unavailable = phase === 'unavailable';
   const quiet = phase === 'quiet' || phase === 'neutral';
@@ -219,6 +226,8 @@ export function ColorPolishHost() {
   // Every like campaign wide, for the header. Summing reactionCounts would only
   // cover the latest 100 recognitions the snapshot carries.
   const [reactionTotal, setReactionTotal] = useState<number | null>(null);
+  const lastLikesTotalRequestAtRef = useRef<number | null>(null);
+  const forceLikesTotalRequestRef = useRef(false);
 
   const markUnsafe = (nextPhase: HostPhase) => {
     snapshotRef.current = null;
@@ -228,6 +237,7 @@ export function ColorPolishHost() {
     setPhase(nextPhase);
     setReactionCounts({});
     setReactionTotal(null);
+    lastLikesTotalRequestAtRef.current = null;
     setFrameGeneration((value) => value + 1);
   };
 
@@ -249,8 +259,24 @@ export function ColorPolishHost() {
       controllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
       const after = cursorRef.current;
+      const requestStartedAt = performanceNow();
+      const phaseMayShowLikes = phaseRef.current === 'checking' || phaseRef.current === 'active';
+      const previousLikesRequestAt = lastLikesTotalRequestAtRef.current;
+      const includeLikesTotal = phaseMayShowLikes && (
+        forceLikesTotalRequestRef.current ||
+        previousLikesRequestAt === null ||
+        requestStartedAt - previousLikesRequestAt >= LIKES_TOTAL_REFRESH_MS
+      );
+      if (includeLikesTotal) {
+        forceLikesTotalRequestRef.current = false;
+        lastLikesTotalRequestAtRef.current = requestStartedAt;
+      }
       try {
-        const path = after ? `/api/display/color-polish?after=${encodeURIComponent(after)}` : '/api/display/color-polish';
+        const query = new URLSearchParams();
+        if (after) query.set('after', after);
+        if (includeLikesTotal) query.set('includeLikesTotal', '1');
+        const queryString = query.toString();
+        const path = queryString ? `/api/display/color-polish?${queryString}` : '/api/display/color-polish';
         // Keep the Vercel test-preview access cookie for the public snapshot read.
         const headers: Record<string, string> = { accept: 'application/json' };
         if (snapshotRef.current && snapshotHashRef.current)
@@ -262,6 +288,10 @@ export function ColorPolishHost() {
         const heartbeat = validateColorPolishHeartbeat(payload);
         if (heartbeat) {
           if (!snapshotRef.current || !snapshotHashRef.current) throw new Error('MISSING_SNAPSHOT');
+          if (includeLikesTotal && phaseRef.current === 'active') {
+            const total = readLikesTotal(response);
+            if (total !== null) setReactionTotal(total);
+          }
           const serverMs = Date.parse(heartbeat.serverTime);
           const receivedPerformanceMs = performanceNow();
           clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
@@ -289,6 +319,7 @@ export function ColorPolishHost() {
           setPhase(next.settings.mode);
           setReactionCounts({});
           setReactionTotal(null);
+          lastLikesTotalRequestAtRef.current = null;
           setFrameGeneration((value) => value + 1);
           return;
         }
@@ -297,6 +328,15 @@ export function ColorPolishHost() {
         const nextPhase: HostPhase = next.presentation.enabled ? 'active' : 'disabled';
         phaseRef.current = nextPhase;
         setPhase(nextPhase);
+        if (nextPhase === 'active') {
+          if (includeLikesTotal) {
+            const total = readLikesTotal(response);
+            if (total !== null) setReactionTotal(total);
+          }
+        } else {
+          setReactionTotal(null);
+          lastLikesTotalRequestAtRef.current = null;
+        }
       } catch {
         if (!mounted || generation !== requestGenerationRef.current) return;
         if (!snapshotRef.current) {
@@ -311,6 +351,7 @@ export function ColorPolishHost() {
     };
 
     const stopPolling = startVisiblePoll(() => void load(), POLL_MS, () => {
+      forceLikesTotalRequestRef.current = true;
       const verifiedAt = lastVerifiedRef.current;
       if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) markUnsafe('unavailable');
     });
@@ -415,40 +456,6 @@ export function ColorPolishHost() {
     document.addEventListener('visibilitychange', visible);
     return () => { controller.abort(); document.removeEventListener('visibilitychange', visible); };
   }, [reactionSignature]);
-
-  const totalActive = phase === 'active';
-  useEffect(() => {
-    if (!totalActive) {
-      setReactionTotal(null);
-      return;
-    }
-    let controller: AbortController | null = null;
-    const load = async () => {
-      if (document.hidden) return;
-      if (controller && !controller.signal.aborted) return;
-      const current = new AbortController();
-      controller = current;
-      const timeout = window.setTimeout(() => current.abort(), REQUEST_TIMEOUT_MS);
-      try {
-        const response = await fetch('/api/display/likes-total', { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: current.signal });
-        if (!response.ok) return;
-        const body: unknown = await response.json();
-        const total = body && typeof body === 'object' ? (body as Record<string, unknown>).total : undefined;
-        if (current.signal.aborted || typeof total !== 'number' || !Number.isSafeInteger(total) || total < 0) return;
-        setReactionTotal(total);
-      } catch {
-        // A failed read keeps the last good total; unsafe states clear it.
-      } finally {
-        window.clearTimeout(timeout);
-        if (controller === current) controller = null;
-      }
-    };
-    const stopPolling = startVisiblePoll(() => void load(), LIKES_TOTAL_POLL_MS);
-    return () => {
-      stopPolling();
-      controller?.abort();
-    };
-  }, [totalActive]);
 
   if (phase === 'active' && snapshot) {
     return (

@@ -20,6 +20,13 @@ export type VerifiedFeedSnapshot = PublicFeedSnapshot & {
   verifiedMonotonicMs: number;
 };
 
+export type VerifiedFeedHeartbeat = {
+  unchanged: true;
+  serverTime: string;
+  verifiedServerTimeMs: number;
+  verifiedMonotonicMs: number;
+};
+
 export const MAX_PUBLIC_FEED_ITEMS = 100;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -108,6 +115,16 @@ export function verifyFeedSnapshot(value: unknown, monotonicNow: number): Verifi
     ...decoded,
     items,
     verifiedServerTimeMs,
+    verifiedMonotonicMs: monotonicNow,
+  };
+}
+
+export function verifyFeedHeartbeat(value: unknown, monotonicNow: number): VerifiedFeedHeartbeat | null {
+  if (!isRecord(value) || Object.keys(value).length !== 2 || value.unchanged !== true || !isIsoDate(value.serverTime)) return null;
+  return {
+    unchanged: true,
+    serverTime: value.serverTime,
+    verifiedServerTimeMs: Date.parse(value.serverTime),
     verifiedMonotonicMs: monotonicNow,
   };
 }
