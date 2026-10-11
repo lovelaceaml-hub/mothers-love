@@ -13,7 +13,11 @@ const PEM_BEGIN = "-----BEGIN CERTIFICATE-----";
 const PEM_END = "-----END CERTIFICATE-----";
 const PEM_CERTIFICATE = /-----BEGIN CERTIFICATE-----\s*([\s\S]*?)\s*-----END CERTIFICATE-----/g;
 
-export function normalizeCaCertificate(value: string | undefined): string | null {
+let hasCachedCertificate = false;
+let cachedRawCertificate: string | undefined;
+let cachedNormalizedCertificate: string | null = null;
+
+function normalizeCaCertificateUncached(value: string | undefined): string | null {
   if (!value) return null;
 
   const normalized = value.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\r\n?/g, "\n").trim();
@@ -42,6 +46,15 @@ export function normalizeCaCertificate(value: string | undefined): string | null
 
   if (!blocks.length || normalized.slice(cursor).trim()) return null;
   return `${blocks.join("\n")}\n`;
+}
+
+export function normalizeCaCertificate(value: string | undefined): string | null {
+  if (hasCachedCertificate && value === cachedRawCertificate) return cachedNormalizedCertificate;
+  const normalized = normalizeCaCertificateUncached(value);
+  hasCachedCertificate = true;
+  cachedRawCertificate = value;
+  cachedNormalizedCertificate = normalized;
+  return normalized;
 }
 
 function isDatabaseUrl(databaseUrl: string): boolean {

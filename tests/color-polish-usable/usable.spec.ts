@@ -290,6 +290,50 @@ test('display falls back to the legacy renderer when color-polish stays unavaila
   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
 });
 
+test('visible TV polls stop in a hidden tab and refresh immediately when shown again', async ({ page }) => {
+  test.setTimeout(45_000);
+  const fixture = buildActiveDisplayFixture();
+  let snapshotRequests = 0;
+  let likesTotalRequests = 0;
+  await page.route('**/api/**', route => fulfillJson(route, { items: [] }));
+  await page.route('**/api/display/color-polish**', route => {
+    snapshotRequests += 1;
+    return fulfillJson(route, fixture);
+  });
+  await page.route('**/api/display/likes-total', route => {
+    likesTotalRequests += 1;
+    return fulfillJson(route, { total: 18 });
+  });
+
+  await page.goto('/display');
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+  await expect.poll(() => likesTotalRequests).toBeGreaterThan(0);
+  const beforeHidden = { snapshot: snapshotRequests, likes: likesTotalRequests };
+
+  await page.evaluate(() => {
+    const visibility = { hidden: true };
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => visibility.hidden });
+    (window as typeof window & { setTestVisibility: (hidden: boolean) => void }).setTestVisibility = (hidden) => {
+      visibility.hidden = hidden;
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+    (window as typeof window & { setTestVisibility: (hidden: boolean) => void }).setTestVisibility(true);
+  });
+
+  // A visible screen would make two more snapshot reads and one more likes read
+  // over this interval. A hidden screen must issue none.
+  await page.waitForTimeout(11_000);
+  expect(snapshotRequests).toBe(beforeHidden.snapshot);
+  expect(likesTotalRequests).toBe(beforeHidden.likes);
+
+  await page.evaluate(() => {
+    (window as typeof window & { setTestVisibility: (hidden: boolean) => void }).setTestVisibility(false);
+  });
+  await expect.poll(() => snapshotRequests, { timeout: 2_000 }).toBe(beforeHidden.snapshot + 1);
+  await expect.poll(() => likesTotalRequests, { timeout: 2_000 }).toBe(beforeHidden.likes + 1);
+  await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+});
+
 async function findRendererFrame(page: Page) {
   await expect.poll(() => page.frames().some(f => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
   const frame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
