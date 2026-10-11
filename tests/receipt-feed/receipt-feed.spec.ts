@@ -15,10 +15,18 @@ test.use({ viewport: { width: 390, height: 844 } });
 
 test('shows the live feed under the receipt on a phone, with a steady heart', async ({ page }) => {
   let reactionReads = 0;
+  let feedReads = 0;
+  await page.addInitScript(() => {
+    const nativeSetInterval = window.setInterval;
+    window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
+      nativeSetInterval(handler, timeout === 10_000 ? 200 : timeout, ...args)
+    )) as typeof window.setInterval;
+  });
   await page.route('**/api/config', async (route) => {
     await route.fulfill({ json: { collectionOpen: true, configured: true } });
   });
   await page.route('**/api/feed', async (route) => {
+    feedReads += 1;
     await route.fulfill({ json: { serverTime, items: [feedItem] } });
   });
   await page.route('**/api/reactions**', async (route) => {
@@ -34,6 +42,8 @@ test('shows the live feed under the receipt on a phone, with a steady heart', as
   });
 
   await page.goto('/recognize');
+  await page.waitForTimeout(100);
+  expect(feedReads).toBe(0);
   // The form itself still shows no feed (Anthony's September 10 rule).
   await expect(page.getByTestId('receipt-live-feed')).toHaveCount(0);
 
@@ -49,6 +59,9 @@ test('shows the live feed under the receipt on a phone, with a steady heart', as
   await expect(feed).toBeVisible();
   await expect(feed.getByRole('heading', { name: 'Recent recognitions' })).toBeVisible();
   await expect(feed.getByText('Your kindness made a hard day feel lighter.')).toBeVisible();
+  await expect.poll(() => feedReads).toBe(1);
+  await page.waitForTimeout(700);
+  expect(feedReads).toBe(1);
 
   // The list has real height on a phone and the page does not scroll sideways.
   const viewport = feed.getByRole('region', { name: 'Recent recognitions' });
@@ -67,10 +80,40 @@ test('shows the live feed under the receipt on a phone, with a steady heart', as
   await page.screenshot({ path: 'test-results/receipt-feed-phone.png', fullPage: true });
 });
 
+test('expression and privacy companions fetch once without a background poll', async ({ page }) => {
+  let feedReads = 0;
+  await page.addInitScript(() => {
+    const nativeSetInterval = window.setInterval;
+    window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
+      nativeSetInterval(handler, timeout === 10_000 ? 150 : timeout, ...args)
+    )) as typeof window.setInterval;
+  });
+  await page.route('**/api/feed', async (route) => {
+    feedReads += 1;
+    await route.fulfill({ json: { serverTime, items: [feedItem] } });
+  });
+  await page.route('**/api/reactions**', async (route) => {
+    await route.fulfill({ json: { items: [{ id: feedItem.id, count: 7, liked: false }] } });
+  });
+
+  await page.goto('/expressions');
+  await expect.poll(() => feedReads).toBe(1);
+  await page.waitForTimeout(500);
+  expect(feedReads).toBe(1);
+
+  await page.goto('/privacy');
+  await expect.poll(() => feedReads).toBe(2);
+  await page.waitForTimeout(500);
+  expect(feedReads).toBe(2);
+});
+
 test('a feed refresh never blanks a heart that is already showing', async ({ page }) => {
   let releaseSecondRead: (() => void) | undefined;
   const secondRead = new Promise<void>((resolve) => { releaseSecondRead = resolve; });
   let reads = 0;
+  let feedReads = 0;
+  let conditionalFeedReads = 0;
+  const etag = `"${'f'.repeat(32)}"`;
   await page.addInitScript(() => {
     const nativeSetInterval = window.setInterval;
     window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
@@ -78,7 +121,15 @@ test('a feed refresh never blanks a heart that is already showing', async ({ pag
     )) as typeof window.setInterval;
   });
   await page.route('**/api/feed', async (route) => {
-    await route.fulfill({ json: { serverTime, items: [feedItem] } });
+    feedReads += 1;
+    const conditional = route.request().headers()['if-none-match'] === etag;
+    if (conditional) conditionalFeedReads += 1;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { ETag: etag },
+      body: JSON.stringify(conditional ? { unchanged: true, serverTime } : { serverTime, items: [feedItem] }),
+    });
   });
   await page.route('**/api/reactions**', async (route) => {
     reads += 1;
@@ -92,6 +143,8 @@ test('a feed refresh never blanks a heart that is already showing', async ({ pag
   // The second read is now held open: this is the moment the old code greyed
   // the heart out and swapped its text.
   await expect.poll(() => reads, { timeout: 20_000 }).toBeGreaterThanOrEqual(2);
+  expect(feedReads).toBeGreaterThanOrEqual(2);
+  expect(conditionalFeedReads).toBeGreaterThanOrEqual(1);
   await expect(heart).toBeEnabled();
   await expect(heart).toHaveAttribute('aria-pressed', 'true');
   await expect(heart).toContainText('7');

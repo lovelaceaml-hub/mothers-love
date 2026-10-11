@@ -24,6 +24,7 @@ vi.mock("@/lib/server/http", async () => {
 
 import { GET } from "@/app/api/reactions/route";
 import { PUT } from "@/app/api/reactions/[id]/route";
+import { MAX_REACTION_BATCH_SIZE } from "@/lib/reaction-contract";
 
 const id = "00000000-0000-4000-8000-000000000010";
 const idTwo = "00000000-0000-4000-8000-000000000011";
@@ -80,6 +81,22 @@ describe("GET /api/reactions", () => {
     expect(databaseClient).not.toHaveBeenCalled();
     const scalar = await GET(request("/api/reactions?ids=not-a-uuid"));
     expect(scalar.status).toBe(400);
+    expect(databaseClient).not.toHaveBeenCalled();
+  });
+
+  it("accepts a bounded 100-ID read and rejects a 101-ID read before the database", async () => {
+    const ids = Array.from({ length: MAX_REACTION_BATCH_SIZE + 1 }, (_, index) => (
+      `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`
+    ));
+    const sql = sqlResult({ ok: true, items: [] });
+
+    const hundred = await GET(request(`/api/reactions?ids=${ids.slice(0, MAX_REACTION_BATCH_SIZE).join(",")}`));
+    expect(hundred.status).toBe(200);
+    expect(sql).toHaveBeenCalledTimes(1);
+
+    databaseClient.mockReset();
+    const hundredOne = await GET(request(`/api/reactions?ids=${ids.join(",")}`));
+    expect(hundredOne.status).toBe(400);
     expect(databaseClient).not.toHaveBeenCalled();
   });
 

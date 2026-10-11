@@ -12,12 +12,14 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
+import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 
 import {
   activeFeedItems,
   MAX_PUBLIC_FEED_ITEMS,
   type PublicFeedItem,
   type VerifiedFeedSnapshot,
+  verifyFeedHeartbeat,
   verifyFeedSnapshot,
 } from './feed-types';
 import styles from './FeedHome.module.css';
@@ -85,7 +87,7 @@ const PublicFeedContext = createContext<PublicFeedContextValue>(defaultContext);
 
 const DEFAULT_RETRY_AFTER_MS = 60_000;
 const MAX_RETRY_AFTER_MS = 5 * 60_000;
-const REACTION_BATCH_SIZE = 30;
+const REACTION_BATCH_SIZE = MAX_REACTION_BATCH_SIZE;
 // Older pages are re-read on every refresh so a hidden recognition leaves them
 // too; this caps that work at 1,000 older recognitions on one open page.
 export const MAX_OLDER_FEED_PAGES = 10;
@@ -149,6 +151,10 @@ function isPublicPage(pathname: string | null) {
   return pathname !== null && PUBLIC_PATHS.has(pathname);
 }
 
+function isHomePage(pathname: string | null) {
+  return pathname === '/';
+}
+
 function monotonicNow() {
   return typeof performance === 'undefined' ? 0 : performance.now();
 }
@@ -158,7 +164,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function decodeReactionPayload(value: unknown): ReactionItem[] | null {
-  if (!isRecord(value) || !Array.isArray(value.items) || value.items.length > 30) return null;
+  if (!isRecord(value) || !Array.isArray(value.items) || value.items.length > MAX_REACTION_BATCH_SIZE) return null;
 
   const seen = new Set<string>();
   const items: ReactionItem[] = [];
@@ -195,7 +201,7 @@ function decodeReactionItem(value: unknown): ReactionItem | null {
 }
 
 export async function fetchReactionCounts(ids: readonly string[], signal?: AbortSignal) {
-  const boundedIds = [...new Set(ids)].slice(0, REACTION_BATCH_SIZE);
+  const boundedIds = [...new Set(ids)].slice(0, MAX_REACTION_BATCH_SIZE);
   if (boundedIds.length === 0) return new Map<string, ReactionItem>();
   const response = await fetch(`/api/reactions?ids=${encodeURIComponent(boundedIds.join(','))}`, {
     cache: 'no-store',
@@ -259,6 +265,7 @@ export function usePublicFeed() {
 export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const active = isPublicPage(pathname);
+  const homePage = isHomePage(pathname);
   const [snapshot, setSnapshot] = useState<VerifiedFeedSnapshot | null>(null);
   const [status, setStatus] = useState<PublicFeedStatus>('loading');
   const [, setClockVersion] = useState(0);
@@ -270,11 +277,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const olderSerialRef = useRef(0);
   const olderControllerRef = useRef<AbortController | null>(null);
   const requestSerialRef = useRef(0);
+  const feedEtagRef = useRef<string | null>(null);
   const feedControllerRef = useRef<AbortController | null>(null);
   const feedDeadlineRef = useRef<number | null>(null);
   const expiryTimerRef = useRef<SafeTimerHandle | null>(null);
-  const reactionControllerRef = useRef<AbortController | null>(null);
   const reactionSerialRef = useRef(0);
+  const reactionReadRequestsRef = useRef(new Map<number, { controller: AbortController; generation: number; ids: string[] }>());
+  const reactionReadOwnersRef = useRef(new Map<string, number>());
   const reactionEntriesRef = useRef<Record<string, ReactionEntry>>({});
   const reactionWriteVersionsRef = useRef(new Map<string, number>());
   const reactionInFlightRef = useRef(new Set<string>());
@@ -306,13 +315,40 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearReactions = useCallback(() => {
-    reactionControllerRef.current?.abort();
-    reactionControllerRef.current = null;
+    reactionReadRequestsRef.current.forEach(({ controller }) => controller.abort());
+    reactionReadRequestsRef.current.clear();
+    reactionReadOwnersRef.current.clear();
     reactionMutationControllersRef.current.forEach((controller) => controller.abort());
     reactionMutationControllersRef.current.clear();
     reactionInFlightRef.current.clear();
     reactionSerialRef.current += 1;
     commitReactions({});
+  }, [commitReactions]);
+
+  const pruneReactionTargets = useCallback((validIds: ReadonlySet<string>) => {
+    reactionReadRequestsRef.current.forEach((request, requestId) => {
+      if (request.ids.every((id) => validIds.has(id))) return;
+      request.controller.abort();
+      reactionReadRequestsRef.current.delete(requestId);
+      request.ids.forEach((id) => {
+        if (reactionReadOwnersRef.current.get(id) === requestId) reactionReadOwnersRef.current.delete(id);
+      });
+    });
+    for (const id of reactionTargetTokensRef.current.keys()) {
+      if (validIds.has(id)) continue;
+      reactionMutationControllersRef.current.get(id)?.abort();
+      reactionMutationControllersRef.current.delete(id);
+      reactionInFlightRef.current.delete(id);
+      reactionTargetTokensRef.current.delete(id);
+      reactionWriteVersionsRef.current.delete(id);
+      const recoveryTimer = reactionRecoveryTimersRef.current.get(id);
+      if (recoveryTimer !== undefined) window.clearTimeout(recoveryTimer);
+      reactionRecoveryTimersRef.current.delete(id);
+      reactionRecoveryRef.current.delete(id);
+    }
+    commitReactions((current) => Object.fromEntries(
+      Object.entries(current).filter(([id]) => validIds.has(id)),
+    ));
   }, [commitReactions]);
 
   // Every item on screen: the live list, then any older pages beneath it.
@@ -343,6 +379,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     if (feedDeadlineRef.current !== null) window.clearTimeout(feedDeadlineRef.current);
     feedDeadlineRef.current = null;
     clearExpiryTimer();
+    feedEtagRef.current = null;
     reactionTargetTokensRef.current.clear();
     reactionWriteVersionsRef.current.clear();
     reactionRecoveryTimersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -357,14 +394,30 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     clearReactions();
   }, [clearExpiryTimer, clearOlder, clearReactions]);
 
-  const loadReactions = useCallback(async (items: PublicFeedItem[], generation: number, forceRecoveryCheck = false) => {
-    reactionControllerRef.current?.abort();
-    const serial = reactionSerialRef.current + 1;
-    reactionSerialRef.current = serial;
-    const ids = items.map((item) => item.id);
-    if (ids.length === 0) {
-      commitReactions({});
-      return;
+  const loadReactions = useCallback(async (
+    items: PublicFeedItem[],
+    generation: number,
+    forceRecoveryCheck = false,
+    onlyMissing = false,
+  ) => {
+    const allIds = [...new Set(items.map((item) => item.id))];
+    const allIdSet = new Set(allIds);
+    // Carry reads across a snapshot revision when all their targets are still
+    // visible. Abort mixed or removed-target reads so moderated/expired items
+    // cannot block the current page's refresh.
+    if (!onlyMissing) {
+      reactionReadRequestsRef.current.forEach((request, requestId) => {
+        if (request.generation === generation) return;
+        if (request.ids.every((id) => allIdSet.has(id))) {
+          request.generation = generation;
+          return;
+        }
+        request.controller.abort();
+        reactionReadRequestsRef.current.delete(requestId);
+        request.ids.forEach((id) => {
+          if (reactionReadOwnersRef.current.get(id) === requestId) reactionReadOwnersRef.current.delete(id);
+        });
+      });
     }
 
     const clearRecovery = (id: string) => {
@@ -375,13 +428,26 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     };
     const now = monotonicNow();
     if (forceRecoveryCheck) {
-      ids.forEach((id) => {
+      allIds.forEach((id) => {
         const recovery = reactionRecoveryRef.current.get(id);
         if (recovery?.kind === 'cookies' || (recovery?.retryAt !== undefined && recovery.retryAt <= now)) {
           clearRecovery(id);
         }
       });
     }
+
+    const ids = allIds.filter((id) => (
+      !reactionReadOwnersRef.current.has(id) && (!onlyMissing || !reactionEntriesRef.current[id]?.item)
+    ));
+    if (ids.length === 0) {
+      if (!onlyMissing) {
+        commitReactions((current) => Object.fromEntries(
+          Object.entries(current).filter(([id]) => reactionTargetTokensRef.current.has(id)),
+        ));
+      }
+      return;
+    }
+
     const activeRecovery = (id: string) => {
       const recovery = reactionRecoveryRef.current.get(id);
       const targetToken = reactionTargetTokensRef.current.get(id);
@@ -415,10 +481,18 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       if (current?.status === 'ready' && current.item) return [id, current];
       return [id, { status: 'loading' as const, pending: false }];
     })) as Record<string, ReactionEntry>;
-    commitReactions(loadingEntries);
-
+    const requestId = reactionSerialRef.current + 1;
+    reactionSerialRef.current = requestId;
     const controller = new AbortController();
-    reactionControllerRef.current = controller;
+    reactionReadRequestsRef.current.set(requestId, { controller, generation, ids });
+    ids.forEach((id) => reactionReadOwnersRef.current.set(id, requestId));
+    commitReactions((current) => {
+      const retained = onlyMissing
+        ? current
+        : Object.fromEntries(Object.entries(current).filter(([id]) => reactionTargetTokensRef.current.has(id)));
+      return { ...retained, ...loadingEntries };
+    });
+
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     try {
       const batches = Array.from(
@@ -429,9 +503,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         batches.map((batch) => fetchReactionCounts(batch, controller.signal)),
       );
       const payloadById = new Map(batchResults.flatMap((batch) => [...batch.entries()]));
-      if (serial !== reactionSerialRef.current || generation !== feedGenerationRef.current) return;
+      const request = reactionReadRequestsRef.current.get(requestId);
+      if (!request || controller.signal.aborted || request.generation !== feedGenerationRef.current) return;
 
-      const next = Object.fromEntries(ids.map((id) => {
+      const activeIds = ids.filter((id) => reactionTargetTokensRef.current.has(id));
+      const next = Object.fromEntries(activeIds.map((id) => {
         const current = reactionEntriesRef.current[id];
         const recovery = activeRecovery(id);
         const item = payloadById.get(id);
@@ -448,10 +524,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
           pending: false,
         }];
       })) as Record<string, ReactionEntry>;
-      commitReactions(next);
+      commitReactions((current) => {
+        const retained = onlyMissing
+          ? current
+          : Object.fromEntries(Object.entries(current).filter(([id]) => reactionTargetTokensRef.current.has(id)));
+        const stillActive = Object.fromEntries(
+          Object.entries(next).filter(([id]) => reactionTargetTokensRef.current.has(id)),
+        );
+        return { ...retained, ...stillActive };
+      });
     } catch {
-      if (serial !== reactionSerialRef.current || generation !== feedGenerationRef.current) return;
-      commitReactions(Object.fromEntries(ids.map((id) => {
+      const request = reactionReadRequestsRef.current.get(requestId);
+      if (!request || request.generation !== feedGenerationRef.current) return;
+      const failed = Object.fromEntries(ids.filter((id) => reactionTargetTokensRef.current.has(id)).map((id) => {
         const current = reactionEntriesRef.current[id];
         const recovery = activeRecovery(id);
         if (recovery) return [id, recoveryEntry(current, recovery)];
@@ -462,9 +547,17 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         // One failed refresh keeps the last confirmed heart instead of blanking it.
         if (current?.status === 'ready' && current.item) return [id, current];
         return [id, { status: 'unavailable' as const, pending: false }];
-      })) as Record<string, ReactionEntry>);
+      })) as Record<string, ReactionEntry>;
+      commitReactions((current) => ({
+        ...current,
+        ...Object.fromEntries(Object.entries(failed).filter(([id]) => reactionTargetTokensRef.current.has(id))),
+      }));
     } finally {
       window.clearTimeout(deadline);
+      reactionReadRequestsRef.current.delete(requestId);
+      ids.forEach((id) => {
+        if (reactionReadOwnersRef.current.get(id) === requestId) reactionReadOwnersRef.current.delete(id);
+      });
     }
   }, [commitReactions]);
 
@@ -492,15 +585,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         lastPageFull = items.length === MAX_PUBLIC_FEED_ITEMS;
       }
       if (serial !== olderSerialRef.current) return;
-      const previousIds = olderItemsRef.current.map((item) => item.id).join();
+      const previousItems = olderItemsRef.current;
+      const previousIds = previousItems.map((item) => item.id).join();
+      const previousIdSet = new Set(previousItems.map((item) => item.id));
       const nextStatus: OlderFeedStatus = !lastPageFull ? 'end' : pages >= MAX_OLDER_FEED_PAGES ? 'limit' : 'idle';
       commitOlder(collected, pages, nextStatus);
       if (collected.map((item) => item.id).join() !== previousIds) {
+        const newlyAdded = collected.filter((item) => !previousIdSet.has(item.id));
         const shown = currentItems(baseSnapshot);
         shown.forEach((item) => {
           if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
         });
-        void loadReactions(shown, feedGenerationRef.current);
+        pruneReactionTargets(new Set(shown.map((item) => item.id)));
+        void loadReactions(newlyAdded, feedGenerationRef.current, false, true);
       }
     } catch {
       if (serial !== olderSerialRef.current) return;
@@ -509,7 +606,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(deadline);
       if (olderControllerRef.current === controller) olderControllerRef.current = null;
     }
-  }, [clearOlder, commitOlder, currentItems, loadReactions]);
+  }, [clearOlder, commitOlder, currentItems, loadReactions, pruneReactionTargets]);
 
   const loadOlder = useCallback(async () => {
     const baseSnapshot = snapshotRef.current;
@@ -537,11 +634,14 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const nextOlder = [...olderAfter(latestBase, olderItemsRef.current), ...items.filter((item) => !known.has(item.id))];
       const nextStatus: OlderFeedStatus = items.length < MAX_PUBLIC_FEED_ITEMS ? 'end' : pages >= MAX_OLDER_FEED_PAGES ? 'limit' : 'idle';
       commitOlder(nextOlder, pages, nextStatus);
+      const previouslyShownIds = new Set(shownBefore.map((item) => item.id));
+      const newlyShown = nextOlder.filter((item) => !previouslyShownIds.has(item.id));
       const shown = currentItems(latestSnapshot);
       shown.forEach((item) => {
         if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
       });
-      void loadReactions(shown, feedGenerationRef.current);
+      pruneReactionTargets(new Set(shown.map((item) => item.id)));
+      void loadReactions(newlyShown, feedGenerationRef.current, false, true);
     } catch {
       if (serial !== olderSerialRef.current) return;
       setOlderStatus('error');
@@ -549,25 +649,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(deadline);
       if (olderControllerRef.current === controller) olderControllerRef.current = null;
     }
-  }, [commitOlder, currentItems, loadReactions]);
+  }, [commitOlder, currentItems, loadReactions, pruneReactionTargets]);
 
   const applySnapshot = useCallback((nextSnapshot: VerifiedFeedSnapshot) => {
     const visibleItems = activeFeedItems(nextSnapshot, monotonicNow());
     const shownItems = [...visibleItems, ...olderAfter(visibleItems, olderItemsRef.current)];
     const nextIds = new Set(shownItems.map((item) => item.id));
-    for (const id of reactionTargetTokensRef.current.keys()) {
-      if (!nextIds.has(id)) {
-        reactionMutationControllersRef.current.get(id)?.abort();
-        reactionMutationControllersRef.current.delete(id);
-        reactionInFlightRef.current.delete(id);
-        reactionTargetTokensRef.current.delete(id);
-        reactionWriteVersionsRef.current.delete(id);
-        const recoveryTimer = reactionRecoveryTimersRef.current.get(id);
-        if (recoveryTimer !== undefined) window.clearTimeout(recoveryTimer);
-        reactionRecoveryTimersRef.current.delete(id);
-        reactionRecoveryRef.current.delete(id);
-      }
-    }
+    pruneReactionTargets(nextIds);
     shownItems.forEach((item) => {
       if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
     });
@@ -584,25 +672,10 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       if (!current) return;
       const freshItems = activeFeedItems(current, monotonicNow());
       const freshIds = new Set([...freshItems, ...olderAfter(freshItems, olderItemsRef.current)].map((item) => item.id));
-      for (const item of current.items) {
-        if (!freshIds.has(item.id)) {
-          reactionMutationControllersRef.current.get(item.id)?.abort();
-          reactionMutationControllersRef.current.delete(item.id);
-          reactionInFlightRef.current.delete(item.id);
-          reactionTargetTokensRef.current.delete(item.id);
-          reactionWriteVersionsRef.current.delete(item.id);
-          const recoveryTimer = reactionRecoveryTimersRef.current.get(item.id);
-          if (recoveryTimer !== undefined) window.clearTimeout(recoveryTimer);
-          reactionRecoveryTimersRef.current.delete(item.id);
-          reactionRecoveryRef.current.delete(item.id);
-        }
-      }
+      pruneReactionTargets(freshIds);
       feedGenerationRef.current += 1;
       setClockVersion((version) => version + 1);
       setStatus(freshItems.length > 0 ? 'ready' : 'empty');
-      commitReactions((entries) => Object.fromEntries(
-        Object.entries(entries).filter(([id]) => freshIds.has(id)),
-      ));
       if (freshItems.length > 0) {
         const elapsedMs = Math.max(0, monotonicNow() - current.verifiedMonotonicMs);
         const remainingMs = Math.min(...freshItems.map((item) => (
@@ -623,7 +696,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
 
     void loadReactions(shownItems, generation);
     if (olderPagesRef.current > 0) void refreshOlder(nextSnapshot);
-  }, [clearExpiryTimer, commitReactions, loadReactions, refreshOlder]);
+  }, [clearExpiryTimer, loadReactions, pruneReactionTargets, refreshOlder]);
 
   const fetchFeed = useCallback(async () => {
     if (!active || document.visibilityState === 'hidden') return;
@@ -636,16 +709,34 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     feedDeadlineRef.current = deadline;
     try {
+      const headers: Record<string, string> = { accept: 'application/json' };
+      if (snapshotRef.current && feedEtagRef.current) headers['If-None-Match'] = `"${feedEtagRef.current}"`;
       const response = await fetch('/api/feed', {
         cache: 'no-store',
         credentials: 'include',
-        headers: { accept: 'application/json' },
+        headers,
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`Feed request failed with status ${response.status}`);
-      const nextSnapshot = verifyFeedSnapshot(await response.json(), requestStartedAt);
+      const payload: unknown = await response.json();
+      const responseTag = /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '')?.[1] ?? null;
+      const heartbeat = verifyFeedHeartbeat(payload, requestStartedAt);
+      if (heartbeat) {
+        const current = snapshotRef.current;
+        if (!current || !feedEtagRef.current || responseTag !== feedEtagRef.current) throw new Error('Feed heartbeat did not match the current snapshot.');
+        if (serial !== requestSerialRef.current || controller.signal.aborted) return;
+        applySnapshot({
+          ...current,
+          serverTime: heartbeat.serverTime,
+          verifiedServerTimeMs: heartbeat.verifiedServerTimeMs,
+          verifiedMonotonicMs: heartbeat.verifiedMonotonicMs,
+        });
+        return;
+      }
+      const nextSnapshot = verifyFeedSnapshot(payload, requestStartedAt);
       if (!nextSnapshot) throw new Error('Feed response was not valid.');
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
+      feedEtagRef.current = responseTag;
       applySnapshot(nextSnapshot);
     } catch {
       if (serial !== requestSerialRef.current) return;
@@ -671,12 +762,12 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, [currentItems, fetchFeed, loadReactions]);
 
   useEffect(() => {
-    if (!active) {
+    if (!active || pathname === '/recognize') {
       return;
     }
 
     const initialRequest = window.setTimeout(() => { void fetchFeed(); }, 0);
-    const interval = window.setInterval(() => { void fetchFeed(); }, 10_000);
+    const interval = homePage ? window.setInterval(() => { void fetchFeed(); }, 10_000) : null;
 
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
@@ -686,15 +777,15 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       setStatus('loading');
       void fetchFeed();
     };
-    document.addEventListener('visibilitychange', onVisibilityChange);
+    if (homePage) document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
       window.clearTimeout(initialRequest);
-      window.clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      if (interval !== null) window.clearInterval(interval);
+      if (homePage) document.removeEventListener('visibilitychange', onVisibilityChange);
       clearFeed('loading');
     };
-  }, [active, clearFeed, fetchFeed]);
+  }, [active, clearFeed, fetchFeed, homePage, pathname]);
 
   const toggleReaction = useCallback((item: PublicFeedItem) => {
     const entry = reactionEntriesRef.current[item.id];

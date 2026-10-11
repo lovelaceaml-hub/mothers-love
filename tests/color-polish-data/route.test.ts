@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { requireConfigured, admitPublicDisplayRequest, queryColorPolishSnapshot, projectColorPolishSnapshot } = vi.hoisted(() => ({
+const { requireConfigured, admitPublicDisplayRequest, queryColorPolishSnapshot, projectColorPolishSnapshot, queryReactionTotal, projectReactionTotal } = vi.hoisted(() => ({
   requireConfigured: vi.fn(),
   admitPublicDisplayRequest: vi.fn(),
   queryColorPolishSnapshot: vi.fn(),
   projectColorPolishSnapshot: vi.fn(),
+  queryReactionTotal: vi.fn(),
+  projectReactionTotal: vi.fn(),
 }));
 
 vi.mock("@/lib/server/http", () => ({ requireConfigured }));
 vi.mock("@/lib/server/public-display-admission", () => ({ admitPublicDisplayRequest }));
 vi.mock("@/lib/server/color-polish", () => ({ queryColorPolishSnapshot, projectColorPolishSnapshot }));
+vi.mock("@/lib/server/reactions", () => ({ queryReactionTotal, projectReactionTotal }));
 
 import { GET } from "@/app/api/display/color-polish/route";
 
@@ -63,6 +66,8 @@ beforeEach(() => {
   admitPublicDisplayRequest.mockReturnValue({ release: vi.fn() });
   queryColorPolishSnapshot.mockReset();
   projectColorPolishSnapshot.mockReset();
+  queryReactionTotal.mockReset();
+  projectReactionTotal.mockReset();
   projectColorPolishSnapshot.mockReturnValue(projected);
 });
 
@@ -99,6 +104,56 @@ describe("GET /api/display/color-polish", () => {
     expect(await response.json()).toEqual({ unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" });
     expect(queryColorPolishSnapshot).toHaveBeenCalledWith(null, expect.any(AbortSignal), etag);
     expect(projectColorPolishSnapshot).not.toHaveBeenCalled();
+  });
+
+  it("includes the campaign total on an active snapshot only when requested", async () => {
+    const active = { ...projected, presentation: { ...projected.presentation, enabled: true } };
+    projectColorPolishSnapshot.mockReturnValue(active);
+    queryColorPolishSnapshot.mockResolvedValue({ data: { ok: true }, error: null });
+    queryReactionTotal.mockResolvedValue({ data: { ok: true, total: 42 }, error: null });
+    projectReactionTotal.mockReturnValue({ ok: true, total: 42 });
+
+    const response = await GET(request("/api/display/color-polish?includeLikesTotal=1"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-likes-total")).toBe("42");
+    expect(queryReactionTotal).toHaveBeenCalledTimes(1);
+    expect(projectReactionTotal).toHaveBeenCalledWith({ ok: true, total: 42 });
+  });
+
+  it("includes a total on requested heartbeats and leaves a healthy snapshot alone if the total read fails", async () => {
+    const etag = "b".repeat(32);
+    queryColorPolishSnapshot.mockResolvedValue({
+      data: { unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" }, etag, error: null,
+    });
+    queryReactionTotal.mockResolvedValue({ data: { ok: true, total: 43 }, error: null });
+    projectReactionTotal.mockReturnValue({ ok: true, total: 43 });
+    const heartbeat = await GET(new NextRequest(`https://mothers-love.vercel.app/api/display/color-polish?includeLikesTotal=1`, {
+      headers: { "If-None-Match": `"${etag}"` },
+    }));
+    expect(heartbeat.headers.get("x-likes-total")).toBe("43");
+    expect(projectColorPolishSnapshot).not.toHaveBeenCalled();
+
+    queryColorPolishSnapshot.mockResolvedValue({ data: { ok: true }, error: null });
+    projectColorPolishSnapshot.mockReturnValue({ ...projected, presentation: { ...projected.presentation, enabled: true } });
+    queryReactionTotal.mockResolvedValue({ data: null, error: new Error("unavailable") });
+    const snapshotResponse = await GET(request("/api/display/color-polish?includeLikesTotal=1"));
+    expect(snapshotResponse.status).toBe(200);
+    expect(snapshotResponse.headers.get("x-likes-total")).toBeNull();
+  });
+
+  it("does not read or return the total when it was not requested or the display is disabled", async () => {
+    queryColorPolishSnapshot.mockResolvedValue({ data: { ok: true }, error: null });
+    queryReactionTotal.mockResolvedValue({ data: { ok: true, total: 42 }, error: null });
+    projectReactionTotal.mockReturnValue({ ok: true, total: 42 });
+
+    const unrequested = await GET(request());
+    expect(unrequested.headers.get("x-likes-total")).toBeNull();
+    expect(queryReactionTotal).not.toHaveBeenCalled();
+
+    const disabled = await GET(request("/api/display/color-polish?includeLikesTotal=1"));
+    expect(disabled.headers.get("x-likes-total")).toBeNull();
+    expect(queryReactionTotal).toHaveBeenCalledTimes(1);
   });
 
   it("fails closed on unavailable configuration, transport errors, and malformed projections", async () => {

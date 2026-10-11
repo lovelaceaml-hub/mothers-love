@@ -1,5 +1,6 @@
 import { randomSessionToken, sha256 } from "./operations";
 import { databaseClient } from "./supabase";
+import { MAX_REACTION_BATCH_SIZE } from "@/lib/reaction-contract";
 
 export const REACTION_COOKIE_NAME = "ml_reaction";
 export const REACTION_COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
@@ -33,7 +34,7 @@ export type DatabaseQueryResult = {
 export function parseReactionIds(value: string | null): string[] | null {
   if (!value) return null;
   const ids = value.split(",").map((id) => id.trim());
-  if (ids.length < 1 || ids.length > 30 || ids.some((id) => !UUID_PATTERN.test(id))) return null;
+  if (ids.length < 1 || ids.length > MAX_REACTION_BATCH_SIZE || ids.some((id) => !UUID_PATTERN.test(id))) return null;
   const seen = new Set<string>();
   for (const id of ids) {
     const normalized = id.toLowerCase();

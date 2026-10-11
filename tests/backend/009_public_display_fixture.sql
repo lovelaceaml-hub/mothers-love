@@ -113,6 +113,7 @@ DECLARE
   latest_event bigint;
   epoch_value bigint;
   arrival jsonb;
+  newest_id uuid := format('00000000-0000-4000-8000-%s', lpad(to_hex(4096 + 1001), 12, '0'))::uuid;
 BEGIN
   SELECT pg_catalog.max(event_id), pg_catalog.floor(EXTRACT(epoch FROM clock_timestamp()))::bigint
   INTO latest_event, epoch_value
@@ -121,13 +122,14 @@ BEGIN
   result := public.ml_public_display_snapshot(format('0.%s', epoch_value));
   IF result->>'ok' IS DISTINCT FROM 'true'
      OR result->>'sync' IS DISTINCT FROM 'delta'
-     OR jsonb_array_length(result->'recognitions') IS DISTINCT FROM 1000
-     OR jsonb_array_length(result->'arrivals') IS DISTINCT FROM 1000 THEN
+     OR jsonb_array_length(result->'recognitions') IS DISTINCT FROM 100
+     OR jsonb_array_length(result->'arrivals') IS DISTINCT FROM 100 THEN
     RAISE EXCEPTION 'bounded public display result failed: %', result;
   END IF;
-  IF result->'recognitions'->0->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000000010'
+  IF result->'recognitions'->0->>'id' IS DISTINCT FROM newest_id::text
+     OR result::text LIKE '%00000000-0000-4000-8000-000000000010%'
      OR result::text ~ 'submittedName|submitted_name|reason_category' THEN
-    RAISE EXCEPTION 'bounded public display projection failed: %', result;
+    RAISE EXCEPTION 'newest-100-before-featured display projection failed: %', result;
   END IF;
   FOR arrival IN SELECT value FROM jsonb_array_elements(result->'arrivals') LOOP
     IF NOT EXISTS (
@@ -165,11 +167,13 @@ DECLARE
   cursor_before text;
   overflow_result jsonb;
   normal_delta_result jsonb;
-  expected_recognition_id constant uuid := '00000000-0000-4000-8000-000000000010'::uuid;
+  expected_recognition_id uuid;
 BEGIN
-  -- Use a currently returned featured recognition, so all 1,001 events are
-  -- eligible arrivals rather than events omitted by the 1,000-record snapshot cap.
-  cursor_before := public.ml_public_display_snapshot(NULL)->>'cursor';
+  -- Use a currently returned newest-100 recognition so arrival membership
+  -- matches the exact selected set used for the snapshot's public items.
+  overflow_result := public.ml_public_display_snapshot(NULL);
+  expected_recognition_id := (overflow_result->'recognitions'->0->>'id')::uuid;
+  cursor_before := overflow_result->>'cursor';
   FOR index_value IN 1..1001 LOOP
     INSERT INTO mothers_love.display_events (recognition_id, event_kind, recognition_version, payload, created_at, expires_at)
     VALUES (expected_recognition_id, 'published', 1, '{}'::jsonb, clock_timestamp(), clock_timestamp() + interval '1 hour');
@@ -180,7 +184,7 @@ BEGIN
      OR overflow_result->>'sync' IS DISTINCT FROM 'reset'
      OR overflow_result->'arrivals' IS DISTINCT FROM '[]'::jsonb
      OR overflow_result->>'cursor' IS NOT DISTINCT FROM cursor_before
-     OR jsonb_array_length(overflow_result->'recognitions') IS DISTINCT FROM 1000 THEN
+     OR jsonb_array_length(overflow_result->'recognitions') IS DISTINCT FROM 100 THEN
     RAISE EXCEPTION 'arrival overflow did not return a bounded reset: %', overflow_result;
   END IF;
 

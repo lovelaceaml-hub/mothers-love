@@ -38,6 +38,7 @@ VALUES
 DO $reaction_projection$
 DECLARE
   result jsonb;
+  batch_request jsonb;
 BEGIN
   result := public.ml_reactions_get(
     jsonb_build_array(
@@ -62,6 +63,30 @@ BEGIN
   IF result->>'code' IS DISTINCT FROM 'INVALID_REQUEST' THEN RAISE EXCEPTION 'scalar request was accepted: %', result; END IF;
   result := public.ml_reactions_get(jsonb_build_array('00000000-0000-4000-8000-000000008010', '00000000-0000-4000-8000-000000008010'), repeat('a', 64));
   IF result->>'code' IS DISTINCT FROM 'INVALID_REQUEST' THEN RAISE EXCEPTION 'duplicate request was accepted: %', result; END IF;
+
+  SELECT jsonb_build_array('00000000-0000-4000-8000-000000008010') || pg_catalog.jsonb_agg(
+    pg_catalog.to_jsonb('00000000-0000-4000-8000-' || pg_catalog.lpad(pg_catalog.to_hex(value), 12, '0'))
+    ORDER BY value
+  )
+  INTO batch_request
+  FROM pg_catalog.generate_series(1, 99) AS ids(value);
+  result := public.ml_reactions_get(batch_request, repeat('a', 64));
+  IF result->>'ok' IS DISTINCT FROM 'true'
+     OR pg_catalog.jsonb_array_length(result->'items') IS DISTINCT FROM 1
+     OR result->'items'->0->>'id' IS DISTINCT FROM '00000000-0000-4000-8000-000000008010' THEN
+    RAISE EXCEPTION '100-ID reaction read failed: %', result;
+  END IF;
+
+  SELECT pg_catalog.jsonb_agg(
+    pg_catalog.to_jsonb('00000000-0000-4000-8000-' || pg_catalog.lpad(pg_catalog.to_hex(value), 12, '0'))
+    ORDER BY value
+  )
+  INTO batch_request
+  FROM pg_catalog.generate_series(1, 101) AS ids(value);
+  result := public.ml_reactions_get(batch_request, repeat('a', 64));
+  IF result->>'code' IS DISTINCT FROM 'INVALID_REQUEST' THEN
+    RAISE EXCEPTION '101-ID reaction read was accepted: %', result;
+  END IF;
 END
 $reaction_projection$;
 
