@@ -2,7 +2,7 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-**Now (2026-10-01):** production is `main`, with eleven TV screens, the sculpted 3D heart, the open hands app icon, an admin list of every submission in arrival order, Android install with a fullscreen TV kiosk mode, and every recognition kept forever. The 3D world is live at its own address, `/world`, beside the TV display (pull request [#19](https://github.com/lovelaceaml-hub/mothers-love/pull/19), merged 2026-09-24). The home page shows older recognitions beneath the newest 100 (Plan 30, 2026-09-26), and the TV header's likes count covers every like, not only the latest 100 (pull request [#25](https://github.com/lovelaceaml-hub/mothers-love/pull/25), 2026-10-01). The current state and open items are on one page: [docs/HANDOFF.md](docs/HANDOFF.md).
+Production details below were last checked on 2026-10-01. Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft; its current-main integration is local only and has not changed production. See [docs/HANDOFF.md](docs/HANDOFF.md) for current release blockers and live status.
 
 ## Quick links
 
@@ -12,7 +12,7 @@ A live appreciation campaign: people share recognitions on a public page, admini
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
-- **Current plan:** [Plan 18, keep every recognition and admin details](docs/PLAN-18-keep-forever-and-admin-details.md): Sections A and B are live, Sections C (admin sees all details) and D (release and records) are next.
+- **Current plan:** [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md): PR #30 is still a draft; migration 019 and safe preview access are required before rollout. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
 - **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Projects/Mother's Love/The Words of Mother's Love`.
@@ -21,7 +21,7 @@ A live appreciation campaign: people share recognitions on a public page, admini
 
 ## Plans
 
-Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); the next new plan takes number 31.
+Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); Plan 31 is the newest plan.
 
 | Plan | Subject | Where it stands |
 | --- | --- | --- |
@@ -55,6 +55,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | Sections 0 to 7 done; Section 8's review passed and pull request #19 merged 2026-09-24, so the world is live at `/world`. Closing entry 2026-10-02 in its Build log, with what is left |
 | [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; live at `/world` since 2026-09-24 (pull request #19) |
 | [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
+| [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | Open draft pull request #30; local merge conflicts resolved; rollout awaits migration 019 and safe preview access |
 
 ## Other documents
 

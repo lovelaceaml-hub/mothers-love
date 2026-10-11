@@ -3,6 +3,7 @@ import { errorResult, jsonResult } from "@/lib/server/response";
 import { requireConfigured } from "@/lib/server/http";
 import { admitPublicDisplayRequest } from "@/lib/server/public-display-admission";
 import { projectColorPolishSnapshot, queryColorPolishSnapshot } from "@/lib/server/color-polish";
+import { validateColorPolishHeartbeat } from "@/lib/color-polish/validation";
 import type { ApiResult } from "@/lib/server/types";
 import { DISPLAY_RECORD_TOKEN, projectDisplayDelta } from "@/lib/color-polish/delta";
 
@@ -25,13 +26,30 @@ export async function GET(request: NextRequest) {
 
   try {
     const after = request.nextUrl.searchParams.get("after");
-    const result = deltaRequested
-      ? await queryColorPolishSnapshot(after, request.signal, known)
-      : await queryColorPolishSnapshot(after, request.signal);
+    const rawTag = request.headers.get("if-none-match");
+    const knownEtag = rawTag && /^"[a-f0-9]{32}"$/.test(rawTag) ? rawTag.slice(1, -1) : null;
+    const result = await queryColorPolishSnapshot(
+      after,
+      request.signal,
+      deltaRequested ? known : knownEtag,
+    );
     if (result.error) return errorResult(503, "UNAVAILABLE");
-    const snapshot = deltaRequested ? projectDisplayDelta(result.data, projectColorPolishSnapshot) : projectColorPolishSnapshot(result.data);
+    const headers = {
+      "X-Robots-Tag": "noindex, nofollow",
+      ...(result.etag ? { ETag: `"${result.etag}"` } : {}),
+    };
+    if (deltaRequested) {
+      const delta = projectDisplayDelta(result.data, projectColorPolishSnapshot);
+      if (!delta) return errorResult(503, "UNAVAILABLE");
+      return jsonResult({ ok: true, ...delta } as unknown as ApiResult, { headers });
+    }
+    const heartbeat = validateColorPolishHeartbeat(result.data);
+    // A compact 200 response (rather than 304) carries fresh serverTime for
+    // the existing 60-second privacy/staleness timer.
+    if (heartbeat) return jsonResult(heartbeat, { headers });
+    const snapshot = projectColorPolishSnapshot(result.data);
     if (!snapshot) return errorResult(503, "UNAVAILABLE");
-    return jsonResult((deltaRequested ? { ok: true, ...snapshot } : snapshot) as unknown as ApiResult, { headers: { "X-Robots-Tag": "noindex, nofollow" } });
+    return jsonResult(snapshot as unknown as ApiResult, { headers });
   } finally {
     admission.release();
   }

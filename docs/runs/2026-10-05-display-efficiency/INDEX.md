@@ -35,7 +35,7 @@ The earlier six checks did not prove grouped arrivals, replay prevention, the fu
 
 SQL validation is actual local integration, not only SQL-text assertions: PostgreSQL 16.15 applies every numbered migration to its own disposable Unix-socket cluster, executes the legacy and new bridges in repeatable-read transactions against 1,200 fictional records, and passes actual reset/unchanged/arrival JSON through the app's public projector and browser cache. The route/query unit tests mock their database client, and browser lifecycle tests mock API responses; the disposable SQL runner does not wire a live HTTP server to its database. Local ACL and boundary checks do not prove the current Supabase schema ledger, hosted TLS, deployment configuration, query billing or physical TV behavior.
 
-Verification logs and SQL payload measurements are saved outside Git at `/Users/anthony/Documents/Codex/2026-10-05/task-3/verification/`. Migration 019 SHA-256: `d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`.
+Verification logs and SQL payload measurements are saved outside Git at `/Users/anthony/Documents/Codex/2026-10-05/task-3/verification/`. The original migration 019 SHA-256 at this run was `d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`; a later hourly-renewal fix changed the migration. See [Plan 31](../../PLAN-31-display-efficiency.md) for the current checksum.
 
 No physical TV or phone commissioning was performed. No real recognitions were read, logged, seeded or captured.
 
@@ -82,6 +82,6 @@ Restore the pre-change app build first. The old functions and routes have not be
 
 ## Deliverables and limits
 
-Code: `src/lib/color-polish/delta.ts`, `display-cache.ts`, `src/lib/visible-poll.ts`, the Color Polish API/query, TV host and V6 fallback. SQL: `database/019_display_delta.sql` plus the optional rollback. Tests: cache/route/query unit tests, visible-poll tests, `tests/color-polish-usable/display-cache.spec.ts`, and `scripts/test-display-delta.mjs`.
+Code: `src/lib/color-polish/delta.ts`, `src/lib/color-polish/display-cache.ts`, `src/lib/visible-poll.ts`, the Color Polish API/query, TV host and V6 fallback. SQL: `database/019_display_delta.sql` plus the optional rollback. Tests: cache/route/query unit tests, visible-poll tests, `tests/color-polish-usable/display-cache.spec.ts`, and `scripts/test-display-delta.mjs`.
 
 Legacy clients and `/world` keep full snapshots. Metadata calculations still query PostgreSQL every five seconds while visible. Request token lists and initial/reset responses grow; unchanged and normal arrival responses shrink. The unavailable-preset recovery path still uses both APIs intentionally. Free-plan storage, quotas and production billing were not measured or changed.

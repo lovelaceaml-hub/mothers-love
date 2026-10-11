@@ -116,6 +116,13 @@ function insightAggregate(value: unknown, start: string, end: string): Aggregate
   return result && result.periodStart === start && result.periodEnd === end ? result : null;
 }
 
+/** A small, strictly checked confirmation that the last full snapshot is still current. */
+export type ColorPolishHeartbeat = { unchanged: true; serverTime: string };
+export function validateColorPolishHeartbeat(value: unknown): ColorPolishHeartbeat | null {
+  if (!record(value) || !exact(value, ['unchanged', 'serverTime']) || value.unchanged !== true || !dateText(value.serverTime)) return null;
+  return { unchanged: true, serverTime: value.serverTime };
+}
+
 export function validateColorPolishSnapshot(value: unknown): ColorPolishSnapshot | null {
   if (!record(value) || value.ok !== undefined && value.ok !== true || !dateText(value.serverTime) || !integer(value.revision, 1) || value.submissionUrl !== SUBMISSION_URL || typeof value.cursor !== 'string' || !/^\d+\.\d+$/.test(value.cursor) || (value.sync !== 'reset' && value.sync !== 'delta') || !Array.isArray(value.recognitions) || value.recognitions.length > MAX_RECOGNITIONS || !Array.isArray(value.arrivals) || value.arrivals.length > MAX_RECOGNITIONS) return null;
   const serverTime = value.serverTime as string;

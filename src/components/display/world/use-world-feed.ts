@@ -46,10 +46,12 @@ export function useWorldFeed(source: WorldSource): WorldFeed {
         const query = store.cursor
           ? `?after=${encodeURIComponent(store.cursor)}`
           : "";
+        const headers: Record<string, string> = { accept: "application/json" };
+        if (store.hash && store.cursor) headers["If-None-Match"] = `"${store.hash}"`;
         const response = await fetch(`/api/display/color-polish${query}`, {
           cache: "no-store",
           credentials: "same-origin",
-          headers: { accept: "application/json" },
+          headers,
           signal: request.signal,
         });
         if (!alive || controller !== request) return;
@@ -64,7 +66,14 @@ export function useWorldFeed(source: WorldSource): WorldFeed {
             return;
           }
           if (!alive || controller !== request) return;
-          store.accept(payload, performance.now());
+          const isHeartbeat = typeof payload === "object" && payload !== null && "unchanged" in payload;
+          const accepted = isHeartbeat
+            ? store.acceptHeartbeat(payload, performance.now())
+            : store.accept(payload, performance.now());
+          if (accepted && store.cursor) {
+            const tag = /^"([a-f0-9]{32})"$/.exec(response.headers.get("etag") ?? "");
+            store.hash = tag?.[1] ?? null;
+          }
         }
       } catch {
         if (alive && controller === request) store.failure();
@@ -75,7 +84,8 @@ export function useWorldFeed(source: WorldSource): WorldFeed {
       }
     }
     const tick = window.setInterval(publish, 500);
-    const poll = window.setInterval(() => void load(), 5000);
+    // Keep five-second arrivals; idle responses transfer only a tiny heartbeat.
+    const poll = window.setInterval(() => void load(), 5_000);
     const visibility = () => {
       // Clear before the browser can display an old personal frame after a hidden gap.
       store.clear("connecting");

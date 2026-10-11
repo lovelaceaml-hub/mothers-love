@@ -58,6 +58,7 @@ try {
     assert.ok(!first.pool.some((entry) => entry.id.endsWith('000000001100')));
   });
   const legacy = (await sql`select public.ml_color_polish_snapshot(null) as value`)[0].value;
+  const rollbackReset = (await sql`select public.ml_color_polish_snapshot(${first.cacheCursor}) as value`)[0].value;
   const newestLegacyIds = new Set([...legacy.recognitions].sort((a, b) => Date.parse(b.firstPublishedAt) - Date.parse(a.firstPublishedAt) || b.id.localeCompare(a.id))
     .slice(0, 100).map((record) => record.id));
   const same = await poll(first.cacheCursor, known(first));
@@ -83,6 +84,7 @@ try {
     values (${newId}, 'Private new fixture', 'Fictional new arrival', 'A fictional new message.', 'published', now(), now(), now() + interval '100 years')`;
   await sql`insert into mothers_love.recognition_expressions values (${newId}, 2)`;
   await sql`insert into mothers_love.display_events (recognition_id, event_kind, expires_at) values (${newId}, 'published', now() + interval '7 days')`;
+  const rollbackArrival = (await sql`select public.ml_color_polish_snapshot(${rollbackReset.cursor}) as value`)[0].value;
   const arrival = await poll(same.cacheCursor, known(first));
   check('one arrival sends one full record and the exact current pool', () => {
     assert.equal(arrival.snapshot.recognitions.length, 1);
@@ -104,6 +106,28 @@ try {
     assert.equal(browserCache.accept({ ok: true, ...projected }).recognitions.length, 100);
   }
   checks.push('actual SQL reset/unchanged/arrival payloads pass the API projector and browser cache');
+  const rollbackCache = new DisplayRecordCache();
+  const rollbackDelta = projectDisplayDelta(first, projectColorPolishSnapshot);
+  const rollbackResetSnapshot = projectColorPolishSnapshot(rollbackReset);
+  const rollbackArrivalSnapshot = projectColorPolishSnapshot(rollbackArrival);
+  assert.ok(rollbackDelta && !rollbackDelta.unchanged);
+  assert.ok(rollbackResetSnapshot);
+  assert.ok(rollbackArrivalSnapshot);
+  rollbackCache.accept({ ok: true, ...rollbackDelta });
+  assert.equal(rollbackResetSnapshot.sync, 'reset');
+  assert.deepEqual(rollbackResetSnapshot.arrivals, []);
+  assert.match(rollbackResetSnapshot.cursor, /^\d+\.\d+$/);
+  rollbackCache.accept(rollbackResetSnapshot);
+  let rollbackPath = new URL(rollbackCache.path(), 'https://example.test');
+  assert.equal(rollbackPath.searchParams.get('after'), rollbackResetSnapshot.cursor);
+  assert.equal(rollbackPath.searchParams.get('known'), null);
+  assert.equal(rollbackArrivalSnapshot.sync, 'delta');
+  assert.equal(rollbackArrivalSnapshot.arrivals[0]?.recognitionId, newId);
+  assert.deepEqual(rollbackCache.accept(rollbackArrivalSnapshot)?.arrivals, rollbackArrivalSnapshot.arrivals);
+  rollbackPath = new URL(rollbackCache.path(), 'https://example.test');
+  assert.equal(rollbackPath.searchParams.get('after'), rollbackArrivalSnapshot.cursor);
+  assert.equal(rollbackPath.searchParams.get('known'), null);
+  checks.push('app rollback from a delta cursor to legacy SQL reset retains the legacy cursor and delivers the next arrival');
   const { projectPublicFeed, projectOlderPublicFeed } = await modules.ssrLoadModule('/src/lib/server/public-feed.ts');
   const { projectReactionResult, projectReactionMutation, projectReactionTotal } = await modules.ssrLoadModule('/src/lib/server/reactions.ts');
   // Use a fresh connection with the exact runtime type-discovery option. The
@@ -213,12 +237,26 @@ try {
   await sql`update mothers_love.settings set mode = 'normal'`;
   assert.equal((await next()).snapshot.recognitions.length, 100);
   checks.push('quiet mode clears records and returning to normal refills the memory cache');
-  const oldLease = current.cacheCursor.split(':');
+  const leaseStart = await poll(null);
+  const leaseCache = new DisplayRecordCache();
+  assert.ok(leaseCache.accept(leaseStart));
+  const renewalId = '00000000-0000-4000-8000-000000009998';
+  await sql`insert into mothers_love.recognitions (id, submitted_name, recipient, message, status, created_at, first_published_at, expires_at)
+    values (${renewalId}, 'Private renewal fixture', 'Fictional renewal arrival', 'A fictional renewal message.', 'published', now(), now(), now() + interval '100 years')`;
+  await sql`insert into mothers_love.recognition_expressions values (${renewalId}, 2)`;
+  await sql`insert into mothers_love.display_events (recognition_id, event_kind, expires_at) values (${renewalId}, 'published', now() + interval '7 days')`;
+  const oldLease = leaseStart.cacheCursor.split(':');
   oldLease[2] = String(Number(oldLease[2]) - 3601);
-  const renewed = await poll(oldLease.join(':'), known(current));
-  assert.equal(renewed.snapshot.sync, 'reset');
+  const renewed = await poll(oldLease.join(':'), known(leaseStart));
+  assert.equal(renewed.snapshot.sync, 'delta');
   assert.equal(renewed.snapshot.recognitions.length, 100);
-  checks.push('hourly reset renews seven-day public expiry leases');
+  assert.equal(renewed.snapshot.arrivals.length, 1);
+  assert.equal(renewed.snapshot.arrivals[0].recognitionId, renewalId);
+  const renewedView = leaseCache.accept(renewed);
+  assert.equal(renewedView?.recognitions.length, 100);
+  assert.equal(renewedView?.arrivals[0]?.recognitionId, renewalId);
+  current = renewed;
+  checks.push('hourly cache renewal refreshes seven-day leases without dropping arrivals');
   assert.equal((await poll('v2:hostile:' + '9'.repeat(300), known(current))).snapshot.sync, 'reset');
   checks.push('malformed/overflowing cursor input safely resets');
   await sql`delete from mothers_love.display_events where event_id = (select max(event_id) from mothers_love.display_events)`;

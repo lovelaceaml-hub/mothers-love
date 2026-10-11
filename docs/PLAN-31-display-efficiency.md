@@ -1,6 +1,6 @@
 # Plan 31: Display efficiency
 
-Status: transferred in `5a1415dc514e43ef1dc543607a88cfe0ea480c4c` and integrated locally onto main `2e1215dc092ced1978b87a1039b6594b0714bfc2`, 2026-10-06. No cloud push, PR, live SQL or deployment.
+Status: transferred in `5a1415dc514e43ef1dc543607a88cfe0ea480c4c` and locally integrated with current main `900d796e839df1430063e4bf4def0dbcf9520e1d` on the feature branch, 2026-10-10. PR #30 remains draft. No cloud push, live SQL or deployment.
 
 Anthony authorized these improvements while keeping arrivals live at approximately five seconds and staying on Supabase Free. Existing submissions normally stay unchanged. Settings, moderation, expiry, quiet mode, presentation and cleanup safety still require verification.
 
@@ -12,7 +12,7 @@ The pool is the newest 100 eligible recognitions, selected at PostgreSQL timesta
 
 The state hash also covers settings, presentation, full anonymous insights and the event cursor. Every poll checks cleanup health and recalculates eligibility, feature expiry and Los Angeles calendar boundaries. The metadata helper preserves migration 012's frozen weekly focus and aggregate checks. The existing numeric revision is retained for compatibility but is not used to decide whether data is unchanged.
 
-The cache lease resets hourly, refetching at most 100 full records to renew the seven-day browser expiry cap. Invalid cursors, lost cache entries, unsafe modes and arrival overflow reset safely. A valid unchanged response updates the host's last successful verification time and carries no arrivals. The existing 60-second stale-content cutoff remains in force.
+The cache lease resets hourly, refetching at most 100 full records to renew the seven-day browser expiry cap. A still-valid event cursor remains eligible for arrival delivery during that full refresh, so an announcement published at the renewal boundary is not dropped. Invalid cursors, lost cache entries, unsafe modes and arrival overflow reset safely. A valid unchanged response updates the host's last successful verification time and carries no arrivals. The existing 60-second stale-content cutoff remains in force.
 
 Visible TV snapshots remain on a five-second cadence. Snapshot and likes-total timers stop while hidden and refresh immediately on return. A return after the stale limit clears cached personal content before requesting a reset. V6 reuses the host's verified snapshot when Color Polish is disabled, removing its redundant four-second snapshot loop. The unavailable Color Polish fallback retains its independent legacy read on a five-second cadence so it can still work when the preset endpoint is down; the host continues probing for recovery. Daily aggregates and heart reads pause while hidden; slow daily/reaction reads cannot overlap on visibility changes. Likes-total uses the isolated bounded public read client, with a five-second SQL statement timeout and eight-second wall deadline, leaving the mutation pool available.
 
@@ -46,5 +46,48 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
 - Installed pinned dependencies only in the isolated clone. No source lockfile changes.
 - Implemented the additive SQL protocol, strict public projection, memory cache, visible polling and V6 snapshot reuse. Added unit, browser and disposable SQL checks.
 - Verification and deployment steps are recorded in [the run record](runs/2026-10-05-display-efficiency/INDEX.md).
+- **2026-10-10, PR blocker remediation (local only).** Merged current `origin/main`
+  (`900d796e839df1430063e4bf4def0dbcf9520e1d`) into the PR branch. Resolved
+  overlapping polling changes by retaining the ETag heartbeat for legacy
+  callers and the opt-in delta bridge for the TV cache. Hourly lease renewal now
+  refreshes all record tokens while preserving a valid event cursor, so newly
+  published arrivals remain deliverable during renewal. On Node 22,
+  typecheck passes, 45 focused tests pass, and the disposable PostgreSQL
+  integration passes 25 checks, including arrival delivery during hourly
+  renewal and across an app-only rollback to the legacy SQL bridge.
+  The broader unit suite passes 934 tests with one skip after excluding the
+  known baseline failure. The three failing world-arrival tests also fail on
+  current main with the same result. An earlier production build passed.
+  A new Chromium regression test verifies that the Studio test helper accepts
+  the arrival scene while its selector remains on Welcome; it passes, as does
+  Node 22 typecheck. The full helper spec run had two failures before that
+  helper is called: the synthetic admin sign-in remained at `/admin/login`
+  instead of redirecting to `/admin`.
+  The browser cache now keeps a legacy cursor separately after a full-snapshot
+  fallback, so arrival polling continues during an app-only rollback. Vitest
+  reports nine display-cache cases passed: seven individual tests and two
+  quiet/neutral parameter cases, including the delta-to-legacy rollback path.
+  Migration 019 remains unapplied; its current SHA-256 is
+  `6c370231ae423c8d9bae44372f6b9849ac2a5a27b6540e45fc7888a7cba20f37`. Safe
+  Vercel preview access is unavailable and automatic deployment of this branch
+  is disabled, so the branch was not pushed or deployed. The final independent
+  review found no actionable issues. See the
+  [remediation run](runs/2026-10-10-pr-remediation/INDEX.md).
 
 Cloud continuation: [current verification](runs/2026-10-06-cloud-efficiency/INDEX.md) and [repeatable setup/usage guards](CLOUD-VALIDATION.md). `npm run check:display-efficiency` enforces fixture payload limits and runs disposable SQL integration without connecting to a configured database.
+
+## Section 1: Integrate the current production baseline
+
+Retain the delta-cache protocol and legacy ETag heartbeat when integrating
+current `main`. Verify the combined source on the CI Node version and preserve
+any failures that are already present on `main`.
+
+## Section 2: Complete the release prerequisites
+
+Before app rollout, obtain approval and apply migration 019, configure a safe
+preview database, enable the Vercel preview for `feat/tv-display-efficiency`
+(currently explicitly disabled in `vercel.json`), complete the hosted preview
+and physical-TV checks, then use the release mode Anthony chooses. The Vercel
+exception targets only this branch and does not disable production from `main`.
+Do not change account settings, push, change live data or deploy before those
+prerequisites are met.

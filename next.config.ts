@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   agentRules: false,
   env: {
     COLOR_POLISH_PREVIEW_BUILD: process.env.VERCEL_ENV === "preview" ? "true" : "false",
+    // Lets an open TV page notice a new version and reload (DisplayBuildWatch).
+    DISPLAY_BUILD_VERSION: process.env.VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_DEPLOYMENT_ID || "",
   },
   outputFileTracingIncludes: {
     "/api/tv-v6": ["./prototypes/tv-v6/Mothers_Love_TV_Prototype_v6.html"],

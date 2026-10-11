@@ -17,6 +17,7 @@ import { projectPublicDisplaySnapshot } from "./public-display";
 
 export type ColorPolishQuery = {
   data: unknown;
+  etag?: string | null;
   error: Error | null;
 };
 
@@ -241,7 +242,11 @@ export function projectColorPolishSnapshot(value: unknown): ColorPolishSnapshot 
   return { ...base, presentation, insights };
 }
 
-export async function queryColorPolishSnapshot(after: string | null, signal?: AbortSignal, known?: string[]): Promise<ColorPolishQuery> {
+export async function queryColorPolishSnapshot(
+  after: string | null,
+  signal?: AbortSignal,
+  knownOrEtag?: string[] | string | null,
+): Promise<ColorPolishQuery> {
   if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
   const client = getPublicDisplayClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
@@ -252,10 +257,30 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
     await transaction`set local statement_timeout = '5000ms'`;
     await transaction`set transaction isolation level repeatable read`;
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    const rows = known === undefined
-      ? await transaction`select public.ml_color_polish_snapshot(${after}) as result`
-      : await transaction`select public.ml_color_polish_delta(${after}, ${JSON.stringify(known)}::text::jsonb) as result`;
-    return rows[0]?.result ?? null;
+    const known = Array.isArray(knownOrEtag) ? knownOrEtag : undefined;
+    if (known !== undefined) {
+      const rows = await transaction`select public.ml_color_polish_delta(${after}, ${JSON.stringify(known)}::text::jsonb) as result`;
+      return { data: rows[0]?.result ?? null, etag: null };
+    }
+    const knownEtag = typeof knownOrEtag === "string" ? knownOrEtag : null;
+    // Hash only stable content: serverTime and the epoch in cursor change each poll.
+    // Keep sync, arrivals, settings and the recognition list in the hash so edits,
+    // withdrawals, moderation and new arrivals invalidate the unchanged response.
+    // Project the unchanged response INSIDE Postgres so the shared pooler never
+    // transfers the full recognition list to the Vercel server on idle polls.
+    const rows = await transaction`
+      with payload as (
+        select public.ml_color_polish_snapshot(${after}) as value
+      ), digest as (
+        select value, md5((value - 'serverTime' - 'cursor')::text) as etag from payload
+      )
+      select etag, case
+        when ${knownEtag}::text = etag and value->>'ok' = 'true'
+          then jsonb_build_object('unchanged', true, 'serverTime', value->'serverTime')
+        else value
+      end as result from digest
+    `;
+    return { data: rows[0]?.result ?? null, etag: typeof rows[0]?.etag === "string" ? rows[0].etag as string : null };
   }));
   void operation.then(() => undefined, () => undefined);
 
@@ -267,8 +292,8 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
   });
 
   try {
-    const data = await Promise.race([operation, deadline]);
-    return { data, error: null };
+    const result = await Promise.race([operation, deadline]);
+    return { ...result, error: null };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
   } finally {

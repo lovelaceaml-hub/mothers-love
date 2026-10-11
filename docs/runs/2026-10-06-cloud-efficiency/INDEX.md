@@ -69,8 +69,12 @@ independent checks are the evidence for integration.
 Reproduce with [Cloud validation](../../CLOUD-VALIDATION.md). Detailed logs,
 baseline comparisons, final patch identity/manifest and local fixture evidence
 are outside Git at `/workspace/scratch/mothers-love-readiness/REPORT.md` and its
-neighboring files. Migration 019 stays byte-identical to the transfer, SHA-256
-`d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`.
+neighboring files. At this record's 2026-10-06 validation, migration 019 was
+byte-identical to the transfer, SHA-256
+`d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`. A later
+hourly-renewal fix amended the migration. Its current hash is recorded in
+[Plan 31](../../PLAN-31-display-efficiency.md) and the 2026-10-10 remediation
+run record.
 
 Migration 019 must be authorized and applied before app rollout. Publishing,
 live SQL and physical-TV commissioning remain separate steps. The original

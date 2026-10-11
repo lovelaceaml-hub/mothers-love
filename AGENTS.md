@@ -11,8 +11,10 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
+  Its Build log records the current local status and rollout requirements.
 - `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
-  (release and records) are next; its Build log says where it stands.
+  (release and records) remain future work outside PR #30; its Build log says where it stands.
 
 ## Check your work
 - `npm run typecheck`, `npm test`, `npm run build`, `npm run test:e2e`; `npm run lint` has known
@@ -27,7 +29,8 @@ Current status and next steps: docs/HANDOFF.md.
 Deploy and Git
 - **A push to `main` is a production deployment, and the church TV shows it.** Changes reach `main`
   only through a pull request Anthony merges; never run a bare `git push` in the main checkout (it
-  tracks `origin/main`). Other pushed branches get Vercel previews, except `codex/home-tv-family`.
+  tracks `origin/main`). Other pushed branches get Vercel previews, except
+  `codex/home-tv-family` and `feat/tv-display-efficiency` while its explicit deployment guard remains.
 - Local building, dependencies and this app's own Vercel hosting are authorized; production changes
   touch only this app's confirmed resources.
 - Branches: `feat/<area>-<subject>` or `fix/<area>-<subject>`, areas `app` (campaign and form), `tv`
@@ -112,6 +115,9 @@ TV at /display (renderer in `public/color-polish/core/` and `public/color-polish
   settings, neutral and quiet, expiry, cleanup gating and offline safety still apply. Kiosk mode
   (`?kiosk=1`) only adds fullscreen and a wake lock; the service worker has no fetch handler, so the
   live display is never cached.
+- An open `/display` reloads itself once a new version is live (`DisplayBuildWatch`, `/api/display/build`):
+  checked every 5 minutes, only after two matching reports, at most once per build per tab; a
+  failed check changes nothing. Local builds have no version and never reload.
 - TV personal content comes only from the verified public snapshot; Neutral, Quiet, expired and
   stale states clear it. Admin and sign-in pages show no feed.
 - Color Polish activation and rollback are SQL only, no admin route:

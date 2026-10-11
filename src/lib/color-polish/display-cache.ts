@@ -7,17 +7,21 @@ export class DisplayRecordCache {
   private snapshot: ColorPolishSnapshot | null = null;
   private tokens = new Map<string, string>();
   private cursor: string | null = null;
+  private legacyCursor: string | null = null;
 
   clear() {
     this.snapshot = null;
     this.tokens.clear();
     this.cursor = null;
+    this.legacyCursor = null;
   }
 
   path() {
     const query = new URLSearchParams({ sync: '2' });
-    if (this.cursor && this.snapshot) {
-      query.set('after', this.cursor);
+    const hasDeltaCache = Boolean(this.cursor && this.snapshot);
+    const after = hasDeltaCache ? this.cursor : this.legacyCursor;
+    if (after) query.set('after', after);
+    if (hasDeltaCache) {
       query.set('known', [...this.tokens.values()].join('.'));
     }
     return `/api/display/color-polish?${query}`;
@@ -29,6 +33,7 @@ export class DisplayRecordCache {
     if (!delta) {
       const legacy = validateColorPolishSnapshot(value);
       this.clear();
+      if (legacy) this.legacyCursor = legacy.cursor;
       return legacy;
     }
     const fail = () => { this.clear(); return null; };
@@ -42,6 +47,7 @@ export class DisplayRecordCache {
       next.recognitions = this.snapshot.recognitions;
       this.snapshot = next;
       this.cursor = delta.cacheCursor;
+      this.legacyCursor = null;
       return next;
     }
     const records = new Map((delta.snapshot.sync === 'reset' ? [] : this.snapshot?.recognitions ?? []).map((item) => [item.id.toLowerCase(), item]));
@@ -60,6 +66,7 @@ export class DisplayRecordCache {
     this.snapshot = next;
     this.tokens = new Map(delta.pool.map((entry) => [entry.id.toLowerCase(), entry.token]));
     this.cursor = delta.cacheCursor;
+    this.legacyCursor = null;
     return next;
   }
 }

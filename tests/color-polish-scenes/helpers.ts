@@ -276,17 +276,17 @@ export type SceneSlug = keyof typeof SCENE_IDS;
 
 // Selecting a Studio scene replaces its preview iframe. Wait on the current
 // frame, rather than holding the outgoing frame during that replacement.
-export async function readyStudioFrame(page: Page, expectedSceneId: number): Promise<Frame> {
+export async function readyStudioFrame(page: Page, expectedSceneId: number, acceptedSceneId?: number): Promise<Frame> {
   let ready: Frame | undefined;
   await expect.poll(async () => {
     const frame = page.frames().find((item) => item.url().endsWith('/color-polish/renderer.html'));
     if (!frame) return false;
     try {
-      const matches = await frame.evaluate((expected) => {
+      const matches = await frame.evaluate((acceptedScenes) => {
         const runtime = (window as any).colorPolishRuntime;
         const state = runtime?.getState();
-        return state?.mode === 'normal' && state?.scene === expected;
-      }, expectedSceneId);
+        return state?.mode === 'normal' && acceptedScenes.includes(state?.scene);
+      }, acceptedSceneId === undefined ? [expectedSceneId] : [expectedSceneId, acceptedSceneId]);
       if (matches && !frame.isDetached()) ready = frame;
       return Boolean(ready);
     } catch (error) {
@@ -320,7 +320,12 @@ export async function openStudioScene(
   await selector.selectOption(optionValue);
 
   const expectedSceneId = slug === 'arrival' ? SCENE_IDS.welcome : SCENE_IDS[slug];
-  const frame = await readyStudioFrame(page, expectedSceneId);
+  const directSceneId = SCENE_IDS[slug];
+  const frame = await readyStudioFrame(
+    page,
+    expectedSceneId,
+    directSceneId === expectedSceneId ? undefined : directSceneId,
+  );
 
   await frame.evaluate((checkpointMs) => {
     (window as any).colorPolishRuntime.step(checkpointMs);

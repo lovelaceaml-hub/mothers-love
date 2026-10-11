@@ -246,6 +246,7 @@ DECLARE
   after_event numeric;
   after_epoch numeric;
   latest_event bigint;
+  event_cursor_valid boolean := false;
   valid_cursor boolean := false;
   items jsonb := '[]'::jsonb;
   arrivals jsonb := '[]'::jsonb;
@@ -300,10 +301,12 @@ BEGIN
     lease_epoch := pg_catalog.split_part(after_cursor, ':', 3)::numeric;
     after_event := pg_catalog.split_part(pg_catalog.split_part(after_cursor, ':', 4), '.', 1)::numeric;
     after_epoch := pg_catalog.split_part(pg_catalog.split_part(after_cursor, ':', 4), '.', 2)::numeric;
+    event_cursor_valid := after_epoch >= lease_epoch
+      AND after_epoch <= pg_catalog.floor(EXTRACT(epoch FROM now_value))
+      AND after_event <= latest_event AND after_event <= 9223372036854775807::numeric;
     valid_cursor := lease_epoch > pg_catalog.floor(EXTRACT(epoch FROM now_value - interval '1 hour'))
       AND lease_epoch <= pg_catalog.floor(EXTRACT(epoch FROM now_value))
-      AND after_epoch >= lease_epoch AND after_epoch <= pg_catalog.floor(EXTRACT(epoch FROM now_value))
-      AND after_event <= latest_event AND after_event <= 9223372036854775807::numeric;
+      AND event_cursor_valid;
   END IF;
   IF NOT valid_cursor THEN
     lease_epoch := pg_catalog.floor(EXTRACT(epoch FROM now_value));
@@ -333,7 +336,7 @@ BEGIN
   JOIN mothers_love.recognitions AS r ON r.id = (p.value->>'id')::uuid
   WHERE NOT known_tokens ? (p.value->>'token');
 
-  IF valid_cursor AND base_snapshot->'settings'->>'mode' = 'normal' THEN
+  IF event_cursor_valid AND base_snapshot->'settings'->>'mode' = 'normal' THEN
     WITH bounded AS (
       SELECT de.event_id, de.recognition_id, de.created_at
       FROM mothers_love.display_events AS de
@@ -350,7 +353,7 @@ BEGIN
     IF arrival_overflow THEN RETURN public.ml_color_polish_delta(NULL, '[]'::jsonb); END IF;
   END IF;
   base_snapshot := base_snapshot || pg_catalog.jsonb_build_object('recognitions', items, 'arrivals', arrivals,
-    'sync', CASE WHEN valid_cursor AND base_snapshot->'settings'->>'mode' = 'normal' THEN 'delta' ELSE 'reset' END);
+    'sync', CASE WHEN event_cursor_valid AND base_snapshot->'settings'->>'mode' = 'normal' THEN 'delta' ELSE 'reset' END);
   RETURN pg_catalog.jsonb_build_object('ok', true, 'cacheCursor', cache_cursor,
     'serverTime', now_value, 'unchanged', false, 'pool', pool_value, 'snapshot', base_snapshot);
 EXCEPTION WHEN others THEN

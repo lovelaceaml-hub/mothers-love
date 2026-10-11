@@ -14,6 +14,8 @@ import { DisplayRecordCache } from '@/lib/color-polish/display-cache';
 import { startVisiblePoll } from '@/lib/visible-poll';
 import type { DisplayMode } from '@/lib/contracts';
 
+// Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
+// rather than the full recognition list. Never slow down delivery to save bandwidth.
 const POLL_MS = 5_000;
 const LIKES_TOTAL_POLL_MS = 10_000;
 // Sits above POLL_MS so a healthy but slow read can still finish before it is
@@ -265,6 +267,7 @@ export function ColorPolishHost() {
         lastVerifiedRef.current = receivedPerformanceMs;
         setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {
+          cache.clear();
           snapshotRef.current = null;
           setSnapshot(null);
           phaseRef.current = next.settings.mode;
@@ -282,6 +285,7 @@ export function ColorPolishHost() {
       } catch {
         if (!mounted || generation !== requestGenerationRef.current) return;
         if (!snapshotRef.current) {
+          cache.clear();
           phaseRef.current = 'unavailable';
           setPhase('unavailable');
         }

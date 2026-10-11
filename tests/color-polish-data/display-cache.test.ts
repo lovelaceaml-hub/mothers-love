@@ -26,6 +26,32 @@ describe('verified display record cache', () => {
     expect(cache.path()).toContain('sync=2');
   });
 
+  it('keeps the legacy cursor across a full-snapshot fallback so arrivals continue after app rollback', () => {
+    const cache = new DisplayRecordCache();
+    cache.accept(reset());
+    expect(cache.path()).toContain('known=');
+
+    const first = snapshot();
+    expect(cache.accept(first)).not.toBeNull();
+    expect(cache.path()).toContain('after=12.1789063200');
+    expect(cache.path()).not.toContain('known=');
+
+    const next = snapshot({
+      serverTime: '2026-09-10T18:00:05.000Z',
+      cursor: '13.1789063205',
+      sync: 'delta',
+      arrivals: [{
+        eventId: '13',
+        recognitionId: first.recognitions[0].id,
+        publishedAt: '2026-09-10T18:00:05.000Z',
+      }],
+    });
+    const accepted = cache.accept(next);
+    expect(accepted?.arrivals).toEqual(next.arrivals);
+    expect(cache.path()).toContain('after=13.1789063205');
+    expect(cache.path()).not.toContain('known=');
+  });
+
   it('adds only the new record, preserves the exact pool order, and accepts one arrival', () => {
     const cache = new DisplayRecordCache();
     const base = reset();
