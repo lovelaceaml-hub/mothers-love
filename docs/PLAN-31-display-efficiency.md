@@ -1,6 +1,6 @@
 # Plan 31: Display efficiency
 
-Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated locally on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809696c2d40c8cb8abd09`. Commit `b315ab8` is local and unpublished. Vercel reports production READY at that base SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. Publishing and release are authorized; the database recovery and safe-preview gates below remain open.
+Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809696c2d40c8cb8abd09`. The branch is published and draft PR #39 is open. Vercel preview `dpl_6qeqJ7F4TZ3jWrv4YkZJSLQakSkk` for commit `c0011fa` is READY and `/display` returned 200; it has no database environment variables, so this is an HTTP/UI smoke check rather than functional database-preview evidence. Vercel reports production READY at the base SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. The database recovery and safe functional-preview gates remain open.
 
 Anthony authorized these improvements while keeping arrivals live at approximately five seconds and staying on Supabase Free. Existing submissions normally stay unchanged. Settings, moderation, expiry, quiet mode, presentation and cleanup safety still require verification.
 
@@ -100,8 +100,9 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
   `origin/main` and production at `29da0dd7aa1c5497765809696c2d40c8cb8abd09`
   (PR #38, READY deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Integrated
   PR #30 source `3f923b3ae6ce70328234b965334dfffb800e139b` locally on
-  `fix/tv-display-efficiency-integration`; local commit `b315ab8` is not
-  published. Renumbered its migration to 020, retained 019 reaction batching,
+  `fix/tv-display-efficiency-integration`; local integration commit `b315ab8`
+  is published with documentation follow-up `c0011fa`. Draft PR #39 is open,
+  and the preview for `c0011fa` is READY. Renumbered the migration to 020, retained 019 reaction batching,
   made both new routines additive `CREATE FUNCTION`s, and moved the index build
   to an autocommit `CREATE INDEX CONCURRENTLY` operation with metadata checks.
   The disposable SQL test caught an invalid schema-qualified index name; that
@@ -118,7 +119,7 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
   folder has no database dump; a general encrypted church-data archive is not
   identified as this Supabase project. No live rows, database objects, project
   settings, preview environment variables, or production deployment were
-  changed. The current backup/restore and functional preview gates remain open.
+  changed. The current backup/restore and functional database-preview gates remain open.
 
 Cloud continuation: [earlier cloud verification](runs/2026-10-06-cloud-efficiency/INDEX.md) and [repeatable setup/usage guards](CLOUD-VALIDATION.md). `npm run check:display-efficiency` enforces fixture payload limits and runs disposable SQL integration without connecting to a configured database.
 

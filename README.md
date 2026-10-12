@@ -2,7 +2,7 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-Production is verified on 2026-10-12 at commit `29da0dd7aa1c5497765809696c2d40c8cb8abd09`, Vercel deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy` (READY). Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft and is not live. Its changes are integrated locally on `fix/tv-display-efficiency-integration`; a current database backup/restore and safe functional preview remain release gates. See [docs/HANDOFF.md](docs/HANDOFF.md).
+Production is verified on 2026-10-12 at commit `29da0dd7aa1c5497765809696c2d40c8cb8abd09`, Vercel deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy` (READY). Original pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft; the current-main integration is published in draft pull request [#39](https://github.com/lovelaceaml-hub/mothers-love/pull/39). Its Vercel preview is READY but has no database variables. A current database backup/restore and safe functional preview remain release gates. See [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Quick links
 
@@ -12,7 +12,7 @@ Production is verified on 2026-10-12 at commit `29da0dd7aa1c5497765809696c2d40c8
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
-- **Current plan:** [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md): PR #30 is still a draft; additive migration 020, backup/restore evidence and safe preview access are required before rollout. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
+- **Current plan:** [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md): the PR #30 work is integrated in draft PR #39; additive migration 020, backup/restore evidence and a safe functional preview are required before rollout. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
 - **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Projects/Mother's Love/The Words of Mother's Love`.
@@ -55,7 +55,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [28](docs/PLAN-28-repository-refactor.md) | Clean up and refactor the repository (was 26) | Sections 0 to 7 done; Section 8's review passed and pull request #19 merged 2026-09-24, so the world is live at `/world`. Closing entry 2026-10-02 in its Build log, with what is left |
 | [29](docs/PLAN-29-world-kit.md) | The 3D Studio kit inside the heavenly world (was 26) | Integrated into the world; live at `/world` since 2026-09-24 (pull request #19) |
 | [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
-| [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | PR #30 integrated locally on current main; rollout awaits migration 020, backup/restore evidence and a safe preview |
+| [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | PR #30 work integrated in draft PR #39; rollout awaits migration 020, backup/restore evidence and a safe functional preview |
 
 ## Other documents
 
