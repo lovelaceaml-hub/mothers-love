@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await queryReactionTotal();
+    const result = await queryReactionTotal(request.signal);
     if (result.error) return errorResult(503, "UNAVAILABLE");
     const total = projectReactionTotal(result.data);
     if (!total) return errorResult(503, "UNAVAILABLE");

@@ -62,4 +62,14 @@ describe("Color Polish snapshot query", () => {
     await expect(queryColorPolishSnapshot(null, controller.signal)).resolves.toMatchObject({ data: null, error: { message: "REQUEST_ABORTED" } });
     expect(postgres).not.toHaveBeenCalled();
   });
+
+  it("queries the opt-in cache bridge with bounded record tokens in the same transaction", async () => {
+    const client = successfulClient({ ok: true, unchanged: true });
+    postgres.mockReturnValue(client);
+    const { queryColorPolishSnapshot } = await import("@/lib/server/color-polish");
+    await queryColorPolishSnapshot("synthetic-cache-cursor", undefined, ["a".repeat(32)]);
+    expect(client.transaction.mock.calls.map(([strings]) => strings.join("?")).at(-1))
+      .toBe("select public.ml_color_polish_delta(?, ?::text::jsonb) as result");
+    expect(client.transaction.mock.calls.at(-1)?.slice(1)).toEqual(["synthetic-cache-cursor", JSON.stringify(["a".repeat(32)])]);
+  });
 });

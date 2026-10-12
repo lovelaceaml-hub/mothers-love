@@ -242,7 +242,11 @@ export function projectColorPolishSnapshot(value: unknown): ColorPolishSnapshot 
   return { ...base, presentation, insights };
 }
 
-export async function queryColorPolishSnapshot(after: string | null, signal?: AbortSignal, knownEtag: string | null = null): Promise<ColorPolishQuery> {
+export async function queryColorPolishSnapshot(
+  after: string | null,
+  signal?: AbortSignal,
+  knownOrEtag?: string[] | string | null,
+): Promise<ColorPolishQuery> {
   if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
   const client = getPublicDisplayClient();
   if (!client) return { data: null, error: new Error("UNAVAILABLE") };
@@ -253,6 +257,12 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
     await transaction`set local statement_timeout = '5000ms'`;
     await transaction`set transaction isolation level repeatable read`;
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+    const known = Array.isArray(knownOrEtag) ? knownOrEtag : undefined;
+    if (known !== undefined) {
+      const rows = await transaction`select public.ml_color_polish_delta(${after}, ${JSON.stringify(known)}::text::jsonb) as result`;
+      return { data: rows[0]?.result ?? null, etag: null };
+    }
+    const knownEtag = typeof knownOrEtag === "string" ? knownOrEtag : null;
     // Hash only stable content: serverTime and the epoch in cursor change each poll.
     // Keep sync, arrivals, settings and the recognition list in the hash so edits,
     // withdrawals, moderation and new arrivals invalidate the unchanged response.

@@ -6,8 +6,10 @@ import {
   loadRenderer,
   noOverflow,
   openStudioScene,
+  readyStudioFrame,
   recognition,
   reducedMotionScene,
+  SCENE_IDS,
   studioClickDoesNotAdvance,
 } from './helpers';
 
@@ -23,6 +25,13 @@ test('helpers open the welcome scene in the Studio and it is circular', async ({
 
   const clickResult = await studioClickDoesNotAdvance(page, frame);
   expect(clickResult.before).toBe(clickResult.after);
+});
+
+test('readyStudioFrame accepts the arrival scene while Studio selects welcome', async ({ page }) => {
+  const arrivalFrame = await loadRenderer(page, { scene: SCENE_IDS.arrival });
+  const readyFrame = await readyStudioFrame(page, SCENE_IDS.welcome, SCENE_IDS.arrival);
+  expect(readyFrame).toBe(arrivalFrame);
+  expect(await readyFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene)).toBe(SCENE_IDS.arrival);
 });
 
 test('reduced motion renders the welcome scene still', async ({ page }) => {

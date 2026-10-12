@@ -7,7 +7,9 @@ import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
 import { parseDisplaySnapshotEtag, projectDisplaySnapshotHeartbeat } from '@/lib/display/snapshot-heartbeat';
+import { startVisiblePoll } from '@/lib/visible-poll';
 import { fetchReactionCounts, type ReactionItem } from '@/components/feed/PublicFeedProvider';
+import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 import { useDisplayChimes } from './use-display-chimes';
 import styles from './V6DisplayExperience.module.css';
 
@@ -199,32 +201,33 @@ function useReactionCounts(ids: string[]) {
       return undefined;
     }
     let active = true;
-    let inFlight = false;
     let controller: AbortController | null = null;
     const load = async () => {
-      if (inFlight) return;
-      inFlight = true;
-      controller = new AbortController();
-      const timeout = window.setTimeout(() => controller?.abort(), 8_000);
+      if (document.hidden || (controller && !controller.signal.aborted)) return;
+      const current = new AbortController();
+      controller = current;
+      const timeout = window.setTimeout(() => current.abort(), 8_000);
       try {
-        const chunks = Array.from({ length: Math.ceil(ids.length / 30) }, (_, index) => ids.slice(index * 30, index * 30 + 30));
-        const responses = await Promise.all(chunks.map((chunk) => fetchReactionCounts(chunk, controller!.signal)));
-        if (!active) return;
+        const chunks = Array.from({ length: Math.ceil(ids.length / MAX_REACTION_BATCH_SIZE) }, (_, index) => ids.slice(index * MAX_REACTION_BATCH_SIZE, (index + 1) * MAX_REACTION_BATCH_SIZE));
+        const responses = await Promise.all(chunks.map((chunk) => fetchReactionCounts(chunk, current.signal)));
+        if (!active || current.signal.aborted) return;
         const next = new Map<string, ReactionItem>();
         for (const response of responses) for (const [id, item] of response) next.set(id, item);
         setCounts(next);
       } catch {
-        if (active) setCounts(new Map());
+        if (active && !current.signal.aborted) setCounts(new Map());
       } finally {
         window.clearTimeout(timeout);
-        inFlight = false;
+        if (controller === current) controller = null;
       }
     };
-    void load();
-    const interval = window.setInterval(() => void load(), 10_000);
+    const cancelWhenHidden = () => { if (document.hidden) controller?.abort(); };
+    document.addEventListener('visibilitychange', cancelWhenHidden);
+    const stopPolling = startVisiblePoll(() => void load(), 10_000);
     return () => {
       active = false;
-      window.clearInterval(interval);
+      stopPolling();
+      document.removeEventListener('visibilitychange', cancelWhenHidden);
       controller?.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -996,9 +999,10 @@ function Shell({ children, snapshot, nowServerMs, nowMs, queueCount, arrival, fe
   );
 }
 
-export function V6DisplayExperience() {
+export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verifiedSnapshot?: DisplaySnapshot; verifiedNowMs?: number } = {}) {
   const reducedMotion = useReducedMotion();
-  const [snapshot, setSnapshot] = useState<DisplaySnapshot | null>(null);
+  const [localSnapshot, setSnapshot] = useState<DisplaySnapshot | null>(null);
+  const snapshot = verifiedSnapshot ?? localSnapshot;
   const [dailyAggregates, setDailyAggregates] = useState<DailyAggregate[]>([]);
   const [stale, setStale] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -1016,15 +1020,45 @@ export function V6DisplayExperience() {
   const initialSnapshotRef = useRef(true);
   const cursorRef = useRef<string | null>(null);
   const snapshotEtagRef = useRef<string | null>(null);
-  const inFlightRef = useRef(false);
   const controllerRef = useRef<AbortController | null>(null);
+  const dailyControllerRef = useRef<AbortController | null>(null);
   const individualStyleRef = useRef(0);
   const groupStyleRef = useRef(0);
   const mountedAtRef = useRef(Date.now());
 
+  const acceptSnapshot = useCallback((next: DisplaySnapshot, etag?: string | null) => {
+    const receivedAt = Date.now();
+    snapshotRef.current = next;
+    if (etag !== undefined) snapshotEtagRef.current = etag;
+    setSnapshot(next);
+    setServerOffsetMs(Date.parse(next.serverTime) - receivedAt);
+    setLastVerifiedAt(receivedAt);
+    setStale(false);
+    setUnavailable(false);
+    cursorRef.current = next.cursor;
+    const arrivals = next.arrivals ?? [];
+    if (initialSnapshotRef.current) {
+      for (const arrival of arrivals) knownEventsRef.current.add(arrival.eventId);
+      initialSnapshotRef.current = false;
+    } else {
+      const freshIds: string[] = [];
+      for (const arrival of arrivals) {
+        if (knownEventsRef.current.has(arrival.eventId)) continue;
+        knownEventsRef.current.add(arrival.eventId);
+        freshIds.push(arrival.recognitionId);
+      }
+      if (freshIds.length) setQueue((current) => [...current, ...freshIds.filter((id) => !current.includes(id))]);
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (verifiedSnapshot) queueMicrotask(() => { if (active) acceptSnapshot(verifiedSnapshot, null); });
+    return () => { active = false; };
+  }, [acceptSnapshot, verifiedSnapshot]);
+
   const loadSnapshot = useCallback(async () => {
-    if (inFlightRef.current || document.visibilityState === 'hidden') return;
-    inFlightRef.current = true;
+    if (document.visibilityState === 'hidden' || (controllerRef.current && !controllerRef.current.signal.aborted)) return;
     const controller = new AbortController();
     controllerRef.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
@@ -1034,20 +1068,17 @@ export function V6DisplayExperience() {
       if (snapshotEtagRef.current) headers['If-None-Match'] = `"${snapshotEtagRef.current}"`;
       let responseTag: string | null = null;
       const payload = await api<unknown>(path, {
-        method: 'GET',
-        auth: false,
-        cache: 'no-store',
-        signal: controller.signal,
-        headers,
+        method: 'GET', auth: false, cache: 'no-store', signal: controller.signal, headers,
         onResponseHeaders: (responseHeaders) => { responseTag = parseDisplaySnapshotEtag(responseHeaders.get('etag')); },
       });
-      const receivedAt = Date.now();
+      if (controller.signal.aborted) return;
       const heartbeat = projectDisplaySnapshotHeartbeat(payload);
       if (heartbeat) {
         const current = snapshotRef.current;
         if (!current || !snapshotEtagRef.current || responseTag !== snapshotEtagRef.current) {
           throw new Error('Display snapshot heartbeat did not match the current snapshot.');
         }
+        const receivedAt = Date.now();
         const refreshed = { ...current, serverTime: heartbeat.serverTime };
         snapshotRef.current = refreshed;
         setSnapshot(refreshed);
@@ -1057,61 +1088,51 @@ export function V6DisplayExperience() {
         setUnavailable(false);
         return;
       }
-      const next = payload as DisplaySnapshot;
-      snapshotEtagRef.current = responseTag;
-      snapshotRef.current = next;
-      setSnapshot(next);
-      setServerOffsetMs(Date.parse(next.serverTime) - receivedAt);
-      setLastVerifiedAt(receivedAt);
-      setStale(false);
-      setUnavailable(false);
-      cursorRef.current = next.cursor;
-      const arrivals = next.arrivals ?? [];
-      if (initialSnapshotRef.current) {
-        for (const arrival of arrivals) knownEventsRef.current.add(arrival.eventId);
-        initialSnapshotRef.current = false;
-      } else {
-        const freshIds: string[] = [];
-        for (const arrival of arrivals) {
-          if (knownEventsRef.current.has(arrival.eventId)) continue;
-          knownEventsRef.current.add(arrival.eventId);
-          freshIds.push(arrival.recognitionId);
-        }
-        if (freshIds.length) setQueue((current) => [...current, ...freshIds.filter((id) => !current.includes(id))]);
-      }
+      acceptSnapshot(payload as DisplaySnapshot, responseTag);
     } catch {
-      setStale(true);
+      if (!controller.signal.aborted) setStale(true);
     } finally {
       window.clearTimeout(timeout);
       if (controllerRef.current === controller) controllerRef.current = null;
-      inFlightRef.current = false;
     }
-  }, []);
+  }, [acceptSnapshot]);
 
   const loadDailyAggregates = useCallback(async () => {
+    if (document.hidden || (dailyControllerRef.current && !dailyControllerRef.current.signal.aborted)) return;
+    const controller = new AbortController();
+    dailyControllerRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
     try {
-      const response = await api<{ ok?: boolean; items: DailyAggregate[] }>('/api/display/daily', { method: 'GET', auth: false, cache: 'no-store' });
-      if (Array.isArray(response.items)) setDailyAggregates(response.items);
+      const response = await api<{ ok?: boolean; items: DailyAggregate[] }>('/api/display/daily', { method: 'GET', auth: false, cache: 'no-store', signal: controller.signal });
+      if (!controller.signal.aborted && Array.isArray(response.items)) setDailyAggregates(response.items);
     } catch {
       // The V6 UI falls back to the currently retained recognition records until
       // the additive anonymous-aggregate migration is available.
+    } finally {
+      window.clearTimeout(timeout);
+      if (dailyControllerRef.current === controller) dailyControllerRef.current = null;
     }
   }, []);
 
+  const hasVerifiedSnapshot = verifiedSnapshot !== undefined;
   useEffect(() => {
-    void loadSnapshot();
-    void loadDailyAggregates();
-    const poll = window.setInterval(() => void loadSnapshot(), SNAPSHOT_POLL_MS);
-    const dailyPoll = window.setInterval(() => void loadDailyAggregates(), 30_000);
-    const visibility = () => { if (document.visibilityState === 'visible') void loadSnapshot(); };
-    document.addEventListener('visibilitychange', visibility);
-    return () => {
-      window.clearInterval(poll);
-      window.clearInterval(dailyPoll);
-      document.removeEventListener('visibilitychange', visibility);
-      controllerRef.current?.abort();
+    const stopSnapshots = hasVerifiedSnapshot ? () => {} : startVisiblePoll(() => void loadSnapshot(), SNAPSHOT_POLL_MS);
+    const stopDaily = startVisiblePoll(() => void loadDailyAggregates(), 30_000);
+    const cancelWhenHidden = () => {
+      if (document.hidden) {
+        controllerRef.current?.abort();
+        dailyControllerRef.current?.abort();
+      }
     };
-  }, [loadDailyAggregates, loadSnapshot]);
+    document.addEventListener('visibilitychange', cancelWhenHidden);
+    return () => {
+      stopSnapshots();
+      stopDaily();
+      document.removeEventListener('visibilitychange', cancelWhenHidden);
+      controllerRef.current?.abort();
+      dailyControllerRef.current?.abort();
+    };
+  }, [hasVerifiedSnapshot, loadDailyAggregates, loadSnapshot]);
 
   useEffect(() => {
     const tick = window.setInterval(() => setNowMs(Date.now()), 250);
@@ -1123,7 +1144,7 @@ export function V6DisplayExperience() {
     if (nowMs - reference >= STALE_HIDE_MS) setUnavailable(true);
   }, [lastVerifiedAt, nowMs]);
 
-  const nowServerMs = nowMs + serverOffsetMs;
+  const nowServerMs = verifiedNowMs ?? nowMs + serverOffsetMs;
   const allRecords = useMemo(() => eligibleRecognitions(snapshot, nowServerMs), [snapshot, nowServerMs]);
   const latest = allRecords.slice(0, 30);
   const reactionIds = latest.map((record) => record.id);

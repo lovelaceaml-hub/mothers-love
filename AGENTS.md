@@ -11,8 +11,12 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
+  Its Build log records the release authorization and remaining safety gates.
+  PR #30 is not live: integrate main after PRs #35 to #37, verify the live
+  migration ledger through approved access, and obtain safe hosted preview evidence.
 - `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
-  (release and records) are next; its Build log says where it stands.
+  (release and records) remain future work outside PR #30; its Build log says where it stands.
 
 ## Check your work
 - `npm run typecheck`, `npm test`, `npm run build`, `npm run test:e2e`; `npm run lint` has known
@@ -27,7 +31,8 @@ Current status and next steps: docs/HANDOFF.md.
 Deploy and Git
 - **A push to `main` is a production deployment, and the church TV shows it.** Changes reach `main`
   only through a pull request Anthony merges; never run a bare `git push` in the main checkout (it
-  tracks `origin/main`). Other pushed branches get Vercel previews, except `codex/home-tv-family`.
+  tracks `origin/main`). Other pushed branches get Vercel previews, except
+  `codex/home-tv-family` and `feat/tv-display-efficiency` while its explicit deployment guard remains.
 - Local building, dependencies and this app's own Vercel hosting are authorized; production changes
   touch only this app's confirmed resources.
 - Branches: `feat/<area>-<subject>` or `fix/<area>-<subject>`, areas `app` (campaign and form), `tv`
