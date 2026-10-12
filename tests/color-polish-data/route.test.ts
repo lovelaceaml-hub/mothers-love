@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { requireConfigured, admitPublicDisplayRequest, queryColorPolishSnapshot, projectColorPolishSnapshot, queryReactionTotal, projectReactionTotal } = vi.hoisted(() => ({
+const { requireConfigured, admitPublicDisplayRequest, queryColorPolishSnapshot, projectColorPolishSnapshot, queryReactionTotal, projectReactionTotal, recordDatabaseResultBytes } = vi.hoisted(() => ({
   requireConfigured: vi.fn(),
   admitPublicDisplayRequest: vi.fn(),
   queryColorPolishSnapshot: vi.fn(),
   projectColorPolishSnapshot: vi.fn(),
   queryReactionTotal: vi.fn(),
   projectReactionTotal: vi.fn(),
+  recordDatabaseResultBytes: vi.fn(),
 }));
 
 vi.mock("@/lib/server/http", () => ({ requireConfigured }));
 vi.mock("@/lib/server/public-display-admission", () => ({ admitPublicDisplayRequest }));
 vi.mock("@/lib/server/color-polish", () => ({ queryColorPolishSnapshot, projectColorPolishSnapshot }));
 vi.mock("@/lib/server/reactions", () => ({ queryReactionTotal, projectReactionTotal }));
+vi.mock("@/lib/server/database-result-metrics", () => ({ recordDatabaseResultBytes }));
 
 import { GET } from "@/app/api/display/color-polish/route";
 
@@ -68,6 +70,7 @@ beforeEach(() => {
   projectColorPolishSnapshot.mockReset();
   queryReactionTotal.mockReset();
   projectReactionTotal.mockReset();
+  recordDatabaseResultBytes.mockReset();
   projectColorPolishSnapshot.mockReturnValue(projected);
 });
 
@@ -104,6 +107,65 @@ describe("GET /api/display/color-polish", () => {
     expect(await response.json()).toEqual({ unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" });
     expect(queryColorPolishSnapshot).toHaveBeenCalledWith(null, expect.any(AbortSignal), etag);
     expect(projectColorPolishSnapshot).not.toHaveBeenCalled();
+    expect(recordDatabaseResultBytes).toHaveBeenCalledWith("display.color-polish", expect.any(Object), {
+      validatorPresent: true,
+      validatorValid: true,
+      validatorMatched: true,
+      projectionOK: true,
+    });
+  });
+
+  it("normalizes a weak request validator before matching the database digest", async () => {
+    const etag = "c".repeat(32);
+    queryColorPolishSnapshot.mockResolvedValue({
+      data: { unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" },
+      etag,
+      error: null,
+    });
+    const response = await GET(new NextRequest("https://mothers-love.vercel.app/api/display/color-polish", {
+      headers: { "If-None-Match": `W/"${etag}"` },
+    }));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("etag")).toBe(`"${etag}"`);
+    expect(queryColorPolishSnapshot).toHaveBeenCalledWith(null, expect.any(AbortSignal), etag);
+  });
+
+  it("ignores a malformed request validator while recording only its boolean state", async () => {
+    const etag = "f".repeat(32);
+    queryColorPolishSnapshot.mockResolvedValue({ data: { ok: true }, etag, error: null });
+    projectColorPolishSnapshot.mockReturnValue(projected);
+
+    const response = await GET(new NextRequest("https://mothers-love.vercel.app/api/display/color-polish", {
+      headers: { "If-None-Match": `W/"${etag} extra"` },
+    }));
+
+    expect(response.status).toBe(200);
+    expect(queryColorPolishSnapshot).toHaveBeenCalledWith(null, expect.any(AbortSignal), null);
+    expect(recordDatabaseResultBytes).toHaveBeenCalledWith("display.color-polish", { ok: true }, {
+      validatorPresent: true,
+      validatorValid: false,
+      validatorMatched: false,
+      projectionOK: true,
+    });
+  });
+
+  it("fails closed when a heartbeat digest does not match the request validator", async () => {
+    const requestTag = "d".repeat(32);
+    queryColorPolishSnapshot.mockResolvedValue({
+      data: { unchanged: true, serverTime: "2026-09-10T18:00:05.000Z" },
+      etag: "e".repeat(32),
+      error: null,
+    });
+    const response = await GET(new NextRequest("https://mothers-love.vercel.app/api/display/color-polish", {
+      headers: { "If-None-Match": `W/"${requestTag}"` },
+    }));
+    expect(response.status).toBe(503);
+    expect(recordDatabaseResultBytes).toHaveBeenCalledWith("display.color-polish", expect.any(Object), {
+      validatorPresent: true,
+      validatorValid: true,
+      validatorMatched: false,
+      projectionOK: false,
+    });
   });
 
   it("includes the campaign total on an active snapshot only when requested", async () => {

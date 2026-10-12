@@ -5,6 +5,8 @@ import { admitPublicDisplayRequest } from "@/lib/server/public-display-admission
 import { projectColorPolishSnapshot, queryColorPolishSnapshot } from "@/lib/server/color-polish";
 import { projectReactionTotal, queryReactionTotal } from "@/lib/server/reactions";
 import { validateColorPolishHeartbeat } from "@/lib/color-polish/validation";
+import { parseDisplaySnapshotEtag } from "@/lib/display/snapshot-heartbeat";
+import { recordDatabaseResultBytes } from "@/lib/server/database-result-metrics";
 import type { ApiResult } from "@/lib/server/types";
 
 export async function GET(request: NextRequest) {
@@ -21,7 +23,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const rawTag = request.headers.get("if-none-match");
-    const knownEtag = rawTag && /^"[a-f0-9]{32}"$/.test(rawTag) ? rawTag.slice(1, -1) : null;
+    const knownEtag = parseDisplaySnapshotEtag(rawTag);
+    const validatorPresent = rawTag !== null;
+    const validatorValid = knownEtag !== null;
     const includeLikesTotal = request.nextUrl.searchParams.get("includeLikesTotal") === "1";
     const likesTotalPromise = includeLikesTotal
       ? queryReactionTotal().catch(() => ({ data: null, error: new Error("DATABASE_ERROR") }))
@@ -43,8 +47,24 @@ export async function GET(request: NextRequest) {
     const heartbeat = validateColorPolishHeartbeat(result.data);
     // A compact 200 response (rather than 304) carries fresh serverTime for
     // the existing 60-second privacy/staleness timer.
-    if (heartbeat) return jsonResult(heartbeat, { headers: withLikesTotal(includeLikesTotal) });
+    const validatorMatched = knownEtag !== null && result.etag === knownEtag;
+    if (heartbeat) {
+      recordDatabaseResultBytes("display.color-polish", result.data, {
+        validatorPresent,
+        validatorValid,
+        validatorMatched,
+        projectionOK: validatorMatched,
+      });
+      if (!validatorMatched) return errorResult(503, "UNAVAILABLE");
+      return jsonResult(heartbeat, { headers: withLikesTotal(includeLikesTotal) });
+    }
     const snapshot = projectColorPolishSnapshot(result.data);
+    recordDatabaseResultBytes("display.color-polish", result.data, {
+      validatorPresent,
+      validatorValid,
+      validatorMatched,
+      projectionOK: snapshot !== null,
+    });
     if (!snapshot) return errorResult(503, "UNAVAILABLE");
     const canShowTotal = snapshot.settings.mode === "normal" && snapshot.presentation.enabled;
     return jsonResult(snapshot as unknown as ApiResult, { headers: withLikesTotal(canShowTotal) });

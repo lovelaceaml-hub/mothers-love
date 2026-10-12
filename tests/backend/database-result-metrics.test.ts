@@ -49,4 +49,30 @@ describe("database result byte samples", () => {
     recordDatabaseResultBytes("feed.older", privateFixture);
     expect(log).toHaveBeenCalledTimes(3);
   });
+
+  it("logs only content-free validator and projection diagnostics for Color Polish", async () => {
+    const log = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const { recordDatabaseResultBytes } = await import("@/lib/server/database-result-metrics");
+    const result = { unchanged: true, serverTime: "2026-10-12T12:00:00.000Z" };
+
+    recordDatabaseResultBytes("display.color-polish", result, {
+      validatorPresent: true,
+      validatorValid: true,
+      validatorMatched: false,
+      projectionOK: false,
+    });
+
+    const entry = JSON.parse(String(log.mock.calls[0]?.[0])) as Record<string, unknown>;
+    expect(entry).toEqual({
+      event: "database_result_bytes",
+      family: "display.color-polish",
+      resultKind: "heartbeat",
+      utf8Bytes: Buffer.byteLength(JSON.stringify(result), "utf8"),
+      validatorPresent: true,
+      validatorValid: true,
+      validatorMatched: false,
+      projectionOK: false,
+    });
+    expect(String(log.mock.calls[0]?.[0])).not.toMatch(/[a-f0-9]{32}/);
+  });
 });

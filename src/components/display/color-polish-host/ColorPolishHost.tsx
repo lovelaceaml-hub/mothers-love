@@ -12,6 +12,7 @@ import {
 } from '@/lib/color-polish/contracts';
 import { validateColorPolishHeartbeat, validateColorPolishSnapshot } from '@/lib/color-polish/validation';
 import type { DisplayMode } from '@/lib/contracts';
+import { matchesDisplaySnapshotEtag, parseDisplaySnapshotEtag } from '@/lib/display/snapshot-heartbeat';
 import { startVisiblePoll } from '@/lib/visible-poll';
 
 // Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
@@ -288,6 +289,8 @@ export function ColorPolishHost() {
         const heartbeat = validateColorPolishHeartbeat(payload);
         if (heartbeat) {
           if (!snapshotRef.current || !snapshotHashRef.current) throw new Error('MISSING_SNAPSHOT');
+          if (!matchesDisplaySnapshotEtag(response.headers.get('etag'), snapshotHashRef.current))
+            throw new Error('HEARTBEAT_ETAG_MISMATCH');
           if (includeLikesTotal && phaseRef.current === 'active') {
             const total = readLikesTotal(response);
             if (total !== null) setReactionTotal(total);
@@ -307,8 +310,7 @@ export function ColorPolishHost() {
         clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
         monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
         cursorRef.current = next.cursor;
-        const tag = /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '');
-        snapshotHashRef.current = tag?.[1] ?? null;
+        snapshotHashRef.current = parseDisplaySnapshotEtag(response.headers.get('etag'));
         lastVerifiedRef.current = receivedPerformanceMs;
         setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {

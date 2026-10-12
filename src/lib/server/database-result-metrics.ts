@@ -6,6 +6,13 @@ export type DatabaseResultFamily =
   | "feed.home"
   | "feed.older";
 
+export type ColorPolishResultDiagnostics = {
+  validatorPresent: boolean;
+  validatorValid: boolean;
+  validatorMatched: boolean;
+  projectionOK: boolean;
+};
+
 const SAMPLE_INTERVAL_MS = 60_000;
 const FAMILIES = new Set<DatabaseResultFamily>([
   "display.color-polish",
@@ -31,7 +38,11 @@ function resultKind(value: unknown): "full" | "heartbeat" {
  * Sample the UTF-8 byte length of a JSON database result without retaining or
  * logging its content. This is the serialized result value, not wire framing.
  */
-export function recordDatabaseResultBytes(family: DatabaseResultFamily, value: unknown): void {
+export function recordDatabaseResultBytes(
+  family: DatabaseResultFamily,
+  value: unknown,
+  diagnostics?: ColorPolishResultDiagnostics,
+): void {
   if (!FAMILIES.has(family)) return;
   const kind = resultKind(value);
   const key = family + ":" + kind;
@@ -53,5 +64,6 @@ export function recordDatabaseResultBytes(family: DatabaseResultFamily, value: u
     family,
     resultKind: kind,
     utf8Bytes: Buffer.byteLength(serialized, "utf8"),
+    ...(family === "display.color-polish" && diagnostics ? diagnostics : {}),
   }));
 }

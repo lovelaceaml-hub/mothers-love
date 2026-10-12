@@ -14,7 +14,6 @@ import type { Aggregate } from "@/lib/contracts";
 import { endOfLosAngelesWeek, isoDateInLosAngeles, isIsoDate, startOfLosAngelesMonth, startOfLosAngelesWeek } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 import { projectPublicDisplaySnapshot } from "./public-display";
-import { recordDatabaseResultBytes } from "./database-result-metrics";
 
 export type ColorPolishQuery = {
   data: unknown;
@@ -280,7 +279,6 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
       end as result from digest
     `;
     const data = rows[0]?.result ?? null;
-    recordDatabaseResultBytes("display.color-polish", data);
     return { data, etag: typeof rows[0]?.etag === "string" ? rows[0].etag as string : null };
   }));
   void operation.then(() => undefined, () => undefined);
