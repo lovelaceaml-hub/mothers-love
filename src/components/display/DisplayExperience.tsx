@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import QRCode from 'qrcode';
+import { createPollingState } from '@/lib/polling-schedule';
+import { startVisiblePoll } from '@/lib/visible-poll';
 
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
@@ -519,6 +521,7 @@ const SCREEN_HEADINGS: Record<PresentationState['screen'], { eyebrow: string; ti
 const EMPTY_REACTION_COUNTS: ReadonlyMap<string, ReactionItem> = new Map();
 
 function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly string[]; children: (reactionCounts: ReadonlyMap<string, ReactionItem>) => ReactNode }) {
+  const pollStateRef = useRef(createPollingState());
   const [reactionCounts, setReactionCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
   const controllerRef = useRef<AbortController | null>(null);
   const requestSerialRef = useRef(0);
@@ -562,11 +565,10 @@ function ReactionCounts({ eligibleIds, children }: { eligibleIds: readonly strin
       }
     };
 
-    void load();
-    const pollTimer = window.setInterval(() => void load(), 10_000);
+    const stopPolling = startVisiblePoll(() => void load(), 10_000, undefined, { state: pollStateRef.current });
     return () => {
       active = false;
-      window.clearInterval(pollTimer);
+      stopPolling();
       controllerRef.current?.abort();
       controllerRef.current = null;
       requestInFlightRef.current = false;
@@ -715,13 +717,10 @@ export function DisplayExperience() {
       });
       if (refreshPlan.shouldRefresh) void loadSnapshot();
     };
-    const pollTimer = window.setInterval(refresh, 1_000);
-    const onVisibilityChange = () => refresh();
-    document.addEventListener('visibilitychange', onVisibilityChange);
+    const stopPolling = startVisiblePoll(refresh, 1_000, undefined, { initial: false });
     return () => {
       window.clearInterval(tickTimer);
-      window.clearInterval(pollTimer);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      stopPolling();
     };
   }, [loadSnapshot, monotonicNow]);
 

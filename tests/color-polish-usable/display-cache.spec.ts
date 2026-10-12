@@ -2,10 +2,12 @@ import { expect, test, type Frame, type Page } from '@playwright/test';
 import { buildActiveDisplayFixture, fulfillJson } from '../color-polish-scenes/helpers';
 import type { ColorPolishSnapshot } from '@/lib/color-polish/contracts';
 
-const NOW = '2026-09-10T18:00:00.000Z';
+// Saturday's fast window: these journeys verify the retained live cadence.
+const NOW = '2026-09-12T16:00:00.000Z';
 const token = (n: number) => n.toString(16).padStart(32, '0');
 const cacheCursor = (n = 1) => `v2:${token(n)}:1789063200:12.1789063200`;
-const base = buildActiveDisplayFixture() as unknown as ColorPolishSnapshot;
+const fixture = buildActiveDisplayFixture();
+const base = { ...fixture, serverTime: NOW, aggregate: { ...fixture.aggregate, periodEnd: '2026-09-12' }, insights: { ...fixture.insights, currentWeek: { ...fixture.insights.currentWeek, periodEnd: '2026-09-12' }, month: { ...fixture.insights.month, periodEnd: '2026-09-12' }, campaign: { ...fixture.insights.campaign, periodEnd: '2026-09-12' } } } as unknown as ColorPolishSnapshot;
 const pool = base.recognitions.map((record, n) => ({ id: record.id, token: token(n + 10) }));
 const reset = () => ({ ok: true, cacheCursor: cacheCursor(), serverTime: NOW, unchanged: false, pool, snapshot: base });
 test.describe.configure({ timeout: 120000 });
@@ -102,7 +104,9 @@ test('unchanged polls stay live, preserve the iframe, stop hidden requests, and 
   await page.clock.runFor(5000);
   await expect.poll(() => snapshotRequests).toBeGreaterThan(beforeReset);
   await expect(display).toBeVisible();
-  expect(paths.at(-1)).toBe('?sync=2');
+  expect(new URLSearchParams(paths.at(-1)).get('sync')).toBe('2');
+  expect(new URLSearchParams(paths.at(-1)).has('after')).toBe(false);
+  expect(new URLSearchParams(paths.at(-1)).has('known')).toBe(false);
   await visibility(page, true);
   const beforeHiddenGap = snapshotRequests;
   await page.clock.fastForward(65000);
@@ -111,7 +115,9 @@ test('unchanged polls stay live, preserve the iframe, stop hidden requests, and 
   await visibility(page, false);
   await resumed;
   await expect(display).toBeVisible();
-  expect(paths.at(-1)).toBe('?sync=2');
+  expect(new URLSearchParams(paths.at(-1)).get('sync')).toBe('2');
+  expect(new URLSearchParams(paths.at(-1)).has('after')).toBe(false);
+  expect(new URLSearchParams(paths.at(-1)).has('known')).toBe(false);
 });
 
 test('the next five-second poll merges an arrival and applies a quiet-mode withdrawal', async ({ page }) => {

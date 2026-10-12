@@ -115,6 +115,7 @@ const beforeOneRender = (run: () => Promise<unknown>) => act(async () => void (a
 
 beforeEach(() => {
   vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-10-10T16:00:00Z'));
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 });
 afterEach(() => {
@@ -124,6 +125,22 @@ afterEach(() => {
 });
 
 describe("an arrival reaches the engine once, even when two publishes share a render", () => {
+  it("allows explicit live-source selection overnight without starting recurring polling", async () => {
+    vi.setSystemTime(new Date('2026-10-13T09:00:00Z'));
+    const harness = await mountFeed('sample');
+    expect(fetch).not.toHaveBeenCalled();
+    await harness.setSource('live');
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await act(async () => { await vi.advanceTimersByTimeAsync(61_000); });
+    expect(last(harness).records).not.toEqual([]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await harness.setSource('sample');
+    harness.answer(snapshot());
+    await harness.setSource('live');
+    expect(fetch).toHaveBeenCalledTimes(2);
+    await harness.unmount();
+  });
+
   it("keeps the entrance when a poll and the half second tick land before one render", async () => {
     const harness = await mountFeed();
     expect(last(harness).phase).toBe("live");

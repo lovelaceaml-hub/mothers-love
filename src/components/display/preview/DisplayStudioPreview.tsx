@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ComponentProps, type ComponentType, type ReactNode } from 'react';
 
+import { snapshotFreshnessRequired, nextPollingBoundary } from '@/lib/polling-schedule';
+import { startVisiblePoll } from '@/lib/visible-poll';
 import { createPortal } from 'react-dom';
 
 import { GardenCard, GardenScene, projectGardenAggregate, projectGardenRecognition } from '@/components/display/garden';
@@ -119,6 +121,7 @@ function useApprovedSnapshot(settings: DisplaySettings, source: PreviewSource, s
   const requestIdentity = `${identity}:${identityCycle.cycle}`;
   const [state, setState] = useState<ApprovedState>({ identity: '', phase: 'empty', reason: 'session', snapshot: null, sessionKey, validatedAtMs: null });
   const generation = useRef(0);
+  const lastVerifiedWallMs = useRef<number | null>(null);
 
   useEffect(() => {
     const requestGeneration = generation.current + 1;
@@ -137,7 +140,7 @@ function useApprovedSnapshot(settings: DisplaySettings, source: PreviewSource, s
 
     let reading = false;
     const readSnapshot = async () => {
-      if (reading) return;
+      if (reading || document.hidden) return;
       reading = true;
       try {
         const response = await fetch('/api/display/snapshot', {
@@ -159,6 +162,7 @@ function useApprovedSnapshot(settings: DisplaySettings, source: PreviewSource, s
           setState({ identity: requestIdentity, phase: 'empty', reason: snapshot.settings.mode === 'normal' ? 'expired' : 'private', snapshot: null, sessionKey, validatedAtMs: null });
           return;
         }
+        lastVerifiedWallMs.current = Date.now();
         setState({ identity: requestIdentity, phase: 'ready', reason: 'checking', snapshot, sessionKey, validatedAtMs: Date.now() });
       } catch (error: unknown) {
         if (controller.signal.aborted || generation.current !== requestGeneration) return;
@@ -166,21 +170,32 @@ function useApprovedSnapshot(settings: DisplaySettings, source: PreviewSource, s
       } finally { reading = false; }
     };
 
-    void readSnapshot();
-    const poll = window.setInterval(() => { void readSnapshot(); }, 7_500);
+    const stopPolling = startVisiblePoll(() => { void readSnapshot(); }, 7_500, () => {
+      if (snapshotFreshnessRequired() && lastVerifiedWallMs.current !== null && Date.now() - lastVerifiedWallMs.current >= 60_000) {
+        setState({ identity: requestIdentity, phase: 'empty', reason: 'unavailable', snapshot: null, sessionKey, validatedAtMs: null });
+      }
+    });
     return () => {
       controller.abort();
-      window.clearInterval(poll);
+      stopPolling();
     };
   }, [requestIdentity, sessionKey, settings.mode, source]);
 
   useEffect(() => {
     if (source !== 'approved' || state.identity !== requestIdentity || state.phase !== 'ready' || !state.snapshot || state.sessionKey !== sessionKey || state.validatedAtMs === null) return undefined;
-    const expiryDelay = snapshotExpiryDelayMs(state.snapshot);
-    const delay = expiryDelay === null ? 60_000 : Math.min(60_000, expiryDelay);
-    const timer = window.setTimeout(() => {
-      if (generation.current > 0) setState({ identity: requestIdentity, phase: 'empty', reason: expiryDelay !== null && expiryDelay <= 60_000 ? 'expired' : 'unavailable', snapshot: null, sessionKey, validatedAtMs: null });
-    }, Math.max(0, Math.min(delay, 60_000)));
+    let timer: number;
+    const check = () => {
+      const expiryWindow = snapshotExpiryDelayMs(state.snapshot!);
+      const expiryDelay = expiryWindow === null ? null : expiryWindow - (Date.now() - state.validatedAtMs!);
+      const age = Date.now() - state.validatedAtMs!;
+      if ((expiryDelay !== null && expiryDelay <= 0) || (snapshotFreshnessRequired() && age >= 60_000)) {
+        if (generation.current > 0) setState({ identity: requestIdentity, phase: 'empty', reason: expiryDelay !== null && expiryDelay <= 0 ? 'expired' : 'unavailable', snapshot: null, sessionKey, validatedAtMs: null });
+        return;
+      }
+      const freshnessDelay = snapshotFreshnessRequired() ? Math.max(1, 60_000 - age) : Infinity;
+      timer = window.setTimeout(check, Math.max(1, Math.min(expiryDelay ?? Infinity, freshnessDelay, nextPollingBoundary() - Date.now())));
+    };
+    check();
     return () => window.clearTimeout(timer);
   }, [requestIdentity, sessionKey, source, state.identity, state.phase, state.sessionKey, state.snapshot, state.validatedAtMs]);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { startVisiblePoll } from '@/lib/visible-poll';
 import { DISPLAY_BUILD, shouldReload } from '@/lib/display-build';
 
 const CHECK_MS = 5 * 60_000;
@@ -30,19 +31,27 @@ export function DisplayBuildWatch() {
     if (!DISPLAY_BUILD) return;
     let previous: string | null = null;
     let stopped = false;
+    let controller: AbortController | null = null;
 
     const check = async () => {
+      if (stopped || document.hidden || controller) return;
+      const request = new AbortController();
+      controller = request;
+      const timeout = window.setTimeout(() => request.abort(), 9_000);
       let reported: string | null = null;
       try {
-        const response = await fetch('/api/display/build', { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } });
+        const response = await fetch('/api/display/build', { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: request.signal });
         if (response.ok) {
           const body = (await response.json()) as { build?: unknown };
           if (typeof body.build === 'string' && body.build) reported = body.build;
         }
       } catch {
         reported = null;
+      } finally {
+        window.clearTimeout(timeout);
+        if (controller === request) controller = null;
       }
-      if (stopped) return;
+      if (stopped || request.signal.aborted) return;
       if (shouldReload({ ours: DISPLAY_BUILD, reported, previous, alreadyReloadedFor: readReloadedFor() }) && reported) {
         writeReloadedFor(reported);
         window.location.reload();
@@ -51,10 +60,11 @@ export function DisplayBuildWatch() {
       previous = reported;
     };
 
-    const timer = window.setInterval(() => void check(), CHECK_MS);
+    const stopPolling = startVisiblePoll(() => void check(), CHECK_MS, undefined, { initial: false });
     return () => {
       stopped = true;
-      window.clearInterval(timer);
+      stopPolling();
+      controller?.abort();
     };
   }, []);
 

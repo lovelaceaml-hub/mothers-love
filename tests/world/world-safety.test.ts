@@ -72,6 +72,18 @@ describe("verified public world feed", () => {
     store.failure(true);
     expect(store.view(4).records).toEqual([]);
   });
+  it("retains planned pauses but still expires records and clears genuine failures", () => {
+    const store = new WorldFeedStore();
+    const value = snapshot();
+    store.accept(value, 0);
+    expect(store.view(600_000, true).records.length).toBeGreaterThan(0);
+    expect(store.view(600_000, true).snapshot?.serverTime).toBe(value.serverTime);
+    store.failure();
+    expect(store.view(600_000, true).records).toEqual([]);
+    const expiresAt = new Date(Date.parse(value.serverTime) + 10_000).toISOString();
+    store.accept({ ...value, recognitions: [{ ...records[0], expiresAt }] }, 700_000);
+    expect(store.view(710_000, true).records).toEqual([]);
+  });
   it("expires offline without using the wall clock and clears at sixty seconds", () => {
     const store = new WorldFeedStore();
     const value = snapshot();
