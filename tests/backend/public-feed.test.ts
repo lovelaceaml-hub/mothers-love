@@ -113,7 +113,8 @@ describe("GET /api/feed", () => {
     expect(await response.json()).toEqual(snapshot);
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(String(rpc.mock.calls[0]?.[0]?.[0])).toContain("public.ml_public_feed()");
-    expect(String(rpc.mock.calls[0]?.[0]?.[0])).toContain("md5((value - 'serverTime')::text)");
+    expect(String(rpc.mock.calls[0]?.[0]?.[0])).toContain("value - 'serverTime'");
+    expect(String(rpc.mock.calls[0]?.[0]?.[0])).toContain("interval '8 hours'");
   });
 
   it("returns only a validated heartbeat when the known content tag is unchanged", async () => {

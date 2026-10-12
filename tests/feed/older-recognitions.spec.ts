@@ -26,6 +26,7 @@ async function serveFeed(page: Page, options: Options) {
   const reactionIds = new Set<string>();
   const reactionRequests: string[][] = [];
   const olderCursors: string[] = [];
+  const olderIfNoneMatch: string[] = [];
   await page.route('**/api/feed', async (route) => {
     const hidden = options.hidden ?? new Set<number>();
     await route.fulfill({ headers: { 'cache-control': 'no-store' }, json: { serverTime, items: records(1, Math.min(options.total, 100), hidden) } });
@@ -33,6 +34,8 @@ async function serveFeed(page: Page, options: Options) {
   await page.route((url) => url.pathname === '/api/feed/older', async (route) => {
     const url = new URL(route.request().url());
     olderCursors.push(`${url.searchParams.get('before')}|${url.searchParams.get('id')}`);
+    const requestTag = route.request().headers()['if-none-match'] ?? null;
+    olderIfNoneMatch.push(requestTag ?? '');
     if (options.failOlder?.()) {
       await route.fulfill({ status: 503, json: { ok: false, code: 'UNAVAILABLE' } });
       return;
@@ -40,7 +43,18 @@ async function serveFeed(page: Page, options: Options) {
     const after = Number(url.searchParams.get('id')?.replace('synthetic-', ''));
     const hidden = options.hidden ?? new Set<number>();
     const count = Math.max(0, Math.min(100, options.total - after));
-    await route.fulfill({ headers: { 'cache-control': 'no-store' }, json: { serverTime, items: records(after + 1, count, hidden) } });
+    const etag = hidden.size > 0 ? `"${'b'.repeat(32)}"` : `"${'a'.repeat(32)}"`;
+    if (requestTag === etag) {
+      await route.fulfill({
+        headers: { 'cache-control': 'no-store', etag },
+        json: { unchanged: true, serverTime },
+      });
+      return;
+    }
+    await route.fulfill({
+      headers: { 'cache-control': 'no-store', etag },
+      json: { serverTime, items: records(after + 1, count, hidden) },
+    });
   });
   await page.route('**/api/reactions**', async (route) => {
     const ids = new URL(route.request().url()).searchParams.get('ids')?.split(',').filter(Boolean) ?? [];
@@ -48,7 +62,7 @@ async function serveFeed(page: Page, options: Options) {
     ids.forEach((id) => reactionIds.add(id));
     await route.fulfill({ json: { items: ids.map((id) => ({ id, count: 0, liked: false })) } });
   });
-  return { reactionIds, reactionRequests, olderCursors };
+  return { reactionIds, reactionRequests, olderCursors, olderIfNoneMatch };
 }
 
 const cards = (page: Page) => page.locator('#recent-recognitions [data-recognition-id]');
@@ -112,4 +126,19 @@ test('a recognition hidden after loading leaves the older pages on the next refr
   // The periodic snapshot still refreshes every shown heart in two batches.
   // Re-reading history must fetch no duplicate batches when it only removes a hidden item.
   await expect.poll(() => served.reactionRequests.length).toBe(beforePeriodicRefresh + 2);
+});
+
+test('an unchanged older page sends a conditional request and keeps its cached items', async ({ page }) => {
+  const served = await serveFeed(page, { total: 150 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Show older recognitions' }).click();
+  await expect(cards(page)).toHaveCount(150);
+  await expect(page.getByText('Test Recipient 120', { exact: true })).toBeAttached();
+
+  await expect.poll(() => served.olderIfNoneMatch.length, { timeout: 15_000 }).toBeGreaterThan(1);
+
+  expect(served.olderIfNoneMatch[0]).toBe('');
+  expect(served.olderIfNoneMatch[1]).toBe(`"${'a'.repeat(32)}"`);
+  await expect(cards(page)).toHaveCount(150);
+  await expect(page.getByText('Test Recipient 120', { exact: true })).toBeAttached();
 });

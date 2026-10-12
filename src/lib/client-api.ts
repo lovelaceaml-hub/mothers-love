@@ -38,7 +38,7 @@ async function readResponseBody(response: Response): Promise<unknown> {
 }
 
 export async function api<T>(path: string, options: ApiClientOptions = {}): Promise<T> {
-  const { auth = true, token, bearerToken, headers, ...requestInit } = options;
+  const { auth = true, token, bearerToken, headers, onResponseHeaders, ...requestInit } = options;
   const explicitToken = bearerToken ?? token ?? null;
   const accessToken = explicitToken ?? (auth ? await getCurrentAccessToken() : null);
   const requestHeaders = new Headers(headers);
@@ -62,6 +62,8 @@ export async function api<T>(path: string, options: ApiClientOptions = {}): Prom
   } catch {
     throw new ApiClientError("The service is temporarily unavailable.", "network_error", 0);
   }
+
+  onResponseHeaders?.(response.headers);
 
   if (!response.ok) {
     throw errorFromBody(await readResponseBody(response), response.status);

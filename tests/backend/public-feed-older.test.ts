@@ -25,8 +25,8 @@ const item = {
 };
 const snapshot = { serverTime: "2026-09-08T10:01:00.000Z", items: [item] };
 
-function request(query: Record<string, string>) {
-  return new NextRequest(`https://mothers-love.example/api/feed/older?${new URLSearchParams(query)}`);
+function request(query: Record<string, string>, headers?: HeadersInit) {
+  return new NextRequest(`https://mothers-love.example/api/feed/older?${new URLSearchParams(query)}`, { headers });
 }
 
 beforeEach(() => {
@@ -50,7 +50,11 @@ describe("older feed cursor", () => {
 
 describe("GET /api/feed/older", () => {
   it("passes the cursor to the dedicated RPC and returns only the public projection", async () => {
-    const rpc = vi.fn().mockResolvedValue([{ result: { ok: true, ...snapshot, items: [{ ...item, submittedName: "Synthetic Sender A." }] } }]);
+    const etag = "a".repeat(32);
+    const rpc = vi.fn().mockResolvedValue([{
+      etag,
+      result: { ok: true, ...snapshot, items: [{ ...item, submittedName: "Synthetic Sender A." }] },
+    }]);
     databaseClient.mockReturnValue(rpc);
 
     const response = await GET(request(cursor));
@@ -58,9 +62,41 @@ describe("GET /api/feed/older", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(response.headers.get("etag")).toBe(`"${etag}"`);
     expect(await response.json()).toEqual(snapshot);
-    expect(String(rpc.mock.calls[0]?.[0]?.join("?"))).toContain("public.ml_public_feed_older(");
-    expect(rpc.mock.calls[0]?.slice(1)).toEqual([cursor.before, cursor.id]);
+    const sql = String(rpc.mock.calls[0]?.[0]?.join("?"));
+    expect(sql).toContain("public.ml_public_feed_older(");
+    expect(sql.match(/public\.ml_public_feed_older\(/g)).toHaveLength(1);
+    expect(sql).toContain("jsonb_build_object('unchanged', true");
+    expect(sql).toContain("interval '8 hours'");
+    expect(rpc.mock.calls[0]?.slice(1)).toEqual([cursor.before, cursor.id, null]);
+  });
+
+  it("returns a matching database heartbeat while keeping the page cacheable by its content tag", async () => {
+    const etag = "b".repeat(32);
+    const serverTime = "2026-09-08T10:02:00.000Z";
+    const rpc = vi.fn().mockResolvedValue([{
+      etag,
+      result: { unchanged: true, serverTime },
+    }]);
+    databaseClient.mockReturnValue(rpc);
+
+    const response = await GET(request(cursor, { "If-None-Match": `"${etag}"` }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("etag")).toBe(`"${etag}"`);
+    expect(await response.json()).toEqual({ unchanged: true, serverTime });
+    expect(rpc.mock.calls[0]?.slice(1)).toEqual([cursor.before, cursor.id, etag]);
+  });
+
+  it("rejects an unmatched older-page heartbeat", async () => {
+    databaseClient.mockReturnValue(vi.fn().mockResolvedValue([{
+      etag: "c".repeat(32),
+      result: { unchanged: true, serverTime: snapshot.serverTime },
+    }]));
+
+    const response = await GET(request(cursor, { "If-None-Match": `"${"d".repeat(32)}"` }));
+    expect(response.status).toBe(503);
   });
 
   it("rejects a bad cursor without reaching the database", async () => {

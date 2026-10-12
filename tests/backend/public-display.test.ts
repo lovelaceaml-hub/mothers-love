@@ -15,7 +15,10 @@ vi.mock("@/lib/server/http", () => ({ requireConfigured }));
 vi.mock("@/lib/server/public-display-admission", () => ({ admitPublicDisplayRequest }));
 
 import { GET } from "@/app/api/display/snapshot/route";
-import { projectPublicDisplaySnapshot } from "@/lib/server/public-display";
+import {
+  projectPublicDisplaySnapshot,
+  projectPublicDisplaySnapshotHeartbeat,
+} from "@/lib/server/public-display";
 
 const recognition = {
   id: "00000000-0000-4000-8000-000000000001",
@@ -66,8 +69,8 @@ const snapshot = {
   arrivals: [{ eventId: "12", recognitionId: recognition.id, publishedAt: recognition.firstPublishedAt }],
 };
 
-function request(path = "/api/display/snapshot", signal?: AbortSignal) {
-  return new NextRequest(`https://mothers-love.example${path}`, { signal });
+function request(path = "/api/display/snapshot", signal?: AbortSignal, headers?: HeadersInit) {
+  return new NextRequest(`https://mothers-love.example${path}`, { signal, headers });
 }
 
 function mockTransactionalDatabase(select: () => Promise<unknown>) {
@@ -200,6 +203,20 @@ describe("public display projection", () => {
       revision: 0,
     });
   });
+
+  it("accepts only the compact display heartbeat shape", () => {
+    expect(projectPublicDisplaySnapshotHeartbeat({
+      unchanged: true,
+      serverTime: "2026-09-08T10:02:00.000Z",
+    })).toEqual({ unchanged: true, serverTime: "2026-09-08T10:02:00.000Z" });
+    expect(projectPublicDisplaySnapshotHeartbeat({
+      unchanged: true,
+      serverTime: "2026-09-08T10:02:00.000Z",
+      recognitions: [],
+    })).toBeNull();
+    expect(projectPublicDisplaySnapshotHeartbeat({ unchanged: false, serverTime: "2026-09-08T10:02:00.000Z" })).toBeNull();
+    expect(projectPublicDisplaySnapshotHeartbeat({ unchanged: true, serverTime: "invalid" })).toBeNull();
+  });
 });
 
 describe("GET /api/display/snapshot", () => {
@@ -219,6 +236,50 @@ describe("GET /api/display/snapshot", () => {
     expect(String(database.transaction.mock.calls[0]?.[0]?.[0])).toContain("set local statement_timeout = '5000ms'");
     expect(String(database.transaction.mock.calls[1]?.[0]?.[0])).toContain("public.ml_public_display_snapshot");
     expect(database.transaction.mock.calls[1]?.[1]).toBe("11.1788861600");
+    expect(database.transaction.mock.calls[1]?.[2]).toBeNull();
+    const sql = String(database.transaction.mock.calls[1]?.[0]?.join("?"));
+    expect(sql.match(/public\.ml_public_display_snapshot\(/g)).toHaveLength(1);
+    expect(sql).toContain("md5(");
+    expect(sql).toContain("interval '8 hours'");
+  });
+
+  it("returns a matching database heartbeat and refreshes only the verification clock", async () => {
+    const etag = "a".repeat(32);
+    const serverTime = "2026-09-08T10:02:00.000Z";
+    const database = mockTransactionalDatabase(async () => [{
+      etag,
+      result: { unchanged: true, serverTime },
+    }]);
+
+    const response = await GET(request(
+      "/api/display/snapshot?after=11.1788861600",
+      undefined,
+      { "If-None-Match": `"${etag}"` },
+    ));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("etag")).toBe(`"${etag}"`);
+    expect(await response.json()).toEqual({ unchanged: true, serverTime });
+    expect(database.transaction.mock.calls[1]?.[1]).toBe("11.1788861600");
+    expect(database.transaction.mock.calls[1]?.[2]).toBe(etag);
+    const sql = String(database.transaction.mock.calls[1]?.[0]?.join("?"));
+    expect(sql).toContain("jsonb_build_object('unchanged', true");
+    expect(sql.match(/public\.ml_public_display_snapshot\(/g)).toHaveLength(1);
+  });
+
+  it("rejects a heartbeat unless its database tag matches the request", async () => {
+    const responseTag = "b".repeat(32);
+    mockTransactionalDatabase(async () => [{
+      etag: responseTag,
+      result: { unchanged: true, serverTime: "2026-09-08T10:02:00.000Z" },
+    }]);
+
+    const response = await GET(request(
+      "/api/display/snapshot",
+      undefined,
+      { "If-None-Match": `"${"c".repeat(32)}"` },
+    ));
+    expect(response.status).toBe(503);
   });
 
   it("maps transport and malformed bridge failures to a safe unavailable response", async () => {
