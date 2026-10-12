@@ -1,0 +1,30 @@
+{
+  "added_tests": [
+    "tests/backend/reactions-total.test.ts :: GET /api/display/likes-total bounds a stalled likes read and retires only its public read generation",
+    "tests/backend/reactions-total.test.ts :: GET /api/display/likes-total does not allocate a connection for an already cancelled request",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache accepts current settings/presentation metadata without reloading old records",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache adds only the new record, preserves the exact pool order, and accepts one arrival",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache empties personal cache for neutral and cannot resurrect it on a partial response",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache empties personal cache for quiet and cannot resurrect it on a partial response",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache keeps the legacy cursor across a full-snapshot fallback so arrivals continue after app rollback",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache projects only public fields and rejects malformed or ineligible delta arrivals",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache removes withdrawn records and replaces edited records even with the same application revision",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache requires a reset after cache loss, invalid tokens, stale expiry, or a backwards clock",
+    "tests/color-polish-data/display-cache.test.ts :: verified display record cache reuses records while refreshing verification time and clearing arrival events",
+    "tests/color-polish-data/query.test.ts :: Color Polish snapshot query queries the opt-in cache bridge with bounded record tokens in the same transaction",
+    "tests/color-polish-data/route.test.ts :: GET /api/display/color-polish rejects oversized, duplicate and malformed cache manifests before opening a database read",
+    "tests/color-polish-data/route.test.ts :: GET /api/display/color-polish returns an opt-in unchanged verification without records and preserves no-store"
+  ],
+  "removed_tests": [],
+  "shared_failures": [
+    "tests/world/feed-arrivals.test.ts :: an arrival reaches the engine once, even when two publishes share a render keeps the entrance when a poll and the half second tick land before one render",
+    "tests/world/feed-arrivals.test.ts :: an arrival reaches the engine once, even when two publishes share a render drops an uncommitted arrival when quiet lands before the render, and never replays it",
+    "tests/world/feed-arrivals.test.ts :: an arrival reaches the engine once, even when two publishes share a render drops an uncommitted arrival on a switch to the sample source"
+  ],
+  "recovered_tests": [
+    "tests/backend/public-display-recovery.test.ts :: public display client recovery tears down one concurrent generation once and cannot retire its replacement",
+    "tests/backend/public-display-recovery.test.ts :: public display client recovery clears the wall timer on both successful and failed operations",
+    "tests/backend/public-display-recovery.test.ts :: public display client recovery settles a never-ending begin at the wall deadline, retires the pool, and recovers on a new generation"
+  ],
+  "new_failures": []
+}

@@ -2,6 +2,13 @@
 -- Metadata retains 012's settings, cleanup, calendar and weekly-focus behavior.
 -- Additive only: no existing routine, table rows or privileges are replaced.
 -- Install and validate the concurrent latest-records index before this file.
+-- App rollback: use legacy snapshot readers; 020 can remain installed.
+-- SQL rollback, if selected after release:
+--   DROP FUNCTION public.ml_color_polish_delta(text, jsonb);
+--   DROP FUNCTION mothers_love.ml_color_polish_metadata();
+-- Optional index removal, in autocommit mode after verifying no dependencies:
+--   DROP INDEX CONCURRENTLY mothers_love.recognitions_display_latest_idx;
+-- Do not undo migration 019 or delete existing settings/weekly-focus rows.
 BEGIN;
 
 DO $delta_index_check$

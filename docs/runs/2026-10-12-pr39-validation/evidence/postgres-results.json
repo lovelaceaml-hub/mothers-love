@@ -1,0 +1,56 @@
+{
+  "checks": [
+    "concurrent latest-records index is ready, valid and has the expected keys",
+    "reset is latest 100, ordered featured first, with browser expiry capped at seven days",
+    "unchanged poll carries no recognition records or metadata snapshot",
+    "an actual cleanup heartbeat changes timestamps without downloading content",
+    "one arrival sends one full record and the exact current pool",
+    "actual SQL reset/unchanged/arrival payloads pass the API projector and browser cache",
+    "app rollback from a delta cursor to legacy SQL reset retains the legacy cursor and delivers the next arrival",
+    "fresh restricted runtime connection skips type catalogs and preserves feed/older/reactions/mutation/config/TV JSONB, UUID, timestamp, nested-array and Unicode contracts",
+    "synthetic payload budgets: unchanged <=200 bytes, gzip <=180 bytes, one arrival <=14 KB, token list <=3299 characters",
+    "a message edit without a version bump invalidates its token",
+    "expression-table changes invalidate cached content independently",
+    "settings changes invalidate metadata without a version bump",
+    "presentation activation changes invalidate metadata independently",
+    "anonymous aggregate/calendar changes invalidate metadata independently",
+    "Los Angeles day/week/month boundaries refresh calendar periods and frozen weekly focus",
+    "feature expiration invalidates the pool token without any intervening write",
+    "elapsed feature boundaries are evaluated at each verification",
+    "moderation removes cached records and refills the latest-100 pool",
+    "expired content leaves the pool before physical cleanup",
+    "quiet mode clears records and returning to normal refills the memory cache",
+    "hourly cache renewal refreshes seven-day leases without dropping arrivals",
+    "malformed/overflowing cursor input safely resets",
+    "event cleanup/reconnection never advances an invalid arrival cursor",
+    "arrival overflow returns a complete bounded reset",
+    "cleanup health failure closes verification despite a previous good cache",
+    "both new SECURITY DEFINER routines have the required postgres owner",
+    "only the restricted runtime bridge is callable"
+  ],
+  "fixtureRecords": 1200,
+  "legacyFullRecords": 1000,
+  "sizes": {
+    "legacyDatabase": {
+      "json": 563802,
+      "gzip": 14739
+    },
+    "legacyBrowser": {
+      "json": 58902,
+      "gzip": 2541
+    },
+    "reset": {
+      "json": 67979,
+      "gzip": 5174
+    },
+    "unchanged": {
+      "json": 155,
+      "gzip": 141
+    },
+    "oneArrival": {
+      "json": 12444,
+      "gzip": 3482
+    },
+    "knownRequestBytes": 3299
+  }
+}

@@ -1,6 +1,6 @@
 # Handoff: The Words of Mother's Love
 
-**Current update, 2026-10-12.** Vercel lists production READY at `29da0dd7aa1c5497765809696c2d40c8cb8abd09`, deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy` (PR #38); this is also verified `origin/main`. PRs #35 to #38 have shipped CPU, conditional-read and weak-validator work. Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft and is not live. Anthony authorized publishing, testing and release after safety gates pass.
+**Current update, 2026-10-12.** Vercel lists production READY at `29da0dd7aa1c5497765809692c7d40c8cb8abd09`, deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy` (PR #38); this is also verified `origin/main`. PRs #35 to #38 have shipped CPU, conditional-read and weak-validator work. Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft and is not live. Anthony authorized publishing, testing and release after safety gates pass.
 
 The PR #30 source `3f923b3ae6ce70328234b965334dfffb800e139b` is integrated in `/workspace/mothers-love-integration` on `fix/tv-display-efficiency-integration`, based on `29da0dd`. The branch is published and draft PR [#39](https://github.com/lovelaceaml-hub/mothers-love/pull/39) is open. Vercel preview `dpl_6qeqJ7F4TZ3jWrv4YkZJSLQakSkk` for commit `c0011fa` is READY; `/display` returned 200. The preview has no database environment variables and is not functional database-preview evidence. The display migration is numbered `020_display_delta.sql` because main already uses 019 for reaction batching. The 020 index is prepared separately with `CREATE INDEX CONCURRENTLY`; existing routines are not replaced. No production SQL has run.
 
@@ -70,3 +70,14 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 - No real recognition, submitted name or other personal data in Git, fixtures, screenshots or logs. Tests use fictional records only.
 - `/display` and its eleven screens stay the TV view. The 3D world becomes its own surface and never enters the TV playlist (Plan 28).
 - Nothing written for Anthony contains an em or en dash.
+
+Independent fresh-environment validation on 2026-10-12 reproduced the exact-base
+failures and found no new integration unit failure; all 14 selected local browser
+checks pass. Full counts, timeout diagnostics and retained release gates are in
+[PR 39 validation](PR39-VALIDATION.md). No release or production SQL occurred.
+
+The authorized PR 39 evidence update corrects the world-arrival fetch mock to
+include Headers, preserving all assertions. The corrected complete unit run
+passes 967 tests with seven skips and zero failures using default timeouts.
+The exact-base comparison and bounded raw evidence are retained in the validation
+record. Recovery and functional hosted-preview gates still pause production.

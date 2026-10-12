@@ -1,6 +1,6 @@
 # Plan 31: Display efficiency
 
-Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809696c2d40c8cb8abd09`. The branch is published and draft PR #39 is open. Vercel preview `dpl_6qeqJ7F4TZ3jWrv4YkZJSLQakSkk` for commit `c0011fa` is READY and `/display` returned 200; it has no database environment variables, so this is an HTTP/UI smoke check rather than functional database-preview evidence. Vercel reports production READY at the base SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. The database recovery and safe functional-preview gates remain open.
+Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809692c7d40c8cb8abd09`. The branch is published and draft PR #39 is open. Vercel preview `dpl_6qeqJ7F4TZ3jWrv4YkZJSLQakSkk` for commit `c0011fa` is READY and `/display` returned 200; it has no database environment variables, so this is an HTTP/UI smoke check rather than functional database-preview evidence. Vercel reports production READY at the base SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. The database recovery and safe functional-preview gates remain open.
 
 Anthony authorized these improvements while keeping arrivals live at approximately five seconds and staying on Supabase Free. Existing submissions normally stay unchanged. Settings, moderation, expiry, quiet mode, presentation and cleanup safety still require verification.
 
@@ -97,7 +97,7 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
   decision. Details: [release attempt](runs/2026-10-10-pr-remediation/INDEX.md#authorized-release-attempt-2026-10-12).
 
 - **2026-10-12, current-main integration and isolated verification.** Verified
-  `origin/main` and production at `29da0dd7aa1c5497765809696c2d40c8cb8abd09`
+  `origin/main` and production at `29da0dd7aa1c5497765809692c7d40c8cb8abd09`
   (PR #38, READY deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Integrated
   PR #30 source `3f923b3ae6ce70328234b965334dfffb800e139b` locally on
   `fix/tv-display-efficiency-integration`; local integration commit `b315ab8`
@@ -148,34 +148,17 @@ scheduled database backup, restore point, or PITR. Repository manifests and
 the Mother’s Love Drive project folder contain source/evidence snapshots, not
 a current database dump. Drive also has a general church-data archive with
 encrypted JSON/SQLite files, but no metadata ties it to this Supabase project;
-its encrypted contents were not opened. Before DDL, Anthony should make a
-fresh logical dump of `public` and `mothers_love` with the Supabase CLI, encrypt
-it outside Git, keep the key separately, record SHA-256, and rehearse restoring
-it into an isolated PostgreSQL/Supabase instance. The migration can add one
-`color_polish_weekly_focus` row on the first read of a new week; no recognition
-or reaction rows are edited by the migration itself.
-
-Proposed backup run, from an authorized Mac and a temporary linked Supabase
-CLI directory (the CLI may prompt for access; do not put tokens or database
-URLs in shell history):
-
-```sh
-umask 077
-mkdir -p "$BACKUP_DIR"
-supabase db dump --linked --schema public,mothers_love --file "$BACKUP_DIR/schema.sql"
-supabase db dump --linked --data-only --schema public,mothers_love --file "$BACKUP_DIR/data.sql"
-shasum -a 256 "$BACKUP_DIR/schema.sql" "$BACKUP_DIR/data.sql" > "$BACKUP_DIR/SHA256SUMS"
-```
-
-Keep the plaintext only on an encrypted local volume. Encrypt the three files
-into one archive with the approved local encryption tool, store its key in
-macOS Keychain, verify the encrypted archive's checksum after upload to an
-owner-only Drive folder, then remove the plaintext. Restore the archive into a
-disposable PostgreSQL/Supabase instance and verify schema objects, ownership,
-grants, and row counts without printing personal rows. Supabase's logical dump
-does not include storage objects; this migration changes no storage objects.
-See the [Supabase backup guidance](https://supabase.com/docs/guides/platform/backups)
-and [CLI dump reference](https://supabase.com/docs/reference/cli/supabase-db-dump).
+its encrypted contents were not opened. Before DDL, the proposed app-only encrypted backup and local restore still need
+Anthony's approval. Do not run the former `public,mothers_love` data dump: it
+would include unrelated public-schema data. Export only the reviewed
+`mothers_love` object/data allowlist and exact app-owned `public.ml_*` bridge
+definitions/ACLs, with no public table data or global role secrets. Use an
+encrypted Mac volume for plaintext and the restored database, and a separately
+keyed `age` archive for storage. The complete scope, encryption, local restore,
+retention and hosted-preview permissions are in
+[PR 39 preview and recovery design](PR39-PREVIEW-RECOVERY.md). No backup or
+production restore has been performed. This app-only backup does not cover
+other apps, Supabase Auth identities or Storage objects.
 
 The Vercel project has no safe preview database or preview environment
 variables. The existing source-branch guard applies to
@@ -183,3 +166,14 @@ variables. The existing source-branch guard applies to
 Use the authorized integration branch preview only for synthetic/local API
 mock checks until a safe preview database is available. Do not apply live SQL
 or merge/deploy the app before the backup/restore and preview gates pass.
+
+Independent fresh-environment validation on 2026-10-12 reproduced the exact-base
+failures and found no new integration unit failure; all 14 selected local browser
+checks pass. Full counts, timeout diagnostics and retained release gates are in
+[PR 39 validation](PR39-VALIDATION.md). No release or production SQL occurred.
+
+The authorized PR 39 evidence update corrects the world-arrival fetch mock to
+include Headers, preserving all assertions. The corrected complete unit run
+passes 967 tests with seven skips and zero failures using default timeouts.
+The exact-base comparison and bounded raw evidence are retained in the validation
+record. Recovery and functional hosted-preview gates still pause production.

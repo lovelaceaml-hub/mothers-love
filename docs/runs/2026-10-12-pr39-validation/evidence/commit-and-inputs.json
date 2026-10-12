@@ -1,0 +1,10 @@
+{
+  "base": "29da0dd7aa1c5497765809692c7d40c8cb8abd09",
+  "integration": "6ff5acfe76511ef57b716b1709df4820207f0b8c",
+  "lockfile_sha256": "f3a39b29c7823f472cfe173f549eeccd18909f6af401c63ce3776fa863b566ff",
+  "tested_migration_sha256": "4fbd2473d19a5804e9d53356bfde5163979dcd8af9e2c6f3a8d5635a1b49079a",
+  "comment_only_migration_sha256": "e1da5c647be17d7479fb5dc499f04ef52001377a561bef0637609cb688e1cf87",
+  "migration_executable_body_unchanged": true,
+  "base_main_checkout_untouched": true,
+  "postgres_image": "sha256:275447c94b11b151decd1f29877965301d5a77032037c46de93d990f739f00a9 [postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d]"
+}
