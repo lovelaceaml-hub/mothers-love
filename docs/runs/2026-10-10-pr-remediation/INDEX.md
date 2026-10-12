@@ -121,8 +121,12 @@ but does not substitute for those missing gates. Hosted preview and physical-TV
 evidence remain absent.
 
 No live migration, main push, PR merge, preview enabling or production
-deployment was performed. The reviewed remediation and these updated records
-are prepared for a normal fast-forward push to PR #30's existing
-`feat/tv-display-efficiency` branch, with the disabled-preview guard unchanged.
+deployment was performed. The reviewed remediation and updated records
+were published by a normal fast-forward push to PR #30's existing
+`feat/tv-display-efficiency` branch at
+`2ae3d08b5bbcb8ae84dcd6ec4d28466319e2a26a`, with the disabled-preview guard
+unchanged. GitHub confirmed that head and reported no checks on the new head;
+the old head's successful checks are not fresh verification. Publication is
+also recorded in [the PR comment](https://github.com/lovelaceaml-hub/mothers-love/pull/30#issuecomment-6117736804).
 Publishing that branch is not a release and must not erase the newer work on
 main. PR #30 stays draft until integration and safety gates are satisfied.

@@ -2,7 +2,7 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-Production was verified on 2026-10-12 at commit `d0ed4e1`, Vercel deployment `dpl_BcAqXnqEmr4ZPwjNc47njN5MsBoi` (READY). Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft and is not live. Its reviewed remediation is prepared for publication, but newer main integration, approved migration-ledger access and safe hosted preview evidence still block release. See [docs/HANDOFF.md](docs/HANDOFF.md).
+Production was verified on 2026-10-12 at commit `d0ed4e1`, Vercel deployment `dpl_BcAqXnqEmr4ZPwjNc47njN5MsBoi` (READY). Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) remains a draft and is not live. Its reviewed remediation has been published, but newer main integration, approved migration-ledger access and safe hosted preview evidence still block release. See [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Quick links
 
