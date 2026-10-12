@@ -242,4 +242,23 @@ describe("GET /api/display/color-polish", () => {
     await GET(request("/api/display/color-polish", controller.signal));
     expect(admitPublicDisplayRequest).toHaveBeenCalledTimes(1);
   });
+
+  it("returns an opt-in unchanged verification without records and preserves no-store", async () => {
+    const cacheCursor = `v2:${"a".repeat(32)}:1789063200:12.1789063200`;
+    const data = { ok: true, serverTime: projected.serverTime, cacheCursor, unchanged: true };
+    queryColorPolishSnapshot.mockResolvedValue({ data, error: null });
+    const response = await GET(request(`/api/display/color-polish?sync=2&after=${cacheCursor}&known=${"b".repeat(32)}`));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(data);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(queryColorPolishSnapshot).toHaveBeenCalledWith(cacheCursor, expect.any(AbortSignal), ["b".repeat(32)]);
+    expect(projectColorPolishSnapshot).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized, duplicate and malformed cache manifests before opening a database read", async () => {
+    for (const known of ["bad", `${"a".repeat(32)}.${"a".repeat(32)}`, "a".repeat(3300)]) {
+      expect((await GET(request(`/api/display/color-polish?sync=2&known=${known}`))).status).toBe(400);
+    }
+    expect(queryColorPolishSnapshot).not.toHaveBeenCalled();
+  });
 });

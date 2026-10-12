@@ -18,6 +18,8 @@ export function getPublicDisplayClient(): Sql | null {
   const client = postgres(config.databaseUrl, {
     max: 1,
     prepare: false,
+    // These read bridges use JSONB; nested arrays are parsed by JSON.parse.
+    fetch_types: false,
     idle_timeout: 20,
     connect_timeout: 10,
     ssl: config.databaseSsl,

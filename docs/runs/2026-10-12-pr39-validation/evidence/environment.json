@@ -1,0 +1,9 @@
+{
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "workers": 2,
+  "TZ": "UTC",
+  "CI": "1",
+  "credential_variables_removed": true
+}

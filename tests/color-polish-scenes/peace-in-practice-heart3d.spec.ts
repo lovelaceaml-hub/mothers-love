@@ -23,7 +23,10 @@ import { buildActiveDisplayFixture, loadRenderer, withoutWebGL2 } from './helper
 // The default test browser has no WebGL 2 at all (which is why the rest of the
 // suite sees the Canvas 2D heart). This file asks for the software renderer,
 // which is also a fair stand in for a display with no graphics acceleration.
-test.use({ launchOptions: { args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] } });
+test.use({ launchOptions: {
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+  args: ['--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+} });
 
 const record = (n: number) => ({
   id: `pip3d-${n}`,

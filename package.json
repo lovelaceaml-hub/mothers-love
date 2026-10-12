@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "check:display-efficiency": "node scripts/check-display-efficiency.mjs",
     "lint": "eslint .",
     "board": "node scripts/render-board.mjs"
   },

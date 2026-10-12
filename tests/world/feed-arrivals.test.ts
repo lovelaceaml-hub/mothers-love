@@ -65,6 +65,7 @@ async function mountFeed(source: WorldSource = "live"): Promise<Harness> {
       return {
         ok: next.status >= 200 && next.status < 300,
         status: next.status,
+        headers: new Headers(),
         json: async () => structuredClone(next.payload),
       };
     }),

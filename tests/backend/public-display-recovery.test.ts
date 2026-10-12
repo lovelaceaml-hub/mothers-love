@@ -56,6 +56,7 @@ describe("public display client recovery", () => {
     expect(postgres).toHaveBeenCalledWith(config.databaseUrl, {
       max: 1,
       prepare: false,
+      fetch_types: false,
       idle_timeout: 20,
       connect_timeout: 10,
       ssl: config.databaseSsl,
@@ -77,7 +78,7 @@ describe("public display client recovery", () => {
     expect(first.end).toHaveBeenCalledTimes(1);
     expect(first.end).toHaveBeenCalledWith({ timeout: 0 });
 
-    await expect(queryPublicDisplaySnapshot(null)).resolves.toEqual({ data: { ok: true, generation: 2 }, error: null });
+    await expect(queryPublicDisplaySnapshot(null)).resolves.toEqual({ data: { ok: true, generation: 2 }, error: null, etag: null });
     expect(postgres).toHaveBeenCalledTimes(2);
   });
 
@@ -94,8 +95,8 @@ describe("public display client recovery", () => {
     const secondRead = queryPublicDisplaySnapshot("12.1");
     await vi.advanceTimersByTimeAsync(8_000);
     await expect(Promise.all([firstRead, secondRead])).resolves.toEqual([
-      { data: null, error: expect.objectContaining({ message: "DATABASE_TIMEOUT" }) },
-      { data: null, error: expect.objectContaining({ message: "DATABASE_TIMEOUT" }) },
+      { data: null, error: expect.objectContaining({ message: "DATABASE_TIMEOUT" }), etag: null },
+      { data: null, error: expect.objectContaining({ message: "DATABASE_TIMEOUT" }), etag: null },
     ]);
     expect(first.end).toHaveBeenCalledTimes(1);
 
@@ -111,7 +112,7 @@ describe("public display client recovery", () => {
     postgres.mockReturnValueOnce(successful).mockReturnValueOnce(failed);
     const { queryPublicDisplaySnapshot, retirePublicDisplayClient } = await loadModules();
 
-    await expect(queryPublicDisplaySnapshot(null)).resolves.toEqual({ data: { ok: true }, error: null });
+    await expect(queryPublicDisplaySnapshot(null)).resolves.toEqual({ data: { ok: true }, error: null, etag: null });
     expect(vi.getTimerCount()).toBe(0);
     retirePublicDisplayClient(successful as never);
     await expect(queryPublicDisplaySnapshot(null)).resolves.toMatchObject({ data: null, error: { message: "synthetic failure" } });

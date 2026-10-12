@@ -1,7 +1,7 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { buildActiveDisplayFixture, fulfillJson, mockCommon, signInAs } from './helpers';
+import { buildActiveDisplayFixture, fulfillJson, mockCommon, readyStudioFrame, signInAs } from './helpers';
 
 // Plan 17 Lane 13: the eleventh screen, slug live-feed, renderer id 12.
 // Fictional sample data only. The direct renderer tests serve every file from this
@@ -653,12 +653,7 @@ test('Studio lists Live Recognitions and previews it with fictional sample conte
   expect(options).toHaveLength(11);
   expect(options[10]).toEqual({ value: 'live-feed', label: 'Live Recognitions' });
   await selector.selectOption('live-feed');
-  await expect.poll(() => page.frames().some((f) => f.url().endsWith('/color-polish/renderer.html'))).toBe(true);
-  const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'))!;
-  await until(frame, (id) => {
-    const state = (window as any).colorPolishRuntime?.getState();
-    return state?.mode === 'normal' && state.scene === id;
-  }, LIVE_FEED);
+  const frame = await readyStudioFrame(page, LIVE_FEED);
   await expect(frame.locator('.lf-panel .chat-item').first()).toBeVisible();
   await expect(page.getByText(/Live Recognitions scene, \d+ of 60 seconds/)).toBeVisible();
   // A click in the Studio preview never advances the scene.

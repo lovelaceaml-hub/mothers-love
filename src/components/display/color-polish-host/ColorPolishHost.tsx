@@ -10,10 +10,10 @@ import {
   type ColorPolishScene,
   type ColorPolishSnapshot,
 } from '@/lib/color-polish/contracts';
-import { validateColorPolishHeartbeat, validateColorPolishSnapshot } from '@/lib/color-polish/validation';
-import type { DisplayMode } from '@/lib/contracts';
-import { matchesDisplaySnapshotEtag, parseDisplaySnapshotEtag } from '@/lib/display/snapshot-heartbeat';
+import { DisplayRecordCache } from '@/lib/color-polish/display-cache';
 import { startVisiblePoll } from '@/lib/visible-poll';
+import type { DisplayMode } from '@/lib/contracts';
+import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 
 // Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
 // rather than the full recognition list. Never slow down delivery to save bandwidth.
@@ -215,8 +215,7 @@ export function ColorPolishHost() {
   const [lastMode, setLastMode] = useState<DisplayMode | null>(null);
   const snapshotRef = useRef<ColorPolishSnapshot | null>(null);
   const phaseRef = useRef<HostPhase>('checking');
-  const cursorRef = useRef<string | null>(null);
-  const snapshotHashRef = useRef<string | null>(null);
+  const cacheRef = useRef(new DisplayRecordCache());
   const requestGenerationRef = useRef(0);
   const reactionGenerationRef = useRef(0);
   const controllerRef = useRef<AbortController | null>(null);
@@ -228,11 +227,10 @@ export function ColorPolishHost() {
   // cover the latest 100 recognitions the snapshot carries.
   const [reactionTotal, setReactionTotal] = useState<number | null>(null);
   const lastLikesTotalRequestAtRef = useRef<number | null>(null);
-  const forceLikesTotalRequestRef = useRef(false);
 
   const markUnsafe = (nextPhase: HostPhase) => {
+    cacheRef.current.clear();
     snapshotRef.current = null;
-    snapshotHashRef.current = null;
     setSnapshot(null);
     phaseRef.current = nextPhase;
     setPhase(nextPhase);
@@ -244,7 +242,9 @@ export function ColorPolishHost() {
 
   useEffect(() => {
     let mounted = true;
+    const cache = cacheRef.current;
     const load = async () => {
+      if (document.hidden) return;
       // A poll already in flight is left alone so a healthy but slow read can
       // finish; the next scheduled tick simply waits its turn instead of
       // aborting good progress in favor of a fresh attempt. The aborted check
@@ -259,63 +259,35 @@ export function ColorPolishHost() {
       const controller = new AbortController();
       controllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-      const after = cursorRef.current;
       const requestStartedAt = performanceNow();
       const phaseMayShowLikes = phaseRef.current === 'checking' || phaseRef.current === 'active';
       const previousLikesRequestAt = lastLikesTotalRequestAtRef.current;
       const includeLikesTotal = phaseMayShowLikes && (
-        forceLikesTotalRequestRef.current ||
-        previousLikesRequestAt === null ||
-        requestStartedAt - previousLikesRequestAt >= LIKES_TOTAL_REFRESH_MS
+        previousLikesRequestAt === null || requestStartedAt - previousLikesRequestAt >= LIKES_TOTAL_REFRESH_MS
       );
       if (includeLikesTotal) {
-        forceLikesTotalRequestRef.current = false;
         lastLikesTotalRequestAtRef.current = requestStartedAt;
       }
       try {
-        const query = new URLSearchParams();
-        if (after) query.set('after', after);
-        if (includeLikesTotal) query.set('includeLikesTotal', '1');
-        const queryString = query.toString();
-        const path = queryString ? `/api/display/color-polish?${queryString}` : '/api/display/color-polish';
+        const path = cache.path(includeLikesTotal);
         // Keep the Vercel test-preview access cookie for the public snapshot read.
-        const headers: Record<string, string> = { accept: 'application/json' };
-        if (snapshotRef.current && snapshotHashRef.current)
-          headers['If-None-Match'] = `"${snapshotHashRef.current}"`;
-        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers, signal: controller.signal });
+        const response = await fetch(path, { method: 'GET', cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' }, signal: controller.signal });
         if (!response.ok) throw new Error(`SNAPSHOT_${response.status}`);
-        const payload: unknown = await response.json();
-        if (!mounted || generation !== requestGenerationRef.current) return;
-        const heartbeat = validateColorPolishHeartbeat(payload);
-        if (heartbeat) {
-          if (!snapshotRef.current || !snapshotHashRef.current) throw new Error('MISSING_SNAPSHOT');
-          if (!matchesDisplaySnapshotEtag(response.headers.get('etag'), snapshotHashRef.current))
-            throw new Error('HEARTBEAT_ETAG_MISMATCH');
-          if (includeLikesTotal && phaseRef.current === 'active') {
-            const total = readLikesTotal(response);
-            if (total !== null) setReactionTotal(total);
-          }
-          const serverMs = Date.parse(heartbeat.serverTime);
-          const receivedPerformanceMs = performanceNow();
-          clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
-          monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
-          lastVerifiedRef.current = receivedPerformanceMs;
-          return;
-        }
-        const next = validateColorPolishSnapshot(payload);
+        const body: unknown = await response.json();
+        if (!mounted || generation !== requestGenerationRef.current || controller.signal.aborted) return;
+        const next = cache.accept(body);
         if (!next) throw new Error('INVALID_SNAPSHOT');
+        if (!mounted || generation !== requestGenerationRef.current) return;
         if (snapshotRef.current && next.revision < snapshotRef.current.revision) return;
         const serverMs = Date.parse(next.serverTime);
         const receivedPerformanceMs = performanceNow();
         clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
         monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
-        cursorRef.current = next.cursor;
-        snapshotHashRef.current = parseDisplaySnapshotEtag(response.headers.get('etag'));
         lastVerifiedRef.current = receivedPerformanceMs;
         setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {
+          cache.clear();
           snapshotRef.current = null;
-          snapshotHashRef.current = null;
           setSnapshot(null);
           phaseRef.current = next.settings.mode;
           setPhase(next.settings.mode);
@@ -342,7 +314,7 @@ export function ColorPolishHost() {
       } catch {
         if (!mounted || generation !== requestGenerationRef.current) return;
         if (!snapshotRef.current) {
-          snapshotHashRef.current = null;
+          cache.clear();
           phaseRef.current = 'unavailable';
           setPhase('unavailable');
         }
@@ -353,7 +325,6 @@ export function ColorPolishHost() {
     };
 
     const stopPolling = startVisiblePoll(() => void load(), POLL_MS, () => {
-      forceLikesTotalRequestRef.current = true;
       const verifiedAt = lastVerifiedRef.current;
       if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) markUnsafe('unavailable');
     });
@@ -362,6 +333,7 @@ export function ColorPolishHost() {
       ++requestGenerationRef.current;
       controllerRef.current?.abort();
       stopPolling();
+      cache.clear();
     };
   }, []);
 
@@ -372,7 +344,6 @@ export function ColorPolishHost() {
       setNowMs(next);
       const verifiedAt = lastVerifiedRef.current;
       if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) {
-        cursorRef.current = null;
         markUnsafe('unavailable');
       }
     };
@@ -435,28 +406,34 @@ export function ColorPolishHost() {
   useEffect(() => {
     const ids = reactionSignature ? reactionSignature.split('\u001f') : [];
     const generation = ++reactionGenerationRef.current;
-    const controller = new AbortController();
+    let controller: AbortController | null = null;
     if (!ids.length) {
       setReactionCounts({});
-      return () => controller.abort();
+      return undefined;
     }
     const load = async () => {
-      if (document.hidden) return;
+      if (document.hidden || controller) return;
+      const current = new AbortController();
+      controller = current;
+      const timeout = window.setTimeout(() => current.abort(), REQUEST_TIMEOUT_MS);
       try {
-        const chunks = Array.from({ length: Math.ceil(ids.length / 30) }, (_, index) => ids.slice(index * 30, index * 30 + 30));
-        const responses = await Promise.all(chunks.map((chunk) => fetchReactionCounts(chunk, controller.signal)));
-        if (generation !== reactionGenerationRef.current) return;
+        const chunks = Array.from({ length: Math.ceil(ids.length / MAX_REACTION_BATCH_SIZE) }, (_, index) => ids.slice(index * MAX_REACTION_BATCH_SIZE, (index + 1) * MAX_REACTION_BATCH_SIZE));
+        const responses = await Promise.all(chunks.map((chunk) => fetchReactionCounts(chunk, current.signal)));
+        if (current.signal.aborted || generation !== reactionGenerationRef.current) return;
         const next: Record<string, number> = {};
         for (const response of responses) for (const [id, item] of response) next[id] = item.count;
         setReactionCounts(next);
       } catch {
-        if (generation === reactionGenerationRef.current) setReactionCounts({});
+        if (!current.signal.aborted && generation === reactionGenerationRef.current) setReactionCounts({});
+      } finally {
+        window.clearTimeout(timeout);
+        if (controller === current) controller = null;
       }
     };
     void load();
     const visible = () => { if (!document.hidden) void load(); };
     document.addEventListener('visibilitychange', visible);
-    return () => { controller.abort(); document.removeEventListener('visibilitychange', visible); };
+    return () => { controller?.abort(); document.removeEventListener('visibilitychange', visible); };
   }, [reactionSignature]);
 
   if (phase === 'active' && snapshot) {
@@ -482,7 +459,7 @@ export function ColorPolishHost() {
       </div>
     );
   }
-  if (phase === 'disabled' && snapshot) return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience /></div>;
+  if (phase === 'disabled' && snapshot) return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience verifiedSnapshot={snapshot} verifiedNowMs={nowMs} /></div>;
   if (phase === 'unavailable' && lastMode !== 'quiet' && lastMode !== 'neutral') {
     return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience /></div>;
   }
