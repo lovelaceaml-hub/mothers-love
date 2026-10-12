@@ -306,6 +306,9 @@ test('visible TV polls stop in a hidden tab and refresh immediately when shown a
   let likesHeaderSent = 0;
   const likesHeadersReceived: string[] = [];
   const etag = `"${'a'.repeat(32)}"`;
+  const responseEtag = `W/${etag}`;
+  const sentValidators: string[] = [];
+  let heartbeatResponses = 0;
   page.on('response', response => {
     if (new URL(response.url()).pathname === '/api/display/color-polish') {
       const value = response.headers()['x-likes-total'];
@@ -330,18 +333,24 @@ test('visible TV polls stop in a hidden tab and refresh immediately when shown a
       likesTotal += 1;
       likesHeaderSent = likesTotal;
     }
-    const unchanged = route.request().headers()['if-none-match'] === etag;
+    const requestEtag = route.request().headers()['if-none-match'] ?? '';
+    sentValidators.push(requestEtag);
+    const unchanged = requestEtag === etag;
+    if (unchanged) heartbeatResponses += 1;
     const body = unchanged ? { unchanged: true, serverTime: '2026-09-10T18:00:05.000Z' } : fixture;
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      headers: { ETag: etag, ...(includeTotal ? { 'X-Likes-Total': String(likesTotal) } : {}) },
+      headers: { ETag: responseEtag, ...(includeTotal ? { 'X-Likes-Total': String(likesTotal) } : {}) },
       body: JSON.stringify(body),
     });
   });
 
   await page.goto('/display');
   await expect(page.locator('[data-display-phase="active"]')).toBeVisible();
+  await expect.poll(() => sentValidators.includes(etag), { timeout: 12_000 }).toBe(true);
+  await expect.poll(() => heartbeatResponses, { timeout: 12_000 }).toBeGreaterThan(0);
+  expect(sentValidators[0]).toBe('');
   const renderer = await findRendererFrame(page);
   await expect.poll(() => likesTotalIncludedRequests).toBeGreaterThan(0);
   await expect.poll(() => likesHeadersReceived.length).toBeGreaterThan(0);

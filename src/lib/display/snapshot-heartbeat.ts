@@ -12,5 +12,9 @@ export function projectDisplaySnapshotHeartbeat(value: unknown): DisplaySnapshot
 }
 
 export function parseDisplaySnapshotEtag(value: string | null): string | null {
-  return /^"([a-f0-9]{32})"$/.exec(value ?? "")?.[1] ?? null;
+  return /^(?:W\/)?"([a-f0-9]{32})"$/.exec(value ?? "")?.[1] ?? null;
+}
+
+export function matchesDisplaySnapshotEtag(value: string | null, expected: string | null): boolean {
+  return expected !== null && /^[a-f0-9]{32}$/.test(expected) && parseDisplaySnapshotEtag(value) === expected;
 }
