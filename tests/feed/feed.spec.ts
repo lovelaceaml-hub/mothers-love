@@ -74,7 +74,7 @@ test('shows the campaign home with safe feed cards and public navigation', async
 });
 
 test('replaces the feed on polling and removes old messages on an error', async ({ page }) => {
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   const responses = [
     snapshot([item({ id: 'first', recipient: 'First R.' })]),
     snapshot([item({ id: 'second', recipient: 'Second R.', firstPublishedAt: '2030-01-01T12:00:00.000Z' })]),
@@ -100,8 +100,8 @@ test('replaces the feed on polling and removes old messages on an error', async 
   await expect(page.getByText('Second R.')).toHaveCount(0);
 });
 
-test('clears personal content while hidden and rechecks immediately on return', async ({ page }) => {
-  await page.clock.install();
+test('clears personal content while hidden and rechecks on the next eligible fast read', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   let requestCount = 0;
   let returnFresh = false;
   await routeReactions(page);
@@ -111,6 +111,7 @@ test('clears personal content while hidden and rechecks immediately on return', 
   });
 
   await page.goto('/');
+  await page.clock.runFor(0);
   await expect(page.getByText('Hidden R.')).toBeVisible();
   returnFresh = true;
   await page.evaluate(() => {
@@ -124,12 +125,13 @@ test('clears personal content while hidden and rechecks immediately on return', 
     Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
     document.dispatchEvent(new Event('visibilitychange'));
   });
+  await page.clock.runFor(10_000);
   await expect(page.getByText('Returned R.')).toBeVisible();
   expect(requestCount).toBeGreaterThanOrEqual(2);
 });
 
 test('uses verified server time for initial suppression and monotonic expiry', async ({ page }) => {
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   await routeReactions(page);
   await routeFeed(page, snapshot([
     item({ id: 'expired', recipient: 'Expired R.', expiresAt: '2030-01-01T11:59:59.000Z' }),
@@ -168,7 +170,7 @@ test('removes each item at its own expiry without waiting for polling', async ({
 });
 
 test('clears the feed when a request exceeds the deadline', async ({ page }) => {
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   await routeReactions(page);
   let requestStarted = false;
   await page.route('**/api/feed', async () => {
@@ -184,7 +186,7 @@ test('clears the feed when a request exceeds the deadline', async ({ page }) => 
 });
 
 test('ignores a stale response after a visibility refresh', async ({ page }) => {
-  await page.clock.install();
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   await routeReactions(page);
   let releaseFirst: (() => void) | undefined;
   const firstResponse = new Promise<void>((resolve) => { releaseFirst = resolve; });
@@ -209,6 +211,7 @@ test('ignores a stale response after a visibility refresh', async ({ page }) => 
     Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
     document.dispatchEvent(new Event('visibilitychange'));
   });
+  await page.clock.runFor(10_000);
   await expect(page.getByText('Fresh R.')).toBeVisible();
   releaseFirst?.();
   await expect(page.getByText('Stale R.')).toHaveCount(0);

@@ -113,8 +113,8 @@ export class WorldFeedStore {
     this.phase = phase;
     this.verifiedAt = -Infinity;
   }
-  view(monotonic: number): WorldFeed {
-    if (this.snapshot && monotonic - this.verifiedAt >= STALE_MS)
+  view(monotonic: number, retainPlanned = false): WorldFeed {
+    if (this.snapshot && (!retainPlanned || this.phase === "reconnecting") && monotonic - this.verifiedAt >= STALE_MS)
       this.clear("unavailable");
     this.highestTime = Math.max(
       this.highestTime,

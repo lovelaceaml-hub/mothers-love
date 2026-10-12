@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startVisiblePoll } from '@/lib/visible-poll';
 
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
+beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-10T16:00:00Z')); });
 
 describe('visible display polling', () => {
   it('keeps the five-second visible cadence, pauses hidden requests, and refreshes on return', () => {

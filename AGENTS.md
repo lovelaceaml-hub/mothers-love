@@ -11,6 +11,9 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
+  retention during planned ten-minute/overnight pauses. This overrides the planned-pause
+  freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
 - `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
   Its Build log records the release authorization and remaining safety gates.
   PR #30 is not live: integrate main after PRs #35 to #37, verify the live
@@ -85,7 +88,9 @@ Product invariants
 - Recognitions are kept forever and stay on the home page; the TV draws from the latest 100;
   browsers never see an expiry more than 7 days ahead; other personal copies keep short lifetimes.
 - Quiet, neutral and privacy overrides cancel every display mode; offline grace is 60 seconds from
-  the last successful verification.
+  the last successful verification. Plan 32 explicitly retains last verified content during planned
+  ten-minute/overnight polling pauses; genuine failures and fast-window freshness keep the 60-second
+  limit, and known expiry/received privacy overrides still apply immediately.
 
 Home page, form and admin
 - Home: the latest 100, then "Show older recognitions" adds 100 older per tap (`/api/feed/older`,

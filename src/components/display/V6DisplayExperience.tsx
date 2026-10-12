@@ -8,6 +8,7 @@ import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
 import { parseDisplaySnapshotEtag, projectDisplaySnapshotHeartbeat } from '@/lib/display/snapshot-heartbeat';
 import { startVisiblePoll } from '@/lib/visible-poll';
+import { createPollingState, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { fetchReactionCounts, type ReactionItem } from '@/components/feed/PublicFeedProvider';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 import { useDisplayChimes } from './use-display-chimes';
@@ -193,6 +194,7 @@ function useReducedMotion() {
 }
 
 function useReactionCounts(ids: string[]) {
+  const pollStateRef = useRef(createPollingState());
   const [counts, setCounts] = useState<ReadonlyMap<string, ReactionItem>>(() => new Map());
   const signature = ids.join('\u001f');
   useEffect(() => {
@@ -223,7 +225,7 @@ function useReactionCounts(ids: string[]) {
     };
     const cancelWhenHidden = () => { if (document.hidden) controller?.abort(); };
     document.addEventListener('visibilitychange', cancelWhenHidden);
-    const stopPolling = startVisiblePoll(() => void load(), 10_000);
+    const stopPolling = startVisiblePoll(() => void load(), 10_000, undefined, { state: pollStateRef.current });
     return () => {
       active = false;
       stopPolling();
@@ -982,7 +984,7 @@ function Shell({ children, snapshot, nowServerMs, nowMs, queueCount, arrival, fe
         <div><h1>{TITLE}</h1><p>{TAGLINE}</p></div>
         <div className={styles.headerRight}>
           <span className={styles.likesPill}>♡ <strong>{reactionTotal}</strong> visible hearts</span>
-          <div><strong>{formatHeaderDate(nowServerMs)}</strong><small>{stale ? 'RECONNECTING · LAST VERIFIED DATA' : 'LIVE TV DISPLAY'}</small></div>
+          <div><strong>{formatHeaderDate(nowServerMs)}</strong><small>{stale ? 'RECONNECTING · LAST VERIFIED DATA' : pollingMode(nowMs) !== 'fast' ? 'LAST VERIFIED DATA · SCHEDULED UPDATES' : 'LIVE TV DISPLAY'}</small></div>
         </div>
       </header>
       {queueCount || arrival ? <div className={styles.queueDock}><b>{queueCount}</b><span>{arrival?.grouped ? 'group on screen' : 'waiting'}</span><i /><i /><i /><i /><small>{arrival ? Math.max(0, Math.ceil((arrival.journeyMs + arrival.readingMs - (nowMs - arrival.startedAt)) / 1000)) : ''}s</small></div> : null}
@@ -1025,6 +1027,8 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
   const individualStyleRef = useRef(0);
   const groupStyleRef = useRef(0);
   const mountedAtRef = useRef(Date.now());
+  const snapshotPollStateRef = useRef(createPollingState());
+  const dailyPollStateRef = useRef(createPollingState());
 
   const acceptSnapshot = useCallback((next: DisplaySnapshot, etag?: string | null) => {
     const receivedAt = Date.now();
@@ -1061,7 +1065,8 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
     if (document.visibilityState === 'hidden' || (controllerRef.current && !controllerRef.current.signal.aborted)) return;
     const controller = new AbortController();
     controllerRef.current = controller;
-    const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
+    let timedOut = false;
+    const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, SNAPSHOT_TIMEOUT_MS);
     try {
       const path = cursorRef.current ? `/api/display/snapshot?after=${encodeURIComponent(cursorRef.current)}` : '/api/display/snapshot';
       const headers: Record<string, string> = { accept: 'application/json' };
@@ -1090,7 +1095,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
       }
       acceptSnapshot(payload as DisplaySnapshot, responseTag);
     } catch {
-      if (!controller.signal.aborted) setStale(true);
+      if (timedOut || !controller.signal.aborted) setStale(true);
     } finally {
       window.clearTimeout(timeout);
       if (controllerRef.current === controller) controllerRef.current = null;
@@ -1116,8 +1121,8 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
 
   const hasVerifiedSnapshot = verifiedSnapshot !== undefined;
   useEffect(() => {
-    const stopSnapshots = hasVerifiedSnapshot ? () => {} : startVisiblePoll(() => void loadSnapshot(), SNAPSHOT_POLL_MS);
-    const stopDaily = startVisiblePoll(() => void loadDailyAggregates(), 30_000);
+    const stopSnapshots = hasVerifiedSnapshot ? () => {} : startVisiblePoll(() => void loadSnapshot(), SNAPSHOT_POLL_MS, undefined, { state: snapshotPollStateRef.current });
+    const stopDaily = startVisiblePoll(() => void loadDailyAggregates(), 30_000, undefined, { state: dailyPollStateRef.current });
     const cancelWhenHidden = () => {
       if (document.hidden) {
         controllerRef.current?.abort();
@@ -1130,7 +1135,9 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
       stopDaily();
       document.removeEventListener('visibilitychange', cancelWhenHidden);
       controllerRef.current?.abort();
+      if (dailyControllerRef.current) dailyPollStateRef.current = createPollingState();
       dailyControllerRef.current?.abort();
+      if (!snapshotRef.current) snapshotPollStateRef.current = createPollingState();
     };
   }, [hasVerifiedSnapshot, loadDailyAggregates, loadSnapshot]);
 
@@ -1141,8 +1148,8 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
 
   useEffect(() => {
     const reference = lastVerifiedAt ?? mountedAtRef.current;
-    if (nowMs - reference >= STALE_HIDE_MS) setUnavailable(true);
-  }, [lastVerifiedAt, nowMs]);
+    if (snapshotFreshnessRequired(stale, nowMs) && nowMs - reference >= STALE_HIDE_MS) setUnavailable(true);
+  }, [lastVerifiedAt, nowMs, stale]);
 
   const nowServerMs = verifiedNowMs ?? nowMs + serverOffsetMs;
   const allRecords = useMemo(() => eligibleRecognitions(snapshot, nowServerMs), [snapshot, nowServerMs]);

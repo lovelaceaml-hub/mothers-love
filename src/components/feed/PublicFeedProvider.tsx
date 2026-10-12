@@ -12,6 +12,8 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
+import { startVisiblePoll } from '@/lib/visible-poll';
+import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 
 import {
@@ -51,7 +53,7 @@ type ReactionRequestError = Error & {
   retryAfterMs?: number;
 };
 
-export type PublicFeedStatus = 'loading' | 'ready' | 'empty' | 'error' | 'hidden';
+export type PublicFeedStatus = 'loading' | 'ready' | 'empty' | 'error' | 'hidden' | 'scheduled';
 
 // 'idle' means another older page may exist; 'end' means none is left; 'limit'
 // means the page holds as many older pages as it keeps refreshed.
@@ -258,6 +260,9 @@ function FeedState({ compact = false }: { compact?: boolean }) {
     );
   }
 
+  if (status === 'scheduled') {
+    return <div className={compact ? styles.companionState : styles.stateCard} aria-live="polite"><h2>Recognitions refresh on a schedule</h2><button type="button" onClick={retry}>Refresh now</button></div>;
+  }
   if (status === 'error') {
     return (
       <div className={compact ? styles.companionState : styles.stateCard} role="alert">
@@ -305,6 +310,15 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const feedEtagRef = useRef<string | null>(null);
   const feedControllerRef = useRef<AbortController | null>(null);
   const feedDeadlineRef = useRef<number | null>(null);
+  const snapshotWallTimesRef = useRef(new WeakMap<VerifiedFeedSnapshot, { wallMs: number; elapsedMs: number }>());
+  const staleTimerRef = useRef<number | null>(null);
+  const lastVerifiedAtRef = useRef<number | null>(null);
+  const pollStateRef = useRef(createPollingState());
+  const pollPathRef = useRef(pathname);
+  const reactionPollStateRef = useRef(createPollingState());
+  const olderPollStateRef = useRef(createPollingState());
+  const deferredReactionReadRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deferredOlderReadRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expiryTimerRef = useRef<SafeTimerHandle | null>(null);
   const reactionSerialRef = useRef(0);
   const reactionReadRequestsRef = useRef(new Map<number, { controller: AbortController; generation: number; ids: string[] }>());
@@ -340,6 +354,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearReactions = useCallback(() => {
+    if (deferredReactionReadRef.current !== null) clearTimeout(deferredReactionReadRef.current);
+    deferredReactionReadRef.current = null;
     reactionReadRequestsRef.current.forEach(({ controller }) => controller.abort());
     reactionReadRequestsRef.current.clear();
     reactionReadOwnersRef.current.clear();
@@ -376,12 +392,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     ));
   }, [commitReactions]);
 
+  const snapshotClock = useCallback((value: VerifiedFeedSnapshot) => {
+    const clock = snapshotWallTimesRef.current.get(value);
+    const elapsed = Math.max(clock?.elapsedMs ?? 0, monotonicNow() - value.verifiedMonotonicMs, clock === undefined ? 0 : Date.now() - clock.wallMs);
+    if (clock) clock.elapsedMs = elapsed;
+    return value.verifiedMonotonicMs + elapsed;
+  }, []);
+
   // Every item on screen: the live list, then any older pages beneath it.
   const currentItems = useCallback((candidate: VerifiedFeedSnapshot | null = snapshotRef.current) => {
     if (!candidate) return [];
-    const items = activeFeedItems(candidate, monotonicNow());
+    const items = activeFeedItems(candidate, snapshotClock(candidate));
     return [...items, ...olderAfter(items, olderItemsRef.current)];
-  }, []);
+  }, [snapshotClock]);
 
   const commitOlder = useCallback((items: PublicFeedItem[], pages: number, nextStatus: OlderFeedStatus) => {
     olderItemsRef.current = items;
@@ -391,6 +414,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearOlder = useCallback((nextStatus: OlderFeedStatus = 'idle') => {
+    if (deferredOlderReadRef.current !== null) clearTimeout(deferredOlderReadRef.current);
+    deferredOlderReadRef.current = null;
     olderSerialRef.current += 1;
     olderControllerRef.current?.abort();
     olderControllerRef.current = null;
@@ -405,6 +430,9 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     if (feedDeadlineRef.current !== null) window.clearTimeout(feedDeadlineRef.current);
     feedDeadlineRef.current = null;
     clearExpiryTimer();
+    if (staleTimerRef.current !== null) window.clearTimeout(staleTimerRef.current);
+    staleTimerRef.current = null;
+    lastVerifiedAtRef.current = null;
     feedEtagRef.current = null;
     reactionTargetTokensRef.current.clear();
     reactionWriteVersionsRef.current.clear();
@@ -420,12 +448,13 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     clearReactions();
   }, [clearExpiryTimer, clearOlder, clearReactions]);
 
-  const loadReactions = useCallback(async (
+  const loadReactions = useCallback(async function scheduledReactions(
     items: PublicFeedItem[],
     generation: number,
     forceRecoveryCheck = false,
     onlyMissing = false,
-  ) => {
+    automatic = false,
+  ): Promise<void> {
     const allIds = [...new Set(items.map((item) => item.id))];
     const allIdSet = new Set(allIds);
     // Carry reads across a snapshot revision when all their targets are still
@@ -472,6 +501,24 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         ));
       }
       return;
+    }
+
+    if (deferredReactionReadRef.current !== null) clearTimeout(deferredReactionReadRef.current);
+    deferredReactionReadRef.current = null;
+    const wallNow = Date.now();
+    if (automatic) {
+      if (document.hidden || document.visibilityState === 'hidden' || pollingMode(wallNow) === 'paused') return;
+      if (!claimPollingRead(reactionPollStateRef.current, 10_000, wallNow)) {
+        const interval = pollingInterval(10_000, wallNow)!;
+        const due = Math.min(nextPollingBoundary(wallNow), (reactionPollStateRef.current.lastStartedAt ?? wallNow) + interval);
+        deferredReactionReadRef.current = setTimeout(() => {
+          deferredReactionReadRef.current = null;
+          if (snapshotRef.current) void scheduledReactions(currentItems(), feedGenerationRef.current, false, false, true);
+        }, Math.max(1, due - wallNow));
+        return;
+      }
+    } else {
+      reactionPollStateRef.current = { lastStartedAt: wallNow, initialPending: false, mode: pollingMode(wallNow) };
     }
 
     const activeRecovery = (id: string) => {
@@ -585,16 +632,34 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         if (reactionReadOwnersRef.current.get(id) === requestId) reactionReadOwnersRef.current.delete(id);
       });
     }
-  }, [commitReactions]);
+  }, [commitReactions, currentItems]);
 
   // After each live refresh, read the older pages again from the new end of the
   // live list, so nothing falls into a gap between them and a recognition hidden
   // since the last read disappears. A failed read clears them rather than keep
   // stale records on screen.
-  const refreshOlder = useCallback(async (baseSnapshot: VerifiedFeedSnapshot) => {
+  const refreshOlder = useCallback(async function scheduledOlder(baseSnapshot: VerifiedFeedSnapshot, automatic = false): Promise<void> {
     const pages = olderPagesRef.current;
-    const base = activeFeedItems(baseSnapshot, monotonicNow());
+    const base = activeFeedItems(baseSnapshot, snapshotClock(baseSnapshot));
     if (pages === 0 || base.length === 0) return;
+    if (deferredOlderReadRef.current !== null) clearTimeout(deferredOlderReadRef.current);
+    deferredOlderReadRef.current = null;
+    const startedAt = Date.now();
+    const startedMode = pollingMode(startedAt);
+    if (automatic) {
+      if (document.hidden || document.visibilityState === 'hidden' || startedMode === 'paused') return;
+      if (!claimPollingRead(olderPollStateRef.current, 10_000, startedAt)) {
+        const due = Math.min(nextPollingBoundary(startedAt), (olderPollStateRef.current.lastStartedAt ?? startedAt) + pollingInterval(10_000, startedAt)!);
+        deferredOlderReadRef.current = setTimeout(() => {
+          deferredOlderReadRef.current = null;
+          if (snapshotRef.current) void scheduledOlder(snapshotRef.current, true);
+        }, Math.max(1, due - startedAt));
+        return;
+      }
+    } else {
+      olderPollStateRef.current = { lastStartedAt: startedAt, initialPending: false, mode: startedMode };
+    }
+
     const serial = olderSerialRef.current + 1;
     olderSerialRef.current = serial;
     olderControllerRef.current?.abort();
@@ -607,6 +672,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const previousPageCache = olderPageCacheRef.current;
       let lastPageFull = true;
       for (let page = 0; page < pages && lastPageFull; page += 1) {
+        if (automatic && (document.hidden || pollingMode() === 'paused' || (startedMode === 'fast' && pollingMode() === 'slow'))) return;
         const after = collected[collected.length - 1] ?? base[base.length - 1];
         const result = await fetchOlderFeedPage(after, controller.signal, previousPageCache.get(olderPageKey(after)));
         const items = result.items;
@@ -628,7 +694,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
           if (!reactionTargetTokensRef.current.has(item.id)) reactionTargetTokensRef.current.set(item.id, {});
         });
         pruneReactionTargets(new Set(shown.map((item) => item.id)));
-        void loadReactions(newlyAdded, feedGenerationRef.current, false, true);
+        void loadReactions(newlyAdded, feedGenerationRef.current, false, true, automatic);
       }
     } catch {
       if (serial !== olderSerialRef.current) return;
@@ -637,12 +703,12 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(deadline);
       if (olderControllerRef.current === controller) olderControllerRef.current = null;
     }
-  }, [clearOlder, commitOlder, currentItems, loadReactions, pruneReactionTargets]);
+  }, [clearOlder, commitOlder, currentItems, loadReactions, pruneReactionTargets, snapshotClock]);
 
   const loadOlder = useCallback(async () => {
     const baseSnapshot = snapshotRef.current;
     if (!baseSnapshot) return;
-    const base = activeFeedItems(baseSnapshot, monotonicNow());
+    const base = activeFeedItems(baseSnapshot, snapshotClock(baseSnapshot));
     if (base.length < MAX_PUBLIC_FEED_ITEMS || olderPagesRef.current >= MAX_OLDER_FEED_PAGES) return;
     const shownBefore = currentItems(baseSnapshot);
     const after = shownBefore[shownBefore.length - 1];
@@ -660,7 +726,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       if (serial !== olderSerialRef.current || !latestSnapshot) return;
       // A live refresh may have landed meanwhile; place the page after the
       // current live list. The next refresh re-reads any gap it left.
-      const latestBase = activeFeedItems(latestSnapshot, monotonicNow());
+      const latestBase = activeFeedItems(latestSnapshot, snapshotClock(latestSnapshot));
       const pages = olderPagesRef.current + 1;
       const known = new Set(shownBefore.map((item) => item.id));
       const nextOlder = [...olderAfter(latestBase, olderItemsRef.current), ...items.filter((item) => !known.has(item.id))];
@@ -684,10 +750,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(deadline);
       if (olderControllerRef.current === controller) olderControllerRef.current = null;
     }
-  }, [commitOlder, currentItems, loadReactions, pruneReactionTargets]);
+  }, [commitOlder, currentItems, loadReactions, pruneReactionTargets, snapshotClock]);
 
-  const applySnapshot = useCallback((nextSnapshot: VerifiedFeedSnapshot) => {
-    const visibleItems = activeFeedItems(nextSnapshot, monotonicNow());
+  const applySnapshot = useCallback((nextSnapshot: VerifiedFeedSnapshot, automatic = false) => {
+    snapshotWallTimesRef.current.set(nextSnapshot, { wallMs: Date.now(), elapsedMs: 0 });
+    const visibleItems = activeFeedItems(nextSnapshot, snapshotClock(nextSnapshot));
     const shownItems = [...visibleItems, ...olderAfter(visibleItems, olderItemsRef.current)];
     const nextIds = new Set(shownItems.map((item) => item.id));
     pruneReactionTargets(nextIds);
@@ -697,6 +764,17 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const generation = feedGenerationRef.current + 1;
     feedGenerationRef.current = generation;
     snapshotRef.current = nextSnapshot;
+    lastVerifiedAtRef.current = Date.now();
+    if (staleTimerRef.current !== null) window.clearTimeout(staleTimerRef.current);
+    const checkFreshness = () => {
+      if (!snapshotRef.current) return;
+      setClockVersion((version) => version + 1);
+      const retained = activeFeedItems(snapshotRef.current, snapshotClock(snapshotRef.current));
+      setStatus(retained.length ? 'ready' : 'empty');
+      if (snapshotFreshnessRequired() && lastVerifiedAtRef.current !== null && Date.now() - lastVerifiedAtRef.current >= 60_000) { clearFeed('error'); return; }
+      staleTimerRef.current = window.setTimeout(checkFreshness, Math.min(60_000, nextPollingBoundary() - Date.now()));
+    };
+    staleTimerRef.current = window.setTimeout(checkFreshness, 60_000);
     setSnapshot(nextSnapshot);
     setStatus(visibleItems.length > 0 ? 'ready' : 'empty');
     setClockVersion((version) => version + 1);
@@ -705,14 +783,14 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const scheduleExpiry = () => {
       const current = snapshotRef.current;
       if (!current) return;
-      const freshItems = activeFeedItems(current, monotonicNow());
+      const freshItems = activeFeedItems(current, snapshotClock(current));
       const freshIds = new Set([...freshItems, ...olderAfter(freshItems, olderItemsRef.current)].map((item) => item.id));
       pruneReactionTargets(freshIds);
       feedGenerationRef.current += 1;
       setClockVersion((version) => version + 1);
       setStatus(freshItems.length > 0 ? 'ready' : 'empty');
       if (freshItems.length > 0) {
-        const elapsedMs = Math.max(0, monotonicNow() - current.verifiedMonotonicMs);
+        const elapsedMs = Math.max(0, snapshotClock(current) - current.verifiedMonotonicMs);
         const remainingMs = Math.min(...freshItems.map((item) => (
           Date.parse(item.expiresAt) - (current.verifiedServerTimeMs + elapsedMs)
         )));
@@ -722,18 +800,23 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       }
     };
     if (visibleItems.length > 0) {
-      const elapsedMs = Math.max(0, monotonicNow() - nextSnapshot.verifiedMonotonicMs);
+      const elapsedMs = Math.max(0, snapshotClock(nextSnapshot) - nextSnapshot.verifiedMonotonicMs);
       const remainingMs = Math.min(...visibleItems.map((item) => (
         Date.parse(item.expiresAt) - (nextSnapshot.verifiedServerTimeMs + elapsedMs)
       )));
       expiryTimerRef.current = setSafeTimeout(scheduleExpiry, Math.max(20, remainingMs + 5));
     }
 
-    void loadReactions(shownItems, generation);
-    if (olderPagesRef.current > 0) void refreshOlder(nextSnapshot);
-  }, [clearExpiryTimer, loadReactions, pruneReactionTargets, refreshOlder]);
+    void loadReactions(shownItems, generation, false, false, automatic);
+    if (olderPagesRef.current > 0) void refreshOlder(nextSnapshot, automatic);
+  }, [clearExpiryTimer, clearFeed, loadReactions, pruneReactionTargets, refreshOlder, snapshotClock]);
 
-  const fetchFeed = useCallback(async () => {
+  const fetchFeed = useCallback(async (manual = false) => {
+    if (manual) {
+      pollStateRef.current.lastStartedAt = Date.now();
+      pollStateRef.current.initialPending = false;
+      pollStateRef.current.mode = pollingMode();
+    }
     if (!active || document.visibilityState === 'hidden') return;
     const serial = requestSerialRef.current + 1;
     requestSerialRef.current = serial;
@@ -765,14 +848,14 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
           serverTime: heartbeat.serverTime,
           verifiedServerTimeMs: heartbeat.verifiedServerTimeMs,
           verifiedMonotonicMs: heartbeat.verifiedMonotonicMs,
-        });
+        }, !manual);
         return;
       }
       const nextSnapshot = verifyFeedSnapshot(payload, requestStartedAt);
       if (!nextSnapshot) throw new Error('Feed response was not valid.');
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
       feedEtagRef.current = responseTag;
-      applySnapshot(nextSnapshot);
+      applySnapshot(nextSnapshot, !manual);
     } catch {
       if (serial !== requestSerialRef.current) return;
       clearFeed('error');
@@ -785,10 +868,10 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     retryRef.current = () => {
       setStatus('loading');
-      void fetchFeed();
+      void fetchFeed(true);
     };
     // Refetch without showing the loading state, so the list never blinks.
-    refreshRef.current = () => { void fetchFeed(); };
+    refreshRef.current = () => { void fetchFeed(true); };
     retryReactionsRef.current = () => {
       const current = snapshotRef.current;
       if (!current) return;
@@ -797,26 +880,36 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   }, [currentItems, fetchFeed, loadReactions]);
 
   useEffect(() => {
+    // A navigation is a new user-opened view, not an automatic catch-up poll.
+    if (pollPathRef.current !== pathname) {
+      pollPathRef.current = pathname;
+      pollStateRef.current = createPollingState();
+    }
     if (!active || pathname === '/recognize') {
       return;
     }
 
-    const initialRequest = window.setTimeout(() => { void fetchFeed(); }, 0);
-    const interval = homePage ? window.setInterval(() => { void fetchFeed(); }, 10_000) : null;
-
+    let stopPolling: (() => void) | undefined;
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        clearFeed('hidden');
-        return;
+      if (snapshotFreshnessRequired()) {
+        if (document.visibilityState === 'hidden' || document.hidden) clearFeed('hidden');
+        else if (!snapshotRef.current) setStatus('scheduled');
       }
-      setStatus('loading');
-      void fetchFeed();
     };
     if (homePage) document.addEventListener('visibilitychange', onVisibilityChange);
-
+    const initialRequest = window.setTimeout(() => {
+      if (homePage) {
+        stopPolling = startVisiblePoll((initialRead) => { void fetchFeed(initialRead); }, 10_000, () => {
+          setClockVersion((version) => version + 1);
+          if (snapshotFreshnessRequired() && lastVerifiedAtRef.current !== null && Date.now() - lastVerifiedAtRef.current >= 60_000) clearFeed('scheduled');
+        }, { state: pollStateRef.current });
+      } else {
+        void fetchFeed(true);
+      }
+    }, 0);
     return () => {
       window.clearTimeout(initialRequest);
-      if (interval !== null) window.clearInterval(interval);
+      stopPolling?.();
       if (homePage) document.removeEventListener('visibilitychange', onVisibilityChange);
       clearFeed('loading');
     };
@@ -961,7 +1054,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     })();
   }, [commitReactions, currentItems]);
 
-  const liveItems = snapshot ? activeFeedItems(snapshot, monotonicNow()) : [];
+  const liveItems = snapshot ? activeFeedItems(snapshot, snapshotClock(snapshot)) : [];
   const context: PublicFeedContextValue = {
     items: liveItems,
     status,

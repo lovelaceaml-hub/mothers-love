@@ -1,5 +1,7 @@
 'use client';
 
+import { pollingMode } from '@/lib/polling-schedule';
+
 import Link from 'next/link';
 import { Component, createRef, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
@@ -80,6 +82,15 @@ function FeedStateCard({ status, onRetry, showAction = true }: { status: PublicF
       <section className={styles.stateCard} aria-live="polite" aria-busy="true">
         <span className={styles.loadingDots} aria-hidden="true"><i /><i /><i /></span>
         <h2>Loading recognitions</h2>
+      </section>
+    );
+  }
+  if (status === 'scheduled') {
+    return (
+      <section className={styles.stateCard} aria-live="polite">
+        <h2>Recognitions refresh on a schedule</h2>
+        <p>Refresh now to view the latest recognitions.</p>
+        <button className={styles.secondaryAction} type="button" onClick={onRetry}>Refresh now<Arrow /></button>
       </section>
     );
   }
@@ -176,7 +187,7 @@ export function RecentRecognitions({ embedded = false }: { embedded?: boolean })
     <section className={embedded ? `${styles.feedSection} ${styles.embeddedFeed}` : styles.feedSection} data-testid={embedded ? 'receipt-live-feed' : undefined}>
       <div className={styles.sectionHeader}>
         <div><p className={styles.eyebrow}>Newest first</p><h2 id="feed-section-heading">Recent recognitions</h2></div>
-        <span className={styles.liveLabel} data-live={status === 'ready'}><i aria-hidden="true" />{status === 'ready' ? 'Live' : status === 'empty' ? 'Newest first' : status === 'error' ? 'Unavailable' : 'Updating'}</span>
+        <span className={styles.liveLabel} data-live={status === 'ready' && pollingMode() === 'fast'}><i aria-hidden="true" />{status === 'ready' ? (pollingMode() === 'fast' ? 'Live' : 'Scheduled updates') : status === 'empty' ? 'Newest first' : status === 'error' ? 'Unavailable' : 'Updating'}</span>
       </div>
       <ReadingViewport status={status}>
         {status === 'ready' && items.length > 0 ? (

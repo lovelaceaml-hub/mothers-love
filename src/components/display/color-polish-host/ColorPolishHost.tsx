@@ -12,6 +12,7 @@ import {
 } from '@/lib/color-polish/contracts';
 import { DisplayRecordCache } from '@/lib/color-polish/display-cache';
 import { startVisiblePoll } from '@/lib/visible-poll';
+import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import type { DisplayMode } from '@/lib/contracts';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 
@@ -26,8 +27,8 @@ const LIKES_TOTAL_REFRESH_MS = 10_000;
 const REQUEST_TIMEOUT_MS = 9_000;
 const STALE_MS = 60_000;
 
-type HostPhase = 'checking' | 'active' | 'disabled' | 'quiet' | 'neutral' | 'unavailable';
-type Clock = { serverMs: number; performanceMs: number };
+type HostPhase = 'checking' | 'active' | 'disabled' | 'quiet' | 'neutral' | 'unavailable' | 'scheduled';
+type Clock = { serverMs: number; performanceMs: number; wallMs: number };
 
 // One screen preview links, preview builds only.
 //
@@ -192,6 +193,7 @@ function readLikesTotal(response: Response): number | null {
 function SafeDisplay({ phase }: { phase: HostPhase }) {
   const unavailable = phase === 'unavailable';
   const quiet = phase === 'quiet' || phase === 'neutral';
+  const scheduled = phase === 'scheduled';
   return (
     <main
       data-testid="color-polish-safe-state"
@@ -200,8 +202,8 @@ function SafeDisplay({ phase }: { phase: HostPhase }) {
     >
       <section style={{ maxWidth: 720 }}>
         <p style={{ margin: 0, fontSize: 13, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a15b58' }}>The Words of Mother&apos;s Love</p>
-        <h1 style={{ margin: '18px 0 10px', fontFamily: 'Georgia, serif', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 500 }}>The display is {quiet ? 'taking a quiet moment.' : unavailable ? 'temporarily unavailable.' : 'connecting.'}</h1>
-        <p style={{ margin: 0, fontSize: 'clamp(1rem, 2vw, 1.35rem)', color: '#6d6876' }}>{quiet ? 'Personal recognition content is hidden until the display mode returns to normal.' : 'The public campaign view will appear after a verified snapshot is available.'}</p>
+        <h1 style={{ margin: '18px 0 10px', fontFamily: 'Georgia, serif', fontSize: 'clamp(2rem, 5vw, 4.5rem)', fontWeight: 500 }}>The display is {quiet ? 'taking a quiet moment.' : scheduled ? 'waiting for its next scheduled refresh.' : unavailable ? 'temporarily unavailable.' : 'connecting.'}</h1>
+        <p style={{ margin: 0, fontSize: 'clamp(1rem, 2vw, 1.35rem)', color: '#6d6876' }}>{quiet ? 'Personal recognition content is hidden until the display mode returns to normal.' : scheduled ? 'Recognitions are hidden between verified updates. Automatic refreshes pause from midnight to 7 am Pacific time.' : 'The public campaign view will appear after a verified snapshot is available.'}</p>
       </section>
     </main>
   );
@@ -211,6 +213,7 @@ export function ColorPolishHost() {
   const [snapshot, setSnapshot] = useState<ColorPolishSnapshot | null>(null);
   const [phase, setPhase] = useState<HostPhase>('checking');
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [wallNowMs, setWallNowMs] = useState(() => Date.now());
   const [frameGeneration, setFrameGeneration] = useState(0);
   const [lastMode, setLastMode] = useState<DisplayMode | null>(null);
   const snapshotRef = useRef<ColorPolishSnapshot | null>(null);
@@ -219,9 +222,12 @@ export function ColorPolishHost() {
   const requestGenerationRef = useRef(0);
   const reactionGenerationRef = useRef(0);
   const controllerRef = useRef<AbortController | null>(null);
+  const failedRefreshRef = useRef(false);
   const lastVerifiedRef = useRef<number | null>(null);
-  const clockRef = useRef<Clock>({ serverMs: Date.now(), performanceMs: performanceNow() });
-  const monotonicNowRef = useRef(Date.now());
+  const pollStateRef = useRef(createPollingState());
+  const reactionPollStateRef = useRef(createPollingState());
+  const clockRef = useRef<Clock>({ serverMs: nowMs, performanceMs: performanceNow(), wallMs: wallNowMs });
+  const monotonicNowRef = useRef(nowMs);
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
   // Every like campaign wide, for the header. Summing reactionCounts would only
   // cover the latest 100 recognitions the snapshot carries.
@@ -260,7 +266,7 @@ export function ColorPolishHost() {
       controllerRef.current = controller;
       const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
       const requestStartedAt = performanceNow();
-      const phaseMayShowLikes = phaseRef.current === 'checking' || phaseRef.current === 'active';
+      const phaseMayShowLikes = phaseRef.current === 'checking' || phaseRef.current === 'active' || phaseRef.current === 'scheduled';
       const previousLikesRequestAt = lastLikesTotalRequestAtRef.current;
       const includeLikesTotal = phaseMayShowLikes && (
         previousLikesRequestAt === null || requestStartedAt - previousLikesRequestAt >= LIKES_TOTAL_REFRESH_MS
@@ -281,9 +287,10 @@ export function ColorPolishHost() {
         if (snapshotRef.current && next.revision < snapshotRef.current.revision) return;
         const serverMs = Date.parse(next.serverTime);
         const receivedPerformanceMs = performanceNow();
-        clockRef.current = { serverMs, performanceMs: receivedPerformanceMs };
+        clockRef.current = { serverMs, performanceMs: receivedPerformanceMs, wallMs: Date.now() };
         monotonicNowRef.current = Math.max(monotonicNowRef.current, serverMs);
         lastVerifiedRef.current = receivedPerformanceMs;
+        failedRefreshRef.current = false;
         setLastMode(next.settings.mode);
         if (next.settings.mode === 'quiet' || next.settings.mode === 'neutral') {
           cache.clear();
@@ -313,10 +320,12 @@ export function ColorPolishHost() {
         }
       } catch {
         if (!mounted || generation !== requestGenerationRef.current) return;
+        failedRefreshRef.current = true;
         if (!snapshotRef.current) {
           cache.clear();
-          phaseRef.current = 'unavailable';
-          setPhase('unavailable');
+          const unsafePhase = 'unavailable';
+          phaseRef.current = unsafePhase;
+          setPhase(unsafePhase);
         }
       } finally {
         window.clearTimeout(timeout);
@@ -326,25 +335,28 @@ export function ColorPolishHost() {
 
     const stopPolling = startVisiblePoll(() => void load(), POLL_MS, () => {
       const verifiedAt = lastVerifiedRef.current;
-      if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) markUnsafe('unavailable');
-    });
+      if (snapshotFreshnessRequired(failedRefreshRef.current) && verifiedAt !== null && Math.max(performanceNow() - verifiedAt, Date.now() - clockRef.current.wallMs) >= STALE_MS && snapshotRef.current) markUnsafe(failedRefreshRef.current ? 'unavailable' : 'checking');
+    }, { state: pollStateRef.current });
     return () => {
       mounted = false;
       ++requestGenerationRef.current;
       controllerRef.current?.abort();
       stopPolling();
+      // An aborted initial verification is retried on React's development remount.
+      if (lastVerifiedRef.current === null) pollStateRef.current = createPollingState();
       cache.clear();
     };
   }, []);
 
   useEffect(() => {
     const tick = () => {
-      const next = Math.max(monotonicNowRef.current, clockRef.current.serverMs + Math.max(0, performanceNow() - clockRef.current.performanceMs));
+      const next = Math.max(monotonicNowRef.current, clockRef.current.serverMs + Math.max(0, performanceNow() - clockRef.current.performanceMs, Date.now() - clockRef.current.wallMs));
       monotonicNowRef.current = next;
       setNowMs(next);
+      setWallNowMs(Date.now());
       const verifiedAt = lastVerifiedRef.current;
-      if (verifiedAt !== null && performanceNow() - verifiedAt >= STALE_MS && snapshotRef.current) {
-        markUnsafe('unavailable');
+      if (snapshotFreshnessRequired(failedRefreshRef.current) && verifiedAt !== null && Math.max(performanceNow() - verifiedAt, Date.now() - clockRef.current.wallMs) >= STALE_MS && snapshotRef.current) {
+        markUnsafe(failedRefreshRef.current ? 'unavailable' : 'checking');
       }
     };
     const timer = window.setInterval(tick, 250);
@@ -407,6 +419,7 @@ export function ColorPolishHost() {
     const ids = reactionSignature ? reactionSignature.split('\u001f') : [];
     const generation = ++reactionGenerationRef.current;
     let controller: AbortController | null = null;
+    let deferredRead: ReturnType<typeof setTimeout> | null = null;
     if (!ids.length) {
       setReactionCounts({});
       return undefined;
@@ -430,10 +443,30 @@ export function ColorPolishHost() {
         if (controller === current) controller = null;
       }
     };
-    void load();
-    const visible = () => { if (!document.hidden) void load(); };
+    const scheduledRead = () => {
+      if (deferredRead !== null) clearTimeout(deferredRead);
+      deferredRead = null;
+      if (document.hidden) return;
+      const now = Date.now();
+      if (claimPollingRead(reactionPollStateRef.current, 10_000, now)) {
+        void load();
+      } else {
+        // A newly arrived record still gets its counts at the next eligible
+        // read, even if the pool never changes again. This is one deferred
+        // read, not an additional recurring reaction-polling stream.
+        const interval = pollingInterval(10_000, now);
+        const due = Math.min(nextPollingBoundary(now), interval === null ? Infinity : (reactionPollStateRef.current.lastStartedAt ?? now) + interval);
+        deferredRead = setTimeout(scheduledRead, Math.max(1, due - now));
+      }
+    };
+    scheduledRead();
+    const visible = scheduledRead;
     document.addEventListener('visibilitychange', visible);
-    return () => { controller?.abort(); document.removeEventListener('visibilitychange', visible); };
+    return () => {
+      controller?.abort();
+      if (deferredRead !== null) clearTimeout(deferredRead);
+      document.removeEventListener('visibilitychange', visible);
+    };
   }, [reactionSignature]);
 
   if (phase === 'active' && snapshot) {
@@ -460,7 +493,7 @@ export function ColorPolishHost() {
     );
   }
   if (phase === 'disabled' && snapshot) return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience verifiedSnapshot={snapshot} verifiedNowMs={nowMs} /></div>;
-  if (phase === 'unavailable' && lastMode !== 'quiet' && lastMode !== 'neutral') {
+  if (phase === 'unavailable' && pollingMode(wallNowMs) === 'fast' && lastMode !== 'quiet' && lastMode !== 'neutral') {
     return <div data-testid="color-polish-display" data-display-phase={phase} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}><V6DisplayExperience /></div>;
   }
   return <SafeDisplay phase={phase} />;
