@@ -1,6 +1,6 @@
 # Plan 31: Display efficiency
 
-Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated locally on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809696c2d40c8cb8abd09`. Vercel reports production READY at that same SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). The integration is not yet committed or published. Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. Publishing and release are authorized; the database recovery and safe-preview gates below remain open.
+Status, 2026-10-12: the PR #30 source (`3f923b3ae6ce70328234b965334dfffb800e139b`) is integrated locally on `fix/tv-display-efficiency-integration`, based on verified `origin/main` `29da0dd7aa1c5497765809696c2d40c8cb8abd09`. Commit `b315ab8` is local and unpublished. Vercel reports production READY at that base SHA (`dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Migration 019 already belongs to reaction batching, so the additive display migration is 020 and its index is built separately with `CREATE INDEX CONCURRENTLY`. Publishing and release are authorized; the database recovery and safe-preview gates below remain open.
 
 Anthony authorized these improvements while keeping arrivals live at approximately five seconds and staying on Supabase Free. Existing submissions normally stay unchanged. Settings, moderation, expiry, quiet mode, presentation and cleanup safety still require verification.
 
@@ -100,8 +100,8 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
   `origin/main` and production at `29da0dd7aa1c5497765809696c2d40c8cb8abd09`
   (PR #38, READY deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy`). Integrated
   PR #30 source `3f923b3ae6ce70328234b965334dfffb800e139b` locally on
-  `fix/tv-display-efficiency-integration`; it is still uncommitted and
-  unpublished. Renumbered its migration to 020, retained 019 reaction batching,
+  `fix/tv-display-efficiency-integration`; local commit `b315ab8` is not
+  published. Renumbered its migration to 020, retained 019 reaction batching,
   made both new routines additive `CREATE FUNCTION`s, and moved the index build
   to an autocommit `CREATE INDEX CONCURRENTLY` operation with metadata checks.
   The disposable SQL test caught an invalid schema-qualified index name; that
