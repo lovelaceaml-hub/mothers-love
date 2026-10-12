@@ -12,7 +12,9 @@ Current status and next steps: docs/HANDOFF.md.
 
 ## Active plan
 - `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
-  Its Build log records the current local status and rollout requirements.
+  Its Build log records the release authorization and remaining safety gates.
+  PR #30 is not live: integrate main after PRs #35 to #37, verify the live
+  migration ledger through approved access, and obtain safe hosted preview evidence.
 - `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
   (release and records) remain future work outside PR #30; its Build log says where it stands.
 

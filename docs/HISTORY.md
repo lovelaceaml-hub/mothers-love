@@ -13,6 +13,10 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### October 12: PR #30 release authorized, safety gates still block deployment
+
+Anthony authorized publishing the PR branch, merging after checks and full replacement without another review or release-mode decision. The isolated release attempt verified that newer PRs #35 to #37 already serve production at `d0ed4e1`, deployment `dpl_BcAqXnqEmr4ZPwjNc47njN5MsBoi` (READY). The reviewed remediation `7a33be4` passed fresh Node 22 typecheck, focused unit and disposable PostgreSQL checks, a synthetic-only build and the Chromium Studio arrival-readiness regression. It is not integrated with that newer main. Approved provider access could not read the sensitive database connection values, so current migration-ledger state, administrative access and backup could not be verified. No safe hosted preview database is configured. No live SQL, merge or production deployment was performed. See [the exact release-attempt record](runs/2026-10-10-pr-remediation/INDEX.md#authorized-release-attempt-2026-10-12).
+
 ### October 1: the TV likes count covers every like, live
 
 Source: pull request #25 (`fix/tv-likes-total`, merged 2026-10-01 at 03:34 UTC as `7cf0001`) and Vercel, production deployment `dpl_DvvjsnYgfVud2WTUzFuY4jobMA9o`. The likes count in the TV header used to add up the likes on the latest 100 recognitions the TV holds, so it went down whenever a new recognition pushed an old one out. Migration 018 adds the read-only `public.ml_reactions_total()`, one number for every like on every published, unexpired recognition, and the TV reads it from `/api/display/likes-total` every 10 seconds, keeping the last good value when a read fails and clearing it in every unsafe state. The migration is applied: the address answered 200 with a total on 2026-10-02, and it answers 503 until the function exists. Rollback: `dpl_EYovPyMndoPYiedj3pTUZP4jWKhn` (pull request #24); the function can stay because the old code never calls it.
@@ -452,4 +456,3 @@ The isolated [heavenly world preview](https://mothers-love-ricohxk3e-lvzion.verc
 [Full plan](PLAN-20-heavenly-world.md) supersedes the initial three-zone [Plan 19](PLAN-19-world-prototype-01.md). Verification evidence, release URL and source checkpoint and remaining privacy-review status are recorded in the [run record](runs/2026-09-20-world-prototype-01/RECORD.md).
 
 Current authority is Plan 20, including the user's full-world expansion and radiant pearl choice. Live mode is authorized only as a read of the existing explicitly public projection. No production promotion, database modification, real-data fixture/screenshot, or change to the current TV renderer belongs in this preview. This branch starts from `tv17/pick` at `8a10f8c`; newer independent production heart work must be preserved.
-

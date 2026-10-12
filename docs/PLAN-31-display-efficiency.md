@@ -1,6 +1,6 @@
 # Plan 31: Display efficiency
 
-Status: transferred in `5a1415dc514e43ef1dc543607a88cfe0ea480c4c` and locally integrated with current main `900d796e839df1430063e4bf4def0dbcf9520e1d` on the feature branch, 2026-10-10. PR #30 remains draft. No cloud push, live SQL or deployment.
+Status: reviewed remediation at `7a33be4b8c83de2c6448efd7208a42ee80168961` includes main through `900d796`. Production has advanced to `d0ed4e1`. PR #30 remains draft and is not released. Full replacement is authorized; newer-main integration and migration/preview safety gates remain open.
 
 Anthony authorized these improvements while keeping arrivals live at approximately five seconds and staying on Supabase Free. Existing submissions normally stay unchanged. Settings, moderation, expiry, quiet mode, presentation and cleanup safety still require verification.
 
@@ -74,7 +74,29 @@ Request frequency for a continuously visible active TV stays at 720 snapshot req
   review found no actionable issues. See the
   [remediation run](runs/2026-10-10-pr-remediation/INDEX.md).
 
-Cloud continuation: [current verification](runs/2026-10-06-cloud-efficiency/INDEX.md) and [repeatable setup/usage guards](CLOUD-VALIDATION.md). `npm run check:display-efficiency` enforces fixture payload limits and runs disposable SQL integration without connecting to a configured database.
+- **2026-10-12, authorized release attempt, blocked.** Worked only in the
+  isolated Copilot checkout. Read the committed plan and remediation records
+  from `7a33be4`, with no edits to the original worktree. GitHub PR #30 was
+  open/draft at `6bd2eab`. Production and origin/main both served `d0ed4e1`,
+  deployment `dpl_BcAqXnqEmr4ZPwjNc47njN5MsBoi` (READY), preserving newer
+  PRs #35 to #37. A provisional merge found five conflicting files and was
+  aborted; the newer integrated payload was not validated or released.
+  On Node 22.23.3, the exact remediation passed typecheck, 27 focused unit
+  tests, the efficiency guard's 22 unit tests and 25 disposable PostgreSQL
+  checks, a synthetic-only production build, and one Chromium Studio
+  arrival-readiness regression. The migration SHA-256 matches the approved
+  `6c370231ae423c8d9bae44372f6b9849ac2a5a27b6540e45fc7888a7cba20f37`.
+  Current live application status could not be inspected: approved Vercel
+  access returned no sensitive database URL or CA values. Administrative
+  migration access and a current backup were not verified. Vercel has no
+  preview environment variables, so required safe hosted preview evidence is
+  absent. No live SQL, production deployment, merge or preview-enabling change
+  was made. Main also contains a distinct reaction-read migration numbered
+  019; resolve ledger naming and numbering before any application.
+  Release mode and branch publication/merge authority no longer need a user
+  decision. Details: [release attempt](runs/2026-10-10-pr-remediation/INDEX.md#authorized-release-attempt-2026-10-12).
+
+Cloud continuation: [earlier cloud verification](runs/2026-10-06-cloud-efficiency/INDEX.md) and [repeatable setup/usage guards](CLOUD-VALIDATION.md). `npm run check:display-efficiency` enforces fixture payload limits and runs disposable SQL integration without connecting to a configured database.
 
 ## Section 1: Integrate the current production baseline
 
@@ -84,10 +106,16 @@ any failures that are already present on `main`.
 
 ## Section 2: Complete the release prerequisites
 
-Before app rollout, obtain approval and apply migration 019, configure a safe
+Full replacement and publishing/merging the correct PR branch are authorized
+by Anthony's 2026-10-11 request; no additional release-mode or review question
+is required. Before app rollout, verify the current live ledger, target,
+approved administrative access, backup and rollback, then apply migration 019
+only if necessary. Preserve the newer main changes and distinct reaction-read
+migration, and revalidate the resulting integration. Configure a safe
 preview database, enable the Vercel preview for `feat/tv-display-efficiency`
 (currently explicitly disabled in `vercel.json`), complete the hosted preview
-and physical-TV checks, then use the release mode Anthony chooses. The Vercel
+and physical-TV checks. The Vercel
 exception targets only this branch and does not disable production from `main`.
-Do not change account settings, push, change live data or deploy before those
-prerequisites are met.
+Branch publication is authorized without a preview deployment; keep its
+deployment guard intact. Do not apply live SQL or merge/deploy the app while
+the required safety prerequisites are missing.
