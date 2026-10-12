@@ -39,6 +39,25 @@ describe("client API helper", () => {
     });
   });
 
+  it("exposes response headers to callers without changing the response body", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "content-type": "application/json", etag: `"${"a".repeat(32)}"` },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const onResponseHeaders = vi.fn();
+
+    await expect(api<{ ok: boolean }>("/api/display/snapshot", {
+      auth: false,
+      onResponseHeaders,
+    })).resolves.toEqual({ ok: true });
+
+    expect(onResponseHeaders).toHaveBeenCalledOnce();
+    expect(onResponseHeaders.mock.calls[0]?.[0].get("etag")).toBe(`"${"a".repeat(32)}"`);
+  });
+
   it("uses a safe network error without exposing request data", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("synthetic transport detail")));
 

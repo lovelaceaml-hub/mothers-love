@@ -14,6 +14,7 @@ import type { Aggregate } from "@/lib/contracts";
 import { endOfLosAngelesWeek, isoDateInLosAngeles, isIsoDate, startOfLosAngelesMonth, startOfLosAngelesWeek } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 import { projectPublicDisplaySnapshot } from "./public-display";
+import { recordDatabaseResultBytes } from "./database-result-metrics";
 
 export type ColorPolishQuery = {
   data: unknown;
@@ -259,10 +260,18 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
     // Project the unchanged response INSIDE Postgres so the shared pooler never
     // transfers the full recognition list to the Vercel server on idle polls.
     const rows = await transaction`
-      with payload as (
+      with payload as materialized (
         select public.ml_color_polish_snapshot(${after}) as value
       ), digest as (
-        select value, md5((value - 'serverTime' - 'cursor')::text) as etag from payload
+        select value,
+          md5(
+            (value - 'serverTime' - 'cursor')::text || '|' ||
+            pg_catalog.to_char(
+              ((value->>'serverTime')::timestamptz at time zone 'UTC') - interval '8 hours',
+              'YYYY-MM-DD'
+            )
+          ) as etag
+        from payload
       )
       select etag, case
         when ${knownEtag}::text = etag and value->>'ok' = 'true'
@@ -270,7 +279,9 @@ export async function queryColorPolishSnapshot(after: string | null, signal?: Ab
         else value
       end as result from digest
     `;
-    return { data: rows[0]?.result ?? null, etag: typeof rows[0]?.etag === "string" ? rows[0].etag as string : null };
+    const data = rows[0]?.result ?? null;
+    recordDatabaseResultBytes("display.color-polish", data);
+    return { data, etag: typeof rows[0]?.etag === "string" ? rows[0].etag as string : null };
   }));
   void operation.then(() => undefined, () => undefined);
 

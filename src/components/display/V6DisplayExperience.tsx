@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
 import { api } from '@/lib/client-api';
+import { parseDisplaySnapshotEtag, projectDisplaySnapshotHeartbeat } from '@/lib/display/snapshot-heartbeat';
 import { fetchReactionCounts, type ReactionItem } from '@/components/feed/PublicFeedProvider';
 import { useDisplayChimes } from './use-display-chimes';
 import styles from './V6DisplayExperience.module.css';
@@ -1010,9 +1011,11 @@ export function V6DisplayExperience() {
   const [storyVisits, setStoryVisits] = useState<Partial<Record<SceneId, number>>>({});
   const [queue, setQueue] = useState<string[]>([]);
   const [activeArrival, setActiveArrival] = useState<ArrivalPresentation | null>(null);
+  const snapshotRef = useRef<DisplaySnapshot | null>(null);
   const knownEventsRef = useRef(new Set<string>());
   const initialSnapshotRef = useRef(true);
   const cursorRef = useRef<string | null>(null);
+  const snapshotEtagRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
   const controllerRef = useRef<AbortController | null>(null);
   const individualStyleRef = useRef(0);
@@ -1027,8 +1030,36 @@ export function V6DisplayExperience() {
     const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
     try {
       const path = cursorRef.current ? `/api/display/snapshot?after=${encodeURIComponent(cursorRef.current)}` : '/api/display/snapshot';
-      const next = await api<DisplaySnapshot>(path, { method: 'GET', auth: false, cache: 'no-store', signal: controller.signal });
+      const headers: Record<string, string> = { accept: 'application/json' };
+      if (snapshotEtagRef.current) headers['If-None-Match'] = `"${snapshotEtagRef.current}"`;
+      let responseTag: string | null = null;
+      const payload = await api<unknown>(path, {
+        method: 'GET',
+        auth: false,
+        cache: 'no-store',
+        signal: controller.signal,
+        headers,
+        onResponseHeaders: (responseHeaders) => { responseTag = parseDisplaySnapshotEtag(responseHeaders.get('etag')); },
+      });
       const receivedAt = Date.now();
+      const heartbeat = projectDisplaySnapshotHeartbeat(payload);
+      if (heartbeat) {
+        const current = snapshotRef.current;
+        if (!current || !snapshotEtagRef.current || responseTag !== snapshotEtagRef.current) {
+          throw new Error('Display snapshot heartbeat did not match the current snapshot.');
+        }
+        const refreshed = { ...current, serverTime: heartbeat.serverTime };
+        snapshotRef.current = refreshed;
+        setSnapshot(refreshed);
+        setServerOffsetMs(Date.parse(heartbeat.serverTime) - receivedAt);
+        setLastVerifiedAt(receivedAt);
+        setStale(false);
+        setUnavailable(false);
+        return;
+      }
+      const next = payload as DisplaySnapshot;
+      snapshotEtagRef.current = responseTag;
+      snapshotRef.current = next;
       setSnapshot(next);
       setServerOffsetMs(Date.parse(next.serverTime) - receivedAt);
       setLastVerifiedAt(receivedAt);

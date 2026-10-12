@@ -13,10 +13,13 @@ import { hasVisibleNameContent } from "@/lib/name-validation";
 import { clampPublicExpiry } from "./expiry-clamp";
 import { isIsoDate, graphemeLength } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
+import { recordDatabaseResultBytes } from "./database-result-metrics";
+import { projectDisplaySnapshotHeartbeat } from "@/lib/display/snapshot-heartbeat";
 
 export type PublicDisplayQuery = {
   data: unknown;
   error: Error | null;
+  etag: string | null;
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -366,18 +369,55 @@ export function projectPublicDisplaySnapshot(value: unknown): DisplaySnapshot | 
   };
 }
 
-export async function queryPublicDisplaySnapshot(after: string | null, signal?: AbortSignal): Promise<PublicDisplayQuery> {
-  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
+export function projectPublicDisplaySnapshotHeartbeat(value: unknown): { unchanged: true; serverTime: string } | null {
+  return projectDisplaySnapshotHeartbeat(value);
+}
+
+export async function queryPublicDisplaySnapshot(
+  after: string | null,
+  signal?: AbortSignal,
+  knownEtag: string | null = null,
+): Promise<PublicDisplayQuery> {
+  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED"), etag: null };
   const client = getPublicDisplayClient();
-  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  if (!client) return { data: null, error: new Error("UNAVAILABLE"), etag: null };
 
   let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
   const operation = Promise.resolve().then(() => client.begin("read only", async (transaction) => {
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
     await transaction`set local statement_timeout = '5000ms'`;
     if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    const rows = await transaction`select public.ml_public_display_snapshot(${after}) as result`;
-    return rows[0]?.result ?? null;
+    // Preserve the existing 1,000-candidate and featured selection exactly.
+    // The function runs once per request; only its normally selected result is
+    // conditionally reduced inside Postgres before it crosses the pooler.
+    // Include the fixed UTC-8 day bucket used by the public expiry clamp, so
+    // projected expiry ceilings are refreshed when that seven-day window moves.
+    const rows = await transaction`
+      with snapshot as materialized (
+        select public.ml_public_display_snapshot(${after})::jsonb as value
+      ), tagged as (
+        select value,
+          md5(
+            (value - 'serverTime' - 'cursor')::text || '|' ||
+            pg_catalog.to_char(
+              ((value->>'serverTime')::timestamptz at time zone 'UTC') - interval '8 hours',
+              'YYYY-MM-DD'
+            )
+          ) as etag
+        from snapshot
+      )
+      select etag,
+        case when ${knownEtag}::text = etag and value->>'ok' = 'true'
+          then jsonb_build_object('unchanged', true, 'serverTime', value->'serverTime')
+          else value
+        end as result
+      from tagged
+    `;
+    const row = rows[0];
+    const data = row?.result ?? null;
+    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    recordDatabaseResultBytes("display.snapshot", data);
+    return { data, etag };
   }));
   void operation.then(() => undefined, () => undefined);
 
@@ -389,10 +429,14 @@ export async function queryPublicDisplaySnapshot(after: string | null, signal?: 
   });
 
   try {
-    const data = await Promise.race([operation, deadline]);
-    return { data, error: null };
+    const result = await Promise.race([operation, deadline]);
+    return { ...result, error: null };
   } catch (error) {
-    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("DATABASE_ERROR"),
+      etag: null,
+    };
   } finally {
     if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
   }

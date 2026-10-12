@@ -3,6 +3,7 @@ import { hasVisibleNameContent } from "@/lib/name-validation";
 import { clampPublicExpiry } from "./expiry-clamp";
 import { graphemeLength } from "./time";
 import { databaseClient } from "./supabase";
+import { recordDatabaseResultBytes } from "./database-result-metrics";
 
 export type PublicFeedQuery = {
   data: unknown;
@@ -99,14 +100,50 @@ export function projectOlderPublicFeed(value: unknown, cursor: PublicFeedCursor)
   return snapshot;
 }
 
-export async function queryOlderPublicFeed(cursor: PublicFeedCursor): Promise<PublicFeedQuery> {
+export async function queryOlderPublicFeed(
+  cursor: PublicFeedCursor,
+  knownEtag: string | null = null,
+): Promise<PublicFeedQuery & { etag: string | null }> {
   const client = databaseClient();
-  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
+  if (!client) return { data: null, error: new Error("UNAVAILABLE"), etag: null };
   try {
-    const rows = await client`select public.ml_public_feed_older(${cursor.before}::timestamptz, ${cursor.id}::uuid) as result`;
-    return { data: rows[0]?.result ?? null, error: null };
+    // Re-run the current page selection on every refresh. The database returns
+    // only a heartbeat when the same public page is still current, so hides,
+    // expiry and edits remain visible immediately without transferring the page.
+    // Keep the same fixed UTC-8 day boundary as the public expiry clamp, which
+    // advances its seven-day ceiling daily even when the stored rows do not.
+    const rows = await client`
+      with older as materialized (
+        select public.ml_public_feed_older(${cursor.before}::timestamptz, ${cursor.id}::uuid)::jsonb as value
+      ), tagged as (
+        select value,
+          md5(
+            (value - 'serverTime')::text || '|' ||
+            pg_catalog.to_char(
+              ((value->>'serverTime')::timestamptz at time zone 'UTC') - interval '8 hours',
+              'YYYY-MM-DD'
+            )
+          ) as etag
+        from older
+      )
+      select etag,
+        case when ${knownEtag}::text = etag
+          then jsonb_build_object('unchanged', true, 'serverTime', value->'serverTime')
+          else value
+        end as result
+      from tagged
+    `;
+    const row = rows[0];
+    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    const data = row?.result ?? null;
+    recordDatabaseResultBytes("feed.older", data);
+    return { data, error: null, etag };
   } catch (error) {
-    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("DATABASE_ERROR"),
+      etag: null,
+    };
   }
 }
 
@@ -121,7 +158,14 @@ export async function queryPublicFeed(knownEtag: string | null = null): Promise<
       with feed as materialized (
         select public.ml_public_feed()::jsonb as value
       ), tagged as (
-        select value, md5((value - 'serverTime')::text) as etag
+        select value,
+          md5(
+            (value - 'serverTime')::text || '|' ||
+            pg_catalog.to_char(
+              ((value->>'serverTime')::timestamptz at time zone 'UTC') - interval '8 hours',
+              'YYYY-MM-DD'
+            )
+          ) as etag
         from feed
       )
       select etag,
@@ -133,7 +177,9 @@ export async function queryPublicFeed(knownEtag: string | null = null): Promise<
     `;
     const row = rows[0];
     const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
-    return { data: row?.result ?? null, error: null, etag };
+    const data = row?.result ?? null;
+    recordDatabaseResultBytes("feed.home", data);
+    return { data, error: null, etag };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR"), etag: null };
   }

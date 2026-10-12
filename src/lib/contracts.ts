@@ -185,4 +185,5 @@ export interface ApiClientOptions extends RequestInit {
   auth?: boolean;
   token?: string | null;
   bearerToken?: string | null;
+  onResponseHeaders?: (headers: Headers) => void;
 }

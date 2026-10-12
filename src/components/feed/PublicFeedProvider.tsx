@@ -92,19 +92,43 @@ const REACTION_BATCH_SIZE = MAX_REACTION_BATCH_SIZE;
 // too; this caps that work at 1,000 older recognitions on one open page.
 export const MAX_OLDER_FEED_PAGES = 10;
 
-async function fetchOlderFeedPage(after: PublicFeedItem, signal: AbortSignal) {
+type CachedOlderFeedPage = { etag: string; items: PublicFeedItem[] };
+type OlderFeedPage = { etag: string | null; items: PublicFeedItem[] };
+
+function olderPageKey(after: PublicFeedItem) {
+  return `${after.firstPublishedAt}|${after.id.toLowerCase()}`;
+}
+
+function readFeedEtag(response: Response) {
+  return /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '')?.[1] ?? null;
+}
+
+async function fetchOlderFeedPage(
+  after: PublicFeedItem,
+  signal: AbortSignal,
+  cached?: CachedOlderFeedPage,
+): Promise<OlderFeedPage> {
   const query = new URLSearchParams({ before: after.firstPublishedAt, id: after.id });
   const requestStartedAt = monotonicNow();
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (cached) headers['If-None-Match'] = `"${cached.etag}"`;
   const response = await fetch(`/api/feed/older?${query}`, {
     cache: 'no-store',
     credentials: 'include',
-    headers: { accept: 'application/json' },
+    headers,
     signal,
   });
   if (!response.ok) throw new Error(`Older feed request failed with status ${response.status}`);
-  const page = verifyFeedSnapshot(await response.json(), requestStartedAt);
+  const payload: unknown = await response.json();
+  const etag = readFeedEtag(response);
+  const heartbeat = verifyFeedHeartbeat(payload, requestStartedAt);
+  if (heartbeat) {
+    if (!cached || etag !== cached.etag) throw new Error('Older feed heartbeat did not match its cached page.');
+    return { etag, items: cached.items };
+  }
+  const page = verifyFeedSnapshot(payload, requestStartedAt);
   if (!page) throw new Error('Older feed response was not valid.');
-  return page.items;
+  return { etag, items: page.items };
 }
 
 // Older items continue the live list: never repeat one of its items and never
@@ -274,6 +298,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
   const [olderStatus, setOlderStatus] = useState<OlderFeedStatus>('idle');
   const olderItemsRef = useRef<PublicFeedItem[]>([]);
   const olderPagesRef = useRef(0);
+  const olderPageCacheRef = useRef(new Map<string, CachedOlderFeedPage>());
   const olderSerialRef = useRef(0);
   const olderControllerRef = useRef<AbortController | null>(null);
   const requestSerialRef = useRef(0);
@@ -369,6 +394,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     olderSerialRef.current += 1;
     olderControllerRef.current?.abort();
     olderControllerRef.current = null;
+    olderPageCacheRef.current.clear();
     commitOlder([], 0, nextStatus);
   }, [commitOlder]);
 
@@ -577,14 +603,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     try {
       const collected: PublicFeedItem[] = [];
+      const refreshedPageCache = new Map<string, CachedOlderFeedPage>();
+      const previousPageCache = olderPageCacheRef.current;
       let lastPageFull = true;
       for (let page = 0; page < pages && lastPageFull; page += 1) {
         const after = collected[collected.length - 1] ?? base[base.length - 1];
-        const items = await fetchOlderFeedPage(after, controller.signal);
+        const result = await fetchOlderFeedPage(after, controller.signal, previousPageCache.get(olderPageKey(after)));
+        const items = result.items;
+        if (result.etag) refreshedPageCache.set(olderPageKey(after), { etag: result.etag, items });
         collected.push(...items);
         lastPageFull = items.length === MAX_PUBLIC_FEED_ITEMS;
       }
       if (serial !== olderSerialRef.current) return;
+      olderPageCacheRef.current = refreshedPageCache;
       const previousItems = olderItemsRef.current;
       const previousIds = previousItems.map((item) => item.id).join();
       const previousIdSet = new Set(previousItems.map((item) => item.id));
@@ -623,7 +654,8 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     setOlderStatus('loading');
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     try {
-      const items = await fetchOlderFeedPage(after, controller.signal);
+      const result = await fetchOlderFeedPage(after, controller.signal);
+      const items = result.items;
       const latestSnapshot = snapshotRef.current;
       if (serial !== olderSerialRef.current || !latestSnapshot) return;
       // A live refresh may have landed meanwhile; place the page after the
@@ -633,6 +665,9 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const known = new Set(shownBefore.map((item) => item.id));
       const nextOlder = [...olderAfter(latestBase, olderItemsRef.current), ...items.filter((item) => !known.has(item.id))];
       const nextStatus: OlderFeedStatus = items.length < MAX_PUBLIC_FEED_ITEMS ? 'end' : pages >= MAX_OLDER_FEED_PAGES ? 'limit' : 'idle';
+      if (result.etag) {
+        olderPageCacheRef.current.set(olderPageKey(after), { etag: result.etag, items });
+      }
       commitOlder(nextOlder, pages, nextStatus);
       const previouslyShownIds = new Set(shownBefore.map((item) => item.id));
       const newlyShown = nextOlder.filter((item) => !previouslyShownIds.has(item.id));
