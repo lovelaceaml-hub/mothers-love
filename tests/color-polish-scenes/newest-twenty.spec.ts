@@ -2,11 +2,12 @@ import { expect, test, type Frame } from '@playwright/test';
 import { buildActiveDisplayFixture, loadRenderer } from './helpers';
 
 // Welcome (scene 1) and Garden (scene 2) draw only from the newest 20 records,
-// least shown first, so they rotate through them (Anthony, 2026-10-17). Every other scene keeps the
-// whole pool. Thirty synthetic records: number 30 is the newest.
+// least shown first, so they rotate through them. Every other scene takes
+// three picks in four from the newest 50 and the fourth from the older rest
+// (Anthony, 2026-10-17). Synthetic records only: the highest number is newest.
 const TOTAL = 30;
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
-const recognitions = Array.from({ length: TOTAL }, (_, i) => {
+const pool = (total: number) => Array.from({ length: total }, (_, i) => {
   const n = i + 1;
   const at = new Date(Date.parse('2026-09-10T15:00:00Z') + n * 60000).toISOString();
   return {
@@ -22,6 +23,7 @@ const recognitions = Array.from({ length: TOTAL }, (_, i) => {
     featured: false,
   };
 });
+const recognitions = pool(TOTAL);
 const newest = new Set(recognitions.slice(TOTAL - 20).map((r) => r.id));
 
 // Every record id seen on screen while the scene runs for `seconds`.
@@ -50,11 +52,25 @@ for (const [name, scene, seconds, least] of [['welcome', 1, 29, 7], ['garden', 2
   });
 }
 
-test('other scenes still draw from the whole pool', async ({ page }) => {
+test('other scenes take three picks in four from the newest 50 and the fourth from older ones', async ({ page }) => {
+  const hundred = pool(100);
+  const newestFifty = new Set(hundred.slice(50).map((r) => r.id));
+  const frame = await loadRenderer(page, { scene: 4, fixture: buildActiveDisplayFixture({ recognitions: hundred }) });
+  const picks: string[] = await frame.evaluate(() => {
+    const w = window as any;
+    return Array.from({ length: 400 }, (_, i) => (i % 2 ? w.choose([]) : w.chooseRandom([]))?.id ?? '');
+  });
+  expect(picks.every(Boolean)).toBe(true);
+  expect(picks.filter((x) => newestFifty.has(x)).length).toBe(300);
+  // Older records still come round: many different ones are reached.
+  expect(new Set(picks.filter((x) => !newestFifty.has(x))).size).toBeGreaterThanOrEqual(40);
+});
+
+test('with too few older records, a pick takes the newest instead of nothing', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 4, fixture: buildActiveDisplayFixture({ recognitions }) });
   const picks: string[] = await frame.evaluate(() => {
     const w = window as any;
-    return Array.from({ length: 60 }, () => w.chooseRandom([])?.id ?? '');
+    return Array.from({ length: 40 }, () => w.chooseRandom([])?.id ?? '');
   });
-  expect(picks.some((x) => x && !newest.has(x))).toBe(true);
+  expect(picks.every(Boolean)).toBe(true);
 });

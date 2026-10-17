@@ -117,15 +117,29 @@ function effectiveNow(){return S.nowMs||0}
 function eligible(r){return !!r&&r.status==='published'&&r.valid!==false&&r.expiresAt>effectiveNow()}
 function records(){return ['empty','offline','neutral'].includes(S.mode)?[]:S.pool.filter(eligible)}
 // Welcome (1) and Garden (2) draw only from the newest 20 records, with the
-// usual preference for the least shown, so they rotate through those 20
-// (Anthony, 2026-10-17). Every other scene keeps the whole pool. A forced
-// record still joins the newest.
-const NEWEST_SCENES=new Set([1,2]),NEWEST_LIMIT=20;
+// usual preference for the least shown, so they rotate through those 20. A
+// forced record still joins the newest. Every other scene mixes: three picks
+// in four come from the newest 50 and the fourth from the older rest, taking
+// the other group when the chosen one has nothing to offer (Anthony,
+// 2026-10-17).
+const NEWEST_SCENES=new Set([1,2]),NEWEST_LIMIT=20,MIX_NEW_LIMIT=50,MIX_CYCLE=4,MIX_NEW_PICKS=3;
 function newestOnly(){return NEWEST_SCENES.has(S.s)}
-function sceneRecords(){const all=records();if(!newestOnly())return all;const newest=[...all].sort((a,b)=>b.createdAt-a.createdAt||a.id.localeCompare(b.id)).slice(0,NEWEST_LIMIT);const forced=S.forceId&&!newest.some(r=>r.id===S.forceId)?all.find(r=>r.id===S.forceId):null;return forced?[forced,...newest]:newest}
-// The scene's pool narrowed to an expression. On a newest-only scene an
-// expression none of the newest carry falls back to all of them.
-function scenePool(exclude,expressionId){const base=sceneRecords().filter(r=>!exclude.includes(r.id));const p=expressionId?base.filter(r=>r.ids.includes(expressionId)):base;return !p.length&&expressionId&&newestOnly()?base:p}
+function sceneRecords(){const all=records();if(!newestOnly())return all;const newest=[...all].sort(byNewest).slice(0,NEWEST_LIMIT);const forced=S.forceId&&!newest.some(r=>r.id===S.forceId)?all.find(r=>r.id===S.forceId):null;return forced?[forced,...newest]:newest}
+function byNewest(a,b){return b.createdAt-a.createdAt||a.id.localeCompare(b.id)}
+// The pool one pick draws from, without excluded records and narrowed to an
+// expression. On a newest-only scene an expression none of the newest carry
+// falls back to all of them. Elsewhere each pick takes its turn in the mix.
+function scenePool(exclude,expressionId){
+ const usable=list=>{const base=list.filter(r=>!exclude.includes(r.id));return expressionId?base.filter(r=>r.ids.includes(expressionId)):base};
+ if(newestOnly()){const base=sceneRecords().filter(r=>!exclude.includes(r.id));const p=usable(base);return !p.length&&expressionId?base:p}
+ // The pool keeps its own order, so a pool of 50 or fewer draws exactly as before.
+ const all=records(),newSet=new Set([...all].sort(byNewest).slice(0,MIX_NEW_LIMIT).map(r=>r.id));
+ const fresh=usable(all.filter(r=>newSet.has(r.id))),older=usable(all.filter(r=>!newSet.has(r.id)));
+ const draw=S.mixDraw||0;S.mixDraw=draw+1;
+ const preferNew=draw%MIX_CYCLE<MIX_NEW_PICKS;
+ const first=preferNew?fresh:older,second=preferNew?older:fresh;
+ return first.length?first:second;
+}
 function totals(){return{today:S.days[localDay(effectiveNow())]||{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:S.month,week:S.currentWeek,all:S.campaign}}
 function lowest(a){let index=0;a.forEach((v,i)=>{if(v<a[index])index=i});return index+1}
 function goal(){const g=S.goal||{};return{id:clamp(Number(g.id)||1,1,9),value:Math.max(0,Number(g.value)||0),target:Math.max(1,Number(g.target)||1),rank:Number.isFinite(g.rank)?Math.max(1,Math.floor(g.rank)):null,ratio:Math.max(0,Number(g.ratio)||0),week:g.week||S.week,referenceFourth:Number(g.referenceFourth)||0,achieved:g.achieved===true}}
