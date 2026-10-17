@@ -442,7 +442,7 @@
   // the reserved bubble on a later pass. No bubble is ever shrunk, deferred
   // or paged to make room for another.
   function welcomeChooseSet(host) {
-    const pool = records();
+    const pool = sceneRecords();
     const forced = S.forceId;
     S.forceId = null;
     if (!pool.length) return [];
@@ -614,7 +614,7 @@
     if (!slot || !a.nextId) return;
     const onScreen = new Set([...V.actors.map((x) => x.id), ...V.actors.filter((x) => x !== a).map((x) => x.nextId).filter(Boolean)]);
     const first = S.pool.find((r) => r.id === a.nextId);
-    const rest = records().filter((r) => !onScreen.has(r.id) && r.id !== a.nextId);
+    const rest = sceneRecords().filter((r) => !onScreen.has(r.id) && r.id !== a.nextId);
     rest.sort((x, y) => (S.lastShown.get(x.id) ?? -10000) - (S.lastShown.get(y.id) ?? -10000) || y.createdAt - x.createdAt || x.id.localeCompare(y.id));
     const candidates = (first && eligible(first) ? [first, ...rest] : rest).filter((r) => r.id !== a.id).slice(0, 60);
     welcomeWithHost((host) => {

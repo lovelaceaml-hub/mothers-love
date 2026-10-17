@@ -116,6 +116,16 @@ function setStateFromSnapshot(snapshot,control={}){
 function effectiveNow(){return S.nowMs||0}
 function eligible(r){return !!r&&r.status==='published'&&r.valid!==false&&r.expiresAt>effectiveNow()}
 function records(){return ['empty','offline','neutral'].includes(S.mode)?[]:S.pool.filter(eligible)}
+// Welcome (1) and Garden (2) draw only from the newest 20 records, with the
+// usual preference for the least shown, so they rotate through those 20
+// (Anthony, 2026-10-17). Every other scene keeps the whole pool. A forced
+// record still joins the newest.
+const NEWEST_SCENES=new Set([1,2]),NEWEST_LIMIT=20;
+function newestOnly(){return NEWEST_SCENES.has(S.s)}
+function sceneRecords(){const all=records();if(!newestOnly())return all;const newest=[...all].sort((a,b)=>b.createdAt-a.createdAt||a.id.localeCompare(b.id)).slice(0,NEWEST_LIMIT);const forced=S.forceId&&!newest.some(r=>r.id===S.forceId)?all.find(r=>r.id===S.forceId):null;return forced?[forced,...newest]:newest}
+// The scene's pool narrowed to an expression. On a newest-only scene an
+// expression none of the newest carry falls back to all of them.
+function scenePool(exclude,expressionId){const base=sceneRecords().filter(r=>!exclude.includes(r.id));const p=expressionId?base.filter(r=>r.ids.includes(expressionId)):base;return !p.length&&expressionId&&newestOnly()?base:p}
 function totals(){return{today:S.days[localDay(effectiveNow())]||{...EMPTY_AGGREGATE,expr:[...EMPTY_AGGREGATE.expr]},month:S.month,week:S.currentWeek,all:S.campaign}}
 function lowest(a){let index=0;a.forEach((v,i)=>{if(v<a[index])index=i});return index+1}
 function goal(){const g=S.goal||{};return{id:clamp(Number(g.id)||1,1,9),value:Math.max(0,Number(g.value)||0),target:Math.max(1,Number(g.target)||1),rank:Number.isFinite(g.rank)?Math.max(1,Math.floor(g.rank)):null,ratio:Math.max(0,Number(g.ratio)||0),week:g.week||S.week,referenceFourth:Number(g.referenceFourth)||0,achieved:g.achieved===true}}
@@ -132,9 +142,9 @@ function markShown(id){
  if(!id)return;
  S.shownCount.set(id,(S.shownCount.get(id)||0)+1);
 }
-function choose(exclude=[],expressionId=null){const p=records().filter(r=>!exclude.includes(r.id)&&(!expressionId||r.ids.includes(expressionId)));p.sort((a,b)=>(S.lastShown.get(a.id)??-10000)-(S.lastShown.get(b.id)??-10000)||b.createdAt-a.createdAt||a.id.localeCompare(b.id));return p[0]}
+function choose(exclude=[],expressionId=null){const p=scenePool(exclude,expressionId);p.sort((a,b)=>(S.lastShown.get(a.id)??-10000)-(S.lastShown.get(b.id)??-10000)||b.createdAt-a.createdAt||a.id.localeCompare(b.id));return p[0]}
 function chooseRandom(exclude=[],expressionId=null){
- const pool=records().filter(r=>!exclude.includes(r.id)&&(!expressionId||r.ids.includes(expressionId)));
+ const pool=scenePool(exclude,expressionId);
  if(!pool.length)return undefined;
  const stable=pool.map(r=>r.id).join(',');
  const draw=S.randomDrawCounter||0;
