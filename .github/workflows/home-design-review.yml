@@ -1,5 +1,13 @@
+# Full suites run only on manual dispatch with explicit approval for this run.
+# Automatic runs retain focused checks; a generic release request is not full-suite approval.
 name: Home design review (no deployment)
 on:
+  workflow_dispatch:
+    inputs:
+      full_suite_approved:
+        description: "Anthony explicitly requested or just approved the full suite for this run"
+        type: boolean
+        default: false
   push:
     branches: [codex/home-tv-family]
 permissions:
@@ -34,6 +42,7 @@ jobs:
       - name: Type check and lint
         run: npm run typecheck && npm run lint
       - name: Unit tests
+        if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
         run: npm test
       - name: Build application without production credentials
         run: npm run build

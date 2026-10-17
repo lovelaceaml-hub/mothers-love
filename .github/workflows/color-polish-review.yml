@@ -1,5 +1,13 @@
+# Full suites run only on manual dispatch with explicit approval for this run.
+# Automatic runs retain focused checks; a generic release request is not full-suite approval.
 name: Color materials review (no deployment)
 on:
+  workflow_dispatch:
+    inputs:
+      full_suite_approved:
+        description: "Anthony explicitly requested or just approved the full suite for this run"
+        type: boolean
+        default: false
   push:
     branches: [codex/home-tv-family]
     paths:
@@ -47,7 +55,10 @@ jobs:
       - name: Check color-only source boundary
         run: node scripts/review/check-color-boundary.mjs
       - name: Type check, lint and unit tests
-        run: npm run typecheck && npm run lint && npm test
+        run: npm run typecheck && npm run lint
+      - name: Full unit suite (explicit approval only)
+        if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
+        run: npm test
       - name: Build app and color-only prototype without production credentials
         run: npm run build && node scripts/review/build-color-prototype.mjs
       - name: Build previous approved design for geometry comparison
