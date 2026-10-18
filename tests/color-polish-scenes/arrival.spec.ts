@@ -6,11 +6,16 @@ import { resolve } from 'node:path';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
-// A wave is five recognitions, drawn at 240 TV px and laid out at the same 240 px,
-// so every word on a group bubble is drawn at the size it is laid out at.
+// A wave is five recognitions. Anthony, 2026-09-19, after watching it on the
+// TV: a group wave always shows all five together, laid out at 300 TV px and
+// drawn at 400, so its words are drawn a third larger (ARRIVAL_GROUP in
+// scenes/arrival.js).
 const GROUP_SIZE = 5;
-const GROUP_LAYOUT = 240;
-const GROUP_DRAWN = 240;
+const GROUP_LAYOUT = 300;
+const GROUP_DRAWN = 400;
+// The group's own centre inside the arrival frame (ARRIVAL_GROUP.cy), set a
+// little below the frame's middle so the larger bubbles clear the title.
+const GROUP_CENTRE_Y = 500;
 // Anthony's floor: text a viewer reads is never under 18 px drawn at 1920.
 const TEXT_FLOOR_PX = 18;
 
@@ -249,7 +254,7 @@ test('the four reworked entrances start deep and resolve flat', async ({ page })
     for (const orb of resolvedInfo) {
       expect(Math.abs(orb.z)).toBeLessThanOrEqual(2);
       // Flat means no flight scale is left: only the fixed drawn size over layout size
-      // factor remains (760 over 540 single, 240 over 240 group).
+      // factor remains (760 over 540 single, 400 over 300 group).
       const drawnOverLayout = wave < 6 ? 760 / 540 : GROUP_DRAWN / GROUP_LAYOUT;
       expect(Math.abs(orb.scale - drawnOverLayout)).toBeLessThanOrEqual(0.02);
       expect(orb.opacity).toBe(1);
@@ -676,7 +681,7 @@ test('screenshots for frame styles at assembly midpoint and path styles at entra
   }
 });
 
-test('arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave', async ({ page }) => {
+test('arrival records log exactly one arrival_record_shown per record for single arrival and a long message group wave', async ({ page }) => {
   test.setTimeout(120_000);
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);
@@ -700,11 +705,11 @@ test('arrival records log exactly one arrival_record_shown per record for single
   }, singleRecordId);
   expect(singleShownLogs).toHaveLength(1);
 
-  // 2. Full oversize group wave of five: each of the five ids has exactly one entry, not more
+  // 2. Group wave of five long messages: each of the five ids has exactly one entry, not more
   seq++;
   const groupPrefix = 'arrival-group-oversize-log';
   const longMessage =
-    'This is an extended appreciation message designed to test the full oversize group reading flow across every circular pair page on the display. Thank you for your continued support and kindness.';
+    'This is an extended appreciation message designed to test the group reading flow with long messages on the display. Thank you for your continued support and kindness.';
   await pushArrivalWave(page, frame, snapshot, 6, seq, {
     idPrefix: groupPrefix,
     message: longMessage,
@@ -712,7 +717,7 @@ test('arrival records log exactly one arrival_record_shown per record for single
 
   const expectedGroupIds = Array.from({ length: GROUP_SIZE }, (_, i) => `${groupPrefix}-${i}`);
 
-  // Step through every buildGroupPage page and exit to completion
+  // Step through the reading and exit to completion
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(1200));
   for (let step = 0; step < 25; step++) {
     const isDone = await frame.evaluate(() => {
@@ -728,16 +733,16 @@ test('arrival records log exactly one arrival_record_shown per record for single
     return st.active === null && st.queueLength === 0;
   });
 
-  // Verify every page of the five messages executed: two, two, then the last one alone
+  // All five stay on screen together for the whole wave: the reading is one
+  // group page, never the old two at a time pair pages.
   const pagesLogged = await frame.evaluate(() => {
     const logs = (window as any).colorPolishRuntime.getState().log || [];
     return logs
       .filter((l: any) => l.type === 'reading_start' && l.kind === 'group')
       .map((l: any) => l.page);
   });
-  const expectedPages = Array.from({ length: Math.ceil(GROUP_SIZE / 2) }, (_, i) => i);
-  expect(pagesLogged).toEqual(expect.arrayContaining(expectedPages));
-  expect(Math.max(...pagesLogged)).toBe(expectedPages[expectedPages.length - 1]);
+  expect(pagesLogged.length).toBeGreaterThan(0);
+  expect(new Set(pagesLogged)).toEqual(new Set([0]));
 
   // Verify each of the five record ids has exactly one arrival_record_shown entry
   const allShownLogs = await frame.evaluate(() => {
@@ -751,7 +756,7 @@ test('arrival records log exactly one arrival_record_shown per record for single
   }
 });
 
-test('a wave of five draws five smaller bubbles, one per recognition, with every word on screen', async ({ page }) => {
+test('a wave of five draws five bubbles at the group size, one per recognition, with every word on screen', async ({ page }) => {
   test.setTimeout(120_000);
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);
@@ -803,7 +808,7 @@ test('a wave of five draws five smaller bubbles, one per recognition, with every
     expect(orb.text.length).toBeGreaterThan(0);
     expect(orb.text.endsWith('...'), 'a message is never ellipsized').toBe(false);
     expect(orb.fits, 'the words fit inside the bubble').toBe(true);
-    expect(orb.drawnDiameter, 'the bubble is drawn at the smaller group size').toBeCloseTo(GROUP_DRAWN, 0);
+    expect(orb.drawnDiameter, 'the bubble is drawn at the group size').toBeCloseTo(GROUP_DRAWN, 0);
     expect(orb.messagePx, 'message drawn px').toBeGreaterThanOrEqual(TEXT_FLOOR_PX);
   }
   // Every word of every message is reachable: whatever does not fit at once is paged, verbatim.
@@ -1865,8 +1870,8 @@ function expectFullScreenComposition(geometry: ArrivalGeometry, kind: 'single' |
   const ring = 28 * (orbs[0].width / (kind === 'group' ? GROUP_LAYOUT : before));
   for (const orb of orbs) {
     if (kind === 'group') {
-      // Anthony asked for smaller group bubbles: the drawn diameter is exactly the new
-      // size in TV units, which is that many real pixels at 1920 and double at 3840.
+      // The drawn diameter is exactly the approved group size in TV units, which is
+      // that many real pixels at 1920 and double at 3840.
       expect(orb.width, `${label}: orb drawn diameter`).toBeCloseTo(GROUP_DRAWN, 0);
       expect(orb.width * zoom, `${label}: orb drawn diameter in screen px`).toBeCloseTo(GROUP_DRAWN * zoom, 0);
       expect(orb.scale, `${label}: orb drawn over layout`).toBeCloseTo(GROUP_DRAWN / GROUP_LAYOUT, 2);
@@ -1898,7 +1903,9 @@ function expectFullScreenComposition(geometry: ArrivalGeometry, kind: 'single' |
   }
   const orbTop = Math.min(...orbs.map((orb) => orb.top));
   const orbBottom = Math.max(...orbs.map((orb) => orb.bottom));
-  expect(Math.abs((orbTop + orbBottom) / 2 - 540), `${label}: orbs centred top to bottom`).toBeLessThanOrEqual(12);
+  // A single or pair centres on the screen; a group centres on its own centre.
+  const middleY = kind === 'group' ? stage.top + GROUP_CENTRE_Y : 540;
+  expect(Math.abs((orbTop + orbBottom) / 2 - middleY), `${label}: orbs centred top to bottom`).toBeLessThanOrEqual(12);
   expect(orbBottom - orbTop, `${label}: orbs span most of the screen height`).toBeGreaterThanOrEqual(680);
   if (kind === 'group') {
     // Five bubbles stay a composed arrangement across the stage, not a thin strip:
@@ -2009,7 +2016,7 @@ test(`the entrance composition fills the whole screen for every wave and every f
   expect([...framesSeen.group].sort()).toEqual([0, 1, 2, 3]);
 });
 
-test(`a 500 grapheme message fits whole on the full screen single orb and the group pairs at ${width}`, async ({ page }) => {
+test(`a 500 grapheme message fits whole on the full screen single orb and pages verbatim in the group of five at ${width}`, async ({ page }) => {
   test.setTimeout(300_000);
   const zoom = width / 1920;
   await page.setViewportSize({ width, height: zoom * 1080 });
@@ -2041,16 +2048,21 @@ test(`a 500 grapheme message fits whole on the full screen single orb and the gr
   expect(MOSTLY_LONG_MESSAGE_500.includes(singleText.trim())).toBe(true);
   await stepToDrained(frame);
 
-  // Group of five long messages: shown as circular pairs.
+  // Group of five long messages: all five together, each paging its own
+  // message inside its own bubble, word for word.
   await pushArrivalWave(page, frame, snapshot, 6, 3, { idPrefix: `long-group-${width}`, message: MOSTLY_LONG_MESSAGE_500 });
   await stepToReading(frame);
   await frame.evaluate(() => (window as any).colorPolishRuntime.step(1700));
-  const pair = await arrivalGeometry(frame);
-  expectFullScreenComposition(pair, 'pair', `w${width} 500 grapheme group pair`);
-  await page.screenshot({ path: resolve(outputFolder, `w${width}-group-pair-long-500.png`) });
-  const pairLogs = await pagesFor(`long-group-${width}`);
-  for (const entry of pairLogs) expect(entry.verbatim).toBe(true);
-  // Five pages of long reading: drain with large steps, then confirm it cleared.
+  const group = await arrivalGeometry(frame);
+  expectFullScreenComposition(group, 'group', `w${width} 500 grapheme group of five`);
+  await page.screenshot({ path: resolve(outputFolder, `w${width}-group-five-long-500.png`) });
+  const groupLogs = await pagesFor(`long-group-${width}`);
+  expect(groupLogs.length, 'the long messages page inside their bubbles').toBeGreaterThan(0);
+  for (const entry of groupLogs) expect(entry.verbatim).toBe(true);
+  const groupTexts = await frame.evaluate(() => [...document.querySelectorAll('#event .event-orb .message')].map((m) => (m.textContent || '').trim()));
+  expect(groupTexts).toHaveLength(GROUP_SIZE);
+  for (const text of groupTexts) expect(text.length > 0 && MOSTLY_LONG_MESSAGE_500.includes(text)).toBe(true);
+  // Long reading: drain with large steps, then confirm it cleared.
   await frame.evaluate(() => {
     const runtime = (window as any).colorPolishRuntime;
     for (let i = 0; i < 80; i++) {
