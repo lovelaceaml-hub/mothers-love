@@ -15,6 +15,7 @@ import { startVisiblePoll } from '@/lib/visible-poll';
 import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import type { DisplayMode } from '@/lib/contracts';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
+import { publishDisplayPhase } from '../display-phase';
 
 // Poll frequently for prompt arrivals; unchanged responses now return a tiny heartbeat
 // rather than the full recognition list. Never slow down delivery to save bandwidth.
@@ -233,6 +234,11 @@ export function ColorPolishHost() {
   // cover the latest 100 recognitions the snapshot carries.
   const [reactionTotal, setReactionTotal] = useState<number | null>(null);
   const lastLikesTotalRequestAtRef = useRef<number | null>(null);
+
+  // Siblings on the TV page, such as the background song, follow the phase.
+  useEffect(() => {
+    publishDisplayPhase(phase);
+  }, [phase]);
 
   const markUnsafe = (nextPhase: HostPhase) => {
     cacheRef.current.clear();
