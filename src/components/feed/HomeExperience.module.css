@@ -75,6 +75,13 @@
 .liveLabel[data-live='true'] i { background: #64845b; box-shadow: 0 0 0 3px #92b58c22; }
 .feedViewport { max-height: min(67svh, 48rem); min-height: 17rem; overflow-y: auto; overflow-x: hidden; overflow-anchor: none; overscroll-behavior: contain; padding: .1rem .6rem 1rem .1rem; scrollbar-width: thin; scrollbar-color: #beb9aa #f2eee2; scroll-margin-top: 1.5rem; border-radius: .4rem; }
 .feedList { display: grid; gap: 1rem; }
+@supports (content-visibility: auto) {
+  .feedCard:nth-child(n + 3) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 12rem;
+  }
+}
+
 .feedCard { min-width: 0; padding: 1.45rem 1.5rem 1.1rem; background: #fffefa; border: 1px solid #e6e1d6; border-top-color: #fff; border-radius: 1.6rem 1.6rem 1.6rem .5rem; box-shadow: 0 8px 20px -15px #78694b38, inset 0 1px 0 #fff; animation: cardReveal .38s ease-out both; }
 .cardHeader { display: flex; gap: .85rem; align-items: center; }
 .cardHeaderCopy { min-width: 0; }

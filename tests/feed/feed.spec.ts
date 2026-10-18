@@ -238,6 +238,14 @@ test('shows the latest 100 items, batches heart counts, and keeps the list keybo
   await expect.poll(() => reactionRequests.length).toBe(1);
   expect(reactionRequests.every((ids) => ids.length <= 100)).toBe(true);
   expect(reactionRequests.flat()).toHaveLength(100);
+  const deferredCard = page.locator('#recent-recognitions [data-recognition-id]').nth(2);
+  await expect(deferredCard).toHaveCSS('content-visibility', 'auto');
+  const reactionButtons = page.locator('#recent-recognitions [data-recognition-id] button');
+  await reactionButtons.nth(0).focus();
+  await page.keyboard.press('Tab');
+  await expect(reactionButtons.nth(1)).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(reactionButtons.nth(2)).toBeFocused();
 });
 
 test('shows the form only on the recognize page, with no live campaign feed', async ({ page }) => {
