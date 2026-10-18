@@ -9,8 +9,12 @@ import {
   studioClickDoesNotAdvance,
 } from './helpers';
 
-test('featured renders circular bubbles and no overflow at 14 s', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'featured', 14000);
+// Featured turns to its next expression at 15 s and every bubble re-enters
+// from below the scene. The Studio preview plays on its own for a moment
+// before a check pauses it, a second or two on a busy machine, so a check of
+// the settled scene looks at 11 s, well clear of that turn.
+test('featured renders circular bubbles and no overflow at 11 s', async ({ page }) => {
+  const { frame } = await openStudioScene(page, 'featured', 11000);
   const circleResult = await circularity(frame);
   expect(circleResult.count).toBeGreaterThan(0);
   expect(circleResult.failures).toHaveLength(0);
@@ -36,7 +40,7 @@ test('the scene stays populated and replaces one bubble at a time', async ({ pag
 });
 
 test('bubbles span two depth layers', async ({ page }) => {
-  const { frame } = await openStudioScene(page, 'featured', 14000);
+  const { frame } = await openStudioScene(page, 'featured', 11000);
 
   const depths = await frame.evaluate(() => {
     const slots = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="4"] .orb-slot'));
@@ -52,7 +56,9 @@ test('bubbles span two depth layers', async ({ page }) => {
   });
 
   expect(blurs.some((b: number) => b >= 0.3)).toBe(true);
-  expect(blurs.some((b: number) => b === 0)).toBe(true);
+  // A near bubble's gentle depth sway can add a faint size blur (at most
+  // 0.09 px, core/motion.js); far and mid bubbles carry 0.3 px or more.
+  expect(blurs.some((b: number) => b < 0.15)).toBe(true);
 });
 
 test('bubbles stay circular during an exit', async ({ page }) => {

@@ -98,6 +98,8 @@ test('at least one bubble changes heading between 6 and 14 s', async ({ page }) 
 });
 
 test('bubbles stay circular through motion', async ({ page }) => {
+  // Five Studio page loads in a row; the default 30 s runs out on a busy machine.
+  test.setTimeout(120000);
   for (const ms of [300, 6000, 14000, 20000]) {
     const freshPage = await page.context().newPage();
     const { frame } = await openStudioScene(freshPage, 'welcome', ms);
@@ -1566,7 +1568,9 @@ test('the fit checks can fail: a message forced past its rim is reported', async
 
   // And the single-page rule can fail too: claiming a paging record shows
   // whole is reported.
-  const paged = await loadRenderer(await page.context().newPage(), { scene: 1, ms: 0, fixture: lengthPool([60, 70, 80, 90, 100], 60, [hardRecord()]) });
+  // At 4 s every bubble has finished its entrance, so the page indicator is
+  // fully visible to the check.
+  const paged = await loadRenderer(await page.context().newPage(), { scene: 1, ms: 4000, fixture: lengthPool([60, 70, 80, 90, 100], 60, [hardRecord()]) });
   const readings = (await bubbleReadings(paged, WELCOME_ROOT)).filter((r) => r.visible && r.pages > 1);
   expect(readings.length, 'the record that cannot fit 480 px pages in the reserved bubble').toBe(1);
   const wrong = await textFits(paged, WELCOME_ROOT, { singlePageIds: [readings[0].id] });

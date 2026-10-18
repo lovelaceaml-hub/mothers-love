@@ -325,9 +325,14 @@ export async function textFits(
       const circleCache = new Map<HTMLElement, Circle | null>();
       const circleOf = (bubble: HTMLElement): Circle | null => {
         if (circleCache.has(bubble)) return circleCache.get(bubble)!;
-        const rect = bubble.getBoundingClientRect();
+        // The circle as drawn: a bubble's life layer carries its entrance
+        // scale (core/transitions.js), which grows past full size for a
+        // moment with the words inside it, so the slot's resting box would
+        // misjudge words that keep their place in the drawn circle.
+        const drawn = bubble.querySelector<HTMLElement>(':scope > .orb-life') || bubble;
+        const rect = drawn.getBoundingClientRect();
         const circle = rect.width > 0
-          ? { cx: rect.left + rect.width / 2, cy: rect.top + rect.height / 2, diameter: Math.min(rect.width, rect.height), scale: bubble.offsetWidth ? rect.width / bubble.offsetWidth : tvScale }
+          ? { cx: rect.left + rect.width / 2, cy: rect.top + rect.height / 2, diameter: Math.min(rect.width, rect.height), scale: drawn.offsetWidth ? rect.width / drawn.offsetWidth : tvScale }
           : null;
         circleCache.set(bubble, circle);
         return circle;

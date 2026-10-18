@@ -293,7 +293,9 @@ export async function readyStudioFrame(page: Page, expectedSceneId: number, acce
       if (frame.isDetached()) return false;
       throw error;
     }
-  }).toBe(true);
+    // A fresh Studio preview can take longer than the default 5 s to come up
+    // on a busy machine.
+  }, { timeout: 15000 }).toBe(true);
   return ready!;
 }
 
