@@ -14,7 +14,7 @@ function garden() {
     const fr = records().find(r => r.id === S.forceId);
     if (fr) chosen.push(fr);
   }
-  for (let i = chosen.length; i < Math.min(5, records().length); i++) {
+  for (let i = chosen.length; i < Math.min(5, sceneRecords().length); i++) {
     const r = chooseRandom(chosen.map(a => a.id));
     if (r) chosen.push(r);
   }
