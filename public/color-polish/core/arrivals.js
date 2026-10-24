@@ -66,7 +66,7 @@ function tickEvent(dt){
    if(a.oversize)pos={...pos,x:mix(pos.x,b.x,smooth(p)),y:mix(pos.y,b.y,smooth(p))};
    if(S.still)pos={x:b.x,y:b.y,z:0,k:1,alpha:1};positionEvent(b,pos);
   });drawEventParticles(p);
-  if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;if(a.fx&&a.fx.landedAt===null)a.fx.landedAt=S.t;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
+  if(p>=1){a.phase='reading';a.phaseAt=S.t;a.localTime=0;if(a.fx&&a.fx.landedAt===null)a.fx.landedAt=S.t;a.elements.forEach(b=>{b.reading.at=0;positionEvent(b,{x:b.x,y:b.y,k:1,z:0,alpha:1})});$('qr-zone').classList.remove('qr-active');$('event-canvas').getContext('2d').clearRect(0,0,ARRIVAL_W,ARRIVAL_H);arrivalRebuildScene();log('reading_start',{kind:a.kind,duration:a.hold,page:a.page,ids:a.items.map(r=>r.id)})}
  }else if(a.phase==='reading'){
   a.localTime=elapsed;
   a.elements.forEach((b,i)=>{if(a.kind==='single')b.reading.duration=Math.min(b.reading.duration,ARRIVAL_SHOW);if(a.kind==='group')b.reading.duration=Math.min(b.reading.duration,a.hold/b.reading.pages.length);if(elapsed<a.hold)tickCirclePages(b,elapsed);if(!S.still)positionEvent(b,{x:b.x+Math.sin(elapsed*.27+i*1.73)*2,y:b.y+Math.sin(elapsed*.32+i*2.39)*3,z:0,k:1,alpha:1})});
@@ -121,7 +121,11 @@ function tickEvent(dt){
  renderQueue();
 }
 
-function endChain(){if(active&&active.phase!=='gap')return;active=null;S.chain=false;$('event').className='event-stage';$('event').replaceChildren();$('stage').classList.remove('dimmed');$('qr-zone').classList.remove('qr-active');arrivalClearSky();renderQueue();if(S.pendingScene){const id=S.pendingScene;S.pendingScene=null;requestScene(id)}else if(S.milestonePending){const v=S.milestonePending;S.milestonePending=null;captureMilestone(v);requestScene(11)}log('queue_drained',{resumeScene:S.s})}
+function endChain(){if(active&&active.phase!=='gap')return;arrivalRebuildScene();active=null;S.chain=false;$('event').className='event-stage';$('event').replaceChildren();$('stage').classList.remove('dimmed');$('qr-zone').classList.remove('qr-active');arrivalClearSky();renderQueue();if(S.pendingScene){const id=S.pendingScene;S.pendingScene=null;requestScene(id)}else if(S.milestonePending){const v=S.milestonePending;S.milestonePending=null;captureMilestone(v);requestScene(11)}log('queue_drained',{resumeScene:S.s})}
+
+// Records that came in with an arrival join the screen behind it here, while
+// the arrival covers it, rather than as a sudden rebuild before it begins.
+function arrivalRebuildScene(){if(!S.rebuildPending||transition)return;S.rebuildPending=false;renderNow(S.s,{keepAge:true})}
 
 function drawEventParticles(p){
  const a=active,can=$('event-canvas'),c=can?.getContext('2d');if(!c||!a)return;c.clearRect(0,0,ARRIVAL_W,ARRIVAL_H);if(S.still)return;

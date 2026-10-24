@@ -3,7 +3,7 @@
 
 function pruneRemovedIds(ids){if(!ids.length)return;const removed=new Set(ids);document.querySelectorAll('[data-record-id],[data-event-id],[data-tribute-id],[data-feed-id]').forEach(el=>{const id=el.dataset.recordId||el.dataset.eventId||el.dataset.tributeId||el.dataset.feedId;if(removed.has(id))el.remove()});slots=slots.filter(slot=>!removed.has(slot.id));if(typeof V!=='undefined'){V.actors=V.actors.filter(actor=>!removed.has(actor.id)&&!removed.has(actor.nextId));V.planets=V.planets.filter(planet=>!removed.has(planet.b?.id))}feedLanes.forEach(lane=>{lane.list=lane.list.filter(id=>!removed.has(id));lane.next=lane.next.filter(id=>!removed.has(id))})}
 function preserveRuntimeState(next,previous,nextById){
- const fields=['bloomIndex','bloomNext','groupNumber','replenishAt','idCounter','singleStyle','groupStyle','singleBag','groupBag','singleBagLast','groupBagLast','speechBag','speechLast','randomDrawCounter','mixDraw','feedArrivalCounter','returnScene','returnAge','pendingScene','chain','countJobs','lowSince','lowAutomatic','milestonePending','milestoneContributors','milestonesSeen','privacyAt','shimmerUntil','lastHeader'];
+ const fields=['bloomIndex','bloomNext','groupNumber','replenishAt','idCounter','singleStyle','groupStyle','singleBag','groupBag','singleBagLast','groupBagLast','speechBag','speechLast','randomDrawCounter','mixDraw','feedArrivalCounter','returnScene','returnAge','pendingScene','chain','countJobs','lowSince','lowAutomatic','milestonePending','milestoneContributors','milestonesSeen','privacyAt','shimmerUntil','lastHeader','rebuildPending'];
  for(const key of fields){const value=previous?.[key];if(value===undefined)continue;if(Array.isArray(value))next[key]=[...value];else if(value instanceof Map)next[key]=new Map(value);else if(value instanceof Set)next[key]=new Set(value);else next[key]=value}
  next.lastShown=new Map(previous?.lastShown instanceof Map?[...previous.lastShown].filter(([id])=>nextById.has(id)):[]);
  next.shownCount=new Map(previous?.shownCount instanceof Map?[...previous.shownCount].filter(([id])=>nextById.has(id)):[]);
@@ -29,7 +29,12 @@ function applySnapshotPayload(snapshot,control={}){
  if(!pauseArrivals&&!replayed){for(const record of newRecords)if(!S.queue.includes(record.id))S.queue.push(record.id);if(newRecords.length&&!active)S.queueStart=S.t+.65}
  if(!previousReady||wasSafe||replayed){renderNow(S.s);initFeed();updateHeader();applyStill()}
  else{
-  mandatoryPrune();if((sceneChanged||recordsChanged(previous.pool,S.pool))&&!active&&!transition)renderNow(S.s,{keepAge:true});else{refreshNumbers();updateHeader();}
+  // A new recognition no longer rebuilds the screen at once, which made the TV
+  // jump just before its arrival began. While an arrival is queued or showing,
+  // the screen is rebuilt once the arrival covers it (arrivalRebuildScene).
+  mandatoryPrune();const changed=recordsChanged(previous.pool,S.pool),arriving=!!active||S.queue.length>0;
+  if(changed&&arriving)S.rebuildPending=true;
+  if((sceneChanged||((changed||S.rebuildPending)&&!arriving))&&!active&&!transition){S.rebuildPending=false;renderNow(S.s,{keepAge:true})}else{refreshNumbers();updateHeader();}
   applyStill();
  }
  renderQueue();
