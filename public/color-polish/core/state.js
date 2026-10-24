@@ -160,7 +160,7 @@ function markShown(id){
 // Bubble colours rotate through this palette so the bubbles on screen never
 // share one; the chips inside still carry each expression's own colour. A
 // record keeps its hue while it is on screen or among the last seven shown.
-const BUBBLE_HUES=['#B79CF2','#FFB27A','#7FD6B2','#F48FB8','#86BDF2','#F5C75A','#D99BE6','#FF9384'];
+const BUBBLE_HUES=['#CDBDF6','#FFCFAA','#A9E6CB','#F8B6CF','#AFD4F6','#F7DC94','#E6BDEE','#FFB8AC'];
 const bubbleClaims=new Map();let bubbleTurn=0;
 function claimBubbleHue(id){
  const onScreen=new Set([...document.querySelectorAll('#tv [data-bubble-for]')].map(el=>el.dataset.bubbleFor));

@@ -239,9 +239,12 @@
 }
 
 /* Plan 17: a planet's fill must be fully opaque so the centre quote never shows
-   through its words as it passes the sun. The bubble fill in renderer.css is
-   opaque (its iridescent base layer has no alpha); depth is shown by the tone
-   filter orbit.js applies, never by transparency. */
+   through its words as it passes the sun. The glassy bubble fill in
+   renderer.css lets a little show through, so a planet sits on a solid base;
+   depth is shown by the tone filter orbit.js applies, never by transparency. */
+#tv .scene[data-scene="10"] .planet-system .orb {
+  background-color: #fffdf8;
+}
 
 /* Plan 17: a planet grows to the diameter its message needs, so orbit.js
    sets the planet and its bubble to the same measured size inline. */
