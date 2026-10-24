@@ -27,7 +27,7 @@ window.colorPolishRuntime={
  setPlaying:value=>{S.playing=value===true;S.still=motionStill(S.motion,!S.playing);applyStill()},
  setClock:ms=>{if(finiteNumber(ms)&&ms>=0){S.t=ms/1000;S.clockControlled=true;updateHeader();tickNumbers()}},
  step:stepRuntime,
- clear:()=>{S=blankState();clearPresentation()},
+ clear:()=>{S=blankState();bubbleClaims.clear();clearPresentation()},
  catalog:catalog.map(item=>({...item}))
 };
 

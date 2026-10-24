@@ -155,7 +155,23 @@ function tickNumbers(){numCache.forEach(c=>{const p=S.still?1:clamp((S.t-c.start
 function markShown(id){
  if(!id)return;
  S.shownCount.set(id,(S.shownCount.get(id)||0)+1);
+ claimBubbleHue(id);
 }
+// Bubble colours rotate through this palette so the bubbles on screen never
+// share one; the chips inside still carry each expression's own colour. A
+// record keeps its hue while it is on screen or among the last seven shown.
+const BUBBLE_HUES=['#B79CF2','#FFB27A','#7FD6B2','#F48FB8','#86BDF2','#F5C75A','#D99BE6','#FF9384'];
+const bubbleClaims=new Map();let bubbleTurn=0;
+function claimBubbleHue(id){
+ const onScreen=new Set([...document.querySelectorAll('#tv [data-bubble-for]')].map(el=>el.dataset.bubbleFor));
+ const recent=[...bubbleClaims.keys()].slice(1-BUBBLE_HUES.length);
+ for(const k of bubbleClaims.keys())if(!onScreen.has(k)&&!recent.includes(k))bubbleClaims.delete(k);
+ const held=new Set([...bubbleClaims].filter(([k])=>k!==id).map(([,h])=>h));
+ let h=bubbleClaims.get(id);
+ if(h===undefined||held.has(h)){h=bubbleTurn;for(let k=0;k<BUBBLE_HUES.length&&held.has(h);k++)h=(h+1)%BUBBLE_HUES.length;bubbleTurn=(h+1)%BUBBLE_HUES.length}
+ bubbleClaims.delete(id);bubbleClaims.set(id,h);
+}
+function bubbleHue(id){const h=bubbleClaims.get(id);return BUBBLE_HUES[h===undefined?bubbleTurn:h]}
 function choose(exclude=[],expressionId=null){const p=scenePool(exclude,expressionId);p.sort((a,b)=>(S.lastShown.get(a.id)??-10000)-(S.lastShown.get(b.id)??-10000)||b.createdAt-a.createdAt||a.id.localeCompare(b.id));return p[0]}
 function chooseRandom(exclude=[],expressionId=null){
  const pool=scenePool(exclude,expressionId);

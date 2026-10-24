@@ -3,7 +3,7 @@
 
 function completeOrb(r,d,{event=false,group=false}={}){
  const size=d>=450?'orb-large':d<285?'orb-small':'';
- return `<div class="orb-breath"><article class="orb ${size}" style="--tint:${catalog[r.ids[0]-1].color}"><div class="orb-sheen"></div><div class="orb-content"><div class="thanks">THANK YOU,</div><h3 class="recipient">${esc(r.name)}</h3><p class="message" data-full-message="${esc(r.id)}">${esc(r.message)}</p>${chips(r.ids)}${reactionMarkup(r)}<div class="orb-page-indicator" hidden></div></div></article></div>`;
+ return `<div class="orb-breath" data-bubble-for="${esc(r.id)}" style="--bubble:${bubbleHue(r.id)}"><article class="orb ${size}" style="--tint:${catalog[r.ids[0]-1].color}"><div class="orb-sheen"></div><div class="orb-content"><div class="thanks">THANK YOU,</div><h3 class="recipient">${esc(r.name)}</h3><p class="message" data-full-message="${esc(r.id)}">${esc(r.message)}</p>${chips(r.ids)}${reactionMarkup(r)}<div class="orb-page-indicator" hidden></div></div></article></div>`;
 }
 function addOrb(r,x,y,d,opts={}){
  if(!r)return '';const key='slot-'+(++S.slotCounter);
