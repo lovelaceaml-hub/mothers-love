@@ -37,7 +37,7 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: conic-gradient(from var(--welcome-ring-angle), transparent 0%, #fff9 35%, color-mix(in srgb, var(--tint, #d9b477) 35%, transparent) 70%, transparent 100%);
+  background: conic-gradient(from var(--welcome-ring-angle), transparent 0%, #fff9 35%, #FFE3A499 70%, transparent 100%);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 6px));
   mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #fff calc(100% - 6px));
   animation: welcomeRingSpin 9s linear infinite;

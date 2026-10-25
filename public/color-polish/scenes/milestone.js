@@ -40,7 +40,8 @@ function tributeContent(a,r){
  const chosenId=hasGoal?goalId:r.ids[0];
  const chosenExpr=catalog[chosenId-1];
  a.el.style.setProperty('--tint',chosenExpr.color);
- a.el.innerHTML=`<div class="stream-pearl"><div class="stream-phrase">${esc(chosenExpr.phrase)}</div><b>${esc(r.name)}</b><div class="stream-tags">${r.ids.map(id=>icon(id)).join('')}</div></div>`;
+ a.el.style.setProperty('--bubble',bubbleHue(r.id));a.el.dataset.bubbleFor=r.id;
+ a.el.innerHTML=`<div class="stream-pearl"><div class="stream-phrase">${esc(chosenExpr.phrase)}</div><b>${esc(r.name)}</b><div class="stream-tags">${shownIds(r.ids,goalId).map(id=>icon(id)).join('')}</div></div>`;
 }
 
 // Plan 17 Lane 8 (Anthony on the church TV, September 19): "the swirling
@@ -295,7 +296,7 @@ function mountTributes(){
  // funnel's sides where no pearl reaches.
  for(let i=0;i<STREAM_FOAM;i++){
   const el=document.createElement('div'),art=i<STREAM_ICON_BUBBLES,d=Math.round(art?56+56*rng():10+50*Math.pow(rng(),1.8));
-  el.className='stream-foam';el.style.width=el.style.height=d+'px';
+  el.className='stream-foam';el.style.width=el.style.height=d+'px';el.style.setProperty('--bubble',BUBBLE_HUES[i%BUBBLE_HUES.length]);
   if(art){const img=document.createElement('img');img.src=ASSETS['icon'+(1+i%9)];img.alt='';el.append(img)}
   root.append(el);
   V.stream.foam.push({el,d,art,y:(V.stream.height+140)*((i*7%STREAM_FOAM)+.5)/STREAM_FOAM-70,angle:rng()*TAU,radius:art?210+rng()*260:80+rng()*470,rise:(art?20:30)+rng()*30-d*.1,turn:.2+rng()*.3,wobble:rng()*TAU});

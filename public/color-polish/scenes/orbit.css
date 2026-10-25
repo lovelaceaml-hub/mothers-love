@@ -238,12 +238,13 @@
   transform-origin: 50% 50%;
 }
 
-/* Plan 17: the shipped planet fill is slightly see-through (F7, F2 and E8
-   alpha in the base orb gradient), which let the centre quote show through a
-   planet's words as it passed the sun. Same colours, fully opaque; depth is
-   shown by the tone filter orbit.js applies, never by transparency. */
+/* Plan 17: a planet's fill must be fully opaque so the centre quote never shows
+   through its words as it passes the sun. The glassy bubble fill in
+   renderer.css lets a little show through, so a planet sits on a solid base.
+   Depth shows through scale alone: orbit.js no longer rebuilds a blur,
+   drop-shadow and tone filter on every frame, which made the scene choppy. */
 #tv .scene[data-scene="10"] .planet-system .orb {
-  background: radial-gradient(circle at 28% 14%, #ffffff 5%, #fffefc 36%, #fffefb 57%, color-mix(in srgb, var(--tint, #FFC7A2) 37%, #fff9ef) 100%);
+  background-color: #fffdf8;
 }
 
 /* Plan 17: a planet grows to the diameter its message needs, so orbit.js

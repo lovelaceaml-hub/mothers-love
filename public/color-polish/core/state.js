@@ -45,6 +45,10 @@ const icon=(id,cl='icon')=>`<img class="${cl}" src="${ASSETS['icon'+id]}" alt="$
 const art=(key,style)=>`<img class="art" src="${ASSETS[key]}" style="${style}" alt="">`;
 const medallion=id=>`<div class="medallion" style="--tint:${catalog[id-1].color}">${icon(id)}</div>`;
 const shimmer=(text,type='')=>`<span class="spark-word"><span class="text-shimmer ${type}">${esc(text)}</span></span>`;
+// TV bubbles show at most three of a recognition's expressions, in the order
+// they were chosen; when a screen is about one expression that the record
+// chose further down, that one takes the third place.
+function shownIds(ids,focus=null){if(ids.length<=3)return ids;const first=ids.slice(0,3);return focus&&ids.includes(focus)&&!first.includes(focus)?[...ids.slice(0,2),focus]:first}
 const chips=ids=>`<div class="chips">${ids.map(id=>`<span class="chip">${icon(id)}${esc(catalog[id-1].name)}</span>`).join('')}</div>`;
 const heading=(small,title,subtitle='')=>`<div class="eyebrow">${esc(small)}</div><h1 class="heading">${shimmer(title,'ink')}</h1>${subtitle?`<p class="subheading">${esc(subtitle)}</p>`:''}`;
 function localDay(ms){return new Intl.DateTimeFormat('en-CA',{timeZone:ZONE,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms))}
@@ -155,7 +159,23 @@ function tickNumbers(){numCache.forEach(c=>{const p=S.still?1:clamp((S.t-c.start
 function markShown(id){
  if(!id)return;
  S.shownCount.set(id,(S.shownCount.get(id)||0)+1);
+ claimBubbleHue(id);
 }
+// Bubble colours rotate through this palette so the bubbles on screen never
+// share one; the chips inside still carry each expression's own colour. A
+// record keeps its hue while it is on screen or among the last seven shown.
+const BUBBLE_HUES=['#CDBDF6','#FFCFAA','#A9E6CB','#F8B6CF','#AFD4F6','#F7DC94','#E6BDEE','#FFB8AC'];
+const bubbleClaims=new Map();let bubbleTurn=0;
+function claimBubbleHue(id){
+ const onScreen=new Set([...document.querySelectorAll('#tv [data-bubble-for]')].map(el=>el.dataset.bubbleFor));
+ const recent=[...bubbleClaims.keys()].slice(1-BUBBLE_HUES.length);
+ for(const k of bubbleClaims.keys())if(!onScreen.has(k)&&!recent.includes(k))bubbleClaims.delete(k);
+ const held=new Set([...bubbleClaims].filter(([k])=>k!==id).map(([,h])=>h));
+ let h=bubbleClaims.get(id);
+ if(h===undefined||held.has(h)){h=bubbleTurn;for(let k=0;k<BUBBLE_HUES.length&&held.has(h);k++)h=(h+1)%BUBBLE_HUES.length;bubbleTurn=(h+1)%BUBBLE_HUES.length}
+ bubbleClaims.delete(id);bubbleClaims.set(id,h);
+}
+function bubbleHue(id){const h=bubbleClaims.get(id);return BUBBLE_HUES[h===undefined?bubbleTurn:h]}
 function choose(exclude=[],expressionId=null){const p=scenePool(exclude,expressionId);p.sort((a,b)=>(S.lastShown.get(a.id)??-10000)-(S.lastShown.get(b.id)??-10000)||b.createdAt-a.createdAt||a.id.localeCompare(b.id));return p[0]}
 function chooseRandom(exclude=[],expressionId=null){
  const pool=scenePool(exclude,expressionId);
