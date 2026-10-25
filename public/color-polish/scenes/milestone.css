@@ -163,10 +163,12 @@
 #tv .scene[data-scene="11"] .stream-pearl {
   padding: 14px 18px;
   box-sizing: border-box;
-  /* Plan 17: the shipped pearl fill is slightly see-through (F7 and E8
-     alpha), which let the words of a pearl behind show through. Same
-     colours, fully opaque. */
-  background: radial-gradient(circle at 30% 15%, #ffffff 4%, #fffef2 45%, color-mix(in srgb, var(--tint) 46%, #fff9ef) 100%);
+  /* Plan 17: a pearl stays fully opaque so the words of a pearl behind never
+     show through. Pearls match the other bubbles (Anthony, October 25, 2026):
+     the same --bubble hue, iridescent rim (renderer.css) and halo, over a
+     frosted opaque centre instead of clear glass. */
+  background: radial-gradient(circle at 30% 18%, #ffffff 0%, #ffffff 5%, transparent 16%), radial-gradient(circle closest-side, #fffefb 0%, #fffdf9 62%, color-mix(in srgb, var(--bubble, #F7DC94) 16%, #fffdf8) 82%, color-mix(in srgb, var(--bubble, #F7DC94) 30%, #fffaf2) 100%);
+  border-color: color-mix(in srgb, var(--bubble, #F7DC94) 40%, white);
 }
 
 #tv .scene[data-scene="11"] .stream-pearl .stream-phrase {
@@ -212,9 +214,10 @@
   pointer-events: none;
   display: grid;
   place-items: center;
-  border: 1px solid #ffffffd6;
-  background: radial-gradient(circle at 32% 26%, #ffffffe0 0 7%, #ffffff4a 19%, #fff7e014 56%, #f1d59a3d 100%);
-  box-shadow: inset -2px -3px 6px #e3c47a42, 0 0 8px #fff3cf59;
+  /* Foam matches the bubbles: clear glass with a rim in its own --bubble hue. */
+  border: 1px solid color-mix(in srgb, var(--bubble, #F7DC94) 45%, #ffffffd9);
+  background: radial-gradient(circle at 32% 26%, #ffffffd9 0 6%, transparent 16%), radial-gradient(circle closest-side, #ffffff14 0 66%, color-mix(in srgb, var(--bubble, #F7DC94) 30%, transparent) 86%, color-mix(in srgb, var(--bubble, #F7DC94) 62%, transparent) 100%);
+  box-shadow: inset -2px -3px 6px color-mix(in srgb, var(--bubble, #F7DC94) 30%, transparent), 0 0 8px color-mix(in srgb, var(--bubble, #F7DC94) 35%, transparent);
 }
 
 #tv .scene[data-scene="11"] .stream-foam img {

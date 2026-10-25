@@ -190,18 +190,23 @@
 #tv .panel { background:linear-gradient(145deg,#FFFEFCF7,#FFFCF3F7); border-color:#D6DBCE; box-shadow:0 17px 29px -22px #3D657B66,inset 0 2px 0 #fff; }
 #tv .medallion { background:radial-gradient(circle at 26% 17%,#FFFFFFF7 8%,#FFFFFFDA 34%,color-mix(in srgb,var(--tint,#FFE083) 55%,#FFFDF5)); border-color:color-mix(in srgb,var(--tint) 56%,white); box-shadow:inset 3px 5px 9px #fff9,inset -6px -8px 14px color-mix(in srgb,var(--tint) 25%,transparent),0 8px 0 #4679850D,0 17px 22px #57618320; }
 #tv .medallion:before { border-top-color:var(--tint); border-left-color:var(--tint); }
-/* Bubbles: glassy pastel, a see-through iridescent rim around a near-white centre,
-   a soft glow and a few bright sparkles, in the bubble's own --bubble hue
-   (state.js BUBBLE_HUES). The centre stays almost opaque so the words read clearly. */
-#tv .orb { background:radial-gradient(circle at 29% 17%,#FFFFFFF5 0%,#FFFFFFA8 9%,transparent 30%),radial-gradient(circle closest-side,#FFFFFFF0 0%,color-mix(in srgb,var(--bubble,#F7DC94) 8%,#FFFFFFEB) 56%,color-mix(in srgb,var(--bubble,#F7DC94) 18%,#FFFFFFC7) 79%,transparent 95%),conic-gradient(from 200deg,color-mix(in srgb,var(--bubble,#F7DC94) 62%,transparent),color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#FFD3E6) 62%,transparent) 60deg,color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#C8E6FF) 62%,transparent) 130deg,color-mix(in srgb,var(--bubble,#F7DC94) 62%,transparent) 180deg,color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#CFF5E1) 62%,transparent) 240deg,color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#FFEBB8) 62%,transparent) 300deg,color-mix(in srgb,var(--bubble,#F7DC94) 62%,transparent)); border-color:color-mix(in srgb,var(--bubble,#F7DC94) 45%,white); box-shadow:inset 6px 8px 16px #ffffffb3,inset -10px -13px 24px color-mix(in srgb,var(--bubble,#F7DC94) 26%,transparent),inset 0 0 0 2px #FFFFFFA6; }
-#tv .orb:before { border-color:#FFFFFFAA; }
-#tv .orb:after { border-top-color:var(--bubble,#F5C75A); border-right-color:color-mix(in srgb,var(--bubble,#F5C75A) 60%,#FFD98A); border-bottom-color:#FFFEF9A3; }
+/* Bubbles (Anthony, October 25, 2026): clear glass from the centre to about
+   three quarters out, then a pastel iridescent rim in the bubble's own --bubble
+   hue (state.js BUBBLE_HUES), a soft halo and a few fine sparkles. A white halo
+   on the words keeps them readable over whatever is behind the bubble. The
+   halo and sparkles are plain gradients that only fade, never blurs or
+   filters, so they cost the TV almost nothing to draw. */
+#tv .orb { background:radial-gradient(circle at 30% 18%,#FFFFFFE6 0%,#FFFFFF70 5%,transparent 16%),radial-gradient(circle closest-side,#FFFFFF2E 0%,#FFFFFF1F 70%,transparent 100%); border-color:color-mix(in srgb,var(--bubble,#F7DC94) 40%,#FFFFFFD9); box-shadow:inset 0 0 0 1px #FFFFFF8C,inset 6px 8px 14px #FFFFFF73,inset -8px -10px 18px color-mix(in srgb,var(--bubble,#F7DC94) 22%,transparent); }
+#tv .orb::before,#tv .scene[data-scene="11"] .stream-pearl::before { content:''; position:absolute; inset:0; border:none; border-radius:50%; pointer-events:none; z-index:-1; opacity:.85; background:conic-gradient(from 200deg,var(--bubble,#F7DC94),color-mix(in srgb,var(--bubble,#F7DC94) 45%,#FFD3E6) 60deg,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#C8E6FF) 130deg,var(--bubble,#F7DC94) 180deg,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#CFF5E1) 240deg,color-mix(in srgb,var(--bubble,#F7DC94) 45%,#FFEBB8) 300deg,var(--bubble,#F7DC94)); -webkit-mask:radial-gradient(closest-side,transparent 72%,#0004 80%,#000b 90%,#000 100%); mask:radial-gradient(closest-side,transparent 72%,#0004 80%,#000b 90%,#000 100%); }
+#tv .orb .orb-content,#tv .scene[data-scene="11"] .stream-pearl { text-shadow:0 0 2px #FFFFFFE6,0 0 8px #FFFFFFCC,0 0 16px #FFFFFF99; }
+#tv .orb:after { border-top-color:var(--bubble,#F7DC94); border-right-color:color-mix(in srgb,var(--bubble,#F7DC94) 60%,#FFE7B0); border-bottom-color:#FFFEF9A3; }
 #tv .orb-slot::before,#tv .event-orb::before { opacity:0; }
-#tv .orb-breath::before { content:''; position:absolute; inset:-3px; border-radius:50%; pointer-events:none; z-index:-1; border:1.5px solid color-mix(in srgb,var(--bubble,#F7DC94) 55%,white); box-shadow:0 0 20px 2px color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 70%,#FFE2B8) 55%,transparent),0 0 48px 6px color-mix(in srgb,var(--bubble,#F7DC94) 20%,transparent); }
-#tv .orb-breath::after { content:''; position:absolute; inset:-9%; pointer-events:none; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23fff' d='M90 7Q90 13 96 13Q90 13 90 19Q90 13 84 13Q90 13 90 7ZM7 74.5Q7 79 11.5 79Q7 79 7 83.5Q7 79 2.5 79Q7 79 7 74.5ZM96 57.4Q96 60 98.6 60Q96 60 96 62.6Q96 60 93.4 60Q96 60 96 57.4ZM21 2.8Q21 5 23.2 5Q21 5 21 7.2Q21 5 18.8 5Q21 5 21 2.8Z'/%3E%3C/svg%3E") center/100% 100% no-repeat; filter:drop-shadow(0 0 3px #FFE7A8) drop-shadow(0 0 7px #FFFFFFCC); animation:bubbleTwinkle 4.8s ease-in-out infinite; animation-delay:var(--delay,0s); }
-@keyframes bubbleTwinkle { 0%,100% { opacity:.5; transform:scale(.94); } 50% { opacity:1; transform:scale(1.03); } }
-#tv.still .orb-breath::after { animation:none; opacity:.85; }
-@media (prefers-reduced-motion:reduce) { #tv .orb-breath::after { animation:none; opacity:.85; } }
+#tv .orb-breath { filter:none; }
+#tv .orb-breath::before,#tv .stream-node::after { content:''; position:absolute; inset:-14%; border:1px solid transparent; border-radius:50%; pointer-events:none; z-index:-1; box-shadow:none; background:radial-gradient(closest-side,transparent 74%,color-mix(in srgb,var(--bubble,#F7DC94) 55%,transparent) 78.5%,color-mix(in srgb,color-mix(in srgb,var(--bubble,#F7DC94) 60%,#FFE2B8) 22%,transparent) 87%,transparent 100%); }
+#tv .orb-breath::after { content:''; position:absolute; inset:-6%; pointer-events:none; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.9'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='88' cy='13' r='2.72' fill='url(%23g)'/%3E%3Ccircle cx='9' cy='79' r='1.92' fill='url(%23g)'/%3E%3Ccircle cx='95' cy='58' r='1.20' fill='url(%23g)'/%3E%3Cpath fill='%23fff' d='M88 9.6Q88 13 91.4 13Q88 13 88 16.4Q88 13 84.6 13Q88 13 88 9.6ZM9 76.6Q9 79 11.4 79Q9 79 9 81.4Q9 79 6.6 79Q9 79 9 76.6ZM95 56.5Q95 58 96.5 58Q95 58 95 59.5Q95 58 93.5 58Q95 58 95 56.5ZM88 11.6Q88 13 89.4 13Q88 13 88 14.4Q88 13 86.6 13Q88 13 88 11.6Z'/%3E%3C/svg%3E") center/100% 100% no-repeat; opacity:.55; animation:bubbleTwinkle 5.6s ease-in-out infinite; animation-delay:var(--delay,0s); }
+@keyframes bubbleTwinkle { 0%,100% { opacity:.3; } 45% { opacity:.85; } 55% { opacity:.6; } }
+#tv.still .orb-breath::after { animation:none; opacity:.55; }
+@media (prefers-reduced-motion:reduce) { #tv .orb-breath::after { animation:none; opacity:.55; } }
 #tv .message, #tv .recipient { color:#2D463E; }
 #tv .chip { background:#FFFDF9ED; border-color:#C9D6C999; color:#465E50; }
 #tv .like-count { color:#AB3C61; }
@@ -263,7 +268,7 @@
 #tv .progress-intro p, #tv .progress-milestone .row, #tv .goal-head, #tv .goal-values, #tv .goal-rank, #tv .goal-caption, #tv .week-range, #tv .stream-caption { color:#705B35; }
 #tv .goal-values b { color:#865F19; }
 #tv .stream-pearl { background:radial-gradient(circle at 30% 15%,#FFFFFFF7 4%,#FFFEF2E8 45%,color-mix(in srgb,var(--tint) 46%,#FFF9EF) 100%); border-color:color-mix(in srgb,var(--tint) 58%,white); box-shadow:inset 6px 7px 14px #fff9,inset -11px -14px 18px color-mix(in srgb,var(--tint) 24%,transparent); }
-#tv .stream-node::before { border-color:var(--tint); box-shadow:0 0 14px color-mix(in srgb,var(--tint) 44%,transparent); }
+#tv .stream-node::before { border-color:color-mix(in srgb,var(--bubble,#F7DC94) 55%,white); box-shadow:none; }
 #tv .stream-node[data-weekly='true']::before { border-color:#C29A2B; box-shadow:0 0 24px #F0C3468A; }
 #tv .stream-node small { color:#705F48; }
 #tv .garden-caption { color:#426038; background:#F4FBDFEA; }

@@ -45,6 +45,10 @@ const icon=(id,cl='icon')=>`<img class="${cl}" src="${ASSETS['icon'+id]}" alt="$
 const art=(key,style)=>`<img class="art" src="${ASSETS[key]}" style="${style}" alt="">`;
 const medallion=id=>`<div class="medallion" style="--tint:${catalog[id-1].color}">${icon(id)}</div>`;
 const shimmer=(text,type='')=>`<span class="spark-word"><span class="text-shimmer ${type}">${esc(text)}</span></span>`;
+// TV bubbles show at most three of a recognition's expressions, in the order
+// they were chosen; when a screen is about one expression that the record
+// chose further down, that one takes the third place.
+function shownIds(ids,focus=null){if(ids.length<=3)return ids;const first=ids.slice(0,3);return focus&&ids.includes(focus)&&!first.includes(focus)?[...ids.slice(0,2),focus]:first}
 const chips=ids=>`<div class="chips">${ids.map(id=>`<span class="chip">${icon(id)}${esc(catalog[id-1].name)}</span>`).join('')}</div>`;
 const heading=(small,title,subtitle='')=>`<div class="eyebrow">${esc(small)}</div><h1 class="heading">${shimmer(title,'ink')}</h1>${subtitle?`<p class="subheading">${esc(subtitle)}</p>`:''}`;
 function localDay(ms){return new Intl.DateTimeFormat('en-CA',{timeZone:ZONE,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms))}

@@ -266,7 +266,7 @@ test('planets orbit in 3D at the slower rate', async ({ page }) => {
   }
 });
 
-test('the far planet is blurred and dim, the near planet sharp with a shadow', async ({ page }) => {
+test('the far planet fades back and the near planet is fully shown, with no per-frame filter', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'orbit', 1000);
 
   type Observation = {
@@ -310,29 +310,13 @@ test('the far planet is blurred and dim, the near planet sharp with a shadow', a
   const lowest = observations[0];
   const highest = observations[observations.length - 1];
 
-  // At the sample where a planet has the lowest z:
-  // computed filter contains a blur of at least 1.2 px and a dimming tone
-  // (brightness at most .93). Plan 17: the planet stays fully opaque, so the
-  // centre quote can never show through its words; depth shows through
-  // blur and tone instead of transparency.
-  const blurMatch = lowest.filter.match(/blur\(([\d.]+)px\)/);
-  expect(blurMatch).not.toBeNull();
-  const blurPx = parseFloat(blurMatch![1]);
-  expect(blurPx).toBeGreaterThanOrEqual(1.2);
-  expect(lowest.opacity).toBe(1);
-  const toneMatch = lowest.filter.match(/brightness\(([\d.]+)\)/);
-  expect(toneMatch, `far planet filter dims by tone: ${lowest.filter}`).not.toBeNull();
-  expect(parseFloat(toneMatch![1])).toBeLessThanOrEqual(0.93);
-
-  // At the sample where a planet has the highest z:
-  // filter has no blur (or blur 0) and contains drop-shadow
-  expect(highest.filter).toContain('drop-shadow');
-  const highestBlurMatch = highest.filter.match(/blur\(([\d.]+)px\)/);
-  if (highestBlurMatch) {
-    expect(parseFloat(highestBlurMatch[1])).toBe(0);
-  } else {
-    expect(highest.filter).not.toContain('blur');
-  }
+  // Depth shows through a gentle fade (Anthony, October 25, 2026): the blur,
+  // drop-shadow and tone filter rebuilt every frame made the scene choppy, and
+  // the planets are clear glass now, so no planet carries a filter at all.
+  for (const o of observations) expect(o.filter === '' || o.filter === 'none', `planet filter: ${o.filter}`).toBe(true);
+  expect(lowest.opacity).toBeLessThanOrEqual(0.85);
+  expect(lowest.opacity).toBeGreaterThanOrEqual(0.75);
+  expect(highest.opacity).toBe(1);
 });
 
 test('planets stay circular through the orbit', async ({ page }) => {

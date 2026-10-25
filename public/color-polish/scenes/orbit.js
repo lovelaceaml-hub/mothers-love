@@ -429,7 +429,7 @@ function orbitScene() {
   const sizes = orbitWithHost((host) => chosen.map(({ r }) => orbitSize(host, r).d));
   chosen.forEach(({ r, expression }, i) => {
     const d = sizes[i];
-    h += `<div class="planet-system" data-planet="${i}" style="width:${d}px;height:${d}px;--d:${d}px;">${addOrb(r, 0, 0, d, { expression, motion: false, growMax: d })}${r.ids.map((n, j) => `<span class="orbit-moon" data-moon="${j}" style="--tint:${catalog[n - 1].color}">${icon(n)}</span>`).join('')}</div>`;
+    h += `<div class="planet-system" data-planet="${i}" style="width:${d}px;height:${d}px;--d:${d}px;">${addOrb(r, 0, 0, d, { expression, motion: false, growMax: d })}${shownIds(r.ids, id).map((n, j) => `<span class="orbit-moon" data-moon="${j}" style="--tint:${catalog[n - 1].color}">${icon(n)}</span>`).join('')}</div>`;
   });
   if (!chosen.length) h += '<p class="subheading" style="position:absolute;left:50px;top:150px">No current recognitions for this expression.</p>';
   return h + '</div>';
@@ -537,14 +537,12 @@ function tickOrbit(dt) {
     const top = cyDrawn - b.d / 2;
     p.el.style.transform = `translate(${left}px,${top}px) scale(${k})`;
     p.el.style.zIndex = String(Math.round(10000 + pos.z));
-    // Depth shows through tone, never transparency: the planet fill stays
-    // opaque so the centre quote can never show through message text.
-    p.el.style.opacity = '1';
-    const dim = pos.z < 0 ? 0.9 + (0.1 * (pos.z + 395)) / 395 : 1;
-    const blur = Math.min(1.8, Math.max(0, (-pos.z - 100) / 160));
-    const shadow = `drop-shadow(0 ${(6 * k).toFixed(1)}px ${(10 * k).toFixed(1)}px #5C659240)`;
-    const tone = dim < 1 ? ` brightness(${dim.toFixed(3)}) saturate(${(0.8 + 0.2 * (dim - 0.9) / 0.1).toFixed(3)})` : '';
-    p.el.style.filter = (blur > 0 ? `blur(${blur.toFixed(2)}px) ${shadow}` : shadow) + tone;
+    // Depth shows through a gentle fade on the far side. The blur,
+    // drop-shadow and tone filter this used to rebuild on every frame made
+    // the scene slow and choppy; the planets are clear glass now (Anthony,
+    // October 25, 2026), so a fade reads as depth and costs almost nothing.
+    const fade = pos.z < 0 ? 0.78 + (0.22 * (pos.z + 395)) / 395 : 1;
+    p.el.style.opacity = fade.toFixed(3);
     b.x = left;
     b.y = top + 84;
     if (b.reading) tickCirclePages(b, V.clock);
@@ -585,8 +583,9 @@ function tickOrbit(dt) {
             b.reading = fitCircle(b.el, r, d, V.clock);
           }
         });
+        const moonIds = shownIds(r.ids, ORBIT_PASS_TOKEN);
         p.moons.forEach((el, j) => {
-          const id = r.ids[j % r.ids.length];
+          const id = moonIds[j % moonIds.length];
           el.innerHTML = icon(id);
           el.style.setProperty('--tint', catalog[id - 1].color);
         });
