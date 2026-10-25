@@ -149,8 +149,8 @@
 
 /* Stream Nodes and Pearls */
 #tv .scene[data-scene="11"] .stream-node {
-  /* 236 px (from 216, Plan 17): room for every catalog phrase, the name and
-     the icon row to sit max(3 percent, 12 px) inside the pearl's rim. */
+  /* The base pearl is 236 px (Plan 17); a pearl grows past it until its whole
+     message fits (milestone.js streamPearlDiameter) and is sized inline. */
   width: 236px;
   height: 236px;
   /* Lane 8 review: the pearl's soft shadow is a box shadow on the round node
@@ -160,47 +160,50 @@
   box-shadow: -7px 13px 12px #99846925;
 }
 
-#tv .scene[data-scene="11"] .stream-pearl {
-  padding: 14px 18px;
-  box-sizing: border-box;
-  /* Plan 17: a pearl stays fully opaque so the words of a pearl behind never
-     show through. Pearls match the other bubbles (Anthony, October 25, 2026):
-     the same --bubble hue, iridescent rim (renderer.css) and halo, over a
-     frosted opaque centre instead of clear glass. */
-  background: radial-gradient(circle at 30% 18%, #ffffff 0%, #ffffff 5%, transparent 16%), radial-gradient(circle closest-side, #fffefb 0%, #fffdf9 62%, color-mix(in srgb, var(--bubble, #F7DC94) 16%, #fffdf8) 82%, color-mix(in srgb, var(--bubble, #F7DC94) 30%, #fffaf2) 100%);
-  border-color: color-mix(in srgb, var(--bubble, #F7DC94) 40%, white);
+/* A pearl is the same bubble as every other screen's (Anthony, October 25,
+   2026): THANK YOU, the name, the whole message and up to three expressions.
+   Its type sizes are fixed, so a longer message makes a larger pearl instead
+   of smaller words. Plan 17: a pearl stays fully opaque, so the words of a
+   pearl behind never show through it. */
+#tv .scene[data-scene="11"] .stream-node .orb {
+  background-color: #fffdf8;
 }
 
-#tv .scene[data-scene="11"] .stream-pearl .stream-phrase {
-  font-size: 18px;
-  line-height: 1.15;
-  color: #6a5840;
-  text-align: center;
-  /* 168 px (from 176) keeps every catalog phrase's corner lines inside the
-     Plan 17 rim margin of the 236 px pearl. */
-  max-width: 168px;
+#tv .scene[data-scene="11"] .stream-node .orb-content {
+  width: 76%;
+  max-width: 76%;
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb .thanks {
+  font-size: 9px;
+  letter-spacing: 1.8px;
   margin-bottom: 4px;
-  font-weight: 500;
 }
 
-#tv .scene[data-scene="11"] .stream-pearl b {
-  font-size: 20px;
-  line-height: 1.1;
-  text-align: center;
-  margin: 2px 0 4px;
-  max-width: 160px;
-  overflow-wrap: anywhere;
+#tv .scene[data-scene="11"] .stream-node .orb .recipient {
+  font-size: 22px;
+  line-height: 1.12;
+  margin-bottom: 6px;
 }
 
-#tv .scene[data-scene="11"] .stream-tags {
-  display: flex;
-  justify-content: center;
+#tv .scene[data-scene="11"] .stream-node .orb .message {
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb .chips {
   gap: 3px;
+  margin-top: 7px;
 }
 
-#tv .scene[data-scene="11"] .stream-tags img {
-  width: 22px;
-  height: 22px;
+#tv .scene[data-scene="11"] .stream-node .orb .chip {
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb .chip img {
+  width: 16px;
+  height: 16px;
 }
 
 /* Glass bubbles of many sizes that ride the vortex between the pearls: the
@@ -223,4 +226,31 @@
 #tv .scene[data-scene="11"] .stream-foam img {
   width: 58%;
   height: 58%;
+}
+
+/* The pearls already rise and turn, and each carries a depth filter, so the
+   bubble's own breathing, sheen and twinkling are held still here: anything
+   animating inside a filtered pearl makes the TV redraw that pearl's filter
+   on every frame. The sparkles stay, shown steady. */
+#tv .scene[data-scene="11"] .stream-node .orb-breath,
+#tv .scene[data-scene="11"] .stream-node .orb-sheen::after,
+#tv .scene[data-scene="11"] .stream-node .orb::after {
+  animation: none;
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb-breath::after {
+  animation: none;
+  opacity: .85;
+}
+
+/* The bubble's halo is drawn as the pearl's own round shadow, in its --bubble
+   hue, instead of the separate halo layer the other screens use: twenty or
+   more pearls overlap in the vortex, and that layer, larger than the pearl,
+   cost the TV more to draw than everything else in a pearl together. */
+#tv .scene[data-scene="11"] .stream-node {
+  box-shadow: -7px 13px 12px #99846925, 0 0 0 1.5px color-mix(in srgb, var(--bubble, #F7DC94) 55%, white), 0 0 22px 3px color-mix(in srgb, color-mix(in srgb, var(--bubble, #F7DC94) 70%, #FFE2B8) 55%, transparent);
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb-breath::before {
+  display: none;
 }

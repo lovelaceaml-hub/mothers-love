@@ -232,7 +232,8 @@ export type TextFitOptions = {
  * - message text is DRAWN at the 18 px floor or larger (36 px at 3840 wide):
  *   the computed font size times the element's real rendered scale
  *   (getBoundingClientRect().width / offsetWidth), which includes the TV
- *   scale, the depth layer and any orbit or drift scaling;
+ *   scale, the depth layer and any orbit or drift scaling; a Goal vortex
+ *   pearl drawn below full size, on its way to the back, is exempt;
  * - a bubble showing a page indicator is not one of `singlePageIds`, is the
  *   only paging bubble on screen, and its pages, at core's reading pace
  *   of max(9, characters / 14) seconds each, add up to no more than the
@@ -282,7 +283,7 @@ export async function textFits(
         return opacity;
       };
 
-      const BUBBLE_SELECTORS = ['.orb-slot', '.orbit-sun', '.stream-pearl'];
+      const BUBBLE_SELECTORS = ['.orb-slot', '.orbit-sun', '.stream-node'];
       const PANEL_SELECTORS = ['.progress-goal', '.progress-milestone', '.progress-rail', '.stream-world', '.progress-sculpture'];
       const closestOf = (el: HTMLElement, selectors: string[]): HTMLElement | null => {
         let node: HTMLElement | null = el;
@@ -347,7 +348,7 @@ export async function textFits(
       // a whole number of px, so the ratio is exact; a text element's
       // offsetWidth is rounded).
       const drawnScale = (el: HTMLElement): number => {
-        const carrier = (el.closest('.orb-slot, .orbit-sun, .stream-pearl') as HTMLElement | null) || el;
+        const carrier = (el.closest('.orb-slot, .orbit-sun, .stream-node') as HTMLElement | null) || el;
         const w = carrier.offsetWidth;
         return w > 0 ? carrier.getBoundingClientRect().width / w : tvScale;
       };
@@ -383,7 +384,11 @@ export async function textFits(
           if (el.matches('.message')) {
             const scale = drawnScale(el);
             const drawn = parseFloat(cs.fontSize) * scale;
-            if (drawn < 18 * tvScale - 0.05) {
+            // A Goal vortex pearl shrinks as it swings to the back of the
+            // vortex, softened by its depth blur (Anthony, October 25, 2026):
+            // the floor holds while it draws at full size or larger.
+            const shrunkPearl = !!el.closest('.stream-node') && scale < tvScale - 1e-3;
+            if (!shrunkPearl && drawn < 18 * tvScale - 0.05) {
               failures.push({ selector, reason: 'message drawn below the 18 px floor', detail: `${drawn.toFixed(2)} px drawn (font ${cs.fontSize} at scale ${scale.toFixed(3)}), floor ${(18 * tvScale).toFixed(1)}` });
             }
           }
@@ -392,7 +397,7 @@ export async function textFits(
         const bubble = closestOf(el, BUBBLE_SELECTORS);
         const circle = bubble ? circleOf(bubble) : null;
         const panel = circle ? null : closestOf(el, PANEL_SELECTORS);
-        const stream = bubble && bubble.matches('.stream-pearl') ? bubble.closest<HTMLElement>('.stream-world') : null;
+        const stream = bubble && bubble.matches('.stream-node') ? bubble.closest<HTMLElement>('.stream-world') : null;
         for (const r of rects) {
           if (circle) {
             const margin = Math.max(rimMargin * circle.diameter, rimMarginMin * circle.scale);

@@ -1,11 +1,15 @@
 // Core orb rendering and circular measurement helpers.
 'use strict';
 
+// The chip row sits low, where the circle narrows, so the content can fit by
+// height and still push a chip past the rim; a chip counts as inside when all
+// four corners clear the rim by 4 px. Layout offsets, so transforms never skew it.
+function chipsInsideCircle(content,chipBox,d){if(!chipBox)return true;const R=d/2-4,cx=content.offsetWidth/2,cy=content.offsetHeight/2;return [...chipBox.querySelectorAll('.chip')].every(c=>{const x0=c.offsetLeft-cx,y0=c.offsetTop-cy,x1=x0+c.offsetWidth,y1=y0+c.offsetHeight;return [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].every(([x,y])=>Math.hypot(x,y)<=R)})}
 // The expression the current screen is about, kept among a bubble's three chips.
 function chipFocus(){return S.s===4?FEATURED_PASS_ID||null:S.s===10?ORBIT_PASS_TOKEN||null:null}
-function completeOrb(r,d,{event=false,group=false}={}){
+function completeOrb(r,d,{event=false,group=false,focus}={}){
  const size=d>=450?'orb-large':d<285?'orb-small':'';
- return `<div class="orb-breath" data-bubble-for="${esc(r.id)}" style="--bubble:${bubbleHue(r.id)}"><article class="orb ${size}" style="--tint:${catalog[r.ids[0]-1].color}"><div class="orb-sheen"></div><div class="orb-content"><div class="thanks">THANK YOU,</div><h3 class="recipient">${esc(r.name)}</h3><p class="message" data-full-message="${esc(r.id)}">${esc(r.message)}</p>${chips(shownIds(r.ids,chipFocus()))}${reactionMarkup(r)}<div class="orb-page-indicator" hidden></div></div></article></div>`;
+ return `<div class="orb-breath" data-bubble-for="${esc(r.id)}" style="--bubble:${bubbleHue(r.id)}"><article class="orb ${size}" style="--tint:${catalog[r.ids[0]-1].color}"><div class="orb-sheen"></div><div class="orb-content"><div class="thanks">THANK YOU,</div><h3 class="recipient">${esc(r.name)}</h3><p class="message" data-full-message="${esc(r.id)}">${esc(r.message)}</p>${chips(shownIds(r.ids,focus===undefined?chipFocus():focus))}${reactionMarkup(r)}<div class="orb-page-indicator" hidden></div></div></article></div>`;
 }
 function addOrb(r,x,y,d,opts={}){
  if(!r)return '';const key='slot-'+(++S.slotCounter);
@@ -89,10 +93,7 @@ function fitCircle(el,r,d,clock=0,growBudget=null){
  msg.style.fontSize=font+'px';msg.style.lineHeight='1.27';msg.textContent=r.message;
  content.style.width=(grouped?'83%':'80%');content.style.maxWidth=content.style.width;
  let limit=d*.855;
- // The chip row sits low, where the circle narrows, so the content can fit by
- // height and still push a chip past the rim; a chip counts as inside when all
- // four corners clear the rim by 4 px. Layout offsets, so transforms never skew it.
- const chipsInside=()=>{const R=d/2-4,cx=content.offsetWidth/2,cy=content.offsetHeight/2;return [...chipBox.querySelectorAll('.chip')].every(c=>{const x0=c.offsetLeft-cx,y0=c.offsetTop-cy,x1=x0+c.offsetWidth,y1=y0+c.offsetHeight;return [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].every(([x,y])=>Math.hypot(x,y)<=R)})};
+ const chipsInside=()=>chipsInsideCircle(content,chipBox,d);
  if(d<335){title.style.fontSize='26px';chipBox.querySelectorAll('.chip').forEach(x=>{x.style.fontSize='10.5px';x.style.padding='2px 3px';x.querySelector('img').style.width='16px';x.querySelector('img').style.height='16px'});chipBox.style.marginTop='6px';el.querySelector('.like-count')?.style.setProperty('margin-top','6px')}
  while((content.scrollHeight>limit||!chipsInside())&&font>fontFloor){font-=.5;msg.style.fontSize=font+'px'}
  if(content.scrollHeight<=limit){page.hidden=true;return{pages:[r.message],index:0,at:clock,duration:Math.max(9,r.message.length/14)}}
