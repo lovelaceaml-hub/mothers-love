@@ -537,12 +537,11 @@ function tickOrbit(dt) {
     const top = cyDrawn - b.d / 2;
     p.el.style.transform = `translate(${left}px,${top}px) scale(${k})`;
     p.el.style.zIndex = String(Math.round(10000 + pos.z));
-    // Depth shows through a gentle fade on the far side. The blur,
+    // Depth shows through scale alone, and the planet stays fully opaque so
+    // the centre quote can never show through its words. The blur,
     // drop-shadow and tone filter this used to rebuild on every frame made
-    // the scene slow and choppy; the planets are clear glass now (Anthony,
-    // October 25, 2026), so a fade reads as depth and costs almost nothing.
-    const fade = pos.z < 0 ? 0.78 + (0.22 * (pos.z + 395)) / 395 : 1;
-    p.el.style.opacity = fade.toFixed(3);
+    // the scene slow and choppy, so there is no filter at all.
+    p.el.style.opacity = '1';
     b.x = left;
     b.y = top + 84;
     if (b.reading) tickCirclePages(b, V.clock);

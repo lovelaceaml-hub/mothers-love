@@ -266,7 +266,7 @@ test('planets orbit in 3D at the slower rate', async ({ page }) => {
   }
 });
 
-test('the far planet fades back and the near planet is fully shown, with no per-frame filter', async ({ page }) => {
+test('planets stay fully opaque and carry no per-frame filter', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'orbit', 1000);
 
   type Observation = {
@@ -310,12 +310,12 @@ test('the far planet fades back and the near planet is fully shown, with no per-
   const lowest = observations[0];
   const highest = observations[observations.length - 1];
 
-  // Depth shows through a gentle fade (Anthony, October 25, 2026): the blur,
-  // drop-shadow and tone filter rebuilt every frame made the scene choppy, and
-  // the planets are clear glass now, so no planet carries a filter at all.
+  // Depth shows through scale alone: the blur, drop-shadow and tone filter
+  // rebuilt every frame made the scene choppy, so no planet carries a filter.
+  // Plan 17: every planet stays fully opaque, so the centre quote never shows
+  // through its words.
   for (const o of observations) expect(o.filter === '' || o.filter === 'none', `planet filter: ${o.filter}`).toBe(true);
-  expect(lowest.opacity).toBeLessThanOrEqual(0.85);
-  expect(lowest.opacity).toBeGreaterThanOrEqual(0.75);
+  expect(lowest.opacity).toBe(1);
   expect(highest.opacity).toBe(1);
 });
 
