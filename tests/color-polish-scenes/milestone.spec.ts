@@ -22,7 +22,7 @@ test('milestone renders circular bubbles, studio preview, and does not overflow 
 
   const streamPearls = await frame.evaluate(() => {
     const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
-    const elements = Array.from(sceneEl?.querySelectorAll<HTMLElement>('.stream-pearl') || []);
+    const elements = Array.from(sceneEl?.querySelectorAll<HTMLElement>('.stream-node .orb') || []);
     return elements.map((el) => {
       const rect = el.getBoundingClientRect();
       const style = window.getComputedStyle(el);
@@ -225,74 +225,39 @@ function buildMilestoneSnapshot(goalExpressionId = 2) {
   return snapshot;
 }
 
-test('every pearl shows catalog phrase and name without THANK YOU, using goal expression or first expression', async ({ page }) => {
+test('every pearl is a full bubble: THANK YOU, the name, the whole message and at most three expressions keeping the goal', async ({ page }) => {
   const snapshot = buildMilestoneSnapshot(1);
   const frame = await loadRenderer(page, { scene: 11, fixture: snapshot as unknown as Record<string, unknown> });
+  const records = snapshot.recognitions.map((r) => ({ id: r.id, name: r.recipient, message: r.message, ids: [...r.expressionIds] }));
 
-  const pearlData = await frame.evaluate(() => {
+  const pearls = await frame.evaluate(() => {
     const runtime = (window as any).colorPolishRuntime;
-    const catalogList = runtime.catalog as Array<{ id: number; phrase: string }>;
-    const catalogPhrases = new Set(catalogList.map((c) => c.phrase));
-
-    const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
-    const nodes = Array.from(sceneEl?.querySelectorAll<HTMLElement>('.stream-node') || []);
-
-    return nodes.map((node) => {
-      const pearl = node.querySelector<HTMLElement>('.stream-pearl');
-      const phraseEl = node.querySelector<HTMLElement>('.stream-phrase');
-      const nameEl = node.querySelector<HTMLElement>('b');
-      const phraseText = phraseEl?.textContent?.trim() || '';
-      const nameText = nameEl?.textContent?.trim() || '';
-      const fullPearlText = pearl?.textContent || '';
-      const tributeId = node.dataset.tributeId || '';
-      const isWeekly = node.dataset.weekly === 'true';
-
-      return {
-        tributeId,
-        phraseText,
-        nameText,
-        fullPearlText,
-        isWeekly,
-        isCatalogPhrase: catalogPhrases.has(phraseText),
-      };
-    });
+    const names = new Map((runtime.catalog as Array<{ id: number; name: string }>).map((c) => [c.name, c.id]));
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="11"] .stream-node'));
+    return nodes.map((node) => ({
+      id: node.dataset.tributeId || '',
+      thanks: node.querySelector('.thanks')?.textContent?.trim() || '',
+      name: node.querySelector('.recipient')?.textContent || '',
+      message: node.querySelector('.message')?.textContent || '',
+      chips: Array.from(node.querySelectorAll('.chip')).map((c) => names.get(c.textContent?.trim() || '') ?? 0),
+      phrase: !!node.querySelector('.stream-phrase'),
+    }));
   });
 
-  expect(pearlData.length).toBeGreaterThanOrEqual(14);
-
-  for (const pearl of pearlData) {
-    expect(pearl.fullPearlText).not.toContain('THANK YOU');
-    expect(pearl.isCatalogPhrase).toBe(true);
-    expect(pearl.nameText.length).toBeGreaterThan(0);
+  expect(pearls.length).toBeGreaterThanOrEqual(14);
+  const goalId = 1;
+  for (const pearl of pearls) {
+    const rec = records.find((r) => r.id === pearl.id)!;
+    expect(rec, `pearl ${pearl.id} holds a fixture record`).toBeTruthy();
+    expect(pearl.thanks).toBe('THANK YOU,');
+    expect(pearl.name).toBe(rec.name);
+    // The whole message, never cut.
+    expect(pearl.message).toBe(rec.message);
+    expect(pearl.phrase).toBe(false);
+    expect(pearl.chips.length).toBe(Math.min(3, rec.ids.length));
+    for (const id of pearl.chips) expect(rec.ids).toContain(id);
+    if (rec.ids.includes(goalId)) expect(pearl.chips).toContain(goalId);
   }
-
-  const fixtureRecords = snapshot.recognitions.map((r) => ({
-    id: r.id,
-    ids: [...r.expressionIds],
-  }));
-
-  const verification = await frame.evaluate(({ records, goalId }) => {
-    const runtime = (window as any).colorPolishRuntime;
-    const catalogList = runtime.catalog as Array<{ id: number; phrase: string }>;
-    const catalogMap = new Map(catalogList.map((c) => [c.id, c.phrase]));
-    const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
-    const nodes = Array.from(sceneEl?.querySelectorAll<HTMLElement>('.stream-node') || []);
-
-    const results: boolean[] = [];
-    for (const node of nodes) {
-      const tid = node.dataset.tributeId;
-      const phraseText = node.querySelector('.stream-phrase')?.textContent?.trim();
-      const rec = records.find((r: { id: string }) => r.id === tid);
-      if (!rec || !phraseText) continue;
-      const expectedId = rec.ids.includes(goalId) ? goalId : rec.ids[0];
-      const expectedPhrase = catalogMap.get(expectedId);
-      results.push(phraseText === expectedPhrase);
-    }
-    return results;
-  }, { records: fixtureRecords, goalId: 1 });
-
-  expect(verification.length).toBeGreaterThan(0);
-  expect(verification.every(Boolean)).toBe(true);
 });
 
 test('with 48-record sample at least 12 distinct record ids pass through in 30 s including outside current week', async ({ page }) => {
@@ -644,47 +609,34 @@ test('left copy is removed and rail is widened without overflow at 2000 ms', asy
   }
 });
 
-test('noOverflow holds and no phrase is truncated at any pearl size', async ({ page }) => {
+test('noOverflow holds and every pearl grows until its whole message fits, at the 18 px type size', async ({ page }) => {
   const frame = await loadRenderer(page, { scene: 11, fixture: buildMilestoneSnapshot() as unknown as Record<string, unknown> });
 
   const overflow = await noOverflow(frame);
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
   expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
 
-  const pearlFits = await frame.evaluate(() => {
-    const runtime = (window as any).colorPolishRuntime;
-    const catalogList = runtime.catalog as Array<{ id: number; phrase: string }>;
-    const catalogPhrases = new Map(catalogList.map((c) => [c.phrase, c.phrase]));
-
-    const sceneEl = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]');
-    const pearls = Array.from(sceneEl?.querySelectorAll<HTMLElement>('.stream-pearl') || []);
-    return pearls.map((pearl) => {
-      const phraseEl = pearl.querySelector<HTMLElement>('.stream-phrase');
-      const text = phraseEl?.textContent?.trim() || '';
-      const fullCatalogPhrase = catalogPhrases.get(text);
-
-      const style = window.getComputedStyle(phraseEl || pearl);
-      const fontSize = parseFloat(style.fontSize) || 0;
-
+  const fits = await frame.evaluate(() => {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="11"] .stream-node'));
+    return nodes.map((node) => {
+      const content = node.querySelector<HTMLElement>('.orb-content')!;
+      const message = node.querySelector<HTMLElement>('.message')!;
       return {
-        pearlScrollW: pearl.scrollWidth,
-        pearlClientW: pearl.clientWidth,
-        pearlScrollH: pearl.scrollHeight,
-        pearlClientH: pearl.clientHeight,
-        hasEllipsis: text.includes('...') || text.includes('…'),
-        matchesFullPhrase: fullCatalogPhrase === text,
-        fontSize,
+        d: node.offsetWidth,
+        contentH: content.scrollHeight,
+        fontSize: parseFloat(window.getComputedStyle(message).fontSize) || 0,
+        ellipsis: window.getComputedStyle(message).textOverflow === 'ellipsis',
       };
     });
   });
 
-  expect(pearlFits.length).toBeGreaterThanOrEqual(14);
-  for (const fit of pearlFits) {
+  expect(fits.length).toBeGreaterThanOrEqual(14);
+  for (const fit of fits) {
+    expect(fit.d).toBeGreaterThanOrEqual(236);
+    expect(fit.d).toBeLessThanOrEqual(560);
     expect(fit.fontSize).toBeGreaterThanOrEqual(18);
-    expect(fit.hasEllipsis).toBe(false);
-    expect(fit.matchesFullPhrase).toBe(true);
-    expect(fit.pearlScrollW).toBeLessThanOrEqual(fit.pearlClientW + 1);
-    expect(fit.pearlScrollH).toBeLessThanOrEqual(fit.pearlClientH + 1);
+    expect(fit.ellipsis).toBe(false);
+    expect(fit.contentH).toBeLessThanOrEqual(fit.d * 0.86 + 1);
   }
 });
 
@@ -823,9 +775,12 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
 const MIN_MOUNTED_PEARLS = 60;
 const MIN_DRAWN_PEARLS = 16;
 const MIN_MEAN_DRAWN_PEARLS = 18;
-/** The same numbers for a pool of only six records: two pearls a record. */
+/** The same numbers for a pool of only six records: two pearls a record.
+ * Three, not four: that pool is mostly long messages, and a pearl grows until
+ * its whole message fits (Anthony, October 25, 2026), so three pearls of up to
+ * 470 px fill the 620 px panel, and copies of one record never touch. */
 const MIN_MOUNTED_PEARLS_SMALL_POOL = 12;
-const MIN_DRAWN_PEARLS_SMALL_POOL = 4;
+const MIN_DRAWN_PEARLS_SMALL_POOL = 3;
 /** No record may hold more pearls than this at the same moment. */
 const MAX_PEARLS_PER_RECORD = 2;
 /** Words on a near pearl (reading layer, scale 1 or more) draw at this many px at 1920, doubled at 3840. */
@@ -853,7 +808,7 @@ type SwirlSample = {
   drawn: number;
   crossing: string[];
   maxCopies: number;
-  /** Smallest drawn phrase size, in px at 1920, on near pearls and on all the others. */
+  /** Smallest drawn message size, in px at 1920, on near pearls and on all the others. */
   minNearPx: number;
   minFarPx: number;
   /** Near pearls fully faded in, how many have at most a tenth of their words covered, and each one's covered share. */
@@ -904,7 +859,7 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
         );
       }
       const motionScale = (stream[index] as unknown as { scale: number } | undefined)?.scale ?? 0;
-      const phrase = node.querySelector<HTMLElement>('.stream-phrase')!;
+      const phrase = node.querySelector<HTMLElement>('.message')!;
       const drawnPx =
         parseFloat(window.getComputedStyle(phrase).fontSize) * (box.width / node.offsetWidth) * to1920;
       const near = node.dataset.layer === 'front' && motionScale >= 1;
@@ -918,7 +873,7 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
         cx: box.left + box.width / 2,
         cy: box.top + box.height / 2,
         r: box.width / 2,
-        texts: [phrase, node.querySelector<HTMLElement>('b')!].map((el) => el.getBoundingClientRect()),
+        texts: [phrase, node.querySelector<HTMLElement>('.recipient')!].map((el) => el.getBoundingClientRect()),
       });
       const motion = stream[index];
       out.nodes.push({
