@@ -49,7 +49,7 @@ function tributeContent(a,r){
  a.el.innerHTML=`<div class="orb-life">${completeOrb(r,d,{focus:goalId})}</div>`;
  if(font)a.el.querySelector('.message').style.fontSize=font+'px';
  bindNumbers(a.el);
- if(V.stream&&a.baseRadius!==undefined)a.radius=Math.max(0,Math.min(a.baseRadius,streamWidestRadius(V.stream.width,a.size,a.depth,a.offset,d/2)));
+ if(V.stream&&a.baseRadius!==undefined)a.radius=Math.max(0,Math.min(a.baseRadius,streamWidestRadius(V.stream.width,a.size*a.shrink,a.depth,a.offset,d/2)));
 }
 
 // The smallest pearl diameter, in steps of 8 px from the base pearl, at which
@@ -119,6 +119,8 @@ function streamPearlDiameter(r,goalId){
 // each carries a whole recognition now, and 60 crowded the panel and made
 // the church TV stutter.
 const STREAM_TARGET=30;
+const STREAM_SHRINK_MIN=.6;
+const STREAM_SHRINK_MAX=.75;
 const STREAM_FRONT_SHARE=12/30;
 // A record may hold two pearls when the pool is smaller than the swirl, and
 // three only when the pool is tiny.
@@ -162,6 +164,14 @@ const STREAM_SPARKS=24;
 // 8 icon bubbles, then the empty foam (24 in all, from 46).
 const STREAM_ICON_BUBBLES=8;
 const STREAM_FOAM=24;
+
+/**
+ * How much smaller pearl `j` of `count` draws (Anthony, October 29, 2026:
+ * "a mixture of 40% to 25%, dynamic"): .6 to .75 of its size, dealt evenly
+ * and shuffled along the helix so neighbours differ. Its whole message is
+ * laid out at the base type size and drawn smaller with the pearl.
+ */
+function streamShrink(j,count){return STREAM_SHRINK_MIN+(STREAM_SHRINK_MAX-STREAM_SHRINK_MIN)*(((j*5)%count+.5)/count)}
 
 /** How many pearls one record may hold at the same time. */
 function streamCopyCap(poolSize,count){
@@ -323,9 +333,11 @@ function mountTributes(){
    // pearls, shuffled along the helix so neighbours differ. Depth swings either side of
    // 0, so the scale is 1 or more on the whole near half, and the swing is
    // held back on the largest pearls so none draws past STREAM_MAX_DRAWN.
-   const size=1+.25*Math.pow(((j*7)%frontCount+.5)/frontCount,2.2),depth=Math.min(300+rng()*40,1000-1000*size/STREAM_MAX_DRAWN);
-   a={el,front,size,depth,offset:0,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.2)%TAU,y:span*(j+.5)/frontCount-STREAM_EDGE,
-    radius:Math.min(330+rng()*30,streamWidestRadius(W,size,depth,0)),pace:23+rng()*1.5,turn:.2+rng()*.01,sway:.1};
+   // Paces and turns differ widely from pearl to pearl (Anthony, October 29,
+   // 2026), and the turn reaches out wide across the panel.
+   const size=1+.25*Math.pow(((j*7)%frontCount+.5)/frontCount,2.2),depth=Math.min(300+rng()*40,1000-1000*size/STREAM_MAX_DRAWN),shrink=streamShrink(j,frontCount);
+   a={el,front,size,shrink,depth,offset:0,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.2)%TAU,y:span*(j+.5)/frontCount-STREAM_EDGE,
+    radius:Math.min(380+rng()*120,streamWidestRadius(W,size*shrink,depth,0)),pace:15+rng()*15,turn:.14+rng()*.14,sway:.1};
   }else{
    // Every sixth depth pearl is a deep giant that swings to the far back of
    // the vortex; the rest lean small. The far end of the swing stops where
@@ -333,9 +345,9 @@ function mountTributes(){
    // the reading pearls' near half. Depth pearls do not bloom.
    const giant=j%6===0,size=giant?1.05+rng()*.1:.68+.42*Math.pow(((j*11)%backCount+.5)/backCount,1.4);
    const far=Math.max(-640,1000-1000*size/STREAM_MIN_DRAWN),nearEnd=Math.min(-45,far+90+rng()*380),depth=(nearEnd-far)/2,offset=(nearEnd+far)/2;
-   const widest=streamWidestRadius(W,size,depth,offset);
-   a={el,front,size,depth,offset,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,y:span*(j+.5)/backCount-STREAM_EDGE,
-    radius:Math.min(widest,Math.sqrt(150*150+rng()*(widest*widest-150*150))),pace:31-11*(size-.68)/.47+rng()*1.5,turn:.13+rng()*.15,sway:.17};
+   const shrink=streamShrink(j,backCount),widest=streamWidestRadius(W,size*shrink,depth,offset);
+   a={el,front,size,shrink,depth,offset,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,y:span*(j+.5)/backCount-STREAM_EDGE,
+    radius:Math.min(widest,Math.sqrt(180*180+rng()*(widest*widest-180*180))),pace:30-11*(size-.68)/.47+rng()*10,turn:.13+rng()*.15,sway:.17};
   }
   Object.assign(a,{id:'',rise:a.pace,angle:a.phase,wobble:rng()*TAU,rng,cycles:0,baseRadius:a.radius,d:STREAM_PEARL_HALF*2});
   el.dataset.size=a.size.toFixed(3);
@@ -388,7 +400,7 @@ function tickTributes(dt){
   // A pearl grown for a long message never draws taller than most of the
   // panel or wider than its sides, and stays inside them across its turn.
   const angle=a.angle+Math.sin(t*.13+a.wobble)*a.sway,z=Math.sin(angle)*a.depth+a.offset,deep=1000/(1000-z);
-  const k=Math.min(deep*a.size*(a.front?streamBloom(u):1),Math.min(H*STREAM_MAX_PANEL,W-2*STREAM_SIDE_MARGIN)/a.d);
+  const k=Math.min(deep*a.size*a.shrink*(a.front?streamBloom(u):1),Math.min(H*STREAM_MAX_PANEL,W-2*STREAM_SIDE_MARGIN)/a.d);
   const reach=a.radius*funnel*deep,half=a.d/2*k;
   const x=clamp(streamAxis(a.y,t,W,H)+Math.cos(angle)*reach+Math.sin(t*.23+a.wobble)*12,half+STREAM_SIDE_MARGIN,Math.max(half+STREAM_SIDE_MARGIN,W-half-STREAM_SIDE_MARGIN)),y=a.y-(deep-.75)*27-Math.sin(angle)*reach*STREAM_TILT;
   const opacity=smooth((y-half)/STREAM_FADE_BAND)*smooth((H-y-half)/STREAM_FADE_BAND);

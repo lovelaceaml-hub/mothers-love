@@ -782,13 +782,19 @@ const MIN_MEAN_DRAWN_PEARLS = 9;
  * its whole message fits (Anthony, October 25, 2026), so three pearls of up to
  * 470 px fill the 620 px panel, and copies of one record never touch. */
 const MIN_MOUNTED_PEARLS_SMALL_POOL = 12;
-const MIN_DRAWN_PEARLS_SMALL_POOL = 3;
+// Two since October 29, 2026: pearls of one pool now rise at widely
+// different paces (Anthony), so a small pool's pearls bunch up at times.
+const MIN_DRAWN_PEARLS_SMALL_POOL = 2;
 /** No record may hold more pearls than this at the same moment. */
 const MAX_PEARLS_PER_RECORD = 2;
-/** Words on a near pearl (reading layer, scale 1 or more) draw at this many px at 1920, doubled at 3840. */
-const MIN_NEAR_WORDS_PX = 18;
-/** No pearl's words draw smaller than the far pearls drew before Lane 8. */
-const MIN_FAR_WORDS_PX = 11;
+/** Words on a near pearl (reading layer, drawn at its own size or larger) draw at this many px at 1920,
+ * doubled at 3840. 10.5 since October 29, 2026: pearls draw .6 to .75 of their size (Anthony), so the
+ * 18 px type draws at 10.8 px or more on the smallest. */
+const MIN_NEAR_WORDS_PX = 10.5;
+/** Smallest words on any pearl. 6.5 px since October 29, 2026: Anthony asked
+ * for pearls 25 to 40 percent smaller, mixed, and accepted small words on the
+ * pearls swinging to the back of the vortex (11 px before). */
+const MIN_FAR_WORDS_PX = 6.5;
 /** Share of a near pearl's words that nearer pearls may cover, averaged over a showing. */
 const MAX_MEAN_COVERED_SHARE = 0.2;
 
@@ -860,11 +866,13 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
           `${id} box ${box.left.toFixed(0)},${box.top.toFixed(0)},${box.right.toFixed(0)},${box.bottom.toFixed(0)} panel ${panel.left.toFixed(0)},${panel.top.toFixed(0)},${panel.right.toFixed(0)},${panel.bottom.toFixed(0)}`,
         );
       }
-      const motionScale = (stream[index] as unknown as { scale: number } | undefined)?.scale ?? 0;
+      const motion0 = stream[index] as unknown as { scale: number; shrink?: number } | undefined;
+      const motionScale = motion0?.scale ?? 0;
       const phrase = node.querySelector<HTMLElement>('.message')!;
       const drawnPx =
         parseFloat(window.getComputedStyle(phrase).fontSize) * (box.width / node.offsetWidth) * to1920;
-      const near = node.dataset.layer === 'front' && motionScale >= 1;
+      // Near: a reading pearl drawn at its own size or larger (its shrink).
+      const near = node.dataset.layer === 'front' && motionScale >= (motion0?.shrink ?? 1);
       if (near) out.minNearPx = Math.min(out.minNearPx, drawnPx);
       else out.minFarPx = Math.min(out.minFarPx, drawnPx);
       pearls.push({
