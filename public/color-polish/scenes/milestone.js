@@ -153,6 +153,12 @@ const STREAM_MIN_DRAWN=.63;
 const STREAM_MAX_DRAWN=1.55;
 // Clear room kept between a pearl's drawn edge and the panel's sides.
 const STREAM_SIDE_MARGIN=6;
+// The funnel's background, kept calm for phones and tablets (Anthony,
+// October 29, 2026): rising rings, ribbons of light and sparks, from 6, 5
+// and 64.
+const STREAM_RINGS=4;
+const STREAM_RIBBONS=3;
+const STREAM_SPARKS=24;
 // 8 icon bubbles, then the empty foam (24 in all, from 46).
 const STREAM_ICON_BUBBLES=8;
 const STREAM_FOAM=24;
@@ -407,7 +413,10 @@ function tickTributes(dt){
   a.el.style.opacity=(.55+.45*clamp((z+420)/660,0,1))*smooth((y-a.d)/60)*smooth((H-y-a.d)/60)*smooth((Math.min(x,W-x)-a.d)/40);
   a.el.style.zIndex=String(1000+Math.round(z));
  }
- drawStream();
+ // The funnel's light changes slowly, so it is redrawn at most 30 times a
+ // second; a phone then spends its frames on the pearls.
+ v.canvasDue=(v.canvasDue||0)+dt;
+ if(v.canvasDue>=1/30||dt<=0){v.canvasDue=0;drawStream()}
 }
 
 function drawStream(){
@@ -423,8 +432,8 @@ function drawStream(){
  // Rising rings: tilted hoops that climb the funnel and widen with it. The
  // far half of each hoop is faint, the near half bright with a fine highlight.
  const ringSpan=H*1.2;
- for(let j=0;j<6;j++){
-  const y=H*1.1-(((j/6)*ringSpan+t*11)%ringSpan),u=streamLift(y,H),rx=405*streamFunnel(u,t),ry=rx*.17,cx=streamAxis(y,t,W,H),show=smooth((y+10)/120)*smooth((H+10-y)/120);
+ for(let j=0;j<STREAM_RINGS;j++){
+  const y=H*1.1-(((j/STREAM_RINGS)*ringSpan+t*11)%ringSpan),u=streamLift(y,H),rx=405*streamFunnel(u,t),ry=rx*.17,cx=streamAxis(y,t,W,H),show=smooth((y+10)/120)*smooth((H+10-y)/120);
   if(show<=0)continue;
   c.globalAlpha=show;
   c.beginPath();c.ellipse(cx,y,rx,ry,0,Math.PI,TAU);c.strokeStyle='#cfa94a5e';c.lineWidth=1.2;c.stroke();
@@ -432,13 +441,13 @@ function drawStream(){
   c.beginPath();c.ellipse(cx,y-1.5,rx,ry,0,.35,Math.PI-.35);c.strokeStyle='#ffffffc8';c.lineWidth=1;c.stroke();
  }
  c.globalAlpha=1;
- // Five ribbons of light wound round the funnel. Each is stroked once whole
- // and faint, then again only where it passes in front, so the winding reads
- // as depth without rigid rails.
- for(let j=0;j<5;j++){
+ // Ribbons of light wound round the funnel. Each is stroked once whole and
+ // faint, then again only where it passes in front, so the winding reads as
+ // depth without rigid rails.
+ for(let j=0;j<STREAM_RIBBONS;j++){
   const whole=new Path2D(),nearSide=new Path2D();let pen=false;
   for(let i=0;i<=80;i++){
-   const q=i/80,yy=H+50-q*(H+100),funnel=streamFunnel(streamLift(yy,H),t),angle=q*TAU*1.35+t*.22+j*TAU/5,z=Math.sin(angle)*360-170,k=1000/(1000-z),reach=(250+j*16)*funnel*k;
+   const q=i/80,yy=H+50-q*(H+100),funnel=streamFunnel(streamLift(yy,H),t),angle=q*TAU*1.35+t*.22+j*TAU/STREAM_RIBBONS,z=Math.sin(angle)*360-170,k=1000/(1000-z),reach=(250+j*16)*funnel*k;
    const x=streamAxis(yy,t,W,H)+Math.cos(angle)*reach,y=yy-Math.sin(angle)*reach*STREAM_TILT;
    i?whole.lineTo(x,y):whole.moveTo(x,y);
    if(Math.sin(angle)>.12){pen?nearSide.lineTo(x,y):nearSide.moveTo(x,y);pen=true}else pen=false;
@@ -447,7 +456,7 @@ function drawStream(){
   c.strokeStyle=['#d9b04c9c','#fff8e0d0','#d3b26f94','#ffffffc4','#e3c16a9c'][j];c.lineWidth=j%2?2.6:1.6;c.stroke(nearSide);
  }
  // Sparks spiral with the funnel: closer in and quicker toward the foot.
- for(let i=0;i<64;i++){const y=((i*71-t*(9+i%8*1.5))%(H+60)+H+60)%(H+60),u=streamLift(y,H),funnel=streamFunnel(u,t),a=i*2.4+t*(.12+.3*(1-u)),r=(170+i%7*38)*funnel,z=Math.sin(a)*300-180,k=900/(900-z),x=streamAxis(y,t,W,H)+Math.cos(a)*r*k;drawSpark(c,x,y-Math.sin(a)*r*k*STREAM_TILT,1+i%4*.6,.2+.25*Math.sin(i+t*.6)**2,i%5?'#d4b76f':'#fffaf0')}
+ for(let i=0;i<STREAM_SPARKS;i++){const y=((i*71-t*(9+i%8*1.5))%(H+60)+H+60)%(H+60),u=streamLift(y,H),funnel=streamFunnel(u,t),a=i*2.4+t*(.12+.3*(1-u)),r=(170+i%7*38)*funnel,z=Math.sin(a)*300-180,k=900/(900-z),x=streamAxis(y,t,W,H)+Math.cos(a)*r*k;drawSpark(c,x,y-Math.sin(a)*r*k*STREAM_TILT,1+i%4*.6,.2+.25*Math.sin(i+t*.6)**2,i%5?'#d4b76f':'#fffaf0')}
  c.restore();
 }
 

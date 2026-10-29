@@ -158,9 +158,6 @@
      a near pearl carries no filter at all. Same offset, spread and colour. */
   border-radius: 50%;
   box-shadow: -7px 13px 12px #99846925;
-  /* Each pearl is its own layer, drawn once and then moved and scaled by the
-     TV's graphics chip instead of repainted every frame. */
-  will-change: transform, opacity;
 }
 
 /* A pearl is the same bubble as every other screen's (Anthony, October 25,
@@ -231,29 +228,29 @@
   height: 58%;
 }
 
-/* The pearls already rise and turn, and each carries a depth filter, so the
-   bubble's own breathing, sheen and twinkling are held still here: anything
-   animating inside a filtered pearl makes the TV redraw that pearl's filter
-   on every frame. The sparkles stay, shown steady. */
-#tv .scene[data-scene="11"] .stream-node .orb-breath,
-#tv .scene[data-scene="11"] .stream-node .orb-sheen::after,
-#tv .scene[data-scene="11"] .stream-node .orb::after {
+/* The pearls already rise and turn, so a bubble's own breathing is held
+   still here. */
+#tv .scene[data-scene="11"] .stream-node .orb-breath {
   animation: none;
 }
 
+/* Plain bubbles in the vortex (Anthony, October 29, 2026: the swirl was
+   choppy on a phone, and smooth there before pearls carried whole messages).
+   A pearl keeps its own pastel --bubble hue, its whole message and its
+   chips, but none of the other screens' decoration: no iridescent rim, inner
+   shadows, circular clip, halo, sheen, rings or sparkles, which phones and
+   tablets struggle to repaint as thirty pearls move and scale. */
+#tv .scene[data-scene="11"] .stream-node .orb {
+  background: radial-gradient(circle at 32% 24%, #ffffff 0 16%, color-mix(in srgb, var(--bubble, #F7DC94) 20%, #fffdf8) 100%);
+  border: 2px solid color-mix(in srgb, var(--bubble, #F7DC94) 60%, white);
+  box-shadow: none;
+  clip-path: none;
+}
+
+#tv .scene[data-scene="11"] .stream-node .orb::before,
+#tv .scene[data-scene="11"] .stream-node .orb::after,
+#tv .scene[data-scene="11"] .stream-node .orb-sheen,
+#tv .scene[data-scene="11"] .stream-node .orb-breath::before,
 #tv .scene[data-scene="11"] .stream-node .orb-breath::after {
-  animation: none;
-  opacity: .85;
-}
-
-/* The bubble's halo is drawn as the pearl's own round shadow, in its --bubble
-   hue, instead of the separate halo layer the other screens use: twenty or
-   more pearls overlap in the vortex, and that layer, larger than the pearl,
-   cost the TV more to draw than everything else in a pearl together. */
-#tv .scene[data-scene="11"] .stream-node {
-  box-shadow: -7px 13px 12px #99846925, 0 0 0 1.5px color-mix(in srgb, var(--bubble, #F7DC94) 55%, white), 0 0 22px 3px color-mix(in srgb, color-mix(in srgb, var(--bubble, #F7DC94) 70%, #FFE2B8) 55%, transparent);
-}
-
-#tv .scene[data-scene="11"] .stream-node .orb-breath::before {
   display: none;
 }
