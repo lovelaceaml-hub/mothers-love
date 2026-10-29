@@ -788,13 +788,14 @@ const MIN_DRAWN_PEARLS_SMALL_POOL = 2;
 /** No record may hold more pearls than this at the same moment. */
 const MAX_PEARLS_PER_RECORD = 2;
 /** Words on a near pearl (reading layer, drawn at its own size or larger) draw at this many px at 1920,
- * doubled at 3840. 10.5 since October 29, 2026: pearls draw .6 to .75 of their size (Anthony), so the
- * 18 px type draws at 10.8 px or more on the smallest. */
-const MIN_NEAR_WORDS_PX = 10.5;
-/** Smallest words on any pearl. 6.5 px since October 29, 2026: Anthony asked
- * for pearls 25 to 40 percent smaller, mixed, and accepted small words on the
- * pearls swinging to the back of the vortex (11 px before). */
-const MIN_FAR_WORDS_PX = 6.5;
+ * doubled at 3840. 8 since October 29, 2026: pearls draw .45 to .95 of their size (Anthony asked for
+ * more size diversity), so the 18 px type draws at 8.1 px or more on the smallest. */
+const MIN_NEAR_WORDS_PX = 8;
+/** Smallest words on any pearl. 5 px since October 29, 2026: Anthony asked
+ * for smaller pearls with more size diversity (.45 to .95 of their size) and
+ * accepted small words on the pearls swinging to the back of the vortex
+ * (11 px before). */
+const MIN_FAR_WORDS_PX = 5;
 /** Share of a near pearl's words that nearer pearls may cover, averaged over a showing. */
 const MAX_MEAN_COVERED_SHARE = 0.2;
 
@@ -987,10 +988,13 @@ test('the swirl is full: at least 16 pearls drawn inside the panel, none cut at 
     // second, and near words mostly uncovered over the showing.
     expect(Math.min(...samples.map((s) => s.minNearPx)), 'smallest near pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_NEAR_WORDS_PX - 0.01);
     expect(Math.min(...samples.map((s) => s.minFarPx)), 'smallest far pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_FAR_WORDS_PX);
+    // Pearls rise and turn at widely different paces since October 29, 2026
+    // (Anthony), so reading pearls can briefly cross each other: at most two
+    // seconds of a showing may pass with no near pearl's words clear.
     expect(
-      Math.min(...samples.map((s) => s.readable)),
+      samples.filter((s) => s.readable < 1).length,
       `near pearls with clear words, per second: ${JSON.stringify(samples.map((s) => s.readable))}`,
-    ).toBeGreaterThanOrEqual(1);
+    ).toBeLessThanOrEqual(2);
     const covered = samples.flatMap((s) => s.covered);
     const meanCovered = covered.reduce((n, v) => n + v, 0) / covered.length;
     expect(meanCovered, `mean covered share of near words: ${meanCovered.toFixed(2)}`).toBeLessThanOrEqual(MAX_MEAN_COVERED_SHARE);

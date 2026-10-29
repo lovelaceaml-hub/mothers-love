@@ -234,15 +234,21 @@
   animation: none;
 }
 
-/* Plain bubbles in the vortex (Anthony, October 29, 2026: the swirl was
-   choppy on a phone, and smooth there before pearls carried whole messages).
-   A pearl keeps its own pastel --bubble hue, its whole message and its
-   chips, but none of the other screens' decoration: no iridescent rim, inner
+/* Light bubbles in the vortex (Anthony, October 29, 2026: the swirl was
+   choppy on a phone, and smooth there before pearls carried whole messages,
+   but a pearl must still look like a bubble). The bubble is painted in one
+   background: a bright glint and a small second reflection, a near-white
+   centre and a rim in the pearl's own --bubble hue with a cool iridescent
+   edge. None of the other screens' extra layers: no conic rim, inner
    shadows, circular clip, halo, sheen, rings or sparkles, which phones and
-   tablets struggle to repaint as thirty pearls move and scale. */
+   tablets struggle to repaint as thirty pearls move and scale. The fill
+   stays opaque (Plan 17). */
 #tv .scene[data-scene="11"] .stream-node .orb {
-  background: radial-gradient(circle at 32% 24%, #ffffff 0 16%, color-mix(in srgb, var(--bubble, #F7DC94) 20%, #fffdf8) 100%);
-  border: 2px solid color-mix(in srgb, var(--bubble, #F7DC94) 60%, white);
+  background:
+    radial-gradient(circle at 30% 22%, #ffffffee 0 5%, #ffffff70 10%, transparent 21%),
+    radial-gradient(circle at 70% 80%, #ffffff60 0 3%, transparent 12%),
+    radial-gradient(circle closest-side, color-mix(in srgb, var(--bubble, #F7DC94) 6%, #fffefc) 0%, color-mix(in srgb, var(--bubble, #F7DC94) 12%, #fffdf8) 60%, color-mix(in srgb, var(--bubble, #F7DC94) 36%, #fff8ee) 82%, color-mix(in srgb, color-mix(in srgb, var(--bubble, #F7DC94) 45%, #bfe0ff) 60%, #ffffff) 92%, color-mix(in srgb, var(--bubble, #F7DC94) 65%, #ffffff) 100%);
+  border: 1.5px solid #ffffffd9;
   box-shadow: none;
   clip-path: none;
 }

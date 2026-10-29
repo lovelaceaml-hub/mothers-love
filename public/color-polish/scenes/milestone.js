@@ -119,8 +119,8 @@ function streamPearlDiameter(r,goalId){
 // each carries a whole recognition now, and 60 crowded the panel and made
 // the church TV stutter.
 const STREAM_TARGET=30;
-const STREAM_SHRINK_MIN=.6;
-const STREAM_SHRINK_MAX=.75;
+const STREAM_SHRINK_MIN=.45;
+const STREAM_SHRINK_MAX=.95;
 const STREAM_FRONT_SHARE=12/30;
 // A record may hold two pearls when the pool is smaller than the swirl, and
 // three only when the pool is tiny.
@@ -167,8 +167,8 @@ const STREAM_FOAM=24;
 
 /**
  * How much smaller pearl `j` of `count` draws (Anthony, October 29, 2026:
- * "a mixture of 40% to 25%, dynamic"): .6 to .75 of its size, dealt evenly
- * and shuffled along the helix so neighbours differ. Its whole message is
+ * smaller and mixed, then more size diversity): .45 to .95 of its size, dealt
+ * evenly and shuffled along the helix so neighbours differ. Its whole message is
  * laid out at the base type size and drawn smaller with the pearl.
  */
 function streamShrink(j,count){return STREAM_SHRINK_MIN+(STREAM_SHRINK_MAX-STREAM_SHRINK_MIN)*(((j*5)%count+.5)/count)}
@@ -337,7 +337,7 @@ function mountTributes(){
    // 2026), and the turn reaches out wide across the panel.
    const size=1+.25*Math.pow(((j*7)%frontCount+.5)/frontCount,2.2),depth=Math.min(300+rng()*40,1000-1000*size/STREAM_MAX_DRAWN),shrink=streamShrink(j,frontCount);
    a={el,front,size,shrink,depth,offset:0,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.2)%TAU,y:span*(j+.5)/frontCount-STREAM_EDGE,
-    radius:Math.min(380+rng()*120,streamWidestRadius(W,size*shrink,depth,0)),pace:15+rng()*15,turn:.14+rng()*.14,sway:.1};
+    radius:Math.min(380+rng()*120,streamWidestRadius(W,size*shrink,depth,0)),pace:10+rng()*26,turn:.1+rng()*.26,sway:.1};
   }else{
    // Every sixth depth pearl is a deep giant that swings to the far back of
    // the vortex; the rest lean small. The far end of the swing stops where
@@ -347,7 +347,7 @@ function mountTributes(){
    const far=Math.max(-640,1000-1000*size/STREAM_MIN_DRAWN),nearEnd=Math.min(-45,far+90+rng()*380),depth=(nearEnd-far)/2,offset=(nearEnd+far)/2;
    const shrink=streamShrink(j,backCount),widest=streamWidestRadius(W,size*shrink,depth,offset);
    a={el,front,size,shrink,depth,offset,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,y:span*(j+.5)/backCount-STREAM_EDGE,
-    radius:Math.min(widest,Math.sqrt(180*180+rng()*(widest*widest-180*180))),pace:30-11*(size-.68)/.47+rng()*10,turn:.13+rng()*.15,sway:.17};
+    radius:Math.min(widest,Math.sqrt(180*180+rng()*(widest*widest-180*180))),pace:26-11*(size-.68)/.47+rng()*18,turn:.1+rng()*.26,sway:.17};
   }
   Object.assign(a,{id:'',rise:a.pace,angle:a.phase,wobble:rng()*TAU,rng,cycles:0,baseRadius:a.radius,d:STREAM_PEARL_HALF*2});
   el.dataset.size=a.size.toFixed(3);
