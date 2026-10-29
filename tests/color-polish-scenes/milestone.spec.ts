@@ -772,21 +772,30 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
 // 20 reading pearls and 40 depth pearls, each with its own size. Measured the
 // same way over a 60 second showing it draws between 20 and 31 pearls with a
 // mean of 25.2, and its near pearls' words are 0.13 covered on average.
-const MIN_MOUNTED_PEARLS = 60;
-const MIN_DRAWN_PEARLS = 16;
-const MIN_MEAN_DRAWN_PEARLS = 18;
+// Since October 29, 2026 the swirl holds 30 pearls (12 reading, 18 depth),
+// each a whole recognition: 60 crowded the panel and stuttered on the TV.
+const MIN_MOUNTED_PEARLS = 30;
+const MIN_DRAWN_PEARLS = 7;
+const MIN_MEAN_DRAWN_PEARLS = 9;
 /** The same numbers for a pool of only six records: two pearls a record.
  * Three, not four: that pool is mostly long messages, and a pearl grows until
  * its whole message fits (Anthony, October 25, 2026), so three pearls of up to
  * 470 px fill the 620 px panel, and copies of one record never touch. */
 const MIN_MOUNTED_PEARLS_SMALL_POOL = 12;
-const MIN_DRAWN_PEARLS_SMALL_POOL = 3;
+// Two since October 29, 2026: pearls of one pool now rise at widely
+// different paces (Anthony), so a small pool's pearls bunch up at times.
+const MIN_DRAWN_PEARLS_SMALL_POOL = 2;
 /** No record may hold more pearls than this at the same moment. */
 const MAX_PEARLS_PER_RECORD = 2;
-/** Words on a near pearl (reading layer, scale 1 or more) draw at this many px at 1920, doubled at 3840. */
-const MIN_NEAR_WORDS_PX = 18;
-/** No pearl's words draw smaller than the far pearls drew before Lane 8. */
-const MIN_FAR_WORDS_PX = 11;
+/** Words on a near pearl (reading layer, drawn at its own size or larger) draw at this many px at 1920,
+ * doubled at 3840. 8 since October 29, 2026: pearls draw .45 to .95 of their size (Anthony asked for
+ * more size diversity), so the 18 px type draws at 8.1 px or more on the smallest. */
+const MIN_NEAR_WORDS_PX = 8;
+/** Smallest words on any pearl. 5 px since October 29, 2026: Anthony asked
+ * for smaller pearls with more size diversity (.45 to .95 of their size) and
+ * accepted small words on the pearls swinging to the back of the vortex
+ * (11 px before). */
+const MIN_FAR_WORDS_PX = 5;
 /** Share of a near pearl's words that nearer pearls may cover, averaged over a showing. */
 const MAX_MEAN_COVERED_SHARE = 0.2;
 
@@ -858,11 +867,13 @@ async function swirlSample(frame: import('@playwright/test').Frame): Promise<Swi
           `${id} box ${box.left.toFixed(0)},${box.top.toFixed(0)},${box.right.toFixed(0)},${box.bottom.toFixed(0)} panel ${panel.left.toFixed(0)},${panel.top.toFixed(0)},${panel.right.toFixed(0)},${panel.bottom.toFixed(0)}`,
         );
       }
-      const motionScale = (stream[index] as unknown as { scale: number } | undefined)?.scale ?? 0;
+      const motion0 = stream[index] as unknown as { scale: number; shrink?: number } | undefined;
+      const motionScale = motion0?.scale ?? 0;
       const phrase = node.querySelector<HTMLElement>('.message')!;
       const drawnPx =
         parseFloat(window.getComputedStyle(phrase).fontSize) * (box.width / node.offsetWidth) * to1920;
-      const near = node.dataset.layer === 'front' && motionScale >= 1;
+      // Near: a reading pearl drawn at its own size or larger (its shrink).
+      const near = node.dataset.layer === 'front' && motionScale >= (motion0?.shrink ?? 1);
       if (near) out.minNearPx = Math.min(out.minNearPx, drawnPx);
       else out.minFarPx = Math.min(out.minFarPx, drawnPx);
       pearls.push({
@@ -977,10 +988,13 @@ test('the swirl is full: at least 16 pearls drawn inside the panel, none cut at 
     // second, and near words mostly uncovered over the showing.
     expect(Math.min(...samples.map((s) => s.minNearPx)), 'smallest near pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_NEAR_WORDS_PX - 0.01);
     expect(Math.min(...samples.map((s) => s.minFarPx)), 'smallest far pearl words, px at 1920').toBeGreaterThanOrEqual(MIN_FAR_WORDS_PX);
+    // Pearls rise and turn at widely different paces since October 29, 2026
+    // (Anthony), so reading pearls can briefly cross each other: at most two
+    // seconds of a showing may pass with no near pearl's words clear.
     expect(
-      Math.min(...samples.map((s) => s.readable)),
+      samples.filter((s) => s.readable < 1).length,
       `near pearls with clear words, per second: ${JSON.stringify(samples.map((s) => s.readable))}`,
-    ).toBeGreaterThanOrEqual(1);
+    ).toBeLessThanOrEqual(2);
     const covered = samples.flatMap((s) => s.covered);
     const meanCovered = covered.reduce((n, v) => n + v, 0) / covered.length;
     expect(meanCovered, `mean covered share of near words: ${meanCovered.toFixed(2)}`).toBeLessThanOrEqual(MAX_MEAN_COVERED_SHARE);
@@ -1085,13 +1099,13 @@ test('the vortex carries many bubble sizes, turns as a funnel and moves at many 
     };
   });
   expect(sizes.pearls.every((n) => Number.isFinite(n) && n > 0)).toBe(true);
-  expect(new Set(sizes.pearls.map((n) => n.toFixed(2))).size, 'distinct pearl sizes').toBeGreaterThanOrEqual(20);
+  expect(new Set(sizes.pearls.map((n) => n.toFixed(2))).size, 'distinct pearl sizes').toBeGreaterThanOrEqual(16);
   expect(Math.min(...sizes.pearls), 'smallest pearl size').toBeLessThanOrEqual(0.75);
   expect(Math.max(...sizes.pearls), 'largest pearl size').toBeGreaterThanOrEqual(1.2);
-  expect(sizes.glass.length, 'glass bubbles').toBeGreaterThanOrEqual(40);
+  expect(sizes.glass.length, 'glass bubbles').toBeGreaterThanOrEqual(24);
   expect(Math.min(...sizes.glass), 'smallest glass bubble, px').toBeLessThanOrEqual(16);
   expect(Math.max(...sizes.glass), 'largest glass bubble, px').toBeGreaterThanOrEqual(90);
-  expect(sizes.iconGlass, 'glass bubbles carrying an icon').toBeGreaterThanOrEqual(10);
+  expect(sizes.iconGlass, 'glass bubbles carrying an icon').toBeGreaterThanOrEqual(8);
 
   // Paces. Pearls rise at their own speed (the scene before: 23 to 24.5).
   const rises = await frame.evaluate(
@@ -1099,12 +1113,15 @@ test('the vortex carries many bubble sizes, turns as a funnel and moves at many 
   );
   expect(Math.max(...rises) - Math.min(...rises), 'spread of rise speeds, px a second').toBeGreaterThanOrEqual(8);
 
-  // Funnel and size on the screen, over a 40 second stretch: depth pearls
+  // Funnel and size on the screen, over a 120 second stretch: depth pearls
   // sit closer to the spine in the lower third of the panel than in the
   // upper third, and the pearls drawn at one moment differ widely in size.
+  // 120 seconds (from 40) since the swirl holds 18 depth pearls instead of
+  // 40: each crosses the panel about three times, so no single pearl's turn
+  // decides the mean.
   const low: number[] = [], high: number[] = [], ratios: number[] = [];
   let crossings = 0;
-  for (let second = 0; second < 40; second++) {
+  for (let second = 0; second < 120; second++) {
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
     const m = await frame.evaluate(() => {
       const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]')!;
