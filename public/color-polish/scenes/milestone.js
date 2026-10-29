@@ -41,21 +41,15 @@ function tributeContent(a,r){
  const chosenExpr=catalog[chosenId-1];
  a.el.style.setProperty('--tint',chosenExpr.color);
  // A pearl is the same bubble as every other screen's, with the whole
- // message (Anthony, October 25, 2026), and grows until all of it fits.
+ // message (Anthony, October 25, 2026). It grows until all of it fits, up to
+ // STREAM_PEARL_MAX; past that a long message keeps every word in smaller
+ // type (Anthony, October 29: smaller bubbles, a smooth swirl).
  const {d,font}=streamPearlDiameter(r,goalId);
  a.d=d;a.el.style.width=a.el.style.height=d+'px';a.el.style.setProperty('--bubble',bubbleHue(r.id));
  a.el.innerHTML=`<div class="orb-life">${completeOrb(r,d,{focus:goalId})}</div>`;
  if(font)a.el.querySelector('.message').style.fontSize=font+'px';
  bindNumbers(a.el);
  if(V.stream&&a.baseRadius!==undefined)a.radius=Math.max(0,Math.min(a.baseRadius,streamWidestRadius(V.stream.width,a.size,a.depth,a.offset,d/2)));
- // A pearl grown for a long message is wholly inside the panel for only a
- // short stretch of its climb, so it rises there slowly enough to be read at
- // core's pace of max(9, characters / 14) seconds, and hurries through the
- // hidden stretches above and below the panel (STREAM_RUSH_FROM). A pearl
- // near the base size keeps its own pace throughout.
- const inside=Math.max(40,(V.stream?.height||620)-d*a.size-2*STREAM_FADE_BAND);
- a.readRise=Math.min(a.pace,inside/Math.max(9,r.message.length/14));
- a.rush=1+Math.pow(Math.max(0,d-STREAM_RUSH_FROM)/80,2);
 }
 
 // The smallest pearl diameter, in steps of 8 px from the base pearl, at which
@@ -64,10 +58,7 @@ function tributeContent(a,r){
 // in a hidden pearl inside the stream, so it carries the scene's own styles.
 // A message too long even for the largest pearl keeps every word and sets
 // its type smaller instead, never cut.
-const STREAM_PEARL_MAX=560;
-// Pearls up to this diameter keep their pace hidden too; larger ones hurry
-// through the hidden stretches, more the larger they are.
-const STREAM_RUSH_FROM=300;
+const STREAM_PEARL_MAX=360;
 const streamDiameterCache=new Map();
 function streamPearlDiameter(r,goalId){
  const key=r.id+'|'+r.message.length+'|'+r.name.length+'|'+shownIds(r.ids,goalId).join(',');
@@ -87,7 +78,7 @@ function streamPearlDiameter(r,goalId){
  const fits=d=>{probe.style.width=probe.style.height=d+'px';return content.scrollHeight<=d*.86&&chipsInsideCircle(content,chipBox,d)&&linesInside(d)};
  let lo=STREAM_PEARL_HALF*2,hi=STREAM_PEARL_MAX,font=0;
  if(fits(lo))hi=lo;
- else if(!fits(hi)){font=parseFloat(getComputedStyle(msg).fontSize);while(!fits(hi)&&font>10){font-=.5;msg.style.fontSize=font+'px'}lo=hi}
+ else if(!fits(hi)){font=parseFloat(getComputedStyle(msg).fontSize);while(!fits(hi)&&font>8){font-=.5;msg.style.fontSize=font+'px'}lo=hi}
  else while(hi-lo>8){const mid=Math.round((lo+hi)/16)*8;fits(mid)?hi=mid:lo=mid}
  const result={d:hi,font};
  probe.remove();streamDiameterCache.set(key,result);
@@ -124,8 +115,11 @@ function streamPearlDiameter(r,goalId){
 // The pearl's layout box never changes (236 px, words 18 px), only its drawn
 // scale, so every phrase, name and icon row keeps its place inside the rim at
 // every size.
-const STREAM_TARGET=60;
-const STREAM_FRONT_SHARE=20/60;
+// 30 pearls, 12 reading and 18 depth (from 60, Anthony, October 29, 2026):
+// each carries a whole recognition now, and 60 crowded the panel and made
+// the church TV stutter.
+const STREAM_TARGET=30;
+const STREAM_FRONT_SHARE=12/30;
 // A record may hold two pearls when the pool is smaller than the swirl, and
 // three only when the pool is tiny.
 const STREAM_MAX_COPIES=3;
@@ -142,7 +136,9 @@ const STREAM_GOLDEN_ANGLE=TAU*.381966;
 // the top, a breathing wave of STREAM_BREATH either side, a spine that sways
 // up to STREAM_SWAY px, and orbits tilted toward the viewer so the far side
 // of a turn sits STREAM_TILT of the radius higher than the near side.
-const STREAM_WAIST=.62;
+// .55 (from .62): with fewer, larger pearls the foot narrows a little more,
+// so the funnel still reads.
+const STREAM_WAIST=.55;
 // Reading pearls ride a gentler funnel, so the pearls that are near together
 // stay spread across the panel at its foot and keep their words clear.
 const STREAM_READING_WAIST=.86;
@@ -157,9 +153,9 @@ const STREAM_MIN_DRAWN=.63;
 const STREAM_MAX_DRAWN=1.55;
 // Clear room kept between a pearl's drawn edge and the panel's sides.
 const STREAM_SIDE_MARGIN=6;
-// 14 icon bubbles, then the empty foam.
-const STREAM_ICON_BUBBLES=14;
-const STREAM_FOAM=46;
+// 8 icon bubbles, then the empty foam (24 in all, from 46).
+const STREAM_ICON_BUBBLES=8;
+const STREAM_FOAM=24;
 
 /** How many pearls one record may hold at the same time. */
 function streamCopyCap(poolSize,count){
@@ -263,7 +259,7 @@ function streamGive(a,r,nodes){
  if(!r)return;
  const holder=nodes.find(x=>x!==a&&x.id===r.id);
  tributeContent(a,r);
- a.rise=holder?holder.rise:Math.min(a.pace,a.readRise);
+ a.rise=holder?holder.rise:a.pace;
 }
 
 /** The record for a pearl re-entering at the bottom: one nobody holds, else a repeat. */
@@ -335,7 +331,7 @@ function mountTributes(){
    a={el,front,size,depth,offset,phase:(j*STREAM_GOLDEN_ANGLE+rng()*.45)%TAU,y:span*(j+.5)/backCount-STREAM_EDGE,
     radius:Math.min(widest,Math.sqrt(150*150+rng()*(widest*widest-150*150))),pace:31-11*(size-.68)/.47+rng()*1.5,turn:.13+rng()*.15,sway:.17};
   }
-  Object.assign(a,{id:'',rise:a.pace,angle:a.phase,wobble:rng()*TAU,rng,cycles:0,baseRadius:a.radius,d:STREAM_PEARL_HALF*2,readRise:a.pace,rush:1});
+  Object.assign(a,{id:'',rise:a.pace,angle:a.phase,wobble:rng()*TAU,rng,cycles:0,baseRadius:a.radius,d:STREAM_PEARL_HALF*2});
   el.dataset.size=a.size.toFixed(3);
   V.stream.nodes.push(a);
  }
@@ -365,16 +361,15 @@ const STREAM_PEARL_HALF = 118;
 // 24 px (from 40): a large pearl is see-through for about a second as it
 // enters or leaves, instead of nearly two.
 const STREAM_FADE_BAND = 24;
-// The largest share of the panel's height a pearl may draw at.
-const STREAM_MAX_PANEL = .92;
+// The largest share of the panel's height a pearl may draw at: .62 (from
+// .92), so a large pearl is wholly inside the panel for most of its climb and
+// pearls crowd each other less (Anthony, October 29, 2026).
+const STREAM_MAX_PANEL = .62;
 function tickTributes(dt){
  if(S.s!==11||!V.stream||active||transition||(S.still&&dt>0))return;
  const v=V.stream,t=V.clock,W=v.width,H=v.height;
  for(const a of v.nodes){
-  // The hurry depends on height alone, with the record's own diameter, so two
-  // pearls holding one record keep the same speed at every height and stay
-  // the same time apart.
-  a.y-=dt*a.rise*(a.y>H-a.d/2||a.y<a.d/2?a.rush:1);
+  a.y-=dt*a.rise;
   if(a.y< -STREAM_EDGE){
    a.y=H+STREAM_EDGE;
    a.cycles++;
@@ -391,24 +386,16 @@ function tickTributes(dt){
   const reach=a.radius*funnel*deep,half=a.d/2*k;
   const x=clamp(streamAxis(a.y,t,W,H)+Math.cos(angle)*reach+Math.sin(t*.23+a.wobble)*12,half+STREAM_SIDE_MARGIN,Math.max(half+STREAM_SIDE_MARGIN,W-half-STREAM_SIDE_MARGIN)),y=a.y-(deep-.75)*27-Math.sin(angle)*reach*STREAM_TILT;
   const opacity=smooth((y-half)/STREAM_FADE_BAND)*smooth((H-y-half)/STREAM_FADE_BAND);
-  // A pearl looks as far away as it draws small: a small depth pearl is
-  // toned, softened and stacked like a pearl deep in the vortex.
+  // A pearl looks as far away as it draws small, and stacks that way.
   const zSeen=Math.min(z,1000-1000/k);
-  const depthTone=zSeen< -220?Math.max(.45,.45+.35*(zSeen+630)/410):1;
   a.el.style.transform=`translate(${x-a.d/2}px,${y-a.d/2}px) scale(${k})`;a.el.style.opacity=clamp(opacity,0,1);a.el.style.zIndex=String(1000+Math.round(zSeen));
-  // Frame cost (Lane 8 review). More than half of the pearls are outside the
-  // panel and fully faded at any moment: those are hidden outright so the
-  // browser paints and filters nothing for them. For every pearl the filter is
-  // stepped (blur to a quarter px, tone to a twentieth) and only written when
-  // the stepped value changes, which is a few times a second per pearl
-  // instead of every frame.
+  // Frame cost. Pearls outside the panel and fully faded are hidden outright
+  // so the browser paints nothing for them. Pearls carry no filter: the
+  // stepped depth blur and tone redrew a whole pearl, words and all, each time
+  // a step changed, which the church TV showed as stutter and flicker
+  // (Anthony, October 29, 2026). Depth shows through size and stacking.
   const shown=opacity>0;
   if(a.shown!==shown){a.shown=shown;a.el.style.visibility=shown?'visible':'hidden'}
-  {
-   const blur=Math.round(Math.min(2,Math.max(0,(-zSeen-120)/260))*4)/4,tone=Math.round(depthTone*20)/20;
-   const filter=`${blur?`blur(${blur}px) `:''}${tone<1?`contrast(${(.55+.45*tone).toFixed(3)}) brightness(${(1+.3*(1-tone)).toFixed(3)})`:''}`||'none';
-   if(a.filter!==filter){a.filter=filter;a.el.style.filter=filter}
-  }
   a.x=x;a.z=z;a.scale=k;a.screenY=y;
  }
  for(const a of v.foam){

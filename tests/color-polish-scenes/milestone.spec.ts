@@ -772,9 +772,11 @@ test('tribute pearls are fully opaque inside the panel and fade out only at its 
 // 20 reading pearls and 40 depth pearls, each with its own size. Measured the
 // same way over a 60 second showing it draws between 20 and 31 pearls with a
 // mean of 25.2, and its near pearls' words are 0.13 covered on average.
-const MIN_MOUNTED_PEARLS = 60;
-const MIN_DRAWN_PEARLS = 16;
-const MIN_MEAN_DRAWN_PEARLS = 18;
+// Since October 29, 2026 the swirl holds 30 pearls (12 reading, 18 depth),
+// each a whole recognition: 60 crowded the panel and stuttered on the TV.
+const MIN_MOUNTED_PEARLS = 30;
+const MIN_DRAWN_PEARLS = 7;
+const MIN_MEAN_DRAWN_PEARLS = 9;
 /** The same numbers for a pool of only six records: two pearls a record.
  * Three, not four: that pool is mostly long messages, and a pearl grows until
  * its whole message fits (Anthony, October 25, 2026), so three pearls of up to
@@ -1085,13 +1087,13 @@ test('the vortex carries many bubble sizes, turns as a funnel and moves at many 
     };
   });
   expect(sizes.pearls.every((n) => Number.isFinite(n) && n > 0)).toBe(true);
-  expect(new Set(sizes.pearls.map((n) => n.toFixed(2))).size, 'distinct pearl sizes').toBeGreaterThanOrEqual(20);
+  expect(new Set(sizes.pearls.map((n) => n.toFixed(2))).size, 'distinct pearl sizes').toBeGreaterThanOrEqual(16);
   expect(Math.min(...sizes.pearls), 'smallest pearl size').toBeLessThanOrEqual(0.75);
   expect(Math.max(...sizes.pearls), 'largest pearl size').toBeGreaterThanOrEqual(1.2);
-  expect(sizes.glass.length, 'glass bubbles').toBeGreaterThanOrEqual(40);
+  expect(sizes.glass.length, 'glass bubbles').toBeGreaterThanOrEqual(24);
   expect(Math.min(...sizes.glass), 'smallest glass bubble, px').toBeLessThanOrEqual(16);
   expect(Math.max(...sizes.glass), 'largest glass bubble, px').toBeGreaterThanOrEqual(90);
-  expect(sizes.iconGlass, 'glass bubbles carrying an icon').toBeGreaterThanOrEqual(10);
+  expect(sizes.iconGlass, 'glass bubbles carrying an icon').toBeGreaterThanOrEqual(8);
 
   // Paces. Pearls rise at their own speed (the scene before: 23 to 24.5).
   const rises = await frame.evaluate(
@@ -1099,12 +1101,15 @@ test('the vortex carries many bubble sizes, turns as a funnel and moves at many 
   );
   expect(Math.max(...rises) - Math.min(...rises), 'spread of rise speeds, px a second').toBeGreaterThanOrEqual(8);
 
-  // Funnel and size on the screen, over a 40 second stretch: depth pearls
+  // Funnel and size on the screen, over a 120 second stretch: depth pearls
   // sit closer to the spine in the lower third of the panel than in the
   // upper third, and the pearls drawn at one moment differ widely in size.
+  // 120 seconds (from 40) since the swirl holds 18 depth pearls instead of
+  // 40: each crosses the panel about three times, so no single pearl's turn
+  // decides the mean.
   const low: number[] = [], high: number[] = [], ratios: number[] = [];
   let crossings = 0;
-  for (let second = 0; second < 40; second++) {
+  for (let second = 0; second < 120; second++) {
     await frame.evaluate(() => (window as any).colorPolishRuntime.step(1000));
     const m = await frame.evaluate(() => {
       const scene = document.querySelector<HTMLElement>('#stage .scene[data-scene="11"]')!;

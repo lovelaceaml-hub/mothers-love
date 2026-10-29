@@ -387,7 +387,10 @@ export async function textFits(
             // A Goal vortex pearl shrinks as it swings to the back of the
             // vortex, softened by its depth blur (Anthony, October 25, 2026):
             // the floor holds while it draws at full size or larger.
-            const shrunkPearl = !!el.closest('.stream-node') && scale < tvScale - 1e-3;
+            // A pearl whose message is too long for the largest pearl keeps
+            // every word in smaller type (Anthony, October 29, 2026: smaller
+            // bubbles), so its type was set below the scene's own size.
+            const shrunkPearl = !!el.closest('.stream-node') && (scale < tvScale - 1e-3 || !!el.style.fontSize);
             if (!shrunkPearl && drawn < 18 * tvScale - 0.05) {
               failures.push({ selector, reason: 'message drawn below the 18 px floor', detail: `${drawn.toFixed(2)} px drawn (font ${cs.fontSize} at scale ${scale.toFixed(3)}), floor ${(18 * tvScale).toFixed(1)}` });
             }

@@ -158,6 +158,9 @@
      a near pearl carries no filter at all. Same offset, spread and colour. */
   border-radius: 50%;
   box-shadow: -7px 13px 12px #99846925;
+  /* Each pearl is its own layer, drawn once and then moved and scaled by the
+     TV's graphics chip instead of repainted every frame. */
+  will-change: transform, opacity;
 }
 
 /* A pearl is the same bubble as every other screen's (Anthony, October 25,
