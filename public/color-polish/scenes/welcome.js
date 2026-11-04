@@ -121,7 +121,7 @@
     if (WELCOME_GRAPHEME_CACHE.has(value)) return WELCOME_GRAPHEME_CACHE.get(value);
     let count = 0;
     if (!WELCOME_SEGMENTER) count = Array.from(value).length;
-    else for (const piece of WELCOME_SEGMENTER.segment(value)) count += piece ? 1 : 1;
+    else for (const _piece of WELCOME_SEGMENTER.segment(value)) count += 1;
     if (WELCOME_GRAPHEME_CACHE.size > 2000) WELCOME_GRAPHEME_CACHE.clear();
     WELCOME_GRAPHEME_CACHE.set(value, count);
     return count;

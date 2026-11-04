@@ -249,7 +249,7 @@ export function ReactionCount({ count }: { count: number }) {
 
 function FeedState({ compact = false }: { compact?: boolean }) {
   const { items, status, retry } = usePublicFeed();
-  const heading = compact ? 'Recent recognitions' : 'Recent recognitions';
+  const heading = 'Recent recognitions';
 
   if (status === 'loading' || status === 'hidden') {
     return (

@@ -15,7 +15,7 @@ export function errorResult(status: number, code: string, error = code): NextRes
 }
 
 export function databaseResult(data: unknown, error?: Error | null, successStatus = 200): NextResponse {
-  if (error) return errorResult(error.message === "UNAVAILABLE" ? 503 : 503, error.message === "UNAVAILABLE" ? "UNAVAILABLE" : "DATABASE_ERROR");
+  if (error) return errorResult(503, error.message === "UNAVAILABLE" ? "UNAVAILABLE" : "DATABASE_ERROR");
   if (!data || typeof data !== "object") return errorResult(503, "DATABASE_ERROR");
   const result = data as ApiResult;
   if (result.ok === false) return errorResult(Number(result.status) || 400, String(result.code || "REQUEST_FAILED"), String(result.error || result.code || "REQUEST_FAILED"));

@@ -262,6 +262,16 @@ export class WorldEngine {
       this.bubbles.dispose();
       this.world.dispose();
       this.kit?.dispose();
+      // A renderer made before the failure would otherwise keep its WebGL context alive,
+      // and repeated failed starts could use up the browser's context limit.
+      try {
+        const partial = this as unknown as { renderer?: THREE.WebGLRenderer; environment?: THREE.WebGLRenderTarget };
+        partial.environment?.dispose();
+        partial.renderer?.dispose();
+        partial.renderer?.forceContextLoss();
+      } catch {
+        // Cleanup is best effort; the original error is the one worth reporting.
+      }
       throw error;
     }
     canvas.addEventListener("webglcontextlost", this.contextLost);
