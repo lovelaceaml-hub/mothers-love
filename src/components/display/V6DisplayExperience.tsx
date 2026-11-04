@@ -461,7 +461,12 @@ function GardenScene({ records, reactions, elapsedMs, motion }: SceneProps) {
       }, 2_400);
       timersRef.current.push(replaceTimer, settleTimer);
     }, 7_000);
-    return () => window.clearInterval(interval);
+    return () => {
+      window.clearInterval(interval);
+      // Pending replace and settle timers belong to this interval; stop them with it.
+      timersRef.current.forEach((timer) => window.clearTimeout(timer));
+      timersRef.current = [];
+    };
   }, [motion, signature, slots.length]);
 
   const byId = new Map(records.map((record) => [record.id, record]));

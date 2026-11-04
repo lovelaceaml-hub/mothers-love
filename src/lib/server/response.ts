@@ -39,7 +39,10 @@ export function requireTrustedOrigin(request: NextRequest): NextResponse | null 
 }
 
 export function requestRateKeys(request: NextRequest): { ip: string; context: string | null } {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  // Same rule as the TV admission guard: the final forwarded address, which a client
+  // cannot prepend to. On Vercel the platform header is preferred.
+  const forwarded = (request.headers.get("x-vercel-forwarded-for") || request.headers.get("x-forwarded-for"))
+    ?.split(",").at(-1)?.trim();
   const ip = forwarded || request.headers.get("x-real-ip") || "unknown";
   const context = request.headers.get("x-ml-request-context")?.trim() || null;
   return { ip: ip.slice(0, 128), context: context?.slice(0, 128) || null };
