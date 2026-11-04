@@ -15,9 +15,9 @@ Current status and next steps: docs/HANDOFF.md.
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
   freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
 - `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
-  Its Build log records the release authorization and remaining safety gates.
-  PR #30 is not live: integrate main after PRs #35 to #37, verify the live
-  migration ledger through approved access, and obtain safe hosted preview evidence.
+  Its Build log records the release authorization and safety gates. PR #30 merged on
+  2026-10-12 with its integration PR #39; whether migration 020 is applied live is not
+  recorded, so verify the live migration ledger through approved access before relying on it.
 - `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
   (release and records) remain future work outside PR #30; its Build log says where it stands.
 
@@ -46,7 +46,7 @@ Deploy and Git
   are planned in `/Users/anthony/Projects/mothers-love-world` (its own AGENTS.md); world code still
   reaches this repo only through a pull request.
 - Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit
-  (next: 31) and each keeps a Build log.
+  (next: 33) and each keeps a Build log.
 - Run evidence (captures, probe output, scratch) goes to Drive, not Git:
   `My Drive/Projects/Mother's Love/The Words of Mother's Love`. Use `git add -f` only for a capture
   that truly belongs in the repo.
