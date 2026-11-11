@@ -12,6 +12,7 @@ A live appreciation campaign: people share recognitions on a public page, admini
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
+- **Waiting for release:** [Plan 33, security update, speed and cleanup](docs/PLAN-33-polish-and-speed.md), pull request [#52](https://github.com/lovelaceaml-hub/mothers-love/pull/52). Until it merges the live site runs a Next.js version with a critical advisory.
 - **Current plans:** [Plan 32, scheduled public polling](docs/PLAN-32-polling-schedule.md), merged in pull request #40 on 2026-10-12, and [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md), merged through pull requests #30 and #39 on 2026-10-12. The live status of migration 020 is not recorded. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
@@ -21,7 +22,7 @@ A live appreciation campaign: people share recognitions on a public page, admini
 
 ## Plans
 
-Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); Plan 32 is the newest plan, so the next new plan takes 33.
+Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); Plan 33 is the newest plan, so the next new plan takes 34.
 
 | Plan | Subject | Where it stands |
 | --- | --- | --- |
@@ -57,6 +58,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
 | [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | Merged 2026-10-12 through pull requests #30 and #39; the live status of migration 020 is not recorded in this repository |
 | [32](docs/PLAN-32-polling-schedule.md) | Scheduled public polling (Pacific time) | Merged 2026-10-12 in pull request #40 |
+| [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete in pull request #52, checked in the cloud; waits for Anthony's merge (2026-11-11) |
 
 ## Other documents
 

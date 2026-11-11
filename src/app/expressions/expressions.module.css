@@ -161,7 +161,8 @@
 .card3 { background: var(--orange); }
 .card4 { background: var(--coral); }
 .card5 { background: var(--red); }
-.card5 { --ink: #242531; color: var(--ink); }
+/* The heading takes the card's own ink: the page's heading green reads 3.6 to 1 on this red. */
+.card5 { --ink: #242531; --card-heading-ink: #242531; color: var(--ink); }
 .card6 { background: var(--lavender); }
 .card7 { background: var(--lime); }
 .card8 { background: var(--green); }

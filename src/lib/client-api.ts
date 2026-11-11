@@ -26,12 +26,13 @@ function errorFromBody(body: unknown, status: number): ApiClientError {
 // The sign-in library is large and only admin requests need it, so it is loaded on
 // first use. The public form and the TV pass `auth: false` and never download it.
 async function currentAccessToken(): Promise<string | null> {
+  let authClient: typeof import("@/lib/auth-client");
   try {
-    const { getCurrentAccessToken } = await import("@/lib/auth-client");
-    return await getCurrentAccessToken();
+    authClient = await import("@/lib/auth-client");
   } catch {
     throw new ApiClientError("The service is temporarily unavailable.", "network_error", 0);
   }
+  return authClient.getCurrentAccessToken();
 }
 
 async function readResponseBody(response: Response): Promise<unknown> {

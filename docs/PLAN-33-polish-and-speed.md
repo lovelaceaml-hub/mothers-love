@@ -28,6 +28,7 @@ Section B, speed people can feel:
 3. The TV's fallback view (V6) accepts the 304 the same way, so it no longer goes stale after its first read.
 4. The sign-in library loads only when an admin request needs it (`src/lib/client-api.ts`); the form's two public requests say `auth: false`.
 5. Feed cards from the third on are skipped by the browser until they scroll near (`content-visibility`, from #46).
+6. On the expressions guide, the heading of the red card ("Please, after you.") takes that card's own dark ink. The page's heading green read 3.6 to 1 on the red, under the 4.5 to 1 the accessibility check asks for; the card's body text already used the darker ink.
 
 Section C, behind the scenes:
 
@@ -35,6 +36,8 @@ Section C, behind the scenes:
 2. One content tag parser (`src/lib/etag.ts`) and one UUID pattern (`src/lib/uuid.ts`) replace ten copies. The three public read routes now accept a tag in either form.
 3. `.github/workflows/checks.yml`: types and a production build on every pull request into `main`. Tests never start by themselves: a pull request may name the test files tied to its change in its description (files only, at most 12 per kind), and the complete suites run only by manual dispatch with `full_suite_approved`, which defaults to false (Anthony's rule of 2026-10-17).
 4. The four dead workflows are removed (`color-polish-review`, `home-design-review`, `mobile-recognition-review`, `promote-tv-color-polish`). `cinematic-world-review` stays.
+5. Tests: new journeys for the weak tag and the empty 304 (`tests/feed/not-modified.spec.ts`) and unit tests for the tag helpers. One heart journey that waited on the real clock now runs on a fixed Saturday morning clock. One heart journey is marked as waiting for a rewrite (`test.fixme` in `tests/feed/reactions.spec.ts`): it needs a refresh to land while a write is pending, which the 10 second schedule no longer allows because a write gives up after 8 seconds.
+6. `@axe-core/playwright` returns to 4.11.0 (the version on `main`, dev only). 4.14 turns on a rule that flags the approved heart button (suggestion 9 below).
 
 Section D, documents: this plan, the handoff, the README and the history entry.
 
@@ -56,6 +59,7 @@ Section D, documents: this plan, the handoff, the README and the history entry.
 6. **Tidy GitHub.** About 20 merged branches are still there; the project rule turns them into `archive/` tags.
 7. **Finish Plan 18** Sections C and D (the admin sees every detail).
 8. **The real hardware checks** that were never recorded: the church TV at viewing distance, a phone scanning its QR code, and the Android kiosk.
+9. **The heart button's spoken name.** A newer accessibility checker (axe 4.14) wants the visible count to be part of the button's name; today the name is "Like recognition for ..." and the count is its description. Changing it means changing the approved wording and its tests, so the checker stays at 4.11 until Anthony decides.
 
 ## Release
 

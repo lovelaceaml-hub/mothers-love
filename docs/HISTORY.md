@@ -13,6 +13,15 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### November 11: Plan 33 prepared, release waits for Anthony's merge (pull request #52)
+
+Source: the pull request and [Plan 33](PLAN-33-polish-and-speed.md). Not live when this was written.
+
+- Security: Next.js 16.4.5 and the other updates of the 2026-11-03 review (#51); the production audit reports 0.
+- Speed: the server runs in `sfo1` beside the database; the home page's unchanged shortcut works on the live host; the sign-in library loads only for admin requests; offscreen feed cards are deferred (#46).
+- Behind the scenes: one guarded read for the TV's database reads, one tag parser and one UUID pattern, a checks workflow for pull requests, four dead workflows removed.
+- No database change. Rollback is promoting the previous Vercel deployment.
+
 ### October 12 to 29: merges with no release note yet (recorded 2026-11-04)
 
 Source: `git log` on `main` and the GitHub pull request list, read on 2026-11-04 during the repository review. No Vercel deployment was checked, so no deployment ids are given. Each line is the pull request title and its merge date in UTC.
