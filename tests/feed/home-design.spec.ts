@@ -206,7 +206,7 @@ test('supporting routes preserve baseline content and geometry after color polis
   for (const route of ['/expressions', '/privacy', '/admin/login', '/display']) {
     await before.goto(process.env.HOME_BASELINE_URL! + route); await after.goto(route);
     for (const page of [before, after]) {
-      if (['/expressions', '/privacy'].includes(route)) await expect(page.getByRole('button', { name: 'Like recognition for Avery', exact: true })).toBeEnabled();
+      if (['/expressions', '/privacy'].includes(route)) await expect(page.getByRole('button', { name: /^Like recognition for Avery, \d+ likes?$/ })).toBeEnabled();
       await page.evaluate(async () => { await document.fonts.ready; });
       await page.waitForTimeout(500);
     }

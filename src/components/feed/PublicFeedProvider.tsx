@@ -1230,6 +1230,11 @@ function FeedCompanionCard({ item }: { item: PublicFeedItem }) {
   );
 }
 
+/** The count as a screen reader says it, so the button's name holds its visible number. */
+function spokenLikes(count: number) {
+  return `${count} ${count === 1 ? 'like' : 'likes'}`;
+}
+
 export function ReactionButton({
   item,
   reaction,
@@ -1249,7 +1254,7 @@ export function ReactionButton({
   const countId = `reaction-count-${item.id}`;
   const recoveryId = `reaction-recovery-${item.id}`;
   const label = reactionItem
-    ? `Like recognition for ${item.recipient}`
+    ? `Like recognition for ${item.recipient}, ${spokenLikes(reactionItem.count)}`
     : reaction?.status === 'error' ? 'Try loading hearts again' : `Hearts unavailable for ${item.recipient}`;
   if (reaction?.status === 'error') {
     return <button className={styles.reactionRetry} type="button" onClick={onRetry}>{label}</button>;
@@ -1261,8 +1266,8 @@ export function ReactionButton({
           className={styles.reactionButton}
           type="button"
           aria-pressed={confirmedItem.liked}
-          aria-label={`Hearts paused for ${item.recipient}. ${reaction.recovery.message}`}
-          aria-describedby={`${countId} ${recoveryId}`}
+          aria-label={`Hearts paused for ${item.recipient}, ${spokenLikes(confirmedItem.count)}. ${reaction.recovery.message}`}
+          aria-describedby={recoveryId}
           disabled
         >
           <span aria-hidden="true">{confirmedItem.liked ? '❤️' : '🤍'}</span>
@@ -1278,8 +1283,10 @@ export function ReactionButton({
         <button
           className={styles.reactionRetry}
           type="button"
-          aria-label={`Enable cookies, then retry hearts for ${item.recipient}`}
-          aria-describedby={reaction.item ? `${countId} ${recoveryId}` : recoveryId}
+          aria-label={reaction.item
+            ? `Enable cookies, then retry hearts for ${item.recipient}, ${spokenLikes(reaction.item.count)}`
+            : `Enable cookies, then retry hearts for ${item.recipient}`}
+          aria-describedby={recoveryId}
           onClick={onRetry}
         >
           <span aria-hidden="true">{confirmedItem?.liked ? '❤️' : '🤍'}</span>
@@ -1295,7 +1302,6 @@ export function ReactionButton({
       type="button"
       aria-pressed={reactionItem?.liked ?? false}
       aria-label={label}
-      aria-describedby={reactionItem ? countId : undefined}
       disabled={!reactionItem || Boolean(reaction?.pending)}
       data-settling={settling ? 'true' : undefined}
       onClick={onToggle}
