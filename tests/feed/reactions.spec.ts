@@ -79,14 +79,10 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   const delayedRead = new Promise<void>((resolve) => { releaseRead = resolve; });
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
 
-  await page.clock.install({ time: new Date('2029-12-31T12:00:00.000Z') });
-  await page.clock.pauseAt(new Date(serverTime));
-  await page.addInitScript(() => {
-    const nativeSetInterval = window.setInterval;
-    window.setInterval = ((handler: TimerHandler, timeout?: number, ...args: unknown[]) => (
-      nativeSetInterval(handler, timeout === 10_000 ? 7_000 : timeout, ...args)
-    )) as typeof window.setInterval;
-  });
+  // A Saturday morning in Las Vegas: the pages refresh every 10 seconds only inside the
+  // fast windows of the polling schedule (Plan 32), whatever the hour the test runs.
+  await page.clock.install({ time: new Date('2026-09-12T15:59:00.000Z') });
+  await page.clock.pauseAt(new Date('2026-09-12T16:00:00.000Z'));
 
   await page.route('**/api/feed', async (route) => {
     await route.fulfill({ json: { serverTime, items: [feedItem] } });
@@ -112,8 +108,10 @@ test('does not let an older poll overwrite a confirmed PUT', async ({ page }) =>
   }).toBe(true);
   await heart.click();
   await expect.poll(() => putCount).toBe(1);
-  await page.clock.fastForward(7_000);
-  await expect.poll(() => readCount).toBe(2);
+  await expect.poll(async () => {
+    await page.clock.fastForward(1_000);
+    return readCount;
+  }, { timeout: 20_000 }).toBe(2);
   await expect(heart).toBeDisabled();
   expect(putCount).toBe(1);
   releasePut?.();
@@ -230,7 +228,8 @@ test('keeps cookie guidance until an explicit read retry succeeds', async ({ pag
 });
 
 test('does not resurrect a hidden item after a pending write returns', async ({ page }) => {
-  await page.clock.install();
+  // Inside a fast window of the polling schedule (Plan 32), whatever the hour the test runs.
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00.000Z') });
   let feedRequestCount = 0;
   let releasePut: (() => void) | undefined;
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
@@ -251,7 +250,10 @@ test('does not resurrect a hidden item after a pending write returns', async ({ 
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
   await expect(heart).toBeEnabled();
   await heart.click();
-  await page.clock.fastForward(10_000);
+  await expect.poll(async () => {
+    await page.clock.fastForward(1_000);
+    return feedRequestCount;
+  }, { timeout: 20_000 }).toBeGreaterThanOrEqual(2);
   await expect(page.getByText('Michelle R.')).toHaveCount(0);
   releasePut?.();
   await expect(page.getByText('Michelle R.')).toHaveCount(0);

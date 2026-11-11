@@ -1,4 +1,3 @@
-import { getCurrentAccessToken } from "@/lib/auth-client";
 import type { ApiClientOptions, ApiError } from "@/lib/contracts";
 
 export class ApiClientError extends Error {
@@ -24,6 +23,17 @@ function errorFromBody(body: unknown, status: number): ApiClientError {
   return new ApiClientError("The request could not be completed.", "request_failed", status);
 }
 
+// The sign-in library is large and only admin requests need it, so it is loaded on
+// first use. The public form and the TV pass `auth: false` and never download it.
+async function currentAccessToken(): Promise<string | null> {
+  try {
+    const { getCurrentAccessToken } = await import("@/lib/auth-client");
+    return await getCurrentAccessToken();
+  } catch {
+    throw new ApiClientError("The service is temporarily unavailable.", "network_error", 0);
+  }
+}
+
 async function readResponseBody(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
@@ -40,7 +50,7 @@ async function readResponseBody(response: Response): Promise<unknown> {
 export async function api<T>(path: string, options: ApiClientOptions = {}): Promise<T> {
   const { auth = true, token, bearerToken, headers, onResponseHeaders, ...requestInit } = options;
   const explicitToken = bearerToken ?? token ?? null;
-  const accessToken = explicitToken ?? (auth ? await getCurrentAccessToken() : null);
+  const accessToken = explicitToken ?? (auth ? await currentAccessToken() : null);
   const requestHeaders = new Headers(headers);
   requestHeaders.set("Accept", "application/json");
 
