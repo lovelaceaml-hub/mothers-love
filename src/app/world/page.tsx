@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { WorldExperience } from "@/components/display/world/WorldExperience";
 import {
   worldArt,
@@ -6,6 +7,7 @@ import {
   worldSampleSource,
   worldView,
 } from "@/components/display/world/art/design-mode";
+import { WORLD_RETIRED } from "@/lib/world-retired";
 
 export const metadata: Metadata = {
   title: "A Heavenly World | Mother's Love",
@@ -25,6 +27,8 @@ export default async function WorldPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  // Retired for now: the address answers with the home page (src/lib/world-retired.ts).
+  if (WORLD_RETIRED) redirect("/");
   const query = await searchParams;
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(query))
