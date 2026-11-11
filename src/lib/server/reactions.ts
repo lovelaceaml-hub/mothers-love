@@ -2,11 +2,11 @@ import { randomSessionToken, sha256 } from "./operations";
 import { databaseClient } from "./supabase";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 import { MAX_REACTION_BATCH_SIZE } from "@/lib/reaction-contract";
+import { UUID_PATTERN } from "@/lib/uuid";
 
 export const REACTION_COOKIE_NAME = "ml_reaction";
 export const REACTION_COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COOKIE_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 export type ReactionItem = {

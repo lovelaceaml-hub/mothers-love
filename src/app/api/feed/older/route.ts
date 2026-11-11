@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { parseContentEtag } from "@/lib/etag";
 import { errorResult, jsonResult } from "@/lib/server/response";
 import { requireConfigured } from "@/lib/server/http";
 import {
@@ -17,8 +18,7 @@ export async function GET(request: NextRequest) {
   const cursor = parsePublicFeedCursor(request.nextUrl.searchParams.get("before"), request.nextUrl.searchParams.get("id"));
   if (!cursor) return errorResult(400, "INVALID_REQUEST");
 
-  const rawTag = request.headers.get("if-none-match");
-  const knownEtag = rawTag && /^"[a-f0-9]{32}"$/.test(rawTag) ? rawTag.slice(1, -1) : null;
+  const knownEtag = parseContentEtag(request.headers.get("if-none-match"));
   const result = await queryOlderPublicFeed(cursor, knownEtag);
   if (result.error) return errorResult(503, "UNAVAILABLE");
 

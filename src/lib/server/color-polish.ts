@@ -14,6 +14,7 @@ import type { Aggregate } from "@/lib/contracts";
 import { endOfLosAngelesWeek, isoDateInLosAngeles, isIsoDate, startOfLosAngelesMonth, startOfLosAngelesWeek } from "./time";
 import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
 import { projectPublicDisplaySnapshot } from "./public-display";
+import { UUID_PATTERN } from "@/lib/uuid";
 
 export type ColorPolishQuery = {
   data: unknown;
@@ -25,7 +26,6 @@ export type ColorPolishPresentationChanges = {
   playlist?: ColorPolishPresentation["playlist"];
 };
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_CALENDAR_DAYS = 31;
 const MIN_PRESENTATION_DURATION_SECONDS = 12;

@@ -1,3 +1,5 @@
+import { CONTENT_TAG_PATTERN, parseContentEtag } from "@/lib/etag";
+
 export type DisplaySnapshotHeartbeat = {
   unchanged: true;
   serverTime: string;
@@ -12,9 +14,9 @@ export function projectDisplaySnapshotHeartbeat(value: unknown): DisplaySnapshot
 }
 
 export function parseDisplaySnapshotEtag(value: string | null): string | null {
-  return /^(?:W\/)?"([a-f0-9]{32})"$/.exec(value ?? "")?.[1] ?? null;
+  return parseContentEtag(value);
 }
 
 export function matchesDisplaySnapshotEtag(value: string | null, expected: string | null): boolean {
-  return expected !== null && /^[a-f0-9]{32}$/.test(expected) && parseDisplaySnapshotEtag(value) === expected;
+  return expected !== null && CONTENT_TAG_PATTERN.test(expected) && parseContentEtag(value) === expected;
 }

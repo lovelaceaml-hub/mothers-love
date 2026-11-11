@@ -5,7 +5,7 @@ import QRCode from 'qrcode';
 
 import { EXPRESSIONS, TAGLINE, TITLE } from '@/lib/catalog';
 import type { DisplaySnapshot, Recognition } from '@/lib/contracts';
-import { api } from '@/lib/client-api';
+import { api, ApiClientError } from '@/lib/client-api';
 import { parseDisplaySnapshotEtag, projectDisplaySnapshotHeartbeat } from '@/lib/display/snapshot-heartbeat';
 import { startVisiblePoll } from '@/lib/visible-poll';
 import { createPollingState, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
@@ -1070,11 +1070,23 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
     try {
       const path = cursorRef.current ? `/api/display/snapshot?after=${encodeURIComponent(cursorRef.current)}` : '/api/display/snapshot';
       const headers: Record<string, string> = { accept: 'application/json' };
-      if (snapshotEtagRef.current) headers['If-None-Match'] = `"${snapshotEtagRef.current}"`;
+      const sentTag = snapshotEtagRef.current;
+      if (sentTag) headers['If-None-Match'] = `"${sentTag}"`;
       let responseTag: string | null = null;
+      let responseDate: string | null = null;
       const payload = await api<unknown>(path, {
         method: 'GET', auth: false, cache: 'no-store', signal: controller.signal, headers,
-        onResponseHeaders: (responseHeaders) => { responseTag = parseDisplaySnapshotEtag(responseHeaders.get('etag')); },
+        onResponseHeaders: (responseHeaders) => {
+          responseTag = parseDisplaySnapshotEtag(responseHeaders.get('etag'));
+          responseDate = responseHeaders.get('date');
+        },
+      }).catch((error: unknown) => {
+        // The host answers a matching conditional request itself with an empty
+        // 304 Not Modified. It stands for the server's unchanged heartbeat.
+        if (!(error instanceof ApiClientError) || error.status !== 304 || !sentTag) throw error;
+        responseTag = responseTag ?? sentTag;
+        const headerMs = Date.parse(responseDate ?? '');
+        return { unchanged: true, serverTime: new Date(Number.isFinite(headerMs) ? headerMs : Date.now()).toISOString() };
       });
       if (controller.signal.aborted) return;
       const heartbeat = projectDisplaySnapshotHeartbeat(payload);
