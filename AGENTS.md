@@ -62,7 +62,8 @@ Data and database
   `mothers_love_runtime`, through the `public.ml_*` bridge functions. Never change other apps'
   objects, global default privileges or exposed schemas. No reset, `db push`, migration repair or
   schema-wide diff against it. Strict TLS. One exact additive auth redirect is allowed if needed,
-  keeping every existing entry. The shared backup excludes campaign personal rows.
+  keeping every existing entry. The shared church backup includes the campaign's lasting rows
+  (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
   Anthony's decision, recorded in `mothers_love.schema_migrations`. Whether 015 and 018 are applied
   live is not recorded (unverified).
