@@ -7,7 +7,8 @@ name: Checks
 #     (space separated test files under tests/ or src/, at most 12 each). Only those run.
 #   - "Run workflow" takes the same lists as unit_files / browser_files.
 #   - full_suite_approved runs the complete unit and browser suites. Tick it only with
-#     Anthony's explicit approval for that one run (his rule of 2026-10-17).
+#     Anthony's explicit approval for that one run (his rule of 2026-10-17), and set
+#     full_suite_scope to the suite he named (unit, browser or both).
 on:
   pull_request:
     branches: [main]
@@ -26,6 +27,15 @@ on:
         type: boolean
         required: false
         default: false
+      full_suite_scope:
+        description: 'Which complete suite the approval covers (it names one suite, or both)'
+        type: choice
+        required: false
+        default: both
+        options:
+          - both
+          - unit
+          - browser
 
 permissions:
   contents: read
@@ -124,7 +134,7 @@ jobs:
 
   full-unit:
     name: Complete unit suite
-    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
+    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved && inputs.full_suite_scope != 'browser'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -137,7 +147,7 @@ jobs:
 
   full-browser:
     name: Complete browser suite (${{ matrix.shard }} of 4)
-    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
+    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved && inputs.full_suite_scope != 'unit'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
