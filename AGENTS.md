@@ -11,6 +11,10 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-34-november-additions.md`: the 3D world retired for now, a kept half-written
+  recognition, the early first read, the heart button's spoken count, admin details (Plan 18
+  Section C, migration 021 not applied), the practice database builder and the test clock fixes.
+  Its Build log and Open decisions say where each stands.
 - `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
   freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
@@ -46,7 +50,7 @@ Deploy and Git
   are planned in `/Users/anthony/Projects/mothers-love-world` (its own AGENTS.md); world code still
   reaches this repo only through a pull request.
 - Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit
-  (next: 31) and each keeps a Build log.
+  (next: 35) and each keeps a Build log.
 - Run evidence (captures, probe output, scratch) goes to Drive, not Git:
   `My Drive/Projects/Mother's Love/The Words of Mother's Love`. Use `git add -f` only for a capture
   that truly belongs in the repo.
@@ -66,7 +70,11 @@ Data and database
   (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
   Anthony's decision, recorded in `mothers_love.schema_migrations`. Whether 015 and 018 are applied
-  live is not recorded (unverified).
+  live is not recorded (unverified). 021 (admin details) is not applied; the admin screens work
+  without it and say so.
+- A practice database for previews is built only by `scripts/practice-database.sh` with the made-up
+  records in `database/practice/seed.sql`. It refuses the production project. Never point it, or a
+  preview, at the live database.
 - Never roll the code back alone past merge `43d801f` (keep forever): roll the database back first
   (`docs/runs/2026-09-23-keep-forever/lanes/SB.md`) or roll forward.
 - Every route enforces server authorization; no private display fields or elevated key in the
@@ -100,7 +108,13 @@ Home page, form and admin
   roster or participant accounts.
 - Hearts: one toggleable like per browser, no sign-in (`docs/PLAN-04-polish-and-hearts.md`). Hearts
   never flash: the 10 second refresh keeps confirmed hearts unchanged while counts load; a tap fills
-  at once, then the server count replaces it, rolling back on failure.
+  at once, then the server count replaces it, rolling back on failure. The heart button's
+  accessible name holds its count ("Like recognition for <name>, 12 likes").
+- A half-written recognition is kept in the tab's session storage only (`src/lib/recognition-draft.ts`):
+  never on the server, never in storage that outlives the tab (the submitted name is admin only),
+  cleared on send and on Start over, ignored after a day.
+- The home page and the form start their first read from a fixed inline script in the page's HTML
+  (`src/lib/early-read.ts`); the answer passes the same checks and its age counts from its real start.
 - `/recognize` shows only the form, no feed; the receipt screen after sending shows the home page's
   Recent recognitions list (`tests/receipt-feed`).
 - Expression cards: one per row at every width, number, quoted expression, check indicator, full
@@ -158,6 +172,11 @@ TV at /display (renderer in `public/color-polish/core/` and `public/color-polish
   page's content policy stays as it is.
 
 The 3D world at /world
+- **Retired for now** (Anthony, 2026-11-11: "Retire the 3d world for now"; he chose "Hide it, keep
+  it"). While `WORLD_RETIRED` in `src/lib/world-retired.ts` is true, `/world` and
+  `/display/world-preview` open the home page, nothing links to the world and its browser journeys
+  wait. Keep all of its code, art and unit tests; do not develop it or bring it back without
+  Anthony. The rules below apply again once it returns.
 - Its own page beside the TV view: never in the TV playlist, never changes `/display`,
   `src/components/display/color-polish` or `public/color-polish`. Everything stays 3D (no painted
   sky panoramas or filters).

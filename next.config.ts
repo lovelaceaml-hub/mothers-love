@@ -42,8 +42,9 @@ const nextConfig: NextConfig = {
     return [{ source: "/display/world-preview", destination: "/world", permanent: false }];
   },
   async rewrites() {
-    // Preview uses the public TV read endpoints without database credentials.
-    if (process.env.VERCEL_ENV !== "preview") return [];
+    // A preview without its own database borrows production's public TV reads. Once the
+    // preview has a practice database (Plan 34 Section F) it reads and writes only that.
+    if (process.env.VERCEL_ENV !== "preview" || process.env.DATABASE_URL?.trim()) return [];
     return {
       beforeFiles: [
         {
