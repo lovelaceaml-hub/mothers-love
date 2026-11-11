@@ -15,6 +15,7 @@ import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/sa
 import { startVisiblePoll } from '@/lib/visible-poll';
 import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
+import { notModifiedServerTimeMs, parseContentEtag } from '@/lib/etag';
 
 import {
   activeFeedItems,
@@ -102,10 +103,34 @@ function olderPageKey(after: PublicFeedItem) {
 }
 
 function readFeedEtag(response: Response) {
-  return /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '')?.[1] ?? null;
+  return parseContentEtag(response.headers.get('etag'));
 }
 
+// Conditional reads are a shortcut, never a requirement. A failed one is repeated as a
+// whole read, and after two failures in a row this page stops sending them, so a browser
+// or network that mishandles them costs at most two extra requests.
+let conditionalReadFailures = 0;
+const conditionalReadsAllowed = () => conditionalReadFailures < 2;
+
 async function fetchOlderFeedPage(
+  after: PublicFeedItem,
+  signal: AbortSignal,
+  cached?: CachedOlderFeedPage,
+): Promise<OlderFeedPage> {
+  const known = conditionalReadsAllowed() ? cached : undefined;
+  try {
+    const page = await readOlderFeedPage(after, signal, known);
+    if (known) conditionalReadFailures = 0;
+    return page;
+  } catch (error) {
+    // A conditional read that fails for any reason is tried once more as a whole read.
+    if (!known || signal.aborted) throw error;
+    conditionalReadFailures += 1;
+    return readOlderFeedPage(after, signal);
+  }
+}
+
+async function readOlderFeedPage(
   after: PublicFeedItem,
   signal: AbortSignal,
   cached?: CachedOlderFeedPage,
@@ -120,6 +145,13 @@ async function fetchOlderFeedPage(
     headers,
     signal,
   });
+  if (response.status === 304) {
+    // The host answers a matching conditional request itself, with no body: the
+    // cached page is still the current one.
+    const tag = readFeedEtag(response);
+    if (!cached || (tag !== null && tag !== cached.etag)) throw new Error('Older feed reply was Not Modified without a matching cached page.');
+    return { etag: cached.etag, items: cached.items };
+  }
   if (!response.ok) throw new Error(`Older feed request failed with status ${response.status}`);
   const payload: unknown = await response.json();
   const etag = readFeedEtag(response);
@@ -249,7 +281,7 @@ export function ReactionCount({ count }: { count: number }) {
 
 function FeedState({ compact = false }: { compact?: boolean }) {
   const { items, status, retry } = usePublicFeed();
-  const heading = compact ? 'Recent recognitions' : 'Recent recognitions';
+  const heading = 'Recent recognitions';
 
   if (status === 'loading' || status === 'hidden') {
     return (
@@ -826,18 +858,41 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const requestStartedAt = monotonicNow();
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     feedDeadlineRef.current = deadline;
-    try {
+    // One read of the list. A conditional read sends the remembered tag, so an
+    // unchanged list costs no download.
+    const read = async (conditional: boolean): Promise<void> => {
       const headers: Record<string, string> = { accept: 'application/json' };
-      if (snapshotRef.current && feedEtagRef.current) headers['If-None-Match'] = `"${feedEtagRef.current}"`;
+      const sentTag = conditional && snapshotRef.current && feedEtagRef.current ? feedEtagRef.current : null;
+      if (sentTag) headers['If-None-Match'] = `"${sentTag}"`;
       const response = await fetch('/api/feed', {
         cache: 'no-store',
         credentials: 'include',
         headers,
         signal: controller.signal,
       });
+      const responseTag = readFeedEtag(response);
+      if (response.status === 304) {
+        // The host answers a matching conditional request itself, with no body. It
+        // stands for the server's unchanged heartbeat; the time comes from its Date.
+        if (serial !== requestSerialRef.current || controller.signal.aborted) return;
+        const current = snapshotRef.current;
+        if (!current || !sentTag || feedEtagRef.current !== sentTag || (responseTag !== null && responseTag !== sentTag)) {
+          throw new Error('Feed reply was Not Modified without a matching snapshot.');
+        }
+        const verifiedServerTimeMs = notModifiedServerTimeMs(
+          response.headers.get('date'),
+          current.verifiedServerTimeMs + Math.max(0, requestStartedAt - current.verifiedMonotonicMs),
+        );
+        applySnapshot({
+          ...current,
+          serverTime: new Date(verifiedServerTimeMs).toISOString(),
+          verifiedServerTimeMs,
+          verifiedMonotonicMs: requestStartedAt,
+        }, !manual);
+        return;
+      }
       if (!response.ok) throw new Error(`Feed request failed with status ${response.status}`);
       const payload: unknown = await response.json();
-      const responseTag = /^"([a-f0-9]{32})"$/.exec(response.headers.get('etag') ?? '')?.[1] ?? null;
       const heartbeat = verifyFeedHeartbeat(payload, requestStartedAt);
       if (heartbeat) {
         const current = snapshotRef.current;
@@ -856,6 +911,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
       feedEtagRef.current = responseTag;
       applySnapshot(nextSnapshot, !manual);
+    };
+    try {
+      const conditional = conditionalReadsAllowed() && Boolean(snapshotRef.current && feedEtagRef.current);
+      try {
+        await read(conditional);
+        if (conditional && serial === requestSerialRef.current && !controller.signal.aborted) conditionalReadFailures = 0;
+      } catch (error) {
+        // A conditional read that fails for any reason is tried once more as a whole
+        // read, so the shortcut can never be the reason the list is lost.
+        if (!conditional || serial !== requestSerialRef.current || controller.signal.aborted) throw error;
+        conditionalReadFailures += 1;
+        await read(false);
+      }
     } catch {
       if (serial !== requestSerialRef.current) return;
       clearFeed('error');

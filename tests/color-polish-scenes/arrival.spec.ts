@@ -608,7 +608,10 @@ test('screenshots for frame styles at assembly midpoint and path styles at entra
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);
 
-  const outputFolder = resolve(process.cwd(), 'docs/runs/2026-09-12-tv-next-level/logs/arrival');
+  // The 2026-09-12 run's captures are tracked in Git, so a test run must not write over them;
+  // new captures go to the ignored test-results folder unless a run asks for another one.
+  const outputFolder =
+    process.env.ARRIVAL_STYLE_CAPTURE_DIR ?? resolve(process.cwd(), 'test-results/arrival-styles');
   await mkdir(outputFolder, { recursive: true });
 
   const screenshotPaths: string[] = [];

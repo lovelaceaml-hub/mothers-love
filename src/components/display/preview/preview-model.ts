@@ -15,6 +15,7 @@ import {
   type DisplaySound,
   type Recognition,
 } from '@/lib/contracts';
+import { UUID_PATTERN } from '@/lib/uuid';
 
 export type PublicPreviewSnapshot = Pick<DisplaySnapshot, 'serverTime' | 'revision' | 'recognitions' | 'aggregate' | 'settings'>;
 export type PreviewDecoration = {
@@ -29,7 +30,6 @@ export type PreviewEmptyReason = 'checking' | 'unavailable' | 'invalid' | 'priva
 const MIN_DURATION_SECONDS = 12;
 const MAX_DURATION_SECONDS = 120;
 const MAX_RECOGNITIONS = 1_000;
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PUBLIC_RECOGNITION_KEYS = new Set([
   'id',
   'recipient',

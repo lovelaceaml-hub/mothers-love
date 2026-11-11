@@ -44,9 +44,16 @@ export function DisplayKioskControl() {
     document.addEventListener('fullscreenchange', updateFullscreenState);
 
     let wakeLock: WakeLockSentinelLike | null = null;
+    let disposed = false;
     const acquireWakeLock = async () => {
       try {
-        wakeLock = await nav.wakeLock?.request('screen') ?? null;
+        const lock = await nav.wakeLock?.request('screen') ?? null;
+        // The page may have left while the request was pending: let the lock go at once.
+        if (disposed) {
+          void lock?.release?.();
+          return;
+        }
+        wakeLock = lock;
       } catch {
         // Wake Lock is optional and can be denied by browser or power policy.
       }
@@ -62,6 +69,7 @@ export function DisplayKioskControl() {
     document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
+      disposed = true;
       document.removeEventListener('fullscreenchange', updateFullscreenState);
       document.removeEventListener('visibilitychange', onVisibility);
       void wakeLock?.release?.();

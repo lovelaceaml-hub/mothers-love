@@ -13,6 +13,30 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### November 11: Plan 33 prepared, release waits for Anthony's merge (pull request #52)
+
+Source: the pull request and [Plan 33](PLAN-33-polish-and-speed.md). Not live when this was written.
+
+- Security: Next.js 16.4.5 and the other updates of the 2026-11-03 review (#51); the production audit reports 0.
+- Speed: the server runs in `sfo1` beside the database; the home page's unchanged shortcut works on the live host; the sign-in library loads only for admin requests; offscreen feed cards are deferred (#46).
+- Behind the scenes: one guarded read for the TV's database reads, one tag parser and one UUID pattern, a checks workflow for pull requests, four dead workflows removed.
+- No database change. Rollback is promoting the previous Vercel deployment.
+
+### October 12 to 29: merges with no release note yet (recorded 2026-11-04)
+
+Source: `git log` on `main` and the GitHub pull request list, read on 2026-11-04 during the repository review. No Vercel deployment was checked, so no deployment ids are given. Each line is the pull request title and its merge date in UTC.
+
+- #39 Integrate TV display efficiency on current main, and #30 TV efficiency: cache verified records and bound public polling (Plan 31), both 2026-10-12. Whether migration 020 was applied live is not recorded.
+- #40 Schedule Pacific public polling and retain last content (Plan 32), 2026-10-12.
+- #42 TV: prefer newer recognitions (Welcome and Garden newest 20, other screens 3:1), 2026-10-18.
+- #43 Tests: fix the failing and flaky TV scene checks, 2026-10-18.
+- #44 Tests: arrival checks follow the approved group of five (400 px), 2026-10-18.
+- #45 TV: campaign song plays softly behind the display, 2026-10-18.
+- #47 fix(tv): keep the screen steady while a new recognition arrives, 2026-10-24.
+- #48 feat(tv): pastel bubbles in their own colors, smoother Orbit, three chips, 2026-10-25.
+- #49 feat(tv): vortex bubbles show the full recognition and grow to fit, 2026-10-25.
+- #50 fix(tv): a smooth, wider Goal vortex with smaller mixed bubbles, 2026-10-29.
+
 ### October 12: PR #30 release authorized, safety gates still block deployment
 
 Anthony authorized publishing the PR branch, merging after checks and full replacement without another review or release-mode decision. The isolated release attempt verified that newer PRs #35 to #37 already serve production at `d0ed4e1`, deployment `dpl_BcAqXnqEmr4ZPwjNc47njN5MsBoi` (READY). The reviewed remediation `7a33be4` passed fresh Node 22 typecheck, focused unit and disposable PostgreSQL checks, a synthetic-only build and the Chromium Studio arrival-readiness regression. It is not integrated with that newer main. Approved provider access could not read the sensitive database connection values, so current migration-ledger state, administrative access and backup could not be verified. No safe hosted preview database is configured. No live SQL, merge or production deployment was performed. See [the exact release-attempt record](runs/2026-10-10-pr-remediation/INDEX.md#authorized-release-attempt-2026-10-12).

@@ -390,7 +390,7 @@ export function SubmissionForm() {
 
   useEffect(() => {
     let active = true;
-    api<ConfigResponse>('/api/config')
+    api<ConfigResponse>('/api/config', { auth: false })
       .then((result) => {
         if (active) setConfig(result);
       })
@@ -468,6 +468,8 @@ export function SubmissionForm() {
     try {
       const result = await api<SubmitResponse>('/api/recognitions', {
         method: 'POST',
+        // Sharing needs no account; without this the form would download the sign-in library.
+        auth: false,
         body: JSON.stringify({
           submittedName: draft.submitter.trim(),
           recipient: draft.recipient.trim(),

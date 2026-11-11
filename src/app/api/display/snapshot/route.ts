@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { parseContentEtag } from "@/lib/etag";
 import { errorResult, jsonResult } from "@/lib/server/response";
 import { requireConfigured } from "@/lib/server/http";
 import { admitPublicDisplayRequest } from "@/lib/server/public-display-admission";
@@ -20,8 +21,7 @@ export async function GET(request: NextRequest) {
     return response;
   }
   try {
-    const rawTag = request.headers.get("if-none-match");
-    const knownEtag = rawTag && /^"[a-f0-9]{32}"$/.test(rawTag) ? rawTag.slice(1, -1) : null;
+    const knownEtag = parseContentEtag(request.headers.get("if-none-match"));
     const result = await queryPublicDisplaySnapshot(
       request.nextUrl.searchParams.get("after"),
       request.signal,

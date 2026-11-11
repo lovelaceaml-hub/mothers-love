@@ -12,9 +12,9 @@ import {
   type DisplaySettings,
   type Recognition,
 } from '@/lib/contracts';
+import { UUID_PATTERN } from '@/lib/uuid';
 
 const SUBMISSION_URL = 'https://mothers-love.vercel.app/recognize';
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_RECOGNITIONS = 1_000;
 const MAX_DAYS = 31;
 

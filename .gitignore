@@ -34,3 +34,14 @@ docs/runs/*/logs/**/probe-r*/
 /home-review-evidence/
 /mobile-recognition-evidence/
 /color-review-evidence/
+
+# Process output from probe and capture runs, same rule as above (Plan 26
+# decision 3): it belongs in Drive. Files already tracked stay tracked.
+docs/runs/*/logs/**/*.out
+docs/runs/*/logs/**/*.err
+docs/runs/*/logs/**/*.log
+
+# Local logs and per-person tool settings.
+*.log
+npm-debug.log*
+.claude/settings.local.json

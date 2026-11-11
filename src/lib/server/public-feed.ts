@@ -4,13 +4,14 @@ import { clampPublicExpiry } from "./expiry-clamp";
 import { graphemeLength } from "./time";
 import { databaseClient } from "./supabase";
 import { recordDatabaseResultBytes } from "./database-result-metrics";
+import { UUID_PATTERN } from "@/lib/uuid";
+import { CONTENT_TAG_PATTERN } from "@/lib/etag";
 
 export type PublicFeedQuery = {
   data: unknown;
   error: Error | null;
 };
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_PUBLIC_FEED_ITEMS = 100;
 
@@ -134,7 +135,7 @@ export async function queryOlderPublicFeed(
       from tagged
     `;
     const row = rows[0];
-    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    const etag = typeof row?.etag === "string" && CONTENT_TAG_PATTERN.test(row.etag) ? row.etag : null;
     const data = row?.result ?? null;
     recordDatabaseResultBytes("feed.older", data);
     return { data, error: null, etag };
@@ -176,7 +177,7 @@ export async function queryPublicFeed(knownEtag: string | null = null): Promise<
       from tagged
     `;
     const row = rows[0];
-    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    const etag = typeof row?.etag === "string" && CONTENT_TAG_PATTERN.test(row.etag) ? row.etag : null;
     const data = row?.result ?? null;
     recordDatabaseResultBytes("feed.home", data);
     return { data, error: null, etag };

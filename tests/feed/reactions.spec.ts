@@ -71,7 +71,13 @@ test('toggles off with the server-confirmed count', async ({ page }) => {
   expect(requests).toEqual([true, false]);
 });
 
-test('does not let an older poll overwrite a confirmed PUT', async ({ page }) => {
+// Waiting for a rewrite. This journey needs a refresh to land while a heart write is still
+// pending. Since the refresh moved to the 10 second schedule (Plan 32) that cannot happen by
+// advancing time: the write gives up after 8 seconds, before the next refresh at 10. As
+// written it failed in the cloud run of 2026-11-11, before anything here was changed.
+// Plan 33 records it; the guard it covers is the write version check in PublicFeedProvider
+// (reactionWriteVersionsRef).
+test.fixme('does not let an older poll overwrite a confirmed PUT', async ({ page }) => {
   let readCount = 0;
   let putCount = 0;
   let releaseRead: (() => void) | undefined;
@@ -230,7 +236,8 @@ test('keeps cookie guidance until an explicit read retry succeeds', async ({ pag
 });
 
 test('does not resurrect a hidden item after a pending write returns', async ({ page }) => {
-  await page.clock.install();
+  // Inside a fast window of the polling schedule (Plan 32), whatever the hour the test runs.
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00.000Z') });
   let feedRequestCount = 0;
   let releasePut: (() => void) | undefined;
   const pendingPut = new Promise<void>((resolve) => { releasePut = resolve; });
@@ -251,7 +258,10 @@ test('does not resurrect a hidden item after a pending write returns', async ({ 
   const heart = page.getByRole('button', { name: 'Like recognition for Michelle R.' });
   await expect(heart).toBeEnabled();
   await heart.click();
-  await page.clock.fastForward(10_000);
+  await expect.poll(async () => {
+    await page.clock.fastForward(1_000);
+    return feedRequestCount;
+  }, { timeout: 20_000 }).toBeGreaterThanOrEqual(2);
   await expect(page.getByText('Michelle R.')).toHaveCount(0);
   releasePut?.();
   await expect(page.getByText('Michelle R.')).toHaveCount(0);

@@ -12,9 +12,11 @@ import {
 import { hasVisibleNameContent } from "@/lib/name-validation";
 import { clampPublicExpiry } from "./expiry-clamp";
 import { isIsoDate, graphemeLength } from "./time";
-import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
+import { guardedPublicDisplayRead } from "./public-display-read";
 import { recordDatabaseResultBytes } from "./database-result-metrics";
 import { projectDisplaySnapshotHeartbeat } from "@/lib/display/snapshot-heartbeat";
+import { UUID_PATTERN } from "@/lib/uuid";
+import { CONTENT_TAG_PATTERN } from "@/lib/etag";
 
 export type PublicDisplayQuery = {
   data: unknown;
@@ -22,7 +24,6 @@ export type PublicDisplayQuery = {
   etag: string | null;
 };
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_TIMESTAMP_LENGTH = 64;
 const MAX_CURSOR_LENGTH = 64;
 const MAX_RECOGNITIONS = 1000;
@@ -378,15 +379,7 @@ export async function queryPublicDisplaySnapshot(
   signal?: AbortSignal,
   knownEtag: string | null = null,
 ): Promise<PublicDisplayQuery> {
-  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED"), etag: null };
-  const client = getPublicDisplayClient();
-  if (!client) return { data: null, error: new Error("UNAVAILABLE"), etag: null };
-
-  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
-  const operation = Promise.resolve().then(() => client.begin("read only", async (transaction) => {
-    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    await transaction`set local statement_timeout = '5000ms'`;
-    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+  const read = await guardedPublicDisplayRead({ signal, deadlineMs: PUBLIC_DISPLAY_OPERATION_DEADLINE_MS }, async (transaction) => {
     // Preserve the existing 1,000-candidate and featured selection exactly.
     // The function runs once per request; only its normally selected result is
     // conditionally reduced inside Postgres before it crosses the pooler.
@@ -415,29 +408,9 @@ export async function queryPublicDisplaySnapshot(
     `;
     const row = rows[0];
     const data = row?.result ?? null;
-    const etag = typeof row?.etag === "string" && /^[a-f0-9]{32}$/.test(row.etag) ? row.etag : null;
+    const etag = typeof row?.etag === "string" && CONTENT_TAG_PATTERN.test(row.etag) ? row.etag : null;
     recordDatabaseResultBytes("display.snapshot", data);
-    return { data, etag };
-  }));
-  void operation.then(() => undefined, () => undefined);
-
-  const deadline = new Promise<never>((_, reject) => {
-    deadlineTimer = setTimeout(() => {
-      retirePublicDisplayClient(client);
-      reject(new Error("DATABASE_TIMEOUT"));
-    }, PUBLIC_DISPLAY_OPERATION_DEADLINE_MS);
+    return { data: data as unknown, etag };
   });
-
-  try {
-    const result = await Promise.race([operation, deadline]);
-    return { ...result, error: null };
-  } catch (error) {
-    return {
-      data: null,
-      error: error instanceof Error ? error : new Error("DATABASE_ERROR"),
-      etag: null,
-    };
-  } finally {
-    if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
-  }
+  return read.error ? { data: null, error: read.error, etag: null } : { ...read.value, error: null };
 }
