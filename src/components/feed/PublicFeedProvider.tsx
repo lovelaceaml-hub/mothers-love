@@ -16,6 +16,7 @@ import { startVisiblePoll } from '@/lib/visible-poll';
 import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 import { notModifiedServerTimeMs, parseContentEtag } from '@/lib/etag';
+import { awaitEarlyRead, takeEarlyRead } from '@/lib/early-read';
 
 import {
   activeFeedItems,
@@ -864,12 +865,28 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const headers: Record<string, string> = { accept: 'application/json' };
       const sentTag = conditional && snapshotRef.current && feedEtagRef.current ? feedEtagRef.current : null;
       if (sentTag) headers['If-None-Match'] = `"${sentTag}"`;
-      const response = await fetch('/api/feed', {
-        cache: 'no-store',
-        credentials: 'include',
-        headers,
-        signal: controller.signal,
-      });
+      // The page's HTML may already have started this very read (src/lib/early-read.ts).
+      // A whole read takes that answer once; its age counts from when it really started.
+      let startedAt = requestStartedAt;
+      let response: Response | null = null;
+      const early = sentTag ? null : takeEarlyRead('feed', monotonicNow());
+      if (early) {
+        try {
+          response = await awaitEarlyRead(early, controller.signal);
+          startedAt = early.startedAt;
+        } catch (error) {
+          if (controller.signal.aborted) throw error;
+          response = null;
+        }
+      }
+      if (!response) {
+        response = await fetch('/api/feed', {
+          cache: 'no-store',
+          credentials: 'include',
+          headers,
+          signal: controller.signal,
+        });
+      }
       const responseTag = readFeedEtag(response);
       if (response.status === 304) {
         // The host answers a matching conditional request itself, with no body. It
@@ -881,19 +898,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         }
         const verifiedServerTimeMs = notModifiedServerTimeMs(
           response.headers.get('date'),
-          current.verifiedServerTimeMs + Math.max(0, requestStartedAt - current.verifiedMonotonicMs),
+          current.verifiedServerTimeMs + Math.max(0, startedAt - current.verifiedMonotonicMs),
         );
         applySnapshot({
           ...current,
           serverTime: new Date(verifiedServerTimeMs).toISOString(),
           verifiedServerTimeMs,
-          verifiedMonotonicMs: requestStartedAt,
+          verifiedMonotonicMs: startedAt,
         }, !manual);
         return;
       }
       if (!response.ok) throw new Error(`Feed request failed with status ${response.status}`);
       const payload: unknown = await response.json();
-      const heartbeat = verifyFeedHeartbeat(payload, requestStartedAt);
+      const heartbeat = verifyFeedHeartbeat(payload, startedAt);
       if (heartbeat) {
         const current = snapshotRef.current;
         if (!current || !feedEtagRef.current || responseTag !== feedEtagRef.current) throw new Error('Feed heartbeat did not match the current snapshot.');
@@ -906,7 +923,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         }, !manual);
         return;
       }
-      const nextSnapshot = verifyFeedSnapshot(payload, requestStartedAt);
+      const nextSnapshot = verifyFeedSnapshot(payload, startedAt);
       if (!nextSnapshot) throw new Error('Feed response was not valid.');
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
       feedEtagRef.current = responseTag;

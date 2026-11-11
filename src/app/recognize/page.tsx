@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SubmissionForm } from '@/components/submission/SubmissionForm';
+import { earlyReadScript } from '@/lib/early-read';
 
 export const metadata: Metadata = {
   title: `Share a recognition | Mother's Love`,
@@ -8,5 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default function RecognizePage() {
-  return <SubmissionForm />;
+  return (
+    <>
+      {/* Asks whether sharing is open while the form's code is still downloading. */}
+      <script dangerouslySetInnerHTML={{ __html: earlyReadScript('config') }} />
+      <SubmissionForm />
+    </>
+  );
 }

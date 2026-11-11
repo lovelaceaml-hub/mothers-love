@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
+import { takeEarlyRead } from '@/lib/early-read';
 import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
 import {
   clearRecognitionDraft,
@@ -90,6 +91,30 @@ export function getValidationErrors(draft: Draft): FieldErrors {
   }
 
   return errors;
+}
+
+function isConfigResponse(value: unknown): value is ConfigResponse {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.collectionOpen === 'boolean' && typeof candidate.configured === 'boolean';
+}
+
+// The page's HTML may already have asked whether sharing is open (src/lib/early-read.ts).
+// That answer is used once when it is a clear yes or no; anything else asks again as before.
+async function readConfig(): Promise<ConfigResponse> {
+  const early = takeEarlyRead('config', typeof performance === 'undefined' ? 0 : performance.now());
+  if (early) {
+    try {
+      const response = await early.response;
+      if (response.ok) {
+        const value: unknown = await response.json();
+        if (isConfigResponse(value)) return value;
+      }
+    } catch {
+      // Fall through to a normal read.
+    }
+  }
+  return api<ConfigResponse>('/api/config', { auth: false });
 }
 
 function errorStatus(error: unknown) {
@@ -401,7 +426,7 @@ export function SubmissionForm() {
 
   useEffect(() => {
     let active = true;
-    api<ConfigResponse>('/api/config', { auth: false })
+    readConfig()
       .then((result) => {
         if (active) setConfig(result);
       })
