@@ -8,7 +8,7 @@ import { clearSafeTimeout, setSafeTimeout } from '@/lib/safe-timer';
 import { useAdminSession } from './admin-shell';
 import { ActionDialog } from './action-dialog';
 import { adminApi, adminJson, getAuthErrorMessage } from './admin-api';
-import { formatDateTime, graphemeLength, isExpired, requiresReason, statusLabel, validateEditorDraft, type ActionKind } from './admin-utils';
+import { auditActionLabel, auditActorLabel, auditEntriesOf, formatDateTime, graphemeLength, heartCountOf, isExpired, reasonLabel, requiresReason, statusLabel, validateEditorDraft, type ActionKind } from './admin-utils';
 import styles from './admin.module.css';
 
 type EditableDraft = {
@@ -175,6 +175,8 @@ export function RecognitionDetailPage({ id }: { id: string }) {
     return <div className={styles.empty}>This recognition is no longer available.</div>;
   }
 
+  const likes = heartCountOf(recognition);
+  const history = auditEntriesOf(recognition);
   const currentStatusClass = recognition.status === 'published' ? styles.badgePublished : recognition.status === 'held' ? styles.badgeHeld : recognition.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
 
   return (
@@ -197,10 +199,27 @@ export function RecognitionDetailPage({ id }: { id: string }) {
         <div className={`${styles.card} ${styles.col5}`}>
           <div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Public preview</h2><p className={styles.cardDescription}>Preview the message shown on the display.</p></div></div>
           <div className={styles.preview}><p className={styles.previewKicker}>Recognized anonymously</p><h3 className={styles.previewTitle}>Thank you, {draft?.recipient || recognition.recipient}</h3><p className={styles.previewMessage}>{draft?.message || recognition.message || 'Message cleared after expiry.'}</p><div className={styles.listItemMeta}>{(draft?.expressionIds ?? recognition.expressionIds).map((expressionId) => <span key={expressionId} className={styles.badge}>{expressionCatalog.find((expression) => expression.id === expressionId)?.phrase ?? `Expression ${expressionId}`}</span>)}</div></div>
-          <div style={{ marginTop: 16 }}><div className={styles.statLine}><span>Created</span><span className={styles.statValue}>{formatDateTime(recognition.createdAt)}</span></div><div className={styles.statLine}><span>First published</span><span className={styles.statValue}>{formatDateTime(recognition.firstPublishedAt)}</span></div><div className={styles.statLine}><span>Count effect</span><span className={styles.statValue}>{recognition.status === 'published' || recognition.status === 'hidden' ? 'Included' : 'None'}</span></div></div>
-          <div className={styles.privatePanel} style={{ marginTop: 16 }}><p className={styles.privateLabel}>Private admin field</p><p style={{ margin: 0 }}>{recognition.submittedName || 'Cleared after expiry'}</p>{recognition.reason ? <p className={styles.fieldHint}>Hold reason: {recognition.reason}</p> : null}</div>
+          <div style={{ marginTop: 16 }}><div className={styles.statLine}><span>Created</span><span className={styles.statValue}>{formatDateTime(recognition.createdAt)}</span></div><div className={styles.statLine}><span>First published</span><span className={styles.statValue}>{formatDateTime(recognition.firstPublishedAt)}</span></div><div className={styles.statLine}><span>Count effect</span><span className={styles.statValue}>{recognition.status === 'published' || recognition.status === 'hidden' ? 'Included' : 'None'}</span></div>{recognition.updatedAt ? <div className={styles.statLine}><span>Last changed</span><span className={styles.statValue}>{formatDateTime(recognition.updatedAt)}</span></div> : null}<div className={styles.statLine}><span>Version</span><span className={styles.statValue}>{recognition.version}</span></div><div className={styles.statLine}><span>Likes</span><span className={styles.statValue} data-testid="detail-likes">{likes === null ? 'Not available yet' : likes}</span></div></div>
+          <div className={styles.privatePanel} style={{ marginTop: 16 }}><p className={styles.privateLabel}>Private admin field</p><p style={{ margin: 0 }}>{recognition.submittedName || 'Cleared after expiry'}</p>{recognition.reason ? <p className={styles.fieldHint}>Reason: {reasonLabel(recognition.reason)}</p> : null}</div>
           <div className={styles.buttonRow} style={{ marginTop: 18 }}><button className={styles.buttonQuiet} type="button" onClick={() => { setAction('hide'); setReason(''); }} disabled={saving || expired || recognition.status === 'hidden' || recognition.status === 'invalid'}>Hide</button><button className={styles.buttonDanger} type="button" onClick={() => { setAction('invalidate'); setReason(''); }} disabled={saving || expired || recognition.status === 'invalid'}>Invalidate</button>{session?.role === 'owner' ? <button className={styles.buttonDanger} type="button" onClick={() => { setAction('delete'); setReason(''); }} disabled={saving || expired}>Permanent delete</button> : null}</div>
         </div>
+      </section>
+
+      <section className={styles.card} style={{ marginTop: 16 }} aria-labelledby="detail-history-title" data-testid="detail-history">
+        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle} id="detail-history-title">History</h2><p className={styles.cardDescription}>Admin actions on this recognition from the last 30 days, newest first.</p></div></div>
+        {history === null ? <p className={styles.fieldHint}>Likes and history appear here once database migration 021 is applied.</p> : null}
+        {history && !history.length ? <p className={styles.fieldHint}>No admin actions are on record for this recognition.</p> : null}
+        {history && history.length ? (
+          <ol style={{ margin: 0, paddingLeft: 20 }}>
+            {history.map((entry, index) => (
+              <li key={`${entry.at}-${index}`} style={{ marginBottom: 8 }}>
+                <strong>{auditActionLabel(entry.action)}</strong> by {auditActorLabel(entry.actorRole)}, {formatDateTime(entry.at)}
+                {entry.reason ? <span className={styles.fieldHint} style={{ display: 'block' }}>Reason: {reasonLabel(entry.reason)}</span> : null}
+                {entry.outcome && entry.outcome !== 'success' ? <span className={styles.fieldHint} style={{ display: 'block' }}>Outcome: {entry.outcome}</span> : null}
+              </li>
+            ))}
+          </ol>
+        ) : null}
       </section>
 
       {latest ? <section className={styles.card} style={{ marginTop: 16 }}><div className={styles.cardHeader}><div><h2 className={styles.cardTitle}>Another update needs your choice</h2><p className={styles.cardDescription}>A newer copy is available. Review it before saving.</p></div></div><div className={styles.grid}><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Your unsaved draft</h3><p className={styles.listItemText}>{draft?.message}</p></div><div className={`${styles.card} ${styles.col6}`}><h3 className={styles.cardTitle}>Newer copy</h3><p className={styles.listItemText}>{latest.message}</p></div></div><div className={styles.buttonRow} style={{ marginTop: 16 }}><button className={styles.buttonSecondary} type="button" onClick={() => { if (adoptRecognition(latest)) setNotice('Loaded the newer copy. Review it, then save.'); }}>Use newer copy</button><button className={styles.button} type="button" onClick={() => { setRecognition((current) => current ? { ...current, version: latest.version } : current); setLatest(null); setNotice('Your draft is still visible. Review it, then save.'); }}>Keep my draft</button></div></section> : null}

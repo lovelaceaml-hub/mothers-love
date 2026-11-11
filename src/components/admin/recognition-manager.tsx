@@ -6,7 +6,7 @@ import type { AdminRecognition, Expression } from '@/lib/contracts';
 import { EXPRESSIONS } from '@/lib/catalog';
 import { clearSafeTimeout, setSafeTimeout, type SafeTimerHandle } from '@/lib/safe-timer';
 import { adminApi, getAuthErrorMessage } from './admin-api';
-import { ADMIN_LIST_PAGE_SIZE as PAGE_SIZE, formatDateTime, isExpired, numberRecognitions, statusLabel, type ListSort, type NumberedRecognition } from './admin-utils';
+import { ADMIN_LIST_PAGE_SIZE as PAGE_SIZE, formatDateTime, isExpired, numberRecognitions, statusLabel, type ListSort, type NumberedRecognition, heartCountOf } from './admin-utils';
 import styles from './admin.module.css';
 
 type RecognitionResponse = { items: AdminRecognition[]; total: number; sort?: ListSort };
@@ -107,7 +107,7 @@ export function RecognitionManager() {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <caption className={styles.srOnly}>Current campaign recognition records</caption>
-              <thead><tr><th scope="col">#</th><th scope="col">Submitted by</th><th scope="col">Recipient</th><th scope="col">Message</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
+              <thead><tr><th scope="col">#</th><th scope="col">Submitted by</th><th scope="col">Recipient</th><th scope="col">Message</th><th scope="col">Expressions</th><th scope="col">Status</th><th scope="col">Likes</th><th scope="col">Created</th><th scope="col">Feature</th><th scope="col"><span className={styles.srOnly}>Open</span></th></tr></thead>
               <tbody>{items.map((item) => {
                 const badgeClass = item.status === 'published' ? styles.badgePublished : item.status === 'held' ? styles.badgeHeld : item.status === 'hidden' ? styles.badgeHidden : styles.badgeInvalid;
                 return <tr key={item.id}>
@@ -117,6 +117,7 @@ export function RecognitionManager() {
                   <td className={styles.messageCell}>{item.message}</td>
                   <td><div>{item.expressionIds.length} selected</div><div className={styles.fieldHint}>{item.expressionIds.map((id) => expressionText.get(id) ?? `Expression ${id}`).join(', ')}</div></td>
                   <td><span className={`${styles.badge} ${badgeClass}`}>{statusLabel(item.status)}</span></td>
+                  <td>{heartCountOf(item) ?? <span className={styles.srOnly}>Not available yet</span>}</td>
                   <td>{formatDateTime(item.createdAt)}</td>
                   <td>{item.featured ? <span className={`${styles.badge} ${styles.badgePending}`}>Featured</span> : <span className={styles.badge}>Standard</span>}</td>
                   <td><Link className={styles.tableRowButton} href={`/admin/recognitions/${encodeURIComponent(item.id)}`}>Open detail</Link></td>
