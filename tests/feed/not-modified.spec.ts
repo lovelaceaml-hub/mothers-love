@@ -107,3 +107,32 @@ test('an older page with a weak tag is kept when its refresh is an empty 304', a
   await expect(cards(page)).toHaveCount(150);
   await expect(page.getByText('Test Recipient 120', { exact: true })).toBeAttached();
 });
+
+test('a conditional read that fails falls back to a whole read instead of an error', async ({ page }) => {
+  await page.clock.install({ time: fastWindow });
+  let fullReads = 0;
+  let brokenConditionalReads = 0;
+  await routeReactions(page);
+  await page.route('**/api/feed', async (route) => {
+    if (route.request().headers()['if-none-match']) {
+      // Stands for anything between the page and the server mishandling the shortcut.
+      brokenConditionalReads += 1;
+      await route.fulfill({ status: 200, headers: { 'cache-control': 'no-store' }, contentType: 'application/json', body: '' });
+      return;
+    }
+    fullReads += 1;
+    await route.fulfill({
+      headers: { 'cache-control': 'no-store', etag: `W/"${tagA}"` },
+      json: { serverTime, items: items(1, 1) },
+    });
+  });
+
+  await page.goto('/');
+  await expect(page.getByText('Test Recipient 1', { exact: true })).toBeVisible();
+  expect(fullReads).toBe(1);
+
+  await expect.poll(async () => { await nextRefresh(page); return brokenConditionalReads; }, { timeout: 20_000 }).toBeGreaterThanOrEqual(1);
+  await expect.poll(() => fullReads).toBeGreaterThanOrEqual(2);
+  await expect(page.getByText('Test Recipient 1', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Unable to load recognitions' })).toHaveCount(0);
+});

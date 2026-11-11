@@ -24,7 +24,7 @@ Section A, security (from #51, unchanged): Next.js 16.4.5, React 19.3.1, supabas
 Section B, speed people can feel:
 
 1. `vercel.json` pins the functions to `sfo1`, beside the database. Expected: the feed, hearts, the form's open check, sending a recognition, admin and every TV read answer several tenths of a second sooner. Measure after release (see Release).
-2. The home page remembers weak tags and treats the host's empty 304 as the unchanged heartbeat, for the live list and for older pages (`src/components/feed/PublicFeedProvider.tsx`, `src/lib/etag.ts`). The server time for that reply comes from its `Date` header, never earlier than the page's own estimate.
+2. The home page remembers weak tags and treats the host's empty 304 as the unchanged heartbeat, for the live list and for older pages (`src/components/feed/PublicFeedProvider.tsx`, `src/lib/etag.ts`). The server time for that reply comes from its `Date` header, never earlier than the page's own estimate. If a conditional read ever fails for any reason, the page reads the whole list once more before it would show an error, so the shortcut cannot be the reason a list is lost.
 3. The TV's fallback view (V6) accepts the 304 the same way, so it no longer goes stale after its first read.
 4. The sign-in library loads only when an admin request needs it (`src/lib/client-api.ts`); the form's two public requests say `auth: false`.
 5. Feed cards from the third on are skipped by the browser until they scroll near (`content-visibility`, from #46).
@@ -71,3 +71,7 @@ Section D, documents: this plan, the handoff, the README and the history entry.
 ## Build log
 
 - 2026-11-11. Review from the live site and the code; findings in the table above. Branch made from `origin/claude/eager-cori-wlho8e` (#51) in `/Users/anthony/Projects/mothers-love-worktrees/app-polish-2026-11`; #46's commit picked onto it. The Mac was busy (load above 20, other programs), so every check ran in the cloud: GitHub Actions for types, the production build and the named tests, Vercel for the preview build.
+- 2026-11-11. Cloud results on commit `d3fd95e`: types and the production build pass; the 12 named unit files pass (106 tests); the 4 named browser files pass (32 journeys, 1 marked as waiting for a rewrite). On the way there the first browser run failed three older journeys for reasons outside this plan: the stricter accessibility checker (heart button name), the red guide card's heading contrast, and two heart journeys tied to the time of day or to a refresh that can no longer happen. Each is handled above.
+- 2026-11-11. Preview of this branch, read through the Vercel CLI: `/api/display/build` answered from `sfo1::sfo1`; `/recognize` loads 205 KB of scripts (268 KB live) and `/display` 231 KB (294 KB live), with no file containing the sign-in library. The preview has no database, so the feed, hearts and sending were not exercised on a hosted copy.
+- 2026-11-11. Added after those results: a failed conditional read is repeated as a whole read, and after two failures in a row the page stops sending conditional reads; one more journey covers it. The checks for the final commit are on the pull request.
+- Not run: the complete unit and browser suites (they need Anthony's explicit approval for the run). Not done: release. Anthony merges #52.

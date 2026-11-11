@@ -106,7 +106,31 @@ function readFeedEtag(response: Response) {
   return parseContentEtag(response.headers.get('etag'));
 }
 
+// Conditional reads are a shortcut, never a requirement. A failed one is repeated as a
+// whole read, and after two failures in a row this page stops sending them, so a browser
+// or network that mishandles them costs at most two extra requests.
+let conditionalReadFailures = 0;
+const conditionalReadsAllowed = () => conditionalReadFailures < 2;
+
 async function fetchOlderFeedPage(
+  after: PublicFeedItem,
+  signal: AbortSignal,
+  cached?: CachedOlderFeedPage,
+): Promise<OlderFeedPage> {
+  const known = conditionalReadsAllowed() ? cached : undefined;
+  try {
+    const page = await readOlderFeedPage(after, signal, known);
+    if (known) conditionalReadFailures = 0;
+    return page;
+  } catch (error) {
+    // A conditional read that fails for any reason is tried once more as a whole read.
+    if (!known || signal.aborted) throw error;
+    conditionalReadFailures += 1;
+    return readOlderFeedPage(after, signal);
+  }
+}
+
+async function readOlderFeedPage(
   after: PublicFeedItem,
   signal: AbortSignal,
   cached?: CachedOlderFeedPage,
@@ -834,9 +858,11 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const requestStartedAt = monotonicNow();
     const deadline = window.setTimeout(() => controller.abort(), 8_000);
     feedDeadlineRef.current = deadline;
-    try {
+    // One read of the list. A conditional read sends the remembered tag, so an
+    // unchanged list costs no download.
+    const read = async (conditional: boolean): Promise<void> => {
       const headers: Record<string, string> = { accept: 'application/json' };
-      const sentTag = snapshotRef.current && feedEtagRef.current ? feedEtagRef.current : null;
+      const sentTag = conditional && snapshotRef.current && feedEtagRef.current ? feedEtagRef.current : null;
       if (sentTag) headers['If-None-Match'] = `"${sentTag}"`;
       const response = await fetch('/api/feed', {
         cache: 'no-store',
@@ -885,6 +911,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
       feedEtagRef.current = responseTag;
       applySnapshot(nextSnapshot, !manual);
+    };
+    try {
+      const conditional = conditionalReadsAllowed() && Boolean(snapshotRef.current && feedEtagRef.current);
+      try {
+        await read(conditional);
+        if (conditional && serial === requestSerialRef.current && !controller.signal.aborted) conditionalReadFailures = 0;
+      } catch (error) {
+        // A conditional read that fails for any reason is tried once more as a whole
+        // read, so the shortcut can never be the reason the list is lost.
+        if (!conditional || serial !== requestSerialRef.current || controller.signal.aborted) throw error;
+        conditionalReadFailures += 1;
+        await read(false);
+      }
     } catch {
       if (serial !== requestSerialRef.current) return;
       clearFeed('error');
