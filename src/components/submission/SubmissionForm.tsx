@@ -7,6 +7,12 @@ import Link from 'next/link';
 import { api } from '@/lib/client-api';
 import { CAMPAIGN_TAGLINE, CAMPAIGN_TITLE, EXPRESSIONS } from '@/lib/catalog';
 import { countGraphemes, hasVisibleNameContent, MAX_NAME_GRAPHEMES } from '@/lib/name-validation';
+import {
+  clearRecognitionDraft,
+  loadRecognitionDraft,
+  recognitionDraftStorage,
+  saveRecognitionDraft,
+} from '@/lib/recognition-draft';
 
 import baseStyles from './SubmissionForm.module.css';
 import experienceStyles from './SubmissionExperience.module.css';
@@ -44,6 +50,8 @@ type ApiLikeError = Error & {
 };
 
 const MAX_MESSAGE_GRAPHEMES = 500;
+const EXPRESSION_IDS = EXPRESSIONS.map((expression) => expression.id);
+const UNCONFIRMED_MESSAGE = 'We could not confirm the response. You can safely retry with the same entries.';
 
 function makeRequestKey() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -382,6 +390,9 @@ export function SubmissionForm() {
   const [submissionError, setSubmissionError] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [requestKey, setRequestKey] = useState(makeRequestKey);
+  // Unfinished entries are kept in this tab until they are sent (src/lib/recognition-draft.ts).
+  const [draftStorageReady, setDraftStorageReady] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
   const previewTriggerRef = useRef<HTMLButtonElement>(null);
   const submitterRef = useRef<HTMLInputElement>(null);
@@ -408,6 +419,37 @@ export function SubmissionForm() {
       errorSummaryRef.current?.focus();
     }
   }, [fieldErrors]);
+
+  // After the first render (so the server's page and the browser's agree), bring back what
+  // this person was writing in this tab. A send whose answer never arrived comes back as
+  // "not confirmed" with its own duplicate guard, so a retry cannot publish it twice.
+  useEffect(() => {
+    const stored = loadRecognitionDraft(recognitionDraftStorage(), Date.now(), EXPRESSION_IDS);
+    if (stored) {
+      setDraft(stored.draft);
+      setRequestKey(stored.requestKey);
+      setDraftRestored(true);
+      if (stored.sendAttempted) {
+        setSubmissionError(UNCONFIRMED_MESSAGE);
+        setViewState('unconfirmed');
+      }
+    }
+    setDraftStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!draftStorageReady) return;
+    const storage = recognitionDraftStorage();
+    if (viewState === 'published' || viewState === 'held') {
+      clearRecognitionDraft(storage);
+      return;
+    }
+    saveRecognitionDraft(storage, {
+      draft,
+      requestKey,
+      sendAttempted: viewState === 'sending' || viewState === 'unconfirmed',
+    }, Date.now());
+  }, [draft, draftStorageReady, requestKey, viewState]);
 
   const selectedExpressions = useMemo(
     () => EXPRESSIONS.filter((expression) => draft.expressionIds.includes(expression.id)),
@@ -485,6 +527,7 @@ export function SubmissionForm() {
         throw new Error('We could not confirm the response.');
       }
       setShowPreview(false);
+      setDraftRestored(false);
       setReceiptStatus(result.status);
       setViewState(result.status);
     } catch (error) {
@@ -492,7 +535,7 @@ export function SubmissionForm() {
         setSubmissionError('Recognition sharing is paused right now. Your entries are still here.');
         setViewState('unconfirmed');
       } else if (isUnconfirmed(error)) {
-        setSubmissionError('We could not confirm the response. You can safely retry with the same entries.');
+        setSubmissionError(UNCONFIRMED_MESSAGE);
         setViewState('unconfirmed');
       } else {
         setSubmissionError(error instanceof Error ? error.message : 'We could not send your recognition. Please try again.');
@@ -511,6 +554,8 @@ export function SubmissionForm() {
     setViewState('editing');
     setShowPreview(false);
     setRequestKey(makeRequestKey());
+    setDraftRestored(false);
+    clearRecognitionDraft(recognitionDraftStorage());
     window.scrollTo({ top: 0, behavior: motionPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
@@ -566,6 +611,13 @@ export function SubmissionForm() {
                 <span className={styles.privateIcon} aria-hidden="true"><span /></span>
                 <p><strong>Your name stays private.</strong> It is visible only to campaign administrators. The recipient, expressions, and message appear on the home page and TV.</p>
               </div>
+
+              {draftRestored && (
+                <div className={styles.draftNote} role="status" data-testid="draft-restored">
+                  <p>Your unfinished recognition is still here.</p>
+                  <button type="button" onClick={resetForm} disabled={viewState === 'sending'}>Start over</button>
+                </div>
+              )}
 
               {formError && (
                 <div className={styles.errorSummary} ref={errorSummaryRef} tabIndex={-1} role="alert" aria-live="assertive">
