@@ -2,7 +2,7 @@
 
 A live appreciation campaign: people share recognitions on a public page, administrators review them, and a TV in the church shows them. Live at https://mothers-love.vercel.app.
 
-`main` is at merge `81a73fe` (pull request [#50](https://github.com/lovelaceaml-hub/mothers-love/pull/50), 2026-10-29); a push to `main` deploys production. The last production deployment recorded in these documents is commit `29da0dd7aa1c5497765809692c7d40c8cb8abd09`, Vercel deployment `dpl_DNb1ULXANYHiKbqNgVVZQazoPWuy` (READY, 2026-10-12); later merges are listed in [docs/HANDOFF.md](docs/HANDOFF.md). Pull request [#30](https://github.com/lovelaceaml-hub/mothers-love/pull/30) (TV display efficiency) merged on 2026-10-12 together with its current-main integration, pull request [#39](https://github.com/lovelaceaml-hub/mothers-love/pull/39). Whether migration `database/020_display_delta.sql` was applied to the live database is not recorded in this repository.
+Production is `main` at merge `65f8a5080a9d965169e2abb52d5fdf667d98feea` (pull request [#52](https://github.com/lovelaceaml-hub/mothers-love/pull/52), Plan 33), Vercel deployment `dpl_BFoKZfmc7H73i1ARwSCRHJnXc7G3` (READY, verified 2026-11-11); a push to `main` deploys production. Details and rollback are in [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Quick links
 
@@ -12,7 +12,7 @@ A live appreciation campaign: people share recognitions on a public page, admini
 - **Admin:** [Sign in](https://mothers-love.vercel.app/admin/login) with email and password, no authenticator; [Display Studio](https://mothers-love.vercel.app/admin/display).
 - **Handoff:** [docs/HANDOFF.md](docs/HANDOFF.md), the current state on one page.
 - **History:** [docs/HISTORY.md](docs/HISTORY.md), every release note, newest first, and what still lives outside `main`.
-- **Waiting for release:** [Plan 33, security update, speed and cleanup](docs/PLAN-33-polish-and-speed.md), pull request [#52](https://github.com/lovelaceaml-hub/mothers-love/pull/52). Until it merges the live site runs a Next.js version with a critical advisory.
+- **Latest release:** [Plan 33, security update, speed and cleanup](docs/PLAN-33-polish-and-speed.md), pull request [#52](https://github.com/lovelaceaml-hub/mothers-love/pull/52), live since 2026-11-11 (deployment `dpl_BFoKZfmc7H73i1ARwSCRHJnXc7G3`).
 - **Current plans:** [Plan 32, scheduled public polling](docs/PLAN-32-polling-schedule.md), merged in pull request #40 on 2026-10-12, and [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md), merged through pull requests #30 and #39 on 2026-10-12. The live status of migration 020 is not recorded. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
@@ -58,7 +58,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [30](docs/PLAN-30-older-recognitions.md) | Show older recognitions | Complete, live 2026-09-26 |
 | [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | Merged 2026-10-12 through pull requests #30 and #39; the live status of migration 020 is not recorded in this repository |
 | [32](docs/PLAN-32-polling-schedule.md) | Scheduled public polling (Pacific time) | Merged 2026-10-12 in pull request #40 |
-| [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete in pull request #52, checked in the cloud; waits for Anthony's merge (2026-11-11) |
+| [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete, live 2026-11-11 (pull request #52) |
 
 ## Other documents
 

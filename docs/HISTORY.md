@@ -13,14 +13,15 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
-### November 11: Plan 33 prepared, release waits for Anthony's merge (pull request #52)
+### November 11: Plan 33 released (pull request #52)
 
-Source: the pull request and [Plan 33](PLAN-33-polish-and-speed.md). Not live when this was written.
+Source: the pull request, [Plan 33](PLAN-33-polish-and-speed.md), Vercel and the live site. Merged by Anthony at 18:16 UTC; merge `65f8a5080a9d965169e2abb52d5fdf667d98feea`; deployment `dpl_BFoKZfmc7H73i1ARwSCRHJnXc7G3`.
 
 - Security: Next.js 16.4.5 and the other updates of the 2026-11-03 review (#51); the production audit reports 0.
 - Speed: the server runs in `sfo1` beside the database; the home page's unchanged shortcut works on the live host; the sign-in library loads only for admin requests; offscreen feed cards are deferred (#46).
 - Behind the scenes: one guarded read for the TV's database reads, one tag parser and one UUID pattern, a checks workflow for pull requests, four dead workflows removed.
-- No database change. Rollback is promoting the previous Vercel deployment.
+- Measured on the live site, before then after: `/api/feed` 0.44 to 1.2 s then 0.16 to 0.28 s; the TV's data 1.1 to 1.4 s then 0.20 to 0.32 s; the likes total 1.0 s then 0.15 to 0.29 s; `/recognize` scripts 268 KB then 205 KB; `/display` scripts 294 KB then 231 KB.
+- No database change. Rollback is promoting the previous production deployment (`https://mothers-love-jp2wsf8xk-lvzion.vercel.app`, pull request #50).
 
 ### October 12 to 29: merges with no release note yet (recorded 2026-11-04)
 
