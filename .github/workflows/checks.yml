@@ -1,9 +1,12 @@
 name: Checks
 
 # Every pull request into main gets the two quick checks: types and a production build.
-# Tests never start by themselves. They run only from "Run workflow":
-#   - unit_files / browser_files: a focused run of the named files.
-#   - full_suite_approved: the complete unit and browser suites. Tick it only with
+# Tests never start by themselves:
+#   - A pull request may name the test files tied to its change, on lines of its
+#     description that start with "Focused unit tests:" or "Focused browser tests:"
+#     (space separated test files under tests/ or src/, at most 12 each). Only those run.
+#   - "Run workflow" takes the same lists as unit_files / browser_files.
+#   - full_suite_approved runs the complete unit and browser suites. Tick it only with
 #     Anthony's explicit approval for that one run (his rule of 2026-10-17).
 on:
   pull_request:
@@ -11,11 +14,11 @@ on:
   workflow_dispatch:
     inputs:
       unit_files:
-        description: 'Focused unit test files or folders, space separated (empty: skip)'
+        description: 'Focused unit test files, space separated (empty: skip)'
         required: false
         default: ''
       browser_files:
-        description: 'Focused browser test files or folders, space separated (empty: skip)'
+        description: 'Focused browser test files, space separated (empty: skip)'
         required: false
         default: ''
       full_suite_approved:
@@ -52,27 +55,63 @@ jobs:
 
   focused:
     name: Focused tests
-    if: github.event_name == 'workflow_dispatch' && !inputs.full_suite_approved && (inputs.unit_files != '' || inputs.browser_files != '')
+    if: >-
+      (github.event_name == 'workflow_dispatch' && !inputs.full_suite_approved && (inputs.unit_files != '' || inputs.browser_files != '')) ||
+      (github.event_name == 'pull_request' && (contains(github.event.pull_request.body, 'Focused unit tests:') || contains(github.event.pull_request.body, 'Focused browser tests:')))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      UNIT_FILES: ${{ inputs.unit_files }}
-      BROWSER_FILES: ${{ inputs.browser_files }}
+      INPUT_UNIT_FILES: ${{ inputs.unit_files }}
+      INPUT_BROWSER_FILES: ${{ inputs.browser_files }}
+      PR_BODY: ${{ github.event.pull_request.body }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pick the focused files
+        id: pick
+        run: |
+          set -f
+          unit="$INPUT_UNIT_FILES"
+          browser="$INPUT_BROWSER_FILES"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            unit=$(printf '%s\n' "$PR_BODY" | tr -d '\r' | sed -n 's/^Focused unit tests:[[:space:]]*//p' | head -n 1)
+            browser=$(printf '%s\n' "$PR_BODY" | tr -d '\r' | sed -n 's/^Focused browser tests:[[:space:]]*//p' | head -n 1)
+          fi
+          check() {
+            local count=0
+            for file in $1; do
+              count=$((count + 1))
+              case "$file" in
+                *[!A-Za-z0-9_./-]*|*..*) echo "Unexpected characters in: $file"; exit 1 ;;
+              esac
+              case "$file" in
+                tests/*|src/*) ;;
+                *) echo "Not a path under tests/ or src/: $file"; exit 1 ;;
+              esac
+              [ -f "$file" ] || { echo "Not a test file: $file"; exit 1; }
+            done
+            [ "$count" -le 12 ] || { echo "At most 12 paths; a complete suite needs full_suite_approved."; exit 1; }
+          }
+          check "$unit"
+          check "$browser"
+          echo "unit=$unit" >> "$GITHUB_OUTPUT"
+          echo "browser=$browser" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
       - run: npm ci
       - name: Focused unit tests
-        if: inputs.unit_files != ''
+        if: steps.pick.outputs.unit != ''
+        env:
+          FILES: ${{ steps.pick.outputs.unit }}
         run: |
-          read -r -a files <<< "$UNIT_FILES"
+          read -r -a files <<< "$FILES"
           npx vitest run "${files[@]}"
       - name: Focused browser tests
-        if: inputs.browser_files != ''
+        if: steps.pick.outputs.browser != ''
+        env:
+          FILES: ${{ steps.pick.outputs.browser }}
         run: |
-          read -r -a files <<< "$BROWSER_FILES"
+          read -r -a files <<< "$FILES"
           npx playwright install --with-deps chromium
           CI=1 npx playwright test --workers=2 "${files[@]}"
       - uses: actions/upload-artifact@v4

@@ -12,7 +12,7 @@ import {
 } from "@/lib/color-polish/contracts";
 import type { Aggregate } from "@/lib/contracts";
 import { endOfLosAngelesWeek, isoDateInLosAngeles, isIsoDate, startOfLosAngelesMonth, startOfLosAngelesWeek } from "./time";
-import { getPublicDisplayClient, retirePublicDisplayClient } from "./public-display-client";
+import { guardedPublicDisplayRead } from "./public-display-read";
 import { projectPublicDisplaySnapshot } from "./public-display";
 import { UUID_PATTERN } from "@/lib/uuid";
 
@@ -247,16 +247,11 @@ export async function queryColorPolishSnapshot(
   signal?: AbortSignal,
   knownOrEtag?: string[] | string | null,
 ): Promise<ColorPolishQuery> {
-  if (signal?.aborted) return { data: null, error: new Error("REQUEST_ABORTED") };
-  const client = getPublicDisplayClient();
-  if (!client) return { data: null, error: new Error("UNAVAILABLE") };
-
-  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
-  const operation = Promise.resolve().then(() => client.begin("read write", async (transaction) => {
-    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
-    await transaction`set local statement_timeout = '5000ms'`;
-    await transaction`set transaction isolation level repeatable read`;
-    if (signal?.aborted) throw new Error("REQUEST_ABORTED");
+  const read = await guardedPublicDisplayRead<{ data: unknown; etag: string | null }>({
+    signal,
+    deadlineMs: COLOR_POLISH_OPERATION_DEADLINE_MS,
+    repeatableReadWrite: true,
+  }, async (transaction) => {
     const known = Array.isArray(knownOrEtag) ? knownOrEtag : undefined;
     if (known !== undefined) {
       const rows = await transaction`select public.ml_color_polish_delta(${after}, ${JSON.stringify(known)}::text::jsonb) as result`;
@@ -290,24 +285,8 @@ export async function queryColorPolishSnapshot(
     `;
     const data = rows[0]?.result ?? null;
     return { data, etag: typeof rows[0]?.etag === "string" ? rows[0].etag as string : null };
-  }));
-  void operation.then(() => undefined, () => undefined);
-
-  const deadline = new Promise<never>((_, reject) => {
-    deadlineTimer = setTimeout(() => {
-      retirePublicDisplayClient(client);
-      reject(new Error("DATABASE_TIMEOUT"));
-    }, COLOR_POLISH_OPERATION_DEADLINE_MS);
   });
-
-  try {
-    const result = await Promise.race([operation, deadline]);
-    return { ...result, error: null };
-  } catch (error) {
-    return { data: null, error: error instanceof Error ? error : new Error("DATABASE_ERROR") };
-  } finally {
-    if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
-  }
+  return read.error ? { data: null, error: read.error } : { ...read.value, error: null };
 }
 
 export const COLOR_POLISH_DEFAULT_PRESENTATION: ColorPolishPresentation = {

@@ -1,4 +1,4 @@
-import { getPublicDisplayClient, retirePublicDisplayClient } from './public-display-client';
+import { guardedPublicDisplayRead } from './public-display-read';
 
 export type PublicDisplayDailyAggregate = {
   date: string;
@@ -44,34 +44,15 @@ export function projectPublicDisplayDailyAggregates(value: unknown): PublicDispl
 }
 
 export async function queryPublicDisplayDailyAggregates(signal?: AbortSignal): Promise<{ data: PublicDisplayDailyAggregate[] | null; error: Error | null }> {
-  if (signal?.aborted) return { data: null, error: new Error('REQUEST_ABORTED') };
-  const client = getPublicDisplayClient();
-  if (!client) return { data: null, error: new Error('UNAVAILABLE') };
-
-  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
-  const operation = Promise.resolve().then(() => client.begin('read only', async (transaction) => {
-    if (signal?.aborted) throw new Error('REQUEST_ABORTED');
-    await transaction`set local statement_timeout = '5000ms'`;
-    if (signal?.aborted) throw new Error('REQUEST_ABORTED');
+  const read = await guardedPublicDisplayRead<unknown>({ signal, deadlineMs: OPERATION_DEADLINE_MS }, async (transaction) => {
     const rows = await transaction`select public.ml_public_display_daily_aggregates() as result`;
     return rows[0]?.result ?? null;
-  }));
-  void operation.then(() => undefined, () => undefined);
-
-  const deadline = new Promise<never>((_, reject) => {
-    deadlineTimer = setTimeout(() => {
-      retirePublicDisplayClient(client);
-      reject(new Error('DATABASE_TIMEOUT'));
-    }, OPERATION_DEADLINE_MS);
   });
-
+  if (read.error) return { data: null, error: read.error };
   try {
-    const raw = await Promise.race([operation, deadline]);
-    const data = projectPublicDisplayDailyAggregates(raw);
+    const data = projectPublicDisplayDailyAggregates(read.value);
     return data ? { data, error: null } : { data: null, error: new Error('INVALID_DAILY_AGGREGATES') };
   } catch (error) {
     return { data: null, error: error instanceof Error ? error : new Error('DATABASE_ERROR') };
-  } finally {
-    if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
   }
 }
