@@ -1,0 +1,123 @@
+name: Checks
+
+# Every pull request into main gets the two quick checks: types and a production build.
+# Tests never start by themselves. They run only from "Run workflow":
+#   - unit_files / browser_files: a focused run of the named files.
+#   - full_suite_approved: the complete unit and browser suites. Tick it only with
+#     Anthony's explicit approval for that one run (his rule of 2026-10-17).
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      unit_files:
+        description: 'Focused unit test files or folders, space separated (empty: skip)'
+        required: false
+        default: ''
+      browser_files:
+        description: 'Focused browser test files or folders, space separated (empty: skip)'
+        required: false
+        default: ''
+      full_suite_approved:
+        description: 'Run the complete unit and browser suites (needs explicit approval for this run)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  npm_config_cache: /tmp/npm-cache
+
+jobs:
+  quick:
+    name: Types and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Build without production credentials
+        run: npm run build
+
+  focused:
+    name: Focused tests
+    if: github.event_name == 'workflow_dispatch' && !inputs.full_suite_approved && (inputs.unit_files != '' || inputs.browser_files != '')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      UNIT_FILES: ${{ inputs.unit_files }}
+      BROWSER_FILES: ${{ inputs.browser_files }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - name: Focused unit tests
+        if: inputs.unit_files != ''
+        run: |
+          read -r -a files <<< "$UNIT_FILES"
+          npx vitest run "${files[@]}"
+      - name: Focused browser tests
+        if: inputs.browser_files != ''
+        run: |
+          read -r -a files <<< "$BROWSER_FILES"
+          npx playwright install --with-deps chromium
+          CI=1 npx playwright test --workers=2 "${files[@]}"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: focused-test-results
+          retention-days: 3
+          path: test-results/
+          if-no-files-found: ignore
+
+  full-unit:
+    name: Complete unit suite
+    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm test
+
+  full-browser:
+    name: Complete browser suite (${{ matrix.shard }} of 4)
+    if: github.event_name == 'workflow_dispatch' && inputs.full_suite_approved
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Browser suite, shard ${{ matrix.shard }} of 4
+        run: CI=1 npx playwright test --workers=2 --shard=${{ matrix.shard }}/4
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results-${{ matrix.shard }}
+          retention-days: 3
+          path: test-results/
+          if-no-files-found: ignore
