@@ -68,7 +68,7 @@ test('the detail page shows likes, the last change and the history of admin acti
   await expect(entries.nth(2)).toContainText('Published by an administrator no longer listed');
   await expect(history).not.toContainText('synthetic-owner');
 
-  const results = await new AxeBuilder({ page }).analyze();
+  const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations).toEqual([]);
 });
 

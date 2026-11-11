@@ -43,7 +43,7 @@ test('a reload brings back the unfinished recognition, and Start over clears it 
   await page.reload();
   await expect(page.getByTestId('draft-restored')).toContainText('Your unfinished recognition is still here.');
   await expectDraft(page);
-  const results = await new AxeBuilder({ page }).analyze();
+  const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations).toEqual([]);
 
   await page.getByRole('button', { name: 'Start over' }).click();
