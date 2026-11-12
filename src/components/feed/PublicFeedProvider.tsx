@@ -16,7 +16,7 @@ import { startVisiblePoll } from '@/lib/visible-poll';
 import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 import { notModifiedServerTimeMs, parseContentEtag } from '@/lib/etag';
-import { awaitEarlyRead, takeEarlyRead } from '@/lib/early-read';
+import { EarlyReadTimeoutError, awaitEarlyRead, takeEarlyRead } from '@/lib/early-read';
 
 import {
   activeFeedItems,
@@ -95,6 +95,7 @@ const REACTION_BATCH_SIZE = MAX_REACTION_BATCH_SIZE;
 // Older pages are re-read on every refresh so a hidden recognition leaves them
 // too; this caps that work at 1,000 older recognitions on one open page.
 export const MAX_OLDER_FEED_PAGES = 10;
+const FEED_READ_DEADLINE_MS = 8_000;
 
 type CachedOlderFeedPage = { etag: string; items: PublicFeedItem[] };
 type OlderFeedPage = { etag: string | null; items: PublicFeedItem[] };
@@ -857,7 +858,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController();
     feedControllerRef.current = controller;
     const requestStartedAt = monotonicNow();
-    const deadline = window.setTimeout(() => controller.abort(), 8_000);
+    const deadline = window.setTimeout(() => controller.abort(), FEED_READ_DEADLINE_MS);
     feedDeadlineRef.current = deadline;
     // One read of the list. A conditional read sends the remembered tag, so an
     // unchanged list costs no download.
@@ -872,10 +873,12 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const early = sentTag ? null : takeEarlyRead('feed', monotonicNow());
       if (early) {
         try {
-          response = await awaitEarlyRead(early, controller.signal);
+          // Its deadline counts from its real start, so a read that hung before the page's
+          // code loaded is not given a second full wait.
+          response = await awaitEarlyRead(early, controller.signal, FEED_READ_DEADLINE_MS - (monotonicNow() - early.startedAt));
           startedAt = early.startedAt;
         } catch (error) {
-          if (controller.signal.aborted) throw error;
+          if (controller.signal.aborted || error instanceof EarlyReadTimeoutError) throw error;
           response = null;
         }
       }

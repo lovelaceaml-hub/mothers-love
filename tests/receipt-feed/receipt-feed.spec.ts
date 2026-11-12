@@ -108,6 +108,9 @@ test('expression and privacy companions fetch once without a background poll', a
 });
 
 test('a feed refresh never blanks a heart that is already showing', async ({ page }) => {
+  // A Saturday morning in Los Angeles: the pages refresh every 10 seconds only in the fast
+  // hours (Plan 32), so the journey must not depend on the hour it runs.
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   let releaseSecondRead: (() => void) | undefined;
   const secondRead = new Promise<void>((resolve) => { releaseSecondRead = resolve; });
   let reads = 0;

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EARLY_READ_MAX_AGE_MS, awaitEarlyRead, earlyReadScript, takeEarlyRead } from '@/lib/early-read';
+import { EARLY_READ_MAX_AGE_MS, EarlyReadTimeoutError, awaitEarlyRead, earlyReadScript, takeEarlyRead } from '@/lib/early-read';
 
 // The unit tests run without a browser: a plain object stands in for the page's window.
 let holder: Record<string, unknown> = {};
@@ -46,14 +46,22 @@ describe('the early first read', () => {
   it('gives up waiting when the caller aborts, and passes a failure through', async () => {
     const never = { startedAt: 0, response: new Promise<Response>(() => {}) };
     const controller = new AbortController();
-    const waiting = awaitEarlyRead(never, controller.signal);
+    const waiting = awaitEarlyRead(never, controller.signal, 60_000);
     controller.abort();
     await expect(waiting).rejects.toMatchObject({ name: 'AbortError' });
 
     const failed = { startedAt: 0, response: Promise.reject(new TypeError('offline')) };
-    await expect(awaitEarlyRead(failed, new AbortController().signal)).rejects.toThrow('offline');
+    await expect(awaitEarlyRead(failed, new AbortController().signal, 60_000)).rejects.toThrow('offline');
 
     const answer = new Response('{}');
-    await expect(awaitEarlyRead({ startedAt: 0, response: Promise.resolve(answer) }, new AbortController().signal)).resolves.toBe(answer);
+    await expect(awaitEarlyRead({ startedAt: 0, response: Promise.resolve(answer) }, new AbortController().signal, 60_000)).resolves.toBe(answer);
+  });
+
+  it('gives a hung early read only what is left of its deadline, and lets an arrived answer win', async () => {
+    const never = { startedAt: 0, response: new Promise<Response>(() => {}) };
+    await expect(awaitEarlyRead(never, new AbortController().signal, 0)).rejects.toBeInstanceOf(EarlyReadTimeoutError);
+    await expect(awaitEarlyRead(never, new AbortController().signal, -500)).rejects.toBeInstanceOf(EarlyReadTimeoutError);
+    const answer = new Response('{}');
+    await expect(awaitEarlyRead({ startedAt: 0, response: Promise.resolve(answer) }, new AbortController().signal, -500)).resolves.toBe(answer);
   });
 });

@@ -132,6 +132,7 @@ test('clears personal content while hidden and rechecks on the next eligible fas
 
 test('uses verified server time for initial suppression and monotonic expiry', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-09-12T16:00:01Z'));
   await routeReactions(page);
   await routeFeed(page, snapshot([
     item({ id: 'expired', recipient: 'Expired R.', expiresAt: '2030-01-01T11:59:59.000Z' }),
@@ -140,7 +141,12 @@ test('uses verified server time for initial suppression and monotonic expiry', a
   ]));
 
   await page.goto('/');
-  await expect(page.getByText('Short lived R.')).toBeVisible();
+  // The list's read now starts with the page (src/lib/early-read.ts) and its age counts from
+  // then, so the clock stands still until the page has drawn it.
+  await expect.poll(async () => {
+    await page.clock.runFor(1);
+    return page.getByText('Short lived R.').count();
+  }).toBe(1);
   await expect(page.getByText('Expired R.')).toHaveCount(0);
   await page.clock.fastForward(1_200);
   await expect(page.getByText('Short lived R.')).toHaveCount(0);

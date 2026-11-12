@@ -44,18 +44,36 @@ export function takeEarlyRead(name: EarlyReadName, nowMs: number): EarlyRead | n
   return { startedAt, response };
 }
 
-/** Waits for the early answer, but no longer than the caller's own abort signal allows. */
-export function awaitEarlyRead(early: EarlyRead, signal: AbortSignal): Promise<Response> {
+/** The early answer took longer than a read is allowed to take, counted from its real start. */
+export class EarlyReadTimeoutError extends Error {
+  constructor() {
+    super('The early read exceeded its deadline.');
+    this.name = 'EarlyReadTimeoutError';
+  }
+}
+
+/**
+ * Waits for the early answer, but no longer than the caller's own abort signal allows and no
+ * longer than `remainingMs`: what is left of a read's deadline, counted from when the early
+ * read really started. An answer that has already arrived always wins, however old.
+ */
+export function awaitEarlyRead(early: EarlyRead, signal: AbortSignal, remainingMs: number): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
-    const onAbort = () => reject(new DOMException('The read was aborted.', 'AbortError'));
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const finish = () => {
+      signal.removeEventListener('abort', onAbort);
+      if (timer !== null) clearTimeout(timer);
+    };
+    const onAbort = () => { finish(); reject(new DOMException('The read was aborted.', 'AbortError')); };
     if (signal.aborted) {
       onAbort();
       return;
     }
     signal.addEventListener('abort', onAbort, { once: true });
+    timer = setTimeout(() => { finish(); reject(new EarlyReadTimeoutError()); }, Math.max(0, remainingMs));
     early.response.then(
-      (response) => { signal.removeEventListener('abort', onAbort); resolve(response); },
-      (error) => { signal.removeEventListener('abort', onAbort); reject(error); },
+      (response) => { finish(); resolve(response); },
+      (error) => { finish(); reject(error); },
     );
   });
 }

@@ -26,13 +26,14 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 
 - The home page's HTML now starts the list's first read while the page's code is still downloading, and the form's HTML does the same for "is sharing open". The page then takes that answer for its first read instead of asking again.
 - Nothing about the data changes: the answer goes through the same checks, its age counts from when the read really started, and a missing, late (over 20 seconds) or failed early answer falls back to the normal read.
+- An early read that hangs gets only what is left of the usual 8 second deadline, counted from its real start, and then the page shows its normal "Unable to load" state with Try again.
 - Left out on purpose: sending the hearts together with the list. Hearts are per browser (the server answers whether this browser liked each one), and their loading has its own safeguards (never flash, roll back on failure, recover from throttling). Folding them into the shared list would make the list different for every browser and switch off the "nothing changed" shortcut of Plan 33. The hearts still load right after the list.
 - Files: `src/lib/early-read.ts`, `src/app/page.tsx`, `src/app/recognize/page.tsx`, `src/components/feed/PublicFeedProvider.tsx`. Tests: `tests/foundation/early-read.test.ts`; the existing feed journeys count reads and still expect exactly one.
 
 ### Section D: the heart button's spoken name
 
 - A screen reader now hears "Like recognition for (name), 12 likes". The visible number is part of the button's name, which the newer accessibility checker asks for, so the count is no longer a separate description. The paused and "enable cookies" states carry the count the same way.
-- `@axe-core/playwright` returns to 4.14.0 (it was held at 4.11.0 in Plan 33 because of this button).
+- `@axe-core/playwright` stays at 4.11.0. Version 4.14 was tried in this plan: with the heart button fixed it still flags the nine expression buttons on the form, whose spoken name ("Select expression 02: ...") does not contain everything the card shows. Changing that name changes approved wording Anthony has not ruled on, so the checker stays where it was (see Open decisions).
 - What people see does not change.
 
 ### Section E: an administrator sees every detail (Plan 18 Section C)
@@ -72,6 +73,8 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 2. **Apply migration 021** so the admin sees likes and history. Until then the screens say it is missing.
 3. **Where the practice database lives.** The existing Supabase account already has three projects, so a new free one may not be available there.
 4. **The five hardware checks** in `docs/HARDWARE-CHECKS.md`.
+5. **The expression cards' spoken names.** The newer accessibility checker wants each card's name to contain all its visible text. Say the word and the nine cards get the same treatment as the heart button.
+6. **Two stale lines in `AGENTS.md`** about pull request #30 ("PR #30 is not live"). They were flagged in the 2026-11-03 review and wait for Anthony because agent files stay in review.
 
 ## Release
 
