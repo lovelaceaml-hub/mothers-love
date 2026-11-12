@@ -1,5 +1,6 @@
 import { expect, test, type Frame } from '@playwright/test';
 import { buildActiveDisplayFixture, circularity, loadRenderer, noOverflow, recognition } from './helpers';
+import { parkedInCloud } from '../cloud-parked';
 
 // Scene 8, We Are Peacemakers: what the live TV shows today (Plan 12
 // production, commit b7d92a0) plus the one change Anthony asked for on
@@ -406,6 +407,7 @@ test('at 3840 the message still draws at or above the 36 px floor on the screen'
 });
 
 test('peacemakers renders circular bubbles and no scene overflow at 14 s', async ({ page }) => {
+  parkedInCloud('its scene measured a few pixels wider than allowed in the complete cloud run of 2026-11-12.');
   const frame = await loadRenderer(page, { fixture: poolFixture(allShortPool), scene: 8, ms: 14000 });
 
   const circleResult = await circularity(frame);

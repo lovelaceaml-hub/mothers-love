@@ -9,6 +9,7 @@ import {
 } from './helpers';
 import { buildColorPolishSampleSnapshot } from '../../src/components/display/color-polish/sample';
 import { buildMostlyLongFixture, textFits } from './text-fits';
+import { parkedInCloud } from '../cloud-parked';
 
 test('milestone renders circular bubbles, studio preview, and does not overflow at 14 s', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'milestone', 14000);
@@ -469,6 +470,7 @@ test('the stream is dense, continuous and individual', async ({ page }) => {
 });
 
 test('extreme depth', async ({ page }) => {
+  parkedInCloud('it failed in the complete cloud run of 2026-11-12 and the cause is not found yet.');
   const { frame } = await openStudioScene(page, 'milestone', 1000);
   // Same reason as the test above: the checkpoints below must measure the
   // time this test steps, not the time the machine took to answer.

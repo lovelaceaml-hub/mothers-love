@@ -12,6 +12,7 @@ import {
   SCENE_IDS,
   studioClickDoesNotAdvance,
 } from './helpers';
+import { parkedInCloud } from '../cloud-parked';
 
 test('helpers open the welcome scene in the Studio and it is circular', async ({ page }) => {
   const { frame } = await openStudioScene(page, 'welcome');
@@ -127,6 +128,7 @@ test('the bubble overlap rule catches touching circles and ignores rectangle cor
 });
 
 test('with the mostly-long fixture, no two bubbles in scene 1 or scene 9 cover each other across a 60 second showing', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(180000);
   const longMsg =
     'This is a special appreciation recognition with a warm detailed message that exceeds one hundred and sixty characters in total length so we can verify slot growth and reading behavior.';

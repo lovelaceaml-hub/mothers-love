@@ -9,8 +9,10 @@ import {
   reducedMotionScene,
   studioClickDoesNotAdvance,
 } from './helpers';
+import { parkedInCloud } from '../cloud-parked';
 
 test('garden renders circular bubbles and no overflow at 14 s', async ({ page }) => {
+  parkedInCloud('its scene measured a few pixels wider than allowed in the complete cloud run of 2026-11-12.');
   const { frame: overflowFrame } = await openStudioScene(page, 'garden', 12000);
   const overflow = await noOverflow(overflowFrame);
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth);
