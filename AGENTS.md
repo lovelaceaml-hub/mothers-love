@@ -71,8 +71,9 @@ Data and database
   (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
   Anthony's decision, recorded in `mothers_love.schema_migrations`. The ledger, read on
-  2026-11-12: 018, 020, 021 and 022 are applied; 015 (admin list oldest first) is not, so the admin
-  list says so; 010, 011 and 013 have no ledger row (whether they are applied was not checked).
+  2026-11-12: 015, 018, 020, 021 and 022 are applied (015 on that day, out of order, after its
+  preconditions were checked against the live function); 010, 011 and 013 have no ledger row
+  (whether they are applied was not checked).
 - Admin history (`mothers_love.admin_audit`) is kept as long as the recognitions (migration 022). It
   holds the acting account, action, reason category and version, never a name or a message.
 - No practice database (Anthony, 2026-11-11: "No practice database."). `scripts/practice-database.sh`
@@ -136,7 +137,8 @@ Home page, form and admin
   action consequences; no age-specific or personal-data duration explanations on app screens.
 - Admin list: the Recognitions screen and review inbox send a 1-based page the API converts to the
   database's 0-based page; passing it straight through hides the newest 50. The list is oldest
-  first, numbered by arrival; without migration 015 the screen says so.
+  first, numbered by arrival (migration 015, applied 2026-11-12); a database without it makes the
+  screen say so.
 
 TV at /display (renderer in `public/color-polish/core/` and `public/color-polish/scenes/`)
 - `/display` opens for anyone with the link: a read-only, explicitly projected snapshot, no code,
