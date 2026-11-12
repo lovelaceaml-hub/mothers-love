@@ -60,6 +60,21 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 - Since Plan 32 the pages refresh every 10 seconds only on Saturday 9:00 to 22:00 and Tuesday 18:00 to 22:00 Pacific. Journeys that wait for a refresh on the real clock fail at other hours.
 - Anthony approved one complete browser suite run in GitHub Actions to find them all (run [43120610415](https://github.com/lovelaceaml-hub/mothers-love/actions/runs/43120610415), on a Wednesday afternoon, outside the fast hours). Its results and the fixes are in the Build log.
 - `.github/workflows/checks.yml` gains `full_suite_scope` (unit, browser or both), so an approval that names one suite runs only that suite.
+- What the run showed (commit `7f1c88f`, which is `main` plus that workflow input; 508 journeys ran: 310 passed, 198 failed, 7 passed on a retry):
+
+  | Cause | Journeys | What was done |
+  | --- | --- | --- |
+  | The cloud tests had no stand-in sign-in settings, so every admin and Studio journey stopped at the sign-in page | 87 | Fixed: `checks.yml` now gives the browser steps `NEXT_PUBLIC_SUPABASE_URL` and its key as stand-in values the journeys mock. After the fix all of `tests/admin/admin.spec.ts` passes in the cloud |
+  | The old Bubble Board journeys (`tests/display/display.e2e.spec.ts`), known debt in the handoff | 26 | Left alone |
+  | `tests/color-polish/color-polish.spec.ts` expects two extra local servers on ports 3102 and 3103 | 26 | Left alone; it was written for a local review, not for the cloud |
+  | The 3D world (`tests/world/world-preview.spec.ts`) | 13 | Moot while the world is retired; the journeys wait behind the switch |
+  | TV scene journeys that time out or miss a state in the cloud (`interview/integration-browser`, `peace-in-practice`, `usable`, `arrival`, `plan08`, `background-song-tap` and others) | about 36 | Not investigated one by one. Some of these may also depend on the hour, because the TV follows the same Pacific schedule |
+  | Real time-of-day journeys on the home page | 4 | Fixed with a fixed Saturday morning clock: `feed/home-design` (polling), `feed/older-recognitions` (two), `receipt-feed` (heart during a refresh) |
+  | A record whose fixed expiry date (2026-09-15) has passed | 2 | Fixed: the admin fixture's date |
+  | Journeys that needed a server address setting to open a second page | 1 (2 places) | Fixed with the default address |
+  | A styling journey still expecting the plain expression card of the earlier design | 1 | Fixed to the approved look's colors |
+
+- So the answer to "why does the complete suite fail" is mostly setup, not the hour: nearly half the failures were the missing sign-in settings. With those fixed, the true list of remaining failures is not known. Finding it needs one more complete run, which needs Anthony's approval again (Open decisions).
 
 ### Section H: housekeeping
 
@@ -74,7 +89,8 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 3. **Where the practice database lives.** The existing Supabase account already has three projects, so a new free one may not be available there.
 4. **The five hardware checks** in `docs/HARDWARE-CHECKS.md`.
 5. **The expression cards' spoken names.** The newer accessibility checker wants each card's name to contain all its visible text. Say the word and the nine cards get the same treatment as the heart button.
-6. **Two stale lines in `AGENTS.md`** about pull request #30 ("PR #30 is not live"). They were flagged in the 2026-11-03 review and wait for Anthony because agent files stay in review.
+6. **One more complete browser run**, now that the sign-in settings are fixed, to get the true list of what still fails. About 45 minutes in GitHub Actions, no cost.
+7. **Two stale lines in `AGENTS.md`** about pull request #30 ("PR #30 is not live"). They were flagged in the 2026-11-03 review and wait for Anthony because agent files stay in review.
 
 ## Release
 
@@ -85,3 +101,7 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 ## Build log
 
 - 2026-11-11. Sections A to F and H built on `feat/app-november-additions` in `/Users/anthony/Projects/mothers-love-worktrees/app-november-additions`. Database work was tried only on throwaway PostgreSQL 16 clusters on the Mac, removed afterwards. The complete browser suite run for Section G was started in GitHub Actions by a Haiku helper with Anthony's quoted approval.
+- 2026-11-11, cloud checks. The pull request's own run (types, production build, the named unit files and 12 named browser files) went through five rounds. Fixed on the way: a type error in two new journeys; the missing stand-in sign-in settings (above); the early read's deadline, which now counts from its real start so a hung read is not given a second full wait; and four older journeys named in Section G. Tried and withdrawn: the accessibility checker at 4.14, because it also flags the nine expression cards.
+- 2026-11-11, result on commit `bdb84a1`: types and the production build pass; the 9 named unit files pass (99 tests); the 12 named browser files pass (92 journeys, 2 skipped: the heart journey parked in Plan 33 and one that skips itself). Over the rounds, these files were verified in the cloud: `submission/draft`, `submission/submission`, `world/world-retired`, `admin/recognition-details`, `admin/admin`, `feed/feed`, `feed/reactions`, `feed/not-modified`, `feed/home-design`, `feed/older-recognitions`, `receipt-feed/receipt-feed`, `mobile-recognition/mobile-recognition` and `interview/submission-experience`.
+- 2026-11-11, hosted preview of the branch, read through the Vercel CLI: `/world` and `/world?source=sample` answer 307 to the home page and `/display/world-preview` to `/world`; the home page carries the early list read, `/recognize` the early open check, `/display` neither. The preview has no database, so nothing was sent or liked on a hosted copy.
+- Not run: the complete unit suite; a second complete browser suite. Not done: release (Anthony merges #54), migration 021 (Anthony's decision), hosting the practice database (Anthony's decision), the hardware checks.
