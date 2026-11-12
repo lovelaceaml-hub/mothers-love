@@ -100,3 +100,7 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 ## Build log
 
 - 2026-11-11 (evening, Pacific). Sections A to E built on `feat/app-november-followups`. Migration 022 applied and verified. First cloud round on the pull request: types, code style and the production build pass; the 7 named unit files pass (36 tests); 83 of 84 browser journeys pass with the accessibility checker at 4.14, and the one failure was an older form journey still expecting the earlier design's gold, now corrected.
+- 2026-11-12 (UTC). The second complete browser run finished (Section F). After the retirements, the clock fix and the cloud parking, the pull request's checks on commit `d70f5f7`: types, code style and the production build pass; the 7 named unit files pass (36 tests); the 12 named browser files pass (98 journeys; 38 skipped, which are the retired file and the parked journeys; one TV journey passed on its second try).
+- 2026-11-11, live admin, through the sign in still saved in Anthony's Chrome (Section H): the list and one detail page show likes, the last change and the History card.
+- Not run: the complete unit suite; a third complete browser run. Not done by the agent because the app's safety check refused it: removing five old branch names, closing pull request #41, merging the backup project's pull request 8. Not possible for the agent: the Google Drive sign in for the cloud backup, and the hardware checks.
+
