@@ -13,7 +13,7 @@ Current status and next steps: docs/HANDOFF.md.
 ## Active plan
 - `docs/PLAN-34-november-additions.md`: the 3D world retired for now, a kept half-written
   recognition, the early first read, the heart button's spoken count, admin details (Plan 18
-  Section C, migration 021 not applied), the practice database builder (not hosted) and the test clock fixes.
+  Section C, migration 021 applied 2026-11-12 UTC), the practice database builder (not hosted) and the test clock fixes.
   Released 2026-11-11; its Open decisions say what still waits for Anthony.
 - `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
@@ -22,8 +22,8 @@ Current status and next steps: docs/HANDOFF.md.
   Its Build log records the release authorization and remaining safety gates.
   PR #30 is not live: integrate main after PRs #35 to #37, verify the live
   migration ledger through approved access, and obtain safe hosted preview evidence.
-- `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
-  (release and records) remain future work outside PR #30; its Build log says where it stands.
+- `docs/PLAN-18-keep-forever-and-admin-details.md`: complete. Section C (admin sees all details)
+  shipped in Plan 34 with migration 021; its Build log has the record.
 
 ## Check your work
 - `npm run typecheck`, `npm test`, `npm run build`, `npm run test:e2e`; `npm run lint` has known
@@ -69,9 +69,9 @@ Data and database
   keeping every existing entry. The shared church backup includes the campaign's lasting rows
   (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
-  Anthony's decision, recorded in `mothers_love.schema_migrations`. Whether 015 and 018 are applied
-  live is not recorded (unverified). 021 (admin details) is not applied; the admin screens work
-  without it and say so.
+  Anthony's decision, recorded in `mothers_love.schema_migrations`. The ledger, read on
+  2026-11-12: 018, 020 and 021 are applied; 015 (admin list oldest first) is not, so the admin
+  list says so; 010, 011 and 013 have no ledger row (whether they are applied was not checked).
 - No practice database (Anthony, 2026-11-11: "No practice database."). `scripts/practice-database.sh`
   and `database/practice/seed.sql` stay as a tool that builds one from made-up records and refuses
   the production project; do not create or host one unless Anthony asks, and never point it, or a

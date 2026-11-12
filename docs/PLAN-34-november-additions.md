@@ -2,7 +2,7 @@
 
 Anthony's request, 2026-11-11, after reading the suggestions of [Plan 33](PLAN-33-polish-and-speed.md): "Retire the 3d world for now. Do everything else". He then chose: the 3D world is hidden and kept ("Hide it, keep it"), one complete browser test run in the cloud is approved ("Yes, one full run"), and the work goes ahead without check-ins ("Go ahead on your own").
 
-Branch `feat/app-november-additions`, pull request [#54](https://github.com/lovelaceaml-hub/mothers-love/pull/54) into `main`. **Released 2026-11-11** (Pacific): Anthony approved the merge in his words, "I approve you to merge." Database migration 021 is in the repository but **not applied**; applying it is Anthony's decision.
+Branch `feat/app-november-additions`, pull request [#54](https://github.com/lovelaceaml-hub/mothers-love/pull/54) into `main`. **Released 2026-11-11** (Pacific): Anthony approved the merge in his words, "I approve you to merge." Database migration 021 was applied 2026-11-12 01:09 UTC (2026-11-11, 5:09 PM Pacific) at Anthony's word ("Yes, apply 021").
 
 ## Sections
 
@@ -85,7 +85,7 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 ## Open decisions for Anthony
 
 1. Merge pull request #54: done 2026-11-11.
-2. **Apply migration 021** so the admin sees likes and history. Until then the screens say it is missing.
+2. Migration 021: applied 2026-11-12 UTC (Build log).
 3. The practice database: decided 2026-11-11, none ("No practice database.").
 4. **The five hardware checks** in `docs/HARDWARE-CHECKS.md`.
 5. **The expression cards' spoken names.** The newer accessibility checker wants each card's name to contain all its visible text. Say the word and the nine cards get the same treatment as the heart button.
@@ -105,3 +105,8 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 - 2026-11-11, result on commit `bdb84a1`: types and the production build pass; the 9 named unit files pass (99 tests); the 12 named browser files pass (92 journeys, 2 skipped: the heart journey parked in Plan 33 and one that skips itself). Over the rounds, these files were verified in the cloud: `submission/draft`, `submission/submission`, `world/world-retired`, `admin/recognition-details`, `admin/admin`, `feed/feed`, `feed/reactions`, `feed/not-modified`, `feed/home-design`, `feed/older-recognitions`, `receipt-feed/receipt-feed`, `mobile-recognition/mobile-recognition` and `interview/submission-experience`.
 - 2026-11-11, hosted preview of the branch, read through the Vercel CLI: `/world` and `/world?source=sample` answer 307 to the home page and `/display/world-preview` to `/world`; the home page carries the early list read, `/recognize` the early open check, `/display` neither. The preview has no database, so nothing was sent or liked on a hosted copy.
 - Not run: the complete unit suite; a second complete browser suite. Not done: release (Anthony merges #54), migration 021 (Anthony's decision), hosting the practice database (Anthony's decision), the hardware checks.
+- 2026-11-11, release. Pull request #54 merged with Anthony's approval at 00:59 UTC on 2026-11-12 (4:59 PM Pacific on the 11th, a Wednesday, outside the TV's service hours). Merge `eb7b5cf853beb0875a40df5de6d5fe16a1defbac`; the live build address reported it within a few minutes. Pages `/`, `/recognize`, `/expressions`, `/privacy`, `/display` and `/admin/login` answered 200; `/world` and `/world?source=sample` answer 307 to the home page. In Chrome on the live site, by counts and attributes only: 100 recognitions, 100 enabled hearts whose names all hold their visible count, exactly one list read, started 0.3 s into the page and taken by the page; on the form one open check, a made-up draft came back after a reload with its note, "Start over" cleared it, and no recognition request was made; `/display` reached the `active` phase.
+- 2026-11-12 01:09:55 UTC, migration 021 applied to `cvuwdlmlukepwfffpgdu` at Anthony's word ("Yes, apply 021"), as one transaction with its ledger row `021_admin_all_details` (SHA-256 `5d85ec7ead86e0879ff9f963d8ef9e324bcd8402abcd507e0af98e7ae3b7520e`, the file on `main`). A read-only check just before confirmed the live function was the 001 definition. Read-only check afterwards, shapes and counts only: all 465 recognitions project a numeric `heartCount`; those counts add up to 3,253, the number of heart rows; the public projection's fields are unchanged; collection is healthy; the live pages and the likes total (3,249 on published recognitions) still answer; an admin request without a sign in gets 401. The audit table holds no action on a current recognition, so every History card reads "No admin actions are on record" until the next admin action.
+- Found on the way: migration 015 (admin list oldest first) is not applied (no ledger row, and the live `ml_api` lacks its sort), which is why the admin list says so. Applying it is Anthony's decision. The ledger does hold 018 and 020.
+- Not checked: the admin screens with a real sign in (hardware check 4).
+

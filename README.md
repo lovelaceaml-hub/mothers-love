@@ -43,7 +43,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [15](docs/PLAN-15-tv-next-level.md) | TV next level pass | Released through Plan 17 |
 | [16](docs/PLAN-16-feed-100.md) | Latest 100 recognitions | Complete, live |
 | [17](docs/PLAN-17-tv-fit-and-release.md) | TV text fit and Plan 15 release | Live since 2026-09-19 |
-| [18](docs/PLAN-18-keep-forever-and-admin-details.md) | Keep every recognition, admin details | Approved 2026-09-23; Sections A and B live 2026-09-24 (every recognition kept forever, migration 016); Sections C and D next. The admin list fix it led to went live 2026-09-20 |
+| [18](docs/PLAN-18-keep-forever-and-admin-details.md) | Keep every recognition, admin details | Approved 2026-09-23; Sections A and B live 2026-09-24 (every recognition kept forever, migration 016); Section C live 2026-11-11 with Plan 34 (migration 021 applied the same evening); complete. The admin list fix it led to went live 2026-09-20 |
 | [19](docs/PLAN-19-world-prototype-01.md) | World prototype 01 | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
 | [20](docs/PLAN-20-heavenly-world.md) | A heavenly world | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
 | [21](docs/PLAN-21-living-heaven.md) | A living heaven of kindness | Part of the 3D world, live at `/world` since 2026-09-24 (pull request #19) |
@@ -59,7 +59,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [31](docs/PLAN-31-display-efficiency.md) | TV display efficiency | Merged 2026-10-12 through pull requests #30 and #39; the live status of migration 020 is not recorded in this repository |
 | [32](docs/PLAN-32-polling-schedule.md) | Scheduled public polling (Pacific time) | Merged 2026-10-12 in pull request #40 |
 | [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete, live 2026-11-11 (pull request #52) |
-| [34](docs/PLAN-34-november-additions.md) | November additions: world retired, kept drafts, early first read, heart name, admin details, practice database, test clocks | Live 2026-11-11 (pull request #54); migration 021 not applied; no practice database (Anthony's decision) |
+| [34](docs/PLAN-34-november-additions.md) | November additions: world retired, kept drafts, early first read, heart name, admin details, practice database, test clocks | Live 2026-11-11 (pull request #54); migration 021 applied the same evening; no practice database (Anthony's decision) |
 
 ## Other documents
 
