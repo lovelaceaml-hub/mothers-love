@@ -1,6 +1,13 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
 import { studioSnapshot, studioSettings } from '../interview/studio-fixtures';
 
+// Saturday morning in Los Angeles. The TV refreshes every few seconds, treats 60 seconds
+// without a verified read as stale and falls back only inside the fast hours (Plan 32), and
+// these journeys check exactly that, so they must not depend on the hour they run.
+test.beforeEach(async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
+});
+
 const syntheticSupabaseUrl = 'https://synthetic.supabase.invalid';
 const syntheticToken = 'synthetic-access-token';
 
