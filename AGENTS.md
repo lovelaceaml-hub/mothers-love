@@ -18,10 +18,8 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
   freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
-- `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
-  Its Build log records the release authorization and remaining safety gates.
-  PR #30 is not live: integrate main after PRs #35 to #37, verify the live
-  migration ledger through approved access, and obtain safe hosted preview evidence.
+- `docs/PLAN-31-display-efficiency.md`: TV efficiency. Live: pull requests #30 and #39 merged on
+  2026-10-12 and migration 020 is in the ledger (applied the same day). Its Build log has the record.
 - `docs/PLAN-18-keep-forever-and-admin-details.md`: complete. Section C (admin sees all details)
   shipped in Plan 34 with migration 021; its Build log has the record.
 
