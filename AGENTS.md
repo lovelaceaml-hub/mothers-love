@@ -11,19 +11,20 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-35-november-followups.md`: the nine follow-ups of 2026-11-11 (expression cards named by
+  what they show, admin history kept, cleanup, old branches, the second complete browser run, the
+  backup's cloud copy). Its table says where each stands and what waits for Anthony.
 - `docs/PLAN-34-november-additions.md`: the 3D world retired for now, a kept half-written
   recognition, the early first read, the heart button's spoken count, admin details (Plan 18
-  Section C, migration 021 not applied), the practice database builder (not hosted) and the test clock fixes.
+  Section C, migration 021 applied 2026-11-12 UTC), the practice database builder (not hosted) and the test clock fixes.
   Released 2026-11-11; its Open decisions say what still waits for Anthony.
 - `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
   freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
-- `docs/PLAN-31-display-efficiency.md`: TV efficiency and PR #30 integration.
-  Its Build log records the release authorization and remaining safety gates.
-  PR #30 is not live: integrate main after PRs #35 to #37, verify the live
-  migration ledger through approved access, and obtain safe hosted preview evidence.
-- `docs/PLAN-18-keep-forever-and-admin-details.md`: Sections C (admin sees all details) and D
-  (release and records) remain future work outside PR #30; its Build log says where it stands.
+- `docs/PLAN-31-display-efficiency.md`: TV efficiency. Live: pull requests #30 and #39 merged on
+  2026-10-12 and migration 020 is in the ledger (applied the same day). Its Build log has the record.
+- `docs/PLAN-18-keep-forever-and-admin-details.md`: complete. Section C (admin sees all details)
+  shipped in Plan 34 with migration 021; its Build log has the record.
 
 ## Check your work
 - `npm run typecheck`, `npm test`, `npm run build`, `npm run test:e2e`; `npm run lint` has known
@@ -50,7 +51,7 @@ Deploy and Git
   are planned in `/Users/anthony/Projects/mothers-love-world` (its own AGENTS.md); world code still
   reaches this repo only through a pull request.
 - Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit
-  (next: 35) and each keeps a Build log.
+  (next: 36) and each keeps a Build log.
 - Run evidence (captures, probe output, scratch) goes to Drive, not Git:
   `My Drive/Projects/Mother's Love/The Words of Mother's Love`. Use `git add -f` only for a capture
   that truly belongs in the repo.
@@ -69,9 +70,12 @@ Data and database
   keeping every existing entry. The shared church backup includes the campaign's lasting rows
   (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
-  Anthony's decision, recorded in `mothers_love.schema_migrations`. Whether 015 and 018 are applied
-  live is not recorded (unverified). 021 (admin details) is not applied; the admin screens work
-  without it and say so.
+  Anthony's decision, recorded in `mothers_love.schema_migrations`. The ledger, read on
+  2026-11-12: 015, 018, 020, 021 and 022 are applied (015 on that day, out of order, after its
+  preconditions were checked against the live function); 010, 011 and 013 have no ledger row
+  (whether they are applied was not checked).
+- Admin history (`mothers_love.admin_audit`) is kept as long as the recognitions (migration 022). It
+  holds the acting account, action, reason category and version, never a name or a message.
 - No practice database (Anthony, 2026-11-11: "No practice database."). `scripts/practice-database.sh`
   and `database/practice/seed.sql` stay as a tool that builds one from made-up records and refuses
   the production project; do not create or host one unless Anthony asks, and never point it, or a
@@ -118,6 +122,9 @@ Home page, form and admin
   (`src/lib/early-read.ts`); the answer passes the same checks and its age counts from its real start.
 - `/recognize` shows only the form, no feed; the receipt screen after sending shows the home page's
   Recent recognitions list (`tests/receipt-feed`).
+- Each expression card's button is named by its own content (number, phrase, meaning, example) with
+  `aria-pressed` for the choice; never give it a separate `aria-label` (the accessibility checker,
+  axe 4.14, asks that a control's name contain its visible text).
 - Expression cards: one per row at every width, number, quoted expression, check indicator, full
   explanation beneath in quieter text. Gold shimmer marks selected cards, never the submit button.
 - Phones: the shimmering Share a recognition action (6 second pulse) dominates above the medallions
@@ -130,7 +137,8 @@ Home page, form and admin
   action consequences; no age-specific or personal-data duration explanations on app screens.
 - Admin list: the Recognitions screen and review inbox send a 1-based page the API converts to the
   database's 0-based page; passing it straight through hides the newest 50. The list is oldest
-  first, numbered by arrival; without migration 015 the screen says so.
+  first, numbered by arrival (migration 015, applied 2026-11-12); a database without it makes the
+  screen say so.
 
 TV at /display (renderer in `public/color-polish/core/` and `public/color-polish/scenes/`)
 - `/display` opens for anyone with the link: a read-only, explicitly projected snapshot, no code,

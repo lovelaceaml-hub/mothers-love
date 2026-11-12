@@ -23,9 +23,9 @@ async function expectDraft(page: Page) {
   await expect(page.getByLabel('Your name')).toHaveValue('Example Sender');
   await expect(page.getByLabel('Who would you like to recognize?')).toHaveValue('Example Friend');
   await expect(page.getByLabel('Share your appreciation')).toHaveValue('Thank you for staying to help 🌼');
-  await expect(page.getByRole('button', { name: /^Selected expression 02/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: /^Selected expression 08/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: /^Select expression 01/ })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('button', { name: /^02 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^08 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^01 /, pressed: false })).toHaveAttribute('aria-pressed', 'false');
 }
 
 async function expectEmpty(page: Page) {

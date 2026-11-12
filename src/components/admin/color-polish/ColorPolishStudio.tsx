@@ -42,6 +42,7 @@ export function ColorPolishStudio() {
   }, [durationMs, playing]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the preview stops itself when its clock reaches the end
     if (elapsedMs >= durationMs && playing) setPlaying(false);
   }, [durationMs, elapsedMs, playing]);
 

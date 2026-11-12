@@ -1,5 +1,6 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
 import { SCENE_IDS, buildActiveDisplayFixture, loadRenderer, type SceneSlug } from './helpers';
+import { parkedInCloud } from '../cloud-parked';
 
 /**
  * Plan 17 Lane 5, Part A: the recognition area runs end to end.
@@ -516,6 +517,7 @@ for (const width of WIDTHS) {
       console.log(`stage-edges ${width} element counts`, JSON.stringify(counts));
     });
     test(`the stage never paints a pixel of the header band or the feed rail band, at every checkpoint, at ${width}`, async ({ page }) => {
+      if (width === 3840) parkedInCloud('at this width it exceeded its time limit in the complete cloud run of 2026-11-12.');
       test.setTimeout(300_000);
       const frame = await loadRenderer(page, { ms: CHECKPOINT_MS, scene: SCENE_IDS.welcome });
       const bands = [

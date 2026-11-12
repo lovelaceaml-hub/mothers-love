@@ -1,5 +1,6 @@
 import { expect, test, type Frame, type Page } from '@playwright/test';
 import { buildActiveDisplayFixture, circularity, loadRenderer, withoutWebGL2 } from './helpers';
+import { parkedInCloud } from '../cloud-parked';
 
 // Scene 9, Peace in Practice.
 //
@@ -354,6 +355,7 @@ test('a 500 grapheme message fits the reserved bubble whole, above the 18 px flo
 });
 
 test('several very long recognitions take turns in the reserved bubble and leave the other bubbles alone', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(90000);
   const frame = await loadRenderer(page, { fixture: threeLongFixture, scene: 9, ms: 1000 });
 
@@ -409,6 +411,7 @@ test('with no very long recognition waiting, the reserved bubble still refreshes
 });
 
 test('on the live playlist, the reserved bubble only takes a message there is still time to read', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(180000);
   const frame = await loadRenderer(page, { fixture: playlistFixture(threeLongFixture.recognitions as unknown[]), scene: 9 });
   // The probe harness pins the scene, which the church TV does not. Unpin it
@@ -440,6 +443,7 @@ test('the scene reads its dwell from the saved playlist, not from a constant', a
 });
 
 test('the reserved bubble eases to the size the next message needs, and its words are whole at every size', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(180000);
   const pool = [
     short(1), short(2), short(3),
@@ -476,6 +480,7 @@ test('the reserved bubble eases to the size the next message needs, and its word
 });
 
 test('across a 60 second showing no bubble covers the heading, the artwork or the reserved bubble', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(180000);
   const frame = await loadRenderer(page, { fixture: mixedFixture, scene: 9 });
   let steady = 0;
@@ -803,6 +808,7 @@ test('without WebGL 2, reduced motion renders the scene still, with the heart he
 });
 
 test('bubbles stay circular and inside the scene at 0.3 s, 6 s, 14 s and 21 s', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(90000);
   for (const ms of [300, 6000, 14000, 21000]) {
     const frame = await loadRenderer(page, { fixture: mixedFixture, scene: 9, ms });

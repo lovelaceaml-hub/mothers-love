@@ -196,19 +196,19 @@ test('shows every expression explanation and lets selection buttons toggle indep
     const card = cards.filter({ hasText: detail.phrase });
     await expect(card).toContainText(detail.principle);
     await expect(card).toContainText(detail.example);
-    await expect(card.getByRole('button', { name: `Select expression ${detail.id}: “${detail.phrase}”` })).toHaveAttribute('aria-pressed', 'false');
+    await expect(card.getByRole('button', { name: `${detail.id} “${detail.phrase}”`, pressed: false })).toHaveAttribute('aria-pressed', 'false');
   }
 
   const first = cards.filter({ hasText: 'How Are You?' });
   const second = cards.filter({ hasText: "Thank you. It's all thanks to you. You've worked hard." });
-  await first.getByRole('button', { name: /^Select expression 01:/ }).click();
-  await expect(first.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(second.getByRole('button', { name: /^Select expression 02:/ })).toHaveAttribute('aria-pressed', 'false');
+  await first.getByRole('button', { name: /^01 /, pressed: false }).click();
+  await expect(first.getByRole('button', { name: /^01 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(second.getByRole('button', { name: /^02 /, pressed: false })).toHaveAttribute('aria-pressed', 'false');
 
-  await second.getByRole('button', { name: /^Select expression 02:/ }).click();
-  await expect(second.getByRole('button', { name: /^Selected expression 02:/ })).toHaveAttribute('aria-pressed', 'true');
-  await first.getByRole('button', { name: /^Selected expression 01:/ }).click();
-  await expect(first.getByRole('button', { name: /^Select expression 01:/ })).toHaveAttribute('aria-pressed', 'false');
+  await second.getByRole('button', { name: /^02 /, pressed: false }).click();
+  await expect(second.getByRole('button', { name: /^02 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+  await first.getByRole('button', { name: /^01 /, pressed: true }).click();
+  await expect(first.getByRole('button', { name: /^01 /, pressed: false })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByRole('button', { name: /Why this matters|Hide why/ })).toHaveCount(0);
 });
 
@@ -284,8 +284,8 @@ test('keeps open form selection behavior while showing the everyday example', as
   const expression = page.getByRole('article').filter({ hasText: 'How Are You?' });
   await expect(expression).toContainText('The first phrase to peace');
   await expect(expression).toContainText('Start with a friendly hello to a neighbor, a classmate, or someone serving your community.');
-  await expression.getByRole('button', { name: /^Select expression 01:/ }).click();
-  await expect(expression.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
+  await expression.getByRole('button', { name: /^01 /, pressed: false }).click();
+  await expect(expression.getByRole('button', { name: /^01 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: /Why this matters|Hide why/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Explore the nine expressions and everyday examples' })).toHaveAttribute('href', '/expressions');
 });

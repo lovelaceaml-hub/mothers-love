@@ -4,6 +4,15 @@ import AxeBuilder from '@axe-core/playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { syntheticSnapshot } from '../plan08/display-fixtures';
 import { DISPLAY_SCREEN_IDS } from '../../src/lib/contracts';
+
+// Retired 2026-11-11 (Plan 35). These journeys drive the Bubble Board renderer through
+// `/display`. Since September 2026 that page shows the Color Polish renderer and falls back to
+// the V6 view, never to the Bubble Board (which only the Studio preview still draws), so they
+// cannot pass as written. They are kept for reference. The TV is covered by the journeys in
+// tests/color-polish-scenes and tests/color-polish-usable.
+// This file's other journeys compared the app with two extra review servers on ports 3102 and
+// 3103 that only existed on the Mac during the September color review.
+test.fixme(true, 'Retired: /display no longer serves the Bubble Board renderer these journeys drive.');
 const out='color-review-evidence';
 const sampleNames=['Avery','Morgan','Jordan','Taylor','Casey','Robin','Jamie','Riley','Quinn'];
 const sampleMessages=['Thank you for staying to help. Your kindness made the afternoon feel lighter.','You took the time to listen. Your patience meant so much.','You greeted me warmly and made room for me to join.'];

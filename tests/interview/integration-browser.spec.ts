@@ -2,6 +2,13 @@ import { writeFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 import { syntheticSnapshot } from '../plan08/display-fixtures';
 
+// Retired 2026-11-11 (Plan 35). These journeys drive the Bubble Board renderer through
+// `/display`. Since September 2026 that page shows the Color Polish renderer and falls back to
+// the V6 view, never to the Bubble Board (which only the Studio preview still draws), so they
+// cannot pass as written. They are kept for reference. The TV is covered by the journeys in
+// tests/color-polish-scenes and tests/color-polish-usable.
+test.fixme(true, 'Retired: /display no longer serves the Bubble Board renderer these journeys drive.');
+
 test('full circle messages pan automatically and the owner can pause all motion', async ({ page }) => {
   const snapshot = syntheticSnapshot({ count: 1, longMessage: true, settings: { motion: 'lively', playlist: [{ id: 'garden', enabled: true }] } });
   await page.route('**/api/**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [] }) }));

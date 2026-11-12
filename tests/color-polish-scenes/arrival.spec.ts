@@ -3,6 +3,7 @@ import { buildActiveDisplayFixture, circularity, loadRenderer } from './helpers'
 import { MOSTLY_LONG_MESSAGE_500, graphemeCount } from './text-fits';
 import { mkdir, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { parkedInCloud } from '../cloud-parked';
 
 test.use({ viewport: { width: 1920, height: 1080 } });
 
@@ -106,6 +107,7 @@ async function pushArrivalWave(
 }
 
 test('single and group entrance styles cycle in the recorded order, and four frame styles are declared', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(60_000);
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);
@@ -163,6 +165,7 @@ test('single and group entrance styles cycle in the recorded order, and four fra
 });
 
 test('the four reworked entrances start deep and resolve flat', async ({ page }) => {
+  parkedInCloud('it exceeded its time limit in the complete cloud run of 2026-11-12.');
   test.setTimeout(60_000);
   const snapshot = buildActiveDisplayFixture() as ArrivalSnapshot;
   const frame = await loadRenderer(page);

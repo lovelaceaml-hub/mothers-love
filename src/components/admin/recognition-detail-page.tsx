@@ -206,7 +206,7 @@ export function RecognitionDetailPage({ id }: { id: string }) {
       </section>
 
       <section className={styles.card} style={{ marginTop: 16 }} aria-labelledby="detail-history-title" data-testid="detail-history">
-        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle} id="detail-history-title">History</h2><p className={styles.cardDescription}>Admin actions on this recognition from the last 30 days, newest first.</p></div></div>
+        <div className={styles.cardHeader}><div><h2 className={styles.cardTitle} id="detail-history-title">History</h2><p className={styles.cardDescription}>Admin actions on this recognition, newest first.</p></div></div>
         {history === null ? <p className={styles.fieldHint}>Likes and history appear here once database migration 021 is applied.</p> : null}
         {history && !history.length ? <p className={styles.fieldHint}>No admin actions are on record for this recognition.</p> : null}
         {history && history.length ? (

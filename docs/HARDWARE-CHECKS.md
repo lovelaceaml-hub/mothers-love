@@ -27,5 +27,5 @@ Photos go to Drive: `My Drive/Projects/Mother's Love/The Words of Mother's Love`
 | 1 | not done | |
 | 2 | not done | |
 | 3 | not done | |
-| 4 | not done | |
+| 4 | 2026-11-11, in part | The agent opened the admin in Anthony's Chrome, where a sign in was still saved: the list showed 50 rows, each with a like count, and one detail page showed likes, the last change and the History card. Counts and labels only; nothing was captured. A fresh sign in with the password was not done, so the check stays open for Anthony. |
 | 5 | not done | |

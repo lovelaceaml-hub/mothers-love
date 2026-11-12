@@ -38,8 +38,8 @@ async function shot(page: Page, name: string, fullPage = false) {
 async function fill(page: Page) {
   await page.getByLabel('Your name', { exact: true }).fill('Private synthetic sender');
   await page.getByLabel('Who would you like to recognize?').fill('Avery');
-  await page.getByRole('button', { name: /^Select expression 02:/ }).click();
-  await page.getByRole('button', { name: /^Select expression 08:/ }).click();
+  await page.getByRole('button', { name: /^02 /, pressed: false }).click();
+  await page.getByRole('button', { name: /^08 /, pressed: false }).click();
   await page.getByLabel('Share your appreciation').fill(messages[0]);
 }
 for (const [width,height] of [[390,844], [320,568], [430,932]]) {

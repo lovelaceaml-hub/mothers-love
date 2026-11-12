@@ -36,7 +36,7 @@ export interface Recognition {
   featured: boolean;
 }
 
-/** One admin action still on record for a recognition (the audit table keeps 30 days). */
+/** One admin action on record for a recognition (kept with it since migration 022). */
 export interface AdminAuditEntry {
   action: string;
   reason: string | null;
