@@ -13,8 +13,8 @@ Current status and next steps: docs/HANDOFF.md.
 ## Active plan
 - `docs/PLAN-34-november-additions.md`: the 3D world retired for now, a kept half-written
   recognition, the early first read, the heart button's spoken count, admin details (Plan 18
-  Section C, migration 021 not applied), the practice database builder and the test clock fixes.
-  Its Build log and Open decisions say where each stands.
+  Section C, migration 021 not applied), the practice database builder (not hosted) and the test clock fixes.
+  Released 2026-11-11; its Open decisions say what still waits for Anthony.
 - `docs/PLAN-32-polling-schedule.md`: Pacific-time public polling and explicit last-content
   retention during planned ten-minute/overnight pauses. This overrides the planned-pause
   freshness rule only; failure, expiry and received privacy overrides retain their safeguards.
@@ -72,8 +72,9 @@ Data and database
   Anthony's decision, recorded in `mothers_love.schema_migrations`. Whether 015 and 018 are applied
   live is not recorded (unverified). 021 (admin details) is not applied; the admin screens work
   without it and say so.
-- A practice database for previews is built only by `scripts/practice-database.sh` with the made-up
-  records in `database/practice/seed.sql`. It refuses the production project. Never point it, or a
+- No practice database (Anthony, 2026-11-11: "No practice database."). `scripts/practice-database.sh`
+  and `database/practice/seed.sql` stay as a tool that builds one from made-up records and refuses
+  the production project; do not create or host one unless Anthony asks, and never point it, or a
   preview, at the live database.
 - Never roll the code back alone past merge `43d801f` (keep forever): roll the database back first
   (`docs/runs/2026-09-23-keep-forever/lanes/SB.md`) or roll forward.

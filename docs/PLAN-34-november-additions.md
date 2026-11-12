@@ -2,7 +2,7 @@
 
 Anthony's request, 2026-11-11, after reading the suggestions of [Plan 33](PLAN-33-polish-and-speed.md): "Retire the 3d world for now. Do everything else". He then chose: the 3D world is hidden and kept ("Hide it, keep it"), one complete browser test run in the cloud is approved ("Yes, one full run"), and the work goes ahead without check-ins ("Go ahead on your own").
 
-Branch `feat/app-november-additions`, pull request [#54](https://github.com/lovelaceaml-hub/mothers-love/pull/54) into `main`. Not live until Anthony merges it. Database migration 021 is in the pull request but **not applied**; applying it is Anthony's decision.
+Branch `feat/app-november-additions`, pull request [#54](https://github.com/lovelaceaml-hub/mothers-love/pull/54) into `main`. **Released 2026-11-11** (Pacific): Anthony approved the merge in his words, "I approve you to merge." Database migration 021 is in the repository but **not applied**; applying it is Anthony's decision.
 
 ## Sections
 
@@ -52,7 +52,7 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 - Safety: it refuses the production project, refuses any database that holds the campaign without the practice marker, never reads `DATABASE_URL`, and takes its address from the environment only.
 - `next.config.ts`: a preview that has its own database no longer borrows production's TV reads or sends hearts to production.
 - Proven on a throwaway PostgreSQL 16: the build, the rebuild (`--reset`) and each refusal; the feed, the older page, the likes total, the open check and the TV read all answer from the practice data.
-- **Not done: where it lives.** Hosting it means creating a database in one of Anthony's accounts and adding its settings to Vercel's Preview environment, which is his decision (see Open decisions).
+- **Not hosted, by Anthony's decision of 2026-11-11: "No practice database."** The builder and the made-up records stay in the repository as a tool (they also prove that every migration applies in order to an empty database), but no practice database exists and none is to be created unless Anthony asks.
 - One thing to know: the TV read only answers when the QR address is the campaign's real form, so a practice TV shows a QR code that opens the real form.
 
 ### Section G: tests that depend on the time of day
@@ -84,9 +84,9 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 
 ## Open decisions for Anthony
 
-1. **Merge pull request #54** (a production deployment; open TVs reload once).
+1. Merge pull request #54: done 2026-11-11.
 2. **Apply migration 021** so the admin sees likes and history. Until then the screens say it is missing.
-3. **Where the practice database lives.** The existing Supabase account already has three projects, so a new free one may not be available there.
+3. The practice database: decided 2026-11-11, none ("No practice database.").
 4. **The five hardware checks** in `docs/HARDWARE-CHECKS.md`.
 5. **The expression cards' spoken names.** The newer accessibility checker wants each card's name to contain all its visible text. Say the word and the nine cards get the same treatment as the heart button.
 6. **One more complete browser run**, now that the sign-in settings are fixed, to get the true list of what still fails. About 45 minutes in GitHub Actions, no cost.
@@ -94,7 +94,7 @@ Branch `feat/app-november-additions`, pull request [#54](https://github.com/love
 
 ## Release
 
-1. Anthony merges #54. Vercel deploys `main`; every open TV reloads once by itself.
+1. Merged 2026-11-11 with Anthony's approval. Vercel deploys `main`; every open TV reloads once by itself.
 2. Check, in this order: the home page lists recognitions; `/recognize` shows the form; `/display` shows recognitions; `/world` opens the home page; `/admin/login` loads.
 3. Rollback: Vercel, Deployments, the previous production deployment, Promote. This plan applies no database change, so none is needed either way. If migration 021 is applied later and must be undone, run the rollback in its header.
 

@@ -13,6 +13,18 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### November 11: Plan 34 released (pull request #54)
+
+Source: the pull request and [Plan 34](PLAN-34-november-additions.md). Merged with Anthony's approval ("I approve you to merge.").
+
+- The 3D world is retired for now: `/world` and `/display/world-preview` open the home page; the code is kept behind `src/lib/world-retired.ts`.
+- The form keeps a half-written recognition in its browser tab until it is sent.
+- The home page's list and the form's open check start with the page.
+- The heart button's spoken name holds its like count.
+- Admin: likes, last change and action history, shown once migration 021 is applied (not applied at release).
+- Tests and checks: stand-in sign-in settings for the cloud browser tests, a suite choice for approved complete runs, eight journeys freed from the hour or date they ran on.
+- No database change. No practice database (Anthony's decision); its builder stays as a tool.
+
 ### November 11: Plan 33 released (pull request #52)
 
 Source: the pull request, [Plan 33](PLAN-33-polish-and-speed.md), Vercel and the live site. Merged by Anthony at 18:16 UTC; merge `65f8a5080a9d965169e2abb52d5fdf667d98feea`; deployment `dpl_BFoKZfmc7H73i1ARwSCRHJnXc7G3`.
