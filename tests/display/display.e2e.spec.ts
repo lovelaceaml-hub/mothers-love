@@ -2,6 +2,13 @@ import { join } from 'node:path';
 
 import { expect, test, type Page } from '@playwright/test';
 
+// Retired 2026-11-11 (Plan 35). These journeys drive the Bubble Board renderer through
+// `/display`. Since September 2026 that page shows the Color Polish renderer and falls back to
+// the V6 view, never to the Bubble Board (which only the Studio preview still draws), so they
+// cannot pass as written. They are kept for reference. The TV is covered by the journeys in
+// tests/color-polish-scenes and tests/color-polish-usable.
+test.fixme(true, 'Retired: /display no longer serves the Bubble Board renderer these journeys drive.');
+
 type FixtureSize = 0 | 1 | 2 | 4 | 5 | 20 | 31 | 'long';
 type FixtureOptions = { showTrails?: boolean; showConstellations?: boolean; nonSharedExpressions?: boolean; continuous?: boolean; milestone?: boolean; mode?: 'normal' | 'quiet' | 'neutral'; motion?: 'calm' | 'standard' | 'lively' | 'still'; message?: string };
 const LONG_RECIPIENT = 'R'.repeat(80);
