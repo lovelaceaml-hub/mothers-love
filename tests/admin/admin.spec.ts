@@ -43,7 +43,7 @@ const recognition = (overrides: Record<string, unknown> = {}) => ({
   expressionIds: [2, 8],
   createdAt: '2026-09-08T08:00:00.000Z',
   firstPublishedAt: '2026-09-08T08:00:00.000Z',
-  expiresAt: '2026-09-15T08:00:00.000Z',
+  expiresAt: '2126-09-15T08:00:00.000Z',
   version: 3,
   status: 'published',
   featured: false,
