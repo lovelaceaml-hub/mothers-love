@@ -51,7 +51,15 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 
 - Reviewed all six. Five belong to pull requests whose work already shipped another way: `fix/infra-cpu-polling` (#35), `fix/infra-etag-compatibility-diagnostics` (#38), `lovelaceaml-hub-performance-improvements` (#46, released inside #52), `feat/world-surface` and `fix/world-arrival-batch` (#19 and #21; the fix shipped as #28).
 - Pull request #41 (`codex/explicit-full-suite-approval-2026-10-17`) is superseded: the three workflows it gated were replaced by `checks.yml`, which asks for `full_suite_approved`; the rule itself is Anthony's standing rule; its Copilot instructions file is carried into this pull request.
-- All six branches have `archive/<branch>` tags on GitHub at their last commits. Removing the five branch names and closing #41 were refused to the agent by the app's safety check, so they wait for Anthony (one command each, in the handoff).
+- All six branches have `archive/<branch>` tags on GitHub at their last commits. Removing the five branch names and closing #41 were refused to the agent by the app's safety check, so they wait for Anthony:
+
+  ```bash
+  git -C /Users/anthony/Projects/mothers-love push origin --delete feat/world-surface fix/infra-cpu-polling fix/infra-etag-compatibility-diagnostics fix/world-arrival-batch lovelaceaml-hub-performance-improvements
+  ```
+
+  ```bash
+  gh pr close 41 --repo lovelaceaml-hub/mothers-love --delete-branch --comment "Superseded: checks.yml requires full_suite_approved, and the Copilot instructions went in with pull request 56. Kept as tag archive/codex/explicit-full-suite-approval-2026-10-17."
+  ```
 
 ### Section F: the second complete browser run
 
@@ -67,6 +75,7 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 ### Section H: hardware checks
 
 - The agent cannot stand in the church, scan a QR code or watch a TV. `docs/HARDWARE-CHECKS.md` has the five checks, what passes and what evidence to keep.
+- One part could be checked: Anthony's Chrome still held an admin sign in, so on 2026-11-11 the agent opened the live admin. The Recognitions list showed 50 rows, every one with a numeric like count; a detail page showed its likes, "Last changed" and the History card ("No admin actions are on record", which is right: the audit table was empty). The list still shows the notice about migration 015. Counts and labels only. A fresh sign in with the password remains for Anthony.
 
 ## Release
 
