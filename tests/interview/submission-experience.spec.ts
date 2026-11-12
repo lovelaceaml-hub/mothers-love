@@ -115,10 +115,12 @@ test.describe('interview completion submission experience', () => {
     const firstChoice = firstCard.getByRole('button', { name: /^Select expression 01:/ });
     const unselectedStyles = await firstCard.evaluate((element) => {
       const style = getComputedStyle(element);
-      return { backgroundColor: style.backgroundColor, backgroundImage: style.backgroundImage };
+      return { backgroundImage: style.backgroundImage, boxShadow: style.boxShadow };
     });
-    expect(unselectedStyles.backgroundColor).toBe('rgb(255, 253, 246)');
-    expect(unselectedStyles.backgroundImage).toBe('none');
+    // The approved look (reference-board colors) tints each card with its own expression
+    // color; gold marks only the selected card.
+    expect(unselectedStyles.backgroundImage).toContain('linear-gradient');
+    expect(unselectedStyles.backgroundImage).not.toContain('rgb(255, 233, 164)');
 
     await firstChoice.click({ position: { x: 24, y: 56 } });
     await expect(firstCard.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
@@ -129,9 +131,10 @@ test.describe('interview completion submission experience', () => {
       return { backgroundImage: style.backgroundImage, transform: style.transform, boxShadow: style.boxShadow };
     });
     expect(selectedStyles.backgroundImage).toContain('linear-gradient');
-    expect(selectedStyles.backgroundImage).toContain('rgb(255, 242, 200)');
+    expect(selectedStyles.backgroundImage).toContain('rgb(255, 233, 164)');
+    expect(selectedStyles.backgroundImage).not.toBe(unselectedStyles.backgroundImage);
     expect(selectedStyles.transform).toBe('none');
-    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).toContain('rgba(150, 117, 40');
+    await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe(unselectedStyles.boxShadow);
 
     const secondCard = page.getByTestId('expression-card-2');
     const secondChoice = secondCard.getByRole('button', { name: /^Select expression 02:/ });
