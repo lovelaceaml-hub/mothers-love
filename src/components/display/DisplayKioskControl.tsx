@@ -24,6 +24,7 @@ export function DisplayKioskControl() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const kiosk = params.get('kiosk') === '1';
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read from the address after mount, so server and browser draw the same first page
     setKioskRequested(kiosk);
 
     if (!kiosk) {

@@ -345,6 +345,7 @@ export function ColorPolishHost() {
     }, { state: pollStateRef.current });
     return () => {
       mounted = false;
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- the counter is bumped on purpose at cleanup so late answers are ignored
       ++requestGenerationRef.current;
       controllerRef.current?.abort();
       stopPolling();
@@ -378,6 +379,7 @@ export function ColorPolishHost() {
     // Build time constant. On a production build this effect does nothing: the
     // query string is never read and no state is set.
     if (!COLOR_POLISH_PREVIEW_BUILD) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the TV host mirrors snapshot state that arrives outside React; rewriting it would change its timing
     setPreviewSearch(typeof window === 'undefined' ? null : window.location.search);
   }, []);
 
@@ -427,6 +429,7 @@ export function ColorPolishHost() {
     let controller: AbortController | null = null;
     let deferredRead: ReturnType<typeof setTimeout> | null = null;
     if (!ids.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the TV host mirrors snapshot state that arrives outside React; rewriting it would change its timing
       setReactionCounts({});
       return undefined;
     }

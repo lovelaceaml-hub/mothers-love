@@ -452,6 +452,7 @@ export function SubmissionForm() {
   useEffect(() => {
     const stored = loadRecognitionDraft(recognitionDraftStorage(), Date.now(), EXPRESSION_IDS);
     if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the saved draft is restored after the first render, so server and browser draw the same first page
       setDraft(stored.draft);
       setRequestKey(stored.requestKey);
       setDraftRestored(true);

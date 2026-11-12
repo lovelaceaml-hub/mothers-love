@@ -64,6 +64,8 @@ jobs:
           node-version: '24'
       - run: npm ci
       - run: npm run typecheck
+      - name: Code style on the app's source
+        run: npx eslint src
       - name: Build without production credentials
         run: npm run build
 

@@ -199,6 +199,7 @@ function useReactionCounts(ids: string[]) {
   const signature = ids.join('\u001f');
   useEffect(() => {
     if (!ids.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
       setCounts(new Map());
       return undefined;
     }
@@ -396,6 +397,7 @@ function GardenScene({ records, reactions, elapsedMs, motion }: SceneProps) {
   const [slots, setSlots] = useState<GardenSlot[]>(() => records.slice(0, 5).map((record) => ({ id: record.id, phase: 'grow', generation: 0 })));
   const [flowers, setFlowers] = useState(0);
   const recordsRef = useRef(records);
+  // eslint-disable-next-line react-hooks/refs -- timers read the newest records through this ref
   recordsRef.current = records;
   const cursorRef = useRef(5);
   const slotRef = useRef(0);
@@ -823,7 +825,8 @@ function MilestoneGoalScene({ records, snapshot, dailyAggregates, nowServerMs, e
         <h2>Every kind word<br/>brought us<br/><span>here.</span></h2>
         <p>Many expressions.<br/>One growing community<br/>of Mother&apos;s Love.</p>
         <blockquote>Every expression matters.</blockquote>
-        {/* eslint-disable-next-line @next/next/no-img-element */}<img src="/home-art/community.webp" alt="" aria-hidden="true" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- a fixed decorative picture on the TV */}
+        <img src="/home-art/community.webp" alt="" aria-hidden="true" />
       </div>
       <div className={styles.achievementWorld}>
         <aside className={styles.achievementRail}>
@@ -1026,6 +1029,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
   const dailyControllerRef = useRef<AbortController | null>(null);
   const individualStyleRef = useRef(0);
   const groupStyleRef = useRef(0);
+  // eslint-disable-next-line react-hooks/purity -- the mount time, read once
   const mountedAtRef = useRef(Date.now());
   const snapshotPollStateRef = useRef(createPollingState());
   const dailyPollStateRef = useRef(createPollingState());
@@ -1180,6 +1184,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
 
   useEffect(() => {
     if (mode === 'normal' && !unavailable) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
     setQueue([]);
     setActiveArrival(null);
     if (pausedAt !== null) {
@@ -1189,6 +1194,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
   }, [mode, pausedAt, unavailable]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
     if (pauseRotation && pausedAt === null) setPausedAt(Date.now());
     if (!pauseRotation && pausedAt !== null && !activeArrival) {
       setSceneStartedAt((started) => started + (Date.now() - pausedAt));
@@ -1218,6 +1224,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
     const eligibleIds = new Set(allRecords.map((record) => record.id));
     if (activeArrival.ids.every((id) => eligibleIds.has(id))) return;
     const surviving = activeArrival.ids.filter((id) => eligibleIds.has(id));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
     setActiveArrival(null);
     setQueue((current) => current.filter((id) => !activeArrival.ids.includes(id) || surviving.includes(id)));
     if (pausedAt !== null && !pauseRotation) {
@@ -1230,6 +1237,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
     if (!personalContentVisible || pauseArrivals || activeArrival || !queue.length) return;
     const availableQueue = queue.filter((id) => allRecords.some((record) => record.id === id));
     if (!availableQueue.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
       setQueue([]);
       return;
     }
@@ -1243,6 +1251,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
     if (nowMs - activeArrival.startedAt < total) return;
     const completed = new Set(activeArrival.ids);
     const remaining = queue.filter((id) => !completed.has(id) && allRecords.some((record) => record.id === id));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
     setQueue(remaining);
     setActiveArrival(null);
     if (!remaining.length && pausedAt !== null) {
@@ -1254,6 +1263,7 @@ export function V6DisplayExperience({ verifiedSnapshot, verifiedNowMs }: { verif
   useEffect(() => {
     if (!personalContentVisible || pauseRotation || activeArrival || pausedAt !== null) return;
     if (elapsedMs < scene.durationMs) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the fallback TV mirrors data that changes outside React; rewriting it would change its timing
     setStoryVisits((current) => ({ ...current, [scene.id]: (current[scene.id] ?? 0) + 1 }));
     setSceneIndex((index) => (index + 1) % V6_SCENES.length);
     setSceneStartedAt(Date.now());
