@@ -60,7 +60,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [32](docs/PLAN-32-polling-schedule.md) | Scheduled public polling (Pacific time) | Merged 2026-10-12 in pull request #40 |
 | [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete, live 2026-11-11 (pull request #52) |
 | [34](docs/PLAN-34-november-additions.md) | November additions: world retired, kept drafts, early first read, heart name, admin details, practice database, test clocks | Live 2026-11-11 (pull request #54); migration 021 applied the same evening; no practice database (Anthony's decision) |
-| [35](docs/PLAN-35-november-followups.md) | November follow-ups: expression card names, kept admin history (migration 022 applied), cleanup, old branches, test retirements | In review, pull request #56 |
+| [35](docs/PLAN-35-november-followups.md) | November follow-ups: expression card names, kept admin history (migration 022 applied), cleanup, old branches, test retirements | Live 2026-11-11 (pull request #56); migrations 022 and 015 applied the same evening |
 
 ## Other documents
 

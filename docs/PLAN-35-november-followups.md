@@ -2,7 +2,7 @@
 
 Anthony's request, 2026-11-11, after reading what was left from [Plan 34](PLAN-34-november-additions.md): "Do all 9. Do not stop until all completed". The nine items are the list he was given that evening. He also said "No practice database." and approved the merge of Plan 34 the same evening.
 
-Branch `feat/app-november-followups`, pull request [#56](https://github.com/lovelaceaml-hub/mothers-love/pull/56) into `main`. It also carries the documents of pull request #55 (migration 021 applied, Plan 34's release record).
+Branch `feat/app-november-followups`, pull request [#56](https://github.com/lovelaceaml-hub/mothers-love/pull/56) into `main`. **Released 2026-11-11** (Pacific) with Anthony's approval ("Yes merge"). It also carries the documents of pull request #55 (migration 021 applied, Plan 34's release record).
 
 ## The nine items and where each stands
 
@@ -93,7 +93,7 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 
 ## Release
 
-1. Anthony merges #56 (a production deployment; open TVs reload once). Migration 022 is already applied and does not depend on the merge.
+1. Merged 2026-11-11 with Anthony's approval (a production deployment; open TVs reload once). Migrations 022 and 015 were already applied and do not depend on the merge.
 2. Check: the home page lists recognitions; `/recognize` shows the nine cards and a card can be chosen; `/display` shows recognitions; `/admin/login` loads.
 3. Rollback: Vercel, Deployments, the previous production deployment, Promote. To undo migration 022, run the rollback in its header (history older than 30 days would then be removed by the next cleanup).
 

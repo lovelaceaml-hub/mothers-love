@@ -13,6 +13,17 @@ Links below are relative to this folder. A few old entries name files by absolut
 
 ## Part 1: entries added on 2026-09-23
 
+### November 11: Plan 35 released (pull request #56)
+
+Source: the pull request and [Plan 35](PLAN-35-november-followups.md). Merged with Anthony's approval ("Yes merge").
+
+- Each expression card on the form is named by what it shows; the accessibility checker is at 4.14.
+- Admin history is kept as long as the recognitions (migration 022, applied 2026-11-12 01:22 UTC).
+- The admin list sorts oldest first (migration 015, written in September, applied 2026-11-12 02:36 UTC).
+- Behind the scenes: the form's drawn pieces have their own file; intentional React patterns carry their reason and the cloud checks lint `src`; `AGENTS.md` says Plan 31 is live.
+- Tests: four files for the retired Bubble Board renderer are parked; the main TV journeys run on a fixed clock; 19 journeys that fail only on the cloud runner are skipped there. The second complete browser run had 88 failures, down from 198.
+- Also recorded here: migration 021 (admin likes and history), applied 2026-11-12 01:09 UTC.
+
 ### November 11: Plan 34 released (pull request #54)
 
 Source: the pull request and [Plan 34](PLAN-34-november-additions.md). Merged with Anthony's approval ("I approve you to merge.").
