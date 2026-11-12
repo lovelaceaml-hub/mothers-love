@@ -113,6 +113,9 @@ test('a failed older page says so and can be retried', async ({ page }) => {
 });
 
 test('a recognition hidden after loading leaves the older pages on the next refresh', async ({ page }) => {
+  // A Saturday morning in Los Angeles, inside the 10 second refresh hours (Plan 32), so the
+  // refresh this journey waits for does not depend on the hour it runs.
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   const hidden = new Set<number>();
   const served = await serveFeed(page, { total: 150, hidden });
   await page.goto('/');
@@ -129,6 +132,9 @@ test('a recognition hidden after loading leaves the older pages on the next refr
 });
 
 test('an unchanged older page sends a conditional request and keeps its cached items', async ({ page }) => {
+  // A Saturday morning in Los Angeles, inside the 10 second refresh hours (Plan 32), so the
+  // refresh this journey waits for does not depend on the hour it runs.
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   const served = await serveFeed(page, { total: 150 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Show older recognitions' }).click();

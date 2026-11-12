@@ -36,9 +36,24 @@ export interface Recognition {
   featured: boolean;
 }
 
+/** One admin action still on record for a recognition (the audit table keeps 30 days). */
+export interface AdminAuditEntry {
+  action: string;
+  reason: string | null;
+  outcome: string;
+  at: string;
+  version: number | null;
+  /** The acting administrator's current role, never an identifier; null once they are removed. */
+  actorRole: "owner" | "moderator" | null;
+}
+
 export interface AdminRecognition extends Recognition {
   submittedName: string;
   reason: string | null;
+  // The three fields below arrive once database migration 021 is applied.
+  updatedAt?: string;
+  heartCount?: number;
+  audit?: AdminAuditEntry[];
 }
 
 export interface Aggregate {

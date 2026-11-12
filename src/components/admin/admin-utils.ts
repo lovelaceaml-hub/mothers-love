@@ -1,4 +1,4 @@
-import type { AdminRecognition, DisplaySettings } from '@/lib/contracts';
+import type { AdminAuditEntry, AdminRecognition, DisplaySettings } from '@/lib/contracts';
 
 export type AdminRole = 'owner' | 'moderator';
 
@@ -107,6 +107,72 @@ export const actionLabel = (action: ActionKind): string => {
     default:
       return action;
   }
+};
+
+/** What an action on record did, in the past tense, for the history list. */
+export const auditActionLabel = (action: string): string => {
+  switch (action) {
+    case 'publish':
+      return 'Published';
+    case 'edit':
+      return 'Edited';
+    case 'hide':
+      return 'Hidden from display';
+    case 'restore':
+      return 'Restored to display';
+    case 'invalidate':
+      return 'Removed as invalid';
+    case 'feature':
+      return 'Featured';
+    case 'unfeature':
+      return 'Feature removed';
+    case 'delete':
+      return 'Permanently deleted';
+    default:
+      return action;
+  }
+};
+
+export const reasonLabel = (reason: string | null | undefined): string => {
+  switch (reason) {
+    case 'privacy':
+      return 'Privacy';
+    case 'recipient_request':
+      return 'Recipient request';
+    case 'spam':
+      return 'Spam';
+    case 'duplicate':
+      return 'Duplicate';
+    case 'test':
+      return 'Test';
+    case 'safety':
+      return 'Safety';
+    case 'correction':
+      return 'Correction';
+    case 'filter_error':
+      return 'Filter error';
+    case 'other':
+      return 'Other';
+    default:
+      return reason || '';
+  }
+};
+
+export const auditActorLabel = (role: AdminAuditEntry['actorRole']): string =>
+  role === 'owner' ? 'the Owner' : role === 'moderator' ? 'a Moderator' : 'an administrator no longer listed';
+
+/** The like count, or null while the database does not send it yet (before migration 021). */
+export const heartCountOf = (recognition: AdminRecognition): number | null =>
+  typeof recognition.heartCount === 'number' && Number.isFinite(recognition.heartCount) && recognition.heartCount >= 0
+    ? Math.floor(recognition.heartCount)
+    : null;
+
+/** The actions on record, or null while the database does not send them yet. */
+export const auditEntriesOf = (recognition: AdminRecognition): AdminAuditEntry[] | null => {
+  if (!Array.isArray(recognition.audit)) return null;
+  return recognition.audit.filter((entry): entry is AdminAuditEntry => (
+    Boolean(entry) && typeof entry === 'object' && typeof entry.action === 'string' && typeof entry.at === 'string'
+  ));
 };
 
 export const actionExplanation = (

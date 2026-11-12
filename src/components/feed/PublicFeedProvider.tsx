@@ -16,6 +16,7 @@ import { startVisiblePoll } from '@/lib/visible-poll';
 import { claimPollingRead, createPollingState, nextPollingBoundary, pollingInterval, pollingMode, snapshotFreshnessRequired } from '@/lib/polling-schedule';
 import { MAX_REACTION_BATCH_SIZE } from '@/lib/reaction-contract';
 import { notModifiedServerTimeMs, parseContentEtag } from '@/lib/etag';
+import { EarlyReadTimeoutError, awaitEarlyRead, takeEarlyRead } from '@/lib/early-read';
 
 import {
   activeFeedItems,
@@ -94,6 +95,7 @@ const REACTION_BATCH_SIZE = MAX_REACTION_BATCH_SIZE;
 // Older pages are re-read on every refresh so a hidden recognition leaves them
 // too; this caps that work at 1,000 older recognitions on one open page.
 export const MAX_OLDER_FEED_PAGES = 10;
+const FEED_READ_DEADLINE_MS = 8_000;
 
 type CachedOlderFeedPage = { etag: string; items: PublicFeedItem[] };
 type OlderFeedPage = { etag: string | null; items: PublicFeedItem[] };
@@ -856,7 +858,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController();
     feedControllerRef.current = controller;
     const requestStartedAt = monotonicNow();
-    const deadline = window.setTimeout(() => controller.abort(), 8_000);
+    const deadline = window.setTimeout(() => controller.abort(), FEED_READ_DEADLINE_MS);
     feedDeadlineRef.current = deadline;
     // One read of the list. A conditional read sends the remembered tag, so an
     // unchanged list costs no download.
@@ -864,12 +866,30 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
       const headers: Record<string, string> = { accept: 'application/json' };
       const sentTag = conditional && snapshotRef.current && feedEtagRef.current ? feedEtagRef.current : null;
       if (sentTag) headers['If-None-Match'] = `"${sentTag}"`;
-      const response = await fetch('/api/feed', {
-        cache: 'no-store',
-        credentials: 'include',
-        headers,
-        signal: controller.signal,
-      });
+      // The page's HTML may already have started this very read (src/lib/early-read.ts).
+      // A whole read takes that answer once; its age counts from when it really started.
+      let startedAt = requestStartedAt;
+      let response: Response | null = null;
+      const early = sentTag ? null : takeEarlyRead('feed', monotonicNow());
+      if (early) {
+        try {
+          // Its deadline counts from its real start, so a read that hung before the page's
+          // code loaded is not given a second full wait.
+          response = await awaitEarlyRead(early, controller.signal, FEED_READ_DEADLINE_MS - (monotonicNow() - early.startedAt));
+          startedAt = early.startedAt;
+        } catch (error) {
+          if (controller.signal.aborted || error instanceof EarlyReadTimeoutError) throw error;
+          response = null;
+        }
+      }
+      if (!response) {
+        response = await fetch('/api/feed', {
+          cache: 'no-store',
+          credentials: 'include',
+          headers,
+          signal: controller.signal,
+        });
+      }
       const responseTag = readFeedEtag(response);
       if (response.status === 304) {
         // The host answers a matching conditional request itself, with no body. It
@@ -881,19 +901,19 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         }
         const verifiedServerTimeMs = notModifiedServerTimeMs(
           response.headers.get('date'),
-          current.verifiedServerTimeMs + Math.max(0, requestStartedAt - current.verifiedMonotonicMs),
+          current.verifiedServerTimeMs + Math.max(0, startedAt - current.verifiedMonotonicMs),
         );
         applySnapshot({
           ...current,
           serverTime: new Date(verifiedServerTimeMs).toISOString(),
           verifiedServerTimeMs,
-          verifiedMonotonicMs: requestStartedAt,
+          verifiedMonotonicMs: startedAt,
         }, !manual);
         return;
       }
       if (!response.ok) throw new Error(`Feed request failed with status ${response.status}`);
       const payload: unknown = await response.json();
-      const heartbeat = verifyFeedHeartbeat(payload, requestStartedAt);
+      const heartbeat = verifyFeedHeartbeat(payload, startedAt);
       if (heartbeat) {
         const current = snapshotRef.current;
         if (!current || !feedEtagRef.current || responseTag !== feedEtagRef.current) throw new Error('Feed heartbeat did not match the current snapshot.');
@@ -906,7 +926,7 @@ export function PublicFeedProvider({ children }: { children: ReactNode }) {
         }, !manual);
         return;
       }
-      const nextSnapshot = verifyFeedSnapshot(payload, requestStartedAt);
+      const nextSnapshot = verifyFeedSnapshot(payload, startedAt);
       if (!nextSnapshot) throw new Error('Feed response was not valid.');
       if (serial !== requestSerialRef.current || controller.signal.aborted) return;
       feedEtagRef.current = responseTag;
@@ -1213,6 +1233,11 @@ function FeedCompanionCard({ item }: { item: PublicFeedItem }) {
   );
 }
 
+/** The count as a screen reader says it, so the button's name holds its visible number. */
+function spokenLikes(count: number) {
+  return `${count} ${count === 1 ? 'like' : 'likes'}`;
+}
+
 export function ReactionButton({
   item,
   reaction,
@@ -1232,7 +1257,7 @@ export function ReactionButton({
   const countId = `reaction-count-${item.id}`;
   const recoveryId = `reaction-recovery-${item.id}`;
   const label = reactionItem
-    ? `Like recognition for ${item.recipient}`
+    ? `Like recognition for ${item.recipient}, ${spokenLikes(reactionItem.count)}`
     : reaction?.status === 'error' ? 'Try loading hearts again' : `Hearts unavailable for ${item.recipient}`;
   if (reaction?.status === 'error') {
     return <button className={styles.reactionRetry} type="button" onClick={onRetry}>{label}</button>;
@@ -1244,8 +1269,8 @@ export function ReactionButton({
           className={styles.reactionButton}
           type="button"
           aria-pressed={confirmedItem.liked}
-          aria-label={`Hearts paused for ${item.recipient}. ${reaction.recovery.message}`}
-          aria-describedby={`${countId} ${recoveryId}`}
+          aria-label={`Hearts paused for ${item.recipient}, ${spokenLikes(confirmedItem.count)}. ${reaction.recovery.message}`}
+          aria-describedby={recoveryId}
           disabled
         >
           <span aria-hidden="true">{confirmedItem.liked ? '❤️' : '🤍'}</span>
@@ -1261,8 +1286,10 @@ export function ReactionButton({
         <button
           className={styles.reactionRetry}
           type="button"
-          aria-label={`Enable cookies, then retry hearts for ${item.recipient}`}
-          aria-describedby={reaction.item ? `${countId} ${recoveryId}` : recoveryId}
+          aria-label={reaction.item
+            ? `Enable cookies, then retry hearts for ${item.recipient}, ${spokenLikes(reaction.item.count)}`
+            : `Enable cookies, then retry hearts for ${item.recipient}`}
+          aria-describedby={recoveryId}
           onClick={onRetry}
         >
           <span aria-hidden="true">{confirmedItem?.liked ? '❤️' : '🤍'}</span>
@@ -1278,7 +1305,6 @@ export function ReactionButton({
       type="button"
       aria-pressed={reactionItem?.liked ?? false}
       aria-label={label}
-      aria-describedby={reactionItem ? countId : undefined}
       disabled={!reactionItem || Boolean(reaction?.pending)}
       data-settling={settling ? 'true' : undefined}
       onClick={onToggle}

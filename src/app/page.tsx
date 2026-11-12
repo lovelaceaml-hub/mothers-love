@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { FeedHome } from '@/components/feed/FeedHome';
+import { earlyReadScript } from '@/lib/early-read';
 
 export const metadata: Metadata = {
   title: "The Words of Mother's Love",
@@ -12,5 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <FeedHome />;
+  return (
+    <>
+      {/* Starts the list's first read while the page's code is still downloading. */}
+      <script dangerouslySetInnerHTML={{ __html: earlyReadScript('feed') }} />
+      <FeedHome />
+    </>
+  );
 }

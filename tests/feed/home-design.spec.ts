@@ -117,7 +117,8 @@ test('loading, unavailable, retry and empty states preserve working controls', a
 
 test('polling preserves the reading anchor and focus; removed records never linger', async ({ page }) => {
   let items = [...fixtures];
-  await page.clock.install();
+  // A Saturday morning in Los Angeles, inside the 10 second refresh hours (Plan 32).
+  await page.clock.install({ time: new Date('2026-09-12T16:00:00Z') });
   await mock(page, () => items);
   await ready(page);
   const viewport = page.getByRole('region', { name: 'Recent recognitions' });
@@ -197,7 +198,7 @@ test('unmodified routes contain no Home theme and have no unexpected browser err
 test('supporting routes preserve baseline content and geometry after color polish', async ({ browser }) => {
   test.skip(!process.env.HOME_BASELINE_URL, 'Baseline server is supplied by review CI.');
   const before = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
-  const after = await browser.newPage({ baseURL: process.env.PLAYWRIGHT_BASE_URL, viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
+  const after = await browser.newPage({ baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3100', viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
   await before.clock.setFixedTime(new Date(serverTime));
   await after.clock.setFixedTime(new Date(serverTime));
   await mock(before); await mock(after);
@@ -206,7 +207,7 @@ test('supporting routes preserve baseline content and geometry after color polis
   for (const route of ['/expressions', '/privacy', '/admin/login', '/display']) {
     await before.goto(process.env.HOME_BASELINE_URL! + route); await after.goto(route);
     for (const page of [before, after]) {
-      if (['/expressions', '/privacy'].includes(route)) await expect(page.getByRole('button', { name: 'Like recognition for Avery', exact: true })).toBeEnabled();
+      if (['/expressions', '/privacy'].includes(route)) await expect(page.getByRole('button', { name: /^Like recognition for Avery, \d+ likes?$/ })).toBeEnabled();
       await page.evaluate(async () => { await document.fonts.ready; });
       await page.waitForTimeout(500);
     }

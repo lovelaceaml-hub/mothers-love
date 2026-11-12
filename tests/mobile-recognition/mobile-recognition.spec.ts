@@ -109,7 +109,7 @@ test('submission prevents duplicate sends and malformed receipts remain unconfir
 });
 test('motion walkthrough and published receipt with synthetic responses only',async({browser})=>{
   test.setTimeout(60000);mkdirSync(out,{recursive:true});
-  const context=await browser.newContext({baseURL:process.env.PLAYWRIGHT_BASE_URL,viewport:{width:390,height:844},recordVideo:{dir:out,size:{width:390,height:844}}});
+  const context=await browser.newContext({baseURL:process.env.PLAYWRIGHT_BASE_URL??'http://127.0.0.1:3100',viewport:{width:390,height:844},recordVideo:{dir:out,size:{width:390,height:844}}});
   const page=await context.newPage();await mock(page);await page.goto('/');await expect(page.locator('[data-recognition-id]').first()).toBeVisible();await page.waitForTimeout(6000);
   await page.getByRole('region',{name:'Recent recognitions',exact:true}).evaluate(el=>{el.scrollTop=175;});await page.waitForTimeout(1500);
   await page.getByRole('link',{name:'Share a recognition',exact:true}).click();await fill(page);await page.getByTestId('expression-card-2').scrollIntoViewIfNeeded();await page.waitForTimeout(1800);

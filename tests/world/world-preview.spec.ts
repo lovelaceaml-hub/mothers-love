@@ -2,6 +2,11 @@ import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { ZONES } from "../../src/components/display/world/world-data";
 import { snapshot } from "./fixtures";
+import { WORLD_RETIRED } from "../../src/lib/world-retired";
+
+// The world is retired for now: its page answers with the home page, so these journeys wait
+// until src/lib/world-retired.ts is set back to false.
+test.skip(WORLD_RETIRED, "The 3D world is retired for now (src/lib/world-retired.ts).");
 
 test.use({
   launchOptions: {

@@ -1102,6 +1102,52 @@
   cursor: pointer;
 }
 
+.draftNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 1.35rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(203, 185, 244, 0.46);
+  border-radius: 1.25rem;
+  background: #fffaf0;
+  color: #51486b;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.draftNote p {
+  margin: 0;
+}
+
+.draftNote button {
+  min-height: 2.5rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(88, 79, 129, 0.5);
+  border-radius: 0.7rem;
+  color: #584f81;
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.draftNote button:focus-visible {
+  border-color: #62b4d7;
+  box-shadow: 0 0 0 4px rgba(142, 214, 245, 0.32);
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+}
+
+.draftNote button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .retryHint {
   margin-top: 0.4rem !important;
   font-weight: 600;
