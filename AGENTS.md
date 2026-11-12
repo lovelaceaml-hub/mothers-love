@@ -11,6 +11,9 @@ Current status and next steps: docs/HANDOFF.md.
 - `docs/HISTORY.md`: release notes, newest first, and what still lives outside `main`.
 
 ## Active plan
+- `docs/PLAN-35-november-followups.md`: the nine follow-ups of 2026-11-11 (expression cards named by
+  what they show, admin history kept, cleanup, old branches, the second complete browser run, the
+  backup's cloud copy). Its table says where each stands and what waits for Anthony.
 - `docs/PLAN-34-november-additions.md`: the 3D world retired for now, a kept half-written
   recognition, the early first read, the heart button's spoken count, admin details (Plan 18
   Section C, migration 021 applied 2026-11-12 UTC), the practice database builder (not hosted) and the test clock fixes.
@@ -48,7 +51,7 @@ Deploy and Git
   are planned in `/Users/anthony/Projects/mothers-love-world` (its own AGENTS.md); world code still
   reaches this repo only through a pull request.
 - Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit
-  (next: 35) and each keeps a Build log.
+  (next: 36) and each keeps a Build log.
 - Run evidence (captures, probe output, scratch) goes to Drive, not Git:
   `My Drive/Projects/Mother's Love/The Words of Mother's Love`. Use `git add -f` only for a capture
   that truly belongs in the repo.
@@ -68,8 +71,10 @@ Data and database
   (since 2026-11-11); its files stay in the private backup folder and never enter Git.
 - Migrations live in `database/` and name their rollback in the header; applying one live is
   Anthony's decision, recorded in `mothers_love.schema_migrations`. The ledger, read on
-  2026-11-12: 018, 020 and 021 are applied; 015 (admin list oldest first) is not, so the admin
+  2026-11-12: 018, 020, 021 and 022 are applied; 015 (admin list oldest first) is not, so the admin
   list says so; 010, 011 and 013 have no ledger row (whether they are applied was not checked).
+- Admin history (`mothers_love.admin_audit`) is kept as long as the recognitions (migration 022). It
+  holds the acting account, action, reason category and version, never a name or a message.
 - No practice database (Anthony, 2026-11-11: "No practice database."). `scripts/practice-database.sh`
   and `database/practice/seed.sql` stay as a tool that builds one from made-up records and refuses
   the production project; do not create or host one unless Anthony asks, and never point it, or a
@@ -116,6 +121,9 @@ Home page, form and admin
   (`src/lib/early-read.ts`); the answer passes the same checks and its age counts from its real start.
 - `/recognize` shows only the form, no feed; the receipt screen after sending shows the home page's
   Recent recognitions list (`tests/receipt-feed`).
+- Each expression card's button is named by its own content (number, phrase, meaning, example) with
+  `aria-pressed` for the choice; never give it a separate `aria-label` (the accessibility checker,
+  axe 4.14, asks that a control's name contain its visible text).
 - Expression cards: one per row at every width, number, quoted expression, check indicator, full
   explanation beneath in quieter text. Gold shimmer marks selected cards, never the submit button.
 - Phones: the shimmering Share a recognition action (6 second pulse) dominates above the medallions

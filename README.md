@@ -22,7 +22,7 @@ Production is `main` at merge `65f8a5080a9d965169e2abb52d5fdf667d98feea` (pull r
 
 ## Plans
 
-Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); Plan 34 is the newest plan, so the next new plan takes 35.
+Every plan lives in `docs/`. Plans are numbered by the date each was first committed (Anthony's ruling, 2026-09-23); Plan 35 is the newest plan, so the next new plan takes 36.
 
 | Plan | Subject | Where it stands |
 | --- | --- | --- |
@@ -60,6 +60,7 @@ Every plan lives in `docs/`. Plans are numbered by the date each was first commi
 | [32](docs/PLAN-32-polling-schedule.md) | Scheduled public polling (Pacific time) | Merged 2026-10-12 in pull request #40 |
 | [33](docs/PLAN-33-polish-and-speed.md) | Security update, speed and cleanup | Complete, live 2026-11-11 (pull request #52) |
 | [34](docs/PLAN-34-november-additions.md) | November additions: world retired, kept drafts, early first read, heart name, admin details, practice database, test clocks | Live 2026-11-11 (pull request #54); migration 021 applied the same evening; no practice database (Anthony's decision) |
+| [35](docs/PLAN-35-november-followups.md) | November follow-ups: expression card names, kept admin history (migration 022 applied), cleanup, old branches, test retirements | In review, pull request #56 |
 
 ## Other documents
 
