@@ -47,6 +47,10 @@ concurrency:
 env:
   NEXT_TELEMETRY_DISABLED: '1'
   npm_config_cache: /tmp/npm-cache
+  # Stand-in public settings, never real ones. The admin and Studio journeys sign in against
+  # a provider they mock at this address; without it the sign-in page cannot start.
+  TEST_SUPABASE_URL: https://synthetic.supabase.invalid
+  TEST_SUPABASE_PUBLISHABLE_KEY: synthetic-public-test-key
 
 jobs:
   quick:
@@ -120,6 +124,8 @@ jobs:
         if: steps.pick.outputs.browser != ''
         env:
           FILES: ${{ steps.pick.outputs.browser }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.TEST_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ env.TEST_SUPABASE_PUBLISHABLE_KEY }}
         run: |
           read -r -a files <<< "$FILES"
           npx playwright install --with-deps chromium
@@ -162,6 +168,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Browser suite, shard ${{ matrix.shard }} of 4
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.TEST_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ env.TEST_SUPABASE_PUBLISHABLE_KEY }}
         run: CI=1 npx playwright test --workers=2 --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v4
         if: failure()
