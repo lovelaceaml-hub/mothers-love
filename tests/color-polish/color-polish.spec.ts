@@ -10,6 +10,8 @@ import { DISPLAY_SCREEN_IDS } from '../../src/lib/contracts';
 // the V6 view, never to the Bubble Board (which only the Studio preview still draws), so they
 // cannot pass as written. They are kept for reference. The TV is covered by the journeys in
 // tests/color-polish-scenes and tests/color-polish-usable.
+// This file's other journeys compared the app with two extra review servers on ports 3102 and
+// 3103 that only existed on the Mac during the September color review.
 test.fixme(true, 'Retired: /display no longer serves the Bubble Board renderer these journeys drive.');
 const out='color-review-evidence';
 const sampleNames=['Avery','Morgan','Jordan','Taylor','Casey','Robin','Jamie','Riley','Quinn'];
