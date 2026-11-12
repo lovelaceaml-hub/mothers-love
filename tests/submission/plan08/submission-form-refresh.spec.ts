@@ -35,7 +35,8 @@ test.describe('Plan 08 submission garden', () => {
 
     const selectedCardBackground = await first.evaluate((card) => getComputedStyle(card).backgroundImage);
     expect(selectedCardBackground).toContain('linear-gradient');
-    expect(selectedCardBackground).toContain('rgb(255, 242, 200)');
+    // The approved look's gold (reference-board colors).
+    expect(selectedCardBackground).toContain('rgb(255, 233, 164)');
 
     await first.getByRole('button', { name: /^01 /, pressed: true }).click();
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '2');
