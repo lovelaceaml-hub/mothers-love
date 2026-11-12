@@ -22,13 +22,13 @@ test.describe('Plan 08 submission garden', () => {
     const second = page.getByRole('article').filter({ hasText: "Thank you. It's all thanks to you. You've worked hard." });
     const ninth = page.getByRole('article').filter({ hasText: "You're amazing. You're doing great!" });
 
-    await first.getByRole('button', { name: /^Select expression 01:/ }).click();
-    await second.getByRole('button', { name: /^Select expression 02:/ }).click();
-    await ninth.getByRole('button', { name: /^Select expression 09:/ }).click();
+    await first.getByRole('button', { name: /^01 /, pressed: false }).click();
+    await second.getByRole('button', { name: /^02 /, pressed: false }).click();
+    await ninth.getByRole('button', { name: /^09 /, pressed: false }).click();
 
-    await expect(first.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(second.getByRole('button', { name: /^Selected expression 02:/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(ninth.getByRole('button', { name: /^Selected expression 09:/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(first.getByRole('button', { name: /^01 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(second.getByRole('button', { name: /^02 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(ninth.getByRole('button', { name: /^09 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '3');
     await expect(page.getByText('3 selected')).toBeVisible();
     await expect(page.getByText('Bouquet growing')).toBeVisible();
@@ -37,9 +37,9 @@ test.describe('Plan 08 submission garden', () => {
     expect(selectedCardBackground).toContain('linear-gradient');
     expect(selectedCardBackground).toContain('rgb(255, 242, 200)');
 
-    await first.getByRole('button', { name: /^Selected expression 01:/ }).click();
+    await first.getByRole('button', { name: /^01 /, pressed: true }).click();
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '2');
-    await expect(second.getByRole('button', { name: /^Selected expression 02:/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(second.getByRole('button', { name: /^02 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('keeps receipt wording truthful for published and held statuses', async ({ page }) => {

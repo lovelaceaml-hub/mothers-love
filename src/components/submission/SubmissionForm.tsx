@@ -263,9 +263,10 @@ function ExpressionChoice({
       <button
         className={styles.expressionSelect}
         type="button"
-        aria-label={`${selected ? 'Selected' : 'Select'} expression ${String(expression.id).padStart(2, '0')}: “${expression.phrase}”`}
+        // The button is named by what it shows (number, phrase, meaning and example), so a
+        // person who speaks what they see names it correctly; aria-pressed carries the choice.
         aria-pressed={selected}
-        aria-describedby={`expression-details-${expression.id}${error ? ' expressions-error' : ''}`}
+        aria-describedby={error ? 'expressions-error' : undefined}
         onClick={onToggle}
         disabled={disabled}
       >

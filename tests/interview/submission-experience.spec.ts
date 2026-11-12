@@ -77,9 +77,9 @@ async function openCollection(page: Page) {
 async function fillSyntheticDraft(page: Page) {
   await page.getByLabel('Your name').fill('Synthetic Sender');
   await page.getByLabel('Who would you like to recognize?').fill('Synthetic Recipient');
-  await page.getByRole('button', { name: /^Select expression 02:/ }).click();
-  await page.getByRole('button', { name: /^Select expression 06:/ }).click();
-  await page.getByRole('button', { name: /^Select expression 08:/ }).click();
+  await page.getByRole('button', { name: /^02 /, pressed: false }).click();
+  await page.getByRole('button', { name: /^06 /, pressed: false }).click();
+  await page.getByRole('button', { name: /^08 /, pressed: false }).click();
   await page.getByLabel('Share your appreciation').fill('Synthetic thanks for a thoughtful act of kindness.');
 }
 
@@ -112,7 +112,7 @@ test.describe('interview completion submission experience', () => {
     expect(new Set(expressionColors).size).toBe(9);
 
     const firstCard = page.getByTestId('expression-card-1');
-    const firstChoice = firstCard.getByRole('button', { name: /^Select expression 01:/ });
+    const firstChoice = firstCard.getByRole('button', { name: /^01 /, pressed: false });
     const unselectedStyles = await firstCard.evaluate((element) => {
       const style = getComputedStyle(element);
       return { backgroundImage: style.backgroundImage, boxShadow: style.boxShadow };
@@ -123,7 +123,7 @@ test.describe('interview completion submission experience', () => {
     expect(unselectedStyles.backgroundImage).not.toContain('rgb(255, 233, 164)');
 
     await firstChoice.click({ position: { x: 24, y: 56 } });
-    await expect(firstCard.getByRole('button', { name: /^Selected expression 01:/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(firstCard.getByRole('button', { name: /^01 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '1');
 
     const selectedStyles = await firstCard.evaluate((element) => {
@@ -137,14 +137,14 @@ test.describe('interview completion submission experience', () => {
     await expect.poll(async () => firstCard.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe(unselectedStyles.boxShadow);
 
     const secondCard = page.getByTestId('expression-card-2');
-    const secondChoice = secondCard.getByRole('button', { name: /^Select expression 02:/ });
+    const secondChoice = secondCard.getByRole('button', { name: /^02 /, pressed: false });
     await secondChoice.focus();
     await expect(secondChoice).toBeFocused();
     await page.keyboard.press('Space');
-    await expect(secondCard.getByRole('button', { name: /^Selected expression 02:/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(secondCard.getByRole('button', { name: /^02 /, pressed: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '2');
     await page.keyboard.press('Enter');
-    await expect(secondCard.getByRole('button', { name: /^Select expression 02:/ })).toHaveAttribute('aria-pressed', 'false');
+    await expect(secondCard.getByRole('button', { name: /^02 /, pressed: false })).toHaveAttribute('aria-pressed', 'false');
     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '1');
   });
 
