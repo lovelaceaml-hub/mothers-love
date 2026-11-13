@@ -43,7 +43,7 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 
 ## Work in flight
 
-- 2026-11-13: the TV renderer (`/color-polish/*`) may also be framed by https://lvz.app (was `'self'` only), so the LV Zion church display (lvz.app/display) can show this TV as one turn of its rotation and jump to it when a new recognition is published (Anthony's request). lvz.app reads only `/api/display/color-polish` recognition ids and first-published times for that, never names or messages. Branch `claude/sleepy-wozniak-jutvtb`.
+- 2026-11-13: the TV renderer (`/color-polish/*`) may also be framed by https://lvz.app (was `'self'` only), so the LV Zion church display (lvz.app/display) can show this TV as one turn of its rotation and jump to it when a new recognition is published (Anthony's request). lvz.app reads only `/api/display/color-polish` recognition ids and first-published times for that, never names or messages. Also `/display?welcome=<recognition id>`: the renderer plays that recognition's arrival on first load when it was published within the last 15 minutes (lvz.app opens the TV this way on a new recognition); tested in `tests/color-polish-scenes/welcome-arrival.spec.ts`. Branch `claude/sleepy-wozniak-jutvtb`.
 
 | Work | Where | State |
 | --- | --- | --- |

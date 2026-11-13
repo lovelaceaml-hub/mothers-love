@@ -534,7 +534,7 @@ export async function withoutWebGL2(page: Page) {
  */
 export async function loadRenderer(
   page: Page,
-  options?: { ms?: number; scene?: number; fixture?: Record<string, unknown> },
+  options?: { ms?: number; scene?: number; fixture?: Record<string, unknown>; control?: Record<string, unknown> },
 ): Promise<Frame> {
   await page.addInitScript(() => {
     let seed = 7301;
@@ -583,7 +583,7 @@ export async function loadRenderer(
     : {};
 
   await page.evaluate(
-    async ({ snapshot, qr, reactionCounts }) => {
+    async ({ snapshot, qr, reactionCounts, extraControl }) => {
       const frame = document.querySelector('iframe');
       if (!frame || !frame.contentWindow) throw new Error('iframe not found');
       const channel = new MessageChannel();
@@ -616,10 +616,11 @@ export async function loadRenderer(
           reactionCounts,
           qrDataUrl: qr,
           submissionUrl: snapshot.submissionUrl,
+          ...extraControl,
         },
       });
     },
-    { snapshot, qr: dummyQr, reactionCounts },
+    { snapshot, qr: dummyQr, reactionCounts, extraControl: options?.control ?? {} },
   );
 
   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));

@@ -53,7 +53,16 @@ type BridgeControl = {
   reactionTotal: number | null;
   submissionUrl: string;
   qrDataUrl: string | null;
+  welcomeId?: string;
 };
+
+// lvz.app's church display opens this TV with ?welcome=<recognition id> when a new recognition is
+// published, so the renderer plays that recognition's arrival on first load (Anthony, 2026-11-13).
+function welcomeIdFromUrl(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const value = new URLSearchParams(window.location.search).get('welcome');
+  return value && /^[A-Za-z0-9-]{8,128}$/.test(value) ? value : undefined;
+}
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
@@ -338,6 +347,7 @@ export function ColorPolishRenderer({
       reactionTotal: safeMode || !isFiniteNumber(reactionTotal) ? null : Math.floor(boundedNumber(reactionTotal, 0, Number.MAX_SAFE_INTEGER)),
       submissionUrl: snapshot?.submissionUrl ?? '',
       qrDataUrl,
+      ...(welcomeIdFromUrl() ? { welcomeId: welcomeIdFromUrl() } : {}),
     };
     channel.port.postMessage({
       version: COLOR_POLISH_VERSION,
@@ -394,6 +404,7 @@ export function ColorPolishRenderer({
               reactionTotal: safeMode || !isFiniteNumber(reactionTotal) ? null : Math.floor(boundedNumber(reactionTotal, 0, Number.MAX_SAFE_INTEGER)),
               submissionUrl: snapshot?.submissionUrl ?? '',
               qrDataUrl,
+              ...(welcomeIdFromUrl() ? { welcomeId: welcomeIdFromUrl() } : {}),
             } satisfies BridgeControl,
           });
         }
