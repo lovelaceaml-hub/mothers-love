@@ -43,6 +43,8 @@ Every release note, newest first, is in [HISTORY.md](HISTORY.md). Every plan, 01
 
 ## Work in flight
 
+- 2026-11-13: the TV renderer (`/color-polish/*`) may also be framed by https://lvz.app (was `'self'` only), so the LV Zion church display (lvz.app/display) can show this TV as one turn of its rotation and jump to it when a new recognition is published (Anthony's request). lvz.app reads only `/api/display/color-polish` recognition ids and first-published times for that, never names or messages. Branch `claude/sleepy-wozniak-jutvtb`.
+
 | Work | Where | State |
 | --- | --- | --- |
 | [Plan 28](PLAN-28-repository-refactor.md), repository cleanup | One pull request per section into `main`; record in [runs/2026-09-22-repo-refactor/](runs/2026-09-22-repo-refactor/INDEX.md) | Sections 0 to 7 done (6 reviewed inside Section 8's completion review); Section 8's completion review of #19 passed and #19 merged on 2026-09-24 at 21:12 UTC (deployment `dpl_2x694rsojnvrwQ6nRHXjvGjmP3c9`). Closing entry in the Build log on 2026-10-02: on 2026-10-02 the live `/`, `/display`, `/world`, `/recognize` and `/admin/login` pages answered 200; Anthony's TV check and a real admin sign in are not recorded; the lost arrival fix did not reach `main` then; pull request #28 shipped it on 2026-10-02 (open item 7) |

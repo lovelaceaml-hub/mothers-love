@@ -20,7 +20,8 @@ const nextConfig: NextConfig = {
       {
         source: "/color-polish/:path*",
         headers: [
-          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+          // lvz.app's church display shows this TV as one turn in its rotation (Anthony, 2026-11-13).
+          { key: "Content-Security-Policy", value: "frame-ancestors 'self' https://lvz.app" },
         ],
       },
       {
