@@ -8,6 +8,9 @@ function preserveRuntimeState(next,previous,nextById){
  next.lastShown=new Map(previous?.lastShown instanceof Map?[...previous.lastShown].filter(([id])=>nextById.has(id)):[]);
  next.shownCount=new Map(previous?.shownCount instanceof Map?[...previous.shownCount].filter(([id])=>nextById.has(id)):[]);
 }
+// lvz.app opens this TV with ?welcome=<id> when a recognition was just published: on the first
+// usable snapshot, that recognition plays its normal arrival once (published within 15 minutes).
+let welcomeHandled=false;
 function applySnapshotPayload(snapshot,control={}){
  const previous=S,previousReady=previous.mode==='normal'&&previous.snapshotRevision!==null,previousIds=new Set(previous.arrivalIds||[]),wasSafe=previous.mode!=='normal';
  const usable=usableSnapshot(snapshot),next=setStateFromSnapshot(usable?snapshot:null,{...control,status:usable?control.status:'unavailable'});
@@ -22,6 +25,7 @@ function applySnapshotPayload(snapshot,control={}){
  if(!previousReady||replayed){next.arrivalIds=new Set(currentArrivals.map(item=>safeText(item?.eventId,128)).filter(Boolean))}else{
   next.arrivalIds=new Set(previousIds);for(const arrival of currentArrivals){const eventId=safeText(arrival?.eventId,128),recognitionId=safeText(arrival?.recognitionId,128),publishedAt=safeEpoch(arrival?.publishedAt),record=next.pool.find(item=>item.id===recognitionId);if(!eventId||!recognitionId||publishedAt===null||!record||!eligible(record))continue;if(!next.arrivalIds.has(eventId)){next.arrivalIds.add(eventId);newRecords.push(record)}}
  }
+ if(!previousReady&&!welcomeHandled&&typeof control.welcomeId==='string'){welcomeHandled=true;const welcome=next.pool.find(record=>record.id===control.welcomeId),nowMs=finiteNumber(control.nowMs)?control.nowMs:Date.now();if(welcome&&eligible(welcome)&&nowMs-welcome.publishedAt<=900000&&!newRecords.includes(welcome))newRecords.push(welcome)}
  S=next;pruneRemovedIds(removedIds);if(activeAffected)cancelActiveEvent();
  const elapsedDelta=S.t-previous.t;
  if(previousReady&&!wasSafe&&!sceneChanged&&!replayed&&elapsedDelta>0&&S.playing){const target=S.t;S.t=previous.t;S.clockControlled=false;coordinator(elapsedDelta);S.clockControlled=true;S.t=target;}
