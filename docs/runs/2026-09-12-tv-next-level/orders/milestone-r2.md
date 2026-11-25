@@ -1,7 +1,7 @@
 # Work order - Section 9 round 3: two remaining failures - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-milestone-20260912-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-milestone
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-milestone
 Branch: tv15/scene-milestone. Rounds 1 and 2 are in the worktree, uncommitted; keep them. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

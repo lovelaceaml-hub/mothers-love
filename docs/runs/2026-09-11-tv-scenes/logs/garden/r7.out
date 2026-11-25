@@ -1,13 +1,13 @@
 Restored the committed test suite for tests 1, 2, 4, 5, and 6, and updated the petal carry test to run against the direct renderer harness using the complete 48-record sample snapshot.
 
 Key changes applied:
-1. Restored tests 1, 2, 4, 5, and 6 and their imports in [tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) to match the committed reference specification.
-2. Implemented the direct renderer harness for `petals are carried, not dropped` using `buildColorPolishSampleSnapshot` from [src/components/display/color-polish/sample.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/src/components/display/color-polish/sample.ts) with `control` envelope settings matching the probe (`nowMs`, `scene: 'garden'`, `reactionCounts: {}`, `qrDataUrl: ''`, `status: 'ready'`, `source: 'sample'`, `playing: true`).
+1. Restored tests 1, 2, 4, 5, and 6 and their imports in [tests/color-polish-scenes/garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) to match the committed reference specification.
+2. Implemented the direct renderer harness for `petals are carried, not dropped` using `buildColorPolishSampleSnapshot` from [src/components/display/color-polish/sample.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/src/components/display/color-polish/sample.ts) with `control` envelope settings matching the probe (`nowMs`, `scene: 'garden'`, `reactionCounts: {}`, `qrDataUrl: ''`, `status: 'ready'`, `source: 'sample'`, `playing: true`).
 3. Set up the `/probe` iframe routing with `resolve(process.cwd(), 'public')` and MessageChannel bootstrap, waiting for `getState().scene === 2`.
 4. Stepped time to 15000 ms, 17000 ms, 20500 ms, and 23000 ms, verifying the living garden dataset petals count (greater than 0, greater than 0, equal to 0, greater than 0).
-5. Appended the round record sentence to [docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
+5. Appended the round record sentence to [docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
 
 ## COMPLETION
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`

@@ -33,12 +33,12 @@ agents, Opus 5.5 and Fable, Sol and Astra when available, Gemini Flash as review
 ## Design and rulings
 
 - Design (authoritative for this plan):
-  `/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md` (lane D1, Fable).
+  `$HOME/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md` (lane D1, Fable).
 - Coordinator rulings on its open questions:
-  `/Users/anthony/Projects/mothers-love-world/studio/docs/runs/2026-09-23-world-kit-v2/decisions/2026-09-23-D1-rulings.md`.
+  `$HOME/Projects/mothers-love-world/studio/docs/runs/2026-09-23-world-kit-v2/decisions/2026-09-23-D1-rulings.md`.
   Kit on by default under `art=design` with `kit=off`; neighbors return with
   "FICTIONAL NEIGHBORS" cards, active pair only; 18 s legs kept.
-- Kit source: `/Users/anthony/Projects/mothers-love-world/studio/kit/` on its `main` branch.
+- Kit source: `$HOME/Projects/mothers-love-world/studio/kit/` on its `main` branch.
 - Unchanged: the frozen wording layout with "Thank you," at the top; personal pixels only
   on the depth tested face; sample only previews, captures and tests; classic and
   cinematic byte identical; no build-polished-apps or Stitch; no real recognition data
@@ -52,7 +52,7 @@ else a fresh Opus 5.5. Runner: the 3D Studio coordinator chat.
 
 ## Lanes (section 8 of the design)
 
-Each lane: its own worktree under `/Users/anthony/Projects/mothers-love-worktrees/`
+Each lane: its own worktree under `$HOME/Projects/mothers-love-worktrees/`
 branched from `feat/world-cinematic`, the exact file ownership in design section 8.1, the
 acceptance in 8.2. Order: K0 alone first; then K1, K2, K3a, K3b, K4 in parallel; K5; K6.
 Release: a new draft PR from `feat/world-cinematic` (draft PR #8 is closed), then Plan 25.
@@ -85,6 +85,6 @@ Coordinator: merges, docs, handoff, index, private push, new draft PR.
 
 - 2026-09-23: Plan written by the coordinator (Opus 5.5). Record tree
   `docs/runs/2026-09-23-world-kit-integration/`. K0 launching.
-- 2026-09-23: K0 merged (7efdacd), kit re-synced twice (neighbors, nature v2), base 2ef8c41. Anthony asleep with ultracode and complete approval; finish line is the 3D world page, not the TV View. Workflow wf_590b2fe1-fe1 launched: K1 (Opus), K2, K3a, K3b (Fable), K4 (Opus) plus 3D Studio lane U0 (Unreal foundation), each with an Opus landing review, a Fable visual review, and a closing Flash second opinion into /Users/anthony/Projects/3d-studio/docs/runs/2026-09-23-night-log.md. Coordinator rulings: K1 may change one hunk of world-recognitions.ts for a lazy kit read; K3b writes tests/world/kit-layout-far.test.ts; K3a and K3b share a structural ZoneLayout table format and the coordinator wires FAR_ZONE_LAYOUTS into the builder at integration.
+- 2026-09-23: K0 merged (7efdacd), kit re-synced twice (neighbors, nature v2), base 2ef8c41. Anthony asleep with ultracode and complete approval; finish line is the 3D world page, not the TV View. Workflow wf_590b2fe1-fe1 launched: K1 (Opus), K2, K3a, K3b (Fable), K4 (Opus) plus 3D Studio lane U0 (Unreal foundation), each with an Opus landing review, a Fable visual review, and a closing Flash second opinion into $HOME/Projects/3d-studio/docs/runs/2026-09-23-night-log.md. Coordinator rulings: K1 may change one hunk of world-recognitions.ts for a lazy kit read; K3b writes tests/world/kit-layout-far.test.ts; K3a and K3b share a structural ZoneLayout table format and the coordinator wires FAR_ZONE_LAYOUTS into the builder at integration.
 - 2026-09-23 (new coordinator chat, Opus 5.5): Anthony ruled at 09:12 that reviews happen only at the end of large sections and speed comes first; wave K's remaining polish and review rounds were stopped with no half written files. K2's record, K3a and K3b merged on `world-kit/int`; the far zones render through `kit-far-zones.ts` and the near zones through K3a's builder. Codex Sol wrote K5 (canvas ladder, `studyTier` on the scene so neighbors follow the chosen quality, detail distance, memory rows) and the integration fixes (K1 hero pearl mirror, sky lane clouds for the smaller cloud model). Typecheck clean, 397 world tests pass. Rulings: `docs/runs/2026-09-23-world-kit-integration/decisions/2026-09-23-integration-rulings.md`. Next: build and harness, preview deploy of `feat/world-cinematic`, hero class at K6 when the heroes land, one final review at the end of the section.
 - 2026-10-02T07:37Z (fix/world-kit-faults-review, Opus 5.5): the K0 kit fault review (`DESIGN_REVIEW_MODE=kit-faults`) passed 4 of 7 on `main` at 7439925. Cause: K0 asked the partial and healthy kit captures to match `kit=off` byte for byte while the builders were stubs (the K0 run at aa0d7c7 passed that way), and K1 to K5 made the builders dress the world, so both now differ by design; the failed kit capture differed only by 1 of 255 along the bottom of the frame, which `kit=off` also shows against itself on some reloads. The world was right and the check was stale. The check now reads the builders' own placement log: no builder runs under `kit=off` or a failed kit, a failed kit matches `kit=off` within 1 of 255, the healthy kit places every piece and dresses the Garden, a partial kit skips only the refused asset (its procedural pieces stand) and still differs from the healthy capture where that asset stands in the Garden, and the focused pearl's words stay identical to `kit=off` (K1's text parity). Evidence in Drive under `The Words of Mother's Love/2026-10-02-world-kit-faults-review`.

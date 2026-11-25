@@ -4,7 +4,7 @@
 
 - Owner: backend lane
 - Runtime: gpt-5.6-luna, xhigh
-- Worktree: `/Users/anthony/Projects/mothers-love-worktrees/backend`
+- Worktree: `$HOME/Projects/mothers-love-worktrees/backend`
 - Branch: `codex/mothers-love-backend`
 - Protected files: foundation shared files, submission, admin, display, plan, contract, and root integration state
 - Backend ownership: `src/app/api/`, `src/lib/server/`, `database/`, `scripts/database/`, `tests/backend/`

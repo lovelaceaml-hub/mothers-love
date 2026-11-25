@@ -4,7 +4,7 @@ title: sockets
 state: merged
 model: opus-5.5
 runner: coordinator
-worktree: /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation/../world-kit-k0
+worktree: $HOME/Projects/mothers-love-worktrees/world-quality-continuation/../world-kit-k0
 review: "acceptance, coordinator"
 depends_on: none
 updated: 2026-09-23T08:17Z

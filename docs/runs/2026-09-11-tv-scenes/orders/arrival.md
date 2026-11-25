@@ -1,7 +1,7 @@
 # Work order - Section 3: Recognition Arrival depth in the weakest entrances (renderer id 3, slug arrival) - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-arrival-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-arrival
 Branch: tv/scene-arrival (already checked out; you never run git commands that change state)
 Read first, in this order, all inside your worktree: docs/PLAN-13-tv-scene-refactor.md (the section named above and the Build log), docs/runs/2026-09-11-tv-scenes/gaps/arrival.md (the gap report; its Decision is the spec), docs/runs/2026-09-11-tv-scenes/INDEX.md, public/color-polish/scenes/arrival.js, public/color-polish/core/stage.js, tests/color-polish-scenes/helpers.ts.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only.
@@ -11,7 +11,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 ## Hard rules
 
 1. Create or edit only the files in your allowlist block. Everything else is protected: every other file under public/color-polish (core/*, renderer.css, renderer.html, other scenes), src/**, scripts/**, tests outside your own spec, and the shared helpers tests/color-polish-scenes/helpers.ts.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-arrival.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-arrival.
 3. Run no shell commands at all; the headless permission gate denies them. The coordinator runs typecheck, lint, test, build, your spec, and the probe after you finish.
 4. Do not edit anything under docs/runs/2026-09-11-tv-scenes/ except your own record file docs/runs/2026-09-11-tv-scenes/lanes/arrival.md.
 5. Never write the em dash (U+2014) or en dash (U+2013) into any file.
@@ -44,8 +44,8 @@ Front matter (lane arrival, title "Section 3, Recognition Arrival depth in the w
 End with `## COMPLETION`: files changed (absolute paths); anything not done and why; the question section only if hard rule 8 applied.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md
+$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js
+$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css
+$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md
 ```

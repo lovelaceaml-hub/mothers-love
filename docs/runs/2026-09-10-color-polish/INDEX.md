@@ -20,7 +20,7 @@ Authoritative application baseline: facab7a06d6b6364df710bf08aafe072df04d09d on 
 | LT | Landed, 905676f, correction ef0f693 | Sonnet 5 (routed directly, Gemini failed twice earlier) | [Order](orders/LT.md), [lane](lanes/LT.md) |
 | LM | Landed, 1b631f1, measurement correction c28f8c6 | Sonnet 5 (routed directly, Gemini failed twice earlier) | [Order](orders/LM.md), [lane](lanes/LM.md) |
 
-Visual worktree: /Users/anthony/Projects/.worktrees/mothers-love-color-v6/visual. Data worktree: /Users/anthony/Projects/.worktrees/mothers-love-color-v6/data. Both writers stopped before integration began in /Users/anthony/Projects/mothers-love. Root owns Git, scripts, documentation, review, database and deployment actions.
+Visual worktree: $HOME/Projects/.worktrees/mothers-love-color-v6/visual. Data worktree: $HOME/Projects/.worktrees/mothers-love-color-v6/data. Both writers stopped before integration began in $HOME/Projects/mothers-love. Root owns Git, scripts, documentation, review, database and deployment actions.
 
 ## Verification so far
 

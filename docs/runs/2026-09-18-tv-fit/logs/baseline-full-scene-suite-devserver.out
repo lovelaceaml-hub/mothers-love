@@ -34,9 +34,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:55:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:55:21
 
     Error Context: test-results/color-polish-scenes-calend-ab51f-rbs-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -65,9 +65,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:72:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:72:21
 
     Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
 
@@ -95,9 +95,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:77:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:77:21
 
     Error Context: test-results/color-polish-scenes-calend-ea969-se-once-on-entry-and-settle-chromium/error-context.md
 
@@ -125,9 +125,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:132:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:132:21
 
     Error Context: test-results/color-polish-scenes-calend-7528c-fx-canvas-render-at-6000-ms-chromium/error-context.md
 
@@ -155,9 +155,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:167:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:167:21
 
     Error Context: test-results/color-polish-scenes-calend-b84aa--the-month-panel-at-6000-ms-chromium/error-context.md
 
@@ -185,9 +185,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:201:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:201:21
 
     Error Context: test-results/color-polish-scenes-calend-fac4f-cene-still-does-not-advance-chromium/error-context.md
 
@@ -215,10 +215,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:226:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:226:28
 
     Error Context: test-results/color-polish-scenes-calend-f8d75-alendar-still-with-no-pulse-chromium/error-context.md
 
@@ -246,9 +246,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:242:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/calendar.spec.ts:242:21
 
     Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
 
@@ -276,9 +276,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:146:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:146:21
 
     Error Context: test-results/color-polish-scenes-expres-765ee-ons-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -306,9 +306,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:177:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:177:21
 
     Error Context: test-results/color-polish-scenes-expressions-grid-cards-fit-with-slack-chromium/error-context.md
 
@@ -336,9 +336,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:189:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:189:21
 
     Error Context: test-results/color-polish-scenes-expressions-compact-cards-fit-chromium/error-context.md
 
@@ -367,10 +367,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:255:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:255:28
 
     Error Context: test-results/color-polish-scenes-expres-b48ec--scene-still-and-matches-G6-chromium/error-context.md
 
@@ -397,9 +397,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:199:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:199:21
 
     Error Context: test-results/color-polish-scenes-expressions-the-focused-card-is-balanced-chromium/error-context.md
 
@@ -428,9 +428,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:289:32
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:289:32
 
     Error Context: test-results/color-polish-scenes-expressions-the-same-holds-at-3840-chromium/error-context.md
 
@@ -457,9 +457,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:308:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:308:21
 
     Error Context: test-results/color-polish-scenes-expres-e2f47-least-1-6x-grid-phrase-size-chromium/error-context.md
 
@@ -488,9 +488,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:370:34
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:370:34
 
     Error Context: test-results/color-polish-scenes-expres-2af07-oomed-states-at-both-widths-chromium/error-context.md
 
@@ -517,9 +517,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:423:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:423:21
 
     Error Context: test-results/color-polish-scenes-expres-2d301-bout-0-7-while-focused-is-1-chromium/error-context.md
 
@@ -549,9 +549,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:476:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:476:21
 
     Error Context: test-results/color-polish-scenes-expres-0c7e7-slateZ-values-in-grid-state-chromium/error-context.md
 
@@ -578,9 +578,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:535:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/expressions.spec.ts:535:21
 
     Error Context: test-results/color-polish-scenes-expres-93c2b-exists-in-expressions-scene-chromium/error-context.md
 
@@ -609,9 +609,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:13:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:13:21
 
     Error Context: test-results/color-polish-scenes-featur-aabab-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -638,9 +638,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:30:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:30:23
 
     Error Context: test-results/color-polish-scenes-featur-a82ff-places-one-bubble-at-a-time-chromium/error-context.md
 
@@ -669,9 +669,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:62:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:62:23
 
     Error Context: test-results/color-polish-scenes-featur-1182c-tay-circular-during-an-exit-chromium/error-context.md
 
@@ -698,9 +698,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:39:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:39:21
 
     Error Context: test-results/color-polish-scenes-featured-bubbles-span-two-depth-layers-chromium/error-context.md
 
@@ -729,9 +729,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:91:32
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:91:32
 
     Error Context: test-results/color-polish-scenes-featur-0527d-orbit-icons-at-2-s-and-17-s-chromium/error-context.md
 
@@ -758,10 +758,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:70:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:70:28
 
     Error Context: test-results/color-polish-scenes-featur-0c83e-rs-the-featured-scene-still-chromium/error-context.md
 
@@ -790,9 +790,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:124:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:124:23
 
     Error Context: test-results/color-polish-scenes-featur-79824--rotates-across-fresh-opens-chromium/error-context.md
 
@@ -819,9 +819,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:137:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:137:21
 
     Error Context: test-results/color-polish-scenes-featur-218e1-eanly-with-no-error-at-16-s-chromium/error-context.md
 
@@ -850,9 +850,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:154:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:154:21
 
     Error Context: test-results/color-polish-scenes-featur-68f3d-ot-re-flip-when-sceneAge-15-chromium/error-context.md
 
@@ -879,9 +879,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:203:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/featured.spec.ts:203:21
 
     Error Context: test-results/color-polish-scenes-featur-5b960--3d-without-overflow-hidden-chromium/error-context.md
 
@@ -917,9 +917,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:30:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:30:21
 
     Error Context: test-results/color-polish-scenes-garden-6d378-h-one-replacement-at-a-time-chromium/error-context.md
 
@@ -946,9 +946,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:14:36
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:14:36
 
     Error Context: test-results/color-polish-scenes-garden-84239-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -978,9 +978,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:131:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:131:21
 
     Error Context: test-results/color-polish-scenes-garden-bubbles-span-two-depth-layers-chromium/error-context.md
 
@@ -1008,9 +1008,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:160:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:160:23
 
     Error Context: test-results/color-polish-scenes-garden-18826-ough-sprout-swell-and-burst-chromium/error-context.md
 
@@ -1040,10 +1040,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:168:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/garden.spec.ts:168:28
 
     Error Context: test-results/color-polish-scenes-garden-21cf6-on-renders-the-garden-still-chromium/error-context.md
 
@@ -1071,9 +1071,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:15:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:15:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -1104,10 +1104,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:29:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.spec.ts:29:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -1135,9 +1135,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:13:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:13:21
 
     Error Context: test-results/color-polish-scenes-milest-41e3e-d-does-not-overflow-at-14-s-chromium/error-context.md
 
@@ -1164,9 +1164,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:54:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:54:21
 
     Error Context: test-results/color-polish-scenes-milest-a0186-ictly-larger-than-threshold-chromium/error-context.md
 
@@ -1199,9 +1199,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:411:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:411:21
 
     Error Context: test-results/color-polish-scenes-milestone-extreme-depth-chromium/error-context.md
 
@@ -1228,9 +1228,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:346:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:346:21
 
     Error Context: test-results/color-polish-scenes-milest-e5e53-e-continuous-and-individual-chromium/error-context.md
 
@@ -1261,10 +1261,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:475:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/milestone.spec.ts:475:28
 
     Error Context: test-results/color-polish-scenes-milest-4db81-renders-the-milestone-still-chromium/error-context.md
 
@@ -1292,9 +1292,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:108:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:108:21
 
     Error Context: test-results/color-polish-scenes-orbit--90fb7-ets-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -1323,9 +1323,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:268:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:268:21
 
     Error Context: test-results/color-polish-scenes-orbit--10719--planet-sharp-with-a-shadow-chromium/error-context.md
 
@@ -1352,9 +1352,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:331:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:331:21
 
     Error Context: test-results/color-polish-scenes-orbit--97d53--circular-through-the-orbit-chromium/error-context.md
 
@@ -1383,9 +1383,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:366:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:366:23
 
     Error Context: test-results/color-polish-scenes-orbit--c9586--two-distinct-catalog-names-chromium/error-context.md
 
@@ -1412,10 +1412,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:353:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:353:28
 
     Error Context: test-results/color-polish-scenes-orbit--9c3be-ion-renders-the-orbit-still-chromium/error-context.md
 
@@ -1451,9 +1451,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:375:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/orbit.spec.ts:375:21
 
     Error Context: test-results/color-polish-scenes-orbit--67dd2-ystem-contains-one-orb-slot-chromium/error-context.md
 
@@ -1476,7 +1476,7 @@ Running 145 tests using 2 workers
       167 |     const hueOk = (s.h >= 345 && s.h <= 360) || (s.h >= 0 && s.h <= 10);
       168 |     expect(hueOk).toBe(true);
       169 |     expect(s.s).toBeGreaterThan(60);
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:166:17
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:166:17
 
     Error Context: test-results/color-polish-scenes-peace--555ea-60-percent-at-hold-midpoint-chromium/error-context.md
 
@@ -1509,10 +1509,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:232:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peace-in-practice.spec.ts:232:28
 
     Error Context: test-results/color-polish-scenes-peace--2e958-cards-and-14-ambient-hearts-chromium/error-context.md
 
@@ -1542,9 +1542,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:30:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:30:21
 
     Error Context: test-results/color-polish-scenes-peacem-da21e-o-does-not-advance-on-click-chromium/error-context.md
 
@@ -1584,10 +1584,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:410:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/peacemakers.spec.ts:410:28
 
     Error Context: test-results/color-polish-scenes-peacem-b5d75-obe-cards-and-one-held-card-chromium/error-context.md
 
@@ -1614,9 +1614,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:111:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:111:21
 
     Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -1645,9 +1645,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:138:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:138:21
 
     Error Context: test-results/color-polish-scenes-status-8a161-t-three-motion-vocabularies-chromium/error-context.md
 
@@ -1674,9 +1674,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:153:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:153:21
 
     Error Context: test-results/color-polish-scenes-status-9643b--follow-different-waveforms-chromium/error-context.md
 
@@ -1705,9 +1705,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:244:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:244:21
 
     Error Context: test-results/color-polish-scenes-status-bf11e-only-when-motion-is-allowed-chromium/error-context.md
 
@@ -1734,9 +1734,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:288:25
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:288:25
 
 
 [1A[2K[118/145] [chromium] › tests/color-polish-scenes/status.spec.ts:310:5 › all nine catalog phrases are present in the DOM verbatim at 0 s
@@ -1776,10 +1776,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:520:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/status.spec.ts:520:28
 
     Error Context: test-results/color-polish-scenes-status-reduced-motion-matches-G5-exactly-chromium/error-context.md
 
@@ -1807,9 +1807,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:13:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:13:21
 
     Error Context: test-results/color-polish-scenes-welcom-094e0-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -1837,9 +1837,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:27:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:27:21
 
     Error Context: test-results/color-polish-scenes-welcom-9013c-d-and-span-two-depth-layers-chromium/error-context.md
 
@@ -1867,9 +1867,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:66:29
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:66:29
 
     Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
 
@@ -1897,9 +1897,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:100:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:100:23
 
 
 [1A[2K[137/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:185:5 › at 2000 ms actors count is exactly 6
@@ -1925,10 +1925,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:134:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:134:28
 
     Error Context: test-results/color-polish-scenes-welcom-d5444-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -1956,9 +1956,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:186:21
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:186:21
 
     Error Context: test-results/color-polish-scenes-welcom-f02c1-s-actors-count-is-exactly-6-chromium/error-context.md
 
@@ -1986,9 +1986,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:193:29
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:193:29
 
     Error Context: test-results/color-polish-scenes-welcom-efea8-east-one-bubble-within-30-s-chromium/error-context.md
 
@@ -2016,9 +2016,9 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:222:23
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:222:23
 
 
 [1A[2K[141/145] [chromium] › tests/color-polish-scenes/welcome.spec.ts:459:5 › circularity and noOverflow pass with speech bubbles present
@@ -2048,10 +2048,10 @@ Running 145 tests using 2 workers
       132 | }
       133 |
       134 | /**
-        at signInAs (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
-        at openStudioScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
-        at reducedMotionScene (/Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:669:28
+        at signInAs ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:131:22)
+        at openStudioScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:290:3)
+        at reducedMotionScene ($HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/helpers.ts:670:21)
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:669:28
 
     Error Context: test-results/color-polish-scenes-welcom-d4d09--without-rotation-or-fading-chromium/error-context.md
 
@@ -2070,7 +2070,7 @@ Running 145 tests using 2 workers
       397 |
       398 |   const radii = await frame9.evaluate(() => {
       399 |     const bubbles = Array.from(document.querySelectorAll<HTMLElement>('#stage .scene[data-scene="1"] .speech-bubble'));
-        at /Users/anthony/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:396:22
+        at $HOME/Projects/mothers-love-worktrees/tv17-base/tests/color-polish-scenes/welcome.spec.ts:396:22
 
     Error Context: test-results/color-polish-scenes-welcom-0545d-9-s-with-border-radius-16px-chromium/error-context.md
 

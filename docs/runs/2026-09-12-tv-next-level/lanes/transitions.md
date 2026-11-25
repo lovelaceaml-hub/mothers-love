@@ -4,7 +4,7 @@ title: Theatrical transitions on tv15/base
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:35Z
@@ -35,17 +35,17 @@ Two tests previously failed because they attempted to access renderer internals 
 - `transitionStart(styleId, oldRoot, prevSceneId, nextRoot)`: activates `#transition-layer`, populates 24 decorative elements, primes initial frame, and returns active transition state.
 
 ### Changed call sites with absolute paths and line numbers
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:17` (`renderNow`): calls `transitionCleanup()` to ensure `#transition-layer` is immediately cleared and deactivated whenever `renderNow` resets the stage.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:46-57` (`requestScene`): on `S.still` path, logs `scene_transition_start` with `style: 'instant'`, fires `onLeave` before old root removal, and returns without starting a transition. On animated path, draws next style via `transitionNextStyle()`, logs `scene_transition_start` with `{from: prev, to: id, style}`, hides new root, and initializes `transition = transitionStart(style, old, prev, el)`.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:78-120` (`tickTransition`): drives three-phase machine:
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:17` (`renderNow`): calls `transitionCleanup()` to ensure `#transition-layer` is immediately cleared and deactivated whenever `renderNow` resets the stage.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:46-57` (`requestScene`): on `S.still` path, logs `scene_transition_start` with `style: 'instant'`, fires `onLeave` before old root removal, and returns without starting a transition. On animated path, draws next style via `transitionNextStyle()`, logs `scene_transition_start` with `{from: prev, to: id, style}`, hides new root, and initializes `transition = transitionStart(style, old, prev, el)`.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:78-120` (`tickTransition`): drives three-phase machine:
   - Phase 1 `cover` (0 to 0.9s): evaluates `desc.cover(transition, p)` on the 24 elements.
   - Phase 2 `swap` (at 0.9s): fires outgoing scene `onLeave` guarded with `try / catch` logging `scene_onleave_error`, removes old root from `#stage`, reveals new root (`style.opacity = ''`), calls `desc.swap(transition)`, and enters `reveal` phase.
   - Phase 3 `reveal` (0.9s to 2.5s): evaluates `desc.reveal(transition, p)`.
   - At 2.5s: calls `transitionCleanup()`, clears `transition = null`, logs `scene_transition_end` with `{scene: S.s, style: finishedStyle}`, and dequeues any `S.pendingScene`.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:165` (`runtimeState`): exposes `transition: transition ? {age: transition.age, style: transition.style, phase: transition.phase, duration: transition.duration} : null`.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:10`: added `<link rel="stylesheet" href="/color-polish/core/transitions.css">`.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:46`: added `<div class="transition-layer" id="transition-layer" aria-hidden="true"></div>` between `#event` and `#scene-countdown`.
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:74`: added `<script src="/color-polish/core/transitions.js" defer></script>`.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js:165` (`runtimeState`): exposes `transition: transition ? {age: transition.age, style: transition.style, phase: transition.phase, duration: transition.duration} : null`.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:10`: added `<link rel="stylesheet" href="/color-polish/core/transitions.css">`.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:46`: added `<div class="transition-layer" id="transition-layer" aria-hidden="true"></div>` between `#event` and `#scene-countdown`.
+- `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html:74`: added `<script src="/color-polish/core/transitions.js" defer></script>`.
 
 ### Exact bag seed
 `randSeed(4801 + (S.idCounter || 0) * 59 + Math.floor(S.t))`

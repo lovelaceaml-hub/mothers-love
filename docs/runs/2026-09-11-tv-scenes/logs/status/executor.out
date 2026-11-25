@@ -4,10 +4,10 @@ The Participation Status scene now provides three distinct seeded motion vocabul
 
 ### Summary of changes
 
-1. [`public/color-polish/scenes/status.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js): Seeded motion vocabularies by index (`float`, `sway`, `breathe`), stored `kind` on actors, wrote `data-motion` attributes to medallions, initialized `nextLift` schedules, and branched `tickStatus` with distinct waveforms.
-2. [`public/color-polish/scenes/status.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css): Added scoped rules under `#tv .scene[data-scene="6"]` for `.expression-stats` overflow clipping, card relative positioning, a 22 second diagonal light sweep pseudo-element, and 9 second card glow pulses with staggered `nth-child` delays, wrapped in `@media (prefers-reduced-motion: no-preference)` and disabled under `#tv.still`.
-3. [`tests/color-polish-scenes/status.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts): Added five Playwright tests covering medallion circularity, lack of overflow, three motion vocabularies, pairwise distinct icon transforms with opposing rotation deltas, ambient sweep activation under motion and suppression under reduced motion, and strict motion envelope compliance (translate <= 6 px, rotate <= 7 deg, scale 0.97 to 1.03) across 30 seconds.
-4. [`docs/runs/2026-09-11-tv-scenes/lanes/status.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md): Generated the lane record documenting all modified files, resolved gap items, and verification status.
+1. [`public/color-polish/scenes/status.js`](file://$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js): Seeded motion vocabularies by index (`float`, `sway`, `breathe`), stored `kind` on actors, wrote `data-motion` attributes to medallions, initialized `nextLift` schedules, and branched `tickStatus` with distinct waveforms.
+2. [`public/color-polish/scenes/status.css`](file://$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css): Added scoped rules under `#tv .scene[data-scene="6"]` for `.expression-stats` overflow clipping, card relative positioning, a 22 second diagonal light sweep pseudo-element, and 9 second card glow pulses with staggered `nth-child` delays, wrapped in `@media (prefers-reduced-motion: no-preference)` and disabled under `#tv.still`.
+3. [`tests/color-polish-scenes/status.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts): Added five Playwright tests covering medallion circularity, lack of overflow, three motion vocabularies, pairwise distinct icon transforms with opposing rotation deltas, ambient sweep activation under motion and suppression under reduced motion, and strict motion envelope compliance (translate <= 6 px, rotate <= 7 deg, scale 0.97 to 1.03) across 30 seconds.
+4. [`docs/runs/2026-09-11-tv-scenes/lanes/status.md`](file://$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md): Generated the lane record documenting all modified files, resolved gap items, and verification status.
 
 ### What Anthony must do
 
@@ -20,10 +20,10 @@ Inspect the diff preview or hand control to the coordinator to run verification 
 ## COMPLETION
 
 Files changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md)
+- [`$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js`](file://$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css`](file://$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css)
+- [`$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts)
+- [`$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md`](file://$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md)
 
 Anything not done and why:
 None. Everything specified in the work order has been implemented. No questions for Anthony were required as all criteria were unambiguous.

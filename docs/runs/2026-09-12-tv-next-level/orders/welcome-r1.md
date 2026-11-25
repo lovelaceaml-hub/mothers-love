@@ -1,7 +1,7 @@
 # Work order - Section 1 round 2: five spec failures, three of them real - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-welcome-20260912-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-welcome
 Branch: tv15/scene-welcome. Your round 1 is in the worktree, uncommitted. Do not redo or revert it.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

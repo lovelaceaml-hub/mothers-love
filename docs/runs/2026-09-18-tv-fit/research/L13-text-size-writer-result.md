@@ -1,18 +1,18 @@
 # Plan 17 Lane 13 follow-up: the Live Recognitions cards use the rail's text size
 
-Writer: Claude Opus 5. Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed, branch tv17/h-live-feed, cut from tv17/pick 2a75745. No database, no Supabase tool, no deploy, no preview. database/014 was not run and not touched. No .env file was created or copied; every check used the synthetic public config in .tv17/verify-studio.sh. Fictional sample data only.
+Writer: Claude Opus 5. Worktree $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed, branch tv17/h-live-feed, cut from tv17/pick 2a75745. No database, no Supabase tool, no deploy, no preview. database/014 was not run and not touched. No .env file was created or copied; every check used the synthetic public config in .tv17/verify-studio.sh. Fictional sample data only.
 
 Anthony, watching the full screen on the church TV (scene slug live-feed, renderer id 12): "good but the text size should be the same as the original". "The original" is the recognition rail at the bottom of every other screen. Only that changed. The panel still fills y 118 to 1055, the QR block is still inside it, the rail is still hidden under this screen only, the scroll is still continuous, the dwell is still read from state, the screen is still last in the rotation, and the reduced motion paging, empty state and privacy states are unchanged.
 
 ## Changed files (all three inside the allowlist)
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/public/color-polish/scenes/live-feed.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/public/color-polish/scenes/live-feed.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/live-feed.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed/public/color-polish/scenes/live-feed.css
+- $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed/public/color-polish/scenes/live-feed.js
+- $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/live-feed.spec.ts
 
 Nothing else was edited. renderer.css, core/chrome.js, the header, the rail itself, the playlist and every other scene are untouched.
 
-One local, untracked helper folder was created in the worktree so the mandated checks could run: .tv17/verify-studio.sh (the same script as /Users/anthony/Projects/mothers-love-worktrees/tv17-base/.tv17/verify-studio.sh, read from there, retyped with port 3217 instead of 3181 so two writers can verify at once; it contains synthetic public config only, no secret) and .tv17/measure.mjs (the measuring and capture script). Neither is committed.
+One local, untracked helper folder was created in the worktree so the mandated checks could run: .tv17/verify-studio.sh (the same script as $HOME/Projects/mothers-love-worktrees/tv17-base/.tv17/verify-studio.sh, read from there, retyped with port 3217 instead of 3181 so two writers can verify at once; it contains synthetic public config only, no secret) and .tv17/measure.mjs (the measuring and capture script). Neither is committed.
 
 ## Before and after (drawn at 1920; every value doubles at 3840)
 
@@ -86,7 +86,7 @@ Fail then pass proof, both runs through `bash .tv17/verify-studio.sh` against a 
 
 ## Command results (run by the writer, real counts)
 
-All from /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed with npm_config_cache=/tmp/npm-cache.
+All from $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed with npm_config_cache=/tmp/npm-cache.
 
 - `npm run typecheck`: clean.
 - `npm test`: 40 files, 255 tests passed, 0 failed (the same count as tv17/pick; this change adds no unit test).
@@ -98,7 +98,7 @@ All from /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed with npm
 
 ## Captures (fictional data only; the writer looked at them)
 
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/text-size/
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/text-size/
 
 - `<pool>/w<1920|3840>-ms<0|6000|14000|21000>/live-feed.png` for pools `empty`, `three` (3 records), `hundred` (100 records) and `long` (12 records, four of them 500 graphemes): 32 images, 0 page errors.
 - `rail-on-welcome/welcome-rail-w1920.png`: the Welcome screen with its recognition rail at 1920, for the side by side against `hundred/w1920-ms0/live-feed.png`. Put the two on screen together and the cards are the same size.

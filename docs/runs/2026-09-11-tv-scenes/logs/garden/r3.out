@@ -1,10 +1,10 @@
 Petal truncation and retire counter removed from Recognition Garden; all spliced petals now transfer into the scene garden store on every burst.
 
-The arbitrary 38-petal slice and retire counter were removed from [`public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js). Every spliced petal from burstAt transfers into `V.garden.petals` on every burst, with total count bounded by the existing 120-item cap. The lane record at [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) has been updated with the accurate draw order and round r3 result entry.
+The arbitrary 38-petal slice and retire counter were removed from [`public/color-polish/scenes/garden.js`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js). Every spliced petal from burstAt transfers into `V.garden.petals` on every burst, with total count bounded by the existing 120-item cap. The lane record at [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) has been updated with the accurate draw order and round r3 result entry.
 
 ### Progress
-- Removed retireCount and petal slice in [`public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
-- Updated Draw order description and appended round r3 in [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+- Removed retireCount and petal slice in [`public/color-polish/scenes/garden.js`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
+- Updated Draw order description and appended round r3 in [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
 
 ### What now works
 Every petal burst in Recognition Garden now preserves and animates all burst petals subject only to the global 120-petal buffer limit.
@@ -13,9 +13,9 @@ Every petal burst in Recognition Garden now preserves and animates all burst pet
 Nothing, you're clear.
 
 ### Next action (2 minutes)
-1. Review the diff in [`public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) and [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
+1. Review the diff in [`public/color-polish/scenes/garden.js`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) and [`docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
 
 ## COMPLETION
 Files changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+- [`$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md`](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

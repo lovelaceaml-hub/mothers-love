@@ -6,7 +6,7 @@
 - Branch: `codex/mothers-love-display`
 - Base: `81aea58`, foundation synced at `28b2ec3`
 - Target: `ML-BUBBLE-APPROVED-V3`
-- Ownership: `/Users/anthony/Projects/mothers-love-worktrees/display/src/app/display/`, `/Users/anthony/Projects/mothers-love-worktrees/display/src/components/display/`, `/Users/anthony/Projects/mothers-love-worktrees/display/src/lib/display/`, `/Users/anthony/Projects/mothers-love-worktrees/display/tests/display/`, and this lane record
+- Ownership: `$HOME/Projects/mothers-love-worktrees/display/src/app/display/`, `$HOME/Projects/mothers-love-worktrees/display/src/components/display/`, `$HOME/Projects/mothers-love-worktrees/display/src/lib/display/`, `$HOME/Projects/mothers-love-worktrees/display/tests/display/`, and this lane record
 - Protected: shared package configuration, catalog, contracts, API routes, server code, schema, submission, admin, plan, index, and other lanes' files
 
 ## Implemented

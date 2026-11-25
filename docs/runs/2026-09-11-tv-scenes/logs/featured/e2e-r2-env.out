@@ -41,9 +41,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-featur-aabab-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -69,9 +69,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:28:23
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:28:23
 
     Error Context: test-results/color-polish-scenes-featur-a82ff-places-one-bubble-at-a-time-chromium/error-context.md
 
@@ -97,9 +97,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:37:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:37:21
 
     Error Context: test-results/color-polish-scenes-featured-bubbles-span-two-depth-layers-chromium/error-context.md
 
@@ -125,9 +125,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:60:23
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:60:23
 
     Error Context: test-results/color-polish-scenes-featur-1182c-tay-circular-during-an-exit-chromium/error-context.md
 
@@ -153,10 +153,10 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:68:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:68:28
 
     Error Context: test-results/color-polish-scenes-featur-0c83e-rs-the-featured-scene-still-chromium/error-context.md
 
@@ -182,9 +182,9 @@ Running 16 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:102:33
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:102:33
 
     Error Context: test-results/color-polish-scenes-featur-0527d-orbit-icons-at-2-s-and-17-s-chromium/error-context.md
 
@@ -207,9 +207,9 @@ Running 16 tests using 5 workers
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
       129 | }
       130 |
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:127:55)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:122:23
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:127:55)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:122:23
 
     Error Context: test-results/color-polish-scenes-featur-79824--rotates-across-fresh-opens-chromium/error-context.md
 
@@ -231,9 +231,9 @@ Running 16 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:135:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:135:21
 
   9) [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 
 
@@ -255,9 +255,9 @@ Running 16 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.spec.ts:11:21
 
   10) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
 
@@ -278,10 +278,10 @@ Running 16 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -307,7 +307,7 @@ Running 16 tests using 5 workers
       231 |   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
       232 |   await expect(selector).toHaveValue('garden');
       233 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:230:95
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:230:95
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 
@@ -327,7 +327,7 @@ Running 16 tests using 5 workers
       263 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
       264 |   const selector = page.getByLabel('Color Polish preview scene');
       265 |   await expect(selector).toHaveValue('welcome');
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:262:14
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:262:14
 
     Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
 
@@ -354,7 +354,7 @@ Running 16 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:424:104
 
   13 failed
     [chromium] › tests/color-polish-scenes/featured.spec.ts:10:5 › featured renders circular bubbles and no overflow at 14 s 

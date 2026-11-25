@@ -4,7 +4,7 @@ title: Color Polish completion fixes
 state: landed
 model: Sonnet 5 (spilled from Gemini 3.8 Flash)
 runner: helper
-worktree: /Users/anthony/.claude/worktrees/mothers-love-color-polish-fixes
+worktree: $HOME/.claude/worktrees/mothers-love-color-polish-fixes
 review: passed
 depends_on: LI
 updated: 2026-09-10T23:20Z
@@ -26,7 +26,7 @@ updated: 2026-09-10T23:20Z
 
 ## Runtime change
 
-First launched on Gemini 3.8 Flash (High) through agy, branch fix/color-polish-completion, based on a7dca27, in worktree /Users/anthony/.claude/worktrees/mothers-love-color-polish-fixes. The Antigravity headless gate auto-denied a shell command the order required, since npm and psql checks are not on its allow-list, so the launch produced no output and no edits. Full ruling at decisions/2026-09-10T22-55Z-LF-gemini-gate-unmet.md; raw launch output at launch/LF.out. Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
+First launched on Gemini 3.8 Flash (High) through agy, branch fix/color-polish-completion, based on a7dca27, in worktree $HOME/.claude/worktrees/mothers-love-color-polish-fixes. The Antigravity headless gate auto-denied a shell command the order required, since npm and psql checks are not on its allow-list, so the launch produced no output and no edits. Full ruling at decisions/2026-09-10T22-55Z-LF-gemini-gate-unmet.md; raw launch output at launch/LF.out. Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
 
 ## Landing evidence
 

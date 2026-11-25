@@ -1,7 +1,7 @@
 # Work order - Section 7: Status motion vocabulary and ambient layer (renderer id 6, slug status) - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-status-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-status
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-status
 Branch: tv/scene-status (already checked out; you never run git commands that change state)
 Read first, in this order, all inside your worktree: docs/PLAN-13-tv-scene-refactor.md (Section 7 and the Build log), docs/runs/2026-09-11-tv-scenes/gaps/status.md (the approved gap report; its Decision is the spec), docs/runs/2026-09-11-tv-scenes/INDEX.md.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only.
@@ -11,7 +11,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 ## Hard rules
 
 1. Create or edit only the files in your allowlist block. Everything else is protected: every other file under public/color-polish (core/*, renderer.css, renderer.html, other scenes), src/**, scripts/**, tests outside your own spec, and the shared helpers tests/color-polish-scenes/helpers.ts.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-status.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-status.
 3. Run no shell commands at all; the headless permission gate denies them. The coordinator runs typecheck, lint, test, build, your spec, and the probe after you finish.
 4. Do not edit anything under docs/runs/2026-09-11-tv-scenes/ except your own record file docs/runs/2026-09-11-tv-scenes/lanes/status.md.
 5. Never write the em dash (U+2014) or en dash (U+2013) into any file.
@@ -59,8 +59,8 @@ Same shape as the calendar lane record: front matter (lane status, title "Sectio
 End with `## COMPLETION`: files changed (absolute paths); anything not done and why; the question section only if hard rule 9 applied.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
+$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.js
+$HOME/.claude/worktrees/mothers-love-tv-status/public/color-polish/scenes/status.css
+$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
 ```

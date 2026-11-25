@@ -34,9 +34,9 @@ Running 13 tests using 5 workers
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
       129 | }
       130 |
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:127:55)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:127:55)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -62,10 +62,10 @@ Running 13 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -91,9 +91,9 @@ Running 13 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-milest-af9d1-d-does-not-overflow-at-14-s-chromium/error-context.md
 
@@ -120,9 +120,9 @@ Running 13 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:51:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:51:21
 
     Error Context: test-results/color-polish-scenes-milest-e5e53-e-continuous-and-individual-chromium/error-context.md
 
@@ -145,9 +145,9 @@ Running 13 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:116:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:116:21
 
     Error Context: test-results/color-polish-scenes-milestone-extreme-depth-chromium/error-context.md
 
@@ -165,7 +165,7 @@ Running 13 tests using 5 workers
       218 |   }
       219 | });
       220 |
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:217:24
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts:217:24
 
   7) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
 
@@ -183,8 +183,8 @@ Running 13 tests using 5 workers
       100 |   await page.getByLabel('Password').fill('synthetic-password');
       101 |   await page.getByRole('button', { name: 'Sign in' }).click();
       102 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:99:42)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:261:3
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:99:42)
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:261:3
 
   8) [chromium] › tests/color-polish-usable/usable.spec.ts:333:5 › stays visually stable through brief connecting glitches 
 
@@ -207,7 +207,7 @@ Running 13 tests using 5 workers
       363 |   glitchesEnabled = true;
       364 |
       365 |   await page.evaluate(() => {
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:362:63
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:362:63
 
     Error Context: test-results/color-polish-usable-usable-dff93-h-brief-connecting-glitches-chromium/error-context.md
 
@@ -232,7 +232,7 @@ Running 13 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-usable/usable.spec.ts:424:104
 
   9 failed
     [chromium] › tests/color-polish-scenes/helpers.spec.ts:10:5 › helpers open the welcome scene in the Studio and it is circular 

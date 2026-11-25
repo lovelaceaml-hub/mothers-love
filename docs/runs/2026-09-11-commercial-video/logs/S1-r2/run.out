@@ -36,14 +36,14 @@ NARRATE OK total=74.04
 
 ## COMPLETION
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/video/SCRIPT.md`
-- `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/video/narration.json`
+- `$HOME/.claude/worktrees/mothers-love-video-audio/docs/video/SCRIPT.md`
+- `$HOME/.claude/worktrees/mothers-love-video-audio/docs/video/narration.json`
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ### Next action (2 minutes)
-Listen to the re-synthesized audio preview at `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/preview.mp3` or inspect the beat audio at `/Users/anthony/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/3-nine-words.mp3`.
+Listen to the re-synthesized audio preview at `$HOME/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/preview.mp3` or inspect the beat audio at `$HOME/.claude/worktrees/mothers-love-video-audio/docs/private/video/audio/3-nine-words.mp3`.
 
 Would you like to proceed with the next step in Plan 14?
 1. Yes, advance to the next step.

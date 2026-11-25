@@ -1,4 +1,4 @@
-The dev server process cleanup and Next.js dev indicator badge suppression are now implemented in [capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs).
+The dev server process cleanup and Next.js dev indicator badge suppression are now implemented in [capture.mjs](file://$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs).
 
 The script now spawns the dev server detached and terminates the full process group on exit, error, or SIGINT with SIGTERM and a 2-second fallback to SIGKILL if the port still answers. Every recorded page also injects an early style to hide `nextjs-portal` before navigation.
 
@@ -28,7 +28,7 @@ $ grep -c $'\xe2\x80\x94\|\xe2\x80\x93' scripts/video/capture.mjs
 
 ## COMPLETION
 File changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs)
+- [$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs](file://$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs)
 
 ### What Anthony must do
 Nothing, you're clear.

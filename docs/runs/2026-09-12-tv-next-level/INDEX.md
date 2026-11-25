@@ -2,7 +2,7 @@
 
 > Current resume note, 2026-09-12: The requested test preview implementation is complete at commit `b8650739a4a35cbe490e941580c2827a4109d35e` on `codex/tv15-full-preview`. Preview: [mothers-love-d4ve0196a-lvzion.vercel.app/display](https://mothers-love-d4ve0196a-lvzion.vercel.app/display), deployment `dpl_4ZvXooEY66gys1MziS5qACqMeDmf`, READY with a passing build. The exact live Plan 12 transition is restored from commit `15320682a90747267e420d369c441e6938603499`, with a 1.15-second crossfade, tiny translate, uniform scale, and no Nave overlay. The Nave version remains preserved at commit `64f5365` for later. All seven new live-transition tests pass. All current 145 scene test titles have passing evidence across the initial run and focused reruns, with no single clean 145-test invocation; every known initial failure is resolved. Six usable tests pass, 222 Vitest tests pass, globals are clean at 258 declarations, typecheck passes, and lint remains at the 18-problem baseline. Final probes at 1920 and 3840 pass for all 10 scenes, 6 single arrival styles, and 5 group arrival styles with zero issues. Featured's two last failures now pass with lazy orbit, Expressions 5 pass, Welcome 14 pass, and Peacemakers 13 pass plus one gap-fix retest. The preview record rewrites exactly two public GET endpoints and uses preview-only iframe same-origin compatibility, with no database credentials. Final deployed click smoke passed with matching source, normal mode, Welcome to Garden, zero page errors, and zero failed requests. Physical TV approval still gates production promotion. Production remains unchanged at commit `15320682a90747267e420d369c441e6938603499` and deployment `dpl_GZdeMyoZDVtKB9gJSwDNeSxrp3LR`.
 
-Plan: /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md
+Plan: $HOME/Projects/mothers-love/docs/PLAN-15-tv-next-level.md
 Runner: coordinator (Opus 5 · high in a fresh chat, Anthony's ruling; Fable advisor only). Mode: Parallel.
 Base: tv/pick 463ce8d. Branches: tv15/base, tv15/arrivals, tv15/scene-<slug>, tv15/pick.
 Coordinator chat opened 2026-09-11T23:30Z (Opus 5 high). tv15/base cut at b2eb842 (463ce8d plus the cherry-picked docs commit d8fa176; code byte-identical to 463ce8d). Writer for every code lane this sitting: Gemini 3.8 Flash (High) via agy, because Codex primary reads 100 percent (resets Tue 6:12 PM). Gemini weekly 32 percent, Claude weekly 71 percent, Claude 5h 58 percent at launch.
@@ -56,9 +56,9 @@ All eleven code lanes are committed and every one passes its own spec suite with
 
 
 <!-- lane: index state: running model: opus-5 worktree: none review: none updated: 2026-09-11T23:32Z -->
-<!-- lane: lane0 state: landed model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-critic review: none updated: 2026-09-11T23:32Z -->
-<!-- lane: base state: landed model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base review: skipped-by-anthony updated: 2026-09-12T01:40Z -->
-<!-- lane: transitions state: running model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base review: sonnet-5 updated: 2026-09-12T01:55Z -->
-<!-- lane: arrival state: running model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival review: sonnet-5 updated: 2026-09-12T01:55Z -->
-<!-- lane: peacemakers state: running model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers review: sonnet-5 updated: 2026-09-12T01:55Z -->
-<!-- lane: peace-in-practice state: running model: gemini-3.8-flash-high worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice review: sonnet-5 updated: 2026-09-12T01:55Z -->
+<!-- lane: lane0 state: landed model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-critic review: none updated: 2026-09-11T23:32Z -->
+<!-- lane: base state: landed model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-base review: skipped-by-anthony updated: 2026-09-12T01:40Z -->
+<!-- lane: transitions state: running model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-base review: sonnet-5 updated: 2026-09-12T01:55Z -->
+<!-- lane: arrival state: running model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival review: sonnet-5 updated: 2026-09-12T01:55Z -->
+<!-- lane: peacemakers state: running model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-peacemakers review: sonnet-5 updated: 2026-09-12T01:55Z -->
+<!-- lane: peace-in-practice state: running model: gemini-3.8-flash-high worktree: $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice review: sonnet-5 updated: 2026-09-12T01:55Z -->

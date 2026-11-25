@@ -1,12 +1,12 @@
 # Plan 17 Lane 5 writer result (Part A only)
 
-Writer: Claude Opus 5. Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv17-entrance, branch tv17/entrance, cut from tv17/pick 33ffbdc.
+Writer: Claude Opus 5. Worktree: $HOME/.claude/worktrees/mothers-love-tv17-entrance, branch tv17/entrance, cut from tv17/pick 33ffbdc.
 Scope: Part A only. The coordinator withdrew Part B (the arrival) mid lane and moved it to another writer. No file under scenes/arrival.css, scenes/arrival.js, core/arrivals.js or tests/color-polish-scenes/arrival.spec.ts was edited at any point in this lane; `git status` in the worktree lists only the two files below.
 
 ## Changed files
 
-1. /Users/anthony/.claude/worktrees/mothers-love-tv17-entrance/public/color-polish/renderer.css (2 rules changed, 3 comment lines added)
-2. /Users/anthony/.claude/worktrees/mothers-love-tv17-entrance/tests/color-polish-scenes/stage-edges.spec.ts (new, 4 tests)
+1. $HOME/.claude/worktrees/mothers-love-tv17-entrance/public/color-polish/renderer.css (2 rules changed, 3 comment lines added)
+2. $HOME/.claude/worktrees/mothers-love-tv17-entrance/tests/color-polish-scenes/stage-edges.spec.ts (new, 4 tests)
 
 public/color-polish/core/stage.js was in the allowlist but needed no change and was not touched.
 The `.event-stage` rule and the `#tv:has(.event-stage.active)` rule in renderer.css were NOT changed, per the coordinator's merge constraint.
@@ -26,7 +26,7 @@ Ordinary scene content still cannot paint over the header or the rail for two in
 
 ## Verify commands, run in this worktree, with real results
 
-All npm and npx runs used `npm_config_cache=/tmp/npm-cache`. `npm ci` was run in this worktree; node_modules was never symlinked. /Users/anthony/Projects/mothers-love/.env.local was never read or copied. The Studio specs were run against a production build started with synthetic public config only (NEXT_PUBLIC_SUPABASE_URL=https://synthetic.supabase.test, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-key), on free port 3191, following the pattern in .tv17/verify-studio.sh. The server was stopped when the lane finished.
+All npm and npx runs used `npm_config_cache=/tmp/npm-cache`. `npm ci` was run in this worktree; node_modules was never symlinked. $HOME/Projects/mothers-love/.env.local was never read or copied. The Studio specs were run against a production build started with synthetic public config only (NEXT_PUBLIC_SUPABASE_URL=https://synthetic.supabase.test, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-key), on free port 3191, following the pattern in .tv17/verify-studio.sh. The server was stopped when the lane finished.
 
 | Command | Result |
 | --- | --- |
@@ -96,10 +96,10 @@ Header band and feed rail band pixels are byte identical before and after. Sampl
 
 `node scripts/color-polish-renderer-probe.mjs <this worktree> <output> --width=<w> --ms=<ms>`, all four runs reporting `"issues":[]` and all ten scenes:
 
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w1920-ms0
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w1920-ms6000
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w3840-ms0
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w3840-ms6000
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w1920-ms0
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w1920-ms6000
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w3840-ms0
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L5/after/w3840-ms6000
 
 Each folder holds the ten scene PNGs plus result.json. The arrival mid flight screenshots named in the order's Verify line belonged to Part B and were not taken, because Part B moved to another writer.
 

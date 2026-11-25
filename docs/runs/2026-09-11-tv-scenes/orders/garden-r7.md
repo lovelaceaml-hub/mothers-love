@@ -1,13 +1,13 @@
 # Work order - garden correction r7: restore the committed spec and use the real sample in the direct harness - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-garden-20260911-r7
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-garden
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-garden
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none.
 
 Round 6 regressed three things: strict tsc reports `Property 'id' does not exist on type 'never'` at line 58 (an untyped array literal in the copied harness); "garden renders circular bubbles and no overflow at 14 s" now reads scrollHeight 654 (it passed at 636 before, so the shared setup or sample time changed); and the direct-harness petal test read 0 petals because it posted the small helpers fixture, which has too few eligible records for a garden replacement, whereas the probe posts the 48-record sample built by src/components/display/color-polish/sample.ts.
 
 ## Hard rules
-1. Edit only tests/color-polish-scenes/garden.spec.ts and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-garden.
+1. Edit only tests/color-polish-scenes/garden.spec.ts and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-garden.
 
 ## The change
 1. Start from the committed spec, copied for you at docs/runs/2026-09-11-tv-scenes/orders/garden-spec-committed-reference.ts.txt: restore every test except "petals are carried, not dropped" to exactly that text (tests 1, 2, 4, 5 and 6 and the imports they use).
@@ -18,6 +18,6 @@ Append one sentence to "## Result" in docs/runs/2026-09-11-tv-scenes/lanes/garde
 End with `## COMPLETION` naming the files changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md
+$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md
 ```

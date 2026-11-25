@@ -2,16 +2,16 @@ The featured expression rotation and dimensional expression panel are implemente
 
 The scene now rotates through all nine expressions using an internal shuffled bag instead of reading `S.featured`, advances to a second expression after 15 seconds with an animated 3D card flip, and presents the expression panel with layered depth, aurora blobs, concentric counter-rotating rings, orbiting upright icons, staggered phrase words, and a diagonal light sweep.
 
-1. Updated [featured.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) to manage the nine-expression bag, build the 3D perspective panel, flip between expressions, and stagger bubble retirements.
-2. Updated [featured.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css) with scoped styles for idle sway, aurora drift, medallion bob, concentric rings, orbiting icons, phrase word reveals, and light sweep, with full still-mode and reduced-motion overrides.
-3. Updated [featured.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts) to adjust the actor threshold to at least one actor, and added tests for 2 s and 17 s catalog content with 8 orbit icons, rotation across fresh opens, and clean flip advance at 16 s.
-4. Appended the Round r2 summary to [featured.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
+1. Updated [featured.js](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) to manage the nine-expression bag, build the 3D perspective panel, flip between expressions, and stagger bubble retirements.
+2. Updated [featured.css](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css) with scoped styles for idle sway, aurora drift, medallion bob, concentric rings, orbiting icons, phrase word reveals, and light sweep, with full still-mode and reduced-motion overrides.
+3. Updated [featured.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts) to adjust the actor threshold to at least one actor, and added tests for 2 s and 17 s catalog content with 8 orbit icons, rotation across fresh opens, and clean flip advance at 16 s.
+4. Appended the Round r2 summary to [featured.md](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
 
 What now works:
-The live TV preview scene in [featured.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) and the Studio preview on [admin display](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/renderer.html) render all nine expressions in rotation with full 3D panel depth and no overflow.
+The live TV preview scene in [featured.js](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) and the Studio preview on [admin display](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/renderer.html) render all nine expressions in rotation with full 3D panel depth and no overflow.
 
 Two-minute next step:
-Have the coordinator run the Playwright test suite for [featured.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts). Estimated duration: 45 seconds.
+Have the coordinator run the Playwright test suite for [featured.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts). Estimated duration: 45 seconds.
 
 What Anthony must do:
 Nothing, you're clear.
@@ -22,10 +22,10 @@ Questions:
 ## COMPLETION
 
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`
 
 Top-level identifiers added:
 - `FEATURED_BAG`

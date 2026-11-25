@@ -37,7 +37,7 @@ Running 13 tests using 2 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

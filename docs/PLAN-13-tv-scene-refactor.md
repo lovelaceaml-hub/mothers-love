@@ -1,6 +1,6 @@
 # Plan 13: TV scene review and refactor
 
-Project: /Users/anthony/Projects/mothers-love. Live TV: https://mothers-love.vercel.app/display. Planner: Fable 5.1 (Anthony's instruction, September 10, 2026). Approved by Anthony in plan mode on September 10, 2026. Run record: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-11-tv-scenes/INDEX.md.
+Project: $HOME/Projects/mothers-love. Live TV: https://mothers-love.vercel.app/display. Planner: Fable 5.1 (Anthony's instruction, September 10, 2026). Approved by Anthony in plan mode on September 10, 2026. Run record: $HOME/Projects/mothers-love/docs/runs/2026-09-11-tv-scenes/INDEX.md.
 
 Runner: coordinator. Section 0 runs alone and lands first. After that the coordinator launches two or three scene lanes per sitting, each in its own worktree and branch, and Anthony picks which scene branches merge.
 
@@ -12,15 +12,15 @@ Branches let Anthony pick any subset only after the single 941-line renderer is 
 
 ## Inputs (frozen)
 
-- Behavior prompts: /Users/anthony/Downloads/Mother's Love TV Prototype — Section-by-Section Build Prompts.md (filename dash is the file's own).
-- Color pass: /Users/anthony/Downloads/Mother's Love TV App — Complete Color & Visual Polish Pass.md (already live; reference only).
-- Behavior prototype: /Users/anthony/Downloads/Mothers_Love_TV_Prototype_v6 2.html, sha256 e442f3a190eb850c447d3e5b41020c8effe6ed4ff7842447a84e0c705c47ab83. A base64-stripped copy for reading lives in the session scratchpad; lanes may regenerate one with sed. Anthony rejected v8; it was moved to the Trash.
-- Live renderer: /Users/anthony/Projects/mothers-love/public/color-polish/renderer.js (941 lines), renderer.css (250), renderer.html (56). Host: src/components/display/color-polish-host/ColorPolishHost.tsx. Bridge: src/components/display/color-polish/renderer.tsx. Contract: src/lib/color-polish/contracts.ts. Sample data: src/components/display/color-polish/sample.ts and sample-fixture.ts. Probe: scripts/color-polish-renderer-probe.mjs. Journeys: tests/color-polish-usable/usable.spec.ts.
+- Behavior prompts: $HOME/Downloads/Mother's Love TV Prototype — Section-by-Section Build Prompts.md (filename dash is the file's own).
+- Color pass: $HOME/Downloads/Mother's Love TV App — Complete Color & Visual Polish Pass.md (already live; reference only).
+- Behavior prototype: $HOME/Downloads/Mothers_Love_TV_Prototype_v6 2.html, sha256 e442f3a190eb850c447d3e5b41020c8effe6ed4ff7842447a84e0c705c47ab83. A base64-stripped copy for reading lives in the session scratchpad; lanes may regenerate one with sed. Anthony rejected v8; it was moved to the Trash.
+- Live renderer: $HOME/Projects/mothers-love/public/color-polish/renderer.js (941 lines), renderer.css (250), renderer.html (56). Host: src/components/display/color-polish-host/ColorPolishHost.tsx. Bridge: src/components/display/color-polish/renderer.tsx. Contract: src/lib/color-polish/contracts.ts. Sample data: src/components/display/color-polish/sample.ts and sample-fixture.ts. Probe: scripts/color-polish-renderer-probe.mjs. Journeys: tests/color-polish-usable/usable.spec.ts.
 
 ## Models, lanes, reviews
 
 - Coordinator and planner: Fable 5.1. Fable writes the 11 gap reports; Gemini writes all code.
-- Writer for every code lane: Gemini 3.8 Flash (High) through agy. Codex primary was at 100 percent at planning time (resets Tuesday September 15, 6:12 PM Pacific), so Luna is unavailable; Gemini is the named alternate. Writable root for agy is /Users/anthony/.claude/worktrees/**, so each lane worktree is /Users/anthony/.claude/worktrees/mothers-love-tv-<slug>.
+- Writer for every code lane: Gemini 3.8 Flash (High) through agy. Codex primary was at 100 percent at planning time (resets Tuesday September 15, 6:12 PM Pacific), so Luna is unavailable; Gemini is the named alternate. Writable root for agy is $HOME/.claude/worktrees/**, so each lane worktree is $HOME/.claude/worktrees/mothers-love-tv-<slug>.
 - Spill if Gemini refuses: Sonnet 5 (medium). Never Opus or Fable for implementation.
 - Landing review per lane: Sonnet 5 (high) on the diff, at most two rounds. Hygiene sweep before each review: Haiku 4.5 (low).
 - Completion review: one Opus 5 (high) review of the tv/pick integration branch before production.
@@ -44,7 +44,7 @@ Scene id map (Anthony's number, renderer id, slug): 1/1 welcome, 2/2 garden, 3/3
 ## Lane 0: Plan critique
 Setup: read-only critic · high · Lane: Codex · Review: none
   Codex: gpt-5.6-sol · high (fallback when Codex primary is exhausted: Antigravity Gemini 3.8 Flash (High), read-only)
-Worktree: none, read-only against /Users/anthony/Projects/mothers-love
+Worktree: none, read-only against $HOME/Projects/mothers-love
 Depends on: none; launches alongside Section 0
 Agents: none
 Reviewers: none (this lane is the reviewer)
@@ -55,7 +55,7 @@ Brief: argue against this plan; find missing decisions, unsafe assumptions, unte
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
   Claude: Sonnet 5 · medium (spill only)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv/base
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch tv/base
 Depends on: none
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -88,7 +88,7 @@ Acceptance (all must hold):
 ## Section 0b: Shared scene test helpers and visualState depth
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv/base
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch tv/base
 Depends on: Section 0 landed and reviewed
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -100,7 +100,7 @@ Acceptance: a smoke spec tests/color-polish-scenes/helpers.spec.ts loads the wel
 ## Section 1: Welcome (renderer id 1)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome, branch tv/scene-welcome
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-welcome, branch tv/scene-welcome
 Depends on: Section 0; gap report gaps/welcome.md approved by Anthony
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -112,7 +112,7 @@ Acceptance: the common scene spec (below) plus a visualState check that at least
 ## Section 2: Recognition Garden (renderer id 2)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden, branch tv/scene-garden
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-garden, branch tv/scene-garden
 Depends on: Section 0; gaps/garden.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -124,7 +124,7 @@ Acceptance: common spec plus visualState flower count strictly increases over 60
 ## Section 3: Recognition Arrival (renderer id 3)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival, branch tv/scene-arrival
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival, branch tv/scene-arrival
 Depends on: Section 0; gaps/arrival.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -136,7 +136,7 @@ Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 s
 ## Section 4: Featured Recognition (renderer id 4)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured, branch tv/scene-featured
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-featured, branch tv/scene-featured
 Depends on: Section 0; gaps/featured.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -148,7 +148,7 @@ Acceptance: common spec plus bubble count never drops to zero during 30 seconds 
 ## Section 5: Calendar (renderer id 5)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-calendar, branch tv/scene-calendar
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-calendar, branch tv/scene-calendar
 Depends on: Section 0; gaps/calendar.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -160,7 +160,7 @@ Acceptance: common spec plus screenshots at 1920 and 3840 showing the corner dat
 ## Section 6: We Are Peacemakers (renderer id 8, data-scene="8")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers, branch tv/scene-peacemakers
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-peacemakers, branch tv/scene-peacemakers
 Depends on: Section 0; gaps/peacemakers.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -172,7 +172,7 @@ Acceptance: common spec plus bubble count never zero; at least one actor blurred
 ## Section 7: Status (renderer id 6, data-scene="6")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-status, branch tv/scene-status
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-status, branch tv/scene-status
 Depends on: Section 0; gaps/status.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -184,7 +184,7 @@ Acceptance: common spec plus the nine medallion transforms differ from each othe
 ## Section 8: Nine Expressions (renderer id 7, data-scene="7")
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions, branch tv/scene-expressions
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-expressions, branch tv/scene-expressions
 Depends on: Section 0; gaps/expressions.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -196,7 +196,7 @@ Acceptance: common spec plus scrollWidth and scrollHeight never exceed client si
 ## Section 9: Peace in Practice (renderer id 9)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv/scene-peace-in-practice
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv/scene-peace-in-practice
 Depends on: Section 0; gaps/peace-in-practice.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -208,7 +208,7 @@ Acceptance: common spec plus a burst is observed in visualState within 60 second
 ## Section 10: Expression Orbit (renderer id 10)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-orbit, branch tv/scene-orbit
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-orbit, branch tv/scene-orbit
 Depends on: Section 0; gaps/orbit.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -220,7 +220,7 @@ Acceptance: common spec plus orbit z values span both signs and at least one pla
 ## Section 11: Milestone and Weekly Goal (renderer id 11)
 Setup: balanced · high · Lane: Antigravity · Review: controller
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone, branch tv/scene-milestone
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-milestone, branch tv/scene-milestone
 Depends on: Section 0; gaps/milestone.md approved; shared fixture lane if the 48-record sample yields too few nodes
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -232,12 +232,12 @@ Acceptance: common spec plus the stream shows at least 12 nodes at every sampled
 ## Section 12: Pick, integration and release
 Setup: balanced · high · Lane: Claude (coordinator glue) · Review: controller + independent
   Claude: Fable 5.1 coordinator for Git and release; Opus 5 · high completion review
-Worktree: /Users/anthony/Projects/mothers-love (single writer)
+Worktree: $HOME/Projects/mothers-love (single writer)
 Depends on: whichever scene lanes Anthony picks
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high on the merge; independent=Claude Opus 5 · high completion review
 Hygiene: Haiku 4.5 · low sweep before review
-Work: recreate tv/pick from tv/base, merge the chosen scene branches, run the full probe with --arrivals and the whole Playwright suite, push, send Anthony the Vercel preview URL. He watches a full playlist cycle and one click advance on the TV. Opus review, fix blocking findings, merge into codex/color-polish-v6 then codex/mothers-love, verify the production deployment, update README quick links, HANDOFF, AGENTS read-first list and /Users/anthony/Projects/README.md. Rollback (Lane 0 objection 7): before promoting, record the production commit of codex/mothers-love in the Build log; if the TV shows a rendering fault after promotion, `git revert -m 1 <merge commit>` on codex/mothers-love and push (Vercel redeploys), or promote the previous production deployment in the Vercel dashboard; both restore the Plan 12 renderer with no database change.
+Work: recreate tv/pick from tv/base, merge the chosen scene branches, run the full probe with --arrivals and the whole Playwright suite, push, send Anthony the Vercel preview URL. He watches a full playlist cycle and one click advance on the TV. Opus review, fix blocking findings, merge into codex/color-polish-v6 then codex/mothers-love, verify the production deployment, update README quick links, HANDOFF, AGENTS read-first list and $HOME/Projects/README.md. Rollback (Lane 0 objection 7): before promoting, record the production commit of codex/mothers-love in the Build log; if the TV shows a rendering fault after promotion, `git revert -m 1 <merge commit>` on codex/mothers-love and push (Vercel redeploys), or promote the previous production deployment in the Vercel dashboard; both restore the Plan 12 renderer with no database change.
 
 ## Common scene spec (tests/color-polish-scenes/<slug>.spec.ts, built on Section 0b helpers.ts)
 1. Circularity during entrance, steady state and exit, including a transition and an arrival: every .orb-slot, .orb and .event-orb has width equal to height within one pixel and computed border-radius of 50 percent.
@@ -267,14 +267,14 @@ Anthony can call Section 12 after any sitting.
 
 ## Build log
 - 2026-09-10: Anthony chose Parallel mode, ruled out Gemini 3.1 Pro entirely (3.8 Flash only), and asked that Haiku 4.5 carry the mechanical rows; setup lines updated before launch.
-- 2026-09-10: Plan approved by Anthony in plan mode (Fable 5.1 planner, per his instruction). Baseline for the completion review: codex/color-polish-v6, codex/mothers-love and origin/codex/mothers-love all at 1532068. Working tree dirty only with two untracked Plan 10 order files (docs/runs/2026-09-10-color-polish/orders/LM.md, LT.md), not touched by this plan. Codex primary at 100 percent, Gemini weekly at 2 percent, Claude weekly at 36 percent at planning time. Anthony rejected the v8 prototype; /Users/anthony/Downloads/Mothers_Love_TV_Prototype_v8.html moved to the Trash by the coordinator. Section 0 not started.
-- 2026-09-10 (evening, coordinator Fable 5.1, Parallel run started): Baseline confirmed before the first edit: codex/color-polish-v6 at 626ee3d, which is 1532068 plus the two Plan 13 docs commits (03456b4, 626ee3d); the working tree was clean. tv/base was cut from 626ee3d rather than 1532068 so the plan and record tree are readable inside the worktree under the Antigravity read gate (code identical). Worktree /Users/anthony/.claude/worktrees/mothers-love-tv-base with node_modules symlinked to the main checkout. Before-split probe baseline: two identical passes of six configs plus arrivals into docs/runs/2026-09-11-tv-scenes/logs/base/before/run1 and run2; 37 of 70 PNGs byte-deterministic, 33 vary between identical runs (listed in logs/base/before/determinism.txt), so the after-split comparison uses the deterministic set plus result.json state for every scene. Arrival style sequence before: singles 1,5,2,3,4,0 then groups 2,4,3,1,0.
+- 2026-09-10: Plan approved by Anthony in plan mode (Fable 5.1 planner, per his instruction). Baseline for the completion review: codex/color-polish-v6, codex/mothers-love and origin/codex/mothers-love all at 1532068. Working tree dirty only with two untracked Plan 10 order files (docs/runs/2026-09-10-color-polish/orders/LM.md, LT.md), not touched by this plan. Codex primary at 100 percent, Gemini weekly at 2 percent, Claude weekly at 36 percent at planning time. Anthony rejected the v8 prototype; $HOME/Downloads/Mothers_Love_TV_Prototype_v8.html moved to the Trash by the coordinator. Section 0 not started.
+- 2026-09-10 (evening, coordinator Fable 5.1, Parallel run started): Baseline confirmed before the first edit: codex/color-polish-v6 at 626ee3d, which is 1532068 plus the two Plan 13 docs commits (03456b4, 626ee3d); the working tree was clean. tv/base was cut from 626ee3d rather than 1532068 so the plan and record tree are readable inside the worktree under the Antigravity read gate (code identical). Worktree $HOME/.claude/worktrees/mothers-love-tv-base with node_modules symlinked to the main checkout. Before-split probe baseline: two identical passes of six configs plus arrivals into docs/runs/2026-09-11-tv-scenes/logs/base/before/run1 and run2; 37 of 70 PNGs byte-deterministic, 33 vary between identical runs (listed in logs/base/before/determinism.txt), so the after-split comparison uses the deterministic set plus result.json state for every scene. Arrival style sequence before: singles 1,5,2,3,4,0 then groups 2,4,3,1,0.
 - 2026-09-10: Lane 0 critique ran on Gemini 3.8 Flash (High) through agy (the plan's named fallback; Codex primary at 100 percent, resets Tuesday 6:12 PM). Eight objections, disposition: 1 (CSS specificity, #tv prefix required) accepted, plan rule updated; 2 (section number versus renderer id) accepted, every scene section header now carries its renderer id; 3 (untestable acceptance in Sections 1, 3, 11) accepted, criteria rewritten and Section 0b added for visualState depth; 4 (Section 0 refactors all scenes, so tv/pick never runs the monolith) rejected as a finding: that is the design, the split is pixel-proven before any scene branch is cut, and "unchosen branches stay parked" refers to behavior work, not source layout; 5 (rightBubbles unowned) accepted, it lives in core/orbs.js; 6 (calendar click versus click-advance) accepted with the coordinator ruling that the day listener never stops propagation, so live TV still advances and day selection is a Studio preview affordance, open for Anthony to overturn; 7 (no rollback) accepted, rollback added to Section 12; 8 (no shared test fixtures) accepted, Section 0b adds tests/color-polish-scenes/helpers.ts on tv/base. Full critique at docs/runs/2026-09-11-tv-scenes/logs/lane0/critique.out.
 - 2026-09-10: Section 0 launched on Gemini 3.8 Flash (High) through agy in the tv/base worktree from the compiled order docs/runs/2026-09-11-tv-scenes/orders/base.md. Gap reports for sitting one written by Fable and awaiting Anthony's approval: gaps/calendar.md (only the entry pulse is missing; corner date, centered count and past-day shimmer are already live), gaps/status.md (per-icon timing already live; gap is motion vocabulary and an ambient layer; the plan's stated acceptance was already satisfied and is strengthened in the report), gaps/expressions.md (no overflow today; the real defect is the focused card 43 percent empty; the plan's scrollHeight acceptance must measure the visible layer because the hidden detail layer always overflows).
 - 2026-09-10 (late evening): Section 0 landed and reviewed, commit 313edb9 on tv/base. Writer Gemini 3.8 Flash (High) via agy in three dispatches: the split (ended on a headless-denied command after writing every file, so the coordinator deleted renderer.js), the record and CSS headers, and a round-2 correction. Setup line held (balanced, high). Evidence: every probe state identical to the baseline in all six configs plus arrivals, both before and after round 2; 27 of 37 deterministic PNGs byte-identical, the other 10 within 68 pixels of feed-rail text noise; typecheck, vitest and build pass; lint has 14 pre-existing errors identical on the baseline; the full Playwright suite has 70 pre-existing failures identical to the baseline (Plan 12 counted only the four folders it ran). The coordinator's like-for-like e2e comparison found one real regression the Sonnet 5 review had missed: window.colorPolishRuntime was exposed by core/stage.js before scenes/arrival.js declared the style tables, so the host's getState poll between deferred scripts threw; round 2 moved the runtime exposure and the bootstrap listener to boot.js and the usable spec passes 6 of 6. Sonnet note carried into Section 0b: registry default replaceMode becomes null with peacemakers registering drift explicitly. Worktree node_modules is a real npm ci install (Turbopack rejects a symlink). Large probe PNG sets stay local under logs/base; the repo keeps the text evidence and the after-r2 1920 checkpoint set. Anthony still owes: approval of the three sitting-one gap reports and a ruling on the calendar click (day selection is Studio-only under the coordinator ruling).
 - 2026-09-10 (late evening): Section 0b landed on tv/base (uncommitted, awaiting review). Gemini 3.8 Flash (High) via agy wrote tests/color-polish-scenes/helpers.ts and helpers.spec.ts, added z, depth, screenScale and blur to visualState actors, and changed the registry default replaceMode to null (peacemakers already registered drift). Verified: typecheck, vitest and build pass, lint unchanged at the pre-existing 18 problems, probe values identical to the Section 0 baseline except the four added keys, scene helpers spec and usable spec 8 of 8. Hygiene sweep clean. The Sonnet 5 landing review waits for the Claude 5-hour refill at 9:00 PM Pacific (95 percent at the time); commit follows that review. Setup line held.
 - 2026-09-10 (evening): Anthony approved the three sitting-one gap reports as written, kept the calendar click ruling (day selection is Studio-only; live TV click still advances), and told the coordinator to start sitting one once Section 0b's review passes. Recorded in docs/runs/2026-09-11-tv-scenes/decisions/.
-- 2026-09-10, 9:15 PM: Section 0b reviewed (Sonnet 5 high, no material findings, one record note corrected) and committed on tv/base. Sitting one launched: Sections 5, 7 and 8 on Gemini 3.8 Flash (High) via agy, worktrees /Users/anthony/.claude/worktrees/mothers-love-tv-{calendar,status,expressions}, branches tv/scene-<slug> cut from tv/base after the 0b commit; orders in docs/runs/2026-09-11-tv-scenes/orders/. Each lane runs no commands (headless gate); the coordinator verifies and reviews.
+- 2026-09-10, 9:15 PM: Section 0b reviewed (Sonnet 5 high, no material findings, one record note corrected) and committed on tv/base. Sitting one launched: Sections 5, 7 and 8 on Gemini 3.8 Flash (High) via agy, worktrees $HOME/.claude/worktrees/mothers-love-tv-{calendar,status,expressions}, branches tv/scene-<slug> cut from tv/base after the 0b commit; orders in docs/runs/2026-09-11-tv-scenes/orders/. Each lane runs no commands (headless gate); the coordinator verifies and reviews.
 - 2026-09-10, late evening: Anthony ruled "continue until the end": the coordinator runs every remaining sitting and Section 12 up to the Vercel preview and the Opus completion review without per-sitting stops; the TV check before production promotion stays his. Recorded in decisions/.
 - 2026-09-10, late evening: sitting-two gap reports written from a 60 second motion study on tv/base (gaps/welcome.md, featured.md, peacemakers.md). Findings: welcome already moves independently but depth is invisible (scale .90 to 1.0, blur under .1 px) and nextTurn is seeded but never read; featured and peacemakers already replace one bubble at a time on a stagger (exits logged at 17, 26, 35, 48 s), so the plan's Section 4 and 6 "staggered replacement" work is already live and the real gap is depth layering; the long-message reader reset in core swapSlot is deferred to a shared lane. Lanes launched on Gemini through the Section 0 descriptor hooks (mount, integrate, place) with no core change.
 - 2026-09-10, 9:50 PM: Section 5 (calendar) reviewed by Sonnet 5 (no material findings) and committed 6fa5e93 on tv/scene-calendar, pushed. One correction round: the lane's settle assertion assumed finished animations report finished, but the shared helper pauses them; the assertion now compares getComputedTiming().endTime with currentTime. Setup line held.

@@ -4,7 +4,7 @@ title: "Section 6, We Are Peacemakers depth layers"
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
+worktree: $HOME/.claude/worktrees/mothers-love-tv-peacemakers
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T09:15Z

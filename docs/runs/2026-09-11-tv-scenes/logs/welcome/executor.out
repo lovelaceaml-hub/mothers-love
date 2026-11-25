@@ -3,11 +3,11 @@ Section 1 Welcome depth layering and heading changes are landed and ready for co
 The Welcome scene now assigns distinct depth layers (far, mid, near) with corresponding scale, pace, z-index, and blur values, and triggers periodic heading turns on `nextTurn`. A full Playwright behavior test suite verifies circularity, speed and depth separation, heading turns, replay stability, and still-mode positioning.
 
 ### What now works
-1. Depth layers (far, mid, near) are assigned to Welcome scene bubbles in [`welcome.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) with scale factors (0.84, 0.93, 1.0), blur caps (0.9px, 0.35px, 0px), pace multipliers (0.7, 0.9, 1.15), and z-index offsets (40, 60, 80).
+1. Depth layers (far, mid, near) are assigned to Welcome scene bubbles in [`welcome.js`](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) with scale factors (0.84, 0.93, 1.0), blur caps (0.9px, 0.35px, 0px), pace multipliers (0.7, 0.9, 1.15), and z-index offsets (40, 60, 80).
 2. Seeded heading changes rotate velocity vectors by 25 to 70 degrees when `V.clock >= a.nextTurn`, rescheduling turns every 4 to 10 seconds.
 3. Bubbles stay circular through all motion, resize, and replay cycles.
 4. In reduced motion (still mode), transform translation is bypassed so slots remain at their initial inline coordinates.
-5. All five behavior test scenarios are implemented in [`welcome.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts).
+5. All five behavior test scenarios are implemented in [`welcome.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts).
 
 ### What Anthony must do
 Nothing, you're clear.
@@ -20,10 +20,10 @@ npm_config_cache=/tmp/npm-cache npx playwright test tests/color-polish-scenes/we
 
 ## COMPLETION
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`
 
 Anything not done and why:
 None. All tasks specified in Section 1 and the gap report are complete. CSS needed no rules beyond its existing header comment because inline styles and the renderer base cover all presentation needs.

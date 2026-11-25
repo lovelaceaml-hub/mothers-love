@@ -192,7 +192,7 @@ Running 171 tests using 5 workers
       19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
       20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
       21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
 
     Error Context: test-results/color-polish-color-polish--354e2-try-and-contrast-home-phone-chromium/error-context.md
 
@@ -210,7 +210,7 @@ Running 171 tests using 5 workers
       19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
       20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
       21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
 
     Error Context: test-results/color-polish-color-polish--b531d-y-and-contrast-home-desktop-chromium/error-context.md
 
@@ -228,7 +228,7 @@ Running 171 tests using 5 workers
       19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
       20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
       21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
 
     Error Context: test-results/color-polish-color-polish--29a87-d-contrast-submission-phone-chromium/error-context.md
 
@@ -246,7 +246,7 @@ Running 171 tests using 5 workers
       19 |   if(path==='/')await expect(baseline.locator('[data-recognition-id]')).toHaveCount(9);else await expect(baseline.getByLabel('Your name',{exact:true})).toBeVisible();
       20 |   const selector=path==='/'?'h1,h2,[data-recognition-id],a[href="/recognize"],#recent-recognitions':'h1,input,textarea,[data-testid^="expression-card-"],form';
       21 |   expect(await boxes(page,selector)).toEqual(await boxes(baseline,selector));expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:18:126
 
     Error Context: test-results/color-polish-color-polish--d7707-contrast-submission-desktop-chromium/error-context.md
 
@@ -271,7 +271,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-garden-chromium/error-context.md
 
@@ -296,7 +296,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-featured-chromium/error-context.md
 
@@ -321,7 +321,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish-actual-app-TV-color-scene-impact-chromium/error-context.md
 
@@ -346,7 +346,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--3325a--TV-color-scene-expressions-chromium/error-context.md
 
@@ -371,7 +371,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--b4c3c-lor-scene-shared-expression-chromium/error-context.md
 
@@ -396,7 +396,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--76989-pp-TV-color-scene-spotlight-chromium/error-context.md
 
@@ -421,7 +421,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--76bde--color-scene-daily-practice-chromium/error-context.md
 
@@ -446,7 +446,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--60c37-V-color-scene-one-kind-word-chromium/error-context.md
 
@@ -471,7 +471,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--24f13--color-scene-everyday-peace-chromium/error-context.md
 
@@ -496,7 +496,7 @@ Running 171 tests using 5 workers
       34 | });}
       35 | test('supporting guides and sign in keep all content',async({page})=>{await page.setViewportSize({width:1440,height:1000});await mock(page);for(const [path,name] of [['/expressions','expression-guide'],['/privacy','sharing-guide'],['/admin/login','sign-in']]){await page.goto(path);await expect(page.getByRole('heading').first()).toBeVisible();await capture(page,name,true);}});
       36 | const sceneIds=[1,2,3,4,5,8,6,7,9,10,11];
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:33:170
 
     Error Context: test-results/color-polish-color-polish--37ad4-V-color-scene-peace-promise-chromium/error-context.md
 
@@ -514,7 +514,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   16) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 2 ─────
 
@@ -530,7 +530,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   17) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 3 ─────
 
@@ -546,7 +546,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   18) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 4 ─────
 
@@ -562,7 +562,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   19) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 5 ─────
 
@@ -578,7 +578,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   20) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 6 ─────
 
@@ -594,7 +594,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   21) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 7 ─────
 
@@ -610,7 +610,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   22) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 8 ─────
 
@@ -626,7 +626,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   23) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 9 ─────
 
@@ -642,7 +642,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   24) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 10 ────
 
@@ -658,7 +658,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   25) [chromium] › tests/color-polish/color-polish.spec.ts:37:49 › V6 reference color screen 11 ────
 
@@ -674,7 +674,7 @@ Running 171 tests using 5 workers
       39 |  const state=await page.evaluate(()=>{const p=(window as any).preview;p.freeze(true);p.step(2000);p.draw();return {dwell:p.visualState().dwell,order:p.getState().order,colors:p.catalog.map((c:any)=>c.color)};});
       40 |  expect(state.dwell).toEqual({1:30,2:180,3:30,4:30,5:30,6:30,7:30,8:60,9:60,10:30,11:30});expect(new Set(state.colors).size).toBe(9);
       41 |  expect(await page.locator('.orb').evaluateAll(els=>els.every(el=>{const s=getComputedStyle(el);return s.borderRadius==='50%'&&Math.abs(parseFloat(s.width)-parseFloat(s.height))<.1}))).toBe(true);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:38:66
 
   26) [chromium] › tests/color-polish/color-polish.spec.ts:44:5 › V6 celebration styles and motion are preserved 
 
@@ -690,7 +690,7 @@ Running 171 tests using 5 workers
       46 |  for(const n of [1,10]){const state=await page.evaluate(n=>{const p=(window as any).preview;p.reset();p.freeze(true);p.add(n);p.step(6500);p.draw();return {active:p.getState().active,single:p.visualState().singleStyles,group:p.visualState().groupStyles};},n);expect(state.single).toHaveLength(6);expect(state.group).toHaveLength(5);expect(state.active.ids).toHaveLength(n);await capture(page,`v6-arrival-${n}`);}
       47 | });
       48 |
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:45:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish/color-polish.spec.ts:45:66
 
   27) [chromium] › tests/color-polish-usable/usable.spec.ts:235:5 › click or tap on the display advances to the next scene 
 
@@ -711,7 +711,7 @@ Running 171 tests using 5 workers
         at eval (eval at evaluate (:290:30), <anonymous>:42:9)
         at UtilityScript.evaluate (<anonymous>:292:16)
         at UtilityScript.<anonymous> (<anonymous>:1:44)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:270:21
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:270:21
 
     Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
 
@@ -728,8 +728,8 @@ Running 171 tests using 5 workers
         at eval (eval at predicate (eval at evaluate (:290:30)), <anonymous>:3:140)
         at predicate (eval at evaluate (:290:30), <anonymous>:7:23)
         at next (eval at evaluate (:290:30), <anonymous>:29:29)
-        at findRendererFrame (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:294:15)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:305:19
+        at findRendererFrame ($HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:294:15)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-usable/usable.spec.ts:305:19
 
     Error Context: test-results/color-polish-usable-usable-be7b0-nd-resets-on-manual-advance-chromium/error-context.md
 
@@ -754,8 +754,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
 
     Error Context: test-results/display-display.e2e-Bubble-1555d-thout-unsafe-sample-content-chromium/error-context.md
 
@@ -780,8 +780,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
 
     Error Context: test-results/display-display.e2e-Bubble-2e614-thout-unsafe-sample-content-chromium/error-context.md
 
@@ -806,8 +806,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
 
     Error Context: test-results/display-display.e2e-Bubble-5974a-thout-unsafe-sample-content-chromium/error-context.md
 
@@ -832,8 +832,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
 
     Error Context: test-results/display-display.e2e-Bubble-0d2b3-thout-unsafe-sample-content-chromium/error-context.md
 
@@ -858,8 +858,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:169:7
 
     Error Context: test-results/display-display.e2e-Bubble-2d621-thout-unsafe-sample-content-chromium/error-context.md
 
@@ -884,7 +884,7 @@ Running 171 tests using 5 workers
       188 |     await expect(page.getByLabel('Display code')).toHaveCount(0);
       189 |     await expect(page.getByRole('button', { name: /Connect this display/ })).toHaveCount(0);
       190 |     expect(forbiddenRequests).toEqual([]);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:187:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:187:51
 
     Error Context: test-results/display-display.e2e-Bubble-911d9-ctly-without-a-pairing-form-chromium/error-context.md
 
@@ -909,7 +909,7 @@ Running 171 tests using 5 workers
       209 |     await expect(page.getByTestId('display-app')).toHaveAttribute('data-cursor', 'fixture-1', { timeout: 12_000 });
       210 |     expect(forbiddenRequests).toEqual([]);
       211 |   });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:208:98
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:208:98
 
     Error Context: test-results/display-display.e2e-Bubble-822d7-e-without-asking-for-a-code-chromium/error-context.md
 
@@ -934,7 +934,7 @@ Running 171 tests using 5 workers
       248 |     expect(snapshotCalls).toBeGreaterThanOrEqual(2);
       249 |     expect(forbiddenRequests).toEqual([]);
       250 |   });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:247:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:247:51
 
     Error Context: test-results/display-display.e2e-Bubble-bace5-out-pair-or-acknowledgement-chromium/error-context.md
 
@@ -959,7 +959,7 @@ Running 171 tests using 5 workers
       274 |     await expect(page.getByRole('heading', { name: 'The display is temporarily unavailable.' })).toBeVisible({ timeout: 15_000 });
       275 |     expect(forbiddenRequests).toEqual([]);
       276 |   });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:273:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:273:51
 
     Error Context: test-results/display-display.e2e-Bubble-7c5e9-fter-an-unauthorized-resync-chromium/error-context.md
 
@@ -984,8 +984,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:279:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:279:5
 
     Error Context: test-results/display-display.e2e-Bubble-2d08e-ly-links-shared-expressions-chromium/error-context.md
 
@@ -1010,8 +1010,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:291:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:291:5
 
     Error Context: test-results/display-display.e2e-Bubble-f084e--live-rail-on-other-screens-chromium/error-context.md
 
@@ -1036,7 +1036,7 @@ Running 171 tests using 5 workers
       370 |     await expect(page.getByTestId('garden-bubble')).toHaveCount(4);
       371 |
       372 |     allowNewRecognition = true;
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:369:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:369:51
 
     Error Context: test-results/display-display.e2e-Bubble-5a5a3--without-advancing-rotation-chromium/error-context.md
 
@@ -1061,8 +1061,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:386:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:386:5
 
     Error Context: test-results/display-display.e2e-Bubble-abc90-rpts-on-grapheme-boundaries-chromium/error-context.md
 
@@ -1087,7 +1087,7 @@ Running 171 tests using 5 workers
       427 |     let railSeen = false;
       428 |     for (let step = 0; step < 60; step += 1) {
       429 |       if (await page.getByTestId('display-app').getAttribute('data-rail-count') === '30') railSeen = true;
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:426:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:426:51
 
     Error Context: test-results/display-display.e2e-Bubble-b4cfd--the-newest-30-rail-records-chromium/error-context.md
 
@@ -1112,8 +1112,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:444:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:444:5
 
     Error Context: test-results/display-display.e2e-Bubble-55f6a-xpression-panel-at-TV-sizes-chromium/error-context.md
 
@@ -1138,8 +1138,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:491:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:491:5
 
     Error Context: test-results/display-display.e2e-Bubble-2da6b--of-the-QR-dock-at-TV-sizes-chromium/error-context.md
 
@@ -1164,8 +1164,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:529:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:529:5
 
     Error Context: test-results/display-display.e2e-Bubble-05d91-onal-counts-in-neutral-mode-chromium/error-context.md
 
@@ -1190,8 +1190,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:538:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:538:5
 
     Error Context: test-results/display-display.e2e-Bubble-40ae3-e-with-a-literal-apostrophe-chromium/error-context.md
 
@@ -1216,8 +1216,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:547:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:547:5
 
     Error Context: test-results/display-display.e2e-Bubble-80924--its-own-motion-composition-chromium/error-context.md
 
@@ -1242,8 +1242,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:572:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:572:5
 
     Error Context: test-results/display-display.e2e-Bubble-4b570--readable-3x3-counter-board-chromium/error-context.md
 
@@ -1268,8 +1268,8 @@ Running 171 tests using 5 workers
       163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       164 | }
       165 |
-        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:638:5
+        at loadLongAcceptance ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:638:5
 
     Error Context: test-results/display-display.e2e-Bubble-eba70-otion-for-an-arrival-screen-chromium/error-context.md
 
@@ -1294,8 +1294,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:653:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:653:5
 
     Error Context: test-results/display-display.e2e-Bubble-10842-tion-for-a-milestone-screen-chromium/error-context.md
 
@@ -1320,8 +1320,8 @@ Running 171 tests using 5 workers
       138 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       139 | }
       140 |
-        at loadAndRead (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:665:5
+        at loadAndRead ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:137:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:665:5
 
     Error Context: test-results/display-display.e2e-Bubble-a1dfa-cerpts-readable-at-TV-sizes-chromium/error-context.md
 
@@ -1346,8 +1346,8 @@ Running 171 tests using 5 workers
       163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       164 | }
       165 |
-        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:693:5
+        at loadLongAcceptance ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:693:5
 
     Error Context: test-results/display-display.e2e-Bubble-d6b63-ion-at-1920-and-3840-widths-chromium/error-context.md
 
@@ -1372,8 +1372,8 @@ Running 171 tests using 5 workers
       163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       164 | }
       165 |
-        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:733:5
+        at loadLongAcceptance ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:733:5
 
     Error Context: test-results/display-display.e2e-Bubble-6c94e-al-recognition-at-TV-widths-chromium/error-context.md
 
@@ -1398,8 +1398,8 @@ Running 171 tests using 5 workers
       163 |   await expect.poll(() => forbiddenRequests).toEqual([]);
       164 | }
       165 |
-        at loadLongAcceptance (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:785:5
+        at loadLongAcceptance ($HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:162:49)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/display/display.e2e.spec.ts:785:5
 
     Error Context: test-results/display-display.e2e-Bubble-29f9d-le-preserving-every-segment-chromium/error-context.md
 
@@ -1437,7 +1437,7 @@ Running 171 tests using 5 workers
       13 |   await expect(message).toHaveAttribute('data-scrolling', 'true');
       14 |   const metrics = await message.evaluate(node => ({ travel: node.style.getPropertyValue('--message-travel'), animation: getComputedStyle(node.firstElementChild!).animationName }));
       15 |   expect(parseFloat(metrics.travel)).toBeGreaterThan(0);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:12:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:12:25
 
     Error Context: test-results/interview-integration-brow-009c6--owner-can-pause-all-motion-chromium/error-context.md
 
@@ -1464,7 +1464,7 @@ Running 171 tests using 5 workers
       32 |     await page.waitForTimeout(2_000); // Measure steady motion after the entrance finishes.
       33 |     const frames = await page.evaluate(() => new Promise<{ frames: number; maxGapMs: number; averageGapMs: number }>(resolve => {
       34 |       const gaps: number[] = []; let last = performance.now(); const start = last;
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:31:51
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:31:51
 
     Error Context: test-results/interview-integration-brow-56dc2--records-rendering-evidence-chromium/error-context.md
 
@@ -1489,7 +1489,7 @@ Running 171 tests using 5 workers
       59 |   await expect(page.locator('[data-story-role="radial-petal"]')).toHaveCount(9);
       60 |   await page.clock.runFor(2_000);
       61 |   await page.screenshot({ path: testInfo.outputPath('nine-opening.png') });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:58:24
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:58:24
 
     Error Context: test-results/interview-integration-brow-74e5e--flower-into-readable-cards-chromium/error-context.md
 
@@ -1514,7 +1514,7 @@ Running 171 tests using 5 workers
       83 |     if (screen === 'shared-expression') await expect(page.getByTestId('connected-recognition')).toHaveCount(4);
       84 |     else await expect(page.getByTestId('monthly-impact-total')).toContainText('12');
       85 |     await page.screenshot({ path: testInfo.outputPath(`${screen}-opening.png`) });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:82:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:82:25
 
     Error Context: test-results/interview-integration-brow-01276-ts-approved-reveal-sequence-chromium/error-context.md
 
@@ -1539,7 +1539,7 @@ Running 171 tests using 5 workers
       83 |     if (screen === 'shared-expression') await expect(page.getByTestId('connected-recognition')).toHaveCount(4);
       84 |     else await expect(page.getByTestId('monthly-impact-total')).toContainText('12');
       85 |     await page.screenshot({ path: testInfo.outputPath(`${screen}-opening.png`) });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:82:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:82:25
 
     Error Context: test-results/interview-integration-brow-a1149-ts-approved-reveal-sequence-chromium/error-context.md
 
@@ -1564,7 +1564,7 @@ Running 171 tests using 5 workers
       107 |     if (screen === 'everyday-peace') {
       108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
       109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
 
     Error Context: test-results/interview-integration-brow-e355d--the-timed-teaching-journey-chromium/error-context.md
 
@@ -1589,7 +1589,7 @@ Running 171 tests using 5 workers
       107 |     if (screen === 'everyday-peace') {
       108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
       109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
 
     Error Context: test-results/interview-integration-brow-a6120--the-timed-teaching-journey-chromium/error-context.md
 
@@ -1614,7 +1614,7 @@ Running 171 tests using 5 workers
       107 |     if (screen === 'everyday-peace') {
       108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
       109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
 
     Error Context: test-results/interview-integration-brow-10017--the-timed-teaching-journey-chromium/error-context.md
 
@@ -1639,7 +1639,7 @@ Running 171 tests using 5 workers
       107 |     if (screen === 'everyday-peace') {
       108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
       109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
 
     Error Context: test-results/interview-integration-brow-b14a5--the-timed-teaching-journey-chromium/error-context.md
 
@@ -1664,7 +1664,7 @@ Running 171 tests using 5 workers
       107 |     if (screen === 'everyday-peace') {
       108 |       await expect(scene.locator('[data-scene="home"]')).toBeVisible();
       109 |       await expect(scene.locator('[data-scene="school"]')).not.toBeVisible();
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/integration-browser.spec.ts:106:25
 
     Error Context: test-results/interview-integration-brow-82f73--the-timed-teaching-journey-chromium/error-context.md
 
@@ -1682,7 +1682,7 @@ Running 171 tests using 5 workers
       126 |   await page.getByTestId('preview-canvas').screenshot({ path: info.outputPath('preview-phone.png') });
       127 |   await page.screenshot({ path: info.outputPath('studio-phone.png'), fullPage: true });
       128 |   expect(saves).toBe(0);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/studio-browser.spec.ts:125:75
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/studio-browser.spec.ts:125:75
 
     Error Context: test-results/interview-studio-browser-s-2570b-previews-and-saves-settings-chromium/error-context.md
 
@@ -1700,7 +1700,7 @@ Running 171 tests using 5 workers
       121 |     expect(unselectedStyles.backgroundImage).toBe('none');
       122 |
       123 |     await firstChoice.click({ position: { x: 24, y: 56 } });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/interview/submission-experience.spec.ts:120:46
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/interview/submission-experience.spec.ts:120:46
 
     Error Context: test-results/interview-submission-exper-14242-pointer-and-keyboard-target-chromium/error-context.md
 
@@ -1718,7 +1718,7 @@ Running 171 tests using 5 workers
       114 |   await page.getByRole('region',{name:'Recent recognitions',exact:true}).evaluate(el=>{el.scrollTop=175;});await page.waitForTimeout(1500);
       115 |   await page.getByRole('link',{name:'Share a recognition',exact:true}).click();await fill(page);await page.getByTestId('expression-card-2').scrollIntoViewIfNeeded();await page.waitForTimeout(1800);
       116 |   await page.getByRole('button',{name:'Preview public message'}).click();await page.waitForTimeout(1800);await page.keyboard.press('Escape');
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/mobile-recognition/mobile-recognition.spec.ts:113:66
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/mobile-recognition/mobile-recognition.spec.ts:113:66
 
   68) [chromium] › tests/plan08/tv-garden-verification.spec.ts:70:7 › Plan 08 TV Garden synthetic browser coverage › keeps the fixed registry, official destinations, and direct display access explicit 
 
@@ -1741,8 +1741,8 @@ Running 171 tests using 5 workers
       53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
       54 |     ? response.cursor
       55 |     : null;
-        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:89:20
+        at openSyntheticDisplay ($HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:89:20
 
     Error Context: test-results/plan08-tv-garden-verificat-fbf92-ect-display-access-explicit-chromium/error-context.md
 
@@ -1767,8 +1767,8 @@ Running 171 tests using 5 workers
       53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
       54 |     ? response.cursor
       55 |     : null;
-        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:284:5
+        at openSyntheticDisplay ($HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:284:5
 
     Error Context: test-results/plan08-tv-garden-verificat-128bf--its-composed-teaching-view-chromium/error-context.md
 
@@ -1793,8 +1793,8 @@ Running 171 tests using 5 workers
       53 |   const cursor = typeof response === 'object' && response !== null && 'cursor' in response && typeof response.cursor === 'string'
       54 |     ? response.cursor
       55 |     : null;
-        at openSyntheticDisplay (/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:296:7
+        at openSyntheticDisplay ($HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:52:25)
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/plan08/tv-garden-verification.spec.ts:296:7
 
     Error Context: test-results/plan08-tv-garden-verificat-07785--as-official-external-forms-chromium/error-context.md
 
@@ -1812,7 +1812,7 @@ Running 171 tests using 5 workers
       39 |
       40 |     await first.getByRole('button', { name: /^Selected expression 01:/ }).click();
       41 |     await expect(page.getByTestId('growing-bouquet')).toHaveAttribute('data-selected-count', '2');
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/submission/plan08/submission-form-refresh.spec.ts:38:36
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/submission/plan08/submission-form-refresh.spec.ts:38:36
 
     Error Context: test-results/submission-plan08-submissi-91cc4-et-from-distinct-selections-chromium/error-context.md
 
@@ -1890,7 +1890,7 @@ Running 171 tests using 5 workers
       299 |   }
       300 | });
       301 |
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/submission/submission.spec.ts:298:32
+        at $HOME/.claude/worktrees/mothers-love-tv-base/tests/submission/submission.spec.ts:298:32
 
     Error Context: test-results/submission-submission-has--1849b-ns-on-the-expressions-guide-chromium/error-context.md
 

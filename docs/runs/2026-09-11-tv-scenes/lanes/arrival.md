@@ -4,7 +4,7 @@ title: Section 3, Recognition Arrival depth in the weakest entrances
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T09:45Z

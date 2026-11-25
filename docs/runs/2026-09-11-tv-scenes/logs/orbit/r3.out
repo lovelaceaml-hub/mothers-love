@@ -1,19 +1,19 @@
 Landing review corrections for Expression Orbit round r3 are complete across all allowlisted files.
 
-KeepAge remounts in [orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js) now retain the current sun expression whenever `S.sceneAge` exceeds 0.5 seconds, preventing the center medallion from switching mid-pass. The dead `V.orbitId = id;` line is removed because `postRender` replaces `V` immediately after markup. In [orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts), the angular rate tolerance window is widened to 0.082 times 0.88 to 1.12 and annotated with wall-clock sampling context.
+KeepAge remounts in [orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js) now retain the current sun expression whenever `S.sceneAge` exceeds 0.5 seconds, preventing the center medallion from switching mid-pass. The dead `V.orbitId = id;` line is removed because `postRender` replaces `V` immediately after markup. In [orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts), the angular rate tolerance window is widened to 0.082 times 0.88 to 1.12 and annotated with wall-clock sampling context.
 
 ### Changes made
 
-1. Replaced `const id = orbitNextId();` with `const id = (S.sceneAge > 0.5 && ORBIT_LAST) ? ORBIT_LAST : orbitNextId();` in [orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L26).
-2. Deleted `V.orbitId = id;` from [orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js).
-3. Widened angular velocity bounds to `0.082 * 0.88` through `0.082 * 1.12` and added the wall-clock sampling comment in [orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L114-L118).
-4. Appended the round r3 tracking line to the `## Result` section of [orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md#L28).
+1. Replaced `const id = orbitNextId();` with `const id = (S.sceneAge > 0.5 && ORBIT_LAST) ? ORBIT_LAST : orbitNextId();` in [orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L26).
+2. Deleted `V.orbitId = id;` from [orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js).
+3. Widened angular velocity bounds to `0.082 * 0.88` through `0.082 * 1.12` and added the wall-clock sampling comment in [orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L114-L118).
+4. Appended the round r3 tracking line to the `## Result` section of [orbit.md](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md#L28).
 
 ## COMPLETION
 
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js)
+- [$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md)
 
 ### What Anthony must do
 

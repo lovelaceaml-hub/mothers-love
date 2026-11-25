@@ -33,7 +33,7 @@ one whose arithmetic the buildability judge could reproduce.
 
 ## The spec
 
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/research/vortex-spec.md
+$HOME/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/research/vortex-spec.md
 1735 lines, 14 sections, every constant fixed, no further design decisions.
 
 ## Root cause this design fixes

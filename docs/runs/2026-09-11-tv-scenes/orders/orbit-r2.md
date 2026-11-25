@@ -1,7 +1,7 @@
 # Work order - orbit correction r2: a random expression every pass - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-orbit-20260911-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-orbit
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-orbit
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 10 (data-scene="10"). Round: r2.
 
 Anthony reviewed the scene on his TV and asked: "In the Expression Orbit section, it only keeps showing the greeting expression, but it needs to rotate randomly through each different expression for each pass it goes through." Root cause: orbitScene() and the backside swap in tickOrbit read `S.featured`, which core sets from the weekly goal expression (Greeting this week). The scene must keep its own random choice per pass and never read S.featured.
@@ -31,8 +31,8 @@ Read first, inside your worktree: public/color-polish/scenes/orbit.js and orbit.
 - New: at 300 ms the sun name matches a catalog entry and every `.planet-system` contains one `.orb-slot`.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
+$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js
+$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css
+$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
 ```

@@ -4,7 +4,7 @@ title: Garden engine
 state: integrated
 model: gpt-5.6-luna xhigh
 runner: Sol-dispatched Luna lane, Terra coordinated
-worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-garden-garden
+worktree: $HOME/Projects/mothers-love-worktrees/tv-garden-garden
 review: Sol passed after integration checks
 depends_on: LF
 updated: 2026-09-09T08:51Z

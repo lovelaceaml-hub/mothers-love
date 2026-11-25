@@ -1,7 +1,7 @@
 # Work order - Section C round 3: remove the runtime interceptor, fix the shimmer - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-arrival-20260912-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-arrival
 Branch: tv15/arrivals, your work is committed at 3ae1716. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

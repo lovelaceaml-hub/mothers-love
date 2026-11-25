@@ -42,7 +42,7 @@ Every recognition is stored indefinitely, stays on the home page and TV, and an 
 
 ### Section D: release and records
 - Release through `live-app-release` from a clean copy of the live branch `codex/mothers-love`. Database first where the plan says so, preview build, then production.
-- Update HANDOFF, README quick links and `/Users/anthony/Projects/README.md`. Remove the interim 21 day extension note once Section B is live.
+- Update HANDOFF, README quick links and `$HOME/Projects/README.md`. Remove the interim 21 day extension note once Section B is live.
 
 ## Model, effort, lane, review and agent choices
 

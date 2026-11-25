@@ -16,7 +16,7 @@ Production is `main` at merge `65f8a5080a9d965169e2abb52d5fdf667d98feea` (pull r
 - **Current plans:** [Plan 32, scheduled public polling](docs/PLAN-32-polling-schedule.md), merged in pull request #40 on 2026-10-12, and [Plan 31, TV display efficiency](docs/PLAN-31-display-efficiency.md), merged through pull requests #30 and #39 on 2026-10-12. The live status of migration 020 is not recorded. [Plan 18](docs/PLAN-18-keep-forever-and-admin-details.md) Sections C and D remain future work.
 - **User manual:** [docs/USER-MANUAL.md](docs/USER-MANUAL.md).
 - **Product contract:** [docs/CONTRACT.md](docs/CONTRACT.md).
-- **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Projects/Mother's Love/The Words of Mother's Love`.
+- **Storage:** [The Words of Mother's Love in Drive](https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw), run evidence, verification captures and finished media. Mounted path: `$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Projects/Mother's Love/The Words of Mother's Love`.
 - **Source:** [Private repository](https://github.com/lovelaceaml-hub/mothers-love), production branch `main`.
 - **Deployments:** [Vercel project](https://vercel.com/lvzion/mothers-love).
 

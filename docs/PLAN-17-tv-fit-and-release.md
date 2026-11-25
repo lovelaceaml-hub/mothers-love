@@ -6,7 +6,7 @@ Status: approved by Anthony on September 18, 2026 ("im ready"). Interview held p
 
 ## Context
 
-Plan 15's test preview (branch `codex/tv15-full-preview` at `5a24f0b`, worktree `/Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview`, preview https://mothers-love-d4ve0196a-lvzion.vercel.app/display) was watched on the church TV. Anthony likes eight scenes and rejects Peacemakers and Peace in Practice. Production is `change/tv-qr-home` at `b7d92a0` (the Plan 16 100-message feed plus the September 18 QR change), pushed as `codex/mothers-love`, deployment `dpl_DEwMhtevRw9uf1WyuSFPUGotNm27`. Production still runs the Plan 12 single-file renderer; the preview runs the Plan 13 split `core/` plus `scenes/` renderer.
+Plan 15's test preview (branch `codex/tv15-full-preview` at `5a24f0b`, worktree `$HOME/Projects/mothers-love-worktrees/tv15-b2-preview`, preview https://mothers-love-d4ve0196a-lvzion.vercel.app/display) was watched on the church TV. Anthony likes eight scenes and rejects Peacemakers and Peace in Practice. Production is `change/tv-qr-home` at `b7d92a0` (the Plan 16 100-message feed plus the September 18 QR change), pushed as `codex/mothers-love`, deployment `dpl_DEwMhtevRw9uf1WyuSFPUGotNm27`. Production still runs the Plan 12 single-file renderer; the preview runs the Plan 13 split `core/` plus `scenes/` renderer.
 
 Reference captures from the interview: `node scripts/color-polish-renderer-probe.mjs <worktree> <out> [--width=3840] [--ms=0|6000|14000|21000]` renders every scene with fictional sample data. Anthony's TV photos of the Words that bring peace scene show the all-nine grid and the in-focus view running past the left and right screen edges.
 
@@ -36,20 +36,20 @@ Cross-cutting rules: Plan 15 cross-cutting rules stay in force (scene-scoped CSS
 
 ## Branch and worktree model
 
-- `tv17/base`: cut from `codex/tv15-full-preview` at `5a24f0b` in `/Users/anthony/Projects/mothers-love-worktrees/tv17-base`.
-- One branch and worktree per lane, cut from `tv17/base`: `/Users/anthony/Projects/mothers-love-worktrees/tv17-<lane>`. Lanes own disjoint files.
+- `tv17/base`: cut from `codex/tv15-full-preview` at `5a24f0b` in `$HOME/Projects/mothers-love-worktrees/tv17-base`.
+- One branch and worktree per lane, cut from `tv17/base`: `$HOME/Projects/mothers-love-worktrees/tv17-<lane>`. Lanes own disjoint files.
 - `tv17/pick`: integration branch in `tv17-base`; merges the lanes, then merges production `b7d92a0` (Section Z).
 
 ## Lane 0: Plan critique
 Setup: read-only critic · high · Lane: Codex · Review: none
   Codex: gpt-5.6-sol · high (fallback while Codex primary is exhausted: Antigravity Gemini 3.8 Flash (High), read-only)
-Worktree: none, read-only against /Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview and /Users/anthony/Projects/mothers-love
+Worktree: none, read-only against $HOME/Projects/mothers-love-worktrees/tv15-b2-preview and $HOME/Projects/mothers-love
 Depends on: none; launches alongside Lanes 1 to 3
 Brief: attack this plan. All material objections, severity-ranked, evidence for each; approval is not an allowed output. Section Z resolves accepted findings before the completion review and records every disposition in the Build log.
 
 ## Lane 1: Bubble fit (Welcome, Orbit, Goal)
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Gemini 3.8 Flash (High) via agy while Codex primary is at or above 80 percent) · Review: controller
-Worktree: /Users/anthony/Projects/mothers-love-worktrees/tv17-fit, branch tv17/fit
+Worktree: $HOME/Projects/mothers-love-worktrees/tv17-fit, branch tv17/fit
 Depends on: tv17/base
 Reviewers: controller=Claude Sonnet 5 · high
 Owns: public/color-polish/scenes/welcome.*, orbit.*, milestone.*, their scene specs under tests/color-polish-scenes/.
@@ -58,7 +58,7 @@ Acceptance: a new `textFits` assertion (every text element's scroll size within 
 
 ## Lane 2: Words that bring peace edges
 Setup: balanced · high · Lane: Codex (same writer rule as Lane 1) · Review: controller
-Worktree: /Users/anthony/Projects/mothers-love-worktrees/tv17-expressions, branch tv17/expressions
+Worktree: $HOME/Projects/mothers-love-worktrees/tv17-expressions, branch tv17/expressions
 Depends on: tv17/base
 Reviewers: controller=Claude Sonnet 5 · high
 Owns: public/color-polish/scenes/expressions.*, tests/color-polish-scenes/expressions.spec.ts.
@@ -67,7 +67,7 @@ Acceptance: sample the motion at 30 points across a full cycle in both views at 
 
 ## Lane 3: Restore live Peacemakers and Peace in Practice
 Setup: frontier · high · Lane: Codex (same writer rule as Lane 1) · Review: controller
-Worktree: /Users/anthony/Projects/mothers-love-worktrees/tv17-restore, branch tv17/restore
+Worktree: $HOME/Projects/mothers-love-worktrees/tv17-restore, branch tv17/restore
 Depends on: tv17/base
 Reviewers: controller=Claude Sonnet 5 · high
 Owns: public/color-polish/scenes/peacemakers.*, peace-in-practice.*, their scene specs.
@@ -81,7 +81,7 @@ Work: merge Lanes 1 to 3 into tv17/pick; merge production `b7d92a0` and confirm 
 ## Build log
 
 - 2026-09-18: Plan written from the page-by-page interview. Codex's unsaved Plan 15 notes committed as a3eda16 on codex/color-polish-v6 and pushed.
-- 2026-09-18 to 19: Parallel run, coordinator Claude Opus 5. Gemini writers could not run (agy headless permission gate), so writers were Claude: Sonnet 5, escalated per Anthony's new rule (failed review goes to a fresh, higher model: Opus 5, then Fable 5.1). Lane worktrees under /Users/anthony/.claude/worktrees/mothers-love-tv17-* (agy write scope). Lane 0 critique dispositions in decisions/. Anthony added Lane 4 (today's fade for every scene change, Plan 15 transition effects removed) and ruled: long messages page only when too long for the largest bubble; Welcome shows as many bubbles as fit whole; Welcome dwell 40 s (code default done, live setting pending). Lanes 2, 3, 4 reviewed by Opus 5 and merged with production b7d92a0 into tv17/pick 33ffbdc (tsc, 222 unit tests, build clean; full browser suite adds no new failures versus base after the Lane 2 fix). Lane 1 failed Opus review three times; round 4 (fresh Opus 5) is unreviewed at tv17/fit 71bf3f8. Anthony asked to see everything without waiting for review: preview https://mothers-love-ea1g20zjs-lvzion.vercel.app/display (tv17/preview-all a7ca45d). Production unchanged. Handoff: docs/runs/2026-09-18-tv-fit/HANDOFF-2026-09-19.md.
+- 2026-09-18 to 19: Parallel run, coordinator Claude Opus 5. Gemini writers could not run (agy headless permission gate), so writers were Claude: Sonnet 5, escalated per Anthony's new rule (failed review goes to a fresh, higher model: Opus 5, then Fable 5.1). Lane worktrees under $HOME/.claude/worktrees/mothers-love-tv17-* (agy write scope). Lane 0 critique dispositions in decisions/. Anthony added Lane 4 (today's fade for every scene change, Plan 15 transition effects removed) and ruled: long messages page only when too long for the largest bubble; Welcome shows as many bubbles as fit whole; Welcome dwell 40 s (code default done, live setting pending). Lanes 2, 3, 4 reviewed by Opus 5 and merged with production b7d92a0 into tv17/pick 33ffbdc (tsc, 222 unit tests, build clean; full browser suite adds no new failures versus base after the Lane 2 fix). Lane 1 failed Opus review three times; round 4 (fresh Opus 5) is unreviewed at tv17/fit 71bf3f8. Anthony asked to see everything without waiting for review: preview https://mothers-love-ea1g20zjs-lvzion.vercel.app/display (tv17/preview-all a7ca45d). Production unchanged. Handoff: docs/runs/2026-09-18-tv-fit/HANDOFF-2026-09-19.md.
 - 2026-09-19 (second run, coordinator Claude Fable 5.1): Anthony watched preview a7ca45d on the church TV and named changes (decisions/2026-09-19T05-45Z-anthony-tv-watch-feedback.md). His rulings this run (decisions/2026-09-19T06-20Z-anthony-60-seconds-and-opus-fable-only.md): every screen 60 seconds except Garden; no Sonnet, Opus for smaller tasks and Fable for bigger; every screen its own lane; one Fable review per Opus lane with the reviewer fixing what it finds, Fable lanes unreviewed; live durations change at release. Lanes, all merged into tv17/pick 2a75745: L1 round 5 Welcome reserved long bubble; L5 scenes paint edge to edge; L6 Orbit smaller bubbles and revolving medallions; L7 Words that bring peace smooth card switch; L8 Goal fuller swirl; L9 Peacemakers reserved bubble; L10 Peace in Practice reserved bubble and true 3D heart; L11 and L14 bright full screen entrance, single and group; L12 preview only per-screen links (/display?scene=<slug>, arrival, arrival-group); L13 new eleventh screen live-feed with database/014_color_polish_live_feed.sql WRITTEN BUT NOT RUN (activation and rollback files under the run's research/). Checks on 2a75745: tsc clean, vitest 255/255, build clean, full scene suite 274 passed 0 failed against a production build with synthetic config. Not done yet: preview deploy (blocked by the auto mode classifier, waiting on Anthony), Anthony's TV approval, local trial of the 014 SQL, the release question, production deploy, live playlist update to 60 seconds, README and HANDOFF updates, worktree cleanup. Note: AGENTS.md mentions September 18 heart and receipt feed changes from another chat; confirm what production runs before release.
 - 2026-09-19 (handoff lane h-milestone, Fable 5.1, Sonnet text cleanup at Anthony's direction): Goal screen now a funnel vortex of 60 pearls with many bubble sizes, glass icon and foam bubbles and drawn light structure; gold-rimmed caption, Individual acts caption and the bare 0 under Growing campaign removed. Anthony approved preview mothers-love-ofay8zu1p ("looks right"). Merged into tv17/pick 9f8d56b. Checks: typecheck clean, vitest 255/255, milestone spec 21/21; the all-screens folder and build were skipped at Anthony's request and are owed before release. Record: docs/runs/2026-09-18-tv-fit/lanes/L8.md.
 - 2026-09-19 (release, coordinator Claude Fable 5.1): Anthony asked for Live Recognitions at the rail's text size (commit fd1268e, two columns, rail scroll speed), approved that screen on the TV, then ordered the release as fast as possible with no further checks. The live receipt feed and steady hearts release (change/receipt-feed-hearts) was merged into tv17/pick first so nothing live was lost (merge 1b7d2e0, README conflict taken from the release branch). Anthony ran the production deploy himself: https://mothers-love.vercel.app aliased to mothers-love-j49n6xe49-lvzion.vercel.app. Smoke check after deploy: /, /recognize, /display and the live-feed scene files all return 200 and the live script has two columns. Checks on fd1268e before the merge: typecheck clean, 255 of 255 unit tests, build clean, scene suite 275 of 276 (status.spec.ts:110 timed out loading the Studio page, not rerun). Not run: any test on 1b7d2e0. Not done: database/014_color_polish_live_feed.sql NOT RUN (the screen uses its default: enabled, 60 s, last), live saved playlist still at its old durations, README and HANDOFF updates, worktree cleanup, push of tv17/pick.

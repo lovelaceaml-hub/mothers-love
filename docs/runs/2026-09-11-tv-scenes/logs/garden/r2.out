@@ -2,13 +2,13 @@ Updated the depth-layer blur threshold and replacement log ordering in the Garde
 
 The depth-layer test now recognizes near bubbles with breathing blurs under 0.15 px as sharp, while retaining the 0.3 px blur assertion for distant bubbles. The replacement cadence check now sorts log entries by timestamp and deduplicates identical timestamps before validating that consecutive replacements occur every 6 to 8 seconds.
 
-1. Updated [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) with the adjusted sharp condition and time-sorted log evaluation.
-2. Appended the round r2 result note to [garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
+1. Updated [garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) with the adjusted sharp condition and time-sorted log evaluation.
+2. Appended the round r2 result note to [garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md).
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

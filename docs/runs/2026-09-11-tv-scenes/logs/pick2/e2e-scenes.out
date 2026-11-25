@@ -104,8 +104,8 @@ Running 82 tests using 5 workers
       297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
       298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
       299 |
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:296:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/featured.spec.ts:60:23
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:296:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/featured.spec.ts:60:23
 
     Error Context: test-results/color-polish-scenes-featur-1182c-tay-circular-during-an-exit-chromium/error-context.md
 
@@ -130,7 +130,7 @@ Running 82 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

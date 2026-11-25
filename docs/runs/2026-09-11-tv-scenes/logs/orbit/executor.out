@@ -1,13 +1,13 @@
-Section 10 (Expression Orbit) is implemented, lit, and ready for coordinator verification in [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit).
+Section 10 (Expression Orbit) is implemented, lit, and ready for coordinator verification in [$HOME/.claude/worktrees/mothers-love-tv-orbit](file://$HOME/.claude/worktrees/mothers-love-tv-orbit).
 
 The orbital speed is tuned to 0.082 rad/s, depth blur reaches 1.8 px with 0.72 opacity at the back, a scale-proportional drop shadow anchors the front pass, and a radial highlight on planet orbs reflects the central sun. All four allowlist files are written with zero shell commands run, no em or en dashes, and strict `#tv .scene[data-scene="10"]` scoping.
 
 ### What now works
-1. Slower planetary orbit: angular rate changed to 0.082 rad/s in [orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L28-L40).
-2. Deep 3D perspective: blur up to 1.8 px behind the sun, opacity scaling from 0.72 to 1.0, and scale-keyed drop shadow `#5C659240` in [orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L34-L36).
-3. Sun lighting: scoped radial highlight `#FFFFFF59` on planet orbs in [orbit.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css#L3-L11).
-4. Automated verification: complete Playwright behavioral test suite in [orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L1-L200) covering circularity, 3D rates, depth occlusion, filter blur and drop shadow, and reduced motion still behavior.
-5. Lane record: landed state documented in [orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md#L1-L26).
+1. Slower planetary orbit: angular rate changed to 0.082 rad/s in [orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L28-L40).
+2. Deep 3D perspective: blur up to 1.8 px behind the sun, opacity scaling from 0.72 to 1.0, and scale-keyed drop shadow `#5C659240` in [orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L34-L36).
+3. Sun lighting: scoped radial highlight `#FFFFFF59` on planet orbs in [orbit.css](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css#L3-L11).
+4. Automated verification: complete Playwright behavioral test suite in [orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L1-L200) covering circularity, 3D rates, depth occlusion, filter blur and drop shadow, and reduced motion still behavior.
+5. Lane record: landed state documented in [orbit.md](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md#L1-L26).
 
 ### What Anthony must do
 Nothing, you're clear.
@@ -17,9 +17,9 @@ Have the coordinator run the verification suite and probe comparison on branch `
 
 ## COMPLETION
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`
 
 Anything not done: None. All requirements and testable acceptance criteria are met.

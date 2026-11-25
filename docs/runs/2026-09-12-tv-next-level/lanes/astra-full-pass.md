@@ -1,8 +1,8 @@
 # Astra full pass
 
 State: implementation complete for requested test preview; deployed click smoke passed
-Plan: /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md
-Record: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/INDEX.md
+Plan: $HOME/Projects/mothers-love/docs/PLAN-15-tv-next-level.md
+Record: $HOME/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/INDEX.md
 
 ## Authority and topology
 
@@ -13,9 +13,9 @@ Record: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/
 
 ## Current branches
 
-- B2 worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch `tv15/base`, commit `906a1cc`.
+- B2 worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch `tv15/base`, commit `906a1cc`.
 - B2 allowlist: `public/color-polish/core/transitions.js` and `public/color-polish/core/transitions.css` only.
-- Integrated preview: /Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview, branch `codex/tv15-full-preview`, commit `b8650739a4a35cbe490e941580c2827a4109d35e`.
+- Integrated preview: $HOME/Projects/mothers-love-worktrees/tv15-b2-preview, branch `codex/tv15-full-preview`, commit `b8650739a4a35cbe490e941580c2827a4109d35e`.
 - Preview URL: [mothers-love-d4ve0196a-lvzion.vercel.app/display](https://mothers-love-d4ve0196a-lvzion.vercel.app/display), deployment `dpl_4ZvXooEY66gys1MziS5qACqMeDmf`, READY with a passing build.
 
 ## Verified evidence
@@ -35,7 +35,7 @@ Final deployed click smoke passed: matching source, normal mode, Welcome to Gard
 
 Anthony watched the preview and said: "that transition was cool but way too intense. it needs to look gracious, nice, beautiful". This was the prior visual ruling and is superseded by the later decision to defer transition work.
 
-A seventh Luna lane worked on the bounded transition update in /Users/anthony/Projects/mothers-love-worktrees/tv15-finish-graceful-transition on branch `codex/tv15-finish-graceful-transition`. Its gentle version is preserved locally at commit `64f5365` for later. No further Nave work is active in this pass.
+A seventh Luna lane worked on the bounded transition update in $HOME/Projects/mothers-love-worktrees/tv15-finish-graceful-transition on branch `codex/tv15-finish-graceful-transition`. Its gentle version is preserved locally at commit `64f5365` for later. No further Nave work is active in this pass.
 
 ## Authority reconciliation
 
@@ -45,7 +45,7 @@ The integrated helper now finishes the actual transition before settled-scene ti
 
 ## Current authority reconciliation, 2026-09-12
 
-Anthony ruled: "forget the transition for now. its something ill work on another time. use the original transition that is currently live." The current target is the exact Plan 12 1.15-second crossfade with tiny translate and uniform scale from commit `15320682a90747267e420d369c441e6938603499`, with no Nave overlay. This version is being ported into the full preview branch `codex/tv15-full-preview` at /Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview. Current checks include globals clean at 258 declarations, Welcome 14 passing, Expressions 5 targeted tests passing including both prior failures, Peacemakers 13 passing plus one gap-fix retest, and the heart cap test passing. Earlier integrated typecheck and 222 Vitest tests passed, with lint at the 18-problem baseline. Featured verification and final preview checks remain pending. Production is unchanged and no promotion is authorized.
+Anthony ruled: "forget the transition for now. its something ill work on another time. use the original transition that is currently live." The current target is the exact Plan 12 1.15-second crossfade with tiny translate and uniform scale from commit `15320682a90747267e420d369c441e6938603499`, with no Nave overlay. This version is being ported into the full preview branch `codex/tv15-full-preview` at $HOME/Projects/mothers-love-worktrees/tv15-b2-preview. Current checks include globals clean at 258 declarations, Welcome 14 passing, Expressions 5 targeted tests passing including both prior failures, Peacemakers 13 passing plus one gap-fix retest, and the heart cap test passing. Earlier integrated typecheck and 222 Vitest tests passed, with lint at the 18-problem baseline. Featured verification and final preview checks remain pending. Production is unchanged and no promotion is authorized.
 
 ## Final test-preview reconciliation, 2026-09-12
 

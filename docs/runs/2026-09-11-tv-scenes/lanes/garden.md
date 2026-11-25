@@ -4,7 +4,7 @@ title: Section 2, Recognition Garden petals on a breeze, passing light and depth
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden
+worktree: $HOME/.claude/worktrees/mothers-love-tv-garden
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T09:41Z

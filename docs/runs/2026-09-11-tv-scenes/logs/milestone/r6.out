@@ -1,12 +1,12 @@
 Normalized the milestone Studio preview Playwright assertions by the live stage scale and recorded the helper fixture override as a deferred follow-up.
 
-In the Studio preview, `#tv` scales down to approximately 0.46 of full 1080p resolution, which caused raw `getBoundingClientRect` pixel measurements to report ~259 px rather than the unscaled 1812 px coordinate layout. The test in [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts) now calculates `scale = sceneRect.width / 1812` and asserts against `rail.width / scale >= 540` and `rail.leftWithinScene / scale < 60`. In addition, [helpers.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts) hardcodes `buildActiveDisplayFixture()` inside `openStudioScene` without accepting override parameters; because `helpers.ts` sits outside the lane allowlist, testing synthetic worst-case data (a four-digit threshold and a 13-character goal name) has been recorded as a deferred follow-up in [milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md).
+In the Studio preview, `#tv` scales down to approximately 0.46 of full 1080p resolution, which caused raw `getBoundingClientRect` pixel measurements to report ~259 px rather than the unscaled 1812 px coordinate layout. The test in [milestone.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts) now calculates `scale = sceneRect.width / 1812` and asserts against `rail.width / scale >= 540` and `rail.leftWithinScene / scale < 60`. In addition, [helpers.ts](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/helpers.ts) hardcodes `buildActiveDisplayFixture()` inside `openStudioScene` without accepting override parameters; because `helpers.ts` sits outside the lane allowlist, testing synthetic worst-case data (a four-digit threshold and a 13-character goal name) has been recorded as a deferred follow-up in [milestone.md](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md).
 
 What Anthony must do:
 - Nothing, you're clear.
 
 ## COMPLETION
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`
 
 Would you like the coordinator to run the verification suite and Playwright checks on this worktree now?

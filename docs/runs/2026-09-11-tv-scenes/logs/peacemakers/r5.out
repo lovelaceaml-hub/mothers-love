@@ -8,18 +8,18 @@ The initial retirement stagger has been updated to 9 + i * 4.6 seconds, and an i
 - Large reader exemption: `a.large` receives `retireAt = Infinity` and is shielded from shortening.
 - Localized overflow test: direct scene children are checked against `#stage .scene[data-scene="8"]` bounds, excluding `canvas.scene-fx` and non-steady `.orb-slot` elements.
 - Bead tail: draws 6 samples (k from 5 to 0) with a 6-step fade.
-- Record line: added to [`docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) noting the single exit departure petal effect in drift mode.
+- Record line: added to [`docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) noting the single exit departure petal effect in drift mode.
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ### Next action (2 minutes)
-Inspect the modified files at [`public/color-polish/scenes/peacemakers.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js), [`tests/color-polish-scenes/peacemakers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts), and [`docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) to hand off to the coordinator review.
+Inspect the modified files at [`public/color-polish/scenes/peacemakers.js`](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js), [`tests/color-polish-scenes/peacemakers.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts), and [`docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md) to hand off to the coordinator review.
 
 1. Should we proceed with the coordinator Playwright verification run?
 2. Would you like to review any specific diff before proceeding?
 
 ## COMPLETION
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md`

@@ -4,7 +4,7 @@ title: Section 1, Welcome depth and heading changes
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+worktree: $HOME/.claude/worktrees/mothers-love-tv-welcome
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T04:53Z

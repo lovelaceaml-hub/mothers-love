@@ -35,7 +35,7 @@ Running 18 tests using 5 workers
       184 | });
       185 |
       186 | test('sweep clip wrapper exists and feature panel preserves 3d without overflow hidden', async ({ page }) => {
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:183:34
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts:183:34
 
     Error Context: test-results/color-polish-scenes-featur-68f3d-ot-re-flip-when-sceneAge-15-chromium/error-context.md
 
@@ -60,7 +60,7 @@ Running 18 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

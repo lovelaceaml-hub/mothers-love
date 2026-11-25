@@ -1,10 +1,10 @@
 Petal expiry sampling updated to verify 0 petals after the first burst expires and positive petals on the second burst.
 
-The test in [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) now steps to 15000 ms and 17000 ms (data-petals above 0), steps to 20500 ms where all first-burst petals have expired before the second burst at about 21.8 s (data-petals is 0), and then steps to 23000 ms after the second burst (data-petals above 0). The lane execution record in [garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) has been updated with the round r5 entry.
+The test in [garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) now steps to 15000 ms and 17000 ms (data-petals above 0), steps to 20500 ms where all first-burst petals have expired before the second burst at about 21.8 s (data-petals is 0), and then steps to 23000 ms after the second burst (data-petals above 0). The lane execution record in [garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) has been updated with the round r5 entry.
 
 What Anthony must do:
 Nothing, you're clear.
 
 ## COMPLETION
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

@@ -3,7 +3,7 @@
 ## Setup
 
 - Implementation runtime: Codex, gpt-5.6-luna, xhigh.
-- Worktree: `/Users/anthony/Projects/mothers-love-worktrees/submission`.
+- Worktree: `$HOME/Projects/mothers-love-worktrees/submission`.
 - Frozen target: `TargetML-BUBBLE-APPROVED-V3`, mobile390x844 and desktop1440x1000.
 - Protected ownership: all files outside `src/app/page.tsx`, `src/app/privacy/`, `src/components/submission/`, `tests/submission/`, and this lane record.
 - Protected data: no real recognition content, credentials, provider operations, Git operations, or production writes.

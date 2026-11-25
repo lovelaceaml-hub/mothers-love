@@ -4,12 +4,12 @@ Plan goal, quoted: "every word on the approved Plan 15 TV scenes fits inside its
 
 Scope: the coordinator narrowed this lane mid-run to work items 5 and 6 (Words that bring peace). Items 1 to 4 (Peacemakers, Peace in Practice) were dropped before any edit was made to those files; `git status` shows them untouched and identical to 33ffbdc. Reserved bubble sizes and font steps are therefore not part of this lane: none were built here.
 
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv17-peace, branch tv17/peace, cut from tv17/pick 33ffbdc.
+Worktree: $HOME/.claude/worktrees/mothers-love-tv17-peace, branch tv17/peace, cut from tv17/pick 33ffbdc.
 
 ## Changed files
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-peace/public/color-polish/scenes/expressions.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-peace/public/color-polish/scenes/expressions.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-peace/tests/color-polish-scenes/expressions.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-peace/public/color-polish/scenes/expressions.js
+- $HOME/.claude/worktrees/mothers-love-tv17-peace/public/color-polish/scenes/expressions.css
+- $HOME/.claude/worktrees/mothers-love-tv17-peace/tests/color-polish-scenes/expressions.spec.ts
 
 Nothing else changed. renderer.css and core/ untouched.
 
@@ -47,8 +47,8 @@ The Mac ran at load average 250 to 430 throughout (other writers), so long runs 
 - Dash check: no U+2013 or U+2014 in the three changed files.
 
 ## Captures
-- Probe, all scenes, 1920 and 3840, ms 0, 6000, 14000, 21000: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L7/after/w{1920,3840}-ms{0,6000,14000,21000}/ (probe logs alongside; the first w1920-ms6000 run timed out under load and was rerun, exit 0).
-- Frames across the switches: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L7/after/switch-frames/ (67 files). `f-1920-30-0NNNN.png` is the 30 s dwell at scene age NNNN ms: 5900 to 8500 is grid to focus, 15900 to 18500 is focus to focus, 25900 to 28500 is focus back to grid. `f-1920-60-*` is the 60 s dwell (26550 is a third focus change there; 55900 to 59500 is its return to the grid). `f-3840-30-*` is 3840 wide.
+- Probe, all scenes, 1920 and 3840, ms 0, 6000, 14000, 21000: $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L7/after/w{1920,3840}-ms{0,6000,14000,21000}/ (probe logs alongside; the first w1920-ms6000 run timed out under load and was rerun, exit 0).
+- Frames across the switches: $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L7/after/switch-frames/ (67 files). `f-1920-30-0NNNN.png` is the 30 s dwell at scene age NNNN ms: 5900 to 8500 is grid to focus, 15900 to 18500 is focus to focus, 25900 to 28500 is focus back to grid. `f-1920-60-*` is the 60 s dwell (26550 is a third focus change there; 55900 to 59500 is its return to the grid). `f-3840-30-*` is 3840 wide.
 - Viewed by the writer: 6300, 6500, 16300, 16400, 16800, 26300 (1920, 30 s), 56550 and 59500 (60 s), and the probe's w1920-ms21000 expressions.png. Seen: cards mid-flight between places, the chosen card growing, the two cards crossing with the new one on top, the reverse glide, the full grid back at 59.5 s, resting focus view unchanged with its glow.
 
 ## Limitations

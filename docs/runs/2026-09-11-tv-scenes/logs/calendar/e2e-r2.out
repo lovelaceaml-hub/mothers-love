@@ -41,9 +41,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:55:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:55:21
 
     Error Context: test-results/color-polish-scenes-calend-ab51f-rbs-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -69,9 +69,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:72:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:72:21
 
     Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
 
@@ -97,9 +97,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:77:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:77:21
 
     Error Context: test-results/color-polish-scenes-calend-ea969-se-once-on-entry-and-settle-chromium/error-context.md
 
@@ -125,9 +125,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:132:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:132:21
 
     Error Context: test-results/color-polish-scenes-calend-7528c-fx-canvas-render-at-6000-ms-chromium/error-context.md
 
@@ -153,9 +153,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:167:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:167:21
 
     Error Context: test-results/color-polish-scenes-calend-b84aa--the-month-panel-at-6000-ms-chromium/error-context.md
 
@@ -181,9 +181,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:201:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:201:21
 
     Error Context: test-results/color-polish-scenes-calend-fac4f-cene-still-does-not-advance-chromium/error-context.md
 
@@ -209,10 +209,10 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:227:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:227:28
 
     Error Context: test-results/color-polish-scenes-calend-f8d75-alendar-still-with-no-pulse-chromium/error-context.md
 
@@ -238,9 +238,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:243:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:243:21
 
     Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
 
@@ -266,9 +266,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -294,10 +294,10 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -321,8 +321,8 @@ Running 16 tests using 5 workers
       103 | }
       104 |
       105 |
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:102:22)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:224:3
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:102:22)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:224:3
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 
@@ -346,8 +346,8 @@ Running 16 tests using 5 workers
       103 | }
       104 |
       105 |
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:102:22)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:261:3
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:102:22)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:261:3
 
     Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
 
@@ -372,7 +372,7 @@ Running 16 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

@@ -3,10 +3,10 @@ Calendar entry pulse implementation and test suite are landed for Section 5.
 Past days on the Recognition Calendar now execute a single subtle entry pulse on mount, staggered by 60ms per day index and settling within 2.5 seconds. The animation strictly respects reduced motion media preferences and stillness state overrides, leaving existing shimmers and cell layouts untouched.
 
 ### What works now
-- Setting `--day-index` on non-future calendar days during scene mount in [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js).
-- The `calendar-entry-pulse` keyframe and scoped past-day animation rule in [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css) with `#tv.still` and reduced-motion suppression.
-- Playwright validation suite covering all five scenarios in [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts).
-- Lane run record landed at [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md).
+- Setting `--day-index` on non-future calendar days during scene mount in [`$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js).
+- The `calendar-entry-pulse` keyframe and scoped past-day animation rule in [`$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css) with `#tv.still` and reduced-motion suppression.
+- Playwright validation suite covering all five scenarios in [`$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts).
+- Lane run record landed at [`$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md).
 
 ### Next step
 1. Hand off to coordinator for verification commands (typecheck, lint, vitest, Playwright scene spec, build, and probe). (2 minutes)
@@ -16,10 +16,10 @@ Nothing, you're clear.
 
 ## COMPLETION
 Files changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)
+- [`$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
+- [`$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
+- [`$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)
 
 Anything not done and why:
 None. Everything in Section 5 and the calendar gap decision is complete.

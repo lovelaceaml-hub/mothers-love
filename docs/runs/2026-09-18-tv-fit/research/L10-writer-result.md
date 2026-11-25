@@ -1,13 +1,13 @@
 # Lane 10 writer result: Peace in Practice, one reserved long bubble plus a true 3D heart
 
-Writer: fresh Claude Opus 5. Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip`, branch `tv17/pip`, cut from `tv17/pick` 3d4b459.
+Writer: fresh Claude Opus 5. Worktree `$HOME/.claude/worktrees/mothers-love-tv17-pip`, branch `tv17/pip`, cut from `tv17/pick` 3d4b459.
 Facts only, no verdict.
 
 ## Changed files
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip/public/color-polish/scenes/peace-in-practice.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip/public/color-polish/scenes/peace-in-practice.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip/tests/color-polish-scenes/peace-in-practice.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv17-pip/public/color-polish/scenes/peace-in-practice.js`
+- `$HOME/.claude/worktrees/mothers-love-tv17-pip/public/color-polish/scenes/peace-in-practice.css`
+- `$HOME/.claude/worktrees/mothers-love-tv17-pip/tests/color-polish-scenes/peace-in-practice.spec.ts`
 
 `git diff --stat`: 3 files changed, 1089 insertions, 277 deletions. Nothing outside the allowlist was touched; `git status` shows only those three files.
 
@@ -101,7 +101,7 @@ Headless Chromium rasterizes Canvas 2D in software, so a TV browser with GPU can
 
 ## Verify: exact commands and results
 
-Run from `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip` with `npm_config_cache=/tmp/npm-cache`. `npm ci` was run in this worktree (exit 0, no symlinked node_modules).
+Run from `$HOME/.claude/worktrees/mothers-love-tv17-pip` with `npm_config_cache=/tmp/npm-cache`. `npm ci` was run in this worktree (exit 0, no symlinked node_modules).
 
 | Command | Result |
 | --- | --- |
@@ -142,12 +142,12 @@ Two deliberate mutations were made, the spec was run, and both failed as intende
 ## Captures
 
 Probe, fictional sample data only, every scene at both widths and all four checkpoints:
-`/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/after/w{1920,3840}-ms{0,6000,14000,21000}/peace-in-practice.png`
+`$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/after/w{1920,3840}-ms{0,6000,14000,21000}/peace-in-practice.png`
 Every probe run reported `"issues":[]` (no page errors, no console errors).
 
 Heart frames at 0, 45, 90, 135 and 180 degrees of the spin, plus a whole scene frame, at both widths:
-`/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart/w{1920,3840}-heart-{0,45,90,135,180}deg.png`
-`/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart/w{1920,3840}-ms6000-scene.png`
+`$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart/w{1920,3840}-heart-{0,45,90,135,180}deg.png`
+`$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart/w{1920,3840}-ms6000-scene.png`
 
 I looked at all of them. At 0 and 180 degrees the heart is a full rose heart with a highlight on the upper left lobe. At 45 and 135 the near lobe clearly stands in front of the far one and the highlight has travelled with the turn. At 90 it is a rounded solid 396 px across, never an edge.
 

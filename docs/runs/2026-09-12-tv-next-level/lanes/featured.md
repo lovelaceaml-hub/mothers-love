@@ -4,7 +4,7 @@ title: Section 3: Featured Recognition (renderer id 4)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured
+worktree: $HOME/.claude/worktrees/mothers-love-tv-featured
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:36Z
@@ -18,14 +18,14 @@ Implement Section 3 (Featured Recognition, renderer id 4) for Mother's Love TV u
 
 ### Files modified
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-12-tv-next-level/lanes/featured.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-12-tv-next-level/lanes/featured.md`
 
 ### Functions and constants created or updated
 
-All top-level declarations in `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js` are prefixed with `featured` or `FEATURED_`:
+All top-level declarations in `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js` are prefixed with `featured` or `FEATURED_`:
 
 - `FEATURED_LAYERS` (line 4): Multi-layer parallax scaling, blur, pacing, and z-index table.
 - `FEATURED_DRIFT_TO` (line 9): Layer drift progression map.

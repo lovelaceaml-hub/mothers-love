@@ -42,9 +42,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -70,10 +70,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -99,9 +99,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:28:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:28:21
 
     Error Context: test-results/color-polish-scenes-peacem-2daa7-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -129,8 +129,8 @@ Running 15 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:43:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:43:21
 
     Error Context: test-results/color-polish-scenes-peacem-55728-5-unless-one-actor-is-large-chromium/error-context.md
 
@@ -156,9 +156,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:62:23
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:62:23
 
     Error Context: test-results/color-polish-scenes-peacem-e7b49-ctor-exiting-at-fresh-opens-chromium/error-context.md
 
@@ -180,9 +180,9 @@ Running 15 tests using 5 workers
       125 |   await page.getByLabel('Email address').fill(`${role}@synthetic.test`);
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:124:14)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:9)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:80:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:124:14)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:9)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:80:21
 
   7) [chromium] › tests/color-polish-scenes/peacemakers.spec.ts:141:5 › the globe-light element and fx canvas exist at 6000 ms 
 
@@ -197,7 +197,7 @@ Running 15 tests using 5 workers
       146 |   expect(fxCanvas).not.toBeNull();
       147 | });
       148 |
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:145:32
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:145:32
 
     Error Context: test-results/color-polish-scenes-peacem-f2ef0--fx-canvas-exist-at-6000-ms-chromium/error-context.md
 
@@ -223,9 +223,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:152:23
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:152:23
 
     Error Context: test-results/color-polish-scenes-peacem-6db64-circular-during-replacement-chromium/error-context.md
 
@@ -250,10 +250,10 @@ Running 15 tests using 5 workers
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
       129 | }
       130 |
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:127:55)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:160:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:127:55)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts:160:28
 
     Error Context: test-results/color-polish-scenes-peacem-d29dd-the-peacemakers-scene-still-chromium/error-context.md
 
@@ -280,7 +280,7 @@ Running 15 tests using 5 workers
       220 |   quiet = true;
       221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
       222 |   await expect(page.locator('iframe')).toHaveCount(0);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:219:83
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:219:83
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 
@@ -305,7 +305,7 @@ Running 15 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

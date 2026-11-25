@@ -2,13 +2,13 @@
 
 Facts only. Fable 5.1 reviews.
 
-Branch `tv17/goal` in `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, cut from tv17/fit 71bf3f8.
+Branch `tv17/goal` in `$HOME/.claude/worktrees/mothers-love-tv17-goal`, cut from tv17/fit 71bf3f8.
 Anthony's words this lane answers: "Goal page: the swirling recognitions need to be fuller, with more bubbles."
 
 ## Changed files
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal/public/color-polish/scenes/milestone.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal/tests/color-polish-scenes/milestone.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv17-goal/public/color-polish/scenes/milestone.js`
+- `$HOME/.claude/worktrees/mothers-love-tv17-goal/tests/color-polish-scenes/milestone.spec.ts`
 
 `public/color-polish/scenes/milestone.css` is in the allowlist and is unchanged: the pearl stays 236 px, because
 that is the size its words need (see "Pearl size" below). Nothing outside the allowlist was touched.
@@ -112,7 +112,7 @@ version of milestone.js back in place and running the same measurement.
 
 ## Verification, exact results
 
-Run from `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, with this lane's own dev server on port 3188
+Run from `$HOME/.claude/worktrees/mothers-love-tv17-goal`, with this lane's own dev server on port 3188
 (`npx next dev --hostname 127.0.0.1 --port 3188`, stopped afterwards) and synthetic public config only
 (`NEXT_PUBLIC_SUPABASE_URL=https://synthetic-project.supabase.test`,
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=synthetic-publishable-key`, `NEXT_PUBLIC_APP_URL=http://127.0.0.1:3188`).
@@ -125,7 +125,7 @@ Run from `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, with this la
   --workers=1 --timeout=90000 --retries=1`: **17 passed (3.1m)**, no test used its retry, no flaky line.
 - Probe captures, all eight, no issues reported by any run:
   `node scripts/color-polish-renderer-probe.mjs . <out> --width=<1920|3840> --ms=<0|6000|14000|21000>` into
-  `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/after/w<width>-ms<ms>/`
+  `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/after/w<width>-ms<ms>/`
   (each folder holds every scene; Goal is `milestone.png`).
 
 Earlier full-file runs on this Mac failed 3 to 7 tests, every one a timeout or a sign-in timeout, while three
@@ -136,8 +136,8 @@ all 17 in 3.1 minutes.
 ## Before and after captures
 
 - Before, the current live look this lane started from:
-  `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after3/w1920-ms6000/milestone.png`
-- After: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/after/w1920-ms6000/milestone.png`
+  `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after3/w1920-ms6000/milestone.png`
+- After: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/after/w1920-ms6000/milestone.png`
   and the seven others under `.../captures/L8/after/`.
 
 ## Pearl size, and why nothing shrank

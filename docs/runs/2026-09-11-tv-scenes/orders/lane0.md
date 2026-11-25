@@ -1,24 +1,24 @@
 # Work order - Lane 0 critique - Mother's Love TV - Plan 13: TV scene review and refactor
 
 Dispatch ID: agy-lane0-20260911
-Project root: /Users/anthony/.claude/worktrees/mothers-love-tv-critic (a read-only checkout of the project at the plan's baseline)
+Project root: $HOME/.claude/worktrees/mothers-love-tv-critic (a read-only checkout of the project at the plan's baseline)
 Mode: read-only critique (no files may be created or modified; run no command that writes)
 Model: Gemini 3.8 Flash (High) through Antigravity, standing in for gpt-5.6-sol because the Codex primary pool is at 100 percent until Tuesday September 15, 6:12 PM Pacific.
 
 ## Task facts
 
-Artifact under review: /Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md
+Artifact under review: $HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md
 
 Read scope (read these and nothing else):
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-11-tv-scenes/INDEX.md
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.html
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/src/components/display/color-polish-host/ColorPolishHost.tsx
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/src/lib/color-polish/contracts.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-usable/usable.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md
+- $HOME/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-11-tv-scenes/INDEX.md
+- $HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js
+- $HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.css
+- $HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.html
+- $HOME/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs
+- $HOME/.claude/worktrees/mothers-love-tv-critic/src/components/display/color-polish-host/ColorPolishHost.tsx
+- $HOME/.claude/worktrees/mothers-love-tv-critic/src/lib/color-polish/contracts.ts
+- $HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-usable/usable.spec.ts
 
 ## Mandate
 

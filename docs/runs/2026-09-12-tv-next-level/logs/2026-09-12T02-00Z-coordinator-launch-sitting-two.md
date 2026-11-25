@@ -5,9 +5,9 @@
 Anthony ruled "skip it and launch" (decisions/2026-09-12T01-40Z-anthony-skip-section-A-landing-review.md), so Section A's Sonnet landing review did not run and sitting two launched immediately on the verified commit.
 
 Section A committed at tv15/base 3e89529. The three scene branches were cut from that exact commit:
-- tv15/arrivals in /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
-- tv15/scene-peacemakers in /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
-- tv15/scene-peace-in-practice in /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+- tv15/arrivals in $HOME/.claude/worktrees/mothers-love-tv-arrival
+- tv15/scene-peacemakers in $HOME/.claude/worktrees/mothers-love-tv-peacemakers
+- tv15/scene-peace-in-practice in $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 
 Section B writes to tv15/base itself, in mothers-love-tv-base, so it is the only lane sharing a worktree with a landed section and the only writer there. The three scene branches therefore do not carry B's transitions; that is the plan's design, since tv15/pick is recreated from tv15/base after B and the scene branches merge onto it.
 

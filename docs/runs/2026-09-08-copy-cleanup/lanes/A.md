@@ -6,7 +6,7 @@ Admin copy cleanup for the settings, sign-in, display, review, recognition, over
 
 ## Baseline
 
-- Worktree: `/Users/anthony/Projects/mothers-love-worktrees/copy-admin`
+- Worktree: `$HOME/Projects/mothers-love-worktrees/copy-admin`
 - Starting HEAD: `0565045c033458d6646f7a8bf1870c0c6438c78a`
 - Starting worktree: clean
 

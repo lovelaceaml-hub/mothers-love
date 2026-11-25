@@ -1,14 +1,14 @@
 The round 8 overflow timing adjustment for Recognition Garden is complete.
 
-In [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts), the `noOverflow` check is now measured at 12000 ms in a separate studio call before the first replacement cycle starts at 14.0 s. This avoids catching the mid-rise newcomer bubble while it sprouts from y 654 below the stage boundary. Circularity and click-advance checks remain evaluated at 14000 ms.
+In [garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts), the `noOverflow` check is now measured at 12000 ms in a separate studio call before the first replacement cycle starts at 14.0 s. This avoids catching the mid-rise newcomer bubble while it sprouts from y 654 below the stage boundary. Circularity and click-advance checks remain evaluated at 14000 ms.
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ### Next action (2 minutes)
-Review the updated test in [garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) and run coordinator verification.
+Review the updated test in [garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts) and run coordinator verification.
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)

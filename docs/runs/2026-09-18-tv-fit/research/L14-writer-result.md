@@ -3,13 +3,13 @@
 Writer: Claude Fable 5.1 (no separate review, owner's ruling; self verified, screenshots looked at).
 Plan goal line checked first: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV." This lane is Anthony's named change to the entrance and does not work against that line. Nothing was deployed.
 
-Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival, branch tv17/arrival, tv17/pick (592a405) merged in first, no package file changed so npm ci was not needed.
+Worktree $HOME/.claude/worktrees/mothers-love-tv17-arrival, branch tv17/arrival, tv17/pick (592a405) merged in first, no package file changed so npm ci was not needed.
 
 ## Changed files (allowlist only)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/core/arrivals.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/tests/color-polish-scenes/arrival.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.css
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.js
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/core/arrivals.js
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/tests/color-polish-scenes/arrival.spec.ts
 - renderer.css was NOT touched. The old box rule stays there; arrival.css outranks it with `#tv .event-stage`.
 
 ## Geometry before and after (TV units, 1920 by 1080)
@@ -42,7 +42,7 @@ How: orbs are still laid out at their old sizes (540, 258, 518), so circular fit
 - Mutation checks (files restored after): old box in arrival.css fails "top margin, expected 54, received 148"; backdrop z-index lowered to 31 fails the hide and compare with 394917 pixels; ring shrink removed fails with 211 px overflow.
 
 ## Captures
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L14/after (36 PNGs): for w1920 and w3840, single and group at arrival-start, arrival-mid-flight, arrival-exit-flight, arrival-cleared; all four frame styles (frame-0-light-beam, frame-1-petal-curtain, frame-2-aurora, frame-3-constellation-gather) for single and group; single-long-500 and group-pair-long-500. Looked at: single and group in several frame styles, mid flight, exit flight, 3840 single, both 500 grapheme frames.
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L14/after (36 PNGs): for w1920 and w3840, single and group at arrival-start, arrival-mid-flight, arrival-exit-flight, arrival-cleared; all four frame styles (frame-0-light-beam, frame-1-petal-curtain, frame-2-aurora, frame-3-constellation-gather) for single and group; single-long-500 and group-pair-long-500. Looked at: single and group in several frame styles, mid flight, exit flight, 3840 single, both 500 grapheme frames.
 
 ## Limitations
 - The four moments (start, mid flight, exit, cleared) were captured in one frame style per kind; the four frame styles were captured at the reading moment. Not every moment times every style.

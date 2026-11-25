@@ -1,7 +1,7 @@
 # L9 review: Peacemakers, one reserved long bubble
 
 Reviewer: Claude Fable 5.1 (single review, corrections made by the reviewer, no second round).
-Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers`, branch `tv17/peacemakers`.
+Worktree `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers`, branch `tv17/peacemakers`.
 Reviewed commit 4ab5d71 (on tv17/pick 3d4b459). Corrections commit: bffea2b.
 
 Plan goal line checked against: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
@@ -35,7 +35,7 @@ Plan goal line checked against: "every word on the approved Plan 15 TV scenes fi
 - `npm run build`: exit 0.
 - `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3197 npx playwright test tests/color-polish-scenes/peacemakers.spec.ts --workers=3`: 19 passed, 0 failed (1.3 min). The unused port only stops Playwright from starting a dev server; the spec serves `public/color-polish` from disk, so no server was started or left running.
 - Probe, 8 runs (1920 and 3840 at ms 0, 6000, 14000, 21000): every run `"issues":[]`, all ten scenes rendered.
-- Captures: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L9/reviewed/w<width>-ms<ms>/peacemakers.png`. At ms 21000 the reserved bubble already shows its second message, with the globe fully visible.
+- Captures: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L9/reviewed/w<width>-ms<ms>/peacemakers.png`. At ms 21000 the reserved bubble already shows its second message, with the globe fully visible.
 
 Measured in a 60 second simulation: all-short pool, the reserved bubble showed three messages (turns at about 18 and 37 seconds); 500 grapheme message first, it stayed 35.7 seconds, then a 320 grapheme message took over at scene age 36.3 with 22.9 seconds of reading and 23.7 seconds left.
 

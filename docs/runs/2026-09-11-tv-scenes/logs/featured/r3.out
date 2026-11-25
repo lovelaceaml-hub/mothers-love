@@ -2,7 +2,7 @@ The four landing review corrections for Featured Recognition (round r3) are appl
 
 Progress: Completed round r3 landing review fixes for Featured Recognition (scene 4).
 
-[featured.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) now preserves the active expression ID during `keepAge` remounts and initializes `V.featuredAdvanced` from `sceneAge` so data refreshes do not trigger duplicate flips. `FEATURED_FLIP_CANCEL` aborts in-flight timers and animation listeners if remount happens during a flip. In [featured.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css), `overflow: hidden` was removed from `.feature-panel` and moved to a dedicated `.feature-sweep-clip` wrapper, keeping light sweeps bounded while preserving 3D transform depth for the medallion, rings, and orbit.
+[featured.js](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js) now preserves the active expression ID during `keepAge` remounts and initializes `V.featuredAdvanced` from `sceneAge` so data refreshes do not trigger duplicate flips. `FEATURED_FLIP_CANCEL` aborts in-flight timers and animation listeners if remount happens during a flip. In [featured.css](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css), `overflow: hidden` was removed from `.feature-panel` and moved to a dedicated `.feature-sweep-clip` wrapper, keeping light sweeps bounded while preserving 3D transform depth for the medallion, rings, and orbit.
 
 ### What works now
 - Remounting with `keepAge: true` preserves `FEATURED_PASS_ID` when `sceneAge > 0.5` rather than drawing a new ID.
@@ -10,18 +10,18 @@ Progress: Completed round r3 landing review fixes for Featured Recognition (scen
 - `FEATURED_FLIP_CANCEL` cleanly clears timeouts and detaches animation listeners if a flip was in progress during remount.
 - `.feature-panel` retains `transform-style: preserve-3d` without being flattened by overflow clipping.
 - Three unread `V.featuredId` assignments were removed.
-- [featured.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts) includes automated tests covering `keepAge` remount stability and 3D sweep-clip structure.
-- Round r3 execution note is recorded in [featured.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
+- [featured.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts) includes automated tests covering `keepAge` remount stability and 3D sweep-clip structure.
+- Round r3 execution note is recorded in [featured.md](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ### Next action (2 minutes)
-Review the updated lane record at [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
+Review the updated lane record at [$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md).
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
+- [$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css)
+- [$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md)

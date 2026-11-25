@@ -5,7 +5,7 @@ Goal: Upgrade all 13 connected locations and their travel corridors toward the s
 - Approved plan: [Plan 24](../../PLAN-24-world-visual-quality.md).
 - Baseline: `b324b81cabe947592f6723425c58f14307b58083`, clean integration worktree.
 - Branch: `feature/world-cinematic-art-pass`; existing draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8).
-- Working directory: `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`.
+- Working directory: `$HOME/Projects/mothers-love-worktrees/world-quality-continuation`.
 - Run ledger: [TASK_LEDGER.json](TASK_LEDGER.json).
 - P0 assignment: [P0-KICKOFF.md](P0-KICKOFF.md).
 - Current runtime authority: Astra owns the explicit sample-only design study. Claude P0 and all Fable/Opus implementation are held for Anthony visual approval. No concurrent source writers.

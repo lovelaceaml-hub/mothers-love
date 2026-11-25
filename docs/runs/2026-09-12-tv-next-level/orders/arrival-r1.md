@@ -1,7 +1,7 @@
 # Work order - Section C round 2: fix six of your own tests - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-arrival-20260912-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-arrival
 Branch: tv15/arrivals (already checked out; never run a git command that changes state)
 Your round 1 work is in this worktree, uncommitted. Do not redo or revert it.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.

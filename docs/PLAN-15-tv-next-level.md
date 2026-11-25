@@ -1,6 +1,6 @@
 # Plan 15: TV next-level pass
 
-Project: /Users/anthony/Projects/mothers-love. Live TV: https://mothers-love.vercel.app/display (Plan 12 renderer, untouched until Section Z promotes). Planner: Fable 5.1 in plan mode, interview grill mode, at Anthony's instruction, September 11, 2026. Plan file on approval: /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md. Record tree: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/.
+Project: $HOME/Projects/mothers-love. Live TV: https://mothers-love.vercel.app/display (Plan 12 renderer, untouched until Section Z promotes). Planner: Fable 5.1 in plan mode, interview grill mode, at Anthony's instruction, September 11, 2026. Plan file on approval: $HOME/Projects/mothers-love/docs/PLAN-15-tv-next-level.md. Record tree: $HOME/Projects/mothers-love/docs/runs/2026-09-12-tv-next-level/.
 
 Approved by Anthony in plan mode on September 11, 2026; written here verbatim from the approved plan, with the record tree created at the same moment.
 
@@ -36,9 +36,9 @@ Delegated to the planner by the brief ("whichever works best", "not sure how to 
 
 ## Inputs (frozen)
 
-- Base: tv/pick at 463ce8d (all eleven Plan 13 scene branches merged, verified, Opus confirmed, pushed). Worktree /Users/anthony/.claude/worktrees/mothers-love-tv-pick.
-- Renderer: /Users/anthony/Projects/mothers-love/public/color-polish/ (core/state.js, orbs.js, motion.js, chrome.js, arrivals.js, stage.js, host.js; scenes/<slug>.js and .css; renderer.html, renderer.css, boot.js). Classic scripts in one global scope, CSP script-src 'self', no inline scripts.
-- Scene specs: /Users/anthony/Projects/mothers-love/tests/color-polish-scenes/ (helpers.ts plus one spec per scene). Probe: scripts/color-polish-renderer-probe.mjs (asserts 10 scenes render, 6 single and 5 group arrival styles; widths 1920 and 3840; ms 0, 6000, 14000, 21000).
+- Base: tv/pick at 463ce8d (all eleven Plan 13 scene branches merged, verified, Opus confirmed, pushed). Worktree $HOME/.claude/worktrees/mothers-love-tv-pick.
+- Renderer: $HOME/Projects/mothers-love/public/color-polish/ (core/state.js, orbs.js, motion.js, chrome.js, arrivals.js, stage.js, host.js; scenes/<slug>.js and .css; renderer.html, renderer.css, boot.js). Classic scripts in one global scope, CSP script-src 'self', no inline scripts.
+- Scene specs: $HOME/Projects/mothers-love/tests/color-polish-scenes/ (helpers.ts plus one spec per scene). Probe: scripts/color-polish-renderer-probe.mjs (asserts 10 scenes render, 6 single and 5 group arrival styles; widths 1920 and 3840; ms 0, 6000, 14000, 21000).
 - Brief and coordinator notes: docs/runs/2026-09-11-tv-scenes/decisions/2026-09-11T20-25Z-anthony-tv-check-next-level-brief.md. Plan 13 follow-ups: docs/runs/2026-09-11-tv-scenes/lanes/follow-ups.md.
 - Art: public/color-polish/assets/community.png (welcome, at left -20, top 325, 910 by 298), globe.png (peacemakers, at left 271, top 134, 604 by 482), heart_render.png and hands.png (declared, unused).
 - Catalog phrases (core/state.js catalog[].phrase): 1 Greeting "How Are You?", 2 Gratitude "Thank you. It's all thanks to you. You've worked hard.", 3 Apology "I'm sorry. It must have been hard on you.", 4 Inclusiveness "It's okay. I understand.", 5 Concession "Please, after you.", 6 Respect "I'd love to hear more about your thoughts.", 7 Encouragement "I'll pray (or root) for you. Everything will go well.", 8 Consideration "Can I give you a hand with anything?", 9 Compliment "You're amazing. You're doing great!"
@@ -46,7 +46,7 @@ Delegated to the planner by the brief ("whichever works best", "not sure how to 
 ## Models, lanes, reviews
 
 - Planner: Fable 5.1 (this plan). Run coordinator: Opus 5 (high) in a fresh chat, by Anthony's ruling; it writes the gap reports and work orders, compiles dispatches, reads diffs against orders, keeps the record tree, and reports; it authors no scene code. Fable is an advisor only, consulted when Opus names a question it cannot settle (a design contradiction, a ruling that needs Anthony, an escalation).
-- Writer for every code lane, per the routing table: gpt-5.6-luna via codex-dispatch when Codex primary is below 80 percent; otherwise Gemini 3.8 Flash (High) via agy (writable root /Users/anthony/.claude/worktrees/**). At planning time Codex primary is at 100 percent and resets Tuesday September 15, 6:12 PM Pacific; Gemini weekly is at 32 percent; Claude weekly at 69 percent; Fable weekly at 92 percent (resets Tuesday 11:00 PM Pacific). The lane's setup line names both; the coordinator picks by the live pool at launch and records the pick in the lane file.
+- Writer for every code lane, per the routing table: gpt-5.6-luna via codex-dispatch when Codex primary is below 80 percent; otherwise Gemini 3.8 Flash (High) via agy (writable root $HOME/.claude/worktrees/**). At planning time Codex primary is at 100 percent and resets Tuesday September 15, 6:12 PM Pacific; Gemini weekly is at 32 percent; Claude weekly at 69 percent; Fable weekly at 92 percent (resets Tuesday 11:00 PM Pacific). The lane's setup line names both; the coordinator picks by the live pool at launch and records the pick in the lane file.
 - Spill when a writer's pool is full: Gemini 3.8 Flash (High), then Sonnet 5 (medium). Never Opus 5 or Fable for implementation. Writer escalation on failure: three Luna failures move the unit to gpt-5.6-terra (workspace-write), two more to gpt-5.6-sol, then Anthony. Gemini 3.1 Pro is never used.
 - Landing review per lane: Sonnet 5 (high) on the diff, one round plus one confirmation pass after corrections (review budget). Hygiene sweep before each review: Haiku 4.5 (low).
 - Completion review: one Opus 5 (high) review of tv15/pick before promotion (Section Z).
@@ -61,7 +61,7 @@ Scene id map (Anthony's number, renderer id, slug): 1/1 welcome, 2/2 garden, 3/3
 ## Branch and merge model
 
 - tv15/base: cut from tv/pick at 463ce8d, first commit is the cherry-picked Plan 15 docs commit. Holds Sections A and B. Only path that touches core/*, renderer.html, renderer.css, boot.js, tests/color-polish-scenes/helpers.ts and scripts/color-polish-renderer-probe.mjs (additive assertions only).
-- tv15/scene-<slug>: one per scene lane, cut from tv15/base after Section A lands, touches only its own files. Reuses the existing worktree directory /Users/anthony/.claude/worktrees/mothers-love-tv-<slug> (check out the new branch there; the Plan 13 branch it held is merged and pushed).
+- tv15/scene-<slug>: one per scene lane, cut from tv15/base after Section A lands, touches only its own files. Reuses the existing worktree directory $HOME/.claude/worktrees/mothers-love-tv-<slug> (check out the new branch there; the Plan 13 branch it held is merged and pushed).
 - tv15/arrivals: Section C, cut from tv15/base after A, in the worktree mothers-love-tv-arrival; owns core/arrivals.js, scenes/arrival.js, scenes/arrival.css and arrival.spec.ts, so it merges like a scene branch even though one file is core (the only core file no other lane touches).
 - tv15/pick: recreated from tv15/base (after B) each time Anthony chooses a subset; merge each chosen branch. Disjoint files, no conflicts. An unchosen branch stays parked.
 - Promotion: after Anthony approves tv15/pick on the TV from the LAN preview, tv15/pick merges into codex/color-polish-v6 and then codex/mothers-love (production). No database change in any lane. The live TV changes only at that moment.
@@ -69,7 +69,7 @@ Scene id map (Anthony's number, renderer id, slug): 1/1 welcome, 2/2 garden, 3/3
 ## Lane 0: Plan critique
 Setup: read-only critic · high · Lane: Codex · Review: none
   Codex: gpt-5.6-sol · high (fallback while Codex primary is exhausted: Antigravity Gemini 3.8 Flash (High), read-only)
-Worktree: none, read-only against /Users/anthony/Projects/mothers-love
+Worktree: none, read-only against $HOME/Projects/mothers-love
 Depends on: none; launches alongside Section A
 Agents: none
 Reviewers: none (this lane is the reviewer)
@@ -81,7 +81,7 @@ Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch; Antigravity Ge
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write after three Luna failures)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
   Claude: Sonnet 5 · medium (spill only)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv15/base
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch tv15/base
 Depends on: none
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -111,7 +111,7 @@ Acceptance (all must hold):
 Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv15/base
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch tv15/base
 Depends on: Section A landed and reviewed
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -127,28 +127,28 @@ Acceptance: common core checks (probe at both widths and all four ms checkpoints
 Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch) · Review: controller
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write)
   Spill if Codex primary is full: Antigravity Gemini 3.8 Flash (High), then Sonnet 5 · medium
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base, branch tv15/base
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-base, branch tv15/base
 Depends on: Section B round 11 (dae3252) and the spec commit 906a1cc
 Lane: Codex executor gpt-5.6-luna, one writer, this worktree only
 Review: controller = Claude Opus 5 (this coordinator); diff against the allowlist plus the spec's own numeric identities
 Agents: none
-Read first: READ THE WHOLE SPECIFICATION BEFORE WRITING ANY CODE: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/research/vortex-spec.md is 1735 lines and is the complete, final specification; every constant, formula, DOM shape, CSS rule, timeline beat, coverage proof, still-mode rule, performance budget and name in it is fixed and NO design decision is open to you, so implement it as written rather than re-deriving it. Then read /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.js and /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.css as they stand today (the round-11 implementation you are replacing), then /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts, which is the gate you must keep green without editing it.
+Read first: READ THE WHOLE SPECIFICATION BEFORE WRITING ANY CODE: $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/research/vortex-spec.md is 1735 lines and is the complete, final specification; every constant, formula, DOM shape, CSS rule, timeline beat, coverage proof, still-mode rule, performance budget and name in it is fixed and NO design decision is open to you, so implement it as written rather than re-deriving it. Then read $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.js and $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.css as they stand today (the round-11 implementation you are replacing), then $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts, which is the gate you must keep green without editing it.
 In scope: Replace the current round-11 transition implementation in transitions.js and transitions.css with The Turning Nave exactly as the specification defines it, following the spec's section 13 build order literally and in order: (1) write the constants and the projection first, `transitionNaveCamera` and `transitionNaveProject` and nothing else, then check the two identities of section 3.2 numerically at the swap against the table in section 3.3 before writing anything further; (2) the 70 bubbles, rim course first, with `transitionNaveBase` and `transitionNaveFrame`; (3) the z-index, the opacity chain and the filter quantisation, so near bubbles completely hide far ones; (4) the wash on the section 5.5 schedule, never visible; (5) the far canvas in the section 3.9 order, sampling `transitionNaveProject` and never duplicating its formulae, the 24 ribs first, and if they do not all pass through one pixel stop and fix that before anything else; (6) the near canvas and the depth split, so a near rib paints in front of a far bubble and behind a near one; (7) the reveal, the flare then the surge, with the flare core preventing the section 5.4 jump. There is exactly ONE projection function and both canvases and every bubble call it; duplicated projection arithmetic is the single highest-risk defect the spec names and is an automatic fail. The four style ids `flood`, `tide`, `vortex` and `storm` keep their existing names and registry shape, and the style bag, the `S.pendingScene` semantics, the `requestScene` guard, the wash element and the 70-bubble count are unchanged by design so the existing test gate stays green.
-Protected: Every other file in this worktree. In particular /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts is protected: the spec's section 11 proves every existing assertion in it still holds unchanged, so an assertion that fails is a defect in your implementation, never a test to edit. Do not touch docs/, scripts/, renderer.html, core/stage.js, or any other core/ file. Never run a git command that mutates state: no add, commit, checkout, stash, reset, revert, merge, rebase, branch, tag, push, clean or worktree command. Do not install packages and do not touch node_modules; the toolchain is already present and the sandbox has no network.
-Acceptance: Run all five of these from the worktree root /Users/anthony/.claude/worktrees/mothers-love-tv-base and report each command's exact exit status plus its output tail in your final message: (1) `node scripts/color-polish-globals-check.mjs` exits 0; (2) `grep -nE 'rotate|matrix3d|skew|scaleX|scaleY|perspective' public/color-polish/core/transitions.js` prints nothing and exits 1, because the spec forbids all six and the transform is `translate3d` plus a single-argument `scale`; (3) `npm run typecheck` exits 0; (4) `npx playwright test tests/color-polish-scenes/transitions.spec.ts` passes with zero failures, which is the gate section 11 proves holds unchanged; (5) `npm run lint` reports no new problems beyond the 18 already present at the baseline commit.
+Protected: Every other file in this worktree. In particular $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts is protected: the spec's section 11 proves every existing assertion in it still holds unchanged, so an assertion that fails is a defect in your implementation, never a test to edit. Do not touch docs/, scripts/, renderer.html, core/stage.js, or any other core/ file. Never run a git command that mutates state: no add, commit, checkout, stash, reset, revert, merge, rebase, branch, tag, push, clean or worktree command. Do not install packages and do not touch node_modules; the toolchain is already present and the sandbox has no network.
+Acceptance: Run all five of these from the worktree root $HOME/.claude/worktrees/mothers-love-tv-base and report each command's exact exit status plus its output tail in your final message: (1) `node scripts/color-polish-globals-check.mjs` exits 0; (2) `grep -nE 'rotate|matrix3d|skew|scaleX|scaleY|perspective' public/color-polish/core/transitions.js` prints nothing and exits 1, because the spec forbids all six and the transform is `translate3d` plus a single-argument `scale`; (3) `npm run typecheck` exits 0; (4) `npx playwright test tests/color-polish-scenes/transitions.spec.ts` passes with zero failures, which is the gate section 11 proves holds unchanged; (5) `npm run lint` reports no new problems beyond the 18 already present at the baseline commit.
 Verify: After the five acceptance commands, state in your final message the numeric result of build-order step 1, the two section 3.2 identities evaluated at the swap printed against the section 3.3 table, and then one line each confirming that the 24 ribs converge on a single pixel, that a near rib paints in front of a far bubble and behind a near one, that the wash is never visible at any sampled age, and that only one projection function exists in the file.
 Completion output: Your final message states, in this order: the canary line; `completed` or `blocked`; the two files you changed and the fact that you changed nothing else; the five acceptance results with their exit statuses; the four verification statements; and any spec constant you could not honour, with the reason. Do not summarise the specification back to me; report only what you did and what the commands returned.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/transitions.css
 ```
 
 ## Section C: Remarkable arrivals (tv15/arrivals)
 Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival, branch tv15/arrivals
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival, branch tv15/arrivals
 Depends on: Section A landed; gap report gaps/arrival.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -164,7 +164,7 @@ Acceptance: probe --arrivals lists 6 single and 5 group styles and 4 frames (the
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome, branch tv15/scene-welcome
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-welcome, branch tv15/scene-welcome
 Depends on: Section A; gaps/welcome.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -177,7 +177,7 @@ Acceptance: common scene spec plus: six `.orb` elements at 0, 6 and 14 s with th
 Setup: balanced · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden, branch tv15/scene-garden
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-garden, branch tv15/scene-garden
 Depends on: Section A; gaps/garden.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -190,7 +190,7 @@ Acceptance: common scene spec plus: with the mostly-long fixture, no `.orb-page-
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured, branch tv15/scene-featured
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-featured, branch tv15/scene-featured
 Depends on: Section A; gaps/featured.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -203,7 +203,7 @@ Acceptance: common scene spec plus: at 14 s the eyebrow and every bubble's chips
 Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers, branch tv15/scene-peacemakers
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-peacemakers, branch tv15/scene-peacemakers
 Depends on: Section A; gaps/peacemakers.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -216,7 +216,7 @@ Acceptance: common scene spec with `cardShape(frame, '.puzzle-card', 'puzzle')` 
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-status, branch tv15/scene-status
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-status, branch tv15/scene-status
 Depends on: Section A; gaps/status.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -229,7 +229,7 @@ Acceptance: common scene spec plus: all nine phrases present in the DOM; at 6 s 
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions, branch tv15/scene-expressions
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-expressions, branch tv15/scene-expressions
 Depends on: Section A; gaps/expressions.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -242,7 +242,7 @@ Acceptance: common scene spec plus: the focused card's `transform` includes a po
 Setup: frontier · xhigh · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · xhigh (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv15/scene-peace-in-practice
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice, branch tv15/scene-peace-in-practice
 Depends on: Section A; gaps/peace-in-practice.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -255,7 +255,7 @@ Acceptance: common scene spec with `cardShape(frame, '.heart-card', 'heart')` pl
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-orbit, branch tv15/scene-orbit
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-orbit, branch tv15/scene-orbit
 Depends on: Section A; gaps/orbit.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -268,7 +268,7 @@ Acceptance: common scene spec plus: the centre element's bounding box is at leas
 Setup: frontier · high · Lane: Codex (Luna via codex-dispatch; Antigravity Gemini 3.8 Flash (High) while Codex primary is at or above 80 percent) · Review: controller
   Codex: gpt-5.6-luna · high (fallback: gpt-5.6-terra · high workspace-write)
   Antigravity: Gemini 3.8 Flash (High) (fallback: Gemini 3.8 Flash (Medium), then Sonnet 5 · medium)
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone, branch tv15/scene-milestone
+Worktree: $HOME/.claude/worktrees/mothers-love-tv-milestone, branch tv15/scene-milestone
 Depends on: Section A; gaps/milestone.md approved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high; independent=none
@@ -280,12 +280,12 @@ Acceptance: common scene spec plus: the goal expression's phrase is rendered at 
 ## Section Z: Pick, integration and release
 Setup: balanced · high · Lane: Claude (coordinator glue) · Review: controller + independent
   Claude: Opus 5 · high coordinator for Git and release (Fable advisor on request); completion review by a fresh Opus 5 · high subagent in its own context, never the coordinator's chat
-Worktree: /Users/anthony/Projects/mothers-love (single writer) plus the tv15/pick worktree at /Users/anthony/.claude/worktrees/mothers-love-tv-pick (check out tv15/pick there)
+Worktree: $HOME/Projects/mothers-love (single writer) plus the tv15/pick worktree at $HOME/.claude/worktrees/mothers-love-tv-pick (check out tv15/pick there)
 Depends on: whichever lanes Anthony picks; Lane 0 objections resolved
 Agents: none
 Reviewers: controller=Claude Sonnet 5 · high on the merge; independent=Claude Opus 5 · high completion review
 Hygiene: Haiku 4.5 · low sweep before review
-Work: recreate tv15/pick from tv15/base, merge tv15/arrivals and the chosen scene branches, run the globals check, typecheck, vitest, build, lint, the probe at both widths with --arrivals, and the scene, helpers and usable specs on an env-loaded production server one lane at a time (Plan 13 runner lessons); resolve Lane 0's accepted objections and any landing-review findings deferred to integration; push; restart the LAN preview from the tv15/pick worktree (stop the tv/pick server first: `kill $(cat docs/runs/2026-09-11-tv-scenes/logs/pick/lan-preview.pid)` from the project folder) and send Anthony the address from logs/pick/lan-preview.txt. Anthony watches a full playlist cycle, at least two arrivals and one click advance on the TV. Opus review, fix blocking findings, one confirmation pass, then merge into codex/color-polish-v6 and codex/mothers-love, verify the production deployment shows the new renderer, update README quick links, HANDOFF (still describes Plan 12), AGENTS read-first list and the one-sentence circle-rule exception, and /Users/anthony/Projects/README.md; stop the LAN preview; leave the worktrees for one week, then remove them in a follow-up chip only when Anthony asks.
+Work: recreate tv15/pick from tv15/base, merge tv15/arrivals and the chosen scene branches, run the globals check, typecheck, vitest, build, lint, the probe at both widths with --arrivals, and the scene, helpers and usable specs on an env-loaded production server one lane at a time (Plan 13 runner lessons); resolve Lane 0's accepted objections and any landing-review findings deferred to integration; push; restart the LAN preview from the tv15/pick worktree (stop the tv/pick server first: `kill $(cat docs/runs/2026-09-11-tv-scenes/logs/pick/lan-preview.pid)` from the project folder) and send Anthony the address from logs/pick/lan-preview.txt. Anthony watches a full playlist cycle, at least two arrivals and one click advance on the TV. Opus review, fix blocking findings, one confirmation pass, then merge into codex/color-polish-v6 and codex/mothers-love, verify the production deployment shows the new renderer, update README quick links, HANDOFF (still describes Plan 12), AGENTS read-first list and the one-sentence circle-rule exception, and $HOME/Projects/README.md; stop the LAN preview; leave the worktrees for one week, then remove them in a follow-up chip only when Anthony asks.
 
 ## Rollback
 
@@ -324,9 +324,9 @@ Lanes verify one at a time on the production runner; landing reviews run when ea
 ## Build log
 - 2026-09-11: Plan drafted by Fable 5.1 in plan mode from Anthony's brief, Plan 13's Build log and follow-ups, and a read-only code map of tv/pick 463ce8d. Anthony ruled the seven forks in the interview (decisions 1 to 7) and delegated 8 to 14. Pools at planning: Claude 5 h 41 percent, Claude weekly 69 percent, Fable weekly 92 percent, Codex primary 100 percent (resets Tuesday September 15, 6:12 PM Pacific), Gemini weekly 32 percent. Baseline for the completion review: tv/pick 463ce8d; codex/mothers-love and origin at 1532068; live TV on the Plan 12 renderer. Anthony chose Parallel mode and ruled that Opus 5 coordinates the run with Fable as advisor only; the start time is his, with Gemini writing until Codex primary refills. At approval the plan is written to docs/PLAN-15-tv-next-level.md, the record tree is created with the fork rulings in decisions/, both are committed as a docs-only commit on codex/color-polish-v6 in the main checkout (which sits at 29f50b1, dirty only with next-env.d.ts and untracked Playwright evidence folders that are not staged), and the kickoff prompt is handed to Anthony. The coordinator's first act is to cut tv15/base from tv/pick 463ce8d and cherry-pick that docs commit onto it as the first commit, so the plan and record tree are readable inside every worktree (code identical to 463ce8d), as Plan 13 did.
 - 2026-09-12: Section B2 opened. Anthony asked for a 3D architectural vortex with real depth covering the whole screen; eight agents produced four competing designs, three judges scored them, and the perspective tunnel won (mean 8.17, worst lens 8.0), absorbing the best of the other three. The result is The Turning Nave, specified in full at docs/runs/2026-09-12-tv-next-level/research/vortex-spec.md, committed at 014d429, with every constant fixed and no design decision left open. Root cause of all eleven earlier rounds, found while preparing the brief: renderer.css declares .stage { perspective: 1600px } and a later rule in the same file resets it to none, so the renderer has never had true perspective and every round faked depth with one scale multiplier; this design uses a real projection instead. The spec was carried into tv15/base as commit 906a1cc (code byte-identical to round 11 dae3252) so the build lane can read it inside its own worktree, and this plan gained Section B2 at 83a9e94. Dispatched to gpt-5.6-luna at xhigh, thread 01a095f3-26d4-79d2-8f72-c45019acbe63, allowlist limited to core/transitions.js and core/transitions.css, with tests/color-polish-scenes/transitions.spec.ts explicitly protected because spec section 11 proves every assertion in it still holds. Codex began rewriting transitions.js and the chat handed off before it finished; the lane record at docs/runs/2026-09-12-tv-next-level/lanes/B2.md carries the baseline, the allowlist, the dispatch parameters and the reviewer's checklist. Anthony's standing instruction for this lane, stated twice: stop asking him to confirm the design in prose, build it and show him a video of it playing, because he cannot picture it until it is made. Nothing reviewed, nothing merged, nothing promoted; the live TV still serves the Plan 12 renderer.
-- 2026-09-12: Resume authority expanded to the full Plan 15 TV pass and test branch preview. Astra is the controller with six Luna implementation lanes running in parallel. B2 remains on tv15/base at 906a1cc with only public/color-polish/core/transitions.js and public/color-polish/core/transitions.css changed; its protected tests pass 14 of 14, globals and typecheck pass, and lint remains at the 18-problem baseline. The integrated test branch codex/tv15-full-preview is at 7efbb91 in /Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview. Its current preview is https://mothers-love-mc677dgw8-lvzion.vercel.app/display. Integrated verification has globals clean at 349 declarations, typecheck clean, 222 Vitest tests passing, lint at the 18-problem baseline, and the 1920 and 3840 renderer probes passing for all 10 scenes plus 6 single and 5 group arrival styles. The preview shows the real-render feed in normal mode, click advance from scene 1 to scene 2 with 70 bubbles and 2 canvases, and zero page errors or failing requests. Work remains running while gaps and 152 tests are completed. Production is unchanged and promotion is held for Anthony's TV approval.
-- 2026-09-12: Anthony watched the preview and ruled: "that transition was cool but way too intense. it needs to look gracious, nice, beautiful". This supersedes the prior intensity constants for the transition visuals. The new target keeps real depth, circular bubbles, full coverage, one projection function, and all four styles, while using a softer Turning Nave, pastel colors, and a gentler reveal. A seventh Luna lane is working on this bounded transition update in /Users/anthony/Projects/mothers-love-worktrees/tv15-finish-graceful-transition on branch codex/tv15-finish-graceful-transition. Five shared fixes are also awaiting full integration verification: random same-second determinism, poll reset of shown counts and speech bags, replacement shown counts, the 18 px group floor, and grown-bubble actor geometry synchronization. Work remains running and nothing is promoted.
-- 2026-09-12: Anthony superseded the gentle transition direction and ruled: "forget the transition for now. its something ill work on another time. use the original transition that is currently live." The exact Plan 12 transition from commit 15320682a90747267e420d369c441e6938603499 is being ported into the full preview branch codex/tv15-full-preview at /Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview: the 1.15-second crossfade with tiny translate and uniform scale, with no Nave overlay. The gentle version is preserved locally at commit 64f5365 for later and receives no further work in this pass. Current checks include globals clean at 258 declarations, Welcome 14 passing, Expressions 5 targeted tests passing including both prior failures, Peacemakers 13 passing plus one gap-fix retest, and the heart cap test passing. Earlier integrated typecheck and 222 Vitest tests passed, with lint at the 18-problem baseline. Featured verification and final preview checks remain pending. Production is unchanged and nothing is promoted.
+- 2026-09-12: Resume authority expanded to the full Plan 15 TV pass and test branch preview. Astra is the controller with six Luna implementation lanes running in parallel. B2 remains on tv15/base at 906a1cc with only public/color-polish/core/transitions.js and public/color-polish/core/transitions.css changed; its protected tests pass 14 of 14, globals and typecheck pass, and lint remains at the 18-problem baseline. The integrated test branch codex/tv15-full-preview is at 7efbb91 in $HOME/Projects/mothers-love-worktrees/tv15-b2-preview. Its current preview is https://mothers-love-mc677dgw8-lvzion.vercel.app/display. Integrated verification has globals clean at 349 declarations, typecheck clean, 222 Vitest tests passing, lint at the 18-problem baseline, and the 1920 and 3840 renderer probes passing for all 10 scenes plus 6 single and 5 group arrival styles. The preview shows the real-render feed in normal mode, click advance from scene 1 to scene 2 with 70 bubbles and 2 canvases, and zero page errors or failing requests. Work remains running while gaps and 152 tests are completed. Production is unchanged and promotion is held for Anthony's TV approval.
+- 2026-09-12: Anthony watched the preview and ruled: "that transition was cool but way too intense. it needs to look gracious, nice, beautiful". This supersedes the prior intensity constants for the transition visuals. The new target keeps real depth, circular bubbles, full coverage, one projection function, and all four styles, while using a softer Turning Nave, pastel colors, and a gentler reveal. A seventh Luna lane is working on this bounded transition update in $HOME/Projects/mothers-love-worktrees/tv15-finish-graceful-transition on branch codex/tv15-finish-graceful-transition. Five shared fixes are also awaiting full integration verification: random same-second determinism, poll reset of shown counts and speech bags, replacement shown counts, the 18 px group floor, and grown-bubble actor geometry synchronization. Work remains running and nothing is promoted.
+- 2026-09-12: Anthony superseded the gentle transition direction and ruled: "forget the transition for now. its something ill work on another time. use the original transition that is currently live." The exact Plan 12 transition from commit 15320682a90747267e420d369c441e6938603499 is being ported into the full preview branch codex/tv15-full-preview at $HOME/Projects/mothers-love-worktrees/tv15-b2-preview: the 1.15-second crossfade with tiny translate and uniform scale, with no Nave overlay. The gentle version is preserved locally at commit 64f5365 for later and receives no further work in this pass. Current checks include globals clean at 258 declarations, Welcome 14 passing, Expressions 5 targeted tests passing including both prior failures, Peacemakers 13 passing plus one gap-fix retest, and the heart cap test passing. Earlier integrated typecheck and 222 Vitest tests passed, with lint at the 18-problem baseline. Featured verification and final preview checks remain pending. Production is unchanged and nothing is promoted.
 - 2026-09-12: The requested test preview implementation is complete at commit b8650739a4a35cbe490e941580c2827a4109d35e on codex/tv15-full-preview. Preview deployment dpl_4ZvXooEY66gys1MziS5qACqMeDmf is READY with a passing build at https://mothers-love-d4ve0196a-lvzion.vercel.app/display. The exact live Plan 12 transition is restored from commit 15320682a90747267e420d369c441e6938603499, with its 1.15-second crossfade, tiny translate, uniform scale, and no Nave overlay. The Nave version is preserved at commit 64f5365 for later. All seven new live-transition tests pass. All current 145 scene test titles have passing evidence across the initial run and focused reruns, not one clean 145-test invocation, and every known initial failure is resolved. Six usable tests pass, 222 Vitest tests pass, globals are clean at 258 declarations, typecheck passes, and lint remains at the 18-problem baseline. Final probes at 1920 and 3840 pass for all 10 scenes, 6 single arrival styles, and 5 group arrival styles with zero issues. Featured's two last failures pass with lazy orbit, Expressions 5 pass, Welcome 14 pass, and Peacemakers 13 pass plus one gap-fix retest. The preview record rewrites exactly two public GET endpoints and uses preview-only iframe same-origin compatibility, with no database credentials. Final deployed click smoke remains pending, and physical TV approval still gates production promotion. Production remains unchanged at commit 15320682a90747267e420d369c441e6938603499 and deployment dpl_GZdeMyoZDVtKB9gJSwDNeSxrp3LR.
 
 - 2026-09-12: Final deployed preview click verification passed on `b865073`: source matched, normal mode, Welcome to Garden, no Nave overlay, zero page errors, and zero failed requests. A first cold-start timeout cleared on a fresh diagnostic and repeat check. Production reconfirmed unchanged at `15320682a90747267e420d369c441e6938603499`, deployment `dpl_GZdeMyoZDVtKB9gJSwDNeSxrp3LR`. Implementation for the requested test preview is complete; physical TV approval still holds promotion.

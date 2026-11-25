@@ -1,7 +1,7 @@
 # Work order - Section B round 5: the flood must fully cover the screen - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-transitions-20260912-r4
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base. Rounds 3 and 4 are in the worktree, uncommitted; keep them. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

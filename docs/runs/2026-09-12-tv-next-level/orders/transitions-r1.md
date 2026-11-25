@@ -1,7 +1,7 @@
 # Work order - Section B round 2: fix two of your own tests - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-transitions-20260912-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base (already checked out; never run a git command that changes state)
 Your round 1 work is in this worktree, uncommitted. Do not redo or revert it.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.

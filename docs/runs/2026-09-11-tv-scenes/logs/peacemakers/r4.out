@@ -13,10 +13,10 @@ Open [/admin/display](https://mothers-love.vercel.app/admin/display) in your bro
 ## COMPLETION
 
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js)
+- [$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css)
+- [$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md](file://$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md)
 
 Top-level identifiers added:
 - `PEACEMAKERS_POSITIONS`

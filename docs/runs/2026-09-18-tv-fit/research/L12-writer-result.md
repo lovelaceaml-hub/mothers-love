@@ -1,14 +1,14 @@
 # L12 writer result: preview only link that holds one screen
 
-Writer: fresh Claude Opus 5. Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link`, branch `tv17/scene-link`, cut from `tv17/pick` 3d4b459. Facts only, no verdict.
+Writer: fresh Claude Opus 5. Worktree `$HOME/.claude/worktrees/mothers-love-tv17-scene-link`, branch `tv17/scene-link`, cut from `tv17/pick` 3d4b459. Facts only, no verdict.
 
 Plan goal line this lane was checked against: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
 
 ## Changed files
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link/src/components/display/color-polish-host/ColorPolishHost.tsx` (+176 / -3)
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link/src/components/display/color-polish/renderer.tsx` (+17 / -2)
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link/tests/display/scene-link.test.ts` (new, the one new test file)
+- `$HOME/.claude/worktrees/mothers-love-tv17-scene-link/src/components/display/color-polish-host/ColorPolishHost.tsx` (+176 / -3)
+- `$HOME/.claude/worktrees/mothers-love-tv17-scene-link/src/components/display/color-polish/renderer.tsx` (+17 / -2)
+- `$HOME/.claude/worktrees/mothers-love-tv17-scene-link/tests/display/scene-link.test.ts` (new, the one new test file)
 
 `src/app/display/page.tsx` was in the allowlist but needed no change: the page still renders `ColorPolishHost` and the query string is read in the browser, so `/display` stays a static route. Nothing under `public/color-polish/**` was touched, no database, no admin route, no new route, no auth change. `git status` in the worktree lists exactly these three files.
 
@@ -64,7 +64,7 @@ Proved three ways:
 
 ## Exact command results
 
-All run in `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link` with `npm_config_cache=/tmp/npm-cache`, after its own `npm ci` (no symlinked `node_modules`).
+All run in `$HOME/.claude/worktrees/mothers-love-tv17-scene-link` with `npm_config_cache=/tmp/npm-cache`, after its own `npm ci` (no symlinked `node_modules`).
 
 | Command | Result |
 | --- | --- |
@@ -78,7 +78,7 @@ All run in `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link` with 
 Notes on the two Playwright figures, with the parent commit measured the same way for comparison:
 
 - `transitions.spec.ts` covers both items the order named: "a click during a transition does not double-advance, and a requested scene queues instead" and "hides the countdown during transition and shows it after completion". All 7 pass on this branch.
-- In `usable.spec.ts`, "scene countdown ring counts down and resets on manual advance" passes on this branch (19.9s). "click or tap on the display advances to the next scene" fails on this branch, in `signInAs` at line 98, because it signs in to `/admin/login` and no database is configured in this local worktree. **The same test fails the same way on the untouched parent commit** (`/Users/anthony/Projects/mothers-love-worktrees/tv17-base`, `tv17/pick` 3d4b459, clean tree). On that parent, the countdown ring test also failed, with `Expected: 180, Received: 30`. So of these two, one is an environment limitation present before this lane and the other is a pre-existing intermittent failure on `tv17/pick`; neither was introduced here.
+- In `usable.spec.ts`, "scene countdown ring counts down and resets on manual advance" passes on this branch (19.9s). "click or tap on the display advances to the next scene" fails on this branch, in `signInAs` at line 98, because it signs in to `/admin/login` and no database is configured in this local worktree. **The same test fails the same way on the untouched parent commit** (`$HOME/Projects/mothers-love-worktrees/tv17-base`, `tv17/pick` 3d4b459, clean tree). On that parent, the countdown ring test also failed, with `Expected: 180, Received: 30`. So of these two, one is an environment limitation present before this lane and the other is a pre-existing intermittent failure on `tv17/pick`; neither was introduced here.
 - Both spec files were first run in parallel under heavy load (other lanes' dev servers on ports 3012, 3171, 3187, 3188, 3191, 3421, 8990 at the time). That run gave 4 passed / 9 failed on this branch and 2 passed / 11 failed on the untouched parent. Running them with `--workers=1` removed the contention. The figures in the table are the serial ones.
 - One earlier cold cache `npm test` run reported 2 failures in `tests/color-polish-data/query.test.ts`. That file passes in isolation on this branch and on the untouched parent, the parent's full suite passed 39 files / 222 tests, and every warm `npm test` run on this branch passed 40 files / 234 tests. It is a load sensitive flake in that file, unrelated to this lane's files.
 
@@ -109,4 +109,4 @@ Production build (same harness, `VERCEL_ENV` unset), 3 passed and 2 skipped in 2
 
 ## Commit
 
-One commit on `tv17/scene-link`: `fa75352`, "Plan 17 Lane 12: preview only link that holds one screen", 3 files changed, 424 insertions, 5 deletions. `next-env.d.ts`, which `next dev` rewrites, was restored before committing so the branch carries only the three files listed above. The worktree is clean, both dev servers were stopped, and `/Users/anthony/Projects/mothers-love-worktrees/tv17-base`, which was used only as an untouched baseline for the Playwright comparison, is back to a clean tree at 3d4b459.
+One commit on `tv17/scene-link`: `fa75352`, "Plan 17 Lane 12: preview only link that holds one screen", 3 files changed, 424 insertions, 5 deletions. `next-env.d.ts`, which `next dev` rewrites, was restored before committing so the branch carries only the three files listed above. The worktree is clean, both dev servers were stopped, and `$HOME/Projects/mothers-love-worktrees/tv17-base`, which was used only as an untouched baseline for the Playwright comparison, is back to a clean tree at 3d4b459.

@@ -35,13 +35,13 @@ The earlier six checks did not prove grouped arrivals, replay prevention, the fu
 
 SQL validation is actual local integration, not only SQL-text assertions: PostgreSQL 16.15 applies every numbered migration to its own disposable Unix-socket cluster, executes the legacy and new bridges in repeatable-read transactions against 1,200 fictional records, and passes actual reset/unchanged/arrival JSON through the app's public projector and browser cache. The route/query unit tests mock their database client, and browser lifecycle tests mock API responses; the disposable SQL runner does not wire a live HTTP server to its database. Local ACL and boundary checks do not prove the current Supabase schema ledger, hosted TLS, deployment configuration, query billing or physical TV behavior.
 
-Verification logs and SQL payload measurements are saved outside Git at `/Users/anthony/Documents/Codex/2026-10-05/task-3/verification/`. The original migration 019 SHA-256 at this run was `d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`; a later hourly-renewal fix changed the migration. See [Plan 31](../../PLAN-31-display-efficiency.md) for the current checksum.
+Verification logs and SQL payload measurements are saved outside Git at `$HOME/Documents/Codex/2026-10-05/task-3/verification/`. The original migration 019 SHA-256 at this run was `d318a6b3ed22680524d4dc10e967bb59eb4b540d1536e5ba56ee16b6380bc5a9`; a later hourly-renewal fix changed the migration. See [Plan 31](../../PLAN-31-display-efficiency.md) for the current checksum.
 
 No physical TV or phone commissioning was performed. No real recognitions were read, logged, seeded or captured.
 
 ## Reproduction commands
 
-Patch cwd: `/Users/anthony/Documents/Codex/2026-10-05/task-3/mothers-love`. Independent baseline cwd: `/Users/anthony/Documents/Codex/2026-10-05/task-3/mothers-love-base-check`, detached at the full base SHA above. Baseline tracked files are clean; only an ignored symlink to the patch's pinned `node_modules` is shared. Source `/Users/anthony/Projects/mothers-love` remains clean on the same commit.
+Patch cwd: `$HOME/Documents/Codex/2026-10-05/task-3/mothers-love`. Independent baseline cwd: `$HOME/Documents/Codex/2026-10-05/task-3/mothers-love-base-check`, detached at the full base SHA above. Baseline tracked files are clean; only an ignored symlink to the patch's pinned `node_modules` is shared. Source `$HOME/Projects/mothers-love` remains clean on the same commit.
 
 ```sh
 npm run typecheck

@@ -4,7 +4,7 @@ title: Section 8: Expression Orbit (renderer id 10)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-orbit
+worktree: $HOME/.claude/worktrees/mothers-love-tv-orbit
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:55Z
@@ -18,7 +18,7 @@ Implement Section 8 (Expression Orbit, renderer id 10) of Plan 15 in accordance 
 
 ### New functions and constants
 
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L6-L19):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L6-L19):
   - `ORBIT_PASS_TOKEN`: Module-level pass token tracking current pass for remount guard.
   - `ORBIT_BASE_DIAMETER` (227): Base planet diameter reduced from 284 px by 0.8 factor.
   - `ORBIT_CENTER_DIAMETER` (420): Centre medallion diameter (1.597x largest bubble diameter, exceeding the 1.5x minimum bound).
@@ -29,21 +29,21 @@ Implement Section 8 (Expression Orbit, renderer id 10) of Plan 15 in accordance 
 
 ### Changed call sites
 
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L21-L37):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L21-L37):
   - `orbitNextId()`: Seeded with `randSeed(3301 + S.idCounter * 41)` instead of `Math.random()`, ensuring reproducible expression sequences matching `core/arrivals.js`.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L39-L74):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L39-L74):
   - `orbitScene()`: Uses `ORBIT_PASS_TOKEN` guard, `chooseRandom(chosen.map(x => x.r.id), id)` for expression filtering and `chooseRandom(chosen.map(x => x.r.id))` for sparse fallback.
   - Generates 3D centre medallion markup with `.orbit-sun-halo`, `.orbit-sun-rays` (4 rays), `.orbit-sun-particles`, 4 concentric depth rings (`.orbit-sun-ring.ring-0` through `ring-3` with `translateZ` 0, 26, 52, 78 px), and `.orbit-sun-content` featuring `${shimmer(e.name)}` above and large `“${esc(e.phrase)}”` in Georgia serif.
   - Iterates chosen records with `orbitPlanetDiameter(r.message)`, setting tiered dimensions on `.planet-system`.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L76-L86):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L76-L86):
   - `mountOrbit()`: Sets `ORBIT_PASS_TOKEN = ORBIT_LAST`.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L93-L96):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L93-L96):
   - `projectOrbit(theta)`: Evaluates projected positions using `ORBIT_RADIUS_X` and `ORBIT_RADIUS_Y` while preserving `z = Math.sin(theta) * 395` and perspective `k = 1420 / (1420 - z)`.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L98-L167):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L98-L167):
   - `tickOrbit(dt)`: Removed unused `p.theta` and `p.angle`. Positions moons dynamically relative to actual planet diameter `b.d` (`rMoon = b.d / 2 + 15`). Backside swap uses `chooseRandom`, updates tiered dimensions, calls `markShown(r.id)`, and refreshes text fitting via `fitCircle`.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L169-L176):
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js#L169-L176):
   - `registerScene(10, ...)`: Registered `onLeave: leaveOrbit`.
-- [public/color-polish/scenes/orbit.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css#L1-L275):
+- [public/color-polish/scenes/orbit.css](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.css#L1-L275):
   - Scoped all rules to `#tv .scene[data-scene="10"]`.
   - Added 3D perspective to `.orbit-universe` (1200px) and `transform-style: preserve-3d` to `.orbit-sun`.
   - Added CSS rules for concentric depth rings (`translateZ` 0, 26, 52, 78 px), `.orbit-sun-halo` with continuous 360-degree `rotateY`, 4 glow rays, floating spark particles, inverted font hierarchy (30 px phrase vs 19 px name), and `.planet-system` tiered size overrides.
@@ -51,17 +51,17 @@ Implement Section 8 (Expression Orbit, renderer id 10) of Plan 15 in accordance 
 
 ### Replaced and tightened assertions
 
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L2-L8):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L2-L8):
   - Imported `loadRenderer` and `buildActiveDisplayFixture` from `./helpers`.
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L215-L232):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L215-L232):
   - Tightened test 2 to assert that no `.orb` or `.orb-slot` carries a 3D rotation (`rotateX`, `rotateY`, or `rotate3d`), while preserving Plan 13 occlusion and z-sign assertions.
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L357-L399):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L357-L399):
   - Added Acceptance test 2 verifying `.orbit-sun` bounding box is at least 1.5 times the largest base diameter, `transformStyle` is `preserve-3d`, 4 depth rings exist on `translateZ` tiers at 0, 26, 52, and 78 px, halo exists, 4 glow rays exist, and particle layer exists.
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L401-L476):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L401-L476):
   - Added Acceptance test 3 loading a fixture with short, medium, and long messages, asserting that three distinct diameters appear (195, 227, 263 px) and all 4 bubbles satisfy circularity within 1 px.
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L478-L494):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L478-L494):
   - Added Acceptance test 4 verifying computed font size of the centre phrase (30 px) is strictly larger than the expression name (19 px).
-- [tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L496-L509):
+- [tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts#L496-L509):
   - Added Acceptance test 6 verifying two probe-seeded runs produce the exact same focused expression name.
 
 ### What could not be executed locally

@@ -4,7 +4,7 @@ title: Remarkable arrivals on tv15/arrivals
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:05Z
@@ -42,7 +42,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
 
 ### Functions and constants added
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`
    - `ARRIVAL_FRAME_STYLES` (line 7): Frozen constant array holding the four approved frame style names: `['Light beam', 'Petal curtain', 'Aurora', 'Constellation gather']`.
    - `ARRIVAL_FRAME_BAG` (line 9) and `ARRIVAL_FRAME_LAST` (line 10): Module-level variables managing the frame shuffle bag without modifying `blankState()`.
    - `nextArrivalFrame` (lines 12-27): Independent shuffle-and-swap seeded generator using `randSeed(2311 + S.idCounter * 53)` to draw frame styles without immediate consecutive repeats.
@@ -51,14 +51,14 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - `arrivalSpawnExitBurst` (lines 108-132): Spawns short-lived heart and petal burst elements in `#event-items` that clean up naturally when the container clears.
    - `arrivalSavedRuntime` and `colorPolishRuntime` property wrapper: Intercepted runtime registration in round 2; removed in round 3.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/core/arrivals.js`
+2. `$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/core/arrivals.js`
    - `beginEvent` (lines 6-18): Selects frame style via `nextArrivalFrame()`, stores `frameStyle` on `active`, and logs both `style` and `frame` in `entrance_start`.
    - `buildEvent` (lines 20-37): Mounts frame markup via `arrivalBuildFrameMarkup(a.frameStyle, a.kind)` inside `#event`, applies `active` and conditional `still` classes, and sets dataset attributes.
    - `eventElement` (lines 154-165): Appends `.arrival-ring` with `transform-style: preserve-3d` immediately before `.event-orb`, and invokes `markShown(r.id)` and `log('arrival_record_shown', { id: r.id })` for every shown record.
    - `positionEvent` (lines 167-179): Positions `.event-orb` with translate and scale only, while applying 3D rotation (`rotateY`, `rotateX`) and translate to `.arrival-ring`.
    - `tickEvent` (lines 45-103): Reads `#feed-columns` geometry once when reading concludes, triggers `arrivalSpawnExitBurst(a)`, and animates exiting orbs toward the feed rail coordinates.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css`
+3. `$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.css`
    - `#tv .event-stage.active::before`: Full-bleed near-black backdrop (`rgba(14, 18, 17, 0.9)`).
    - `#tv .event-stage .arrival-ring`: 3D ring with `transform-style: preserve-3d` and dual metallic glowing rims.
    - `#tv .event-stage .event-orb .recipient`: Transform-only shimmer sweep on recipient name pseudo-element.
@@ -66,7 +66,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - `#tv .event-stage .arrival-burst-item`: Scatter animation for exit burst hearts and petals.
    - `#tv.still` and `@media (prefers-reduced-motion: reduce)`: Static presentation overrides disabling all animations and transitions.
 
-4. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts`
+4. `$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts`
    - Migrated harness from local duplicate to Section A's `loadRenderer` helper.
    - Added acceptance test asserting four frame styles and 11-wave sequence.
    - Added circularity tests across entrance midpoint, hold midpoint, and exit midpoint.
@@ -80,7 +80,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
 
 ### Call sites changed with absolute paths and line numbers
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/core/arrivals.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/core/arrivals.js`
    - Line 13: `const frameStyle = nextArrivalFrame();` added inside `beginEvent`.
    - Line 14: `active = { ..., frameStyle, exitPos: null }` initialized with frame style.
    - Line 16: `log('entrance_start', { ..., frame: ARRIVAL_FRAME_STYLES[frameStyle] })` logged.
@@ -92,7 +92,7 @@ The test suite at tests/color-polish-scenes/arrival.spec.ts was updated accordin
    - Line 160: `markShown(r.id); log('arrival_record_shown', { id: r.id });` invoked per record in `eventElement`.
    - Lines 172-177: 3D rotation and translation applied to `b.ringEl` in `positionEvent`.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`
+2. `$HOME/.claude/worktrees/mothers-love-tv-arrival/public/color-polish/scenes/arrival.js`
    - Lines 7-125: Declared `ARRIVAL_FRAME_STYLES`, frame bag variables, `nextArrivalFrame`, frame markup builder, and exit burst spawner (runtime interceptor removed in round 3).
 
 ### The two bag seeds

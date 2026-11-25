@@ -1,4 +1,4 @@
-Updated [`scripts/video/assemble.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) to extract full double-quoted strings for `CAMPAIGN_TITLE` and `CAMPAIGN_TAGLINE` including apostrophes, with self-check validations.
+Updated [`scripts/video/assemble.mjs`](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) to extract full double-quoted strings for `CAMPAIGN_TITLE` and `CAMPAIGN_TAGLINE` including apostrophes, with self-check validations.
 
 ### Verification outputs
 
@@ -20,7 +20,7 @@ Output: (clean, no syntax errors)
 
 ## COMPLETION
 File changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+- [`$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs`](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
 
 ### What Anthony must do
 Nothing, you're clear.

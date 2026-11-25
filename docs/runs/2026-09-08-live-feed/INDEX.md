@@ -1,6 +1,6 @@
 # Live feed run
 
-Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-03-live-feed.md.
+Read first: $HOME/Projects/mothers-love/docs/PLAN-03-live-feed.md.
 Runner: current coordinator, two isolated Luna xhigh writers. Baseline a10adfa7085fc5c9f351a008b9e2dd8c9ee70981, clean.
 
 | Lane | Owner/model | State | Dependency |

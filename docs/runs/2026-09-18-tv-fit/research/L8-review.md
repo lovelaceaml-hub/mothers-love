@@ -4,7 +4,7 @@ Plan goal line: "every word on the approved Plan 15 TV scenes fits inside its bu
 
 Owner's words for this lane: "On the goal page, the swirling recognition needs to be fuller, with more bubbles."
 
-Reviewed: branch `tv17/goal` in `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, writer commit 18d4997 on 71bf3f8.
+Reviewed: branch `tv17/goal` in `$HOME/.claude/worktrees/mothers-love-tv17-goal`, writer commit 18d4997 on 71bf3f8.
 Review commit: **89e9ab8** on `tv17/goal`. Files changed, all inside the allowlist:
 `public/color-polish/scenes/milestone.js`, `public/color-polish/scenes/milestone.css`, `tests/color-polish-scenes/milestone.spec.ts`.
 
@@ -60,7 +60,7 @@ Script time per frame is small in all three (0.3 to 0.6 ms throttled); the cost 
 
 ## Command results
 
-From `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, synthetic public config only (`https://synthetic-project.supabase.test`, `synthetic-publishable-key`), own dev server on port 3188, stopped afterwards (port confirmed free). `.env.local` never read or copied. No database touched. Nothing deployed.
+From `$HOME/.claude/worktrees/mothers-love-tv17-goal`, synthetic public config only (`https://synthetic-project.supabase.test`, `synthetic-publishable-key`), own dev server on port 3188, stopped afterwards (port confirmed free). `.env.local` never read or copied. No database touched. Nothing deployed.
 
 - `npm run typecheck`: passed, no output.
 - `npm test`: 39 files, 222 tests passed.
@@ -70,7 +70,7 @@ From `/Users/anthony/.claude/worktrees/mothers-love-tv17-goal`, synthetic public
 
 ## Captures
 
-Reviewed Goal captures: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/reviewed/w<1920|3840>-ms<0|6000|14000|21000>/milestone.png`.
+Reviewed Goal captures: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L8/reviewed/w<1920|3840>-ms<0|6000|14000|21000>/milestone.png`.
 Compare with the writer's `.../captures/L8/after/` and the look before the lane `.../captures/L1/after3/w1920-ms6000/milestone.png`. I looked at the PNGs at both widths: full across the right side, several whole readable pearls at once, smaller soft pearls filling behind and at the sides, left column unchanged.
 
 ## What the owner should know

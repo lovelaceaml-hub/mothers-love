@@ -4,7 +4,7 @@ title: We Are Peacemakers, the puzzle world
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
+worktree: $HOME/.claude/worktrees/mothers-love-tv-peacemakers
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:36Z
@@ -18,10 +18,10 @@ Rebuild Scene 8 (We Are Peacemakers, renderer id 8) ground up into a puzzle worl
 
 ### Files modified
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-12-tv-next-level/lanes/peacemakers.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-12-tv-next-level/lanes/peacemakers.md`
 
 ### Declarations in peacemakers.js
 

@@ -1,7 +1,7 @@
 # Work order - Section B round 3: three review findings - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-transitions-20260912-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base, your work is committed at 6c522c1. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

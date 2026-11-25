@@ -3,10 +3,10 @@ The test suite now directly verifies medallion circularity and enforces per-voca
 The shared circularity helper previously bypassed the status scene because it only checked orb selectors. In addition, the old rotation delta check allowed single-vocabulary code to pass on phase alone. Dedicated DOM evaluations and per-vocabulary motion signatures now verify circular dimensions at 14 s and 6 s, alongside distinct float, sway, and breathe signatures across 6 s, 7 s, and 8 s.
 
 ### Changes made
-1. Added direct medallion circularity validation to [status.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts) verifying width, height, and border-radius at both 14000 ms and 6000 ms.
-2. Replaced the rotation delta block in [status.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts) with three fresh scene samples checking float vertical drift, sway pendulum turns, and breathe pulse/lift dynamics.
+1. Added direct medallion circularity validation to [status.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts) verifying width, height, and border-radius at both 14000 ms and 6000 ms.
+2. Replaced the rotation delta block in [status.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts) with three fresh scene samples checking float vertical drift, sway pendulum turns, and breathe pulse/lift dynamics.
 3. Kept the pairwise-distinct transform assertion at 6000 ms and the static text assertions intact.
-4. Appended the Round 1 entry to the Result section of [status.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md).
+4. Appended the Round 1 entry to the Result section of [status.md](file://$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md).
 
 ### Current status
 The status scene test suite strictly asserts circular medallion geometry and per-vocabulary motion behavior against the preview renderer at [mothers-love.vercel.app/admin/display](https://mothers-love.vercel.app/admin/display).
@@ -18,7 +18,7 @@ Nothing, you're clear.
 Have the coordinator run the Playwright test suite to confirm the updated spec passes (estimate: 2 minutes).
 
 ## COMPLETION
-- /Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
+- $HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
 
 Should the coordinator proceed with the test verification now?

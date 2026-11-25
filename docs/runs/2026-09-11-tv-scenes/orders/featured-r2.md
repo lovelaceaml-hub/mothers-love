@@ -1,7 +1,7 @@
 # Work order - featured correction r2: all nine expressions rotate, a dimensional expression panel - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-featured-20260911-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-featured
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-featured
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 4 (data-scene="4"). Round: r2.
 
 Anthony reviewed the scene on his TV and asked two things: "The featured recognition section keeps showing just the greeting, but it needs to rotate through all of them," and "That section with the greeting phrase also needs to be very dynamic and dimensional, with a very high, complex design that really makes it stand out." Root cause of the first: featured() reads `S.featured`, which core sets from the weekly goal expression (Greeting this week). The scene must stop reading S.featured and keep its own rotation. The second is the `.feature-panel` block on the left (500 by 562 px, arch top), which today is a static gradient card with a medallion, the name, the principle and the phrase.
@@ -41,8 +41,8 @@ Read first, inside your worktree: public/color-polish/scenes/featured.js and fea
 - New: at 16000 ms (a fresh open, one second after the in-pass advance) no runtime error is logged and the panel has neither `flip-out` nor `flip-in` after a further 700 ms wait.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md
+$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js
+$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css
+$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md
 ```

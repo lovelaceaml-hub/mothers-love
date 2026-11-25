@@ -1,7 +1,7 @@
 # Starting baseline
 
 - Recorded: 2026-09-09
-- Repository: `/Users/anthony/Projects/mothers-love`
+- Repository: `$HOME/Projects/mothers-love`
 - Starting commit: `64590968dd5523134835216a1e5a5c2b8305160f`
 - Starting branch: `codex/mothers-love`
 - Working tree before Plan 08 records: clean

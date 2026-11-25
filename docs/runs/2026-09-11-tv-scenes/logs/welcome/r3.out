@@ -3,27 +3,27 @@ The welcome scene now features six recognition bubbles that arrive, spin, float 
 The layout replaces the fixed four bubble helper with a scene local six bubble arrangement that stays clear of the keep-out area and stage bounds. Bubbles drift in and out continuously with staggered retirements, spinning into place on entrance and rotating during exit while steady text stays upright. The canvas draws soft ground shadow ellipses, sparkle trails on moving bubbles, and rim glints on steady bubbles, all while preserving circularity and respecting reduced motion.
 
 ### What now works
-1. **Scene-local six-bubble layout**: [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) mounts up to six non-overlapping bubbles on the right and beneath the copy block, falling back to a single large reader if any message requires reader mode.
-2. **Continuous drift cycle**: [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) sets `replaceMode: 'drift'`, staggers initial retirements across 9 to 29 seconds, and shortens replacement lifetimes to 14 to 20 seconds.
-3. **Entrance, exit, and rim spin**: [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) applies rolling Z rotation from 200 to 320 degrees down to 0 on entrance, and 0 up to 160 degrees on exit. [welcome.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css) adds a 9 second conic-gradient rotating ring on `.orb-slot::after` with alternating directions and a 7 second sheen sweep.
-4. **Canvas dimensional depth**: [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) implements `drawWelcome` to render depth-scaled ground shadow ellipses, 14-frame sparkle trails for entering and exiting bubbles, and orbiting rim glints for steady bubbles, capped at 120 sparks per frame and silenced under still mode.
-5. **Automated test suite**: [welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) verifies actor counts at 2000 ms, 30 second bubble replacement, entering slot rotation angles, circularity across 300, 6000, 14000, and 20000 ms, and fx canvas presence under reduced motion.
+1. **Scene-local six-bubble layout**: [welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) mounts up to six non-overlapping bubbles on the right and beneath the copy block, falling back to a single large reader if any message requires reader mode.
+2. **Continuous drift cycle**: [welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) sets `replaceMode: 'drift'`, staggers initial retirements across 9 to 29 seconds, and shortens replacement lifetimes to 14 to 20 seconds.
+3. **Entrance, exit, and rim spin**: [welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) applies rolling Z rotation from 200 to 320 degrees down to 0 on entrance, and 0 up to 160 degrees on exit. [welcome.css](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css) adds a 9 second conic-gradient rotating ring on `.orb-slot::after` with alternating directions and a 7 second sheen sweep.
+4. **Canvas dimensional depth**: [welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) implements `drawWelcome` to render depth-scaled ground shadow ellipses, 14-frame sparkle trails for entering and exiting bubbles, and orbiting rim glints for steady bubbles, capped at 120 sparks per frame and silenced under still mode.
+5. **Automated test suite**: [welcome.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) verifies actor counts at 2000 ms, 30 second bubble replacement, entering slot rotation angles, circularity across 300, 6000, 14000, and 20000 ms, and fx canvas presence under reduced motion.
 
 ### What Anthony must do
 - Nothing, you're clear.
 
 ### Next action (2 minutes)
-Open the Studio preview at [https://mothers-love.vercel.app/admin/display](https://mothers-love.vercel.app/admin/display) or review the local spec file at [welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts).
+Open the Studio preview at [https://mothers-love.vercel.app/admin/display](https://mothers-love.vercel.app/admin/display) or review the local spec file at [welcome.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts).
 
 ### Questions
 1. Would you like the coordinator to run verification (typecheck, lint, build, spec, probe) now?
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
+- [$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
+- [$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
 
 Top-level and scene-scoped identifiers added:
 - `WELCOME_FAR_SCALE`

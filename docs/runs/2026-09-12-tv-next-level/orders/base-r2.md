@@ -1,7 +1,7 @@
 # Work order - Section A round 3: fix the no-overlap test's scope - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-base-20260911-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base (already checked out; never run a git command that changes state)
 Your rounds 1 and 2 are in this worktree, uncommitted. Do not redo or revert them.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.

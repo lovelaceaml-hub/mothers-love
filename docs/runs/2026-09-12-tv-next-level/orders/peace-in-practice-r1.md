@@ -1,7 +1,7 @@
 # Work order - Section 7 round 2: three review findings - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-peace-in-practice-20260912-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 Branch: tv15/scene-peace-in-practice, your round 1 is committed at 6c60ffc. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

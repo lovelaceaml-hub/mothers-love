@@ -35,8 +35,8 @@ Running 13 tests using 5 workers
       297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
       298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
       299 |
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -59,9 +59,9 @@ Running 13 tests using 5 workers
       297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
       298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
       299 |
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -84,8 +84,8 @@ Running 13 tests using 5 workers
       297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
       298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
       299 |
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:296:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
 
     Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
 

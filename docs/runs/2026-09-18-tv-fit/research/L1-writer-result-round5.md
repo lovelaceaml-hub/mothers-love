@@ -1,14 +1,14 @@
 # L1 round 5 writer result: Welcome, one reserved long bubble
 
-Writer: fresh Claude Opus 5. Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-fit, branch tv17/fit, cut from round 4 (71bf3f8). Commit 0a7ea0e.
+Writer: fresh Claude Opus 5. Worktree $HOME/.claude/worktrees/mothers-love-tv17-fit, branch tv17/fit, cut from round 4 (71bf3f8). Commit 0a7ea0e.
 Plan goal line, quoted: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
 
 Facts only, no verdict. No .env file was created or copied; nothing contacted a database; all sample data is fictional.
 
 ## Changed files
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts
 
 Not changed: public/color-polish/scenes/welcome.css, tests/color-polish-scenes/text-fits.ts, and every Orbit and Goal file (orbit.js, orbit.css, milestone.js, milestone.css and their specs), as the order required.
 
@@ -253,7 +253,7 @@ and 36.00 px at 3840, both in the reserved bubble at its floor.
 
 Eight probe runs of the whole playlist with the fictional sample snapshot, at
 1920 and 3840 wide and at 0, 6000, 14000 and 21000 ms, into
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after5/
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after5/
 as w1920-ms0, w1920-ms6000, w1920-ms14000, w1920-ms21000, w3840-ms0,
 w3840-ms6000, w3840-ms14000 and w3840-ms21000. Each folder holds one PNG per
 scene; Welcome is welcome.png. Command, per run:

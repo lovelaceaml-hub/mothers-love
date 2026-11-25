@@ -55,21 +55,21 @@ scripts/video/cards.html:0
 ```
 
 Limitations:
-No audio track was present at `/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/music/track.mp3`, so the script ran with narration only (`music: none`) per the work order instructions.
+No audio track was present at `$HOME/.claude/worktrees/mothers-love-video/docs/private/video/music/track.mp3`, so the script ran with narration only (`music: none`) per the work order instructions.
 
 ## COMPLETION
-- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+- [$HOME/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
+- [$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
 
 Generated deliverables:
-- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json)
+- [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-16x9.mp4)
+- [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/mothers-love-commercial-9x16.mp4)
+- [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png)
+- [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-9x16.png)
+- [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/assembly.json)
 
 What Anthony must do:
 Nothing, you are clear.
 
 Next step:
-Inspect the contact sheet preview at [/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png) (takes 30 seconds).
+Inspect the contact sheet preview at [$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/out/sheets/mothers-love-commercial-16x9.png) (takes 30 seconds).

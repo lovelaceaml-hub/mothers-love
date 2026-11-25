@@ -3,7 +3,7 @@
 > vitest run
 
 
-[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m/Users/anthony/.claude/worktrees/mothers-love-tv-calendar[39m
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m$HOME/.claude/worktrees/mothers-love-tv-calendar[39m
 
  [32m✓[39m tests/backend/tls-config.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 478[2mms[22m[39m
      [33m[2m✓[22m[39m keeps strict SSL when DATABASE_URL requests sslmode=disable [33m 386[2mms[22m[39m

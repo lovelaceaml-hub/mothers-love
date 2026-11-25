@@ -2,18 +2,18 @@ Expression Orbit now chooses a fresh random expression for every pass and never 
 
 ### What changed
 
-1. In [`public/color-polish/scenes/orbit.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js):
+1. In [`public/color-polish/scenes/orbit.js`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js):
    - Added top-level `ORBIT_BAG`, `ORBIT_LAST`, and `orbitNextId()` to shuffle catalog expressions 1 to 9 with Fisher-Yates, prevent back-to-back repeats across bag refills, and store the chosen expression ID on `V.orbitId`.
    - Updated `orbitScene()` to render the central sun (medallion, name, phrase, principle) using the drawn expression ID instead of `S.featured`.
    - Updated planet selection to pick up to four records carrying the chosen expression, filling remaining slots with any available records and passing `expression: null`.
    - Updated the backside swap in `tickOrbit` to check `b.expression` first, falling back to any record in the pool if none remain for that expression.
    - Removed all references to `S.featured`.
 
-2. In [`tests/color-polish-scenes/orbit.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts):
+2. In [`tests/color-polish-scenes/orbit.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts):
    - Added acceptance test verifying that across six fresh opens at 300 ms, the sun title displays at least two distinct catalog names.
    - Added acceptance test verifying that at 300 ms the sun title matches a valid catalog name and every `.planet-system` contains exactly one `.orb-slot`.
 
-3. In [`docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md):
+3. In [`docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md):
    - Appended the Round r2 entry to the `## Result` section recording the change.
 
 ### What Anthony must do
@@ -29,9 +29,9 @@ Would you like the coordinator to run verification now?
 ## COMPLETION
 
 Files changed:
-- [`public/color-polish/scenes/orbit.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js)
-- [`tests/color-polish-scenes/orbit.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts)
-- [`docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md)
+- [`public/color-polish/scenes/orbit.js`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js)
+- [`tests/color-polish-scenes/orbit.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts)
+- [`docs/runs/2026-09-11-tv-scenes/lanes/orbit.md`](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md)
 
 Top-level identifiers added:
 - `ORBIT_BAG`

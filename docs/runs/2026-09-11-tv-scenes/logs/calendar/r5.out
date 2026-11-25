@@ -4,8 +4,8 @@ Adding `isolation: isolate;` creates an independent stacking context on the Toda
 
 What works now:
 - Scene 5 Today ring retains its glow and halo above the cell background in normal mode, `#tv.still` mode, and `prefers-reduced-motion: reduce`.
-- Rule `#tv .scene[data-scene="5"] .day.today` is established outside media queries in [calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css).
-- Lane execution record updated with Round r5 in [calendar.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md).
+- Rule `#tv .scene[data-scene="5"] .day.today` is established outside media queries in [calendar.css](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css).
+- Lane execution record updated with Round r5 in [calendar.md](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md).
 
 ### What Anthony must do
 Nothing, you're clear.
@@ -18,5 +18,5 @@ Would you like to run the verification sweep now?
 2. Inspect the scene files first
 
 ## COMPLETION
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md`

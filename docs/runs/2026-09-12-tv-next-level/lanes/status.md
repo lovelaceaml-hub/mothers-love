@@ -4,7 +4,7 @@ title: Section 5: Status (renderer id 6)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-status
+worktree: $HOME/.claude/worktrees/mothers-love-tv-status
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:58Z
@@ -12,7 +12,7 @@ updated: 2026-09-12T04:58Z
 
 ## Work order
 
-Implement Section 5: Participation Status (renderer id 6) for Plan 15 in worktree /Users/anthony/.claude/worktrees/mothers-love-tv-status. Revamp the scene to display all nine catalog phrases as primary card labels with expression names as small eyebrows above them, and the month counts unchanged. Transform the medallions into 3D coins using CSS preserve-3d and backface-visibility that flip on a staggered cadence (card i flipping at 2.5 + i * 1.4 seconds and then every 9 seconds for 0.8 seconds with an ease) between the front icon face and reverse two-digit number face with a tint ring. Retune Today and Overall counters to count up over 1.2 seconds on mount via numCache and hold. Relocate the light sweep to a dedicated element spanning the entire expression-stats grid beneath the cards, accompanied by an ambient particle layer spanning the grid. Maintain still mode support under S.still (static icon face, no flip or motion waveforms, immediate final counts, and visible phrases), declare an onLeave hook for timer cleanup, and preserve existing motion vocabulary assertions.
+Implement Section 5: Participation Status (renderer id 6) for Plan 15 in worktree $HOME/.claude/worktrees/mothers-love-tv-status. Revamp the scene to display all nine catalog phrases as primary card labels with expression names as small eyebrows above them, and the month counts unchanged. Transform the medallions into 3D coins using CSS preserve-3d and backface-visibility that flip on a staggered cadence (card i flipping at 2.5 + i * 1.4 seconds and then every 9 seconds for 0.8 seconds with an ease) between the front icon face and reverse two-digit number face with a tint ring. Retune Today and Overall counters to count up over 1.2 seconds on mount via numCache and hold. Relocate the light sweep to a dedicated element spanning the entire expression-stats grid beneath the cards, accompanied by an ambient particle layer spanning the grid. Maintain still mode support under S.still (static icon face, no flip or motion waveforms, immediate final counts, and visible phrases), declare an onLeave hook for timer cleanup, and preserve existing motion vocabulary assertions.
 
 ## Result
 

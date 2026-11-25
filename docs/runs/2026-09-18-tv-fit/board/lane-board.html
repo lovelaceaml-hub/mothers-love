@@ -245,7 +245,7 @@
   <div class="coordinator-box">
     <h1>2026-09-18-tv-fit</h1>
     <dl>
-      <dt>Plan</dt><dd class="mono">/Users/anthony/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md</dd>
+      <dt>Plan</dt><dd class="mono">$HOME/Projects/mothers-love/docs/PLAN-17-tv-fit-and-release.md</dd>
       <dt>Runner</dt><dd>coordinator</dd>
       <dt>Coordinator</dt><dd>Claude Opus 5 (high), kickoff chat</dd>
     </dl>
@@ -253,7 +253,7 @@
       <table class="baselines-table">
         <thead><tr><th>Repo</th><th>Path</th><th>Branch</th><th>Baseline HEAD</th></tr></thead>
         <tbody>
-          <tr><td>mothers-love</td><td class="mono">/Users/anthony/Projects/mothers-love-worktrees/tv17-base</td><td>tv17/base</td><td class="mono">5a24f0b336038b2dc128d20bac4881d09b127e54</td></tr>
+          <tr><td>mothers-love</td><td class="mono">$HOME/Projects/mothers-love-worktrees/tv17-base</td><td>tv17/base</td><td class="mono">5a24f0b336038b2dc128d20bac4881d09b127e54</td></tr>
           <tr><td>mothers-love (production)</td><td class="mono">n/a</td><td>codex/mothers-love</td><td class="mono">b7d92a07f20ee27351d8af254b3f5e36f52f40c8</td></tr>
         </tbody>
       </table>
@@ -273,7 +273,7 @@
         <h3 class="lane-title">Plan critique</h3>
         <dl class="lane-meta">
           <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
-          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-critic</dd>
+          <dt>Worktree</dt><dd class="mono">$HOME/.claude/worktrees/mothers-love-tv17-critic</dd>
           <dt>Review</dt><dd>none</dd>
           <dt>Depends on</dt><dd>none</dd>
           <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
@@ -291,7 +291,7 @@
         <h3 class="lane-title">Bubble fit (Welcome, Orbit, Goal)</h3>
         <dl class="lane-meta">
           <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
-          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-fit</dd>
+          <dt>Worktree</dt><dd class="mono">$HOME/.claude/worktrees/mothers-love-tv17-fit</dd>
           <dt>Review</dt><dd>sonnet-5-high</dd>
           <dt>Depends on</dt><dd>tv17/base</dd>
           <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
@@ -309,7 +309,7 @@
         <h3 class="lane-title">Words that bring peace edges</h3>
         <dl class="lane-meta">
           <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
-          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-expressions</dd>
+          <dt>Worktree</dt><dd class="mono">$HOME/.claude/worktrees/mothers-love-tv17-expressions</dd>
           <dt>Review</dt><dd>sonnet-5-high</dd>
           <dt>Depends on</dt><dd>tv17/base</dd>
           <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
@@ -327,7 +327,7 @@
         <h3 class="lane-title">Restore live Peacemakers and Peace in Practice</h3>
         <dl class="lane-meta">
           <dt>Model</dt><dd>gemini-3.8-flash-high</dd>
-          <dt>Worktree</dt><dd class="mono">/Users/anthony/.claude/worktrees/mothers-love-tv17-restore</dd>
+          <dt>Worktree</dt><dd class="mono">$HOME/.claude/worktrees/mothers-love-tv17-restore</dd>
           <dt>Review</dt><dd>sonnet-5-high</dd>
           <dt>Depends on</dt><dd>tv17/base</dd>
           <dt>Updated</dt><dd>2026-09-18T19:15Z</dd>
@@ -381,7 +381,7 @@
         <li class="log-entry">
           <span class="file-tag mono">2026-09-18T19-15Z-L0-launch-lanes-0-to-3.md</span>
           <strong>2026-09-18T19:15Z L0 launch lanes 0 to 3</strong>
-          <p>Launched L0 (critic), L1, L2, L3 together at 2026-09-18T19:15Z on Gemini 3.8 Flash (High) via agy, headless accept-edits, 45 minute timeout. Preflight status.json 2026-09-18T19:14:38Z: codex primary 100 (so Gemini per the plan&#39;s writer rule), gemini_bucket 0 expired on a fresh state_vscdb entry (reads as reset, unprobed; these launches are the probe). Deviation: lane worktrees are /Users/anthony/.claude/worktrees/mothers-love-tv17-{fit,expressions,restore,critic} instead of /Users/anthony/Projects/mothers-love-worktrees/tv17-&lt;lane&gt;, because the agy headless permission gate (~/.gemini/antigravity-cli/settings.json) allows writes only under /Users/anthony/.claude/worktrees/**. Branch names unchanged. tv17/base worktree is at the plan&#39;s path. Each writer lane has an untracked .tv17/verify.sh running Playwright against its own dev server (ports 3171, 3172, 3173) because playwright.config.ts reuses any server on 3100, which would let lanes test each other&#39;s code.</p>
+          <p>Launched L0 (critic), L1, L2, L3 together at 2026-09-18T19:15Z on Gemini 3.8 Flash (High) via agy, headless accept-edits, 45 minute timeout. Preflight status.json 2026-09-18T19:14:38Z: codex primary 100 (so Gemini per the plan&#39;s writer rule), gemini_bucket 0 expired on a fresh state_vscdb entry (reads as reset, unprobed; these launches are the probe). Deviation: lane worktrees are $HOME/.claude/worktrees/mothers-love-tv17-{fit,expressions,restore,critic} instead of $HOME/Projects/mothers-love-worktrees/tv17-&lt;lane&gt;, because the agy headless permission gate (~/.gemini/antigravity-cli/settings.json) allows writes only under $HOME/.claude/worktrees/**. Branch names unchanged. tv17/base worktree is at the plan&#39;s path. Each writer lane has an untracked .tv17/verify.sh running Playwright against its own dev server (ports 3171, 3172, 3173) because playwright.config.ts reuses any server on 3100, which would let lanes test each other&#39;s code.</p>
         </li>
       </ul>
     </section>

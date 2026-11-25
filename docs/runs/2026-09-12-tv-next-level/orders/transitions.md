@@ -1,7 +1,7 @@
 # Work order - Section B: Theatrical transitions on tv15/base - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-transitions-20260912
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base at 3e89529 (already checked out; never run a git command that changes state)
 Plan: docs/PLAN-15-tv-next-level.md, Section B. Read it, plus the Decisions section (decision 5 binds you) and the cross-cutting rules.
 Binding disposition: docs/runs/2026-09-12-tv-next-level/decisions/2026-09-12T00-15Z-coordinator-lane0-disposition.md. **Read objections O3 and O11 there before you start; they change this section's acceptance and its bubble count.**
@@ -110,7 +110,7 @@ title: Theatrical transitions on tv15/base
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: sonnet-5 on landing
 depends_on: base
 updated: <UTC stamp, format 2026-09-12T01:59Z>

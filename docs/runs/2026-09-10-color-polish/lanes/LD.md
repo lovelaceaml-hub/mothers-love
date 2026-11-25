@@ -4,7 +4,7 @@ title: Anonymous data support
 state: landed
 model: gpt-5.6-luna max
 runner: executor_luna
-worktree: /Users/anthony/Projects/.worktrees/mothers-love-color-v6/data
+worktree: $HOME/Projects/.worktrees/mothers-love-color-v6/data
 review: pending
 depends_on: pending
 updated: 2026-09-10T21:08Z

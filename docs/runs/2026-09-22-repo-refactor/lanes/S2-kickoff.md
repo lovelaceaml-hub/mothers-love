@@ -1,9 +1,9 @@
-Implement Plan 26: Clean up and refactor the Mother's Love repository, Section 2: Fix the main working copy, at /Users/anthony/Projects/mothers-love/docs/PLAN-26-repository-refactor.md
+Implement Plan 26: Clean up and refactor the Mother's Love repository, Section 2: Fix the main working copy, at $HOME/Projects/mothers-love/docs/PLAN-26-repository-refactor.md
 
 Read first, in this order:
-1. /Users/anthony/Projects/mothers-love/docs/PLAN-26-repository-refactor.md including its Build log, which now carries Sections 0 and 1
-2. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S1.md, the Result and both reviews
-3. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S2.md
+1. $HOME/Projects/mothers-love/docs/PLAN-26-repository-refactor.md including its Build log, which now carries Sections 0 and 1
+2. $HOME/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S1.md, the Result and both reviews
+3. $HOME/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S2.md
 
 Setup line, verbatim: Model claude-opus-5, effort xhigh. Fallback Gemini 3.8 Flash for the mechanical hashing and copy rows only. Lane Claude. Agents: no. Review: Sonnet 5 high read only, preceded by a Haiku 4.5 low hygiene sweep. Set your effort to xhigh before you begin.
 
@@ -20,7 +20,7 @@ Section 1 completed 2026-09-23 at commit 6459af2 on codex/color-polish-v6. Branc
 
 1. **The plan's figure of 1,596 untracked evidence files is stale. Count it live before you plan the move.** The Section 1 review measured 2,242 in the main checkout with:
 
-       git -C /Users/anthony/Projects/mothers-love status --porcelain --untracked-files=all | grep -c '^??'
+       git -C $HOME/Projects/mothers-love status --porcelain --untracked-files=all | grep -c '^??'
 
    The extra 646 are almost all under docs/runs/2026-09-11-tv-scenes/ and all predate Plan 26. Section 1 created, moved and deleted none of them. The plan text still says 1,596 in three places (the survey table, decision 3, and Section 2's own paragraph). **Correcting those three is part of this section**, because this section owns the evidence move.
 
@@ -32,7 +32,7 @@ Section 1 completed 2026-09-23 at commit 6459af2 on codex/color-polish-v6. Branc
 
 ## In scope
 
-Move /Users/anthony/Projects/mothers-love onto the production branch. Copy the untracked evidence files to the project's Drive folder with SHA-256 receipts before removing them, reading the configured Drive path from /Users/anthony/Projects/docs/STORAGE-PATHS.json rather than inventing one. Add the evidence paths to .gitignore. Leave the checkout clean. Correct the three stale 1,596 figures in the plan.
+Move $HOME/Projects/mothers-love onto the production branch. Copy the untracked evidence files to the project's Drive folder with SHA-256 receipts before removing them, reading the configured Drive path from $HOME/Projects/docs/STORAGE-PATHS.json rather than inventing one. Add the evidence paths to .gitignore. Leave the checkout clean. Correct the three stale 1,596 figures in the plan.
 
 ## Protected and out of scope
 

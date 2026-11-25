@@ -32,7 +32,7 @@ Running 15 tests using 5 workers
       118 | });
       119 |
       120 | test('the far planet is blurred and dim, the near planet sharp with a shadow', async ({ page }) => {
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:117:25
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:117:25
 
     Error Context: test-results/color-polish-scenes-orbit--de2d9-it-in-3D-at-the-slower-rate-chromium/error-context.md
 
@@ -57,7 +57,7 @@ Running 15 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

@@ -1,4 +1,4 @@
-Removed the still-mode early return in [welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) so depth styling applies on initial mount under reduced motion, and updated [welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) to verify matrix scale and stillness.
+Removed the still-mode early return in [welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js) so depth styling applies on initial mount under reduced motion, and updated [welcome.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) to verify matrix scale and stillness.
 
 ### Why
 - The `if (S.still) return true;` check at the start of `placeWelcome` was skipping initial layer transform, opacity, blur, and z-index assignment when `postRender` called `renderFloaters` at mount.
@@ -10,6 +10,6 @@ Nothing, you're clear.
 
 ## COMPLETION
 Files changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
+- [`$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts)
+- [`$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md`](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)

@@ -1,7 +1,7 @@
 # Work order - Section 1: Welcome (renderer id 1) - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-welcome-20260912
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-welcome
 Branch: tv15/scene-welcome at 6c522c1 (already checked out; never run a git command that changes state)
 Plan: docs/PLAN-15-tv-next-level.md, Section 1, plus the Decisions section (decisions 1, 8 and 9 bind you) and the cross-cutting rules.
 **Your gap report is binding and overrides the plan where they differ: docs/runs/2026-09-12-tv-next-level/gaps/welcome.md. Read all of it (G1 through G4) before writing anything.** It settles the reader-collapse removal, the three measured speech anchors with their exact bubble boxes, and which Plan 13 follow-ups apply.
@@ -84,7 +84,7 @@ title: Welcome, six bubbles and speech from the people
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+worktree: $HOME/.claude/worktrees/mothers-love-tv-welcome
 review: sonnet-5 on landing
 depends_on: base
 updated: <UTC stamp, format 2026-09-12T02:59Z>

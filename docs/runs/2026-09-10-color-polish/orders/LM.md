@@ -2,8 +2,8 @@
 
 Writer: Claude Sonnet 5 (Gemini through agy failed twice today; routing decision recorded). Reviewer: Fable coordinator reads the diff; verification is re-run in the main checkout before release. Anthony's request, 2026-09-10, quoted: "The share recognition button needs to be even more prominent in your face, even in front of the floating icons, and then it should even get your attention. With something, and then the recent recognitions on that page, they need to be less vertical, not taking as much space."
 
-Worktree (the only place you may write): /Users/anthony/.claude/worktrees/mothers-love-home-cta
-Branch: change/home-cta-compact, based on 81592a9. Dependencies linked at /Users/anthony/.claude/worktrees/mothers-love-home-cta/node_modules.
+Worktree (the only place you may write): $HOME/.claude/worktrees/mothers-love-home-cta
+Branch: change/home-cta-compact, based on 81592a9. Dependencies linked at $HOME/.claude/worktrees/mothers-love-home-cta/node_modules.
 
 Read first, inside the worktree: AGENTS.md, src/components/feed/FeedHome.tsx and src/components/feed/HomeExperience.module.css (the home page; the single Share a recognition link now sits in welcomeCopy under the title with a shimmer; below it a row of floating expression medallions, then the Recent recognitions feed), src/components/feed/PublicFeedProvider.tsx (feed cards), and tests/feed plus tests/mobile-recognition (existing journeys, some take phone screenshots).
 

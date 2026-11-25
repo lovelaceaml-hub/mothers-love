@@ -1,23 +1,23 @@
 The Recognition Garden scene identifiers and blur ceiling are updated.
 
-The top-level `LAYERS` object is renamed to `GARDEN_LAYERS` so it no longer collides with matching names in other scenes across the shared global lexical scope. In [placeGarden](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js#L75-L97), blur computation is capped at 0.9 px to prevent far-layer bubbles from exceeding the readability ceiling during entrance scaling.
+The top-level `LAYERS` object is renamed to `GARDEN_LAYERS` so it no longer collides with matching names in other scenes across the shared global lexical scope. In [placeGarden](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js#L75-L97), blur computation is capped at 0.9 px to prevent far-layer bubbles from exceeding the readability ceiling during entrance scaling.
 
 ### What works now
-- [garden.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) defines and uses `GARDEN_LAYERS` cleanly in the shared scope.
+- [garden.js](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) defines and uses `GARDEN_LAYERS` cleanly in the shared scope.
 - Far-layer bubble blur is capped at 0.9 px via `Math.min(.9, Math.max(baseBlur, L.blur))`.
-- [garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) records the Round r1 outcome.
+- [garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md) records the Round r1 outcome.
 
 ### What Anthony must do
 - Nothing, you're clear.
 
 ### Next step
-- Review the diff in [garden.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) (estimated time: 1 minute).
+- Review the diff in [garden.js](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js) (estimated time: 1 minute).
 
 ## COMPLETION
 
 Files changed:
-1. [public/color-polish/scenes/garden.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
-2. [docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
+1. [public/color-polish/scenes/garden.js](file://$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js)
+2. [docs/runs/2026-09-11-tv-scenes/lanes/garden.md](file://$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md)
 
 Identifiers renamed:
 - `LAYERS` -> `GARDEN_LAYERS` (declaration at line 4, and references at lines 58 and 77)

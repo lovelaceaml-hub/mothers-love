@@ -1,11 +1,11 @@
 # Work order - Section A: Shared primitives - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-base-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv15/base at b2eb842 (already checked out; you never run a git command that changes state)
-Plan: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/PLAN-15-tv-next-level.md (read Section A and the Decisions section first, then the whole file including the Build log)
-Run record: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/INDEX.md
-Anthony's rulings: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md
+Plan: $HOME/.claude/worktrees/mothers-love-tv-base/docs/PLAN-15-tv-next-level.md (read Section A and the Decisions section first, then the whole file including the Build log)
+Run record: $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/INDEX.md
+Anthony's rulings: $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md
 Lane: Antigravity, Gemini 3.8 Flash (High) (Codex primary is at 100 percent, so Luna is unavailable and Gemini is this lane's named writer). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only, on your diff.
 
 You run as this lane's declared writer. Nobody answers questions mid-run; read this whole order before editing.
@@ -13,7 +13,7 @@ You run as this lane's declared writer. Nobody answers questions mid-run; read t
 ## Hard rules
 
 1. Create or edit only the files in the allowlist block below. Everything else is protected. In particular: nothing under public/color-polish/scenes/, not core/arrivals.js, not core/chrome.js, not core/host.js, not renderer.css, not boot.js, nothing under src/, nothing under database/, and no spec file other than the two named.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Never touch anything outside /Users/anthony/.claude/worktrees/mothers-love-tv-base. Every path you need is inside that worktree.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Never touch anything outside $HOME/.claude/worktrees/mothers-love-tv-base. Every path you need is inside that worktree.
 3. Do not edit anything under docs/runs/2026-09-12-tv-next-level/ except your own record file docs/runs/2026-09-12-tv-next-level/lanes/base.md.
 4. Never write the em dash (U+2014) or en dash (U+2013) into any file, comment or log line. Use a comma, colon, or parentheses.
 5. Behavior tests, not source-text regexes, for everything you change. A regex over source text is not a test.
@@ -126,7 +126,7 @@ You cannot run the server-backed checks (rule 8). Your job is to make every one 
 3. `onLeave` fires once at each of the three sites and a throwing `onLeave` logs instead of breaking the swap.
 4. With a mostly-long pool (four of six records over 160 characters), `rightBubbles` returns four bubbles, never one; every message reaches one page at or above the 18 px floor where it fits; a 500-character message is either on one grown slot or paginated, never truncated; the `verbatim` log stays true.
 5. A descriptor with two anchors mounts two `.speech-bubble` elements with `border-radius` 16 px; phrases come from the nine with no immediate repeat; under reduced motion one phrase stays fixed.
-6. The globals check passes on this branch and fails on a fixture with a duplicated top-level name. Create that fixture under scripts/ only if you can do it inside your allowlist; if not, prove the failure path by running the script against a temporary directory you create under /Users/anthony/.claude/worktrees/mothers-love-tv-base and then delete, and paste the output.
+6. The globals check passes on this branch and fails on a fixture with a duplicated top-level name. Create that fixture under scripts/ only if you can do it inside your allowlist; if not, prove the failure path by running the script against a temporary directory you create under $HOME/.claude/worktrees/mothers-love-tv-base and then delete, and paste the output.
 7. `npm run typecheck`, `npm test`, `npm run lint` all run. Lint must stay at its pre-existing 18 problems, not more.
 8. Your record file lists every new function and every call site you changed, with absolute paths and line numbers.
 
@@ -141,7 +141,7 @@ title: Shared primitives on tv15/base
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: sonnet-5 on landing
 depends_on: none
 updated: <UTC stamp, format 2026-09-11T23:59Z>

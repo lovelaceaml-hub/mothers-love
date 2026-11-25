@@ -4,7 +4,7 @@ The readiness supplement contains 19 non-sensitive artifacts plus a member hash 
 
 Archive: https://drive.google.com/file/d/1s43Mv9ImTB9wAF4JdIYw2VULKQGE3JHu/view
 Private parent: https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw
-Mounted copy: /Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/mothers-love-readiness-evidence-2026-09-08.zip
+Mounted copy: $HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/mothers-love-readiness-evidence-2026-09-08.zip
 
 Size: 2376364 bytes.
 SHA-256: c9fcb26d923c6f9dcd071f50e78e6d446df4749a6690c5be56a438cd8f76b8f2

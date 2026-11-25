@@ -1,7 +1,7 @@
 # The LAN preview server
 
 Address: http://192.168.0.86:3100/display (the Mac's en0 address; it follows the network)
-Branch served: tv15/preview in /Users/anthony/.claude/worktrees/mothers-love-tv-pick
+Branch served: tv15/preview in $HOME/.claude/worktrees/mothers-love-tv-pick
 Pid file: lan.pid. Stop with `kill $(cat .../logs/preview/lan.pid)`.
 
 ## The stale-server trap, 2026-09-12T04:20Z

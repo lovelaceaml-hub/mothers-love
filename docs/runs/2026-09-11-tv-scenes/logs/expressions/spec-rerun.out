@@ -40,9 +40,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:111:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:111:21
 
     Error Context: test-results/color-polish-scenes-expres-765ee-ons-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -68,9 +68,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:142:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:142:21
 
     Error Context: test-results/color-polish-scenes-expressions-grid-cards-fit-with-slack-chromium/error-context.md
 
@@ -96,9 +96,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:154:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:154:21
 
     Error Context: test-results/color-polish-scenes-expressions-compact-cards-fit-chromium/error-context.md
 
@@ -124,9 +124,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:164:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:164:21
 
     Error Context: test-results/color-polish-scenes-expressions-the-focused-card-is-balanced-chromium/error-context.md
 
@@ -152,9 +152,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:173:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:173:21
 
     Error Context: test-results/color-polish-scenes-expres-a5318-sion-can-be-the-focused-one-chromium/error-context.md
 
@@ -180,10 +180,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:209:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:209:28
 
     Error Context: test-results/color-polish-scenes-expres-6734f-ion-renders-the-scene-still-chromium/error-context.md
 
@@ -209,9 +209,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:222:32
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts:222:32
 
     Error Context: test-results/color-polish-scenes-expressions-the-same-holds-at-3840-chromium/error-context.md
 
@@ -237,9 +237,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -265,10 +265,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -293,7 +293,7 @@ Running 15 tests using 5 workers
       220 |   quiet = true;
       221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
       222 |   await expect(page.locator('iframe')).toHaveCount(0);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-usable/usable.spec.ts:219:83
+        at $HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-usable/usable.spec.ts:219:83
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 

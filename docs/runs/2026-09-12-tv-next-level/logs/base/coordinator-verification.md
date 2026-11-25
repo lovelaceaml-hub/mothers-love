@@ -1,6 +1,6 @@
 # Coordinator verification of Section A, tv15/base
 
-Run by the coordinator (Opus 5 high) 2026-09-12, on the worktree /Users/anthony/.claude/worktrees/mothers-love-tv-base at tv15/base with rounds 1 and 2 applied. Not taken from the writer's report: every command was run here.
+Run by the coordinator (Opus 5 high) 2026-09-12, on the worktree $HOME/.claude/worktrees/mothers-love-tv-base at tv15/base with rounds 1 and 2 applied. Not taken from the writer's report: every command was run here.
 
 | Check | Result | Log |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Presentation and hearts run
 
-Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-04-polish-and-hearts.md.
+Read first: $HOME/Projects/mothers-love/docs/PLAN-04-polish-and-hearts.md.
 
 Baseline:91b2c176c1e05929c06f87c494c9758c73892d82, clean. Runner: one coordinator chat integrating isolated worktrees sequentially. Implementation: Luna xhigh, with Terra high after three failures and Sol high after two Terra failures. Review: native Sol high controller and independent Terra high reaction privacy review.
 

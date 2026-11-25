@@ -1,6 +1,6 @@
 # Lane H: Entrance, group of five (writer result)
 
-Branch `tv17/h-arrival-group`, commit **bfcaab3**, worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-h-arrival-group`. Not pushed, not merged, nothing deployed.
+Branch `tv17/h-arrival-group`, commit **bfcaab3**, worktree `$HOME/.claude/worktrees/mothers-love-tv17-h-arrival-group`. Not pushed, not merged, nothing deployed.
 
 ## Chosen size and measured text
 - Drawn bubble: **240 px** at 1920 (480 px at 3840), down from 300 px. Layout size moved to 240 as well, so the drawn over layout factor is 1.0 and every word is drawn at the size it is laid out at.
@@ -24,8 +24,8 @@ Branch `tv17/h-arrival-group`, commit **bfcaab3**, worktree `/Users/anthony/.cla
 - `npm test`: 255 of 255 passed (run before the last two small edits, which were an entrance order constant and test-only changes).
 - `npm run build`: clean, run after the final edits (exit code 0, all routes built).
 - Captures (production build, synthetic public config, own port 3188 so no other chat's server was touched):
-  - `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-1920.png`
-  - `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-3840.png`
+  - `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-1920.png`
+  - `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-3840.png`
   - Both were inspected: five smaller bubbles, 3 over 2, every word inside its bubble, title, A WAVE OF FIVE caption, and a five dot waiting pill reading "Group of 5 on screen".
 
 ## What was skipped, on Anthony's mid-lane ruling to get this visible fast
@@ -41,6 +41,6 @@ Anthony saw only 2 bubbles on the preview because his real recognitions are long
 - **Chosen diameter: 400 px drawn, laid out at 300** (drawn over layout 1.333), up from 240. Slots in frame coordinates (1812 by 972, TV adds 54,54), a 3 over 2 stagger centred on the group centre cx 906, cy 500: `[[286,340],[906,340],[1526,340],[596,660],[1216,660]]`. Neighbour gap 220 px in a row and about 45 px on the diagonal, ring glow clear of the title by about 29 px, of the waiting pill by about 51 px, of the bottom caption by about 40 px and of the frame edge by about 51 px.
 - **Smallest drawn text at 1920: 24.0 px** for a long message (the 18 px layout floor times 1.333) and 24.7 px for a short one; recipient 34.7 px. Both are well above the 18 px floor, and twice that at 3840.
 - **Hold fix:** the wave hold counted a per page floor of 8 seconds while the page cycler uses 9, so the last page of a 4 page message could never come up. The hold now counts the same 9 second floor for any multi page bubble. Measured: 30 s for five short messages, 36 s for five 400 to 500 character messages (4 pages).
-- **Ran:** `npm run typecheck` clean, `npm run build` clean (both after the final edit). Two captures at 1920, inspected: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-r2-short-1920.png` and `.../h-arrival-group-five-r2-long-1920.png`. The long one uses a 27 character name and a record with five expressions; all five bubbles show, every message pages inside its own bubble (01 / 03 and 01 / 04 CONTINUED), nothing is clipped.
+- **Ran:** `npm run typecheck` clean, `npm run build` clean (both after the final edit). Two captures at 1920, inspected: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/h-arrival-group-five-r2-short-1920.png` and `.../h-arrival-group-five-r2-long-1920.png`. The long one uses a 27 character name and a record with five expressions; all five bubbles show, every message pages inside its own bubble (01 / 03 and 01 / 04 CONTINUED), nothing is clipped.
 - **Skipped:** no unit tests, no playwright spec runs, no test edits, per Anthony's speed ruling.
 - **Stale tests for the integration lane to fix (do not assume they pass):** in `tests/color-polish-scenes/arrival.spec.ts` the `GROUP_LAYOUT` and `GROUP_DRAWN` constants are still 240, which stales "the four reworked entrances start deep and resolve flat", "a wave of five draws five smaller bubbles, one per recognition, with every word on screen" and the group branch of `expectFullScreenComposition` (exact diameter, drawn over layout, and the vertical centre tolerance of 12 against the new centre at TV 554); "arrival records log exactly one arrival_record_shown per record for single arrival and oversize group wave" still expects three pair pages; and "a 500 grapheme message fits whole on the full screen single orb and the group pairs" still measures the group wave as a `pair`.

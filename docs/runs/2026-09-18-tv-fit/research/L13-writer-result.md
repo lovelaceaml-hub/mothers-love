@@ -1,6 +1,6 @@
 # Plan 17 Lane 13 writer result: Live Recognitions full screen (slug live-feed, renderer id 12)
 
-Writer: Claude Fable 5.1. Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-live-feed, branch tv17/live-feed, cut from tv17/pick 3d4b459. No database was contacted, no Supabase, Vercel or deploy tool was used, nothing was deployed. The SQL below is written to files only and has never been run anywhere, including locally.
+Writer: Claude Fable 5.1. Worktree $HOME/.claude/worktrees/mothers-love-tv17-live-feed, branch tv17/live-feed, cut from tv17/pick 3d4b459. No database was contacted, no Supabase, Vercel or deploy tool was used, nothing was deployed. The SQL below is written to files only and has never been run anywhere, including locally.
 
 ## What now exists
 
@@ -33,9 +33,9 @@ Tests:
 Not touched: boot.js, core/chrome.js, core/stage.js, renderer.css, src/lib/server/validation.ts (its playlist is the legacy ten screen display settings, unrelated), every other scene.
 
 Files outside the repository worktree, as the order names them:
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/activation-live-feed.sql
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/rollback-live-feed.sql
-- /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/ (captures and the capture script l13-capture.mjs)
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/activation-live-feed.sql
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/rollback-live-feed.sql
+- $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/ (captures and the capture script l13-capture.mjs)
 
 ## Layout numbers (drawn at 1920 x 1080; every value doubles at 3840 x 2160)
 
@@ -76,9 +76,9 @@ Forward order: 1. deploy the new build, 2. run database/013, 3. optional activat
 
 ## SQL files for Anthony's approval (none has been run)
 
-1. /Users/anthony/.claude/worktrees/mothers-love-tv17-live-feed/database/013_color_polish_live_feed.sql : replaces only mothers_love.ml_color_polish_valid_playlist (CREATE OR REPLACE, same signature, IMMUTABLE, empty search_path). Accepts 10 or 11 entries, the ten originals required, live-feed optional, each id once, durations 12 to 180, at least one enabled. No table, row, grant or other function changes; nothing outside mothers_love; idempotent. It differs from the 011 function on four lines.
-2. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/activation-live-feed.sql : optional. Guards that 013 is in place, then appends live-feed (enabled, 60 s) to the saved row with a revision check, exactly what the app's own save does (playlist, revision plus one, updated_at). Does nothing if already saved.
-3. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/rollback-live-feed.sql : described in (c).
+1. $HOME/.claude/worktrees/mothers-love-tv17-live-feed/database/013_color_polish_live_feed.sql : replaces only mothers_love.ml_color_polish_valid_playlist (CREATE OR REPLACE, same signature, IMMUTABLE, empty search_path). Accepts 10 or 11 entries, the ten originals required, live-feed optional, each id once, durations 12 to 180, at least one enabled. No table, row, grant or other function changes; nothing outside mothers_love; idempotent. It differs from the 011 function on four lines.
+2. $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/activation-live-feed.sql : optional. Guards that 013 is in place, then appends live-feed (enabled, 60 s) to the saved row with a revision check, exactly what the app's own save does (playlist, revision plus one, updated_at). Does nothing if already saved.
+3. $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/research/rollback-live-feed.sql : described in (c).
 
 Note: database/ already holds 013_public_feed_100.sql from the production merge. The order names 013_color_polish_live_feed.sql, so that name was kept; the coordinator may renumber it to 014 (update the two research files' comments and sql-contract.test.ts if so).
 
@@ -95,7 +95,7 @@ Note: database/ already holds 013_public_feed_100.sql from the production merge.
 
 ## Captures (fictional data only; looked at by the writer)
 
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/after/<pool>/w<1920|3840>-ms<0|6000|14000|21000>/live-feed.png, pools: empty, three, hundred, long (twelve records, five of them 500 graphemes). 32 images, 0 page errors, result.json beside them holds the measured panel box, font sizes, rail visibility and scroll offsets for each. The capture script is logs/captures/L13/l13-capture.mjs (copy it into a worktree to run it: node l13-capture.mjs <output folder>).
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L13/after/<pool>/w<1920|3840>-ms<0|6000|14000|21000>/live-feed.png, pools: empty, three, hundred, long (twelve records, five of them 500 graphemes). 32 images, 0 page errors, result.json beside them holds the measured panel box, font sizes, rail visibility and scroll offsets for each. The capture script is logs/captures/L13/l13-capture.mjs (copy it into a worktree to run it: node l13-capture.mjs <output folder>).
 
 ## Limitations
 

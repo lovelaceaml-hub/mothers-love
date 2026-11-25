@@ -9,7 +9,7 @@ Plan 28 Section 3 made this file on 2026-09-23, and Section 5 added part 4 on 20
 3. **Documents and files kept outside `main`.** What stayed on branches or tags when every document came to `main`, and where each one is.
 4. **The world branch's handoff and agent notes.** The 3D world's own release notes and agent notes, kept when the world came to `main`.
 
-Links below are relative to this folder. A few old entries name files by absolute path under `/Users/anthony/Projects/mothers-love-worktrees/`; many of those working copies no longer exist, and the tag in part 3 or the branch named in the entry holds the file.
+Links below are relative to this folder. A few old entries name files by absolute path under `$HOME/Projects/mothers-love-worktrees/`; many of those working copies no longer exist, and the tag in part 3 or the branch named in the entry holds the file.
 
 ## Part 1: entries added on 2026-09-23
 
@@ -85,7 +85,7 @@ Source: pull request #9 (`fix/android-pwa-kiosk`, merged 2026-09-21 as `1b4c31a`
 
 Source: `tv17/pick` commit `f94fe94`, text unchanged.
 
-Worktree cleanup (September 21): 49 old working copies were saved to GitHub (unfinished edits committed to their own branches, detached ones as `archive/<name>`, 17 never-uploaded branches pushed), then removed by Anthony's run of `/Users/anthony/Projects/mothers-love-worktrees/remove-old-copies.sh`. Differing review screenshots were moved to `/Users/anthony/Projects/mothers-love-worktrees/_saved-evidence` (local only). Eight remain: the main checkout, this `tv17-base` live copy, and six in use by other chats (tv-pearl-design, tv-pearl-sequence, world-quality-continuation, heart-ribbons-3d and two under ~/Documents/Codex/2026-09-20).
+Worktree cleanup (September 21): 49 old working copies were saved to GitHub (unfinished edits committed to their own branches, detached ones as `archive/<name>`, 17 never-uploaded branches pushed), then removed by Anthony's run of `$HOME/Projects/mothers-love-worktrees/remove-old-copies.sh`. Differing review screenshots were moved to `$HOME/Projects/mothers-love-worktrees/_saved-evidence` (local only). Eight remain: the main checkout, this `tv17-base` live copy, and six in use by other chats (tv-pearl-design, tv-pearl-sequence, world-quality-continuation, heart-ribbons-3d and two under ~/Documents/Codex/2026-09-20).
 
 ### September 20 (evening): butterfly heart app icon, live
 
@@ -169,7 +169,7 @@ Live at https://mothers-love.vercel.app/display as commit `011a9ed` on `codex/mo
 
 Verified: `tests/color-polish-scenes/live-feed.spec.ts` 18 of 18 on the final code, and a live smoke check (/, /recognize, /display return 200, the live script carries the new speeds). Before the receipt feed merge the build passed typecheck, 255 of 255 unit tests, the build, and 275 of 276 scene tests (`status.spec.ts:110` timed out loading the Studio page and was not rerun). No test ran on the merged build, at Anthony's request for speed.
 
-Open: `database/014_color_polish_live_feed.sql` is NOT RUN and is not needed (the screen uses its default: enabled, 60 seconds, last). Its number collides with the applied `database/014_recognition_archive.sql`, so renumber it before it is ever run. The live saved playlist keeps its old durations; the change to 60 seconds waits for Anthony. Worktree cleanup is not done. Full history: [Plan 17](PLAN-17-tv-fit-and-release.md) Build log, kept in /Users/anthony/Projects/mothers-love/docs/.
+Open: `database/014_color_polish_live_feed.sql` is NOT RUN and is not needed (the screen uses its default: enabled, 60 seconds, last). Its number collides with the applied `database/014_recognition_archive.sql`, so renumber it before it is ever run. The live saved playlist keeps its old durations; the change to 60 seconds waits for Anthony. Worktree cleanup is not done. Full history: [Plan 17](PLAN-17-tv-fit-and-release.md) Build log, kept in $HOME/Projects/mothers-love/docs/.
 
 ### September 19: receipt feed, steady hearts, and nothing is deleted any more
 
@@ -187,15 +187,15 @@ The QR code on the TV display at https://mothers-love.vercel.app/display now ope
 
 ### September 12: Plan 15 preview, production held
 
-[TV test preview](https://mothers-love-d4ve0196a-lvzion.vercel.app/display) runs code commit `b865073` on `codex/tv15-full-preview`, in `/Users/anthony/Projects/mothers-love-worktrees/tv15-b2-preview`. All ten TV scenes are integrated with the original 1.15 second live crossfade. Anthony deferred the Turning Nave; its prior version remains at `64f5365`. Production remains `1532068` and has not been pushed or promoted. [Current verification and remaining TV approval](runs/2026-09-12-tv-next-level/lanes/astra-full-pass.md). Preview access needs a Vercel session or temporary share link.
+[TV test preview](https://mothers-love-d4ve0196a-lvzion.vercel.app/display) runs code commit `b865073` on `codex/tv15-full-preview`, in `$HOME/Projects/mothers-love-worktrees/tv15-b2-preview`. All ten TV scenes are integrated with the original 1.15 second live crossfade. Anthony deferred the Turning Nave; its prior version remains at `64f5365`. Production remains `1532068` and has not been pushed or promoted. [Current verification and remaining TV approval](runs/2026-09-12-tv-next-level/lanes/astra-full-pass.md). Preview access needs a Vercel session or temporary share link.
 
 ### September 10: steady TV, scene countdown, dominant home action
 
-Three more follow-ups from Plan 11 are live at https://mothers-love.vercel.app. The TV display at /display now stays steady through brief connection glitches, and every scene shows a small, subtle countdown ring in the bottom right corner. Two root causes of the flashes were fixed: every new poll had been aborting the in-flight request with a timeout too short for a healthy but slow read, and the renderer iframe was remounting on any momentary status change, dropping the bootstrap handshake. On phones, the Share a recognition action is now the dominant element, pulsing in front of the floating medallions, and recent recognition cards are shorter without truncating messages. Verified in the main checkout: typecheck clean, 222 of 222 unit tests, a production build, the renderer probe at zero issues across all 10 scenes, and 60 browser journeys passing, 1 skipped. Deployed as commit c28f8c6, Vercel deployment dpl_QftFLj8ww2f83bkhDPsRGH18yqCm, READY. Rollback runs npx vercel rollback to dpl_9DsFVYvDX1fSXRirH3vGHfxeFwQd, commit 076c4cd, the Plan 11 build; no database change was involved. Three pre-existing browser test failures are unchanged, plus 26 pre-existing failing journeys in tests/display/display.e2e.spec.ts that target a legacy test id nothing has rendered since commit a7dca27. Read /Users/anthony/Projects/mothers-love/docs/PLAN-12-tv-stability-countdown-and-home-action.md for the full history.
+Three more follow-ups from Plan 11 are live at https://mothers-love.vercel.app. The TV display at /display now stays steady through brief connection glitches, and every scene shows a small, subtle countdown ring in the bottom right corner. Two root causes of the flashes were fixed: every new poll had been aborting the in-flight request with a timeout too short for a healthy but slow read, and the renderer iframe was remounting on any momentary status change, dropping the bootstrap handshake. On phones, the Share a recognition action is now the dominant element, pulsing in front of the floating medallions, and recent recognition cards are shorter without truncating messages. Verified in the main checkout: typecheck clean, 222 of 222 unit tests, a production build, the renderer probe at zero issues across all 10 scenes, and 60 browser journeys passing, 1 skipped. Deployed as commit c28f8c6, Vercel deployment dpl_QftFLj8ww2f83bkhDPsRGH18yqCm, READY. Rollback runs npx vercel rollback to dpl_9DsFVYvDX1fSXRirH3vGHfxeFwQd, commit 076c4cd, the Plan 11 build; no database change was involved. Three pre-existing browser test failures are unchanged, plus 26 pre-existing failing journeys in tests/display/display.e2e.spec.ts that target a legacy test id nothing has rendered since commit a7dca27. Read $HOME/Projects/mothers-love/docs/PLAN-12-tv-stability-countdown-and-home-action.md for the full history.
 
 ### September 10: TV click advance and home action
 
-Two follow-up changes from Plan 10 are live at https://mothers-love.vercel.app. On the TV display at /display, a click, tap, ArrowRight or Space now advances to the next scene, live only, never in the Studio sample preview. On phones, the single Share a recognition action now sits above Recent recognitions with a coral, peach and gold shimmer, and /recognize shows only the form, with no live campaign feed; both name fields show titled examples like B. Daniel and S. Grace L. Verified in the main checkout: typecheck clean, 222 of 222 unit tests, a production build, and 55 browser journeys passing, 1 skipped, and 3 pre-existing failures unchanged from before this release. Deployed as commit 076c4cd, Vercel deployment dpl_9DsFVYvDX1fSXRirH3vGHfxeFwQd, READY. Rollback runs npx vercel rollback to dpl_BaxrmngrNd8yEjFttZUQBQBKTMRr, commit 06172bb, the Plan 10 build; no database change was involved. Read /Users/anthony/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md for the full history.
+Two follow-up changes from Plan 10 are live at https://mothers-love.vercel.app. On the TV display at /display, a click, tap, ArrowRight or Space now advances to the next scene, live only, never in the Studio sample preview. On phones, the single Share a recognition action now sits above Recent recognitions with a coral, peach and gold shimmer, and /recognize shows only the form, with no live campaign feed; both name fields show titled examples like B. Daniel and S. Grace L. Verified in the main checkout: typecheck clean, 222 of 222 unit tests, a production build, and 55 browser journeys passing, 1 skipped, and 3 pre-existing failures unchanged from before this release. Deployed as commit 076c4cd, Vercel deployment dpl_9DsFVYvDX1fSXRirH3vGHfxeFwQd, READY. Rollback runs npx vercel rollback to dpl_BaxrmngrNd8yEjFttZUQBQBKTMRr, commit 06172bb, the Plan 10 build; no database change was involved. Read $HOME/Projects/mothers-love/docs/PLAN-11-tv-click-and-home-polish.md for the full history.
 
 ### September 10: Color Polish live
 
@@ -272,7 +272,7 @@ Shared backup remains at 589c098, privately pushed, excluding campaign personal 
 Private source: https://github.com/lovelaceaml-hub/mothers-love, branch codex/mothers-love. The final readiness source/status commit is pushed and remote HEAD verified by root. New manifests and readiness receipts record the source/operation evidence. Read PLAN-01-full-app.md, CONTRACT.md, USER-MANUAL.md and UI-QUALITY-REPORT.md. Original source-handoff and prior release receipts remain history.
 
 Non-sensitive evidence storage: https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw
-Exact mounted folder: /Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love
+Exact mounted folder: $HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love
 The prior release archive and its verified SHA-256 remain in research/release-storage.md. The readiness supplement is privately uploaded and its mounted-copy SHA-256 verified; see research/readiness-storage.md for the exact artifact URL and hash.
 
 ### Physical commissioning
@@ -381,7 +381,7 @@ These left the main checkout's working copy on 2026-09-23 when it moved from `co
 Each one is identical in `archive/codex/color-polish-v6` (commit `e5ffa3a`), `record/2026-09-22-repo-refactor-section-1` and `record/2026-09-22-repo-refactor-section-2`, all pushed to GitHub. To restore them into a working copy:
 
 ```bash
-git -C /Users/anthony/Projects/mothers-love checkout archive/codex/color-polish-v6 -- public/color-polish/renderer.js scripts/video
+git -C $HOME/Projects/mothers-love checkout archive/codex/color-polish-v6 -- public/color-polish/renderer.js scripts/video
 ```
 
 The commercial's words are on `main` in [video/SCRIPT.md](video/SCRIPT.md) and [video/narration.json](video/narration.json), and its finished files are in Drive under `Project Outputs/The Words of Mother's Love/Commercial`.
@@ -394,11 +394,11 @@ Added by Plan 28 Section 5 on 2026-09-24, when `feat/world-surface` brought the 
 
 #### September 23: this checkout moved to the one home
 
-This checkout now lives at `/Users/anthony/Projects/mothers-love-world/web` (it was
-`/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation`). The project
-home is `/Users/anthony/Projects/mothers-love-world/START-HERE.md`; the active plan is
-`/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`.
-3D Studio moved to `/Users/anthony/Projects/mothers-love-world/studio`, and
+This checkout now lives at `$HOME/Projects/mothers-love-world/web` (it was
+`$HOME/Projects/mothers-love-worktrees/world-quality-continuation`). The project
+home is `$HOME/Projects/mothers-love-world/START-HERE.md`; the active plan is
+`$HOME/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`.
+3D Studio moved to `$HOME/Projects/mothers-love-world/studio`, and
 `scripts/world-kit-sync.mjs --studio` now defaults there.
 
 #### September 22: Pass D2, the world made radiant
@@ -407,7 +407,7 @@ home is `/Users/anthony/Projects/mothers-love-world/START-HERE.md`; the active p
 
 Unchanged and proven on every section: the frozen wording layout on the pearl (0 differing pixels with the glow on and off), no personal pixels outside the depth-tested slot, and `art=classic` and `art=cinematic` byte-identical to Codex's D1 captures. Production, API and database untouched; PR #8 stays draft.
 
-Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-27-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
+Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-27-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
 
 #### September 21: Show designs before Claude implementation
 
@@ -452,8 +452,8 @@ Continue branch `feature/tv-3d-world-prototype-01` in its isolated worktree. The
 
 #### Active state: PLAN-01, the 3D world with Peace and Joy (September 24)
 
-The active plan is `/Users/anthony/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
-(start at `/Users/anthony/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
+The active plan is `$HOME/Projects/mothers-love-world/docs/PLAN-01-painted-world-and-hosts.md`
+(start at `$HOME/Projects/mothers-love-world/START-HERE.md`). **Everything stays 3D
 (Anthony, 2026-09-24):** "I want everything to be 3D" and "I like how it shows currently".
 No painted sky panoramas, painted island layers or painted colour filter go into the world.
 The paintings made on 2026-09-23 are set aside on Drive `3D World/art/painted-v2/` and are
@@ -464,7 +464,7 @@ not used. The rules in the sections below still bind unless PLAN-01 changes them
 Anthony granted the 3D Studio coordinator full creative design and admin authority for
 the 3D world. [Plan 26](PLAN-29-world-kit.md) is active: lanes K0 to K6 in their own
 worktrees, merged here by the coordinator. The design is
-`/Users/anthony/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
+`$HOME/Projects/mothers-love-world/studio/docs/design/WORLD-INTEGRATION.md`. Every rule in the
 section below still binds. One writer per worktree; do not write in this checkout while
 a K lane is merging.
 
@@ -477,7 +477,7 @@ Anthony reviewed the D1 prototype against the approved direction board on 2026-0
 
 [Plan 24](PLAN-24-world-visual-quality.md) is the active authority for this art branch. Anthony approved implementation with Claude Opus high for shared runtime and integration, Claude Fable high for visual implementation, and Astra high for initial designs/prototypes. These assignments supersede historical model-routing instructions below. Start with P0 readiness diagnosis before visual implementation. Preserve Plan 23's world-space behavior and all 13 destinations.
 
-Work in `/Users/anthony/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](runs/2026-09-21-world-quality/RECORD.md), [task ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
+Work in `$HOME/Projects/mothers-love-world/web`, on `feature/world-cinematic-art-pass`, through draft [PR #8](https://github.com/lovelaceaml-hub/mothers-love/pull/8). Follow the [execution record](runs/2026-09-21-world-quality/RECORD.md), [task ledger](runs/2026-09-21-world-quality/TASK_LEDGER.json), and current bounded kickoff. One writer owns the worktree at a time. The supplied HTML and pictures define appearance; copied source documents are historical evidence, not authority to override this approved plan. Production, real-data artifacts, unrelated worktrees, API/database/auth changes, and merge/promotion are outside this task.
 
 #### September 21: Recognition bubbles inside the world
 

@@ -1,7 +1,7 @@
 # Work order - Section 8 round 2: five spec failures - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-orbit-20260912-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-orbit
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-orbit
 Branch: tv15/scene-orbit. Your round 1 is in the worktree, uncommitted. Do not redo or revert it.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

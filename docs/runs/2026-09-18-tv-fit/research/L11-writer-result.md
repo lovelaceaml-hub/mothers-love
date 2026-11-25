@@ -1,15 +1,15 @@
 # Lane 11 writer result: Arrival, bright, heavenly, full screen
 
 Writer: fresh Claude Opus 5. Branch tv17/arrival, cut from tv17/pick 3d4b459.
-Worktree: /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival.
+Worktree: $HOME/.claude/worktrees/mothers-love-tv17-arrival.
 Facts only. No verdict on the work.
 
 ## Changed files (all inside the L11 allowlist)
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/core/arrivals.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival/tests/color-polish-scenes/arrival.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.css
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/scenes/arrival.js
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/public/color-polish/core/arrivals.js
+- $HOME/.claude/worktrees/mothers-love-tv17-arrival/tests/color-polish-scenes/arrival.spec.ts
 
 renderer.css and core/stage.js were not touched. No rule outside the allowlist was needed.
 
@@ -116,7 +116,7 @@ diff contains no mutation.
 
 ## Exact command results
 
-All run from /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival with
+All run from $HOME/.claude/worktrees/mothers-love-tv17-arrival with
 `npm_config_cache=/tmp/npm-cache`. Dependencies installed with `npm ci` in this worktree
 (exit code 0). Playwright ran against a dedicated dev server on the free port 3187
 (`PLAYWRIGHT_BASE_URL=http://127.0.0.1:3187`), which was stopped afterwards; port 3187 confirmed
@@ -146,7 +146,7 @@ code.
 
 ## Captures
 
-Directory: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L11/after
+Directory: $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L11/after
 Sixteen PNGs, single and group, at 1920 by 1080 and 3840 by 2160, four moments each:
 
 - w1920-single-arrival-start.png, w1920-single-arrival-mid-flight.png,

@@ -1,7 +1,7 @@
 # Work order - welcome correction r4: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-welcome-20260911-r4
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-welcome
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 1 (data-scene="1"). Round: r4.
 
 The Sonnet 5 landing review of your previous round (r3) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -18,8 +18,8 @@ The Sonnet 5 landing review of your previous round (r3) found the items below. Y
 Append one line "Round r4: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/welcome.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
+$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
 ```

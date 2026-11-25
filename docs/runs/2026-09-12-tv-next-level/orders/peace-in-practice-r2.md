@@ -1,7 +1,7 @@
 # Work order - Section 7 round 3: one test does not reach the cap - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-peace-in-practice-20260912-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 Branch: tv15/scene-peace-in-practice. Your round 2 work is in the worktree, uncommitted. Do not redo or revert it.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

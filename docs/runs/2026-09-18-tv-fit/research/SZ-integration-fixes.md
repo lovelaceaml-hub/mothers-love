@@ -2,7 +2,7 @@
 
 Goal of this step: take the merged tv17/pick branch from 271 passed, 2 failed to zero failures, and settle whether each failure was a real defect a viewer would see or a test problem.
 
-Worktree: /Users/anthony/Projects/mothers-love-worktrees/tv17-base, branch tv17/pick.
+Worktree: $HOME/Projects/mothers-love-worktrees/tv17-base, branch tv17/pick.
 Start: f2c6df8. Result: 2a75745.
 Files changed: tests/color-polish-scenes/helpers.spec.ts and tests/color-polish-scenes/welcome.spec.ts. No scene code, no CSS and not core/speech.js: neither defect lives in the renderer.
 
@@ -54,7 +54,7 @@ A first version finished every animation in the document and timed out under a s
 - helpers.spec.ts alone: 6 passed.
 - npm run typecheck: clean.
 - npm test: 40 files, 255 tests passed.
-- Full folder, fresh production build, synthetic config (bash .tv17/verify-studio.sh tests/color-polish-scenes): 274 passed, 0 failed, 8.8 minutes. Log: /Users/anthony/Projects/mothers-love-worktrees/tv17-base/.tv17/full-scenes-sz.txt (not committed). 274 is the earlier 273 plus the one new unit test.
+- Full folder, fresh production build, synthetic config (bash .tv17/verify-studio.sh tests/color-polish-scenes): 274 passed, 0 failed, 8.8 minutes. Log: $HOME/Projects/mothers-love-worktrees/tv17-base/.tv17/full-scenes-sz.txt (not committed). 274 is the earlier 273 plus the one new unit test.
 - The arrival PNGs rewritten by the arrival spec were restored with git checkout before committing. .tv17 was not committed. No database, no deploy, no .env.local.
 
 ## Observation, not acted on

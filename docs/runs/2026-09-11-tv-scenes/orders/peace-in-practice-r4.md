@@ -1,7 +1,7 @@
 # Work order - peace in practice correction r4: a real 3D heart - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-peace-in-practice-20260911-r4
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 9 (data-scene="9"). Round: r4.
 
 Anthony reviewed the scene on his TV and asked: "The rotating heart in the Peace and Practice section is not fully dimensional. I want it to be completely 3D and dynamic." Today createHeart() returns a flat `<img>` of heart_render.png turned with `perspective(800px) rotateY(t*7.5deg)`, so it reads as a spinning card. Replace it with a heart rendered as a lit three dimensional mesh on a canvas.
@@ -34,8 +34,8 @@ Read first, inside your worktree: public/color-polish/scenes/peace-in-practice.j
 - Existing: circularity excluding the heart field, no overflow, Studio click, burst within 60 s, bubble count never zero, depth layers, reduced motion still with `#heart-host canvas` present.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md
 ```

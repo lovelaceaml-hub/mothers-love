@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
-const repo = '/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation';
+const repo = '$HOME/Projects/mothers-love-worktrees/world-quality-continuation';
 const output = '/private/tmp/mothers-love-plan24-dev-harness-baseline';
 const require = createRequire(path.join(repo, 'package.json'));
 const { chromium } = require('@playwright/test');

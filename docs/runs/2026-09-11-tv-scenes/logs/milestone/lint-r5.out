@@ -3,7 +3,7 @@
 > eslint .
 
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/admin/color-polish/ColorPolishStudio.tsx
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/admin/color-polish/ColorPolishStudio.tsx
   44:45  error  Error: Calling setState synchronously within an effect can trigger cascading renders
 
 Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
@@ -12,7 +12,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/admin/color-polish/ColorPolishStudio.tsx:44:45
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/admin/color-polish/ColorPolishStudio.tsx:44:45
   42 |
   43 |   useEffect(() => {
 > 44 |     if (elapsedMs >= durationMs && playing) setPlaying(false);
@@ -21,7 +21,7 @@ Calling setState synchronously within an effect body causes cascading renders th
   46 |
   47 |   const selectScene = (nextScene: ColorPolishScene) => {  react-hooks/set-state-in-effect
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx
    197:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
 
 Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
@@ -30,7 +30,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:197:7
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:197:7
   195 |   useEffect(() => {
   196 |     if (!ids.length) {
 > 197 |       setCounts(new Map());
@@ -42,7 +42,7 @@ Calling setState synchronously within an effect body causes cascading renders th
 
 React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:393:3
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:393:3
   391 |   const [flowers, setFlowers] = useState(0);
   392 |   const recordsRef = useRef(records);
 > 393 |   recordsRef.current = records;
@@ -56,7 +56,7 @@ React refs are values that are not needed for rendering. Refs should only be acc
 
 `Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1020:31
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1020:31
   1018 |   const individualStyleRef = useRef(0);
   1019 |   const groupStyleRef = useRef(0);
 > 1020 |   const mountedAtRef = useRef(Date.now());
@@ -72,7 +72,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1072:10
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1072:10
   1070 |   useEffect(() => {
   1071 |     void loadSnapshot();
 > 1072 |     void loadDailyAggregates();
@@ -88,7 +88,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1112:5
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1112:5
   1110 |   useEffect(() => {
   1111 |     if (mode === 'normal' && !unavailable) return;
 > 1112 |     setQueue([]);
@@ -104,7 +104,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1121:45
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1121:45
   1119 |
   1120 |   useEffect(() => {
 > 1121 |     if (pauseRotation && pausedAt === null) setPausedAt(Date.now());
@@ -120,7 +120,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1150:5
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1150:5
   1148 |     if (activeArrival.ids.every((id) => eligibleIds.has(id))) return;
   1149 |     const surviving = activeArrival.ids.filter((id) => eligibleIds.has(id));
 > 1150 |     setActiveArrival(null);
@@ -136,7 +136,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1162:7
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1162:7
   1160 |     const availableQueue = queue.filter((id) => allRecords.some((record) => record.id === id));
   1161 |     if (!availableQueue.length) {
 > 1162 |       setQueue([]);
@@ -152,7 +152,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1175:5
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1175:5
   1173 |     const completed = new Set(activeArrival.ids);
   1174 |     const remaining = queue.filter((id) => !completed.has(id) && allRecords.some((record) => record.id === id));
 > 1175 |     setQueue(remaining);
@@ -168,7 +168,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1186:5
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/V6DisplayExperience.tsx:1186:5
   1184 |     if (!personalContentVisible || pauseRotation || activeArrival || pausedAt !== null) return;
   1185 |     if (elapsedMs < scene.durationMs) return;
 > 1186 |     setStoryVisits((current) => ({ ...current, [scene.id]: (current[scene.id] ?? 0) + 1 }));
@@ -177,12 +177,12 @@ Calling setState synchronously within an effect body causes cascading renders th
   1188 |     setSceneStartedAt(Date.now());
   1189 |   }, [activeArrival, elapsedMs, pauseRotation, pausedAt, personalContentVisible, scene.durationMs, scene.id]);  react-hooks/set-state-in-effect
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx
    57:46  error    Error: Cannot call impure function during render
 
 `Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:57:46
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:57:46
   55 |   const controllerRef = useRef<AbortController | null>(null);
   56 |   const lastVerifiedRef = useRef<number | null>(null);
 > 57 |   const clockRef = useRef<Clock>({ serverMs: Date.now(), performanceMs: performanceNow() });
@@ -194,7 +194,7 @@ Calling setState synchronously within an effect body causes cascading renders th
 
 `Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:58:34
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:58:34
   56 |   const lastVerifiedRef = useRef<number | null>(null);
   57 |   const clockRef = useRef<Clock>({ serverMs: Date.now(), performanceMs: performanceNow() });
 > 58 |   const monotonicNowRef = useRef(Date.now());
@@ -211,7 +211,7 @@ Effects are intended to synchronize state between React and external systems suc
 
 Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:168:7
+$HOME/.claude/worktrees/mothers-love-tv-milestone/src/components/display/color-polish-host/ColorPolishHost.tsx:168:7
   166 |     const controller = new AbortController();
   167 |     if (!ids.length) {
 > 168 |       setReactionCounts({});
@@ -220,7 +220,7 @@ Calling setState synchronously within an effect body causes cascading renders th
   170 |     }
   171 |     const load = async () => {  react-hooks/set-state-in-effect
 
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish/color-polish.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish/color-polish.spec.ts
   1:1  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
 
 ✖ 18 problems (14 errors, 4 warnings)

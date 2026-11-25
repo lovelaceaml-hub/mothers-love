@@ -1,7 +1,7 @@
 # Work order - peacemakers correction r5: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-peacemakers-20260911-r5
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peacemakers
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 8 (data-scene="8"). Round: r5.
 
 The Sonnet 5 landing review and the coordinator's Playwright run of your previous round (r4) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -16,7 +16,7 @@ The Sonnet 5 landing review and the coordinator's Playwright run of your previou
 Append one line "Round r5: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md
 ```

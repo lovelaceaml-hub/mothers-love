@@ -1,7 +1,7 @@
 # Run: 2026-09-09-tv-garden-refresh
 
 Plan ID: 2026-09-09-tv-garden-refresh
-Plan file: /Users/anthony/Projects/mothers-love/docs/PLAN-08-tv-garden-and-submission.md
+Plan file: $HOME/Projects/mothers-love/docs/PLAN-08-tv-garden-and-submission.md
 Runner: Sol integration chat with Terra lane coordinator
 Started: 2026-09-09T07:33Z
 Coordinator: Terra high, non-editing
@@ -10,7 +10,7 @@ Coordinator: Terra high, non-editing
 
 | Repo | Path | Branch | Baseline HEAD |
 |---|---|---|---|
-| mothers-love | /Users/anthony/Projects/mothers-love | codex/mothers-love | 64590968dd5523134835216a1e5a5c2b8305160f |
+| mothers-love | $HOME/Projects/mothers-love | codex/mothers-love | 64590968dd5523134835216a1e5a5c2b8305160f |
 
 ## Lanes
 
