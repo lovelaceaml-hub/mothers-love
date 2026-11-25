@@ -1,10 +1,10 @@
 Rewrote the rotation test to drive bloom rotation through `window.colorPolishRuntime.setScene(7)`.
 
-The rotation loop now directly calls [stage.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/core/stage.js)'s forced scene request inside the frame, advancing `bloomIndex` sequentially across all 9 expressions without remounting the Studio iframe. The Replay button click and frame re-discovery steps were removed while preserving all four per-round card assertions and the 18 round cap.
+The rotation loop now directly calls [stage.js](file://$HOME/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/core/stage.js)'s forced scene request inside the frame, advancing `bloomIndex` sequentially across all 9 expressions without remounting the Studio iframe. The Replay button click and frame re-discovery steps were removed while preserving all four per-round card assertions and the 18 round cap.
 
 ### Changes made
-1. Updated [expressions.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts#L172-L206): replaced the Studio Replay click loop with `window.colorPolishRuntime.setScene(7)`, `waitForFunction`, `step(14000)` animation pause, and focused card assertions.
-2. Updated [expressions.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md#L49-L53): appended the Round 1 explanation line to the `## Result` section.
+1. Updated [expressions.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts#L172-L206): replaced the Studio Replay click loop with `window.colorPolishRuntime.setScene(7)`, `waitForFunction`, `step(14000)` animation pause, and focused card assertions.
+2. Updated [expressions.md](file://$HOME/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md#L49-L53): appended the Round 1 explanation line to the `## Result` section.
 
 ### What Anthony must do
 Nothing, you're clear.
@@ -13,5 +13,5 @@ Run the test suite to verify the rotation spec passes (1 minute).
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md](file://$HOME/.claude/worktrees/mothers-love-tv-expressions/docs/runs/2026-09-11-tv-scenes/lanes/expressions.md)

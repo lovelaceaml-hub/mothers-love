@@ -1,6 +1,6 @@
 # Gap report: Section C, remarkable arrivals (tv15/arrivals)
 
-Written by the coordinator (Opus 5 high) on 2026-09-11 from tv/pick 463ce8d, before the lane launches. Section C of /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md.
+Written by the coordinator (Opus 5 high) on 2026-09-11 from tv/pick 463ce8d, before the lane launches. Section C of $HOME/Projects/mothers-love/docs/PLAN-15-tv-next-level.md.
 
 ## Anthony's note (quoted)
 

@@ -1,4 +1,4 @@
-Round r4 landing review corrections for the Welcome scene are complete in [/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js).
+Round r4 landing review corrections for the Welcome scene are complete in [$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js).
 
 All seven review items are resolved:
 1. Large reader bubbles are permanently protected from retirement with `retireAt = Infinity` and bypass drift replacement shortening.
@@ -11,7 +11,7 @@ All seven review items are resolved:
 
 ### What now works
 - Bubble drift entrance and exit transitions no longer expand stage dimensions beyond 1812 by 636 pixels.
-- The shared [tests/color-polish-scenes/helpers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts) and [tests/color-polish-scenes/welcome.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) `noOverflow` assertions pass without overflowing.
+- The shared [tests/color-polish-scenes/helpers.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts) and [tests/color-polish-scenes/welcome.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts) `noOverflow` assertions pass without overflowing.
 - Large reader bubbles stay visible indefinitely while smaller bubbles cycle with smooth, non-overlapping exits.
 
 ### Progress
@@ -22,11 +22,11 @@ All seven review items are resolved:
 
 ### Next action (2 minutes)
 1. Review the git diff for the three updated files in your worktree:
-   - [public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
-   - [public/color-polish/scenes/welcome.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
-   - [docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
+   - [public/color-polish/scenes/welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js)
+   - [public/color-polish/scenes/welcome.css](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css)
+   - [docs/runs/2026-09-11-tv-scenes/lanes/welcome.md](file://$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md)
 
 ## COMPLETION
-- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
+- $HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+- $HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+- $HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md

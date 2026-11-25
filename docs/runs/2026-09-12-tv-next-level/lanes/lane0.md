@@ -4,7 +4,7 @@ title: Plan critique
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-critic
+worktree: $HOME/.claude/worktrees/mothers-love-tv-critic
 review: none
 depends_on: none
 updated: 2026-09-11T23:59Z
@@ -99,30 +99,30 @@ What would fix it: Specify that an emergency promotion revert must be applied to
 ## What I checked
 
 I read every file using direct file reads without executing shell commands:
-- [docs/PLAN-15-tv-next-level.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-15-tv-next-level.md): examined all sections including Context, Decisions 1 through 14, Inputs, Models/Lanes/Reviews, Branch and merge model, Lane 0, Section A, Section B, Section C, Sections 1 through 9, Section Z, Rollback, Common scene spec, Gap reports, Order of work, Assumptions, and Build log.
-- [docs/runs/2026-09-12-tv-next-level/INDEX.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-12-tv-next-level/INDEX.md): examined run layout, branch definitions, and planned lane states.
-- [docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md): verified Anthony's 7 explicit fork rulings, coordinator selection, and delegated decisions 8 through 14.
-- [docs/runs/2026-09-11-tv-scenes/INDEX.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-11-tv-scenes/INDEX.md): examined Plan 13 run history and verified that cited brief and follow-up files are absent.
-- [scripts/color-polish-renderer-probe.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs): verified replayKey stepping logic, requestAnimationFrame stubbing, lack of transition triggering, and arrival assertion structure.
-- [public/color-polish/renderer.html](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.html): verified DOM layout, script ordering, and transition layer placement.
-- [public/color-polish/boot.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/boot.js): verified colorPolishRuntime interface, reduced-motion listeners, and setScene behavior.
-- [public/color-polish/core/state.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/state.js): verified blankState, choose(), S.lastShown, catalog constants, and number formatting.
-- [public/color-polish/core/stage.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/stage.js): verified registerScene, renderNow, requestScene, coordinator loop, transition execution, and onLeave hook call sites.
-- [public/color-polish/core/motion.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/motion.js): verified swapSlot, floater physics, and particle emitters.
-- [public/color-polish/core/orbs.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/orbs.js): verified addOrb, fitCircle, circular pagination, and readerSlot collapse logic.
-- [public/color-polish/core/arrivals.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/arrivals.js): verified arrival event pipeline, hold durations, and style definitions.
-- [public/color-polish/core/host.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/host.js): verified applySnapshotPayload, replayed branch calling renderNow, and message validation.
-- [public/color-polish/scenes/welcome.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/welcome.js): verified six-bubble layout, depth layers, and speaker anchor requirements.
-- [public/color-polish/scenes/garden.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/garden.js): verified garden replacement timing and direct harness usage.
-- [public/color-polish/scenes/featured.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/featured.js): verified 3D panel structure, flip timers, and DOM isolation.
-- [public/color-polish/scenes/peacemakers.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/peacemakers.js): verified globe rendering, thread animation, and baseline bubble slots.
-- [public/color-polish/scenes/status.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/status.js): verified medallion sizing, phrase placement, and monthly metrics.
-- [public/color-polish/scenes/expressions.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/expressions.js): verified 9-card perspective arc and bloom mechanics.
-- [public/color-polish/scenes/peace-in-practice.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/peace-in-practice.js): verified 3D canvas heart mesh vertices, quad counts, and floating heart accumulation.
-- [public/color-polish/scenes/orbit.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/orbit.js): verified 3D center medallion requirements and planetary orbits.
-- [public/color-polish/scenes/milestone.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/milestone.js): verified contributorPool logic, weekly goal expression display, and stream pearls.
-- [public/color-polish/assets/](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/assets/): checked directory contents to verify presence of community.png, globe.png, puzzle.png, and missing globe-puzzle.png.
-- [tests/color-polish-scenes/helpers.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/helpers.ts): checked circularity, noOverflow, SCENE_IDS, and openStudioScene.
-- [tests/color-polish-scenes/arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/arrival.spec.ts): inspected direct renderer harness setup.
-- [tests/color-polish-scenes/garden.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/garden.spec.ts): inspected living garden assertions and direct harness.
-- [tests/color-polish-scenes/peacemakers.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/peacemakers.spec.ts): inspected 14 s timing checks, overflow rules, and actor lifecycle assertions.
+- [docs/PLAN-15-tv-next-level.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-15-tv-next-level.md): examined all sections including Context, Decisions 1 through 14, Inputs, Models/Lanes/Reviews, Branch and merge model, Lane 0, Section A, Section B, Section C, Sections 1 through 9, Section Z, Rollback, Common scene spec, Gap reports, Order of work, Assumptions, and Build log.
+- [docs/runs/2026-09-12-tv-next-level/INDEX.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-12-tv-next-level/INDEX.md): examined run layout, branch definitions, and planned lane states.
+- [docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-12-tv-next-level/decisions/2026-09-11T22-00Z-anthony-plan15-forks.md): verified Anthony's 7 explicit fork rulings, coordinator selection, and delegated decisions 8 through 14.
+- [docs/runs/2026-09-11-tv-scenes/INDEX.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/runs/2026-09-11-tv-scenes/INDEX.md): examined Plan 13 run history and verified that cited brief and follow-up files are absent.
+- [scripts/color-polish-renderer-probe.mjs](file://$HOME/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs): verified replayKey stepping logic, requestAnimationFrame stubbing, lack of transition triggering, and arrival assertion structure.
+- [public/color-polish/renderer.html](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.html): verified DOM layout, script ordering, and transition layer placement.
+- [public/color-polish/boot.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/boot.js): verified colorPolishRuntime interface, reduced-motion listeners, and setScene behavior.
+- [public/color-polish/core/state.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/state.js): verified blankState, choose(), S.lastShown, catalog constants, and number formatting.
+- [public/color-polish/core/stage.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/stage.js): verified registerScene, renderNow, requestScene, coordinator loop, transition execution, and onLeave hook call sites.
+- [public/color-polish/core/motion.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/motion.js): verified swapSlot, floater physics, and particle emitters.
+- [public/color-polish/core/orbs.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/orbs.js): verified addOrb, fitCircle, circular pagination, and readerSlot collapse logic.
+- [public/color-polish/core/arrivals.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/arrivals.js): verified arrival event pipeline, hold durations, and style definitions.
+- [public/color-polish/core/host.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/core/host.js): verified applySnapshotPayload, replayed branch calling renderNow, and message validation.
+- [public/color-polish/scenes/welcome.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/welcome.js): verified six-bubble layout, depth layers, and speaker anchor requirements.
+- [public/color-polish/scenes/garden.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/garden.js): verified garden replacement timing and direct harness usage.
+- [public/color-polish/scenes/featured.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/featured.js): verified 3D panel structure, flip timers, and DOM isolation.
+- [public/color-polish/scenes/peacemakers.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/peacemakers.js): verified globe rendering, thread animation, and baseline bubble slots.
+- [public/color-polish/scenes/status.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/status.js): verified medallion sizing, phrase placement, and monthly metrics.
+- [public/color-polish/scenes/expressions.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/expressions.js): verified 9-card perspective arc and bloom mechanics.
+- [public/color-polish/scenes/peace-in-practice.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/peace-in-practice.js): verified 3D canvas heart mesh vertices, quad counts, and floating heart accumulation.
+- [public/color-polish/scenes/orbit.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/orbit.js): verified 3D center medallion requirements and planetary orbits.
+- [public/color-polish/scenes/milestone.js](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/scenes/milestone.js): verified contributorPool logic, weekly goal expression display, and stream pearls.
+- [public/color-polish/assets/](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/assets/): checked directory contents to verify presence of community.png, globe.png, puzzle.png, and missing globe-puzzle.png.
+- [tests/color-polish-scenes/helpers.ts](file://$HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/helpers.ts): checked circularity, noOverflow, SCENE_IDS, and openStudioScene.
+- [tests/color-polish-scenes/arrival.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/arrival.spec.ts): inspected direct renderer harness setup.
+- [tests/color-polish-scenes/garden.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/garden.spec.ts): inspected living garden assertions and direct harness.
+- [tests/color-polish-scenes/peacemakers.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-scenes/peacemakers.spec.ts): inspected 14 s timing checks, overflow rules, and actor lifecycle assertions.

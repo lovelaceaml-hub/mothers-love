@@ -56,14 +56,14 @@ Limitations: none; all mock routes fulfilled cleanly and every clip recorded wit
 
 ## COMPLETION
 Files created:
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/fixtures.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/fixtures.mjs)
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/capture.mjs`](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/capture.mjs)
+- [`$HOME/.claude/worktrees/mothers-love-video/scripts/video/fixtures.mjs`](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/fixtures.mjs)
+- [`$HOME/.claude/worktrees/mothers-love-video/scripts/video/capture.mjs`](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/capture.mjs)
 
 Output clips directory:
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/clips`](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/clips)
+- [`$HOME/.claude/worktrees/mothers-love-video/docs/private/video/clips`](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/clips)
 
 What Anthony must do:
 Nothing, you're clear.
 
 Next step:
-Inspect the contact sheets in [`docs/private/video/clips/sheets/`](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/private/video/clips/sheets) (about 1 minute), then proceed to Section 3: Narration audio.
+Inspect the contact sheets in [`docs/private/video/clips/sheets/`](file://$HOME/.claude/worktrees/mothers-love-video/docs/private/video/clips/sheets) (about 1 minute), then proceed to Section 3: Narration audio.

@@ -1,13 +1,13 @@
 # Work order - peace-in-practice correction r1: unique top-level identifiers - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-peace-in-practice-20260911-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none.
 
 The Sonnet review found a blocking cross-lane defect. Every scene file loads as a separate classic script sharing one global lexical scope, so a top-level `const LAYERS` in your scene file collides with the same identifier in another scene file once the branches merge: the second script to load throws SyntaxError "Identifier 'LAYERS' has already been declared" at parse time and none of it runs, so that scene disappears. Four lanes declared `const LAYERS` (featured, peacemakers, garden, peace-in-practice).
 
 ## Hard rules
-1. Edit only public/color-polish/scenes/peace-in-practice.js and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice.
+1. Edit only public/color-polish/scenes/peace-in-practice.js and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice.
 2. Do not wrap the file in an IIFE: core code calls some scene functions by global name (for example gardenReplace) and the registry call must stay at top level. Rename instead.
 
 ## The change
@@ -19,6 +19,6 @@ Append one line to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lan
 End with `## COMPLETION` naming the two files changed and listing every identifier you renamed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js
+$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md
 ```

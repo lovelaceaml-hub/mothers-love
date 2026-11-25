@@ -4,7 +4,7 @@ title: "Section 4, Featured Recognition depth layers"
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-featured
+worktree: $HOME/.claude/worktrees/mothers-love-tv-featured
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T09:14Z

@@ -1,4 +1,4 @@
-Hold Section 0 execution: eight material objections must be addressed in [PLAN-13-tv-scene-refactor.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md) before launching implementation.
+Hold Section 0 execution: eight material objections must be addressed in [PLAN-13-tv-scene-refactor.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md) before launching implementation.
 
 The review identified CSS specificity locks, inverted scene identifiers, untestable criteria, and scope creep in Section 0. These flaws would cause silent visual overrides, build failures, and broken automated verification across the scene branches. The full critique below provides specific file and line evidence for each objection.
 
@@ -13,9 +13,9 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: The plan requires every scene CSS rule to be scoped to `.scene[data-scene="N"]` in `scenes/<slug>.css`, while keeping the existing `renderer.css` as the shared base. However, almost every rule in the live Color Polish pass in `renderer.css` is prefixed with `#tv`.
 - **Why it matters**: In CSS cascade specificity, an ID selector (`#tv .day`, `#tv .edu-card`, `#tv .stat-expression`, `#tv .orbit-sun`, etc.) has specificity `(0, 1, 1, 0)`. A class-scoped rule like `.scene[data-scene="5"] .day` has specificity `(0, 0, 2, 0)`. The ID selector in `renderer.css` strictly overrides the class rule regardless of load order. Because scene lanes are strictly forbidden from editing `renderer.css`, any visual refinements written by scene writers into `scenes/<slug>.css` will be silently discarded and ignored by the browser.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md line 32](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L32): "every scene CSS rule scoped to .scene[data-scene="N"] (arrival: .event-stage)."
-  - [PLAN-13-tv-scene-refactor.md line 74](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L74): "the existing renderer.css stays as the shared base."
-  - [public/color-polish/renderer.css lines 152 to 251](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.css#L152): `#tv .edu-card`, `#tv .day`, `#tv .stat-expression`, `#tv .orbit-sun`, `#tv .progress-milestone .threshold`, and dozens of others all use `#tv`.
+  - [PLAN-13-tv-scene-refactor.md line 32](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L32): "every scene CSS rule scoped to .scene[data-scene="N"] (arrival: .event-stage)."
+  - [PLAN-13-tv-scene-refactor.md line 74](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L74): "the existing renderer.css stays as the shared base."
+  - [public/color-polish/renderer.css lines 152 to 251](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.css#L152): `#tv .edu-card`, `#tv .day`, `#tv .stat-expression`, `#tv .orbit-sun`, `#tv .progress-milestone .threshold`, and dozens of others all use `#tv`.
 
 ---
 
@@ -24,10 +24,10 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: The plan labels sections according to Anthony's campaign list (Section 6: We Are Peacemakers, Section 7: Status, Section 8: Nine Expressions). However, the internal renderer IDs are completely different (Peacemakers is ID 8, Status is ID 6, Expressions is ID 7).
 - **Why it matters**: The plan tells writers to scope rules to `.scene[data-scene="N"]`. A Gemini 3.8 Flash writer assigned to Section 6 (Peacemakers) will naturally write `.scene[data-scene="6"]`, which in the DOM is actually Participation Status! Section 7 (Status) will write `.scene[data-scene="7"]` (which targets Expressions), and Section 8 (Expressions) will write `.scene[data-scene="8"]` (which targets Peacemakers). This numbering inversion will cross-contaminate and corrupt styles across all three scenes.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md line 32](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L32): "every scene CSS rule scoped to .scene[data-scene="N"]"
-  - [PLAN-13-tv-scene-refactor.md line 34](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L34): "Scene id map (Anthony's number, renderer id, slug): ... 6/8 peacemakers, 7/6 status, 8/7 expressions."
-  - [PLAN-13-tv-scene-refactor.md lines 148, 160, 172](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L148): "Section 6: We Are Peacemakers", "Section 7: Status", "Section 8: Nine Expressions".
-  - [public/color-polish/renderer.js line 247](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L247): `el.dataset.scene=id;` where `id` is the renderer ID (8 for peacemakers, 6 for status, 7 for expressions).
+  - [PLAN-13-tv-scene-refactor.md line 32](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L32): "every scene CSS rule scoped to .scene[data-scene="N"]"
+  - [PLAN-13-tv-scene-refactor.md line 34](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L34): "Scene id map (Anthony's number, renderer id, slug): ... 6/8 peacemakers, 7/6 status, 8/7 expressions."
+  - [PLAN-13-tv-scene-refactor.md lines 148, 160, 172](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L148): "Section 6: We Are Peacemakers", "Section 7: Status", "Section 8: Nine Expressions".
+  - [public/color-polish/renderer.js line 247](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L247): `el.dataset.scene=id;` where `id` is the renderer ID (8 for peacemakers, 6 for status, 7 for expressions).
 
 ---
 
@@ -39,10 +39,10 @@ Now working: The live production TV display remains healthy and untouched at htt
   3. Section 1 requires: "a visualState check that ... depth spans at least two layers." The `visualState().actors` object exposes `x, y, d, scale, opacity, vx, vy, life, readingPages`, but does not expose `z`, `depth`, or `layer`.
 - **Why it matters**: Writers for Sections 1, 3, and 11 cannot pass their gates without either guessing, altering protected test tools, or writing invalid tests.
 - **Evidence**:
-  - [scripts/color-polish-renderer-probe.mjs lines 83 to 109](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs#L83): The `--arrivals` loop iterates 11 waves and steps the runtime, but calls `page.screenshot` zero times.
-  - [PLAN-13-tv-scene-refactor.md line 122](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L122): "Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 styles, with a screenshot per style at its entrance midpoint."
-  - [PLAN-13-tv-scene-refactor.md line 218](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L218): "Acceptance: common spec plus stream node count stays above a floor for the full 30 seconds and no node repeats the same path twice."
-  - [public/color-polish/renderer.js line 921](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L921): `visualState()` actor mapping has no `depth` or `layer` properties.
+  - [scripts/color-polish-renderer-probe.mjs lines 83 to 109](file://$HOME/.claude/worktrees/mothers-love-tv-critic/scripts/color-polish-renderer-probe.mjs#L83): The `--arrivals` loop iterates 11 waves and steps the runtime, but calls `page.screenshot` zero times.
+  - [PLAN-13-tv-scene-refactor.md line 122](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L122): "Acceptance: common spec plus the probe --arrivals sequence still lists 6 and 5 styles, with a screenshot per style at its entrance midpoint."
+  - [PLAN-13-tv-scene-refactor.md line 218](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L218): "Acceptance: common spec plus stream node count stays above a floor for the full 30 seconds and no node repeats the same path twice."
+  - [public/color-polish/renderer.js line 921](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L921): `visualState()` actor mapping has no `depth` or `layer` properties.
 
 ---
 
@@ -51,8 +51,8 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: Section 0 claims to be a simple "foundation split, no visual change." But to eliminate branching on scene numbers in core files, Section 0 must invent a dynamic registry interface (`registerScene`), extract all 11 scenes into standalone descriptors in `scenes/<slug>.js`, and replace all existing scene calls in one step.
 - **Why it matters**: If Section 0 creates full descriptors for all 11 scenes on `tv/base`, then all 11 scenes are already refactored on `tv/base`. When Anthony uses `tv/pick` to select a subset (e.g. only Welcome and Calendar), the unselected scenes in `tv/pick` do not run the battle-tested monolithic `renderer.js` code; they run the brand-new, unverified Section 0 split implementations. The plan's promise that unchosen scenes remain untouched is false.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md line 40](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L40): "tv/pick: recreated from tv/base each time Anthony chooses a subset; merge each chosen branch. Disjoint files, no conflicts. An unchosen branch stays parked and blocks nothing."
-  - [PLAN-13-tv-scene-refactor.md lines 66 to 77](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L66): Core code must read `registerScene` descriptors instead of branching on scene numbers, requiring full extraction of all 11 scenes before any scene lane launches.
+  - [PLAN-13-tv-scene-refactor.md line 40](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L40): "tv/pick: recreated from tv/base each time Anthony chooses a subset; merge each chosen branch. Disjoint files, no conflicts. An unchosen branch stays parked and blocks nothing."
+  - [PLAN-13-tv-scene-refactor.md lines 66 to 77](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L66): Core code must read `registerScene` descriptors instead of branching on scene numbers, requiring full extraction of all 11 scenes before any scene lane launches.
 
 ---
 
@@ -61,9 +61,9 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: The Section 0 file division (lines 66-75) omits shared helper functions that span multiple scenes. Most notably, `rightBubbles()` is shared across Welcome (Scene 1), Peacemakers (Scene 8), and Peace in Practice (Scene 9).
 - **Why it matters**: If `rightBubbles()` is placed inside `scenes/welcome.js`, and Anthony creates a `tv/pick` containing Peacemakers but not Welcome, Peacemakers will crash with a runtime `ReferenceError: rightBubbles is not defined`. If multiple scene lanes define it, classic script global scope will throw a duplicate identifier error.
 - **Evidence**:
-  - [public/color-polish/renderer.js lines 159 to 164](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L159): `function rightBubbles() { ... }`
-  - [public/color-polish/renderer.js lines 166, 181, 182](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L166): Used in `welcome()`, `peaceScene()`, and `peacemakers()`.
-  - [PLAN-13-tv-scene-refactor.md lines 67 to 75](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L67): `rightBubbles()` is omitted from the file mapping of `core/orbs.js` and all core modules.
+  - [public/color-polish/renderer.js lines 159 to 164](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L159): `function rightBubbles() { ... }`
+  - [public/color-polish/renderer.js lines 166, 181, 182](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L166): Used in `welcome()`, `peaceScene()`, and `peacemakers()`.
+  - [PLAN-13-tv-scene-refactor.md lines 67 to 75](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L67): `rightBubbles()` is omitted from the file mapping of `core/orbs.js` and all core modules.
 
 ---
 
@@ -72,8 +72,8 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: Section 0 replaces the dead inline `onclick` on calendar day buttons with a delegated event listener. However, on the live TV display, a global click listener (`document.addEventListener('click', manualAdvance)`) advances the scene on any click or tap.
 - **Why it matters**: When a user clicks a calendar day on live TV, the event will trigger day selection AND bubble to `document`, immediately advancing to the next scene. If the day listener calls `event.stopPropagation()` to stop the advance, it breaks the core requirement deployed in Plan 11 that clicking anywhere on live TV advances the scene. The plan fails to define how day selection and scene advance coexist.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md line 79](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L79): "replace the dead inline onclick on calendar days ... with a data-day attribute and a delegated listener".
-  - [public/color-polish/renderer.js lines 292 to 307 and 589](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L292): `manualAdvance()` executes on `document` click whenever `S.source === 'live'`.
+  - [PLAN-13-tv-scene-refactor.md line 79](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L79): "replace the dead inline onclick on calendar days ... with a data-day attribute and a delegated listener".
+  - [public/color-polish/renderer.js lines 292 to 307 and 589](file://$HOME/.claude/worktrees/mothers-love-tv-critic/public/color-polish/renderer.js#L292): `manualAdvance()` executes on `document` click whenever `S.source === 'live'`.
 
 ---
 
@@ -82,7 +82,7 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: Section 12 specifies merging `tv/pick` directly into `codex/color-polish-v6` and `codex/mothers-love` (production) after preview verification. It provides zero instructions, scripts, or commit targets for rolling back production if physical TV hardware shows rendering anomalies.
 - **Why it matters**: Display rendering on real 4K smart TV web engines frequently surfaces GPU memory limits or layout bugs not visible in local headless Chromium. Without an explicit rollback mechanism, recovering from a flawed deployment requires ad hoc manual intervention.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md line 228](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L228): Section 12 details promotion, but contains zero rollback procedures.
+  - [PLAN-13-tv-scene-refactor.md line 228](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L228): Section 12 details promotion, but contains zero rollback procedures.
 
 ---
 
@@ -91,14 +91,14 @@ Now working: The live production TV display remains healthy and untouched at htt
 - **What is wrong**: The common scene spec (line 234) requires every scene spec (`tests/color-polish-scenes/<slug>.spec.ts`) to verify that `/admin/display` renders the scene from sample data and does not advance on click. Testing `/admin/display` requires authenticated Supabase session mocking (`mockCommon`, `signInAs`, overview fixtures).
 - **Why it matters**: That mocking infrastructure currently exists as private, unexported functions in `tests/color-polish-usable/usable.spec.ts`. Because Section 0 protects `tests/**`, no shared test fixture file exists. All 11 scene lanes will either duplicate 150 lines of Playwright setup or create conflicting fixtures, causing maintenance and merge friction.
 - **Evidence**:
-  - [PLAN-13-tv-scene-refactor.md lines 64 and 234](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L64): Section 0 protects `tests/**`, while common spec mandates testing `/admin/display`.
-  - [tests/color-polish-usable/usable.spec.ts lines 63 to 104](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-usable/usable.spec.ts#L63): Auth and overview mocks are unexported module internals.
+  - [PLAN-13-tv-scene-refactor.md lines 64 and 234](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md#L64): Section 0 protects `tests/**`, while common spec mandates testing `/admin/display`.
+  - [tests/color-polish-usable/usable.spec.ts lines 63 to 104](file://$HOME/.claude/worktrees/mothers-love-tv-critic/tests/color-polish-usable/usable.spec.ts#L63): Auth and overview mocks are unexported module internals.
 
 ---
 
 ### Recommended Next Steps
 
-1. Now: Update [PLAN-13-tv-scene-refactor.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md) to fix CSS specificity scoping (e.g. scoping via `#tv .scene[data-scene="N"]`), map renderer IDs explicitly, add missing shared helpers to `core/orbs.js`, and clarify testable acceptance criteria.
+1. Now: Update [PLAN-13-tv-scene-refactor.md](file://$HOME/.claude/worktrees/mothers-love-tv-critic/docs/PLAN-13-tv-scene-refactor.md) to fix CSS specificity scoping (e.g. scoping via `#tv .scene[data-scene="N"]`), map renderer IDs explicitly, add missing shared helpers to `core/orbs.js`, and clarify testable acceptance criteria.
 2. Later: Re-verify Section 0 acceptance criteria once the revised architecture contract is documented.
 
 What Anthony must do:

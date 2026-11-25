@@ -4,11 +4,11 @@
 
 Bounded public TV snapshot backend for Plan 05. The assigned files are:
 
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-backend/database/006_public_display.sql`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-backend/src/lib/server/public-display.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-backend/src/app/api/display/snapshot/route.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-backend/tests/backend/009_public_display_fixture.sql`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-backend/tests/backend/public-display.test.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-backend/database/006_public_display.sql`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-backend/src/lib/server/public-display.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-backend/src/app/api/display/snapshot/route.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-backend/tests/backend/009_public_display_fixture.sql`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-backend/tests/backend/public-display.test.ts`
 
 ## Implementation
 
@@ -24,7 +24,7 @@ Bounded public TV snapshot backend for Plan 05. The assigned files are:
 - `npm test -- --run tests/backend` passed, 9 files and 52 tests.
 - `npm run typecheck` passed.
 - `git diff --check` passed.
-- A temporary symlink to `/Users/anthony/Projects/mothers-love/node_modules` was used for local checks and removed before handoff.
+- A temporary symlink to `$HOME/Projects/mothers-love/node_modules` was used for local checks and removed before handoff.
 - PostgreSQL migration and fixture execution remain with the root coordinator as required by the plan.
 
 ## Handoff

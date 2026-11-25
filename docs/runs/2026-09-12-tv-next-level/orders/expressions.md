@@ -1,7 +1,7 @@
 # Work order - Section 6: Nine Expressions (renderer id 7) - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-expressions-20260912
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-expressions
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-expressions
 Branch: tv15/scene-expressions (already checked out; never run a git command that changes state)
 Plan: docs/PLAN-15-tv-next-level.md, Section 6, plus the Decisions section (decisions 1 and 12 bind you) and the cross-cutting rules.
 **Your gap report is binding and overrides the plan where they differ: docs/runs/2026-09-12-tv-next-level/gaps/expressions.md. Read all of it (G1 through G6) before writing anything.**
@@ -81,7 +81,7 @@ title: Section 6: Nine Expressions (renderer id 7)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions
+worktree: $HOME/.claude/worktrees/mothers-love-tv-expressions
 review: sonnet-5 on landing
 depends_on: base
 updated: <UTC stamp, format 2026-09-12T03:59Z>

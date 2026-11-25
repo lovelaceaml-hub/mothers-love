@@ -4,7 +4,7 @@ title: Section 2: Recognition Garden (renderer id 2)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-garden
+worktree: $HOME/.claude/worktrees/mothers-love-tv-garden
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:58Z
@@ -18,7 +18,7 @@ Section 2 brings Recognition Garden (renderer id 2) to the Plan 15 standard, rou
 
 ### Functions and call sites changed
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js`
    - `garden` (lines 10-31):
      - Prioritizes `S.forceId` when present by finding the record in `records()`.
      - Draws five eligible records using `chooseRandom` instead of `choose`.
@@ -29,7 +29,7 @@ Section 2 brings Recognition Garden (renderer id 2) to the Plan 15 standard, rou
      - Selects the replacement record using `chooseRandom(exclude, a.expression)` instead of `replaceActor(ready[0], 'petals')` (which called `choose`).
      - Directly initiates swelling and exit kinematics (`life: 'swelling'`, `exitDX`, `exitDY`), logging `bubble_exit_start` with kind `petals` and `garden_replacement`.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`
+2. `$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts`
    - Dropped the local `setupGardenHarness` helper (previously lines 72-162) and associated Node filesystem imports (`readFile`, `resolve`, `publicFolder`).
    - Imported `loadRenderer`, `buildActiveDisplayFixture`, and `recognition` from `./helpers`.
    - Updated `test('petals are carried, not dropped')` (lines 72-102) to initialize through `await loadRenderer(page, { scene: 2 })`, preserving every existing assertion verbatim.

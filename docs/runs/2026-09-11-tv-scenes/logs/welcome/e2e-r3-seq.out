@@ -33,7 +33,7 @@ Running 16 tests using 5 workers
       18 |   expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
       19 |
       20 |   const clickResult = await studioClickDoesNotAdvance(page, frame);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:17:32
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:17:32
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -51,7 +51,7 @@ Running 16 tests using 5 workers
       18 |   expect(overflow.scrollHeight).toBeLessThanOrEqual(overflow.clientHeight);
       19 |
       20 |   const clickResult = await studioClickDoesNotAdvance(page, frame);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:17:32
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:17:32
 
     Error Context: test-results/color-polish-scenes-welcom-094e0-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -76,7 +76,7 @@ Running 16 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

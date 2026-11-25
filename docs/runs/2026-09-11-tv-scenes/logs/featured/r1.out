@@ -7,13 +7,13 @@ Nothing, you're clear.
 
 ### Next action
 Review the changes in the worktree before coordinator verification:
-[`/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
+[`$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
 
 ## COMPLETION
 
 ### Files changed
-1. [`/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
-2. [`/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md)
+1. [`$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js)
+2. [`$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md)
 
 ### Identifiers renamed
 - `LAYERS` -> `FEATURED_LAYERS` (top-level declaration and all references in `mountFeatured`, `integrateFeatured`, and `placeFeatured`)

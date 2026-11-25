@@ -1,6 +1,6 @@
 # Lane M: Home motion and primary action
 
-Read first: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-08-live-feed/INDEX.md.
+Read first: $HOME/Projects/mothers-love/docs/runs/2026-09-08-live-feed/INDEX.md.
 Baseline a918ff30f601be7bbcdb3c3d2973b41b3c3e6d3b, clean. User requests animated home and a brighter Share a recognition action that attracts attention.
 
 Model: gpt-5.6-luna. Effort: xhigh. Agent: home_motion. Reviewer: native Sol high controller, proportional visual follow-up. Runtime: Codex. Root owns verification, documentation, Git integration and existing Vercel deployment. One isolated writer owns only feed CSS and presentation markup/state. Root prepares synthetic visual checks in parallel. No backend, content, data or dependency changes.

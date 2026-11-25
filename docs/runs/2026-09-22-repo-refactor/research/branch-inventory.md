@@ -1,6 +1,6 @@
 # Branch inventory, Plan 26 Section 0 safety net
 
-Generated 2026-09-23T01:27Z by Claude Opus 5 (xhigh) in the main checkout `/Users/anthony/Projects/mothers-love`.
+Generated 2026-09-23T01:27Z by Claude Opus 5 (xhigh) in the main checkout `$HOME/Projects/mothers-love`.
 Machine readable copy: [branch-inventory.json](branch-inventory.json)
 
 Every branch listed as `archive` below now has a permanent annotated tag on GitHub. Nothing was deleted, renamed, merged or pushed as a branch in this section.
@@ -37,10 +37,10 @@ Ahead and behind are measured from the local ref against production `1b4c31a`. N
 | Branch | Local | Remote | Ahead | Behind | Worktree | Note |
 | --- | --- | --- | --- | --- | --- | --- |
 | `codex/mothers-love` | `554234a` | `1b4c31a` | 0 | 24 |  | the local ref is 24 commits behind origin and is a strict ancestor of it, so it holds nothing production lacks; no archive tag was made because it is a keeper and nothing is at risk; Section 1 must fast forward it to origin before renaming it to main |
-| `codex/tv-pearl-design-study` | `acadd2c` | `acadd2c` | 2 | 0 | /Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design |  |
-| `codex/tv-pearl-sequence` | `57882ac` | `57882ac` | 19 | 16 | /Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence |  |
-| `feature/tv-3d-world-prototype-01` | `07cb3f6` | `07cb3f6` | 5 | 16 | /Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/mothers-love |  |
-| `feature/world-cinematic-art-pass` | `e8e0c47` | `e8e0c47` | 25 | 16 | /Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation | open PR #8 (draft) heads this branch into feature/tv-3d-world-prototype-01 |
+| `codex/tv-pearl-design-study` | `acadd2c` | `acadd2c` | 2 | 0 | $HOME/Projects/mothers-love-worktrees/tv-pearl-design |  |
+| `codex/tv-pearl-sequence` | `57882ac` | `57882ac` | 19 | 16 | $HOME/Projects/mothers-love-worktrees/tv-pearl-sequence |  |
+| `feature/tv-3d-world-prototype-01` | `07cb3f6` | `07cb3f6` | 5 | 16 | $HOME/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/mothers-love |  |
+| `feature/world-cinematic-art-pass` | `e8e0c47` | `e8e0c47` | 25 | 16 | $HOME/Projects/mothers-love-worktrees/world-quality-continuation | open PR #8 (draft) heads this branch into feature/tv-3d-world-prototype-01 |
 
 ## Findings that Section 1 must act on
 
@@ -55,11 +55,11 @@ Ahead and behind are counted against production `1b4c31a`. `Scope` says where th
 
 | Branch | Scope | Tag | Tag commit | Ahead | Behind | Worktree | Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `(detached HEAD)` | worktree only | `archive/detached-world-bubbles` | `bb03f79` | 4 | 16 | /Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/world-bubbles | detached commit in the world-bubbles worktree, named by the lane order |
+| `(detached HEAD)` | worktree only | `archive/detached-world-bubbles` | `bb03f79` | 4 | 16 | $HOME/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/world-bubbles | detached commit in the world-bubbles worktree, named by the lane order |
 | `archive/mothers-love-tv-critic` | local+remote | `archive/archive/mothers-love-tv-critic` | `6f7368d` | 1 | 141 |  |  |
 | `change/admin-all-submissions-in-order` | remote only | `archive/change/admin-all-submissions-in-order` | `c47599e` | 0 | 15 |  |  |
 | `change/butterfly-heart-app-icon` | remote only | `archive/change/butterfly-heart-app-icon` | `3e7bb1b` | 0 | 183 |  |  |
-| `change/heart-ribbons-3d` | local+remote | `archive/change/heart-ribbons-3d` | `e29955b` | 1 | 12 | /Users/anthony/Projects/mothers-love-worktrees/heart-ribbons-3d |  |
+| `change/heart-ribbons-3d` | local+remote | `archive/change/heart-ribbons-3d` | `e29955b` | 1 | 12 | $HOME/Projects/mothers-love-worktrees/heart-ribbons-3d |  |
 | `change/home-cta-compact` | local only | `archive/change/home-cta-compact` | `1b631f1` | 0 | 194 |  |  |
 | `change/home-polish` | local only | `archive/change/home-polish` | `ff56752` | 0 | 198 |  |  |
 | `change/message-limit-249` | local+remote | `archive/change/message-limit-249` | `0357a68` | 25 | 182 |  |  |
@@ -69,7 +69,7 @@ Ahead and behind are counted against production `1b4c31a`. `Scope` says where th
 | `change/tv-countdown-stability` | local only | `archive/change/tv-countdown-stability` | `905676f` | 0 | 194 |  |  |
 | `change/tv-qr-home` | local+remote | `archive/change/tv-qr-home` | `b7d92a0` | 0 | 184 |  |  |
 | `codex/color-polish-data` | local only | `archive/codex/color-polish-data` | `532ae8e` | 0 | 209 |  |  |
-| `codex/color-polish-v6` | local+remote | `archive/codex/color-polish-v6` | `e5ffa3a` | 37 | 182 | /Users/anthony/Projects/mothers-love |  |
+| `codex/color-polish-v6` | local+remote | `archive/codex/color-polish-v6` | `e5ffa3a` | 37 | 182 | $HOME/Projects/mothers-love |  |
 | `codex/color-polish-visual` | local only | `archive/codex/color-polish-visual` | `15e737e` | 0 | 210 |  |  |
 | `codex/home-tv-family` | remote only | `archive/codex/home-tv-family` | `2bb1c88` | 4 | 238 |  |  |
 | `codex/interview-insights` | local only | `archive/codex/interview-insights` | `811dfba` | 0 | 257 |  |  |
@@ -181,7 +181,7 @@ Ahead and behind are counted against production `1b4c31a`. `Scope` says where th
 | `tv17/orbit-goal` | local only | `archive/tv17/orbit-goal` | `07bddcb` | 0 | 92 |  |  |
 | `tv17/peace` | local only | `archive/tv17/peace` | `07693e2` | 0 | 79 |  |  |
 | `tv17/peacemakers` | local only | `archive/tv17/peacemakers` | `bffea2b` | 0 | 77 |  |  |
-| `tv17/pick` | local+remote | `archive/tv17/pick` | `f94fe94` | 2 | 16 | /Users/anthony/Projects/mothers-love-worktrees/tv17-base |  |
+| `tv17/pick` | local+remote | `archive/tv17/pick` | `f94fe94` | 2 | 16 | $HOME/Projects/mothers-love-worktrees/tv17-base |  |
 | `tv17/pip` | local only | `archive/tv17/pip` | `fbe3c90` | 0 | 77 |  |  |
 | `tv17/preview-all` | local+remote | `archive/tv17/preview-all` | `a7ca45d` | 2 | 80 |  |  |
 | `tv17/restore` | local+remote | `archive/tv17/restore` | `b84c0a9` | 0 | 94 |  |  |

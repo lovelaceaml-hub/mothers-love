@@ -1,7 +1,7 @@
 # Work order - featured correction r3: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-featured-20260911-r3
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-featured
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-featured
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 4 (data-scene="4"). Round: r3.
 
 The Sonnet 5 landing review of your previous round (r2) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -15,8 +15,8 @@ The Sonnet 5 landing review of your previous round (r2) found the items below. Y
 Append one line "Round r3: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/featured.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md
+$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js
+$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css
+$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md
 ```

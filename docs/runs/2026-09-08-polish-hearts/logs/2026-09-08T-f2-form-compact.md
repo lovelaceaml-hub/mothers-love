@@ -1,6 +1,6 @@
 # F2 form compact event
 
-Implemented and committed the F2 user correction in the isolated worktree `/Users/anthony/Projects/mothers-love-worktrees/form-compact`.
+Implemented and committed the F2 user correction in the isolated worktree `$HOME/Projects/mothers-love-worktrees/form-compact`.
 
 Commits: `2e07c8e`, `5a69de5`, `3b6c539`, `a9a717e`, `45717e4`.
 

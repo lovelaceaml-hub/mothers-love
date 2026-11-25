@@ -1,7 +1,7 @@
 # Work order - milestone correction r5: drop the left copy, widen the campaign and goal rail - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-milestone-20260911-r5
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-milestone
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-milestone
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 11 (data-scene="11"). Round: r5.
 
 Anthony reviewed the scene on his TV and asked two things: the words on the left ("Every kind word helped us get here", "Expressions of Mother's Love, recognized together", the month line and "Every expression matters") are removed; and "the actual growing campaign and the goal should extend all the way to the left so that that space is bigger." Today milestoneScene() renders a `.progress-intro` column at left 15 px (358 px wide) and the `.progress-sculpture` panel starts at left 431 px with a 310 px wide `.progress-rail` holding the milestone block and the weekly goal block; the helix stream starts at 364 px inside the sculpture.
@@ -30,8 +30,8 @@ Read first, inside your worktree: public/color-polish/scenes/milestone.js and mi
 - Existing: the stream shows at least 14 nodes at every sampled second, each with its own seeded radius, speed and phase; extreme depth; circularity of any bubbles; reduced motion still. Keep them, adjusting the radius bounds if a test encoded the old range.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
+$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js
+$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css
+$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
 ```

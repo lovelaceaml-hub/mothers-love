@@ -1506,7 +1506,7 @@ marked, and for those the proof must be re-run.
 
 ## 11. Test impact
 
-File: `/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts`
+File: `$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/transitions.spec.ts`
 
 **Every assertion in the file holds as written. No revision is required.** That
 was a design constraint, not a happy accident: the brief permits only

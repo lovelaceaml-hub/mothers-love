@@ -1,12 +1,12 @@
 # L9 writer result: Peacemakers, one reserved long bubble
 
-Writer: fresh Claude Opus 5. Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers`, branch `tv17/peacemakers`, cut from `tv17/pick` 3d4b459. Facts only, no verdict.
+Writer: fresh Claude Opus 5. Worktree `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers`, branch `tv17/peacemakers`, cut from `tv17/pick` 3d4b459. Facts only, no verdict.
 
 ## Changed files
 
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers/public/color-polish/scenes/peacemakers.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers/public/color-polish/scenes/peacemakers.css` (comment only; the scene still needs no rules of its own)
-- `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers/public/color-polish/scenes/peacemakers.js`
+- `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers/public/color-polish/scenes/peacemakers.css` (comment only; the scene still needs no rules of its own)
+- `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts`
 
 Nothing outside the allowlist was touched. `git status` in the worktree lists exactly these three files. No core change was needed.
 
@@ -48,7 +48,7 @@ The dwell is read from state (`S.dwell[S.s] ?? DWELL[S.s]`), never hardcoded; a 
 
 ## Exact command results
 
-Run from `/Users/anthony/.claude/worktrees/mothers-love-tv17-peacemakers` with `npm_config_cache=/tmp/npm-cache`. `npm ci` completed with exit code 0 before any of these.
+Run from `$HOME/.claude/worktrees/mothers-love-tv17-peacemakers` with `npm_config_cache=/tmp/npm-cache`. `npm ci` completed with exit code 0 before any of these.
 
 - `npm run typecheck`: exit 0, no diagnostics.
 - `npm test`: 39 test files passed, 222 tests passed, 0 failed (12.02 s).
@@ -67,7 +67,7 @@ Both mutations were reverted; the committed file is the 572 px, guarded version 
 
 ## Captures
 
-`/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L9/after/w<width>-ms<ms>/peacemakers.png` for widths 1920 and 3840 at ms 0, 6000, 14000 and 21000 (each folder also holds the other nine scenes and `result.json`). This path is excluded from git in the main checkout, as Lane 3's captures are.
+`$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L9/after/w<width>-ms<ms>/peacemakers.png` for widths 1920 and 3840 at ms 0, 6000, 14000 and 21000 (each folder also holds the other nine scenes and `result.json`). This path is excluded from git in the main checkout, as Lane 3's captures are.
 
 The renderer probe's sample pool holds only 74 to 90 character messages, so these captures show case 4 above: the reserved bubble holding a regular message, with three regular bubbles drifting. The very long cases are covered by the spec, not by these captures.
 

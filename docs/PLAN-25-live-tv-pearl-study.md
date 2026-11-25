@@ -12,7 +12,7 @@ Anthony approved this concrete proposal with "do it" on September 21. This is a 
 - Fable and Opus implementation remains after visual approval. No agent or independent-review run is claimed for this interim design checkpoint.
 
 ## Scope and boundaries
-Base: production source 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a, freshly fetched from origin/codex/mothers-love. New isolated branch codex/tv-pearl-design-study in /Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design. Initial checkout is clean. Existing dirty checkouts remain untouched.
+Base: production source 1b4c31ab9aaa7454f26a5dd20250c5da3ddd2d2a, freshly fetched from origin/codex/mothers-love. New isolated branch codex/tv-pearl-design-study in $HOME/Projects/mothers-love-worktrees/tv-pearl-design. Initial checkout is clean. Existing dirty checkouts remain untouched.
 
 The deliverable contains a same-source current-style sample comparison, an enhanced Garden, and a sample arrival through the existing director. It does not promote production, change the public feed, alter app data, or complete all TV scenes. Asset and app quality must be reviewed separately. No purchases or external asset generation are required.
 

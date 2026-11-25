@@ -1,14 +1,14 @@
 # L6 writer result: Expression Orbit, smaller bubbles and revolving medallions
 
-Writer: fresh Claude Opus 5. Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-orbit-goal, branch tv17/orbit-goal, cut from tv17/fit 71bf3f8. Facts only, no verdict.
+Writer: fresh Claude Opus 5. Worktree $HOME/.claude/worktrees/mothers-love-tv17-orbit-goal, branch tv17/orbit-goal, cut from tv17/fit 71bf3f8. Facts only, no verdict.
 
 Scope actually done: Expression Orbit only (items 8 of the September 19 TV watch), after the coordinator's scope change. Goal (item 3) was dropped before any edit was made: milestone.js, milestone.css and milestone.spec.ts were never touched in this worktree and still match 71bf3f8 (git status lists only the three files below).
 
 ## Changed files
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-orbit-goal/public/color-polish/scenes/orbit.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-orbit-goal/public/color-polish/scenes/orbit.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-orbit-goal/tests/color-polish-scenes/orbit.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-orbit-goal/public/color-polish/scenes/orbit.js
+- $HOME/.claude/worktrees/mothers-love-tv17-orbit-goal/public/color-polish/scenes/orbit.css
+- $HOME/.claude/worktrees/mothers-love-tv17-orbit-goal/tests/color-polish-scenes/orbit.spec.ts
 
 Diffstat: 3 files changed, 412 insertions, 34 deletions.
 
@@ -47,7 +47,7 @@ A 500 grapheme message cannot fit a small orbiting bubble. The drawn area those 
 
 ## Verification, run in this worktree
 
-Local dev server for the studio tests: next dev on 127.0.0.1:3421 (a free port), with synthetic public env values only (NEXT_PUBLIC_SUPABASE_URL=https://synthetic.test, a synthetic publishable key). /Users/anthony/Projects/mothers-love/.env.local was never read or copied. The server was stopped afterwards; nothing is listening on 3421.
+Local dev server for the studio tests: next dev on 127.0.0.1:3421 (a free port), with synthetic public env values only (NEXT_PUBLIC_SUPABASE_URL=https://synthetic.test, a synthetic publishable key). $HOME/Projects/mothers-love/.env.local was never read or copied. The server was stopped afterwards; nothing is listening on 3421.
 
 - npm run typecheck: pass, no output.
 - npm test (vitest run): 39 test files passed, 222 tests passed.
@@ -70,8 +70,8 @@ Changed existing assertions, both in orbit.spec.ts:
 
 ## Capture paths
 
-- After (this branch): /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L6/after/w1920-ms0, w1920-ms6000, w1920-ms14000, w1920-ms21000, w3840-ms0, w3840-ms6000, w3840-ms14000, w3840-ms21000 (orbit.png plus result.json in each, and the other nine scenes for reference).
-- Before (tv17/fit 71bf3f8, this writer's own baseline run): /private/tmp/claude-501/-Users-anthony-Projects/bb31cf60-1f58-42c7-955f-4c1c46edcadd/scratchpad/captures/before/ (session scratch, not committed). The lane's published before image is the one the order named, /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after3/w1920-ms6000/orbit.png.
+- After (this branch): $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L6/after/w1920-ms0, w1920-ms6000, w1920-ms14000, w1920-ms21000, w3840-ms0, w3840-ms6000, w3840-ms14000, w3840-ms21000 (orbit.png plus result.json in each, and the other nine scenes for reference).
+- Before (tv17/fit 71bf3f8, this writer's own baseline run): /private/tmp/claude-501/-Users-anthony-Projects/bb31cf60-1f58-42c7-955f-4c1c46edcadd/scratchpad/captures/before/ (session scratch, not committed). The lane's published before image is the one the order named, $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/after3/w1920-ms6000/orbit.png.
 
 ## Limitations
 

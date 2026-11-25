@@ -30,9 +30,9 @@ Running 5 tests using 2 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:72:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:72:21
 
     Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -58,9 +58,9 @@ Running 5 tests using 2 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:99:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:99:21
 
     Error Context: test-results/color-polish-scenes-status-8a161-t-three-motion-vocabularies-chromium/error-context.md
 
@@ -86,9 +86,9 @@ Running 5 tests using 2 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:114:29
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:114:29
 
     Error Context: test-results/color-polish-scenes-status-9643b--follow-different-waveforms-chromium/error-context.md
 
@@ -114,9 +114,9 @@ Running 5 tests using 2 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:211:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:211:21
 
     Error Context: test-results/color-polish-scenes-status-bf11e-only-when-motion-is-allowed-chromium/error-context.md
 
@@ -142,9 +142,9 @@ Running 5 tests using 2 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:249:25
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/status.spec.ts:249:25
 
   5 failed
     [chromium] › tests/color-polish-scenes/status.spec.ts:71:5 › status renders circular medallions and no overflow at 14 s 

@@ -4,7 +4,7 @@ title: Dominant home action and compact recent recognitions
 state: landed
 model: Sonnet 5 (routed directly, Gemini through agy failed twice earlier that day)
 runner: helper
-worktree: /Users/anthony/.claude/worktrees/mothers-love-home-cta
+worktree: $HOME/.claude/worktrees/mothers-love-home-cta
 review: passed
 depends_on: LC, LH
 updated: 2026-09-10T23:40Z
@@ -26,7 +26,7 @@ The coordinator read the diff and rejected the first pass: the message text was 
 
 ## Runtime change
 
-Routed directly to a Claude Sonnet 5 helper, with no repeat Gemini attempt: lanes LC and LH had each already failed on Gemini 3.8 Flash through agy twice earlier the same day, recorded at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Branch change/home-cta-compact, worktree /Users/anthony/.claude/worktrees/mothers-love-home-cta, based on 81592a9.
+Routed directly to a Claude Sonnet 5 helper, with no repeat Gemini attempt: lanes LC and LH had each already failed on Gemini 3.8 Flash through agy twice earlier the same day, recorded at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Branch change/home-cta-compact, worktree $HOME/.claude/worktrees/mothers-love-home-cta, based on 81592a9.
 
 ## Landing evidence
 

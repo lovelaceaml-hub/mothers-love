@@ -1,7 +1,7 @@
 # Work order - Section 4 round 3: four blocking review findings - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-peacemakers-20260912-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peacemakers
 Branch: tv15/scene-peacemakers, your work is committed at 30a7098. Never run a git command that changes state.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high.
 

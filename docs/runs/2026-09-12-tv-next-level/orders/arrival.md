@@ -1,7 +1,7 @@
 # Work order - Section C: Remarkable arrivals (tv15/arrivals) - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-arrival-20260912
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-arrival
 Branch: tv15/arrivals at 3e89529 (already checked out; never run a git command that changes state)
 Plan: docs/PLAN-15-tv-next-level.md, Section C, plus the Decisions section (decision 6 binds you) and the cross-cutting rules.
 **Your gap report is binding and overrides the plan where they differ: docs/runs/2026-09-12-tv-next-level/gaps/arrival.md. Read all of it (G1 through G8, plus G7b) before you write anything. It settles the frame bag location, the near-black backdrop, the luminance check, the feed-rail flight, the 3D ring, the oversize group path, and the arrival's own shown-count call.**
@@ -85,7 +85,7 @@ title: Remarkable arrivals on tv15/arrivals
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-arrival
+worktree: $HOME/.claude/worktrees/mothers-love-tv-arrival
 review: sonnet-5 on landing
 depends_on: base
 updated: <UTC stamp, format 2026-09-12T01:59Z>

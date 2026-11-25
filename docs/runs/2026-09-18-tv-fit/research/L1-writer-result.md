@@ -148,16 +148,16 @@ Unchanged from the round 2 state the review confirmed (opaque pearls, edge fade,
 
 ## Files changed (absolute paths)
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.css (identical to base)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/orbit.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/orbit.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/milestone.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/milestone.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/text-fits.ts (new)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/orbit.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/milestone.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.css (identical to base)
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/orbit.js
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/orbit.css
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/milestone.js
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/milestone.css
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/text-fits.ts (new)
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/orbit.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/milestone.spec.ts
 
 ## COMPLETION
 
@@ -170,7 +170,7 @@ Verification commands and results (run from the worktree root):
 - Proof that the new checks catch the old code (the final specs copied into scratch trees of the base and of the round 2 code, same filter): base 5a24f0b: 17 failed, 4 passed; round 2 tree: 11 failed, 10 passed (the passes are the checks the round 2 review had confirmed: centre circle, Goal decision 6, tier growth, font-ready). First failure text per test in .tv17/proof/basetree-proof-final-full.txt and .tv17/proof/r2tree-proof-final-full.txt; examples: base "message drawn below the 18 px floor: 15.12 px drawn (font 18px at scale 0.840)", "text past the bubble rim margin: corner 132.6 > 120.7 (pearl)", round 2 "smallest drawn message size over 80 s" (Orbit 14.1 px), "the 500 grapheme record needs 35.7 s of reading and is not shown at 30 s", "paginated a message that must show whole (medium-140)".
 - `npx tsc --noEmit`: exit 0. `npx vitest run`: 39 files, 222 tests passed.
 
-Captures: /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/.tv17/captures/after3/w{1920,3840}-ms{0,6000,14000,21000}/ (probe, fictional sample data, all 8 runs exit 0 with `"issues":[]`). Earlier sets remain in .tv17/captures/before/, after/ and after2/. Fixture screenshots from this round are in .tv17/scratch/shots/.
+Captures: $HOME/.claude/worktrees/mothers-love-tv17-fit/.tv17/captures/after3/w{1920,3840}-ms{0,6000,14000,21000}/ (probe, fictional sample data, all 8 runs exit 0 with `"issues":[]`). Earlier sets remain in .tv17/captures/before/, after/ and after2/. Fixture screenshots from this round are in .tv17/scratch/shots/.
 
 Not run: Studio specs of the other scenes through verify-studio.sh (only the four the coordinator named). No check on the physical TV.
 
@@ -194,7 +194,7 @@ At the default 30 s Welcome dwell, a message of about 420 graphemes or more cann
 
 ## COMPLETION (round 4)
 
-- Files changed this round: /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js, /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts, /Users/anthony/.claude/worktrees/mothers-love-tv17-fit/.tv17/RESULT.md. Scratch in .tv17/r4/.
+- Files changed this round: $HOME/.claude/worktrees/mothers-love-tv17-fit/public/color-polish/scenes/welcome.js, $HOME/.claude/worktrees/mothers-love-tv17-fit/tests/color-polish-scenes/welcome.spec.ts, $HOME/.claude/worktrees/mothers-love-tv17-fit/.tv17/RESULT.md. Scratch in .tv17/r4/.
 - Welcome now follows "fewer, whole": no normal record pages, one long record at most, in B, inside the time left.
 - Checks run:
   - verify.sh on the full folder: only Studio specs and base failures failed.

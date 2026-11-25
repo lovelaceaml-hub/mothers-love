@@ -1,6 +1,6 @@
 # Copy cleanup run
 
-Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-02-copy-cleanup.md.
+Read first: $HOME/Projects/mothers-love/docs/PLAN-02-copy-cleanup.md.
 
 | Lane | Owner/model | State | Dependency |
 |---|---|---|---|

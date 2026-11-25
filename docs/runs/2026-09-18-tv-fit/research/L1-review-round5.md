@@ -2,7 +2,7 @@
 
 Plan goal line, quoted: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
 
-Reviewed: commit 0a7ea0e on 71bf3f8, worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-fit, branch tv17/fit.
+Reviewed: commit 0a7ea0e on 71bf3f8, worktree $HOME/.claude/worktrees/mothers-love-tv17-fit, branch tv17/fit.
 Result: corrected in place. Final commit 0ec1bbf on tv17/fit. No second round.
 Nothing was deployed, no database was contacted, no .env file was created or copied (synthetic public config only), sample data is fictional.
 
@@ -66,7 +66,7 @@ welcome.spec.ts:384 now passes (finding 5). Orbit and Goal specs were not rerun 
 
 ## Captures (welcome.png only)
 
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/reviewed/ : w1920 and w3840 at ms0, ms6000, ms14000, ms21000 (sample snapshot), plus w<width>-ms6000-long-pool (500, 250, 400, 60, 90, 120, 150, 180 graphemes) and w<width>-ms30000-all-180-to-420. I looked at them: four bubbles, words whole inside every rim, nothing over the title, people, speech bubbles, header or feed rail; the 21 s frame shows a top bubble flying in with its spin. Messages that end mid word in the long pool captures are my synthetic text cut to an exact length, not truncation by the scene.
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L1/reviewed/ : w1920 and w3840 at ms0, ms6000, ms14000, ms21000 (sample snapshot), plus w<width>-ms6000-long-pool (500, 250, 400, 60, 90, 120, 150, 180 graphemes) and w<width>-ms30000-all-180-to-420. I looked at them: four bubbles, words whole inside every rim, nothing over the title, people, speech bubbles, header or feed rail; the 21 s frame shows a top bubble flying in with its spin. Messages that end mid word in the long pool captures are my synthetic text cut to an exact length, not truncation by the scene.
 
 ## For Anthony
 

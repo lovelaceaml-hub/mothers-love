@@ -7,7 +7,7 @@
 > vitest run
 
 
-[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m/Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed[39m
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m$HOME/.claude/worktrees/mothers-love-tv17-h-live-feed[39m
 
  [32m✓[39m tests/foundation/client-api.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 603[2mms[22m[39m
      [33m[2m✓[22m[39m adds credentials and an explicit bearer token without logging payloads [33m 600[2mms[22m[39m
@@ -386,8 +386,8 @@ stage-edges 3840 crossers {"welcome":{"crossers":1,"total":85},"garden":{"crosse
       293 |
       294 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       295 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/helpers.ts:292:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/status.spec.ts:128:31
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/helpers.ts:292:57)
+        at $HOME/.claude/worktrees/mothers-love-tv17-h-live-feed/tests/color-polish-scenes/status.spec.ts:128:31
 
     Error Context: test-results/color-polish-scenes-status-1c6d6-ons-and-no-overflow-at-14-s-chromium/error-context.md
 

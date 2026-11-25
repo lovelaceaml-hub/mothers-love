@@ -4,7 +4,7 @@ title: Integration and release
 state: complete
 model: gpt-5.6-sol high controller
 runner: root Sol integration
-worktree: /Users/anthony/Projects/mothers-love
+worktree: $HOME/Projects/mothers-love
 review: fresh reviewer Terra high passed
 depends_on: LF, LG, LI, LT, LC, LS, LP, LV
 updated: 2026-09-09T09:20Z

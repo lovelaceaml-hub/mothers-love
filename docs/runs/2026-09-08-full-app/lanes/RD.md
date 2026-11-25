@@ -4,7 +4,7 @@
 
 - Owner: data activation readiness lane
 - Runtime: gpt-5.6-luna, xhigh
-- Worktree: `/Users/anthony/Projects/mothers-love-worktrees/ready-data`
+- Worktree: `$HOME/Projects/mothers-love-worktrees/ready-data`
 - Exclusive write: this lane record only
 - Protected: provider state, credentials, schema, source, plan, contract, index, board, and all other lane records
 - Status: READY for root-controlled activation after the root preflight already reported in this run

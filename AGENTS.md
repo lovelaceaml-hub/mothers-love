@@ -46,9 +46,9 @@ Deploy and Git
 - Branches: `feat/<area>-<subject>` or `fix/<area>-<subject>`, areas `app` (campaign and form), `tv`
   (2D TV view), `world` (3D world), `admin`, `infra`. A retired branch becomes an
   `archive/<old-branch-name>` tag. Leave the local-only `world-kit/*` branches alone.
-- The main checkout `/Users/anthony/Projects/mothers-love` stays on `main`; other worktrees go under
-  `/Users/anthony/Projects/mothers-love-worktrees/`, one per live branch. World art, hosts and film
-  are planned in `/Users/anthony/Projects/mothers-love-world` (its own AGENTS.md); world code still
+- The main checkout `$HOME/Projects/mothers-love` stays on `main`; other worktrees go under
+  `$HOME/Projects/mothers-love-worktrees/`, one per live branch. World art, hosts and film
+  are planned in `$HOME/Projects/mothers-love-world` (its own AGENTS.md); world code still
   reaches this repo only through a pull request.
 - Documents live in `docs/` on `main`, one set. Plans are numbered by the date of their first commit
   (next: 36) and each keeps a Build log.
@@ -207,5 +207,5 @@ The 3D world at /world
   functions called in place. `scripts/review/move-check.mjs` proves a file split is a pure move.
 - Review: `DESIGN_REVIEW_CHANNEL=chrome node scripts/review-world-design.mjs` against a production
   build on port 32743, `DESIGN_REVIEW_MODE` one of `stills`, `tour`, `quality`, `parity`,
-  `kit-faults`. Hold `/Users/anthony/Projects/mothers-love-worktrees/.build-lock` first (exists only
+  `kit-faults`. Hold `$HOME/Projects/mothers-love-worktrees/.build-lock` first (exists only
   while held). Live preview checks assert attributes only; no screenshots of real records.

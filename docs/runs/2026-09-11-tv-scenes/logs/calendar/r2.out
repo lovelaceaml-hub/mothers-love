@@ -11,10 +11,10 @@ Review the living calendar in the Studio preview at [/admin/display](https://mot
 ## COMPLETION
 
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js)
+- [$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css)
+- [$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md)
 
 Top-level identifiers added:
 - `CALENDAR_SPARKLE_COLORS`

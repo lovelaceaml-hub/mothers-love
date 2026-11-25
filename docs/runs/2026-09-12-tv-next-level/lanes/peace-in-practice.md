@@ -4,7 +4,7 @@ title: Peace in Practice, the red heart and heart cards
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+worktree: $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:45Z
@@ -18,7 +18,7 @@ Section 7 rebuilds Scene 9 (Peace in Practice, renderer id 9) for Mother's Love 
 
 ### Functions and constants added or modified
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.js`
    - `pipHeartSVG` (lines 15-19): Local SVG heart generator rendering base #d7263d, highlight #ff8a95, and shadow #8a0f22 with glossy specular highlight, avoiding reliance on protected `heartSVG`.
    - `PIP_CARD_SLOTS` (lines 21-25): The three fixed, disjoint slot geometry definitions for slots A (872, 150, 300x300), B (1196, 40, 300x300), and C (1510, 190, 290x290) with 0, 3.5, and 7.0 s phase offsets.
    - `pipCards` (line 27): Module-level array maintaining state machines for each card slot.
@@ -39,10 +39,10 @@ Section 7 rebuilds Scene 9 (Peace in Practice, renderer id 9) for Mother's Love 
    - `pipRenderHeartFrame` (lines 624-845): Renders the 3D heart with retinted shadow (#8a0f2230) and smooth interpolated quad fills.
    - `registerScene(9, ...)` (lines 876-892): Registers scene descriptor with `mount`, `tickAge`, `onLeave`, and floater keepOut bounds.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css`
+2. `$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/scenes/peace-in-practice.css`
    - Scoped styles for `#tv .scene[data-scene="9"]` covering `#heart-cards`, `#heart-field`, `.heart-card` clip-path and drop-shadow, inner content layout, name, 18 px message text, floating hearts, and reduced motion still rules.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts`
+3. `$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts`
    - Complete acceptance test suite verifying items 1 through 9 from gap report G1-G10 plus preserved Plan 13 canvas tests.
 
 ### Round 2 review corrections
@@ -65,7 +65,7 @@ Inspection and coordinator verification confirmed that the heart eviction logic 
 
 ### checkFullFits and tickSlots verification
 
-Inspection of `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/core/orbs.js` (line 77) confirms that `checkFullFits()` executes `slots.forEach(...)`, performing zero iterations when `slots` is empty. In `/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/core/motion.js` (line 13), `tickSlots(dt)` operates on `V.actors`, which is mapped from `slots`; when `slots` is empty, `V.actors` remains an empty array, so all floater motion, page advances, and actor retirement logic cleanly execute no operations.
+Inspection of `$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/core/orbs.js` (line 77) confirms that `checkFullFits()` executes `slots.forEach(...)`, performing zero iterations when `slots` is empty. In `$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/public/color-polish/core/motion.js` (line 13), `tickSlots(dt)` operates on `V.actors`, which is mapped from `slots`; when `slots` is empty, `V.actors` remains an empty array, so all floater motion, page advances, and actor retirement logic cleanly execute no operations.
 
 ### Vertex-normal shading approach
 

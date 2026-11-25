@@ -1,10 +1,10 @@
 # Plan 17 Lane 4 result: today's fade for every scene change
 
 ## Files changed (absolute paths)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/transitions.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/transitions.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/stage.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-transitions/tests/color-polish-scenes/transitions.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/transitions.js
+- $HOME/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/transitions.css
+- $HOME/.claude/worktrees/mothers-love-tv17-transitions/public/color-polish/core/stage.js
+- $HOME/.claude/worktrees/mothers-love-tv17-transitions/tests/color-polish-scenes/transitions.spec.ts
 
 ## What changed
 `core/transitions.js` no longer registers the four Plan 15 styles (flood, tide, vortex, storm), no longer

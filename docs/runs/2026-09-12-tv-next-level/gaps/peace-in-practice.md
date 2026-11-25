@@ -1,6 +1,6 @@
 # Gap report: Section 7, Peace in Practice red heart and heart cards (renderer id 9)
 
-Written by the coordinator (Opus 5 high) on 2026-09-11 from tv/pick 463ce8d, before the lane launches. Section 7 of /Users/anthony/Projects/mothers-love/docs/PLAN-15-tv-next-level.md.
+Written by the coordinator (Opus 5 high) on 2026-09-11 from tv/pick 463ce8d, before the lane launches. Section 7 of $HOME/Projects/mothers-love/docs/PLAN-15-tv-next-level.md.
 
 ## Anthony's note (quoted)
 

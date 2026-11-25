@@ -37,8 +37,8 @@ Running 16 tests using 5 workers
       289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:288:14)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:288:14)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:11:21
 
   2) [chromium] › tests/color-polish-scenes/helpers.spec.ts:24:5 › reduced motion renders the welcome scene still 
 
@@ -62,10 +62,10 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -91,9 +91,9 @@ Running 16 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-welcom-094e0-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -121,8 +121,8 @@ Running 16 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:25:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:25:21
 
     Error Context: test-results/color-polish-scenes-welcom-9013c-d-and-span-two-depth-layers-chromium/error-context.md
 
@@ -150,8 +150,8 @@ Running 16 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts:64:29
 
     Error Context: test-results/color-polish-scenes-welcom-16799--heading-between-6-and-14-s-chromium/error-context.md
 
@@ -176,7 +176,7 @@ Running 16 tests using 5 workers
       231 |   await page.getByTestId('color-polish-studio').getByRole('button',{name:'Replay',exact:true}).click();
       232 |   await expect(selector).toHaveValue('garden');
       233 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:230:95
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:230:95
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 
@@ -197,7 +197,7 @@ Running 16 tests using 5 workers
       243 |   const tvFrame = page.frames().find(f => f.url().endsWith('/color-polish/renderer.html'));
       244 |   if (!tvFrame) throw new Error('color-polish renderer frame not found on /display');
       245 |   await tvFrame.waitForFunction(() => (window as any).colorPolishRuntime?.getState().mode === 'normal');
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:242:3
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:242:3
 
   8) [chromium] › tests/color-polish-usable/usable.spec.ts:281:5 › display falls back to the legacy renderer when color-polish stays unavailable 
 
@@ -221,7 +221,7 @@ Running 16 tests using 5 workers
       288 | });
       289 |
       290 | async function findRendererFrame(page: Page) {
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:287:59
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:287:59
 
     Error Context: test-results/color-polish-usable-usable-7a3aa-or-polish-stays-unavailable-chromium/error-context.md
 
@@ -238,8 +238,8 @@ Running 16 tests using 5 workers
       311 |     const number = await tvFrame.locator('#scene-countdown-number').textContent();
       312 |     return { scene: state.scene as number, dwell: state.visual.dwell[state.scene] as number, number: Number(number) };
       313 |   };
-        at readCountdown (/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:310:33)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:315:24
+        at readCountdown ($HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:310:33)
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:315:24
 
     Error Context: test-results/color-polish-usable-usable-be7b0-nd-resets-on-manual-advance-chromium/error-context.md
 
@@ -264,7 +264,7 @@ Running 16 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

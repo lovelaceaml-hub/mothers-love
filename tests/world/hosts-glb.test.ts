@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
+import { homedir } from "node:os";
 import * as T from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -29,8 +30,8 @@ const HEIGHT = 0.9;
 const CANDIDATES = [
   process.env.HOSTS_KIT_DIR,
   path.resolve("public/world-kit/v1/hosts"),
-  "/Users/anthony/Projects/mothers-love-world/studio/kit/world/hosts",
-  "/Users/anthony/Projects/mothers-love-world/lanes/hosts/kit/world/hosts",
+  path.join(homedir(), "Projects/mothers-love-world/studio/kit/world/hosts"),
+  path.join(homedir(), "Projects/mothers-love-world/lanes/hosts/kit/world/hosts"),
 ].filter((dir): dir is string => !!dir);
 const KIT = CANDIDATES.find(dir => existsSync(path.join(dir, "peace.glb")) && existsSync(path.join(dir, "joy.glb")));
 

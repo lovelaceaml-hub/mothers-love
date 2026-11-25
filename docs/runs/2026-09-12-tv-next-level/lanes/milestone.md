@@ -4,7 +4,7 @@ title: Section 9: Milestone and Weekly Goal (renderer id 11)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone
+worktree: $HOME/.claude/worktrees/mothers-love-tv-milestone
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T05:10Z
@@ -18,13 +18,13 @@ Section 9 revamps the Milestone and Weekly Goal scene (renderer id 11) for Plan 
 
 ### Functions and constants added
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
    - `milestoneSetContributors` (lines 80-82): Sets `S.milestoneContributors` from an array of record ids.
    - `milestoneGetShownCount` (lines 84-86): Exposes the current session shown count for a given record id from `S.shownCount`.
 
 ### Call sites changed
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
    - `milestoneScene` (lines 5-8): Inverted DOM order in `.progress-rail` to place `.progress-goal` first as the primary visual block, followed by `.progress-milestone` as the secondary rail. Rendered `<div class="goal-phrase">${esc(e.phrase)}</div>` directly below `.goal-name`.
    - `contributorPool` (lines 14-16): Replaced the week-filtered and goal-filtered 14-record floor with `return records();`, opening the stream to the entire eligible display pool.
    - `tributeContent` (lines 18-29): Added `markShown(r.id)` at the top of content assignment; replaced literal `THANK YOU` with `<div class="stream-phrase">${esc(chosenExpr.phrase)}</div>` using Decision 10 expression selection; updated `--tint` to the chosen expression color; set `data-weekly` based on whether the record includes the weekly goal expression.
@@ -32,12 +32,12 @@ Section 9 revamps the Milestone and Weekly Goal scene (renderer id 11) for Plan 
    - `tickTributes` (lines 80-107): Updated off-screen recycling to pick next records via `chooseRandom`; adjusted node centering translate offset to `(x - 108, y - 108)` matching 216 px node dimensions.
    - `registerScene(11, ...)` (lines 127-139): Added `onLeave` hook clearing `V.stream = null;`.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`
+2. `$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`
    - Inverted typography hierarchy: `.progress-goal h3` styled to 48 px (scene largest) and `.progress-goal .goal-phrase` to 38 px (scene second largest), both strictly larger than `.progress-milestone .threshold` reduced to 30 px.
    - Restyled `.progress-goal` as the top rail block (removed border-top and top padding) and `.progress-milestone` as the secondary rail (added border-top separator and compact vertical rhythm).
    - Increased `.stream-node` dimensions from 158 px to 216 px with 14 px padding, and styled `.stream-pearl .stream-phrase` at 18 px floor with 1.15 line-height and max-width 176 px to fit long phrases without clipping or truncation.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+3. `$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
    - Replaced and expanded test suite with 8 behavioral Playwright test cases covering Acceptance criteria 1 through 7:
      - Common scene spec: circularity and no overflow in studio preview.
      - Inverted hierarchy: verified goal name and phrase computed font sizes are largest on screen and strictly larger than `.threshold`.

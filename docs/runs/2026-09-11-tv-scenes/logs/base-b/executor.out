@@ -3,16 +3,16 @@ Section 0b is ready for the coordinator verification pass.
 The shared Color Polish scene test helpers and smoke spec are in place, the stage runtime exposes actor depth fields, and the lane record is recorded.
 
 What now works:
-- [`helpers.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts) exports all admin auth mocks, snapshot fixtures, Studio scene bootstrap, circularity testing, and overflow assertions.
-- [`helpers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts) verifies that the Studio welcome preview renders with circular orbs, contained layout, advance suppression on click, and still mode on reduced motion.
-- [`stage.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js) adds `z`, `depth`, `screenScale`, and `blur` to `visualState()`, with `registerScene` default `replaceMode` set to `null` and [`peacemakers.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js) explicitly holding `replaceMode: 'drift'`.
-- [`base-b.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md) records the lane summary and exact changes.
+- [`helpers.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts) exports all admin auth mocks, snapshot fixtures, Studio scene bootstrap, circularity testing, and overflow assertions.
+- [`helpers.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts) verifies that the Studio welcome preview renders with circular orbs, contained layout, advance suppression on click, and still mode on reduced motion.
+- [`stage.js`](file://$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js) adds `z`, `depth`, `screenScale`, and `blur` to `visualState()`, with `registerScene` default `replaceMode` set to `null` and [`peacemakers.js`](file://$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js) explicitly holding `replaceMode: 'drift'`.
+- [`base-b.md`](file://$HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md) records the lane summary and exact changes.
 
 What Anthony must do:
 Nothing, you're clear.
 
 Next two-minute action:
-Review the diff in [`helpers.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts) and [`stage.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js) before handing control back to the coordinator.
+Review the diff in [`helpers.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts) and [`stage.js`](file://$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js) before handing control back to the coordinator.
 
 Questions:
 1. Ready for the coordinator to run the full verification suite and landing review on tv/base?
@@ -20,11 +20,11 @@ Questions:
 ## COMPLETION
 
 Files changed:
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js)
-- [`/Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md)
+- [`$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts)
+- [`$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts)
+- [`$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js`](file://$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js`](file://$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js)
+- [`$HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md`](file://$HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md)
 
 Anything not done and why:
 Nothing, all requested work in Tasks 1 through 4 is complete. Shell commands were skipped in compliance with Hard Rule 6 for the coordinator to execute.

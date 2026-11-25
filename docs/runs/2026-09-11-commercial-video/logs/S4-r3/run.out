@@ -1,4 +1,4 @@
-All six review findings are resolved and verified in [assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) and [cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html).
+All six review findings are resolved and verified in [assemble.mjs](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs) and [cards.html](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/cards.html).
 
 The decode check now monitors process exit status and stderr via `spawnSync`, card JSON injection is safely escaped with browser page errors trapped, and rendered card elements are measured for overflow and 40 px margin bounds. Segment building for 9:16 now branches on `beat.portrait` with explicit failure guards, the narration audio mix uses the dynamic timeline length, and frame rate parameters reference the single `FPS` constant.
 
@@ -58,8 +58,8 @@ scripts/video/cards.html:0
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
-- [/Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file:///Users/anthony/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
+- [$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/assemble.mjs)
+- [$HOME/.claude/worktrees/mothers-love-video/scripts/video/cards.html](file://$HOME/.claude/worktrees/mothers-love-video/scripts/video/cards.html)
 
 ### What Anthony must do
 Nothing, you're clear.

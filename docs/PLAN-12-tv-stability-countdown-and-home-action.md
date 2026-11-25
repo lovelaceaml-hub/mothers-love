@@ -20,7 +20,7 @@ Anthony approved implementation and production release in this task on the eveni
 
 ### Lane LT: TV stability and scene countdown
 
-Setup: writer Sonnet 5 (routed directly, Gemini through agy failed twice earlier the same day), branch change/tv-countdown-stability, worktree /Users/anthony/.claude/worktrees/mothers-love-tv-countdown, based on 81592a9. Reviewer: the Fable coordinator. Order at docs/runs/2026-09-10-color-polish/orders/LT.md.
+Setup: writer Sonnet 5 (routed directly, Gemini through agy failed twice earlier the same day), branch change/tv-countdown-stability, worktree $HOME/.claude/worktrees/mothers-love-tv-countdown, based on 81592a9. Reviewer: the Fable coordinator. Order at docs/runs/2026-09-10-color-polish/orders/LT.md.
 
 Three causes of the flashes were confirmed and fixed in src/components/display/color-polish-host/ColorPolishHost.tsx and src/components/display/color-polish/renderer.tsx. First, every new poll aborted the in-flight request, and the request timeout equaled the 5 second poll interval, so a healthy but slow read was always killed; the fix leaves an in-flight poll alone and raises the timeout to 9 seconds. Second, the renderer iframe was keyed on source plus a safe or active flag, so any momentary status change remounted the whole renderer and dropped the bootstrap handshake; the fix keys the iframe on source only and sends the safe state through the existing postMessage control instead. Third, found during correction: under React strict mode in development, the polling effect mounts, cleans up and mounts again before the first request clears its ref, so the new in-flight guard saw an aborted controller and skipped the request, leaving the display on checking for 5 seconds; the guard now ignores an aborted controller.
 
@@ -30,7 +30,7 @@ tests/color-polish-usable/usable.spec.ts gained 4 journeys: glitch stability wit
 
 ### Lane LM: dominant home action and compact recent recognitions
 
-Setup: writer Sonnet 5 (routed directly, Gemini through agy failed twice earlier the same day), branch change/home-cta-compact, worktree /Users/anthony/.claude/worktrees/mothers-love-home-cta, based on 81592a9. Reviewer: the Fable coordinator. Order at docs/runs/2026-09-10-color-polish/orders/LM.md.
+Setup: writer Sonnet 5 (routed directly, Gemini through agy failed twice earlier the same day), branch change/home-cta-compact, worktree $HOME/.claude/worktrees/mothers-love-home-cta, based on 81592a9. Reviewer: the Fable coordinator. Order at docs/runs/2026-09-10-color-polish/orders/LM.md.
 
 src/components/feed/HomeExperience.module.css changed, phone width rules only. The Share a recognition action is now full width, 60 pixels tall (48 pixels on screens under 580 pixels tall), bold at 1.05rem, z-index 5, and pulled up 18 pixels so it layers in front of the floating expression medallions. A ctaPulse animation runs every 6 seconds, a scale of 1.04 with a glow bloom lasting about 900 milliseconds, on top of the existing shimmer; the page's reduced-motion rule silences both.
 

@@ -10,7 +10,7 @@ Anthony authorized all four proposed refinement areas and specified: "The layout
 - Review: direct author inspection and proportionate tests for this intermediate prototype. No independent review claim. Claude implementation remains held.
 - Baseline: clean `38d72831912b21468e3ca375ee6bf20bb1c03bbf`, containing application source `9dc7e455047f7eebb8ebfcc1affd125f3b591d3c`. Local and remote art branch reconciled; PR #8 open and draft; repository private.
 - Scope: explicit fictional `source=sample&art=design`; existing renderer, clock, camera, reading, arrivals and privacy clearing. Preserve all 13 destinations and classic/cinematic behavior.
-- Visual evidence: `/Users/anthony/Downloads/Mothers_Love_Bubble_Atelier/previews/Recognition_Pearl_Closeup.png`, the four approved world pictures and previous fixed-source runtime captures. Attachment documents are appearance evidence, not new timing or data contracts.
+- Visual evidence: `$HOME/Downloads/Mothers_Love_Bubble_Atelier/previews/Recognition_Pearl_Closeup.png`, the four approved world pictures and previous fixed-source runtime captures. Attachment documents are appearance evidence, not new timing or data contracts.
 
 ## Work ledger
 

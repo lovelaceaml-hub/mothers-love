@@ -1,6 +1,6 @@
 # L6 review: Expression Orbit (single Fable 5.1 review, reviewer corrects)
 
-Reviewed: branch tv17/orbit-goal, writer commit 421d6ee on 71bf3f8, worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-orbit-goal.
+Reviewed: branch tv17/orbit-goal, writer commit 421d6ee on 71bf3f8, worktree $HOME/.claude/worktrees/mothers-love-tv17-orbit-goal.
 Final commit after review: 07bddcb.
 Plan goal line checked against: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV ...". Nothing in this lane contradicts it.
 
@@ -55,7 +55,7 @@ tests/color-polish-scenes/orbit.spec.ts, two new tests:
 - npm test: 39 files, 222 tests passed.
 - npm run build: exit 0, compiled, 36 of 36 static pages.
 - npx playwright test tests/color-polish-scenes/orbit.spec.ts --workers=1: 26 passed, 0 failed, 3.1 minutes (24 from the writer, 2 new).
-- Probe captures, issues [] in all four: /Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L6/reviewed/w1920-ms6000, w1920-ms14000, w3840-ms6000, w3840-ms14000.
+- Probe captures, issues [] in all four: $HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L6/reviewed/w1920-ms6000, w1920-ms14000, w3840-ms6000, w3840-ms14000.
 
 ## For the owner
 

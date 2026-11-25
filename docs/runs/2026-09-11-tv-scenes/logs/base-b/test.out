@@ -3,7 +3,7 @@
 > vitest run
 
 
-[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m/Users/anthony/.claude/worktrees/mothers-love-tv-base[39m
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m$HOME/.claude/worktrees/mothers-love-tv-base[39m
 
  [32m✓[39m tests/interview/teaching-screens.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 12[2mms[22m[39m
  [32m✓[39m tests/color-polish-data/color-polish.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 22[2mms[22m[39m

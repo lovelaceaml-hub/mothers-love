@@ -4,7 +4,7 @@ title: Section 6: Nine Expressions (renderer id 7)
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-expressions
+worktree: $HOME/.claude/worktrees/mothers-love-tv-expressions
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:57Z
@@ -18,14 +18,14 @@ Section 6 revamps Scene 7 (The Nine Expressions, renderer id 7) to be more theat
 
 ### Functions and constants added
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.js`
    - `expressions_ROW_Z` (line 4): Array `[-40, 0, -40]` specifying row depth translations creating the concave arc facing the viewer.
    - `expressions_COL_ROTY` (line 5): Array `[7, 0, -7]` specifying column yaw rotations creating the concave arc facing the viewer.
    - `nineScene` (lines 7-38): Generates the 3D perspective stage markup with data attributes (`data-col`, `data-row`), initial translate3d and rotateY transforms, and `.edu-bloom` particle and spark elements.
    - `tickEducation` (lines 40-109): Updates card transforms, layout dimensions, opacity, and particle burst animation based on `p = S.still ? 1 : ease((S.eduAge - 6) / 3)`, eliminating per-frame lerping of position and size while lifting the focused card forward to `translateZ(90px)`.
    - `registerScene(7)` (lines 111-125): Registers scene 7 with `markup`, `archOpacity`, `mount`, `tickAge`, and `onLeave` teardown lifecycle hook.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.css`
+2. `$HOME/.claude/worktrees/mothers-love-tv-expressions/public/color-polish/scenes/expressions.css`
    - Scoped rules for `#tv .scene[data-scene="7"]` establishing 1600px perspective and preserve-3d context.
    - Base `.edu-card` transform-style preserve-3d and transition styling.
    - Grid card styling with 590px by 167px dimensions and 14px 24px front padding.
@@ -33,7 +33,7 @@ Section 6 revamps Scene 7 (The Nine Expressions, renderer id 7) to be more theat
    - Compact card styling with 403px by 126px dimensions and 0.7 opacity.
    - `.edu-bloom` particle and spark container and element definitions.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts`
+3. `$HOME/.claude/worktrees/mothers-love-tv-expressions/tests/color-polish-scenes/expressions.spec.ts`
    - Kept all existing tests passing (medallion circularity, grid card slack and dimensions, compact card fit, focused card balance, 9-expression coverage, reduced motion, 3840x2160 scaling).
    - Added test for focused card positive translateZ and >=1.6x phrase size ratio (Acceptance 2).
    - Added test for visible layer scrollWidth and scrollHeight bounds at 1920 and 3840 (Acceptance 3).

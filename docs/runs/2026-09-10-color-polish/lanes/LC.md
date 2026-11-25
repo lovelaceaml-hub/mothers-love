@@ -4,7 +4,7 @@ title: TV click advance
 state: landed
 model: Sonnet 5 (spilled from Gemini 3.8 Flash)
 runner: helper
-worktree: /Users/anthony/.claude/worktrees/mothers-love-click-advance
+worktree: $HOME/.claude/worktrees/mothers-love-click-advance
 review: passed
 depends_on: LF
 updated: 2026-09-10T23:55Z
@@ -26,7 +26,7 @@ Full order at [orders/LC.md](../orders/LC.md). Anthony's request, quoted: "if I 
 
 ## Runtime change
 
-First launched on Gemini 3.8 Flash (High) through agy, branch change/tv-click-advance, based on 2e05c75, in worktree /Users/anthony/.claude/worktrees/mothers-love-click-advance, after Anthony widened the Antigravity gate with bash, python3 and psql. The agy print-mode launch started the renderer probe as a background task, then ended while "standing by," with no edits and no error. Raw launch output at [launch/LC.out](../launch/LC.out); full ruling at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
+First launched on Gemini 3.8 Flash (High) through agy, branch change/tv-click-advance, based on 2e05c75, in worktree $HOME/.claude/worktrees/mothers-love-click-advance, after Anthony widened the Antigravity gate with bash, python3 and psql. The agy print-mode launch started the renderer probe as a background task, then ended while "standing by," with no edits and no error. Raw launch output at [launch/LC.out](../launch/LC.out); full ruling at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
 
 ## Landing evidence
 

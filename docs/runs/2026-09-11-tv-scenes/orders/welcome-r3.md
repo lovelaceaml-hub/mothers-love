@@ -1,7 +1,7 @@
 # Work order - welcome correction r3: bubbles that arrive, spin, leave, with depth - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-welcome-20260911-r3
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-welcome
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 1 (data-scene="1"). Round: r3.
 
 Anthony reviewed the scene on his TV and asked: "The Words of Mother's Love, the living campaign of appreciation section should have multiple recognition bubbles coming in, floating out, and spinning, with very animated and dimensional effects." Today the scene shows four bubbles from the shared rightBubbles() helper that never get replaced (replaceMode null), with depth layers that only change scale and blur.
@@ -34,8 +34,8 @@ Read first, inside your worktree: public/color-polish/scenes/welcome.js (yours),
 - Reduced motion: `still` is true, no runtime error, the fx canvas exists.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
+$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js
+$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
 ```

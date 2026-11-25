@@ -3,14 +3,14 @@ Updated the Peace in Practice test suite and lane record for round r3.
 The sharp actor assertion now checks for blur under 0.15 px to handle standard breathing scale, and the overflow assertion measures scene root children excluding the pre-existing background heart field overhang.
 
 ### Changes made
-1. In [peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts#L20-L40), updated the overflow assertion to evaluate the maximum bottom edge across scene root elements excluding `#heart-field` and its descendants, asserting it remains within `clientHeight` while preserving the `scrollWidth` check.
-2. In [peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts#L147-L163), added `parseBlur` and updated the sharp depth layer check to `parseBlur(a.blur) < 0.15` while retaining the blurred check above 0.3 px.
-3. In [peace-in-practice.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md#L52), appended one sentence to `## Result` noting the threshold adjustment and the pre-existing heart field overhang.
+1. In [peace-in-practice.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts#L20-L40), updated the overflow assertion to evaluate the maximum bottom edge across scene root elements excluding `#heart-field` and its descendants, asserting it remains within `clientHeight` while preserving the `scrollWidth` check.
+2. In [peace-in-practice.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts#L147-L163), added `parseBlur` and updated the sharp depth layer check to `parseBlur(a.blur) < 0.15` while retaining the blurred check above 0.3 px.
+3. In [peace-in-practice.md](file://$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md#L52), appended one sentence to `## Result` noting the threshold adjustment and the pre-existing heart field overhang.
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md](file://$HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/docs/runs/2026-09-11-tv-scenes/lanes/peace-in-practice.md)
 
 ### What Anthony must do
 Nothing, you're clear.

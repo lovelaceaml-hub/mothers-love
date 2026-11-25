@@ -33,8 +33,8 @@ Running 16 tests using 5 workers
       50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
       51 |   }
       52 | }
-        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:73:3
+        at assertDayCellsCornerAndCenter ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:73:3
 
     Error Context: test-results/color-polish-scenes-calend-b0700-ner-date-and-centered-count-chromium/error-context.md
 
@@ -52,7 +52,7 @@ Running 16 tests using 5 workers
       122 |     expect(timings.length).toBeGreaterThan(0);
       123 |     for (const timing of timings) {
       124 |       expect(timing.endTime).toBeLessThanOrEqual(timing.currentTime);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:121:28
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:121:28
 
     Error Context: test-results/color-polish-scenes-calend-ea969-se-once-on-entry-and-settle-chromium/error-context.md
 
@@ -70,8 +70,8 @@ Running 16 tests using 5 workers
       50 |     expect(cell.scrollHeight).toBeLessThanOrEqual(cell.clientHeight);
       51 |   }
       52 | }
-        at assertDayCellsCornerAndCenter (/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:244:3
+        at assertDayCellsCornerAndCenter ($HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:49:30)
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts:244:3
 
     Error Context: test-results/color-polish-scenes-calendar-the-same-holds-at-3840-chromium/error-context.md
 
@@ -96,7 +96,7 @@ Running 16 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

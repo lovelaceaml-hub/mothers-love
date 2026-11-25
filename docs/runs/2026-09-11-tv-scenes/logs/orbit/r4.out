@@ -1,4 +1,4 @@
-Ported the 3D orbit rate test to the direct renderer harness in [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts).
+Ported the 3D orbit rate test to the direct renderer harness in [$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts).
 
 The test now drives `renderer.html` directly via the `/probe` harness without going through the Studio host page. This eliminates host snapshot polling and keepAge remounts, so planet phases remain contiguous across the 25 second timeline. The checkpoints (1000 to 26000 ms in 5 s steps), the three assertions (z signs, planet crossing the sun, measured rate), and the original 0.082 rate tolerance of 0.92 to 1.08 are preserved.
 
@@ -6,10 +6,10 @@ The test now drives `renderer.html` directly via the `/probe` harness without go
 1. Direct probe harness `setupOrbitHarness` boots `renderer.html` directly with `control.scene` set to `'orbit'`.
 2. The 3D orbit rate test steps time deterministically from 1000 to 26000 ms with no background snapshot polling or phase corruption.
 3. All other test cases remain on the Studio harness as requested.
-4. Lane execution record updated in [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md).
+4. Lane execution record updated in [$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md).
 
 ### Two-minute next step
-Review the test diff in [/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts).
+Review the test diff in [$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts).
 
 ### What Anthony must do
 Nothing, you're clear.
@@ -19,5 +19,5 @@ Nothing, you're clear.
 2. Inspect the updated test implementation and lane record diffs first.
 
 ## COMPLETION
-- /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
+- $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md

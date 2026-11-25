@@ -10,15 +10,15 @@ The previous halo pseudo element used `inset: -3px` and an element rotation that
 - Still mode and reduced-motion overrides remain fully enforced.
 
 ### Changes made
-1. [`calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css): Rebuilt `#tv .scene[data-scene="5"] .day.today::after` with `inset: 0`, `padding: 3px`, masked border box, and animated `background-position` from `200% 0` to `-100% 0` over 6s linear infinite; updated `@keyframes calendarTodayHalo` to animate `background-position`.
-2. [`calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md): Appended the Round r4 summary line to the Result section.
+1. [`calendar.css`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css): Rebuilt `#tv .scene[data-scene="5"] .day.today::after` with `inset: 0`, `padding: 3px`, masked border box, and animated `background-position` from `200% 0` to `-100% 0` over 6s linear infinite; updated `@keyframes calendarTodayHalo` to animate `background-position`.
+2. [`calendar.md`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md): Appended the Round r4 summary line to the Result section.
 
 ### What Anthony must do
 Nothing, you're clear.
 
 ### Two-minute action
-Inspect the uncommitted diff in [`calendar.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css) and [`calendar.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md) before the coordinator runs the test suite.
+Inspect the uncommitted diff in [`calendar.css`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css) and [`calendar.md`](file://$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md) before the coordinator runs the test suite.
 
 ## COMPLETION
-- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
+- $HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
+- $HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md

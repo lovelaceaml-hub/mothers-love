@@ -1,7 +1,7 @@
 # Work order - calendar correction r4: the Today halo must not overflow the cell - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-calendar-20260911-r4
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-calendar
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-calendar
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 5 (data-scene="5"). Round: r4.
 
 The coordinator's Playwright run of round r3 still fails the pre-existing "corner date and centered count" test (and its 3840 twin): a day cell's scrollWidth is 167 against a clientWidth of 164. The cause is the `.day.today::after` halo with `inset: -3px`, which extends 3 px outside the cell on every side (scrollable overflow counts absolutely positioned descendants even when clipped), and its `rotate(360deg)` animation would also sweep the rounded rectangle's corners outside the cell. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous orders.
@@ -13,7 +13,7 @@ The coordinator's Playwright run of round r3 still fails the pre-existing "corne
 Append one line "Round r4: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/calendar.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
+$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
+$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
 ```

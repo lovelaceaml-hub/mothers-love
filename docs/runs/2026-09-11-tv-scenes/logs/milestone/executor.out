@@ -3,10 +3,10 @@ Section 11 milestone stream density, extreme depth, and Playwright verification 
 The stream now maintains a density floor of at least 14 visible recognition pearls with enhanced 3D depth, continuous motion, and circular geometry.
 
 ### What now works
-- [milestone.js](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js): `contributorPool()` enforces a 14-record floor using recent eligible recognitions; `mountTributes()` widens depth to 360-520 and rise to 16-44 px/s; `tickTributes()` applies blur up to 2 px and clamps far opacity to at least 0.45.
-- [milestone.css](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css): Scoped rule under `#tv .scene[data-scene="11"]` ensures `.stream-node` elements maintain a 50% border radius.
-- [milestone.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts): Four behavioral Playwright tests verify overflow prevention, orb circularity, density continuity and uniqueness across 26 seconds, extreme depth metrics (z span, scale, blur), and reduced motion still mode.
-- [milestone.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md): Section 11 lane record created with required frontmatter, gap closures, pool floor rationale, and results.
+- [milestone.js](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js): `contributorPool()` enforces a 14-record floor using recent eligible recognitions; `mountTributes()` widens depth to 360-520 and rise to 16-44 px/s; `tickTributes()` applies blur up to 2 px and clamps far opacity to at least 0.45.
+- [milestone.css](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css): Scoped rule under `#tv .scene[data-scene="11"]` ensures `.stream-node` elements maintain a 50% border radius.
+- [milestone.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts): Four behavioral Playwright tests verify overflow prevention, orb circularity, density continuity and uniqueness across 26 seconds, extreme depth metrics (z span, scale, blur), and reduced motion still mode.
+- [milestone.md](file://$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md): Section 11 lane record created with required frontmatter, gap closures, pool floor rationale, and results.
 
 ## What Anthony must do
 Nothing, you're clear.
@@ -16,10 +16,10 @@ Tell the coordinator to proceed with the landing verification suite and Sonnet 5
 
 ## COMPLETION
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/public/color-polish/scenes/milestone.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md`
 
 Anything not done and why:
 None. All tasks from the work order are complete.

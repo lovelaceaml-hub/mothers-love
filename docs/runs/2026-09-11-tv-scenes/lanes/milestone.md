@@ -4,7 +4,7 @@ title: Section 11, Milestone stream density and extreme depth
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-milestone
+worktree: $HOME/.claude/worktrees/mothers-love-tv-milestone
 review: "sonnet-5 high on landing"
 depends_on: base-b
 updated: 2026-09-11T09:37Z
@@ -40,6 +40,6 @@ Round r6: normalized Studio preview getBoundingClientRect measurements by live s
 - Hygiene sweep: flagged the CSS rule, since removed. Review: Sonnet 5 (high): pool floor, depth widening and opacity floor match the Decision; one should-fix (the inert CSS rule) corrected in round 3; notes on the per-sample bars and the pre-existing lint.
 
 ## COMPLETION
-- /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
+- $HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
 

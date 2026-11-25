@@ -3,7 +3,7 @@
 > vitest run
 
 
-[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m/Users/anthony/.claude/worktrees/mothers-love-tv-garden[39m
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90m$HOME/.claude/worktrees/mothers-love-tv-garden[39m
 
  [32m✓[39m tests/backend/public-display-recovery.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 55[2mms[22m[39m
  [32m✓[39m tests/color-polish-data/query.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 63[2mms[22m[39m

@@ -32,7 +32,7 @@ Running 15 tests using 5 workers
       104 |   expect(firstBurstSample.visualFx).toBeGreaterThan(0);
       105 |
       106 |   // two samples later the data-peace-fx count is lower (they expire)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:103:41
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:103:41
 
     Error Context: test-results/color-polish-scenes-peace--eda77--signs-and-glow-within-60-s-chromium/error-context.md
 
@@ -57,7 +57,7 @@ Running 15 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

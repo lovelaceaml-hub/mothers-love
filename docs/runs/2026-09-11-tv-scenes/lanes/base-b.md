@@ -4,7 +4,7 @@ title: Section 0b, Shared scene test helpers and visualState depth
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: "sonnet-5 high on landing"
 depends_on: base
 updated: 2026-09-11T04:14Z

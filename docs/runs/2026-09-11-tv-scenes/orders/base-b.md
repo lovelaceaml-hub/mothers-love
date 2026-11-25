@@ -1,9 +1,9 @@
 # Work order - Section 0b: Shared scene test helpers and visualState depth - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-base-b-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv/base (already checked out, Section 0 already committed on it; you never run git commands that change state)
-Plan: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/PLAN-13-tv-scene-refactor.md, Section 0b (read it first, including the Build log)
+Plan: $HOME/.claude/worktrees/mothers-love-tv-base/docs/PLAN-13-tv-scene-refactor.md, Section 0b (read it first, including the Build log)
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only.
 
 You run as the lane's declared writer. Nobody answers questions mid-run; read this whole order before editing.
@@ -11,7 +11,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 ## Hard rules
 
 1. Create or edit only the files in your allowlist block. Everything else is protected, including tests/color-polish-usable/usable.spec.ts (copy from it, never edit it), every other core/*.js and scenes/*.js file, renderer.html and renderer.css.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-base.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-base.
 3. Do not edit anything under docs/runs/2026-09-11-tv-scenes/ except your own record file docs/runs/2026-09-11-tv-scenes/lanes/base-b.md.
 4. Never write the em dash (U+2014) or en dash (U+2013) into any file.
 5. Behavior tests, not source-text regexes.
@@ -20,7 +20,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 
 ## Task 1: tests/color-polish-scenes/helpers.ts
 
-Create /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts exporting, in TypeScript that passes the repo's strict tsconfig and eslint:
+Create $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts exporting, in TypeScript that passes the repo's strict tsconfig and eslint:
 
 - `mockCommon(page, options?)`, `signInAs(page, role?)`, `fulfillJson(route, body, status?)`, `settings(overrides?)`, `overview(overrides?)`, `recognition(overrides?)`, `authSession(role)` and `buildActiveDisplayFixture(overrides?)`: copied from tests/color-polish-usable/usable.spec.ts lines 1 to 211 (they are module-private there), with the same bodies, exported. Keep the `studioSnapshot` and `studioSettings` import from '../interview/studio-fixtures' if buildActiveDisplayFixture needs it.
 - `const SCENE_IDS = { welcome: 1, garden: 2, arrival: 3, featured: 4, calendar: 5, status: 6, expressions: 7, peacemakers: 8, 'peace-in-practice': 9, orbit: 10, milestone: 11 } as const` and `type SceneSlug = keyof typeof SCENE_IDS`.
@@ -34,11 +34,11 @@ Every function gets a two-line doc comment saying what it does and which scene s
 
 ## Task 2: visualState depth (core/stage.js only)
 
-In /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js, find `function visualState()`. Its actor mapping today exposes x, y, d, scale, opacity, vx, vy, life and readingPages (read the function to confirm the exact list). Add, without removing or reordering anything: `z: a.z`, `depth: a.depth`, `screenScale: a.screenScale`, and `blur: a.el ? a.el.style.filter : ''`. Also, in the same file's `registerScene` defaults, change `replaceMode:'drift'` to `replaceMode:null` (the Sonnet review's note: a future floater scene that forgets to register replaceMode must not silently start replacing bubbles), and in /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js add `replaceMode:'drift'` to its registerScene call so its behavior is unchanged (it relied on the old default). Change nothing else in either file. Both edits are behavior-neutral today.
+In $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js, find `function visualState()`. Its actor mapping today exposes x, y, d, scale, opacity, vx, vy, life and readingPages (read the function to confirm the exact list). Add, without removing or reordering anything: `z: a.z`, `depth: a.depth`, `screenScale: a.screenScale`, and `blur: a.el ? a.el.style.filter : ''`. Also, in the same file's `registerScene` defaults, change `replaceMode:'drift'` to `replaceMode:null` (the Sonnet review's note: a future floater scene that forgets to register replaceMode must not silently start replacing bubbles), and in $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js add `replaceMode:'drift'` to its registerScene call so its behavior is unchanged (it relied on the old default). Change nothing else in either file. Both edits are behavior-neutral today.
 
 ## Task 3: the smoke spec
 
-Create /Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts with two tests using only the helpers:
+Create $HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts with two tests using only the helpers:
 1. "helpers open the welcome scene in the Studio and it is circular": openStudioScene(page, 'welcome'), then circularity(frame) has count above 0 and no failures, and noOverflow(frame) shows scrollWidth <= clientWidth and scrollHeight <= clientHeight, and studioClickDoesNotAdvance returns before === after.
 2. "reduced motion renders the welcome scene still": reducedMotionScene(page, 'welcome') has still === true and the frame's `getState().mode` is 'normal'.
 
@@ -46,7 +46,7 @@ Follow the import style of tests/color-polish-usable/usable.spec.ts (`import { e
 
 ## Task 4: record file
 
-Write /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md:
+Write $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md:
 
 ```
 ---
@@ -55,7 +55,7 @@ title: Section 0b, Shared scene test helpers and visualState depth
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: "sonnet-5 high on landing"
 depends_on: base
 updated: <UTC timestamp like 2026-09-11T03:10Z>
@@ -73,9 +73,9 @@ updated: <UTC timestamp like 2026-09-11T03:10Z>
 End with `## COMPLETION`: files changed (absolute paths); anything not done and why.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md
+$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts
+$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js
+$HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base-b.md
 ```

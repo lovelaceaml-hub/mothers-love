@@ -4,9 +4,9 @@
 
 Direct public TV View startup for Plan 05. The assigned files are:
 
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-display/src/components/display/DisplayExperience.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-display/src/components/display/DisplayExperience.module.css`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-display/tests/display/display.e2e.spec.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-display/src/components/display/DisplayExperience.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-display/src/components/display/DisplayExperience.module.css`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-display/tests/display/display.e2e.spec.ts`
 
 ## Implementation
 
@@ -22,7 +22,7 @@ Direct public TV View startup for Plan 05. The assigned files are:
 
 ## Verification
 
-- `npm run typecheck` passed with a temporary symlink to `/Users/anthony/Projects/mothers-love/node_modules`; the symlink was removed afterward.
+- `npm run typecheck` passed with a temporary symlink to `$HOME/Projects/mothers-love/node_modules`; the symlink was removed afterward.
 - `npx eslint src/components/display/DisplayExperience.tsx tests/display/display.e2e.spec.ts` passed with the same temporary symlink; the symlink was removed afterward.
 - `npx vitest run tests/display/coordinator.test.ts` passed, 16 tests.
 - `git diff --check` passed.

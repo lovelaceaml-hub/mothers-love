@@ -2,8 +2,8 @@
 
 Writer: Gemini 3.8 Flash (High) through the agy CLI, gate widened by Anthony today (bash, python3, psql added). Reviewer: Fable coordinator reads the diff; verification is re-run in the main checkout by the coordinator before release. Anthony's request, 2026-09-10: "if I click on the TV display it goes to the next one."
 
-Worktree (the only place you may write): /Users/anthony/.claude/worktrees/mothers-love-click-advance
-Branch: change/tv-click-advance, based on 2e05c75. Dependencies are linked at /Users/anthony/.claude/worktrees/mothers-love-click-advance/node_modules.
+Worktree (the only place you may write): $HOME/.claude/worktrees/mothers-love-click-advance
+Branch: change/tv-click-advance, based on 2e05c75. Dependencies are linked at $HOME/.claude/worktrees/mothers-love-click-advance/node_modules.
 
 Read first, inside the worktree:
 - AGENTS.md (product invariants; no real data anywhere)
@@ -32,7 +32,7 @@ Verification, from the worktree root, prefix npm and npx with npm_config_cache=/
 1. npm run typecheck
 2. npm test
 3. npx playwright test tests/color-polish-usable (if Playwright's dev server fails to start in the worktree because of the node_modules symlink and Turbopack, say so; the coordinator re-runs it in the main checkout)
-4. node scripts/color-polish-renderer-probe.mjs /Users/anthony/.claude/worktrees/mothers-love-click-advance /Users/anthony/.claude/worktrees/mothers-love-click-advance/.lane/probe-1920 --width=1920 (must report issues: [] and all 10 scenes)
+4. node scripts/color-polish-renderer-probe.mjs $HOME/.claude/worktrees/mothers-love-click-advance $HOME/.claude/worktrees/mothers-love-click-advance/.lane/probe-1920 --width=1920 (must report issues: [] and all 10 scenes)
 5. ./node_modules/.bin/eslint public/color-polish/renderer.js tests/color-polish-usable
 
 Report (plain text, under 350 words): the exact listener and helper you added, files changed, each verification command with pass or fail and the key numbers, and anything not done and why.

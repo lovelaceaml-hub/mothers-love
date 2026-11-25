@@ -12,10 +12,10 @@ Built on round 2's uncommitted work (expressions.js and expressions.spec.ts). Ro
 4. The vacuous "caption inside layout" check (measured against `.educational`, which fills the scene) is replaced by a check against the scene box, the box the TV cuts at, plus an unclipped-words check on the caption element; the caption is positioned against the scene, not derived from it, so this can fail. The "no card covers the caption" guard stays.
 
 ## Files changed (absolute paths)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.js
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/tests/color-polish-scenes/expressions.spec.ts
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md (this file), scratch in .tv17/scratch/r3b/ (pre-fix copies pre.js, pre.css, pre.spec.ts; final copies new.*; harnesses and outputs)
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.js
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/tests/color-polish-scenes/expressions.spec.ts
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md (this file), scratch in .tv17/scratch/r3b/ (pre-fix copies pre.js, pre.css, pre.spec.ts; final copies new.*; harnesses and outputs)
 
 ## Specs (all through loadRenderer)
 - Fit spec (both widths): title clearance now also checked in the grid phase (top row's highest corner at least 16 px below the title at 1920, 32 at 3840); caption check made real as described above.
@@ -67,8 +67,8 @@ The two Plan 15 Studio specs measure phraseSlack (card rect bottom minus phrase 
 - The 12 px threshold is untouched; the text sizes are untouched (25 px grid, 19 px compact, well above the 18 px floor).
 
 ## Files changed (absolute paths)
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css
-- /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md (this section); scratch in /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/.tv17/scratch/r4/ (base.js, base.css from 5a24f0b; pre.js, pre.css, pre.spec.ts from f78e75f; new.css; slack.mjs; outputs)
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css
+- $HOME/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md (this section); scratch in $HOME/.claude/worktrees/mothers-love-tv17-expressions/.tv17/scratch/r4/ (base.js, base.css from 5a24f0b; pre.js, pre.css, pre.spec.ts from f78e75f; new.css; slack.mjs; outputs)
 
 ## Verification commands and results
 - `bash .tv17/verify-studio.sh tests/color-polish-scenes/expressions.spec.ts` (production build, synthetic public config, port 3182): 24 passed (45.6 s), 0 failed, including "grid cards fit with slack", "compact cards fit", every other Studio spec and all loadRenderer specs (edge sweep, fit, wider letters, leaving focus, motion). Output: .tv17/scratch/r4/run-studio.txt.
@@ -88,7 +88,7 @@ The two Plan 15 Studio specs measure phraseSlack (card rect bottom minus phrase 
 - No commit, as instructed. Port 3182 stopped by the verify script; next-env.d.ts restored to HEAD by it. docs/ untouched.
 
 ## COMPLETION
-- Files changed: /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css (grid and compact card inner spacing only: grid front padding 14 to 10 top, grid phrase margin 10 to 7 and line-height 1.22; compact front padding 12 to 8 top, compact phrase margin 6 to 4 and line-height 1.2; text sizes, positions, sizes, motion, glow and transitions unchanged). Plus /Users/anthony/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md and .tv17/scratch/r4/, .tv17/captures/after4/.
+- Files changed: $HOME/.claude/worktrees/mothers-love-tv17-expressions/public/color-polish/scenes/expressions.css (grid and compact card inner spacing only: grid front padding 14 to 10 top, grid phrase margin 10 to 7 and line-height 1.22; compact front padding 12 to 8 top, compact phrase margin 6 to 4 and line-height 1.2; text sizes, positions, sizes, motion, glow and transitions unchanged). Plus $HOME/.claude/worktrees/mothers-love-tv17-expressions/.tv17/RESULT.md and .tv17/scratch/r4/, .tv17/captures/after4/.
 - Verification: `bash .tv17/verify-studio.sh tests/color-polish-scenes/expressions.spec.ts` 24 passed, 0 failed (both previously failing Studio specs now pass, threshold still 12); `npx tsc --noEmit` clean; edge sweep worst margin 16.01 px at 1920 and 32.03 px at 3840, 0 violations (unchanged); leaving-focus worst 18.43 and 36.85 px, 0 violations (unchanged); pre-fix proof run 2 failed at 10.60 and 10.77, new CSS restored.
 - Captures: .tv17/captures/before/, after/, after2/, after3/ (earlier rounds) and .tv17/captures/after4/ (this round).
 - Not run: vitest (no unit test reads the CSS; passed in round 3 on identical JS).

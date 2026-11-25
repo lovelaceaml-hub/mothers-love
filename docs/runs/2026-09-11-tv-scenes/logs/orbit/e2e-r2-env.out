@@ -42,9 +42,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -72,10 +72,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -101,9 +101,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-orbit--90fb7-ets-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -125,8 +125,8 @@ Running 15 tests using 5 workers
       289 |   await expect(page.getByTestId('color-polish-studio')).toBeVisible();
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:288:14)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:26:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:288:14)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:26:21
 
     Error Context: test-results/color-polish-scenes-orbit--de2d9-it-in-3D-at-the-slower-rate-chromium/error-context.md
 
@@ -152,9 +152,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:120:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:120:21
 
     Error Context: test-results/color-polish-scenes-orbit--10719--planet-sharp-with-a-shadow-chromium/error-context.md
 
@@ -177,9 +177,9 @@ Running 15 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:183:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:183:21
 
     Error Context: test-results/color-polish-scenes-orbit--97d53--circular-through-the-orbit-chromium/error-context.md
 
@@ -209,10 +209,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:205:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:205:28
 
     Error Context: test-results/color-polish-scenes-orbit--9c3be-ion-renders-the-orbit-still-chromium/error-context.md
 
@@ -240,8 +240,8 @@ Running 15 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:218:23
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:218:23
 
     Error Context: test-results/color-polish-scenes-orbit--c9586--two-distinct-catalog-names-chromium/error-context.md
 
@@ -263,9 +263,9 @@ Running 15 tests using 5 workers
       126 |   await page.getByLabel('Password').fill('synthetic-password');
       127 |   await page.getByRole('button', { name: 'Sign in' }).click();
       128 |   await expect(page).toHaveURL(/\/admin(?:\/?$)/);
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:125:42)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:227:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:125:42)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts:227:21
 
   10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
 
@@ -289,7 +289,7 @@ Running 15 tests using 5 workers
       219 |   await expect(page.frameLocator('iframe').getByText('Synthetic Friend').first()).toBeVisible();
       220 |   quiet = true;
       221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:218:63
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:218:63
 
   11) [chromium] › tests/color-polish-usable/usable.spec.ts:409:5 › falls back after the color-polish API stays down for more than 60 seconds 
 
@@ -312,7 +312,7 @@ Running 15 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

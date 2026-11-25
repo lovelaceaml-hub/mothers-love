@@ -8,77 +8,77 @@
   "files": [
     {
       "source": "/private/tmp/mothers-love-plan24-optimized-baseline/cinematic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/cinematic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/cinematic.png",
       "bytes": 1201257,
       "sha256": "77d666a1b651ec782067b863b2a307448ee6491bd83a79c941b240b7a3f4dde5",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-optimized-baseline/classic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/classic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/classic.png",
       "bytes": 1202594,
       "sha256": "98232e52b90701b7816f321c7489b129c6c1b1bf06740c0bd0cd196092c1c0f1",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-optimized-baseline/report.json",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/report.json",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/report.json",
       "bytes": 3347,
       "sha256": "15762f17f575ba755b0b5c8a1cb6e603cb5dcdd88f6ed3995c7563a6fe3a9e08",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/dev-cinematic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/dev-cinematic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/dev-cinematic.png",
       "bytes": 1204373,
       "sha256": "87ef3a4f4253467b7b72edca4769dabbc7418bccf88928db574c17fff0b6885a",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/dev-classic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/dev-classic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/dev-classic.png",
       "bytes": 1205662,
       "sha256": "6f6e6d366b544a1e9f31215f177d9f1db0124b875665115630cde82d440d01bd",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/harness-cinematic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/harness-cinematic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/harness-cinematic.png",
       "bytes": 1148411,
       "sha256": "2335381f694854c382006c61fec9586f7afcf5dd41af2c7b6cfd414c54c4523a",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/harness-classic.png",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/harness-classic.png",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/harness-classic.png",
       "bytes": 1137109,
       "sha256": "7446dcaf5a5203fac3f251b5a1ea389d49fe19b086e251c444d217a26918cb98",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/report.json",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/report.json",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/report.json",
       "bytes": 4347,
       "sha256": "a88d1dc104abda36fa2dc3f2850d2c3a9dbd25367bbffe40f4e1cd1cc0cccb2c",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/scene-review.html",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/scene-review.html",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/scene-review.html",
       "bytes": 1579,
       "sha256": "c047c192119dc4e3fea934513315a21a36616d0431aad95e863761fdf1ae790f",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-dev-harness-baseline/world-review-runtime.js",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/world-review-runtime.js",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/dev-and-harness/world-review-runtime.js",
       "bytes": 1805785,
       "sha256": "d5ab2d8029a865ff64722f9f93c6d3ffec6deac50cc06555a9373cbfae3dda98",
       "originalRetained": true
     },
     {
       "source": "/private/tmp/mothers-love-plan24-baseline-probe.mjs",
-      "destination": "/Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/mothers-love-plan24-baseline-probe.mjs",
+      "destination": "$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/mothers-love-plan24-baseline-probe.mjs",
       "bytes": 6847,
       "sha256": "2e348a8fbf8de47ca8bfce0f33fbe672be929f1a0a68162d88ae2c92db82c962",
       "originalRetained": true

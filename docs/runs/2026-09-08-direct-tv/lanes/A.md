@@ -4,13 +4,13 @@
 
 Direct TV View admin experience for Plan 05. The assigned files are:
 
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/settings-access.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/display-controls.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/admin-overview.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/src/app/admin/display/page.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/src/app/admin/settings/page.tsx`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/tests/admin/admin.spec.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/direct-tv-admin/tests/admin/admin-utils.test.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/settings-access.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/display-controls.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/src/components/admin/admin-overview.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/src/app/admin/display/page.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/src/app/admin/settings/page.tsx`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/tests/admin/admin.spec.ts`
+- `$HOME/Projects/mothers-love-worktrees/direct-tv-admin/tests/admin/admin-utils.test.ts`
 
 ## Implementation
 
@@ -24,7 +24,7 @@ Direct TV View admin experience for Plan 05. The assigned files are:
 
 ## Verification
 
-- `npm_config_cache=/tmp/npm-cache npm run typecheck` passed with a temporary symlink to `/Users/anthony/Projects/mothers-love/node_modules`; the symlink was removed afterward.
+- `npm_config_cache=/tmp/npm-cache npm run typecheck` passed with a temporary symlink to `$HOME/Projects/mothers-love/node_modules`; the symlink was removed afterward.
 - `npm_config_cache=/tmp/npm-cache npm run lint` passed with the same temporary symlink; the symlink was removed afterward.
 - `git diff --check` passed.
 - Browser execution remains with the root coordinator as required by the plan.

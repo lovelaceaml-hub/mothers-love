@@ -1,9 +1,9 @@
-Implement Plan 26: Clean up and refactor the Mother's Love repository, Section 1: Rename and reduce the branches, at /Users/anthony/Projects/mothers-love/docs/PLAN-26-repository-refactor.md
+Implement Plan 26: Clean up and refactor the Mother's Love repository, Section 1: Rename and reduce the branches, at $HOME/Projects/mothers-love/docs/PLAN-26-repository-refactor.md
 
 Read first, in this order:
-1. /Users/anthony/Projects/mothers-love/docs/PLAN-26-repository-refactor.md including its Build log
-2. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/research/branch-inventory.md, especially the section "Findings that Section 1 must act on"
-3. /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S1.md
+1. $HOME/Projects/mothers-love/docs/PLAN-26-repository-refactor.md including its Build log
+2. $HOME/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/research/branch-inventory.md, especially the section "Findings that Section 1 must act on"
+3. $HOME/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/lanes/S1.md
 
 The complete execution envelope, setup line, safety facts and gate for this section are in that third file. Follow it exactly.
 
@@ -13,11 +13,11 @@ Set your own effort to xhigh before you begin. This chat was started from a term
 
 ## What Section 0 already did
 
-Section 0 completed 2026-09-23 at commit d4cb9ac on codex/color-polish-v6. It pushed 133 annotated tags named archive/<branch-name> to GitHub, one for every distinct non keeper branch name, plus archive/detached-world-bubbles for the detached commit bb03f79 in the world-bubbles worktree. All 220 non keeper branch tips, local and remote, are reachable from their tags. 72 of the 133 archived branches hold commits production does not have, so the tags matter. The machine readable inventory at /Users/anthony/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/research/branch-inventory.json has 138 rows; drive the deletions from it rather than re-deriving the list. Restore any branch with: git branch <name> archive/<name>
+Section 0 completed 2026-09-23 at commit d4cb9ac on codex/color-polish-v6. It pushed 133 annotated tags named archive/<branch-name> to GitHub, one for every distinct non keeper branch name, plus archive/detached-world-bubbles for the detached commit bb03f79 in the world-bubbles worktree. All 220 non keeper branch tips, local and remote, are reachable from their tags. 72 of the 133 archived branches hold commits production does not have, so the tags matter. The machine readable inventory at $HOME/Projects/mothers-love/docs/runs/2026-09-22-repo-refactor/research/branch-inventory.json has 138 rows; drive the deletions from it rather than re-deriving the list. Restore any branch with: git branch <name> archive/<name>
 
 BEFORE DELETING ANYTHING, run this and confirm it resolves:
 
-    git -C /Users/anthony/Projects/mothers-love rev-parse record/2026-09-22-repo-refactor-section-0
+    git -C $HOME/Projects/mothers-love rev-parse record/2026-09-22-repo-refactor-section-0
 
 Do not assume it. If it does not resolve, stop and commit the Section 0 record first.
 

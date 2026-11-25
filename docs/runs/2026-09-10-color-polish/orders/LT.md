@@ -2,8 +2,8 @@
 
 Writer: Claude Sonnet 5 (Gemini through agy failed twice today; routing decision recorded). Reviewer: Fable coordinator reads the diff; verification is re-run in the main checkout before release. Anthony's requests, 2026-09-10, quoted: "Sometimes the connection is glitchy. Sometimes it shows that it's not available or that it's connecting just for a brief second, and it comes back." and "every page, each scene, in the bottom-right corner, in a subtle way, in a small number, had a countdown until the next view comes. The time that it's counting down should really be discrete and not really draw too much attention to it. If it can have the design where not only is it counting down, but the circle around it is running out, and then once it gets to zero, that's when there's no more, and then it just moves on."
 
-Worktree (the only place you may write): /Users/anthony/.claude/worktrees/mothers-love-tv-countdown
-Branch: change/tv-countdown-stability, based on 81592a9. Dependencies linked at /Users/anthony/.claude/worktrees/mothers-love-tv-countdown/node_modules.
+Worktree (the only place you may write): $HOME/.claude/worktrees/mothers-love-tv-countdown
+Branch: change/tv-countdown-stability, based on 81592a9. Dependencies linked at $HOME/.claude/worktrees/mothers-love-tv-countdown/node_modules.
 
 Read first, inside the worktree: AGENTS.md; src/components/display/color-polish-host/ColorPolishHost.tsx (polls /api/display/color-polish every 5 s with an abort timeout, keeps snapshotRef, phases checking, active, disabled, quiet, neutral, unavailable, 60 s stale rule, V6 fallback when unavailable); src/components/display/color-polish/renderer.tsx (the sandboxed iframe bridge; note line 267 to 268: safeMode = status !== 'ready' || snapshot === null and frameKey = source plus safe or active, and the iframe element is keyed by frameKey, so any momentary status change remounts the whole renderer); public/color-polish/renderer.js (state S, coordinator() rotation near line 532 with S.sceneAge and the dwell per scene, requestScene, manualAdvance added today near line 290, init near line 556, the control.status handling near lines 96 and 213); public/color-polish/renderer.css; tests/color-polish-usable/usable.spec.ts and scripts/color-polish-renderer-probe.mjs.
 
@@ -22,7 +22,7 @@ Verification, from the worktree root, prefix npm and npx with npm_config_cache=/
 1. npm run typecheck
 2. npm test
 3. npx playwright test tests/color-polish-usable tests/display (if the dev server refuses to start because node_modules is a symlink, say so; the coordinator re-runs in the main checkout)
-4. node scripts/color-polish-renderer-probe.mjs /Users/anthony/.claude/worktrees/mothers-love-tv-countdown /Users/anthony/.claude/worktrees/mothers-love-tv-countdown/.lane/probe-1920 --width=1920
+4. node scripts/color-polish-renderer-probe.mjs $HOME/.claude/worktrees/mothers-love-tv-countdown $HOME/.claude/worktrees/mothers-love-tv-countdown/.lane/probe-1920 --width=1920
 5. ./node_modules/.bin/eslint src/components/display/color-polish-host src/components/display/color-polish public/color-polish/renderer.js tests/color-polish-usable
 
 Report (plain text, under 400 words): the causes you confirmed for the flashes and what you changed for each, the countdown implementation summary, files changed, each verification command with pass or fail and key numbers, anything not done and why.

@@ -81,7 +81,7 @@ Running 64 tests using 2 workers
       104 | });
       105 |
       106 | test('bubbles span two depth layers', async ({ page }) => {
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/garden.spec.ts:103:20
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-scenes/garden.spec.ts:103:20
 
     Error Context: test-results/color-polish-scenes-garden-petals-are-carried-not-dropped-chromium/error-context.md
 
@@ -106,7 +106,7 @@ Running 64 tests using 2 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-pick/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

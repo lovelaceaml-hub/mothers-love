@@ -4,7 +4,7 @@ title: Home action, form-only recognize page, titled name examples
 state: landed
 model: Sonnet 5 (spilled from Gemini 3.8 Flash)
 runner: helper
-worktree: /Users/anthony/.claude/worktrees/mothers-love-home-polish
+worktree: $HOME/.claude/worktrees/mothers-love-home-polish
 review: passed
 depends_on: LF
 updated: 2026-09-10T23:55Z
@@ -26,7 +26,7 @@ Full order at [orders/LH.md](../orders/LH.md). Anthony's requests, quoted: "on t
 
 ## Runtime change
 
-First launched on Gemini 3.8 Flash (High) through agy, branch change/home-polish, based on 2e05c75, in worktree /Users/anthony/.claude/worktrees/mothers-love-home-polish, after Anthony widened the Antigravity gate with bash, python3 and psql. agy reported a required "command" permission auto-denied in headless mode, with no edits; its logs do not record which command. Raw launch output at [launch/LH.out](../launch/LH.out); full ruling at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
+First launched on Gemini 3.8 Flash (High) through agy, branch change/home-polish, based on 2e05c75, in worktree $HOME/.claude/worktrees/mothers-love-home-polish, after Anthony widened the Antigravity gate with bash, python3 and psql. agy reported a required "command" permission auto-denied in headless mode, with no edits; its logs do not record which command. Raw launch output at [launch/LH.out](../launch/LH.out); full ruling at [decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md](../decisions/2026-09-11T00-05Z-LC-LH-gemini-failed-twice.md). Under the routing table's spill order (Gemini refuses, then Sonnet 5, never Opus or Fable), the lane moved to a Claude Sonnet 5 helper in the same worktree and branch, with the same order.
 
 ## Landing evidence
 

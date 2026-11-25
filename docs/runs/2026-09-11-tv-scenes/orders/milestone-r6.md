@@ -1,7 +1,7 @@
 # Work order - milestone correction r6: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-milestone-20260911-r6
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-milestone
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-milestone
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 11 (data-scene="11"). Round: r6.
 
 The Sonnet 5 landing review and the coordinator's Playwright run of your previous round (r5) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -13,6 +13,6 @@ The Sonnet 5 landing review and the coordinator's Playwright run of your previou
 Append one line "Round r6: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/milestone.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
+$HOME/.claude/worktrees/mothers-love-tv-milestone/tests/color-polish-scenes/milestone.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-milestone/docs/runs/2026-09-11-tv-scenes/lanes/milestone.md
 ```

@@ -10,7 +10,7 @@ Coordinator: Copilot App
 
 | Repo | Path | Branch | Baseline HEAD |
 |---|---|---|---|
-| mothers-love | `/Users/anthony/Projects/mothers-love-worktrees/tv-display-efficiency-audit` | `feat/tv-display-efficiency` | PR head `6bd2eab`; current `origin/main` `900d796e839df1430063e4bf4def0dbcf9520e1d` |
+| mothers-love | `$HOME/Projects/mothers-love-worktrees/tv-display-efficiency-audit` | `feat/tv-display-efficiency` | PR head `6bd2eab`; current `origin/main` `900d796e839df1430063e4bf4def0dbcf9520e1d` |
 
 ## Lanes
 
@@ -22,8 +22,8 @@ Coordinator: Copilot App
 This bounded remediation records its work in the two lane files. No separate
 research, decision, event-log, diagram, or lane-board files were needed.
 
-<!-- lane: S1 state: verified model: Copilot App worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-display-efficiency-audit review: passed updated: 2026-10-11T06:44Z -->
-<!-- lane: S2 state: blocked model: Copilot App worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-display-efficiency-audit review: passed updated: 2026-10-11T06:44Z -->
+<!-- lane: S1 state: verified model: Copilot App worktree: $HOME/Projects/mothers-love-worktrees/tv-display-efficiency-audit review: passed updated: 2026-10-11T06:44Z -->
+<!-- lane: S2 state: blocked model: Copilot App worktree: $HOME/Projects/mothers-love-worktrees/tv-display-efficiency-audit review: passed updated: 2026-10-11T06:44Z -->
 
 ## Independent review
 

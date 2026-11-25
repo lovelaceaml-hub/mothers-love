@@ -2,7 +2,7 @@
 
 Reviewer: Claude Fable 5.1, the single review round for this Opus-written lane. The reviewer corrected what it found; there is no second round.
 
-Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-scene-link`, branch `tv17/scene-link`. Writer commit `fa75352`, reviewer commit `da18111`, both on top of `tv17/pick` `3d4b459`.
+Worktree `$HOME/.claude/worktrees/mothers-love-tv17-scene-link`, branch `tv17/scene-link`. Writer commit `fa75352`, reviewer commit `da18111`, both on top of `tv17/pick` `3d4b459`.
 
 Plan goal line checked against: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV." This lane only adds preview-build links for judging screens; it changes no scene and nothing on the production TV.
 

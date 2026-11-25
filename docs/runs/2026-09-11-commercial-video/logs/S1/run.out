@@ -1,8 +1,8 @@
 Section 1 commercial video script and narration files have been created and verified.
 
-The script balances the 7 beats across a 74 second target with 179 spoken words, calm 2.4 word-per-second pacing, and captions strictly under 40 characters per line. Every campaign phrase and tagline matches [`catalog.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-video/src/lib/catalog.ts) byte for byte, all personal names and messages are fictional, and zero em or en dashes are present.
+The script balances the 7 beats across a 74 second target with 179 spoken words, calm 2.4 word-per-second pacing, and captions strictly under 40 characters per line. Every campaign phrase and tagline matches [`catalog.ts`](file://$HOME/.claude/worktrees/mothers-love-video/src/lib/catalog.ts) byte for byte, all personal names and messages are fictional, and zero em or en dashes are present.
 
-### Full contents of [SCRIPT.md](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md)
+### Full contents of [SCRIPT.md](file://$HOME/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md)
 
 ```markdown
 # Commercial Video Script: The Words of Mother's Love
@@ -148,5 +148,5 @@ Review the script above and approve it to proceed with Section 2 (capture harnes
 
 ## COMPLETION
 Created files:
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md`](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md)
-- [`/Users/anthony/.claude/worktrees/mothers-love-video/docs/video/narration.json`](file:///Users/anthony/.claude/worktrees/mothers-love-video/docs/video/narration.json)
+- [`$HOME/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md`](file://$HOME/.claude/worktrees/mothers-love-video/docs/video/SCRIPT.md)
+- [`$HOME/.claude/worktrees/mothers-love-video/docs/video/narration.json`](file://$HOME/.claude/worktrees/mothers-love-video/docs/video/narration.json)

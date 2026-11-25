@@ -4,7 +4,7 @@ title: Shared primitives on tv15/base
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: sonnet-5 on landing
 depends_on: none
 updated: 2026-09-12T01:17Z
@@ -18,49 +18,49 @@ Section A builds the shared foundation primitives for Plan 15 on tv15/base, incl
 
 ### Functions added across both rounds
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/state.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/state.js`
    - `markShown` (lines 130-133): Increments the session shown counter map S.shownCount for a given recognition id.
    - `chooseRandom` (lines 135-151): Selects a record weighted inversely by (1 + times shown) with deterministic PRNG seeding.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js`
+2. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js`
    - `drawSlots` (lines 18-70): Assigns records to scene positions with preference for short records, computing each slot's grow cap against readerBounds and neighboring slots without overlap.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/speech.js`
+3. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/speech.js`
    - `nextSpeechPhrase` (lines 4-21): Shuffles catalog phrases with a non-repeating bag.
    - `mountSpeech` (lines 23-45): Attaches speech bubble DOM elements at designated speaker coordinates.
    - `tickSpeech` (lines 47-76): Animates speech bubble fade in, presentation, and fade out cycles.
 
-4. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts`
+4. `$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.ts`
    - `CIRCULARITY_EXEMPT` (lines 337-340): Typed map of scene slugs to exempt card selectors (peacemakers puzzle cards and peace-in-practice heart cards).
    - `circularity` (lines 347-427): Updated circularity evaluator that skips elements matching exempt selectors for the active scene.
    - `cardShape` (lines 433-495): Evaluates non-circular card geometry, verifying non-zero size, non-50% border radius, scene root containment, and aspect ratio bounds.
    - `loadRenderer` (lines 501-602): Reusable direct-renderer test harness for Playwright tests, serving /probe with mocked routes and MessageChannel control.
 
-5. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/scripts/color-polish-globals-check.mjs`
+5. `$HOME/.claude/worktrees/mothers-love-tv-base/scripts/color-polish-globals-check.mjs`
    - `parseVarNamesFromStatement` (lines 7-79): Parses top-level declaration variable names from JavaScript statements.
    - `extractColumnZeroDeclarations` (lines 81-197): Extracts column-zero function, class, const, let, and var declarations from classic scripts.
    - `checkGlobals` (lines 199-282): Validates that scripts loaded by renderer.html share unique global names without collision.
 
 ### Call sites changed
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js`
    - Line 12: `markShown(r.id)` called inside `addOrb` when each orb slot is created.
    - Line 74: `rightBubbles` calls `drawSlots(chosen, ps, { readerBounds: { maxW: 1786, maxH: 623 } })`.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/motion.js`
+2. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/motion.js`
    - Line 9: In `swapSlot`, replaced the negative timestamp hack with `S.forceId = r.id; renderNow(S.s, { keepAge: true });`.
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js`
+3. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js`
    - Line 5: Added `onLeave: null` to scene descriptor registration defaults in `registerScene`.
    - Line 12: `renderNow` invokes `sceneDescriptor(prev).onLeave?.(oldRoot)` before clearing the previous root.
    - Line 48: `requestScene` invokes `sceneDescriptor(prev).onLeave?.(old)` during still-mode instant scene replacement.
    - Line 75: `tickTransition` invokes `sceneDescriptor(transition.prev).onLeave?.(transition.old)` upon transition completion.
 
-4. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html`
+4. `$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html`
    - Line 9: Linked `<link rel="stylesheet" href="/color-polish/core/speech.css">`.
    - Line 69: Added `<script src="/color-polish/core/speech.js" defer></script>`.
 
-5. `/Users/anthony/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts`
+5. `$HOME/.claude/worktrees/mothers-love-tv-base/tests/color-polish-scenes/helpers.spec.ts`
    - Lines 36-40: Added test for `loadRenderer` asserting mode is normal.
    - Lines 42-75: Added test for `cardShape` asserting pass on valid card shapes and failure on invalid card shapes.
    - Lines 77-125: Added Task 1 no-overlap test asserting no two orb-slot rectangles intersect in scene 1 or scene 9 under a mostly-long fixture.

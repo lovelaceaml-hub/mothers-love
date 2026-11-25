@@ -4,7 +4,7 @@ title: neighbors
 state: merged
 model: Claude Opus 5.5 (writer, assigned by the coordinator's workflow)
 runner: coordinator workflow, background lane
-worktree: /Users/anthony/Projects/mothers-love-worktrees/world-kit-k4 (branch world-kit/k4, base 2ef8c41)
+worktree: $HOME/Projects/mothers-love-worktrees/world-kit-k4 (branch world-kit/k4, base 2ef8c41)
 review: visual director polish round applied (notes 1 to 6); coordinator review pending
 depends_on: LK0 (sockets, merged at 2ef8c41)
 updated: 2026-09-23T15:53Z
@@ -18,7 +18,7 @@ Plan 26 goal (quoted): "the design world (art=design) is dressed with the 3D Stu
 
 Finish line (Anthony, verbatim): "This is not for the TV View. It is for the 3d world". Only `/display/world-preview` changes; the TV View and anything it renders stay untouched.
 
-Scope received: design section 5 of `/Users/anthony/Projects/3d-studio/docs/design/WORLD-INTEGRATION.md` and coordinator ruling 2. Owned files: `src/components/display/world/kit/kit-neighbors.ts` (K0 stub, final signature), `src/components/display/world/neighbor-dialogue.ts` (add `neighborSchedule`, rewire `neighborDialogue`), the accessible sentence hunk in `src/components/display/world/WorldExperience.tsx`, `tests/world/neighbor-schedule.test.ts` (and the lane's own `tests/world/kit-neighbors.test.ts`). Rigged `neighbor.*` cast (13 clips each), active pair's speech cards only, every card printing "FICTIONAL NEIGHBORS", one clock driving clips, cards and the accessible text, a hero slot per actor (`neighbor-hero.<name>` with the same skeleton and clips, falling back to the toy), one AnimationMixer per actor updated only when visible, SkeletonUtils clone, tier cadence (design 5.3), skinned draws at Garden High at most 10. Sample data only, build lock around every build and harness run, port 32748, no push, merge or deploy.
+Scope received: design section 5 of `$HOME/Projects/3d-studio/docs/design/WORLD-INTEGRATION.md` and coordinator ruling 2. Owned files: `src/components/display/world/kit/kit-neighbors.ts` (K0 stub, final signature), `src/components/display/world/neighbor-dialogue.ts` (add `neighborSchedule`, rewire `neighborDialogue`), the accessible sentence hunk in `src/components/display/world/WorldExperience.tsx`, `tests/world/neighbor-schedule.test.ts` (and the lane's own `tests/world/kit-neighbors.test.ts`). Rigged `neighbor.*` cast (13 clips each), active pair's speech cards only, every card printing "FICTIONAL NEIGHBORS", one clock driving clips, cards and the accessible text, a hero slot per actor (`neighbor-hero.<name>` with the same skeleton and clips, falling back to the toy), one AnimationMixer per actor updated only when visible, SkeletonUtils clone, tier cadence (design 5.3), skinned draws at Garden High at most 10. Sample data only, build lock around every build and harness run, port 32748, no push, merge or deploy.
 
 ## Result
 

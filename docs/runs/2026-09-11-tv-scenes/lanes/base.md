@@ -4,7 +4,7 @@ title: Section 0, Foundation split, no visual change
 state: reviewed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: "sonnet-5 high on landing"
 depends_on: none
 updated: 2026-09-11T02:10Z

@@ -72,7 +72,7 @@
       "tag_sha": "e29955b8b34be3226297b274ba30c32ab4a34909",
       "ahead_of_production": 1,
       "behind_production": 12,
-      "worktree": "/Users/anthony/Projects/mothers-love-worktrees/heart-ribbons-3d",
+      "worktree": "$HOME/Projects/mothers-love-worktrees/heart-ribbons-3d",
       "notes": ""
     },
     {
@@ -202,7 +202,7 @@
       "tag_sha": "e5ffa3ac95b9d977eefead42a4adaee26f821a5f",
       "ahead_of_production": 37,
       "behind_production": 182,
-      "worktree": "/Users/anthony/Projects/mothers-love",
+      "worktree": "$HOME/Projects/mothers-love",
       "notes": ""
     },
     {
@@ -957,7 +957,7 @@
       "tag_sha": null,
       "ahead_of_production": 2,
       "behind_production": 0,
-      "worktree": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-design",
+      "worktree": "$HOME/Projects/mothers-love-worktrees/tv-pearl-design",
       "notes": "",
       "counts_measured_from": "local ref"
     },
@@ -971,7 +971,7 @@
       "tag_sha": null,
       "ahead_of_production": 19,
       "behind_production": 16,
-      "worktree": "/Users/anthony/Projects/mothers-love-worktrees/tv-pearl-sequence",
+      "worktree": "$HOME/Projects/mothers-love-worktrees/tv-pearl-sequence",
       "notes": "",
       "counts_measured_from": "local ref"
     },
@@ -1089,7 +1089,7 @@
       "tag_sha": null,
       "ahead_of_production": 5,
       "behind_production": 16,
-      "worktree": "/Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/mothers-love",
+      "worktree": "$HOME/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/mothers-love",
       "notes": "",
       "counts_measured_from": "local ref"
     },
@@ -1116,7 +1116,7 @@
       "tag_sha": null,
       "ahead_of_production": 25,
       "behind_production": 16,
-      "worktree": "/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation",
+      "worktree": "$HOME/Projects/mothers-love-worktrees/world-quality-continuation",
       "notes": "open PR #8 (draft) heads this branch into feature/tv-3d-world-prototype-01",
       "counts_measured_from": "local ref"
     },
@@ -1728,7 +1728,7 @@
       "tag_sha": "f94fe9453a1af88a44e23b155c6b236bc1023225",
       "ahead_of_production": 2,
       "behind_production": 16,
-      "worktree": "/Users/anthony/Projects/mothers-love-worktrees/tv17-base",
+      "worktree": "$HOME/Projects/mothers-love-worktrees/tv17-base",
       "notes": ""
     },
     {
@@ -1819,7 +1819,7 @@
       "tag_sha": "bb03f791528b845d147dfb4f2ffc7122e53c4bbc",
       "ahead_of_production": 4,
       "behind_production": 16,
-      "worktree": "/Users/anthony/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/world-bubbles",
+      "worktree": "$HOME/Documents/Codex/2026-09-20/branch-design-ribbon-examples-chatgpt-conversation/work/world-bubbles",
       "notes": "detached commit in the world-bubbles worktree, named by the lane order"
     }
   ]

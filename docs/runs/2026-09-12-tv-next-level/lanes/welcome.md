@@ -4,7 +4,7 @@ title: Welcome, six bubbles and speech from the people
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+worktree: $HOME/.claude/worktrees/mothers-love-tv-welcome
 review: sonnet-5 on landing
 depends_on: base
 updated: 2026-09-12T04:45Z
@@ -18,7 +18,7 @@ Section 1 implements the Welcome scene (renderer id 1) for Plan 15, ensuring six
 
 ### Functions added and changed call sites
 
-1. `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`
+1. `$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.js`
    - `welcomeBubbles` (lines 28-35): Migrated selection to `chooseRandom(chosen.map((a) => a.id))` and slot generation to `drawSlots(chosen, WELCOME_POSITIONS, { readerBounds: { maxW: 1804, maxH: 625 } })`. Deleted the `const long = chosen.find(...)` check and `readerSlot` call, guaranteeing six `.orb` slots every pass without reader collapse.
    - `mountWelcome` (lines 43-66): Applied follow-up 9 with negative ring animation delay `${(-i * 1.5).toFixed(1)}s`. Removed the `if (a.large)` stationary branch that assigned `retireAt = Infinity`, ensuring all six bubbles participate in depth layering and scene animation.
    - `primeWelcome` (lines 68-91): New descriptor hook called by `stage.js` after `mountSpeech`. Labels speech elements with `data-speaker` and offsets normal motion phases by 0s, 2.5s, and 5.0s (delaying speakers 1 and 2 via `fading_out` and `fadeAge = 0.5 - delay`), while keeping all anchors showing and unfaded under `S.still`.
@@ -27,7 +27,7 @@ Section 1 implements the Welcome scene (renderer id 1) for Plan 15, ensuring six
    - `leaveWelcome` (lines 254-256): New descriptor `onLeave` hook to clean up scene-specific state on scene exit.
    - `registerScene(1, ...)` (lines 258-274): Declared `prime: primeWelcome`, `onLeave: leaveWelcome`, and `speakers: [{ x: 509, y: 361 }, { x: 628, y: 422 }, { x: 702, y: 408 }]`.
 
-2. `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css`
+2. `$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css`
    - Added scoped rules for `#tv .scene[data-scene="1"] .speech-bubble` with font size 13.5px, line height 1.25, centered layout, and 16px border radius (lines 64-75).
    - Styled bounded boxes and tail alignments for the three speakers (lines 81-125):
      - Speaker 0 (Child on shoulders, anchor 509, 361): left 504px, top 236px, width 180px, height 86px, tail at left 8px (border width 8px).
@@ -35,7 +35,7 @@ Section 1 implements the Welcome scene (renderer id 1) for Plan 15, ensuring six
      - Speaker 2 (Man with yellow backpack, anchor 702, 408): left 704px, top 306px, width 160px, height 86px, tail at left 14px.
    - Added reduced motion transitions suppression for speech bubbles under `#tv.still` and `@media (prefers-reduced-motion: reduce)` (lines 55-62).
 
-3. `/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`
+3. `$HOME/.claude/worktrees/mothers-love-tv-welcome/tests/color-polish-scenes/welcome.spec.ts`
    - Tightened `at 2000 ms actors count is at least 5 unless in reader mode` to `at 2000 ms actors count is exactly 6` (lines 185-190).
    - Added `buildMostlyLongFixture()` with 4 of 6 records over 160 characters (lines 254-338).
    - Added test for six `.orb` elements at 0s, 6s, and 14s with mostly-long fixture and zero readerSlot collapse (lines 340-362).

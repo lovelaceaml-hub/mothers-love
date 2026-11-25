@@ -40,8 +40,8 @@ All app cases used the same Garden camera `41.000,11.000,40.000`, reported elaps
 - [Development and no-data raw report](BASELINE-DEV-HARNESS.json)
 - [Development and harness probe](baseline-probe.mjs)
 - [Verified recovery manifest](BASELINE-RECOVERY-MANIFEST.json)
-- [Cinematic app capture](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/cinematic.png>)
-- [Same-build classic capture](</Users/anthony/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/classic.png>)
+- [Cinematic app capture](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/cinematic.png>)
+- [Same-build classic capture](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-quality-baseline-9a6bbf8/optimized/classic.png>)
 
 Eleven output files were copied into the configured project Drive output folder and individually verified by SHA-256. Originals remain in `/private/tmp`. The local mounted copies are verified; remote Drive synchronization was not independently queried.
 

@@ -1,7 +1,7 @@
 # Work order - welcome correction r6: spin the ring's gradient, never its box - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-welcome-20260911-r6
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-welcome
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-welcome
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 1 (data-scene="1"). Round: r6.
 
 The coordinator measured the remaining overflow directly: the scene root's scrollHeight reads 643 (and earlier 645, 646, and 1833 wide) with no element's bounding box past the stage, and hiding individual bubbles removes it at different instants. The culprit is `.orb-slot::after`: it is a square box (inset -6 px) rotated by the welcomeRingSpin keyframes, and a rotated square's axis-aligned bounding box grows by up to 41 percent, so the ring's box sweeps past the stage edge as it turns even though the radial mask hides those pixels. The bubble clamp cannot help because the pseudo element rotates independently. Your previous edits are still uncommitted; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash.
@@ -13,6 +13,6 @@ The coordinator measured the remaining overflow directly: the scene root's scrol
 Append one line "Round r6: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/welcome.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
+$HOME/.claude/worktrees/mothers-love-tv-welcome/public/color-polish/scenes/welcome.css
+$HOME/.claude/worktrees/mothers-love-tv-welcome/docs/runs/2026-09-11-tv-scenes/lanes/welcome.md
 ```

@@ -1,7 +1,7 @@
 # Work order - Section 2: Recognition Garden petals on a breeze, passing light and depth (renderer id 2, slug garden) - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-garden-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-garden
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-garden
 Branch: tv/scene-garden (already checked out; you never run git commands that change state)
 Read first, in this order, all inside your worktree: docs/PLAN-13-tv-scene-refactor.md (the section named above and the Build log), docs/runs/2026-09-11-tv-scenes/gaps/garden.md (the gap report; its Decision is the spec), docs/runs/2026-09-11-tv-scenes/INDEX.md, public/color-polish/core/motion.js (all of it: mountFloaters, integrateFloaters, renderFloaters, replaceActor, installNext, burstAt, drawSceneFX, tickSlots), public/color-polish/scenes/garden.js, tests/color-polish-scenes/helpers.ts.
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only.
@@ -11,7 +11,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 ## Hard rules
 
 1. Create or edit only the files in your allowlist block. Everything else is protected: every other file under public/color-polish (core/*, renderer.css, renderer.html, other scenes), src/**, scripts/**, tests outside your own spec, and the shared helpers tests/color-polish-scenes/helpers.ts.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-garden.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-garden.
 3. Run no shell commands at all; the headless permission gate denies them. The coordinator runs typecheck, lint, test, build, your spec, and the probe after you finish.
 4. Do not edit anything under docs/runs/2026-09-11-tv-scenes/ except your own record file docs/runs/2026-09-11-tv-scenes/lanes/garden.md.
 5. Never write the em dash (U+2014) or en dash (U+2013) into any file.
@@ -71,8 +71,8 @@ Front matter (lane garden, title "Section 2, Recognition Garden petals on a bree
 End with `## COMPLETION`: files changed (absolute paths); anything not done and why; the question section only if hard rule 8 applied.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md
+$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.js
+$HOME/.claude/worktrees/mothers-love-tv-garden/public/color-polish/scenes/garden.css
+$HOME/.claude/worktrees/mothers-love-tv-garden/tests/color-polish-scenes/garden.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-garden/docs/runs/2026-09-11-tv-scenes/lanes/garden.md
 ```

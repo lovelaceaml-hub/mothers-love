@@ -3,7 +3,7 @@
 Reviewer: Claude Fable 5.1 (single review, reviewer corrects; ruling 2026-09-19 07:40Z).
 Plan goal line checked first: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV." This lane is Anthony's named change (watch feedback item 4) and does not conflict with it.
 
-Worktree /Users/anthony/.claude/worktrees/mothers-love-tv17-arrival, branch tv17/arrival.
+Worktree $HOME/.claude/worktrees/mothers-love-tv17-arrival, branch tv17/arrival.
 Reviewed commit 80673f0 (writer). Final commit a87fed1 (review fixes).
 
 ## Verdict
@@ -45,7 +45,7 @@ Passes after corrections. The writer's structure (backdrop on #tv, CSS gate, lif
 - No server was needed or started: these specs serve public/color-polish from disk through Playwright routing, so PLAYWRIGHT_BASE_URL pointed at an unused port (3211) only to skip the config's own web server. Nothing left listening.
 
 ## Captures
-/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L11/reviewed (24 PNGs): the writer's 16 moments again with the corrected look, plus 8 new: every frame style (Light beam, Petal curtain, Aurora, Constellation gather) for single and group at 1920, named w1920-<kind>-frame-<n>-<style>.png.
+$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L11/reviewed (24 PNGs): the writer's 16 moments again with the corrected look, plus 8 new: every frame style (Light beam, Petal curtain, Aurora, Constellation gather) for single and group at 1920, named w1920-<kind>-frame-<n>-<style>.png.
 
 ## For Anthony
 - Not deployed. Your own look on the church TV is still the real check.

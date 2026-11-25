@@ -1,9 +1,9 @@
 Arrival spec timing and discriminating depth checks are updated and recorded.
 
-Virtual time steps in [arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) now account for the 650 ms queue gap before sampling mid-entrance and resolved flat states. Direct frame evaluations of `singleTrajectory` and `groupTrajectory` replace the DOM-based depth assertions, verifying depth separation and settled flat geometry without shell commands or live DOM clamping artifacts. The execution record in [arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md) has been updated with the Round 3 note.
+Virtual time steps in [arrival.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) now account for the 650 ms queue gap before sampling mid-entrance and resolved flat states. Direct frame evaluations of `singleTrajectory` and `groupTrajectory` replace the DOM-based depth assertions, verifying depth separation and settled flat geometry without shell commands or live DOM clamping artifacts. The execution record in [arrival.md](file://$HOME/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md) has been updated with the Round 3 note.
 
 ### What works now
-1. [arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) steps 650 ms first after each wave push, then evaluates the resolved state at entrance completion plus 100 ms (4350 ms total for singles, 5450 ms total for groups) where `.event-orb` elements resolve to z 0 within 2, scale 1 within 0.02, and opacity 1.
+1. [arrival.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts) steps 650 ms first after each wave push, then evaluates the resolved state at entrance completion plus 100 ms (4350 ms total for singles, 5450 ms total for groups) where `.event-orb` elements resolve to z 0 within 2, scale 1 within 0.02, and opacity 1.
 2. Direct trajectory evaluations verify that `singleTrajectory(2, .15).z` and `singleTrajectory(5, .15).z` both start below minus 450, group style 0 constellation rank 9 starts at least 400 deeper than rank 0, and group style 4 ripple of kindness differentiates sources by at least 100 in z.
 3. Settled trajectory checks confirm that styles 2, 5, group 0, and group 4 all return z 0 within 0.5 and scale factor k 1 within 0.01 at progress 1.
 4. Circularity and screenshot tests sample at the true mid-entrance point (650 ms plus 1800 ms for singles, 650 ms plus 2350 ms for groups).
@@ -16,5 +16,5 @@ Review the modified test spec or run the coordinator verification suite when rea
 
 ## COMPLETION
 Files changed:
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts)
-- [/Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md](file:///Users/anthony/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md)
+- [$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts](file://$HOME/.claude/worktrees/mothers-love-tv-arrival/tests/color-polish-scenes/arrival.spec.ts)
+- [$HOME/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md](file://$HOME/.claude/worktrees/mothers-love-tv-arrival/docs/runs/2026-09-11-tv-scenes/lanes/arrival.md)

@@ -1,7 +1,7 @@
 # Work order - orbit correction r3: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-orbit-20260911-r3
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-orbit
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-orbit
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 10 (data-scene="10"). Round: r3.
 
 The Sonnet 5 landing review of your previous round (r2) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -14,7 +14,7 @@ The Sonnet 5 landing review of your previous round (r2) found the items below. Y
 Append one line "Round r3: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/orbit.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
+$HOME/.claude/worktrees/mothers-love-tv-orbit/public/color-polish/scenes/orbit.js
+$HOME/.claude/worktrees/mothers-love-tv-orbit/tests/color-polish-scenes/orbit.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-orbit/docs/runs/2026-09-11-tv-scenes/lanes/orbit.md
 ```

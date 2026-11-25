@@ -1,6 +1,6 @@
 # Direct TV link run
 
-Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-05-direct-tv.md.
+Read first: $HOME/Projects/mothers-love/docs/PLAN-05-direct-tv.md.
 
 Baseline: e15cb1ecf2d6f2141c0a604f66bc1aa5b418c8e2, clean. Runner: root coordinator, isolated worktrees, sequential integration. Non-sensitive source and synthetic evidence only, existing private Git and Drive destinations.
 

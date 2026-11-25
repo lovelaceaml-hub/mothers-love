@@ -54,7 +54,7 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 - All six branches have `archive/<branch>` tags on GitHub at their last commits. Removing the five branch names and closing #41 were refused to the agent by the app's safety check, so they wait for Anthony:
 
   ```bash
-  git -C /Users/anthony/Projects/mothers-love push origin --delete feat/world-surface fix/infra-cpu-polling fix/infra-etag-compatibility-diagnostics fix/world-arrival-batch lovelaceaml-hub-performance-improvements
+  git -C $HOME/Projects/mothers-love push origin --delete feat/world-surface fix/infra-cpu-polling fix/infra-etag-compatibility-diagnostics fix/world-arrival-batch lovelaceaml-hub-performance-improvements
   ```
 
   ```bash
@@ -79,7 +79,7 @@ Branch `feat/app-november-followups`, pull request [#56](https://github.com/love
 - "Parked in the cloud checks only" means `parkedInCloud(...)` from `tests/cloud-parked.ts`: the journey is skipped when the checks run in GitHub Actions and still runs on a developer's machine. Each call says what the cloud run showed. The five with no cause found are the ones to look at first, because two of them cover the TV's fallback and refresh.
 - So a complete cloud run should now pass, and a new failure will stand out. That has not been proven with a third complete run (it needs Anthony's approval).
 
-### Section G: the church backup's cloud copy (in `/Users/anthony/Projects/church-data-backup`)
+### Section G: the church backup's cloud copy (in `$HOME/Projects/church-data-backup`)
 
 - Found: the cloud job's last run (a dry run on 2026-11-04) read everything except the main database, where it stopped with "4 custom role(s) present; pg_dump cannot capture roles". It also has no Google Drive sign-in yet.
 - Fixed in code (church-data-backup pull request 8): each custom role is recorded in the backup's manifest as the statements that recreate it, never a password, and the restore rehearsal recreates the roles before loading the dumps. 39 focused tests pass.

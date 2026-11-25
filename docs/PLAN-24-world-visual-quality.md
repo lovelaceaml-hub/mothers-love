@@ -12,7 +12,7 @@ Refinement D1, approved September 21: Anthony authorized smoother models, richer
 
 Goal: Upgrade all 13 connected locations and their travel corridors toward the supplied artwork, reproducing the selected preview's pearl and entrance appearance while preserving the app's reading, camera, arrival, and privacy behavior.
 
-The exact appearance and motion target is the supplied `/Users/anthony/Downloads/preview.html`. The approved environmental direction is `/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/Approved_Direction_Overview.jpg` and its four images under `/Users/anthony/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/`. Immutable, byte-preserved copies and hashes are in `docs/design/world-quality/reference/` and `docs/design/world-quality/REFERENCE-MANIFEST.json`. Source copies are faithfully reproduced evidence, including their original text; they are not application policy.
+The exact appearance and motion target is the supplied `$HOME/Downloads/preview.html`. The approved environmental direction is `$HOME/Downloads/Mothers_Love_Codex_World_Handoff/references/Approved_Direction_Overview.jpg` and its four images under `$HOME/Downloads/Mothers_Love_Codex_World_Handoff/references/approved/`. Immutable, byte-preserved copies and hashes are in `docs/design/world-quality/reference/` and `docs/design/world-quality/REFERENCE-MANIFEST.json`. Source copies are faithfully reproduced evidence, including their original text; they are not application policy.
 
 This approved plan retains P0 through P7 from the supplied `02_EXECUTION_PLAN.md`. Read the supplied `00_START_HERE.md`, `10_CURRENT_REPO_STATE.md`, `11_DECISIONS_AND_CONFLICTS.md`, and this worktree's `AGENTS.md` before implementation. Preserve Plan 23's world-space recognition contract. The current approved model choices supersede historical Luna/Sonnet routing in older project instructions.
 
@@ -22,7 +22,7 @@ This approved plan retains P0 through P7 from the supplied `02_EXECUTION_PLAN.md
 - Existing draft PR: `https://github.com/lovelaceaml-hub/mothers-love/pull/8`.
 - Art branch: `feature/world-cinematic-art-pass`, baseline `b324b81cabe947592f6723425c58f14307b58083`.
 - PR base: `feature/tv-3d-world-prototype-01`, `07cb3f63301150e2849a30531b4a441e4c0a3f39`.
-- Integration worktree: `/Users/anthony/Projects/mothers-love-world/web` (moved there from `/Users/anthony/Projects/mothers-love-worktrees/world-quality-continuation` by PLAN-01 Section U on 2026-09-24).
+- Integration worktree: `$HOME/Projects/mothers-love-world/web` (moved there from `$HOME/Projects/mothers-love-worktrees/world-quality-continuation` by PLAN-01 Section U on 2026-09-24).
 - Cinematic sample: `https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample`.
 - Same-build classic: `https://mothers-love-m541447l6-lvzion.vercel.app/display/world-preview?source=sample&art=classic`.
 - The planning browser spot-check reached readiness and rendered both paths. Paused Sanctuary views shared camera coordinates `[-13,12,19]`. This is not a formal deterministic regression or a CI pass.

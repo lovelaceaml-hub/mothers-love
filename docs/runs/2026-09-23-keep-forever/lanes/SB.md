@@ -4,7 +4,7 @@ title: never expire, safely (database plus server)
 state: reviewed
 model: Claude Opus 5.5 coordinator; writer gpt-6-sol (attempt 3)
 runner: coordinator
-worktree: /Users/anthony/Projects/mothers-love-worktrees/never-expire (branch change/never-expire, base ffce531)
+worktree: $HOME/Projects/mothers-love-worktrees/never-expire (branch change/never-expire, base ffce531)
 review: Claude two rounds (round 1 coordinator, round 2 fresh Opus reviewer)
 depends_on: SA
 updated: 2026-09-24
@@ -24,7 +24,7 @@ At kickoff the live site was down: /api/feed and /api/display/snapshot returned 
 | 2 | gpt-5.6-terra xhigh | Stopped before finishing when Anthony asked to move Codex work to GPT-6. |
 | 3 | gpt-6-sol xhigh | Canary ok, allowlist ok, HEAD unchanged. Design matches the work order. |
 
-Ledger rows: section `2026-09-23-keep-forever/SB`, attempts 1 to 3 in /Users/anthony/Projects/docs/orchestrator-ledger.csv.
+Ledger rows: section `2026-09-23-keep-forever/SB`, attempts 1 to 3 in $HOME/Projects/docs/orchestrator-ledger.csv.
 
 ## What changed
 

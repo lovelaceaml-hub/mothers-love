@@ -15,7 +15,7 @@ The first launch of Lane 0 and Section A, fired in the same minute, both died wi
 
 ## Failure 2: the headless permission gate
 
-Both lanes then hit `jetski: no output produced, a tool required the "command" permission that headless mode cannot prompt for, so it was auto-denied`. The gate at /Users/anthony/.gemini/antigravity-cli/settings.json allows exactly these commands: ls, cat, pwd, find, grep, node, npm, git status, git diff, bash, python3, psql. Anything else ends the run with no printed output, even when file edits already succeeded.
+Both lanes then hit `jetski: no output produced, a tool required the "command" permission that headless mode cannot prompt for, so it was auto-denied`. The gate at $HOME/.gemini/antigravity-cli/settings.json allows exactly these commands: ls, cat, pwd, find, grep, node, npm, git status, git diff, bash, python3, psql. Anything else ends the run with no printed output, even when file edits already succeeded.
 
 The gate was **not** widened. Two order changes handled it instead:
 

@@ -1,7 +1,7 @@
 # L10 review: Peace in Practice, one reserved long bubble and a true 3D heart
 
 Reviewer: Claude Fable 5.1 (single review, corrections made by the reviewer, no second round).
-Worktree `/Users/anthony/.claude/worktrees/mothers-love-tv17-pip`, branch `tv17/pip`.
+Worktree `$HOME/.claude/worktrees/mothers-love-tv17-pip`, branch `tv17/pip`.
 Reviewed commit dc3f2cf (on tv17/pick 3d4b459). Corrections commit: fbe3c90.
 
 Plan goal line checked against: "every word on the approved Plan 15 TV scenes fits inside its bubble, box or panel on the church TV, Peacemakers and Peace in Practice show exactly what the live TV shows today, and the result goes live only after Anthony approves it on the TV."
@@ -67,8 +67,8 @@ With real animation frames (240 frames, drop shadow on): draw median 2.1 ms, max
 - Mutation checks, each failed as intended and was reverted (source compared byte for byte afterwards): thickness 0.66 (the egg) and 0.03 (flat) fail the proportions case; a 24 x 24 light table (banding) fails the smoothness case; no time left rule fails the live playlist case; no rise from below and no artwork keep-out each fail the 60 second case; no regular turn fails the refresh case; a size jump fails the easing case.
 
 Captures:
-- Heart frames at 0, 45, 90, 135, 180 degrees, both widths: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart-reviewed/w{1920,3840}-heart-{0,45,90,135,180}deg.png`. I looked at all of them and at enlarged crops of the outline and the cleft: smooth, no band, streak or seam; the outline is clean at both widths.
-- Scene captures: `/Users/anthony/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/reviewed/w{1920,3840}-ms{0,6000,14000,21000}/peace-in-practice.png`.
+- Heart frames at 0, 45, 90, 135, 180 degrees, both widths: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/heart-reviewed/w{1920,3840}-heart-{0,45,90,135,180}deg.png`. I looked at all of them and at enlarged crops of the outline and the cleft: smooth, no band, streak or seam; the outline is clean at both widths.
+- Scene captures: `$HOME/Projects/mothers-love/docs/runs/2026-09-18-tv-fit/logs/captures/L10/reviewed/w{1920,3840}-ms{0,6000,14000,21000}/peace-in-practice.png`.
 
 Measured in a 60 second simulation on the playlist dwell: all short pool, the reserved bubble showed three messages (turns at 18.6 and 37.2 seconds). Mixed pool, a 250 grapheme message first (504 px), a 320 grapheme message took over at 19.3 seconds (552 px, 22.9 seconds of reading), then at 43.5 seconds a regular message took the turn because the 500 grapheme one (35.7 seconds) no longer fit the time left; it gets the first turn at the next showing.
 

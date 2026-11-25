@@ -41,7 +41,7 @@ Defect, Milestone scene: the weekly goal range renders "INVALID DATE NaN-NaN" an
 ## Hygiene sweep findings (Haiku 4.5, read-only)
 
 1. README.md line 5 says current work is Plan 09; Plan 10 is current.
-2. /Users/anthony/Projects/README.md still points the project at Plan 09.
+2. $HOME/Projects/README.md still points the project at Plan 09.
 3. PLAN-10 Build log entries have words run together (lines 35, 37, 39, 43).
 4. docs/runs/2026-09-10-color-polish/INDEX.md line 22 says the production migration is not applied while HANDOFF.md says the database support is deployed.
 No dead links, no missing referenced files, no em or en dashes in changed source.

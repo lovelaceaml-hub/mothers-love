@@ -1,4 +1,4 @@
-The dev badge hiding script in [scripts/video/capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs) has been updated to repeatedly hide `nextjs-portal` via an interval across React hydration.
+The dev badge hiding script in [scripts/video/capture.mjs](file://$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs) has been updated to repeatedly hide `nextjs-portal` via an interval across React hydration.
 
 React hydration previously tore down the injected `<style>` tag. The periodic query now ensures the inline style `display: none !important` remains enforced on `nextjs-portal`.
 
@@ -22,7 +22,7 @@ React hydration previously tore down the injected `<style>` tag. The periodic qu
 
 ## COMPLETION
 
-Changed file: [/Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs](file:///Users/anthony/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs)
+Changed file: [$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs](file://$HOME/.claude/worktrees/mothers-love-video-audio/scripts/video/capture.mjs)
 
 ### What Anthony must do
 Nothing, you're clear. Hand control back to the coordinator to run the capture script.

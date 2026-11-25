@@ -37,8 +37,8 @@ Running 15 tests using 5 workers
       297 |   const frame = page.frames().find((f) => f.url().endsWith('/color-polish/renderer.html'));
       298 |   if (!frame) throw new Error('color-polish renderer frame not found on /admin/display');
       299 |
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:296:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.spec.ts:11:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:296:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-helper-810b6-e-Studio-and-it-is-circular-chromium/error-context.md
 
@@ -64,10 +64,10 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.spec.ts:25:28
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.spec.ts:25:28
 
     Error Context: test-results/color-polish-scenes-helper-ea6fe-ers-the-welcome-scene-still-chromium/error-context.md
 
@@ -93,9 +93,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:11:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:11:21
 
     Error Context: test-results/color-polish-scenes-peace--c6102-les-and-no-overflow-at-14-s-chromium/error-context.md
 
@@ -121,9 +121,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:47:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:47:21
 
     Error Context: test-results/color-polish-scenes-peace--eda77--signs-and-glow-within-60-s-chromium/error-context.md
 
@@ -149,9 +149,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:130:21
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:130:21
 
     Error Context: test-results/color-polish-scenes-peace--3e329-bbles-span-two-depth-layers-chromium/error-context.md
 
@@ -179,8 +179,8 @@ Running 15 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:167:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:167:21
 
     Error Context: test-results/color-polish-scenes-peace--11f44-lar-through-swell-and-burst-chromium/error-context.md
 
@@ -206,9 +206,9 @@ Running 15 tests using 5 workers
       129 | }
       130 |
       131 | /**
-        at signInAs (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:194:32
+        at signInAs ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:128:22)
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:287:3)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:194:32
 
     Error Context: test-results/color-polish-scenes-peace--40f71-canvas-that-turns-over-time-chromium/error-context.md
 
@@ -236,8 +236,8 @@ Running 15 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:227:21
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:227:21
 
   9) [chromium] › tests/color-polish-scenes/peace-in-practice.spec.ts:271:5 › reduced motion renders the scene still 
 
@@ -263,9 +263,9 @@ Running 15 tests using 5 workers
       290 |
       291 |   // The select option values match the scene slugs. Arrival has no dropdown option, so select welcome instead.
       292 |   const selector = page.getByLabel('Color Polish preview scene');
-        at openStudioScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
-        at reducedMotionScene (/Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:452:21)
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:272:28
+        at openStudioScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:289:57)
+        at reducedMotionScene ($HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/helpers.ts:452:21)
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-scenes/peace-in-practice.spec.ts:272:28
 
   10) [chromium] › tests/color-polish-usable/usable.spec.ts:212:5 › usable Color Polish TV and Studio 
 
@@ -289,7 +289,7 @@ Running 15 tests using 5 workers
       220 |   quiet = true;
       221 |   await expect(page.locator('[data-display-phase="quiet"]')).toBeVisible({timeout:12000});
       222 |   await expect(page.locator('iframe')).toHaveCount(0);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:219:83
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:219:83
 
     Error Context: test-results/color-polish-usable-usable-usable-Color-Polish-TV-and-Studio-chromium/error-context.md
 
@@ -309,7 +309,7 @@ Running 15 tests using 5 workers
       274 |   await page.waitForTimeout(300);
       275 |
       276 |   const studioSceneAfter = await studioFrame.evaluate(() => (window as any).colorPolishRuntime.getState().scene);
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:273:61
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:273:61
 
     Error Context: test-results/color-polish-usable-usable-c0938--advances-to-the-next-scene-chromium/error-context.md
 
@@ -334,7 +334,7 @@ Running 15 tests using 5 workers
       425 |   await expect(page.locator('[data-testid="color-polish-safe-state"]')).toHaveCount(0);
       426 |   await expect(page.getByText('temporarily unavailable')).toHaveCount(0);
       427 | });
-        at /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:424:104
+        at $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice/tests/color-polish-usable/usable.spec.ts:424:104
 
     Error Context: test-results/color-polish-usable-usable-da596-wn-for-more-than-60-seconds-chromium/error-context.md
 

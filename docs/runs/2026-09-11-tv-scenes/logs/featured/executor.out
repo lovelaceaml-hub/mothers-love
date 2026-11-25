@@ -4,10 +4,10 @@ The featured scene now implements the three-tier floater depth model (far, mid, 
 
 ### Changes implemented
 
-1. [`featured.js`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js): Added depth configuration (`far`, `mid`, `near`), `mount` layer seeding, `integrate` forward drift trigger after 12 seconds, `place` smoothed interpolation and slot synchronization, and dataset depth updates.
-2. [`featured.css`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css): Preserved the scoped header comment with no additional CSS required.
-3. [`featured.spec.ts`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts): Implemented five behavioral Playwright tests covering circularity, absence of overflow, click advance prevention, single-bubble replacement cadence, depth layers, exit circularity, and still mode.
-4. [`featured.md`](file:///Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md): Recorded lane execution, closed gap report items, and logged the deferred reader orb reset.
+1. [`featured.js`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js): Added depth configuration (`far`, `mid`, `near`), `mount` layer seeding, `integrate` forward drift trigger after 12 seconds, `place` smoothed interpolation and slot synchronization, and dataset depth updates.
+2. [`featured.css`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css): Preserved the scoped header comment with no additional CSS required.
+3. [`featured.spec.ts`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts): Implemented five behavioral Playwright tests covering circularity, absence of overflow, click advance prevention, single-bubble replacement cadence, depth layers, exit circularity, and still mode.
+4. [`featured.md`](file://$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md): Recorded lane execution, closed gap report items, and logged the deferred reader orb reset.
 
 ### What Anthony must do
 
@@ -16,10 +16,10 @@ Nothing, you're clear.
 ## COMPLETION
 
 Files changed:
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
-- `/Users/anthony/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.js`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/public/color-polish/scenes/featured.css`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/tests/color-polish-scenes/featured.spec.ts`
+- `$HOME/.claude/worktrees/mothers-love-tv-featured/docs/runs/2026-09-11-tv-scenes/lanes/featured.md`
 
 Anything not done:
 - Long-message reader orb whole-scene reset deferred to a future shared `tv/base` lane as specified in the work order and gap report.

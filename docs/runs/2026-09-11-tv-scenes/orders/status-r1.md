@@ -1,13 +1,13 @@
 # Work order - Section 7 correction round 1: stronger spec - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-status-20260911-r1
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-status
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-status
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none.
 
 The Sonnet review found the scene code correct and every motion inside the envelope, but two of your tests do not prove what they claim. Fix the tests only.
 
 ## Hard rules
-1. Edit only tests/color-polish-scenes/status.spec.ts and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside /Users/anthony/.claude/worktrees/mothers-love-tv-status. Do not edit helpers.ts (shared, protected) or the scene files.
+1. Edit only tests/color-polish-scenes/status.spec.ts and your record file. Run no shell commands. Never write the em dash or en dash. Read and write only inside $HOME/.claude/worktrees/mothers-love-tv-status. Do not edit helpers.ts (shared, protected) or the scene files.
 
 ## Finding 1: circularity never measures this scene's medallions
 The shared `circularity(frame)` helper selects `.orb-slot, .orb, .event-orb`; the status scene has none, so it returns count 0 and failures empty by vacuity. In the first test, keep the helper call but add a scene-specific check evaluated in the frame: every `.scene[data-scene="6"] .medallion` (there are nine in `.stat-expression` plus any in the top panel) has a bounding rect whose width equals its height within 1 px and a computed `border-radius` of 50 percent (or a pixel value equal to half the width within 1 px); assert the count is at least 9 and failures are empty. Check it at 6000 ms as well, mid-motion, since the transform rotates and scales the icon image inside the medallion.
@@ -25,6 +25,6 @@ Append one line to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lan
 End with `## COMPLETION` naming the two files changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
+$HOME/.claude/worktrees/mothers-love-tv-status/tests/color-polish-scenes/status.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-status/docs/runs/2026-09-11-tv-scenes/lanes/status.md
 ```

@@ -1,7 +1,7 @@
 # Work order - Section 7: Peace in Practice, the red heart and heart cards (renderer id 9) - Mother's Love TV (Plan 15)
 
 Dispatch ID: agy-peace-in-practice-20260912
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 Branch: tv15/scene-peace-in-practice at 3e89529 (already checked out; never run a git command that changes state)
 Plan: docs/PLAN-15-tv-next-level.md, Section 7, plus the Decisions section (decisions 2 and 7 bind you) and the cross-cutting rules.
 **Your gap report is binding and overrides the plan where they differ: docs/runs/2026-09-12-tv-next-level/gaps/peace-in-practice.md. Read all of it (G1 through G10) before writing anything. It settles the card lifecycle, the three exact slot boxes, the reading time, the text rect inside the heart silhouette, the 160 cap, the red palette without editing protected code, the mesh resolution, the hue sampling method, and reduced motion.**
@@ -85,7 +85,7 @@ title: Peace in Practice, the red heart and heart cards
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-peace-in-practice
+worktree: $HOME/.claude/worktrees/mothers-love-tv-peace-in-practice
 review: sonnet-5 on landing
 depends_on: base
 updated: <UTC stamp, format 2026-09-12T01:59Z>

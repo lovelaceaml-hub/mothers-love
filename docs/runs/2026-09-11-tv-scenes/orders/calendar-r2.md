@@ -1,7 +1,7 @@
 # Work order - calendar correction r2: a living calendar - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-calendar-20260911-r2
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-calendar
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-calendar
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 5 (data-scene="5"). Round: r2.
 
 Anthony reviewed the scene on his TV and asked: "On the Recognition Calendar, there needs to be some sort of animation, which I'll let you freely come up with." The coordinator chose the design below. Today the scene is static apart from a one-shot entry pulse on past days at mount.
@@ -33,8 +33,8 @@ Read first, inside your worktree: public/color-polish/scenes/calendar.js and cal
 - Existing: corner date and centred count, no overflow at 1920 and 3840, Studio day click selects a day and the scene still does not advance, entry pulse settle assertion, reduced motion still with computed `animation-name` of `none` on `.day.past`.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
+$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js
+$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
+$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
 ```

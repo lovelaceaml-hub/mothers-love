@@ -6,10 +6,10 @@ Implemented a cached TV-only PostgreSQL client and an approximately 8 second who
 
 ## Changed files
 
-- `/Users/anthony/Projects/mothers-love-worktrees/garden-read-recovery/src/lib/server/public-display-client.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/garden-read-recovery/src/lib/server/public-display.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/garden-read-recovery/tests/backend/public-display.test.ts`
-- `/Users/anthony/Projects/mothers-love-worktrees/garden-read-recovery/tests/backend/public-display-recovery.test.ts`
+- `$HOME/Projects/mothers-love-worktrees/garden-read-recovery/src/lib/server/public-display-client.ts`
+- `$HOME/Projects/mothers-love-worktrees/garden-read-recovery/src/lib/server/public-display.ts`
+- `$HOME/Projects/mothers-love-worktrees/garden-read-recovery/tests/backend/public-display.test.ts`
+- `$HOME/Projects/mothers-love-worktrees/garden-read-recovery/tests/backend/public-display-recovery.test.ts`
 
 ## Verification
 

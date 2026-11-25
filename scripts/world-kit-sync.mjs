@@ -22,6 +22,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 // The schema and budgets are the world's own `kit-manifest.ts`, loaded through Node's type
@@ -46,7 +47,7 @@ const option = (name, fallback) => {
   return at >= 0 && args[at + 1] ? args[at + 1] : fallback;
 };
 const checkOnly = args.includes("--check");
-const studio = path.resolve(option("--studio", process.env.WORLD_KIT_STUDIO || "/Users/anthony/Projects/mothers-love-world/studio"));
+const studio = path.resolve(option("--studio", process.env.WORLD_KIT_STUDIO || path.join(homedir(), "Projects", "mothers-love-world", "studio")));
 const out = path.resolve(option("--out", path.join(repo, "public", "world-kit")));
 const threeDir = path.resolve(option("--three", path.join(repo, "node_modules", "three")));
 const versionDir = path.join(out, KIT_VERSION);

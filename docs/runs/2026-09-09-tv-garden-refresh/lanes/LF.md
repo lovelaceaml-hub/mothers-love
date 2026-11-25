@@ -4,7 +4,7 @@ title: Foundation and safe skeleton
 state: integrated
 model: gpt-5.6-luna xhigh
 runner: Sol-dispatched Luna lane, Terra coordinated
-worktree: /Users/anthony/Projects/mothers-love-worktrees/tv-garden-foundation
+worktree: $HOME/Projects/mothers-love-worktrees/tv-garden-foundation
 review: Sol passed after typecheck and 33 focused tests
 depends_on: none
 updated: 2026-09-09T07:52Z

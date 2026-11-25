@@ -3,7 +3,7 @@
 ## Scope
 
 Owner: Luna xhigh
-Worktree: `/Users/anthony/Projects/mothers-love-worktrees/flexible-names-ui`
+Worktree: `$HOME/Projects/mothers-love-worktrees/flexible-names-ui`
 Baseline: `a6c5c337c44b1d4bdbd62bb2f99f8a772879bfd2`
 
 Updated the public submission form and privacy copy so submitted and recipient names accept any trimmed nonblank value up to 80 graphemes. Removed the first-name and last-initial helper import, export, validation, copy and placeholders. Preserved message and expression validation, moderation receipts, payload trimming, no truncation, and the existing visual structure. Updated the admin search placeholder to `Search by name`.

@@ -1,10 +1,10 @@
 # Work order - Section 0: Foundation split, no visual change - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-base-20260911
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-base
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-base
 Branch: tv/base (already checked out; you never run git commands that change state)
-Plan: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/PLAN-13-tv-scene-refactor.md (Section 0; read it first, including the Build log)
-Run record: /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/INDEX.md
+Plan: $HOME/.claude/worktrees/mothers-love-tv-base/docs/PLAN-13-tv-scene-refactor.md (Section 0; read it first, including the Build log)
+Run record: $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/INDEX.md
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Review after landing: Claude Sonnet 5 (high), read-only, on your diff.
 
 You run as the lane's declared writer. Nobody answers questions mid-run; read this whole order before editing.
@@ -12,7 +12,7 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 ## Hard rules
 
 1. Create or edit only the files in your allowlist block. Everything else is protected. In particular: nothing under src/, tests/, scripts/, database/, and not src/lib/color-polish/contracts.ts or src/components/display/color-polish/sample-fixture.ts.
-2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Never touch anything outside /Users/anthony/.claude/worktrees/mothers-love-tv-base. Read files only inside that worktree; every path you need is there.
+2. Never run git commit, push, merge, checkout, stash, reset, worktree, or any deploy or restart command. Never touch anything outside $HOME/.claude/worktrees/mothers-love-tv-base. Read files only inside that worktree; every path you need is there.
 3. Do not edit anything under docs/runs/2026-09-11-tv-scenes/ except your own record file docs/runs/2026-09-11-tv-scenes/lanes/base.md.
 4. Never write the em dash (U+2014) or en dash (U+2013) into any file. Use a comma, colon, or parentheses.
 5. Behavior must be byte-for-byte identical on screen after the split. This section adds no feature and changes no visual. Do not "improve" anything you move.
@@ -22,9 +22,9 @@ You run as the lane's declared writer. Nobody answers questions mid-run; read th
 
 ## What exists today
 
-- /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.js: 941 lines, one classic script, 'use strict' on line 3, loaded by renderer.html with `<script src="/color-polish/renderer.js" defer>` under a CSP of `script-src 'self'` (no inline scripts, no inline handlers).
-- /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.css: 250 lines, shared base plus scene rules already scoped with `.scene[data-scene='N']`.
-- /Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html: 56 lines, the only place scripts are listed.
+- $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.js: 941 lines, one classic script, 'use strict' on line 3, loaded by renderer.html with `<script src="/color-polish/renderer.js" defer>` under a CSP of `script-src 'self'` (no inline scripts, no inline handlers).
+- $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.css: 250 lines, shared base plus scene rules already scoped with `.scene[data-scene='N']`.
+- $HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html: 56 lines, the only place scripts are listed.
 - The host (src/components/display/color-polish-host/ColorPolishHost.tsx) loads renderer.html in a sandboxed iframe and talks to it over a MessageChannel. It reads window.colorPolishRuntime. Both are protected; their contract must not change.
 - The probe (scripts/color-polish-renderer-probe.mjs, protected) serves every file under public/color-polish/ by path, so any new file you add under public/color-polish/ is served automatically. It calls window.colorPolishRuntime.getState(), step(ms), setScene(id), clear() and expects the same shapes as today.
 
@@ -170,7 +170,7 @@ renderer.css is not edited. The eleven scenes/<slug>.css files hold only their h
 
 ## Verification you may run (skip any the gate denies, and say so)
 
-From /Users/anthony/.claude/worktrees/mothers-love-tv-base:
+From $HOME/.claude/worktrees/mothers-love-tv-base:
 
 ```
 node --check public/color-polish/core/state.js   (repeat for every new .js file)
@@ -183,7 +183,7 @@ Do not run npm scripts, the probe, or Playwright. The coordinator runs typecheck
 
 ## Record file
 
-Write /Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md with this front matter and sections:
+Write $HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md with this front matter and sections:
 
 ```
 ---
@@ -192,7 +192,7 @@ title: Section 0, Foundation split, no visual change
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-base
+worktree: $HOME/.claude/worktrees/mothers-love-tv-base
 review: sonnet-5 high on landing
 depends_on: none
 updated: <UTC timestamp>
@@ -212,37 +212,37 @@ What you did, what you could not run.
 End with `## COMPLETION`: files changed (absolute paths, including deleted renderer.js); exact verification commands and their full output; anything not run and why; limitations or deviations; a `QUESTION FOR ANTHONY` section only if hard rule 6 applied.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/state.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/motion.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/chrome.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/arrivals.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/renderer.html
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/boot.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/state.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/orbs.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/motion.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/chrome.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/arrivals.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/stage.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/core/host.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.js
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/welcome.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/garden.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/arrival.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/featured.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/calendar.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peacemakers.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/status.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/expressions.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/peace-in-practice.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/orbit.css
+$HOME/.claude/worktrees/mothers-love-tv-base/public/color-polish/scenes/milestone.css
+$HOME/.claude/worktrees/mothers-love-tv-base/docs/runs/2026-09-11-tv-scenes/lanes/base.md
 ```

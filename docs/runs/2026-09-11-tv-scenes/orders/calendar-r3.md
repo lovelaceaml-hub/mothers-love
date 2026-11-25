@@ -1,7 +1,7 @@
 # Work order - calendar correction r3: landing review corrections - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-calendar-20260911-r3
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-calendar
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-calendar
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 5 (data-scene="5"). Round: r3.
 
 The Sonnet 5 landing review of your previous round (r2) found the items below. Your previous edits are still uncommitted in the worktree; build on them. Edit only the files in the allowlist. Run no shell commands. Never write the em dash or the en dash. Keep every rule of the previous order (scene prefix on top-level const and let, scoped CSS, circular bubbles, still mode, shipped colors only).
@@ -18,8 +18,8 @@ The Sonnet 5 landing review of your previous round (r2) found the items below. Y
 Append one line "Round r3: <what changed>" to the "## Result" section of docs/runs/2026-09-11-tv-scenes/lanes/calendar.md. End with `## COMPLETION` listing every file changed.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
+$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.js
+$HOME/.claude/worktrees/mothers-love-tv-calendar/public/color-polish/scenes/calendar.css
+$HOME/.claude/worktrees/mothers-love-tv-calendar/tests/color-polish-scenes/calendar.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-calendar/docs/runs/2026-09-11-tv-scenes/lanes/calendar.md
 ```

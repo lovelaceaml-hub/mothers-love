@@ -4,7 +4,7 @@ Status: READY for the bounded software audit. No material software blocker was f
 
 ## Scope and constraints
 
-Read-only audit of the current release worktree at `/Users/anthony/Projects/mothers-love-worktrees/ready-admin` after reading the absolute plan, run index, contract, project instructions and relevant source handoff. Reviewed email/password login, invitation and recovery setup, both sign-out buttons, Owner and Moderator boundaries, collection settings, pairing, display startup and resync behavior. No implementation edits, Git, installs, dependencies, providers, credentials or real data were used. Root owns live checks.
+Read-only audit of the current release worktree at `$HOME/Projects/mothers-love-worktrees/ready-admin` after reading the absolute plan, run index, contract, project instructions and relevant source handoff. Reviewed email/password login, invitation and recovery setup, both sign-out buttons, Owner and Moderator boundaries, collection settings, pairing, display startup and resync behavior. No implementation edits, Git, installs, dependencies, providers, credentials or real data were used. Root owns live checks.
 
 ## Findings
 

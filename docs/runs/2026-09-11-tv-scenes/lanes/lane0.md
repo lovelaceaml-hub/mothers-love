@@ -4,7 +4,7 @@ title: Lane 0, Plan critique
 state: landed
 model: gemini-3.8-flash-high
 runner: coordinator
-worktree: /Users/anthony/.claude/worktrees/mothers-love-tv-critic
+worktree: $HOME/.claude/worktrees/mothers-love-tv-critic
 review: none
 depends_on: none
 updated: 2026-09-11T01:43Z

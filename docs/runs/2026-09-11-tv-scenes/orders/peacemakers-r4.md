@@ -1,7 +1,7 @@
 # Work order - peacemakers correction r4: six recognitions, kindness threads, more life - Mother's Love TV (Plan 13)
 
 Dispatch ID: agy-peacemakers-20260911-r4
-Project root (your worktree): /Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers
+Project root (your worktree): $HOME/.claude/worktrees/mothers-love-tv-peacemakers
 Lane: Antigravity, Gemini 3.8 Flash (High). Effort: high. Agents: none. Renderer id: 8 (data-scene="8"). Round: r4.
 
 Anthony reviewed the scene on his TV and asked: "We Are Peacemakers should also have multiple recognitions there, and it needs to be dynamic and have more effects." Today the scene shows four bubbles from the shared rightBubbles() helper with drift replacement every 17 to 44 s and depth layers, and the globe art sits still.
@@ -33,8 +33,8 @@ Read first, inside your worktree: public/color-polish/scenes/peacemakers.js and 
 - Circularity holds at 300, 6000, 14000 and 20000 ms; reduced motion renders still with no runtime error.
 
 ```allowlist
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts
-/Users/anthony/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.js
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/public/color-polish/scenes/peacemakers.css
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/tests/color-polish-scenes/peacemakers.spec.ts
+$HOME/.claude/worktrees/mothers-love-tv-peacemakers/docs/runs/2026-09-11-tv-scenes/lanes/peacemakers.md
 ```

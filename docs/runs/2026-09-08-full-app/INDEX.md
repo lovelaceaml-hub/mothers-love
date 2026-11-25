@@ -1,5 +1,5 @@
 # Full app run
-Read first: /Users/anthony/Projects/mothers-love/docs/PLAN-01-full-app.md including Build log and /Users/anthony/Projects/mothers-love/docs/CONTRACT.md.
+Read first: $HOME/Projects/mothers-love/docs/PLAN-01-full-app.md including Build log and $HOME/Projects/mothers-love/docs/CONTRACT.md.
 
 | Lane | Owner/model | State | Dependency |
 |---|---|---|---|
