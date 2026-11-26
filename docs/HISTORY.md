@@ -272,7 +272,7 @@ Shared backup remains at 589c098, privately pushed, excluding campaign personal 
 Private source: https://github.com/lovelaceaml-hub/mothers-love, branch codex/mothers-love. The final readiness source/status commit is pushed and remote HEAD verified by root. New manifests and readiness receipts record the source/operation evidence. Read PLAN-01-full-app.md, CONTRACT.md, USER-MANUAL.md and UI-QUALITY-REPORT.md. Original source-handoff and prior release receipts remain history.
 
 Non-sensitive evidence storage: https://drive.google.com/drive/folders/1JBeoaxaZ9ZMTIFMSmlKT5jn9rcdysnmw
-Exact mounted folder: $HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love
+Exact mounted folder: $HOME/Library/CloudStorage/GoogleDrive-ACCOUNT/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love
 The prior release archive and its verified SHA-256 remain in research/release-storage.md. The readiness supplement is privately uploaded and its mounted-copy SHA-256 verified; see research/readiness-storage.md for the exact artifact URL and hash.
 
 ### Physical commissioning
@@ -407,7 +407,7 @@ home is `$HOME/Projects/mothers-love-world/START-HERE.md`; the active plan is
 
 Unchanged and proven on every section: the frozen wording layout on the pearl (0 differing pixels with the glow on and off), no personal pixels outside the depth-tested slot, and `art=classic` and `art=cinematic` byte-identical to Codex's D1 captures. Production, API and database untouched; PR #8 stays draft.
 
-Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-27-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
+Records: [D2-FABLE-PASS.md](runs/2026-09-21-world-quality/D2-FABLE-PASS.md) (section ledger, every preview URL, corrections, evidence), [RADIANCE-DESIGN.md](runs/2026-09-21-world-quality/RADIANCE-DESIGN.md) (the glow architecture and its checkpoint corrections), Drive evidence `$HOME/Library/CloudStorage/GoogleDrive-ACCOUNT/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-22-world-radiance-2ad95b0`. Next: [Plan 25](PLAN-27-world-promotion.md), the promotion to the live TV, drafted and awaiting Anthony's approval. To resume: read Plan 25, then D2-FABLE-PASS.md, then run the harness from `scripts/review-world-design.mjs` against `next start -p 32743` (launch config `mothers-love-world-study` in the root `.claude/launch.json`).
 
 #### September 21: Show designs before Claude implementation
 
