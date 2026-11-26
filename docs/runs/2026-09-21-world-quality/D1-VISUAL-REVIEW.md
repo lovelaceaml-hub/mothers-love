@@ -1,6 +1,6 @@
 # Mother’s Love: visual refinement 02
 
-[Open the refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Previous prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Same-build classic](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=classic) | [Connected tour](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/connected-tour.mp4>)
+[Open the refined prototype](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Previous prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Same-build classic](https://mothers-love-o6rtntg3y-lvzion.vercel.app/display/world-preview?source=sample&art=classic) | Connected tour (`2026-09-21-world-refinement-80586a2/connected-tour.mp4` in Drive)
 
 The current wording layout is preserved, with **Thank you at the top**. Astra refined the sample prototype only. Fable and Opus remain held for Anthony’s visual approval. No build-polished-apps or Stitch workflow was used.
 
@@ -10,23 +10,23 @@ Source: `80586a20b2aaee166bbd48d26ac8bd3f0c5daa29`. All current images, the 69.2
 
 | Previous source 9dc7e45 | Refined source 80586a2 |
 | --- | --- |
-| ![Previous Garden](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/previous-garden.png>) | ![Refined Garden](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-garden.png>) |
+| Previous Garden (`2026-09-21-world-refinement-80586a2/previous-garden.png` in Drive) | Refined Garden (`2026-09-21-world-refinement-80586a2/design-garden.png` in Drive) |
 
-[Open full 3840 by 2160 capture](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/high-4k-garden.png>). The interactive study starts in High definition. Automatic and Low remain available in Settings.
+Open full 3840 by 2160 capture (`2026-09-21-world-refinement-80586a2/high-4k-garden.png` in Drive). The interactive study starts in High definition. Automatic and Low remain available in Settings.
 
 ## Pearl and connected world
 
 The pearl gains fine side engraving, prismatic edge layers, broad edge reflections, small glints and gold/pearl orbital beads. The existing words, font sizes and coordinates are unchanged. Primary recognition textures are 2048 square, secondary textures 1024 square, with an increased circular silhouette resolution. The app still owns full reading, paging, privacy clearing and canonical symbols.
 
-![Refined ribbon arrival and pearl](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/arrival-ribbon.png>)
+Refined ribbon arrival and pearl (`2026-09-21-world-refinement-80586a2/arrival-ribbon.png` in Drive)
 
-![Supplied Atelier pearl detail, appearance reference](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/atelier-pearl-reference.png>)
+Supplied Atelier pearl detail, appearance reference (`2026-09-21-world-refinement-80586a2/atelier-pearl-reference.png` in Drive)
 
-![Sanctuary](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-heart.png>)
+Sanctuary (`2026-09-21-world-refinement-80586a2/design-heart.png` in Drive)
 
-![Expressions](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/design-expressions.png>)
+Expressions (`2026-09-21-world-refinement-80586a2/design-expressions.png` in Drive)
 
-![Phone](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-refinement-80586a2/phone-garden.png>)
+Phone (`2026-09-21-world-refinement-80586a2/phone-garden.png` in Drive)
 
 ## What changed in the world
 

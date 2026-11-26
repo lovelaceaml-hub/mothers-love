@@ -1,6 +1,6 @@
 # Mother’s Love: visual review 01
 
-[Open the interactive prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Same-build classic comparison](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=classic) | [Watch the connected tour](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/connected-tour.mp4>)
+[Open the interactive prototype](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=design) | [Same-build classic comparison](https://mothers-love-4dyumji0r-lvzion.vercel.app/display/world-preview?source=sample&art=classic) | Watch the connected tour (`2026-09-21-world-design-study-9dc7e45/connected-tour.mp4` in Drive)
 
 Fable and Opus implementation remains held until Anthony has reviewed the designs. This is an Astra sample-only study, not the finished art upgrade.
 
@@ -10,28 +10,28 @@ Source: `9dc7e455047f7eebb8ebfcc1affd125f3b591d3c`. The preview, screenshots and
 
 Your supplied direction remains the quality target. These are actual runtime images, and the difference in blossom detail, atmosphere and material richness remains visible.
 
-![Approved environmental direction](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/references/Approved_Direction_Overview.jpg>)
+Approved environmental direction (`2026-09-21-world-design-study-9dc7e45/references/Approved_Direction_Overview.jpg` in Drive)
 
 | Study | Supplied visual target | Actual runtime frame |
 | --- | --- | --- |
-| Recognition pearl | ![Target](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/references/01_Recognition_Pearl_Target.jpeg>) | ![Runtime](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-garden.png>) |
-| Arrival Bloom | ![Target](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/references/02_Arrival_Bloom_Target.jpeg>) | ![Runtime](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/arrival-bloom.png>) |
-| Ribbon Portal | ![Target](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/references/03_Ribbon_Portal_Target.jpeg>) | ![Runtime](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/arrival-ribbon.png>) |
-| Constellation Gather | ![Target](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/references/04_Constellation_Gather_Target.jpeg>) | ![Runtime](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/arrival-constellation.png>) |
+| Recognition pearl | Target (`2026-09-21-world-design-study-9dc7e45/references/01_Recognition_Pearl_Target.jpeg` in Drive) | Runtime (`2026-09-21-world-design-study-9dc7e45/design-garden.png` in Drive) |
+| Arrival Bloom | Target (`2026-09-21-world-design-study-9dc7e45/references/02_Arrival_Bloom_Target.jpeg` in Drive) | Runtime (`2026-09-21-world-design-study-9dc7e45/arrival-bloom.png` in Drive) |
+| Ribbon Portal | Target (`2026-09-21-world-design-study-9dc7e45/references/03_Ribbon_Portal_Target.jpeg` in Drive) | Runtime (`2026-09-21-world-design-study-9dc7e45/arrival-ribbon.png` in Drive) |
+| Constellation Gather | Target (`2026-09-21-world-design-study-9dc7e45/references/04_Constellation_Gather_Target.jpeg` in Drive) | Runtime (`2026-09-21-world-design-study-9dc7e45/arrival-constellation.png` in Drive) |
 
 ## Connected world
 
-![Garden](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-garden.png>)
+Garden (`2026-09-21-world-design-study-9dc7e45/design-garden.png` in Drive)
 
-![Sanctuary and original sculpted heart](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-heart.png>)
+Sanctuary and original sculpted heart (`2026-09-21-world-design-study-9dc7e45/design-heart.png` in Drive)
 
-![Expressions](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-expressions.png>)
+Expressions (`2026-09-21-world-design-study-9dc7e45/design-expressions.png` in Drive)
 
 ## Phone studies
 
-![Phone recognition](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/phone-garden.png>)
+Phone recognition (`2026-09-21-world-design-study-9dc7e45/phone-garden.png` in Drive)
 
-![Phone Bloom](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/phone-bloom.png>)
+Phone Bloom (`2026-09-21-world-design-study-9dc7e45/phone-bloom.png` in Drive)
 
 ## Verification and limitations
 
@@ -47,18 +47,18 @@ Your supplied direction remains the quality target. These are actual runtime ima
 
 | Destination | Actual sample capture | Stage |
 | --- | --- | --- |
-| Garden | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-garden.png>) | First connected study |
-| Sanctuary | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-heart.png>) | First connected study |
-| Expressions | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-expressions.png>) | First connected study |
-| Butterfly Gate | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-welcome.png>) | Early sketch |
-| Pearl Pavilion | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-featured.png>) | Early sketch |
-| Garden of Days | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-calendar.png>) | Early sketch |
-| Peace Globe | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-peacemakers.png>) | Early sketch |
-| Love Observatory | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-status.png>) | Early sketch |
-| Expression Cosmos | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-orbit.png>) | Early sketch |
-| Fountain of Kindness | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-milestone.png>) | Early sketch |
-| River of Recognitions | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-live-feed.png>) | Early sketch |
-| Daily Practice Terrace | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-practice.png>) | Early sketch |
-| Peace Promise | [Open frame](<$HOME/Library/CloudStorage/GoogleDrive-lovelace.aml@gmail.com/My Drive/Anthony Mac Storage/Project Outputs/The Words of Mother's Love/2026-09-21-world-design-study-9dc7e45/design-promise.png>) | Early sketch |
+| Garden | Open frame (`2026-09-21-world-design-study-9dc7e45/design-garden.png` in Drive) | First connected study |
+| Sanctuary | Open frame (`2026-09-21-world-design-study-9dc7e45/design-heart.png` in Drive) | First connected study |
+| Expressions | Open frame (`2026-09-21-world-design-study-9dc7e45/design-expressions.png` in Drive) | First connected study |
+| Butterfly Gate | Open frame (`2026-09-21-world-design-study-9dc7e45/design-welcome.png` in Drive) | Early sketch |
+| Pearl Pavilion | Open frame (`2026-09-21-world-design-study-9dc7e45/design-featured.png` in Drive) | Early sketch |
+| Garden of Days | Open frame (`2026-09-21-world-design-study-9dc7e45/design-calendar.png` in Drive) | Early sketch |
+| Peace Globe | Open frame (`2026-09-21-world-design-study-9dc7e45/design-peacemakers.png` in Drive) | Early sketch |
+| Love Observatory | Open frame (`2026-09-21-world-design-study-9dc7e45/design-status.png` in Drive) | Early sketch |
+| Expression Cosmos | Open frame (`2026-09-21-world-design-study-9dc7e45/design-orbit.png` in Drive) | Early sketch |
+| Fountain of Kindness | Open frame (`2026-09-21-world-design-study-9dc7e45/design-milestone.png` in Drive) | Early sketch |
+| River of Recognitions | Open frame (`2026-09-21-world-design-study-9dc7e45/design-live-feed.png` in Drive) | Early sketch |
+| Daily Practice Terrace | Open frame (`2026-09-21-world-design-study-9dc7e45/design-practice.png` in Drive) | Early sketch |
+| Peace Promise | Open frame (`2026-09-21-world-design-study-9dc7e45/design-promise.png` in Drive) | Early sketch |
 
 The next action is visual feedback. Keep PR #8 draft and do not start Claude implementation or promote production automatically.
